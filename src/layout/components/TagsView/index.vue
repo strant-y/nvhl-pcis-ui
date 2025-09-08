@@ -1,6 +1,6 @@
 <template>
   <div class="tags-container">
-    <!-- <el-scrollbar
+    <el-scrollbar
       class="scroll-container"
       :vertical="false"
       @wheel.prevent="handleScroll"
@@ -23,10 +23,10 @@
           @click.prevent.stop="closeSelectedTag(tag)"
         />
       </router-link>
-    </el-scrollbar> -->
+    </el-scrollbar>
 
     <!-- tag标签操作菜单 -->
-    <!-- <ul
+    <ul
       v-show="contentMenuVisible"
       class="contextmenu"
       :style="{ left: left + 'px', top: top + 'px' }"
@@ -55,18 +55,7 @@
         <svg-icon icon-class="close_all" />
         关闭所有
       </li>
-    </ul> -->
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item
-        v-for="tag in visitedViewsNew"
-        :key="tag.fullPath"
-        :to="{}"
-        @click.prevent="toView(tag)"
-      >
-        {{ translateRouteTitle(tag.title) }}
-      </el-breadcrumb-item>
-    </el-breadcrumb>
-    <div class="current-title">{{ currentTitle }}</div>
+    </ul>
   </div>
 </template>
 

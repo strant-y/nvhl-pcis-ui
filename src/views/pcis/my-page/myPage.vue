@@ -192,15 +192,14 @@
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
-        <slot></slot>
         <div class="main-header">
           <div class="tp" style="background: #ebedfc">
-            <span class="font-weight-500">条款：</span
+            <span>条款：</span
             ><span class="publicStyle"
               >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
                 props.param.cTermNme
               }}</span
-            >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
+            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
             <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
               : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
@@ -208,35 +207,33 @@
               : productStore.cCiMrk == '3' ? '外部共保我方主共_无联保'
               : productStore.cCiMrk == '4' ? '外部共保我方从共_无联保'
               : productStore.cCiMrk == '5' ? '司内联保_主联'
-              : '联保单' }}</span> |
+              : '联保单' }}</span>&nbsp;&nbsp;|&nbsp;&nbsp;
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
             }}</span
-            >&nbsp;|&nbsp;<span class="font-weight-500">是否互联网出单:</span
-            >&nbsp;<span class="publicStyle">{{
+            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>是否互联网出单:</span
+            >&nbsp;&nbsp;<span class="publicStyle">{{
               props.param.cIsNet == "0" ? "是" : "否"
             }}</span>
           </div>
           <div class="btm" style="background: #ebedfc">
-            <span class="font-weight-500">保险期限：</span
+            <span>保险期限：</span
             ><span class="publicStyle">{{ tmDay }}</span
-            >&nbsp;<span class="font-weight-500">天</span
-            >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
+            >&nbsp;&nbsp;<span>天</span
+            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>保额：</span
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
-              class="font-weight-500"
-              >保费: </span
+            >&nbsp;&nbsp;<span>元</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span>保费: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>&nbsp;
+            >&nbsp;&nbsp;<span>元</span>&nbsp;&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
+							|&nbsp;&nbsp;<span>协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
-							>&nbsp;<span class="font-weight-500">元</span>
+							>&nbsp;&nbsp;<span>元</span>
 						</template>
             <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-              |&nbsp;<span class="font-weight-500">协议剩余保额: </span
+              |&nbsp;&nbsp;<span>协议剩余保额: </span
             ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>
+            >&nbsp;&nbsp;<span>元</span>
             </template>
           </div>
         </div>
@@ -349,7 +346,17 @@
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
       </el-main>
-      <div class="right-sidebar-trigger">
+      <div class="right-btns">
+        <div class="btns-content" v-if="rightBtnList.length > 0">
+          <rt-button
+            v-for="(bth, idx) in rightBtnList"
+            :item="bth"
+            :key="idx"
+            :loading="bth.loading"
+          />
+        </div>
+      </div>
+      <!-- <div class="right-sidebar-trigger">
         <el-popover
             placement="left"
             trigger="click"
@@ -384,7 +391,7 @@
             </el-button>
           </div>
         </el-popover>
-      </div>
+      </div> -->
     </el-container>
     <div class="bottom-items">
       <!--新增的申请单号显示和复制按钮-->
@@ -555,7 +562,7 @@ const handleAnchorClick = (event, selector) => {
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
       mainContent.scrollTo({
-        top: target.offsetTop - 160, // 减去一些偏移量
+        top: target.offsetTop - 75, // 减去一些偏移量
         behavior: 'smooth'
       });
     }
@@ -1039,8 +1046,9 @@ const basicRightBtn = [
     label: "保存模板",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "template2",
-    iconSize: "20",
+    // svgIcon: "template2",
+    // iconSize: "20",
+    icon: "Memo",
     func: () => {
       handleSaveTemplate()
     },
@@ -1049,8 +1057,9 @@ const basicRightBtn = [
     label: "复制出单",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "copy2",
-    iconSize: "25", // 设置图标大小为25px
+    // svgIcon: "copy2",
+    // iconSize: "25", // 设置图标大小为25px
+    icon: "CopyDocument",
     func: () => {
       copyPolicyFun();
     },
@@ -1059,8 +1068,9 @@ const basicRightBtn = [
     label: "额度明细",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "limit",
-    iconSize: "25",
+    // svgIcon: "limit",
+    // iconSize: "25",
+    icon: "Tickets",
     func: () => {
       openLimit();
     },
@@ -1512,8 +1522,9 @@ async function loadAfter() {
         label: "费用信息",
         type: "primary",
         id: "modFee",
-        svgIcon: "fee1", // 使用本地图标库
-        iconSize: "22", // 设置图标大小
+        // svgIcon: "fee1", // 使用本地图标库
+        // iconSize: "22", // 设置图标大小
+        icon: "Money",
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
           const params = {};
@@ -1568,8 +1579,9 @@ async function loadAfter() {
         label: "任务痕迹",
         type: "primary",
         id: "taskVestige",
-        svgIcon: "track", // 使用本地图标库
-        iconSize: "20", // 设置图标大小
+        // svgIcon: "track", // 使用本地图标库
+        // iconSize: "20", // 设置图标大小
+        icon: "SetUp",
         func: () => {
           dzmodal
             .open(TaskListVestige, {
@@ -1586,8 +1598,9 @@ async function loadAfter() {
         label: "核保信息",
         type: "primary",
         id: "undrInfo",
-        svgIcon: "Agree", // 使用本地图标库
-        iconSize: "25", // 设置图标大小
+        // svgIcon: "Agree", // 使用本地图标库
+        // iconSize: "25", // 设置图标大小
+        icon: "DocumentChecked",
         func: () => {
           dzmodal
             .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
@@ -1855,8 +1868,6 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "limit",
-        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -1980,8 +1991,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "template2",
-        iconSize: "20",
+        // svgIcon: "template2",
+        // iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -1990,8 +2001,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "copy2",
-        iconSize: "25", // 设置图标大小为25px
+        // svgIcon: "copy2",
+        // iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -2000,8 +2011,9 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "limit",
-        iconSize: "25",
+        // svgIcon: "limit",
+        // iconSize: "25",
+        icon: "Tickets",
         func: () => {
           openLimit();
         },
@@ -2131,8 +2143,9 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "template2",
-        iconSize: "20",
+        // svgIcon: "template2",
+        // iconSize: "20",
+        icon: "Memo",
         func: () => {
           handleSaveTemplate()
         },
@@ -2141,8 +2154,9 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "copy2",
-        iconSize: "25", // 设置图标大小为25px
+        // svgIcon: "copy2",
+        // iconSize: "25", // 设置图标大小为25px
+        icon: "CopyDocument",
         func: () => {
           copyPolicyFun();
         },
@@ -2151,8 +2165,9 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "limit",
-        iconSize: "25",
+        // svgIcon: "limit",
+        // iconSize: "25",
+        icon: "Tickets",
         func: () => {
           openLimit();
         },
@@ -2322,8 +2337,9 @@ async function loadAfter() {
       label: "历史赔案",
       type: "primary",
       buttonColor: bottomBtnColor1,
-      svgIcon: "histogram", // 使用本地图标库
-      iconSize: "25", // 设置图标大小
+      // svgIcon: "histogram", // 使用本地图标库
+      // iconSize: "25", // 设置图标大小
+      icon: "Histogram",
       func: () => {
         historyClaimcaseFun();
         // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -5433,7 +5449,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   padding: 0px;
 }
 .publicStyle {
-  color: red;
+  color: #FF4D4F;
 }
 .mypage-app {
   display: flex;
@@ -5548,9 +5564,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   position: relative;
   transition: width 0.3s ease;
 }
-.font-weight-500 {
-  font-weight: 500;
-}
 .main-container {
   display: flex;
   flex-direction: column;
@@ -5560,6 +5573,9 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     justify-content: center;
     align-items: center;
     margin-top: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.85);
   }
   .main-content {
     flex: 1;
@@ -5569,9 +5585,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   }
 }
 :deep(.el-card__header) {
-  padding: 10px 20px!important;
   .el-row {
     align-items: center;
+    color: rgba(0,0,0,0.85);
+    font-size: 16px;
     &:first-child {
       font-size: 16px;
       font-weight: 500;
@@ -5586,70 +5603,146 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   padding: 10px 20px;
 }
 
-.right-sidebar-trigger {
-  position: fixed;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
-}
-.btns-content {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  .flex-center {
+// .right-sidebar-trigger {
+//   position: fixed;
+//   right: 0;
+//   top: 50%;
+//   transform: translateY(-50%);
+//   z-index: 1000;
+// }
+// .btns-content {
+//   display: flex;
+//   align-items: center;
+//   flex-direction: column;
+//   gap: 8px;
+//   padding: 12px;
+//   .flex-center {
+//     display: flex;
+//     align-items: center;
+//   }
+// }
+
+// .menu-trigger {
+//   background-color: #fff;
+//   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+//   transition: all 0.3s;
+// }
+
+// .menu-trigger:hover {
+//   transform: scale(1.1);
+// }
+
+// .action-menu-popper {
+//   margin-right: 10px !important;
+//   border-radius: 8px;
+//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+// }
+
+// .action-menu-popper .el-button {
+//   justify-content: flex-start;
+//   padding: 10px 12px;
+//   border-radius: 6px;
+//   transition: all 0.3s;
+//   border: none;
+// }
+
+// .action-menu-popper .el-button:hover {
+//   background-color: #f5f7fa;
+//   transform: translateX(4px);
+// }
+
+// .action-menu-popper .el-button.text {
+//   color: #606266;
+// }
+
+// .action-menu-popper .el-button.text:hover {
+//   color: #409eff;
+// }
+
+// .action-menu-popper .el-button .svg-icon,
+// .action-menu-popper .el-button .el-icon {
+//   transition: all 0.3s;
+// }
+
+// .action-menu-popper .el-button:hover .svg-icon,
+// .action-menu-popper .el-button:hover .el-icon {
+//   transform: scale(1.1);
+// }
+
+.right-btns {
+  // padding: 0 3rem;
+  margin: 72px 20px 0 0;
+  // min-width: calc(150px + 6rem);
+  .btns-content {
+    background: #FFFFFF;
+    padding: 10px;
+    border-radius: 5px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: start;
+    // width: 150px;
+    :deep(.el-button) {
+      margin: 0 0 12px 0;
+      border: none;
+      background-color: transparent!important;
+      color: #333;
+      padding: 0;
+      .el-icon {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        border-radius: 2px;
+        margin-right: 10px!important;
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &:nth-child(5n + 1) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-1;
+          svg {
+            color: $btn-icon-color-1;
+          }
+        }
+      }
+      &:nth-child(5n + 2) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-2;
+          svg {
+            color: $btn-icon-color-2;
+          }
+        }
+      }
+      &:nth-child(5n + 3) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-3;
+          svg {
+            color: $btn-icon-color-3;
+          }
+        }
+      }
+      &:nth-child(5n + 4) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-4;
+          svg {
+            color: $btn-icon-color-4;
+          }
+        }
+      }
+      &:nth-child(5n + 5) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-5;
+          svg {
+            color: $btn-icon-color-5;
+          }
+        }
+      }
+    }
   }
-}
-
-.menu-trigger {
-  background-color: #fff;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
-}
-
-.menu-trigger:hover {
-  transform: scale(1.1);
-}
-
-.action-menu-popper {
-  margin-right: 10px !important;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.action-menu-popper .el-button {
-  justify-content: flex-start;
-  padding: 10px 12px;
-  border-radius: 6px;
-  transition: all 0.3s;
-  border: none;
-}
-
-.action-menu-popper .el-button:hover {
-  background-color: #f5f7fa;
-  transform: translateX(4px);
-}
-
-.action-menu-popper .el-button.text {
-  color: #606266;
-}
-
-.action-menu-popper .el-button.text:hover {
-  color: #409eff;
-}
-
-.action-menu-popper .el-button .svg-icon,
-.action-menu-popper .el-button .el-icon {
-  transition: all 0.3s;
-}
-
-.action-menu-popper .el-button:hover .svg-icon,
-.action-menu-popper .el-button:hover .el-icon {
-  transform: scale(1.1);
 }
 </style>
 <style>

@@ -108,16 +108,12 @@ $menu-active-text: var(--menu-active-text); // 菜单激活文字颜色
 $menu-hover: var(--menu-hover); // 菜单悬停背景色
 $sidebar-logo-background: var(--sidebar-logo-background); // 侧边栏 Logo 背景色
 
-.el-menu-item:hover {
+.el-menu-item:hover,.el-menu-item.is-active {
   background-color: var(--menu-hover) !important;
   color: #FFFFFF!important;
 }
 .el-sub-menu__title:hover {
   background-color: var(--menu-hover);
-  color: #FFFFFF;
-}
-.el-menu-item.is-active {
-  background-color: var(--menu-hover) !important;
   color: #FFFFFF;
 }
 

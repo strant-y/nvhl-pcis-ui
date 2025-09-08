@@ -8,7 +8,7 @@
           <rtinput v-model="searchValue" :item="searchItem" />
           <rtButton :item="searchBtnItem" />
         </div>
-        <div class="top-menu">
+        <!-- <div class="top-menu">
           <div class="menu-label">
             <i class="flex-center fast-edit">
               <el-button
@@ -34,7 +34,7 @@
               {{tag.name.replace('事故预防','')}}
             </el-tag>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="bottom-box">
         <div class="title-box">
@@ -198,14 +198,14 @@
             </div>
           </div>
         </div>
-        <div class="center-content2">
+        <!-- <div class="center-content2">
           <div class="user-box">
             <img :src="headIcon" alt="">
             <div class="user-info">
               <div class="user-name">{{ user.opCnm }}</div>
                <el-tag v-if="cOpgrpCnm">{{ cOpgrpCnm }}</el-tag>
             </div>
-          </div>
+          </div> -->
           <!-- 暂时隐藏消息通知 -->
           <!-- <div class="content-list-box">
             <div class="list-title">
@@ -237,7 +237,7 @@
               </template>
             </div>
           </div> -->
-          <div>
+          <!-- <div>
               <div class="code-box">
                 <div class="code-inner-box">
                     <span class="title">移动端二维码：</span>
@@ -250,7 +250,7 @@
                     </div>
                 </div>
               </div>
-          </div>
+          </div> -->
           <!-- <div class="content-list-box">
             <div class="list-title">
               <div class="title-line">
@@ -269,7 +269,7 @@
               </div>
             </div>
           </div> -->
-        </div>
+        <!-- </div> -->
       </div>
     </div>
   </div>
@@ -348,7 +348,7 @@ const searchItem = {
   prefixIcon: "Search"
 }
 const searchBtnItem = {
-  label: "查询",
+  label: "搜  索",
   type: "primary",
   func: () => {
     handleSearch(searchValue.value);
@@ -383,7 +383,7 @@ const moreBtnItem = ref({
     toQuery(moreurl.value)
   }
 })
-const labelIcon = "/src/assets/img/9.svg";
+const labelIcon = "/src/assets/img/slash.png";
 const platformUrl = "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
 const ecahrtsRef = ref(null)
 let ecahrtsRefInstance: ECharts | null = null
@@ -1889,7 +1889,7 @@ window.addEventListener("resize", () => {
     width: 100%;
     height: 100%;
     background-color: #fff;
-    background-image: url("@/assets/img/home_bg.png");
+    background-image: url("@/assets/img/home_bg1.png");
     background-size: 100% 24.06667rem;
     background-position: top;
     background-repeat: no-repeat;
@@ -1901,17 +1901,19 @@ window.addEventListener("resize", () => {
       margin-bottom: 0.5rem;
 
       .top-title1 {
-        width: 100%;
-        font-size: 2rem;
         font-weight: 600;
-        color: #333;
-        margin-bottom: 0.6rem;
+        margin-bottom: 6px;
+        font-size: 34px;
+        color: #333333;
+        line-height: 48px;
       }
 
       .top-title2 {
-        font-size: 0.8rem;
-        color: #333;
+        font-weight: 600;
         margin-bottom: 1.5rem;
+        font-size: 16px;
+        color: #333333;
+        line-height: 22px;
       }
 
       .top-search {
@@ -1961,9 +1963,10 @@ window.addEventListener("resize", () => {
       justify-content: space-between;
 
       .center-content1 {
-        width: 75%;
+        width: 100%;
         background: #fff;
-        box-shadow: 0 0 0.4rem #0000001a;
+        // box-shadow: 0 0 0.4rem #0000001a;
+        box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.1);
         border-radius: 5px;
         padding: 1rem 1.5rem;
         display: flex;
@@ -2121,7 +2124,8 @@ window.addEventListener("resize", () => {
     .bottom-box {
       width: 100%;
       background: #fff;
-      box-shadow: 0 0 0.4rem #0000001a;
+      // box-shadow: 0 0 0.4rem #0000001a;
+      box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.1);
       border-radius: 5px;
       padding: 2rem;
       display: flex;

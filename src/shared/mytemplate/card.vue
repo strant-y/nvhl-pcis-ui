@@ -180,9 +180,10 @@ defineExpose({
 </script>
 
 <style scoped>
-.searchbar ::v-deep .el-card__header {
-  background-color: #e5f3fa ;
-  padding: 15px 20px ; 
+:deep(.searchbar .el-card__header) {
+  height: 32px;
+  padding: 4px 0 4px 12px;
+  background: #ffffff;
 }
 
 .searchbar {

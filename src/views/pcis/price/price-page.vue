@@ -5168,7 +5168,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   }
 }
 :deep(.el-card__header) {
-  padding: 10px 20px!important;
+  // padding: 10px 20px!important;
   .el-row {
     align-items: center;
     &:first-child {

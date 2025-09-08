@@ -726,14 +726,17 @@ defineExpose({
 
 <style lang="css" scoped>
 .rt_group {
-  background: #f2f2f2;
   margin-bottom: 10px;
+  background: #FAFAFA;
+  border: 1px solid #D9D9D9;
+  padding: 3px 12px;
 }
-/* .rt_group_title {
-  font-weight: bold;
-  font-size: 16px;
-  padding: 12px;
-} */
+.rt_group_title {
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(0,0,0,0.85);
+  line-height: 24px;
+}
 .rt_group_icon {
   float: right;
   margin-right: 10px;

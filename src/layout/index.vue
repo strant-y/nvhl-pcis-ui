@@ -35,10 +35,9 @@
     <div v-else :class="{ hasTagsView: showTagsView }" class="main-container">
       <div :class="{ 'fixed-header': fixedHeader }">
         <NavBar v-if="layout === 'left'" />
-      </div>
-      <AppMain>
         <TagsView v-if="showTagsView && scrollYShowTagsView" />
-      </AppMain>
+      </div>
+      <AppMain />
       <Settings v-if="defaultSettings.showSettings" />
     </div>
     <div>

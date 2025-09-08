@@ -303,15 +303,16 @@ defineExpose({
   box-shadow: 0 0 2px rgb(0 0 0 / 30%);
 }
 .table-container ::v-deep .el-card__header {
-  background-color: #d0f3fc4d !important;
+  // background-color: #d0f3fc4d !important;
 }
 .table-container {
   margin-top: 0px;
   margin-bottom: 0px;
 }
 .table_header :deep(.el-card__header) {
-  background-color: #e5f3fa;
-  padding: 5px 20px;
+  height: 32px;
+  padding: 4px 0 4px 12px;
+  background: #ffffff;
 }
 
 .table_header_has-title-btns :deep(.el-card__header) {
