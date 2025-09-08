@@ -704,17 +704,26 @@ const method = {
         const termref = opertaor.getTableRefByKey("cvrg");
         const terms = termref.getFromValue();
         console.log('terms', terms);
+ 
 
         for (let i = 0; i < terms.length; i++) {
             const term = terms[i];
+            console.log(term)
             if ( term['Term.cRdrTyp'] == '1' && term['Term.cClauseCategory']  == '1') { // 判断是附加条款
                termref?.setTermData({
                  termNo: term['Term.cUniqueTermNo'],
                  planNo: term['Term.cPlanNo'],
-                 factorProp: 'Term.nSeatTotal',
+                 factorProp: 'Term.nInsuredcompanySeats',
               }, val);
             }
         }
+
+
+          // termref?.setTermData({
+          //   termNo:"00425000085",
+          //   planNo:'P1',
+          //   factorProp: 'Term.nSeatTotal',
+          // },123);   
     }
   },
 

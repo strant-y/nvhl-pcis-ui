@@ -4379,6 +4379,10 @@ const validateDistConsistency = async () => {
       const distMap = formconfig1[0].pageInfo.filter(
         (item: any) => item.pageKey === 'dist'
       );
+      const tgtMap = formconfig1[0].pageInfo.filter(
+        (item: any) => item.pageKey === 'tgt'
+      );
+
       if (!distMap.length) {
         return true;
       }
@@ -4387,8 +4391,8 @@ const validateDistConsistency = async () => {
         cProdNo: props.param?.cProdNo,     // 产品号
         cComponentTable: [
             ...distMap.map((item: any) => item.pageCode),
-            'tgt'
-        ]
+            ...tgtMap.map((item: any) => item.pageCode)
+        ],
       };
 
       if (props.param?.pageName === 'priceInquiry') {

@@ -78,6 +78,12 @@ onMounted(() => {
       }, 1000)
 });
 
+// 获取开户行省
+const loadSelDataCounty = ()=>{
+
+}
+
+
 // 可以操作的配置项处理  身份认真里面的几项
 const canOperateForm = () => {
   setFormItem("Acctinfo.cAcctNo", {
