@@ -1250,12 +1250,6 @@ const initPage = async () => {
       codeparam.push(codeinit[res]);
     }
   });
-  console.log(formconfig11);
-  formconfig11[0].pageInfo.forEach(res => { 
-    if(res.pageKey === 'cvrg'){
-      res.pageCode = 'webPlyTermCommon';
-    }
-  });
   await getInitParam(codeparam);
   // if(productStore.$state.cCiMrk == "0"){
   //   formconfig11[0].pageInfo = formconfig11[0].pageInfo.filter(
