@@ -378,6 +378,15 @@ function reset (){
 			},
 		],
 	});
+  freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
+        value: JSON.parse(sessionStorage.getItem("user")).companyId,
+      },
+    ],
+  });
 	handleQuery(true)
 }
 

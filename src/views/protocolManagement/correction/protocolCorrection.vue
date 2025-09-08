@@ -110,6 +110,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ]
             });
             handleQuery(true);
+            freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
+            setFormItem("cDptCde", {
+              loadData: [
+                {
+                  label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
+                  value: JSON.parse(sessionStorage.getItem("user")).companyId,
+                },
+              ],
+            });
             // freeEditRef.value?.resetForm();
           },
         }),
@@ -502,6 +511,15 @@ onMounted(() => {
 			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
 		]
 	});
+  freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
+  setFormItem("cDptCde", {
+    loadData: [
+      {
+        label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
+        value: JSON.parse(sessionStorage.getItem("user")).companyId,
+      },
+    ],
+  });
 });
 
 function toDtl(row: any, type: string,cEdrType = '') {
