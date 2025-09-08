@@ -89,6 +89,7 @@ const cardMainconfig = ref(
   creatCardConfig({
     title: "主条款信息",
     showInTitle: true,
+    id: "addPlan_btn",
     titleClass: "mainTitle",
     titleBtns: [
       createFreeButtonBase({
@@ -108,6 +109,7 @@ const cardComconfig = ref(
   creatCardConfig({
     title: "公共信息",
     showInTitle: true,
+    id: "addPlan_btn",
     titleClass: "mainTitle",
     titleBtns: [
       createFreeButtonBase({
@@ -707,6 +709,22 @@ function setDisabledAll() {
       item.hidden = true;
     });
   }
+  if (
+    cardMainconfig.value.titleBtns &&
+    cardMainconfig.value.titleBtns.length > 0
+  ) {
+    cardMainconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
+  if (
+    cardComconfig.value.titleBtns &&
+    cardComconfig.value.titleBtns.length > 0
+  ) {
+    cardComconfig.value.titleBtns.forEach((item: any) => {
+      item.hidden = true;
+    });
+  }
   if (Object.keys(tremTemplateRefs.value).length > 0) {
     Object.keys(tremTemplateRefs.value).forEach((item: any) => {
       tremTemplateRefs.value[item].setDisabledAll();
@@ -721,6 +739,16 @@ function setUnDisabledByKeyList(key: any) {
   });
   cardconfig.value.titleBtns?.forEach((item: any) => {
     if (item.id === key) {
+      item.hidden = false;
+    }
+  });
+  cardMainconfig.value.titleBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
+      item.hidden = false;
+    }
+  });
+  cardComconfig.value.titleBtns?.forEach((item: any) => {
+    if ("Btn_" + item.id === key) {
       item.hidden = false;
     }
   });
