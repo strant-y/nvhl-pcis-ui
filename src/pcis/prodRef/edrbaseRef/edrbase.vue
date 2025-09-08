@@ -297,6 +297,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "批改公式",
+        readonly: true,
         rows: 2,
         itemWidth: 2,
       },
