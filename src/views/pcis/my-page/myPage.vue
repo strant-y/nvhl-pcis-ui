@@ -2685,8 +2685,9 @@ function baseValite(){
  * 投保保费计算
  */
 const calcPremium = () => {
-  if(props.param.cRsnCde !== '99'){
     const btn = getBtn("btn010101");
+  if(props.param.cRsnCde !== '99'){
+    // const btn = getBtn("btn010101");
     btn.loading = true;
   }else{
 
@@ -2729,6 +2730,7 @@ const calcPremium = () => {
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
+       const btn = getBtn("btn010101");
        btn.loading = false;
     }
     console.log("appCalc-res", res);
@@ -4163,14 +4165,15 @@ const saveEdrPlyInfo = async () => {
       }
       res.EdrBase.push(edrBaseDatas._value);
     }else{
+
       res["EdrBase"] = edrbase.value?.getFromValue();
       if (
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-        Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
+        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != "" &&
+        Array.isArray(res["EdrBase"]?.["EdrBase.cEdrRsnDetail"])
       ) {
         res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+          res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
       }
     }
     
@@ -4181,7 +4184,7 @@ const saveEdrPlyInfo = async () => {
     //     }
     //   })
     // }
-    const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
+    const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
     const edrInfo: any = await saveEdrAppPlyInfo(res)
     btn.loading = false;
     if(edrInfo["code"] == "200") {
