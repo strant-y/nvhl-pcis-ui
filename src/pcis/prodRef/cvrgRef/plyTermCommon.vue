@@ -30,7 +30,7 @@
         </myCard>
       </template>
       <myCard :cardConfig="cardComconfig">
-        <termcommon
+        <termCommon
           v-model="planDataCommon"
           :disabled-flag="disAbledFlag"
           :faters="faters"
@@ -45,6 +45,7 @@
 <script setup lang="ts">
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { mutualExclusionClause } from "./mutualExclusionClause.ts";
+import termCommon from "./termCommon.vue";
 
 const tremTemplate = defineAsyncComponent({
   loader: () => import("./trem-template.vue"),
@@ -52,12 +53,7 @@ const tremTemplate = defineAsyncComponent({
   timeout: 3000
 });
 import { v4 as uuidv4 } from "uuid";
-const termcommon = defineAsyncComponent({
-  loader:() => import("./termCommon.vue"),
-  delay: 200, // 延迟显示 loading 组件
-  timeout: 3000 // 超时时间
-  }
-  );
+
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
