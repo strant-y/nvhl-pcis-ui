@@ -217,6 +217,16 @@ const tableconfig = reactive<AppTableConfig>(
         title: "英文名称",
         inputtype: "rtinput",
       },
+      {
+        prop: "cIsCommon",
+        title: "公共信息",
+        inputtype: "rtswitch",
+        width:25,
+        keymap:{
+          y:'1',
+          n:'0'
+        }
+      },
     ],
   })
 );
