@@ -485,6 +485,7 @@ import { distRequiredMap } from './requiredDistMap';
 import { ElTable, ElTableColumn } from 'element-plus';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
+import { fa } from 'element-plus/es/locale';
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -1500,10 +1501,12 @@ async function loadAfter() {
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
-      const getFormconfig = edrbase.value?.getFormconfig();
-      getFormconfig.fromSchema?.forEach((item) => {
-        item.disabled = true;
-      });
+      if(props.param.cRsnCde !='99'){
+        const getFormconfig = edrbase.value?.getFormconfig();
+        getFormconfig.fromSchema?.forEach((item) => {
+          item.disabled = true;
+        });
+      }
     }
     bthList.value = uwBtn;
     rightBtnList.value = [
@@ -2730,6 +2733,7 @@ const calcPremium = () => {
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
+       const btn = getBtn("btn010101");
        btn.loading = false;
     }
     console.log("appCalc-res", res);
@@ -4059,11 +4063,33 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  const btn = getBtn("saveEdr");
-  if (btn) {
-    btn.loading = true;
-  }
+  //历史数据补全功能特殊处理
   if(props.param.cTransMrk === '1'){
+    // 获取保存按钮的通用方法
+    const getSaveButton = () => {
+      let btn = getBtn("saveEdr");
+      // 如果通过ID找不到，尝试通过标签查找
+      if (!btn) {
+        btn = bthList.value.find(item => item.label === "保存" || item.id === "saveEdr");
+      }
+      return btn;
+    };
+    
+    // 释放按钮加载状态的通用方法
+    const releaseButtonLoading = () => {
+      try {
+        const btn = getSaveButton();
+        if (btn && btn.loading !== undefined) {
+          btn.loading = false;
+        }
+      } catch (e) {
+        console.warn("释放按钮加载状态时出错:", e);
+      }
+    };
+    const btn = getSaveButton();
+    if (btn) {
+      btn.loading = true;
+    }
     const res = opertaor.getDataAll();
     const resParam = Object.assign(res,{'cTransMrk':'1'})
     // const edrInfo: any = await saveEdrAppPlyInfo(resParam)
@@ -4095,9 +4121,10 @@ const saveEdrPlyInfo = async () => {
       const ops = opertaor.convertData(edrInfo);
       console.log("转换的数据", ops);
       ElMessage.success(edrInfo.msg);
-      if (btn) {
-        btn.loading = false;
-      }
+      btn.loading = false
+      // if (btn === undefined) {
+      //   btn.loading = false;
+      // }
       // if(ops['ci'] && ops['ci'].length>0){
       //   ops['ci'].forEach((item:any)=>{
       //     if(item['Ci.nCiShare']){
@@ -4150,7 +4177,6 @@ const saveEdrPlyInfo = async () => {
       ElMessage.error(edrInfo.msg);
     }
   }else{
-    debugger
     const btn = getBtn("saveEdr");
     btn.loading = true;
     const res = opertaor.getDataAll();
@@ -4162,7 +4188,7 @@ const saveEdrPlyInfo = async () => {
       if (!res.EdrBase) {
         res.EdrBase = [];
       }
-      res.EdrBase.push(edrBaseDatas._value);
+      // res.EdrBase.push(edrBaseDatas._value);
     }else{
 
       res["EdrBase"] = edrbase.value?.getFromValue();
@@ -4375,8 +4401,8 @@ const submitEdrToUndrFun = async () => {
     // btn.loading = false;
     return;
   }
-  const edrBaseValidate = await edrbase.value?.validate();
-  if(props.param.cTransMrk !== "1"){
+    if(props.param.cTransMrk !== "1" ){
+    const edrBaseValidate = await edrbase.value?.validate();
      if(!edrBaseValidate) {
       ElMessage.warning("请填写批改信息中的必填项")
       return
@@ -4748,6 +4774,10 @@ const validateDistConsistency = async () => {
       const distMap = formconfig1[0].pageInfo.filter(
         (item: any) => item.pageKey === 'dist'
       );
+      const tgtMap = formconfig1[0].pageInfo.filter(
+        (item: any) => item.pageKey === 'tgt'
+      );
+
       if (!distMap.length) {
         return true;
       }
@@ -4756,8 +4786,8 @@ const validateDistConsistency = async () => {
         cProdNo: props.param?.cProdNo,     // 产品号
         cComponentTable: [
             ...distMap.map((item: any) => item.pageCode),
-            'tgt'
-        ]
+            ...tgtMap.map((item: any) => item.pageCode)
+        ],
       };
 
       if (props.param?.pageName === 'priceInquiry') {
@@ -4768,7 +4798,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
-        ElMessage.error(distRes.msg);
+        ElMessage.success(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示

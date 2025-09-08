@@ -214,6 +214,17 @@ const schemaMap = reactive<Record<string, any>>({
         }
       },
     },
+    {
+      prop: "showWordLimit",
+      inputtype: "rtselect",
+      title: "是否显示剩余字段",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "maxlength",
+      inputtype: "rtnumber",
+      title: "文本最大长度",
+    },
   ],
   rtselect: [
     {
