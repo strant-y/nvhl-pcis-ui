@@ -64,7 +64,7 @@ const nPrmFun = () => {
     // 比例
     let nCiShare = Number(getOwnShare()) || 100;
     const totalAmount = Number(data['base']['Base.nPrm']);
-    const splitCount = Number(data.base?.['Base.nPayNum'])
+    const splitCount = Number(data.base?.['Base.nPayNum']) || 1
     const totalCent = Math.round(totalAmount * 100);
     const result = ref<number[]>([]);
     const quotient = Math.floor(totalCent / splitCount);
