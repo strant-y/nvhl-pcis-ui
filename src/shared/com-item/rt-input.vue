@@ -42,6 +42,7 @@
         "
         :maxlength="item.maxlength"
         :minlength="item.minlength"
+        :show-word-limit="item.showWordLimit === '1' ? true : false"
         :readonly="
           item.type === 'color' || item.type === 'icon'
             ? true
