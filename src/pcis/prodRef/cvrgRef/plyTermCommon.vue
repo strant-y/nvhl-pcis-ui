@@ -664,12 +664,15 @@ function showFlush() {
 }
 
 function getPlanNo() {
-  return [
-    {
-      label: "P1",
-      value: "P1",
-    },
-  ];
+  let  plans = [];
+  if(formData.value['m'] && formData.value['m'].length > 0){
+    formData.value['m'].forEach(e => {
+      let d = {};
+      d[e['Term.cPlanNo']] = e['Term.cPlanNo'];
+      plans.push(d);
+    })
+  }
+  return plans;
 }
 
 function updateBtn() {
