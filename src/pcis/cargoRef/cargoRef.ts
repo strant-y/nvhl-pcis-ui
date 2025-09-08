@@ -1,4 +1,5 @@
 import ECargoGoodsTgt from '@/pcis/cargoRef/ECargoGoodsTgt.vue' //ECargo 清单
+import ECargoTgtSummary from '@/pcis/cargoRef/ECargoTgtSummary.vue' //ECargo 标的总计
 import ECargoCvrgECargo from '@/pcis/cargoRef/ECargoCvrg.vue' // 险别信息
 import ECargoFeeWarn from '@/pcis/cargoRef/ECargoFeeWarn.vue' // 协议费用提醒
 import ECargoApplicantECargo from '@/pcis/cargoRef/ECargoApplicant.vue' // 投保人信息
@@ -26,6 +27,7 @@ const componentMap = {
   AgreementSpecialRef:  markRaw(ECargoSpecial),
   AgreementDistInsuredRef:  markRaw(AgreementDistInsured),
   AgreementDistGoodsRef: markRaw(ECargoGoodsTgt),
+  AgreementTgtSummaryRef: markRaw(ECargoTgtSummary),
   AgreementAcctinfoRef: markRaw(ECargoAcctinfo),
   AgreementImagedInformationRef: markRaw(ECargoImagedInformation),
   AgreementDistTransportRef:  markRaw(AgreementDistTransport),

@@ -247,6 +247,7 @@ onMounted(()=>{
     edrbaseFlag.value =false
     edritemFlag.value =false
   }
+
 })
 // 复制申请单号
 const copyPolicyNumber = () => {

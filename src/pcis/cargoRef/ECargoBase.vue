@@ -111,7 +111,7 @@ const method = {
           let obj = {
             loadData: [
               {
-                label: selectObj.name,
+                label: `${selectObj.id}${selectObj.name}`,
                 value: selectObj.id,
               },
             ],
@@ -259,6 +259,15 @@ const method = {
               return 	ElMessage.warning("所选机构不是出单机构");
             }
             baseEditRef.value?.setValue("ECargoBase.cDptCde", selectObj.id);
+            baseEditRef.value?.setValue("ECargoBase.cIntroDptcde", selectObj.id);
+            baseEditRef.value?.addCodeListMap({
+              code:"ECargoBase.cIntroDptcde", list:[
+                {
+                  label: `${selectObj.id}${selectObj.name}`,
+                  value: selectObj.id,
+                },
+              ],
+            })
             baseEditRef.value?.setValue("ECargoBase.cDptCnm", selectObj.name);
             baseEditRef.value?.addCodeListMap({
               code:"ECargoBase.cDptCde", list:[
