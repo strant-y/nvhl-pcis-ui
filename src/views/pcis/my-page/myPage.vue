@@ -2687,7 +2687,7 @@ function baseValite(){
 const calcPremium = () => {
     const btn = getBtn("btn010101");
   if(props.param.cRsnCde !== '99'){
-    // const btn = getBtn("btn010101");
+    const btn = getBtn("btn010101");
     btn.loading = true;
   }else{
 

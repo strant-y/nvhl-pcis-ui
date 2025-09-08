@@ -103,6 +103,7 @@ onMounted(async  () => {
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
 
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
+        console.log('清单777')
     if(['DistECargo.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {

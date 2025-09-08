@@ -209,9 +209,7 @@ const method = {
     }else if(val=='0'){
       setFormItem("Base.nPayNum", { disabled: true, });
       setValue('Base.nPayNum',1)
-
- 
-
+      console.log('执行了吗')
     
        nPayNumberFun(true);
     }
