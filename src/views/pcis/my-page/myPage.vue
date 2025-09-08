@@ -3772,9 +3772,9 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   const data = opertaor.getDataAll();
   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
   const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk)
-  let nCiShare= 100;
+  let nCiShare= 1;
   if(nCiOwnPrm){
-       nCiShare = Number(getOwnShare()) || 100 ;
+       nCiShare = Number(getOwnShare()) || 1;
   }
   const pay = {};
   if (applicant) {
@@ -3790,7 +3790,7 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
 
 
 
-  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * (nCiShare/100)).toFixed(8))  : 0;
+  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * nCiShare).toFixed(8))  : 0;
 // debugger
 
 
@@ -3823,13 +3823,7 @@ const calcPremiumEdrSurrender = () => {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
-  // if(res['ci'] && res['ci'].length>0){
-  //   res['ci'].forEach((item:any)=>{
-  //     if(item['Ci.nCiShare']){
-  //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-  //     }
-  //   })
-  // }
+
   calcSurrenEdr(res).then((res: any) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -3848,13 +3842,7 @@ const calcPremiumEdrSurrender = () => {
         ? res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]
         : 0;
       const ops = opertaor.convertData(res);
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
+
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
