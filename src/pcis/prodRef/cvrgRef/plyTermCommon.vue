@@ -30,12 +30,14 @@
         </myCard>
       </template>
       <myCard :cardConfig="cardComconfig">
-        <termCommon
+        <template v-if = "planDataCommon && Object.keys(planDataCommon).length > 0">
+          <termCommon
           v-model="planDataCommon"
           :disabled-flag="disAbledFlag"
           :faters="faters"
           ref="termcommonRef"
         />
+        </template>
       </myCard>
     </myCard>
     <comDialog ref="dialog"></comDialog>
@@ -46,12 +48,8 @@
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { mutualExclusionClause } from "./mutualExclusionClause.ts";
 import termCommon from "./termCommon.vue";
+import tremTemplate from "./trem-template.vue";
 
-const tremTemplate = defineAsyncComponent({
-  loader: () => import("./trem-template.vue"),
-  delay: 200,
-  timeout: 3000
-});
 import { v4 as uuidv4 } from "uuid";
 
 const dialog = ref<DialogMethod | null>(null);
