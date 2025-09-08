@@ -300,6 +300,7 @@ const checkUser = () => {
 };
 
 let isCoypBtn = ref<any>(false);    // 用来处理 同步被保人 清空问题
+let isOcrEcho = false;          // OCR识别处理
 
 // 绑定方法
 const method = {
@@ -976,8 +977,13 @@ const method = {
       setFormItem(`Insured.${field}`, { disabled: false });
     });
 
-    checkUser();      // 调用客户信息接口
-    clearValidate('Insured.cCertfCde')    // 清除报错信息
+    // checkUser();      // 调用客户信息接口
+    // clearValidate('Insured.cCertfCde')    // 清除报错信息
+
+    if (!isInit && !isOcrEcho) {
+      checkUser (); // 调用客户信息接口
+      clearValidate ('Insured.cCertfCde'); // 清除报错信息
+    }
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
@@ -1050,8 +1056,11 @@ const method = {
     // 回显不执行下方操作
      if (isInit) return; 
 
+debugger;
+     if (isInit || isCoypBtn.value || isOcrEcho) return;
+
     // 切换清空
-    if (!isCoypBtn.value && val) {
+    if (val) {
       const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde"];
       fieldsToClear.forEach(field => {
         setValue(field, null);
@@ -1361,6 +1370,8 @@ function clearValidate(key = null) {
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
+      isOcrEcho = true;
+ 
     const file = fileInput.files[0];
     // 处理文件上传逻辑
     const param = {
@@ -1492,10 +1503,14 @@ function handleFileChange(event: Event) {
           }
           checkUser();
           formconfig.value.fileInputType = ""
+            setTimeout(() => {
+              isOcrEcho = false;
+            }, 1000);
         }
       })
       .catch((err) => {
         formconfig.value.fileInputType = ""
+        isOcrEcho = false;
         ElMessage.error(err);
       });
     fileInputRef.value.value = ""; // 清空文件输入框的值
