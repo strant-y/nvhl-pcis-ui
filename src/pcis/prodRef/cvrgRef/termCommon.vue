@@ -111,6 +111,8 @@ const tremAddTemplate3 = defineAsyncComponent(
   () => import("./trem-add3-template.vue")
 );
 
+const emit = defineEmits(["update:modelValue"]);
+
 const hiddenFlag = ref<any[]>([]);
 function isHidden(pl: any) {
   return hiddenFlag.value.indexOf(pl) == -1;
