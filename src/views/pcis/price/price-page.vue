@@ -4387,7 +4387,7 @@ const validateDistConsistency = async () => {
         cProdNo: props.param?.cProdNo,     // 产品号
         cComponentTable: [
             ...distMap.map((item: any) => item.pageCode),
-            'tgt'
+            'EmployeeTgt040002'
         ]
       };
 
