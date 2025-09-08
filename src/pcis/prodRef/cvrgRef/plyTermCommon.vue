@@ -46,11 +46,18 @@
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { mutualExclusionClause } from "./mutualExclusionClause.ts";
 
-const tremTemplate = defineAsyncComponent(() => import("./trem-template.vue"));
+const tremTemplate = defineAsyncComponent({
+  loader: () => import("./trem-template.vue"),
+  delay: 200,
+  timeout: 3000
+});
 import { v4 as uuidv4 } from "uuid";
-const termcommon = defineAsyncComponent(() => import("./termCommon.vue"));
-
-const selectTgtFix = defineAsyncComponent(() => import("./selectTgt.vue"));
+const termcommon = defineAsyncComponent({
+  loader:() => import("./termCommon.vue"),
+  delay: 200, // 延迟显示 loading 组件
+  timeout: 3000 // 超时时间
+  }
+  );
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -294,32 +301,6 @@ function addAndinitData() {
 const method = {
   funcadd: () => {
     addTermData();
-  },
-  selectTgt: () => {
-    if (!selectedRow.value || !selectedRow.value.data) {
-      ElMessage.warning("请先选择一行条款数据!");
-      return;
-    }
-    dialog.value?.open(
-      selectTgtFix,
-      {
-        selectedData: selectedRow.value.data, //需要把自定义的过滤掉，只传过去从模板中选择的
-        selectList: [],
-      },
-      {
-        getSelected(selectdata: any) {
-          if (selectdata && selectdata.length > 0) {
-            const ids = selectdata.map((item) => item["Dist.nSeqNo"]).join(",");
-            setCargoSeq(ids);
-          } else {
-            setCargoSeq("");
-          }
-          tremTemplateRefs.value["m0"].dataFlash();
-          dialog.value?.handleClose();
-        },
-      },
-      { title: "选择货物", width: 65 }
-    );
   },
 };
 

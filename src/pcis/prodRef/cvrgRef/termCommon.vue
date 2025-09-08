@@ -89,9 +89,6 @@ const props = defineProps({
   faters: {
     type: Object,
   },
-  rowIndex: {
-    type: [Number, String],
-  },
 });
 
 import { dataOpertaor } from "@/store/modules/data-opertaor";
