@@ -4163,7 +4163,7 @@ const saveEdrPlyInfo = async () => {
       if (!res.EdrBase) {
         res.EdrBase = [];
       }
-      res.EdrBase.push(edrBaseDatas._value);
+      // res.EdrBase.push(edrBaseDatas._value);
     }else{
 
       res["EdrBase"] = edrbase.value?.getFromValue();
@@ -4376,8 +4376,8 @@ const submitEdrToUndrFun = async () => {
     // btn.loading = false;
     return;
   }
-  const edrBaseValidate = await edrbase.value?.validate();
-  if(props.param.cTransMrk !== "1"){
+    if(props.param.cTransMrk !== "1" || props.param.cRsnCde !='99'){
+    const edrBaseValidate = await edrbase.value?.validate();
      if(!edrBaseValidate) {
       ElMessage.warning("请填写批改信息中的必填项")
       return
