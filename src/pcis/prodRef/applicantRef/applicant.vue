@@ -405,7 +405,7 @@ const method = {
 
     if(!isInit && !isOcrEcho){
         checkUser();   // 调用客户信息接口
-        learValidate('Applicant.cCertfCde')  // 清除报错信息
+        clearValidate('Applicant.cCertfCde')  // 清除报错信息
     }
 
 

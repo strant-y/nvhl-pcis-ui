@@ -878,7 +878,7 @@ const setCusBenefitInfo = () => {
   }
 
   dzmodal
-    .open(amlExtendInfo, { type: "Issuer", controlFlag })
+    .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam })
     .then((res: any) => {
       if (res.type === "ok") {
       }

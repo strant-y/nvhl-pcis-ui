@@ -39,6 +39,8 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 const fileInputRef = ref(null);
 import moment from "moment/moment";
 import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
+
 const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam.param;
@@ -692,6 +694,7 @@ const method = {
   },
 	// 证件类型
 	cardTypeChange: (val:any) => {
+    console.log(1212)
     checkUser();
     // 清除报错信息
     clearValidate('ECargoApplicant.cCertfCde')  
@@ -802,6 +805,9 @@ const method = {
       // });
     }
   },
+  tOEndTmDisable: (date: any) => {
+    return disablePastDates(date);
+  }
 };
 
 

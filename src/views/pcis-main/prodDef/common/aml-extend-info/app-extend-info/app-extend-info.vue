@@ -47,16 +47,20 @@ import {
 
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-opertaor.init();
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 
 const props = defineProps({
 	data: Object,
 	type: String,
+	idxParam:Object,
 });
+
+
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+opertaor.init();
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";

@@ -133,6 +133,14 @@ onMounted(async () => {
     rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })]
   });
 
+  // 询价出单 核定座位总数 非必填
+  console.log('询价查询---',params)
+   if (params.cProdNo === '043002' && params.pageName ==="priceInquiry") {
+        setFormItem("Tgt.nSeatsNumber", {
+          rules: [getRules("phoneNo", {})],
+        });
+   }
+
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);
