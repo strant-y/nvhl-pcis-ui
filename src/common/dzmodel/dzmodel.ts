@@ -25,6 +25,7 @@ import componentEdit from "./componentModel/componentEdit.vue";
 
 import edrItemEdit from "./edrItemEdit/edrItemEdit.vue";
 import buttonEdit from "./commonutils/buttonEdit.vue";
+import addtremComView from "./prodconfig/addtremComView.vue";
 
 /**用于动态弹窗组件的映射生成 */
 const componentMap = {
@@ -43,6 +44,7 @@ const componentMap = {
 	
   
     addtremView:addtremView,
+    addtremComView:addtremComView,
     riskFactorConfig:riskFactorConfig,
     termGroupConfig:termGroupConfig,
     termRiskGroupConfig:termRiskGroupConfig,

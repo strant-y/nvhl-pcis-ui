@@ -506,6 +506,7 @@ const saveApplicationEdr = async  () => {
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
+    AgreementTgtSummary:null,
     AgreementDistInsured:null,
     AgreementDistTransport:null,
     ...{},
@@ -572,6 +573,7 @@ const saveEdrPlyInfo = async () => {
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
+    AgreementTgtSummary:null,
     AgreementDistInsured:null,
     AgreementDistTransport:null,
     ...{},
@@ -758,6 +760,7 @@ function query() {
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
       delete dataForm.AgreementDistGoods
+      delete dataForm.AgreementTgtSummary
       delete dataForm.AgreementDistInsured
       delete dataForm.AgreementDistTransport
       if(props.type === 'EDR_APP_NEW_SCENE'){
@@ -961,6 +964,7 @@ async function save() {
  const res = await cargoApi.save({
     ...allFromData,
     AgreementDistGoods:null,
+   AgreementTgtSummary:null,
    AgreementDistInsured:null,
    AgreementDistTransport:null,
     ...{},

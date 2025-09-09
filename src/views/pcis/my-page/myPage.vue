@@ -1913,6 +1913,22 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
+          ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
+          ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
+          ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
+          ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
+          ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+          ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+          ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+          ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
+          ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
+          ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
+          ops.plyBase['Base.cSlsDptcde'] = "" // 业务员机构代码
+          ops.plyBase['Base.cSlsCde'] = "" // 业务员执业证号
+          ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
+          ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
+          ops.plyBase['Base.cRemark'] = "" // 出单员备注
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){
@@ -2063,6 +2079,22 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
+          ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
+          ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
+          ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
+          ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
+          ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+          ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+          ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+          ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
+          ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
+          ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
+          ops.plyBase['Base.cSlsDptcde'] = "" // 业务员机构代码
+          ops.plyBase['Base.cSlsCde'] = "" // 业务员执业证号
+          ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
+          ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
+          ops.plyBase['Base.cRemark'] = "" // 出单员备注
         }
         // if(ops['ci'] && ops['ci'].length>0){
         //   ops['ci'].forEach((item:any)=>{

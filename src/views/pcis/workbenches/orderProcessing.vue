@@ -582,7 +582,8 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "DocumentCopy",
         hideBtns: (row: any) => {
-          if (row.baseType !== "询价") {
+          // 联保单不显示复制按钮
+          if (row.baseType !== "询价" && row.cCiMrk !== "6") {
             return false;
           } else {
             return true;

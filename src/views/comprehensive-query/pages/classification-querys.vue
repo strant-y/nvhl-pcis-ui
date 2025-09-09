@@ -828,24 +828,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               typeCode: "CPrjCtgTyp_List",
               codeParam: { CRangeCde: user.value.companyId, cLev: 1 },
               func: (v) => {
-                  formconfig1.fromSchema?.forEach((item) => {
-                      if (item.prop === "cPrjCtgMidTyp") {
-                          freeEditRef.value.setValue(
-                              "cPrjCtgMidTyp",
-                              ""
-                          );
-                          freeEditRef.value.setValue(
-                              "cPrjCtgSubTyp",
-                              ""
-                          );
-                          item.typeCode = "CPrjCtgTyp_List";
-                          item.codeParam = {
-                              CRangeCde: user.value.companyId,
-                              cLev: 2,
-                              CParCde: v,
-                          };
-                      }
-                  });
+                 if(v){
+                    setValue("cPrjCtgMidTyp","");
+                    setValue("cPrjCtgSubTyp","")
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if (item.prop === "cPrjCtgMidTyp") {
+                            item.typeCode = "CPrjCtgTyp_List";
+                            item.codeParam = {
+                                CRangeCde: user.value.companyId,
+                                cLev: 2,
+                                CParCde: v,
+                            };
+                        }
+                    });
+                 }
               },
           },
           {
@@ -856,12 +852,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               filterable: true,
               hidden: true,
               func: (v) => {
+                 if(v){
+                  setValue("cPrjCtgSubTyp","")
                   formconfig1.fromSchema?.forEach((item) => {
                       if (item.prop === "cPrjCtgSubTyp") {
-                          freeEditRef.value.setValue(
-                              "cPrjCtgSubTyp",
-                              ""
-                          );
                           item.typeCode = "CPrjCtgTyp_List";
                           item.codeParam = {
                               CRangeCde: user.value.companyId,
@@ -870,6 +864,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           };
                       }
                   });
+                 }
               },
           },
           {
@@ -1127,16 +1122,14 @@ const tableObj = {
                 tooltip: "复制",
                 size: "large",
                 icon: "DocumentCopy",
-                // hideBtns: (row: any) => {
-                //   if (
-                //     row.cAppStatus == "1" ||
-                //     row.cAppStatus == "5"
-                //   ) {
-                //     return false;
-                //   } else {
-                //     return true;
-                //   }
-                // },
+                hideBtns: (row: any) => {
+                    // 联保单不显示复制按钮
+                    if (row.cCiMrk === "联保单") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
                 tableClick: async (row) => {
                     console.log(row);
                     const r = await row;

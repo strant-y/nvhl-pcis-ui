@@ -92,7 +92,7 @@ const props = defineProps({
 });
 
 const routeQryParams: any = props.data;
-const isAdd = ref((routeQryParams?.type !== 'add' && routeQryParams?.type !== 'update' && routeQryParams?.type !== 'view'))
+const isAdd = ref((routeQryParams?.type !== 'planConfigAdd' && routeQryParams?.type !== 'planConfigupdate' && routeQryParams?.type !== 'planConfigview'))
 const user = ref(userStore.user);
 const reviewInfoRef = ref(null);
 const policyService = new PolicyService();
@@ -858,7 +858,7 @@ const submit = () => {
 }
 
 onMounted(() => {
-  if (routeQryParams?.type == 'add') {
+  if (routeQryParams?.type == 'planConfigAdd') {
     nextTick(() => {
       freeEditRef.value?.setValue("cKindNo", routeQryParams?.rowData.cKindNo);
       freeEditRef.value?.setValue("cProdNo", routeQryParams?.rowData.cProdNo);
@@ -894,7 +894,7 @@ onMounted(() => {
   }
   // || props.type == 'goods'
   nextTick(() => {
-    if (routeQryParams?.type == 'view' || routeQryParams?.type == 'under' ||props.goodsType=='goods' ) {
+    if (routeQryParams?.type == 'planConfigview' || routeQryParams?.type == 'under' ||props.goodsType=='goods' ) {
       freeEditRef.value.setDisabledAll();
       opertaor.setDisabledAll();
     }
