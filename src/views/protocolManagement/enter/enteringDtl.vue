@@ -944,7 +944,7 @@ const premiumCalculation = ()=>{
       }
       ElMessage.success('保费计算成功')
     }else {
-      ElMessage.error('保费计算失败！')
+      ElMessage.error('保费计算失败,请先添加条款!')
     }
     isSuccess = true
   }catch (err:any){
