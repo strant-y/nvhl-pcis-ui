@@ -3,7 +3,7 @@
     <myCard :cardConfig="cardconfig">
       <template v-if="formData['m'] && formData['m'].length > 0">
         <myCard :cardConfig="cardMainconfig">
-          <tremTemplate
+          <tremTemplatecommon
             v-for="(i, index) in formData['m']"
             :key="index"
             :rowIndex="index"
@@ -48,7 +48,7 @@
 import { CardConfig, creatCardConfig } from "@/shared/mytemplate/card-config";
 import { mutualExclusionClause } from "./mutualExclusionClause.ts";
 import termCommon from "./termCommon.vue";
-import tremTemplate from "./trem-template.vue";
+import tremTemplatecommon from "./trem-template-common.vue";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -160,6 +160,7 @@ onMounted(async () => {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
     };
+    console.log(parparam);
     qryProdRelTermRiskList(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
