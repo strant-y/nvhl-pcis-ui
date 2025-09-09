@@ -189,14 +189,17 @@ onMounted(async () => {
     data1.value = data;
     expandedKeys.value = data.map((item) => item.id);
     data1.value.forEach((item: any) => {
-      if (tremMap.value[item.cUniqueTermNo]) {
-        const risks = tremMap.value[item.cUniqueTermNo];
+      // if (tremMap.value[item.cUniqueTermNo]) {
+      //   const risks = tremMap.value[item.cUniqueTermNo];
+      //   item.children?.forEach((i: any) => {
+      //     if (risks.includes(i.cRiskNo)) {
+      //       i.disabled = param.type !== "ECargo";
+      //     }
+      //   });
+      // } 将前端写死的配置,修改为后端配置
         item.children?.forEach((i: any) => {
-          if (risks.includes(i.cRiskNo)) {
-            i.disabled = param.type !== "ECargo";
-          }
+          i.disabled = param.type !== "ECargo" && i.cIsDissel === '1';
         });
-      }
       selectAdditionNodes.value.forEach((v) => {
         if (v.cRowId && v.cTermNo === item.cTermNo) {
           item.disabled = param.type !== "ECargo";
@@ -343,8 +346,6 @@ function flushSelectData() {
 }
 
 async function selectOne() {
-  console.log(data3.value );
-  console.log( data3.value.length);
   props.method.isOk(data3.value);
   emits("handleClose");
 }
