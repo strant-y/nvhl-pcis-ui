@@ -978,6 +978,7 @@ async function save() {
       const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
       agreementBaseRef.setValue('ECargoBase.cEcAgrNo', resData.value['ECargoBase.cEcAgrNo'])
       agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
+      agreementBaseRef.setValue('ECargoBase.cAppTyp', resData.value['ECargoBase.cAppTyp'] || '')
     }else {
       isOk = false
       ElMessage.success(res.msg);
