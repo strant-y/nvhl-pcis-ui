@@ -12,7 +12,7 @@
       :data="tableDatas"
       style="width: 100%"
       :default-sort="item.defaultSort"
-      :border="item.border ? item.border : true"
+      :border="item.border || item.border === false ? item.border : true"
       :fit="item.fit ? item.fit : true"
       :stripe="item.stripe === undefined ? true : item.stripe"
       :size="item.size ? item.size : 'default'"
@@ -891,11 +891,12 @@ function isrequired(i: any) {
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
-/*
+
 :deep(.el-table .cell) {
-  white-space: nowrap;
+  /* white-space: nowrap; */
+  line-height: 25px;
 }
-*/
+
 :deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }

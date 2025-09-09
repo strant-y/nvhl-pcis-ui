@@ -66,7 +66,8 @@ function resolvePath(routePath: string) {
 </script>
 <style lang="scss" scoped>
 :deep(.el-sub-menu.is-active .el-sub-menu__title) {
-  color: #FFFFFF;
+  color: #FFFFFF!important;
   background: var(--el-color-primary);
 }
+
 </style>

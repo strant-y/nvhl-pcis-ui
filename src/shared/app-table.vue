@@ -318,4 +318,7 @@ defineExpose({
 .table_header_has-title-btns :deep(.el-card__header) {
   padding: 10px 20px;
 }
+.el-pagination {
+  margin-top: 12px;
+}
 </style>

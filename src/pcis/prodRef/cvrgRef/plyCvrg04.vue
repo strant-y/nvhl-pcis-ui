@@ -248,11 +248,18 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
     icon: "CirclePlus",
     type: "primary",
     size: "small",
+    link: true,
   },
+  // delPlan: {
+  //   icon: "Delete",
+  //   type: "danger",
+  //   size: "small",
+  // },
   delPlan: {
-    icon: "Delete",
-    type: "danger",
+    label: "删除",
+    type: "primary",
     size: "small",
+    link: true,
   },
 });
 
@@ -918,7 +925,7 @@ defineExpose({
 }
 
 ::v-deep .el-card__header {
-   padding: 10px 16px !important;
+   /* padding: 10px 16px !important; */
  }
 
 ::v-deep .el-card__body {
@@ -926,6 +933,6 @@ defineExpose({
  }
 
 :deep(.planCard > .el-card__header:first-child) {
-  background: #bfe0f5;
+  background: #FAFAFA;
 }
 </style>

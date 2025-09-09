@@ -21,6 +21,8 @@ const statusList = [
 export const tableObj = {
   // 出单--暂存任务
   notWaitObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "baseType",
@@ -59,6 +61,8 @@ export const tableObj = {
   },
   // 出单--已提交任务
   submittedObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "baseType",
@@ -124,6 +128,8 @@ export const tableObj = {
   },
   // 出单--待修改任务
   notReviseObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "baseType",
@@ -180,6 +186,8 @@ export const tableObj = {
 
   //出单-待续保
   waitObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "cPlyNo",
@@ -221,6 +229,8 @@ export const tableObj = {
   },
   // 出单-待缴费
   waitPayObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
 			{
 				prop: "cAppNo",

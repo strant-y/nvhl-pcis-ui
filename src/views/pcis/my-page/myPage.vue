@@ -5581,7 +5581,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
-    margin: 12px 20px;
+    margin: 12px 10px;
   }
 }
 :deep(.el-card__header) {
@@ -5592,6 +5592,15 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     &:first-child {
       font-size: 16px;
       font-weight: 500;
+    }
+    .el-button-group {
+      .el-button {
+        background: #ffffff;
+        color: var(--el-color-primary);
+        border: none;
+        height: 24px;
+        padding: 0 14px;
+      }
     }
   }
 }
@@ -5671,7 +5680,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .right-btns {
   // padding: 0 3rem;
-  margin: 72px 20px 0 0;
+  margin: 72px 10px 0 0;
   // min-width: calc(150px + 6rem);
   .btns-content {
     background: #FFFFFF;

@@ -187,11 +187,16 @@ defineExpose({
 }
 
 .searchbar {
-  border: 1px solid #ddd;
-  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+  /* border: 1px solid #ddd; */
+  /* box-shadow: 0 0 2px rgb(0 0 0 / 30%); */
 }
 :deep(.mainTitle .el-card__header) {
-  background: #d1e7f7;
+  /* background: #d1e7f7; */
+}
+:deep(.mainTitle) {
+  box-shadow: none;
+  border: 0;
+  --el-card-border-color: transparent;
 }
 
 /* 按钮样式 */
@@ -200,7 +205,7 @@ defineExpose({
   align-items: center;
   gap: 8px;
   margin-left: 20px;
-  padding: 8px 18px;
+  padding: 4px 10px;
   border-radius: 4px; /* 常用较小圆角 */
   color: #1a3e72; /* 深蓝色文字 */
   background-color: #f8fafc; /* 非常浅的背景 */
@@ -213,6 +218,7 @@ defineExpose({
   outline: none;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   position: relative;
+  margin-right: 10px;
 }
 
 /* 悬停状态  */

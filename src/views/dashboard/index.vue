@@ -3,7 +3,9 @@
     <div class="home">
       <div class="top-box">
         <div class="top-title1">财产险承保系统</div>
-        <div class="top-title2">智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧</div>
+        <div class="top-title2">
+          智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧
+        </div>
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
           <rtButton :item="searchBtnItem" />
@@ -128,23 +130,33 @@
               </template>
               <template #column-cAppNoInfo="{ row, column, index }">
                 <div class="policy-info-cell">
-                  <div class="policy-number-row" style="height: 23px;">
+                  <div class="policy-number-row" v-if="row.cAppNo">
                     <span
                       v-html="row.cAppNo"
                       :class="row.baseType !== '询价' ? 'primmaryColor' : ''"
-                      @dblclick="row.baseType !== '询价' ? toQuery2(row) : ()=>{}"
+                      @dblclick="
+                        row.baseType !== '询价' ? toQuery2(row) : () => {}
+                      "
                     ></span>
-                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)" v-if="row.cAppNo">
+                    <el-icon
+                      class="copy-icon"
+                      @click="copyText(row.cAppNo)"
+                      v-if="row.cAppNo"
+                    >
                       <DocumentCopy />
                     </el-icon>
                   </div>
-                  <div class="policy-number-row" style="height: 23px;">
+                  <div class="policy-number-row" v-if="row.cInquiryNo">
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
                       @dblclick="toQuery2(row)"
                     ></span>
-                    <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)" v-if="row.cInquiryNo">
+                    <el-icon
+                      class="copy-icon"
+                      @click="copyText(row.cInquiryNo)"
+                      v-if="row.cInquiryNo"
+                    >
                       <DocumentCopy />
                     </el-icon>
                   </div>
@@ -159,12 +171,16 @@
           <div class="title-box">
             <div class="title-line">
               <span class="title">统计图</span>
-              <img class="icon" :src="labelIcon" alt="">
+              <img class="icon" :src="labelIcon" alt="" />
             </div>
           </div>
           <div class="statistic-tab-box">
             <el-tabs @tab-click="handleStatisticTabClick">
-              <el-tab-pane v-for="tab in statisticTabList" :key="tab" :label="tab">
+              <el-tab-pane
+                v-for="tab in statisticTabList"
+                :key="tab"
+                :label="tab"
+              >
               </el-tab-pane>
             </el-tabs>
             <!-- <span v-for="item in statisticTabList" :key="item" class="tab-item" @click="handleTabClick(item)">{{ item }}</span> -->
@@ -192,9 +208,35 @@
             </div> -->
           </div>
           <div class="content-charts-box">
-            <div class="echarts-box" style="display: flex;">
-              <div ref="ecahrtsRef" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
-              <div ref="ecahrtsRef1" class="echarts-container" :style="{ width: chartWidth, height: chartHeight }"></div>
+            <div class="echarts-box">
+              <div style="width: 49%">
+                <div class="echarts-title">
+                  <span>总量统计图</span>
+                  <el-button-group>
+                    <el-button @click="changeEchartsType('0')" :type="ecahrtsOptionsType === '0' ? 'primary' : ''">柱状图</el-button>
+                    <el-button @click="changeEchartsType('1')" :type="ecahrtsOptionsType === '1' ? 'primary' : ''">饼状图</el-button>
+                  </el-button-group>
+                </div>
+                <div
+                  ref="ecahrtsRef"
+                  class="echarts-container"
+                  :style="{ width: chartWidth, height: chartHeight }"
+                ></div>
+              </div>
+              <div style="width: 49%">
+                <div class="echarts-title">
+                  <span>保费统计图</span>
+                  <el-button-group>
+                    <el-button @click="changeEcharts1Type('0')" :type="ecahrtsOptions1Type === '0' ? 'primary' : ''">柱状图</el-button>
+                    <el-button @click="changeEcharts1Type('1')" :type="ecahrtsOptions1Type === '1' ? 'primary' : ''">饼状图</el-button>
+                  </el-button-group>
+                </div>
+                <div
+                  ref="ecahrtsRef1"
+                  class="echarts-container"
+                  :style="{ width: chartWidth, height: chartHeight }"
+                ></div>
+              </div>
             </div>
           </div>
         </div>
@@ -206,8 +248,8 @@
                <el-tag v-if="cOpgrpCnm">{{ cOpgrpCnm }}</el-tag>
             </div>
           </div> -->
-          <!-- 暂时隐藏消息通知 -->
-          <!-- <div class="content-list-box">
+        <!-- 暂时隐藏消息通知 -->
+        <!-- <div class="content-list-box">
             <div class="list-title">
               <div class="title-line">
                 <span class="title">消息通知</span>
@@ -237,7 +279,7 @@
               </template>
             </div>
           </div> -->
-          <!-- <div>
+        <!-- <div>
               <div class="code-box">
                 <div class="code-inner-box">
                     <span class="title">移动端二维码：</span>
@@ -251,7 +293,7 @@
                 </div>
               </div>
           </div> -->
-          <!-- <div class="content-list-box">
+        <!-- <div class="content-list-box">
             <div class="list-title">
               <div class="title-line">
                 <span class="title">待办事项</span>
@@ -276,29 +318,32 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts'
-import type { ECharts, EChartsOption } from 'echarts'
-import { EchartsService, ChartConfig } from '@/views/charts/service/echarts/echarts.service'
-import {useSettingsStore, useUserStore} from "@/store";
+import * as echarts from "echarts";
+import type { ECharts, EChartsOption } from "echarts";
+import {
+  EchartsService,
+  ChartConfig,
+} from "@/views/charts/service/echarts/echarts.service";
+import { useSettingsStore, useUserStore } from "@/store";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { tableObj, tab1, tab2 } from "./mapObj"
+import { tableObj, tab1, tab2 } from "./mapObj";
 import moment from "moment";
-import { PcisQueryService } from '@/views/dashboard/service/v1.service';
+import { PcisQueryService } from "@/views/dashboard/service/v1.service";
 const pcisQueryService = new PcisQueryService();
 import { useRouter } from "vue-router";
 const router = useRouter();
-import { AppKey } from '@/constants/api';
+import { AppKey } from "@/constants/api";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { statisticProps } from 'element-plus';
+import { statisticProps } from "element-plus";
 const dzmodal = useDzModal();
-const shortMenuDialog = defineAsyncComponent(() =>
-  import("./components/shortMenuDialog.vue")
+const shortMenuDialog = defineAsyncComponent(
+  () => import("./components/shortMenuDialog.vue")
 );
-import {getShortcutDataList, updateShortRoute} from "@/api/menu";
+import { getShortcutDataList, updateShortRoute } from "@/api/menu";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 const {
   hasReceived,
@@ -345,65 +390,69 @@ const searchItem = {
   title: "",
   placeholder: "输入申请单号进行查询",
   itemWidth: 2,
-  prefixIcon: "Search"
-}
+  prefixIcon: "Search",
+};
 const searchBtnItem = {
   label: "搜  索",
   type: "primary",
   func: () => {
     handleSearch(searchValue.value);
   },
-}
+};
 const issueBtnItem = ref({
   label: "出单统计图",
-  type: 'primary',
+  type: "primary",
   func: () => {
-    ecahrtsBtnIndex.value = 0
-    echartsOptions.legend.data = ['每月出单量', '每月出单量同比']
-    echartsOptions.series[0].name = '每月出单量'
-    echartsOptions.series[1].name = '每月出单量同比'
-    handleRefreshEcharts()
+    ecahrtsBtnIndex.value = 0;
+    echartsOptions.legend.data = ["每月出单量", "每月出单量同比"];
+    echartsOptions.series[0].name = "每月出单量";
+    echartsOptions.series[1].name = "每月出单量同比";
+    handleRefreshEcharts();
   },
-})
+});
 const nPrmBtnItem = ref({
   label: "保费统计图",
-  type: 'default',
+  type: "default",
   func: () => {
-    ecahrtsBtnIndex.value = 1
-    echartsOptions.legend.data = ['每月保费量', '每月保费量同比']
-    echartsOptions.series[0].name = '每月保费量'
-    echartsOptions.series[1].name = '每月保费量同比'
-    handleRefreshEcharts()
+    ecahrtsBtnIndex.value = 1;
+    echartsOptions.legend.data = ["每月保费量", "每月保费量同比"];
+    echartsOptions.series[0].name = "每月保费量";
+    echartsOptions.series[1].name = "每月保费量同比";
+    handleRefreshEcharts();
   },
-})
+});
 const moreBtnItem = ref({
-  type:'text',
-  label:'查看更多',
+  type: "text",
+  label: "查看更多",
   func: () => {
-    toQuery(moreurl.value)
-  }
-})
+    toQuery(moreurl.value);
+  },
+});
 const labelIcon = "/src/assets/img/slash.png";
-const platformUrl = "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
-const ecahrtsRef = ref(null)
-let ecahrtsRefInstance: ECharts | null = null
-const ecahrtsRef1 = ref(null)
-let ecahrtsRefInstance1: ECharts | null = null
-const chartWidth = ref('50%')
-const chartHeight = ref('400px')
+const platformUrl =
+  "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
+const ecahrtsRef = ref(null);
+let ecahrtsRefInstance: ECharts | null = null;
+const ecahrtsRef1 = ref(null);
+let ecahrtsRefInstance1: ECharts | null = null;
+const chartWidth = ref("100%");
+const chartHeight = ref("400px");
 const userStore = useUserStore();
 const user = userStore.user;
 const roles = user.roles;
-const userItem = JSON.parse(sessionStorage.getItem("user") || '{}');
-const cOpgrpCnm = userItem.roles && userItem.roles[0] ? userItem.roles[0].cOpgrpCnm : "";
-const currentTabName = ref('') //tabs默认值
-const isOperate = ref(false) //管理员 出单岗
-const isAudit = ref(false) //  核保岗
-const moreurl = ref('');
-const shortListData = ref(null)  // 第二模块tabl列表数据
-const headIcon = `/src/assets/images/${userStore.user.cCssStyle === '2' ? '0' : '1'}_.png`;
-const shorMenuList = ref([]);// 快捷菜单列表
+const userItem = JSON.parse(sessionStorage.getItem("user") || "{}");
+const cOpgrpCnm =
+  userItem.roles && userItem.roles[0] ? userItem.roles[0].cOpgrpCnm : "";
+const currentTabName = ref(""); //tabs默认值
+const isOperate = ref(false); //管理员 出单岗
+const isAudit = ref(false); //  核保岗
+const moreurl = ref("");
+const shortListData = ref(null); // 第二模块tabl列表数据
+const headIcon = `/src/assets/images/${userStore.user.cCssStyle === "2" ? "0" : "1"}_.png`;
+const shorMenuList = ref([]); // 快捷菜单列表
 const cPayTypList = ref([]);
+const ecahrtsOptionsType = ref("0")
+const ecahrtsOptions1Type = ref("0")
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -415,7 +464,10 @@ const pageresult = reactive<Pageresult>({
 // 申请单号、保单号增加双击事件
 Object.keys(tableObj).forEach((i: any) => {
   tableObj[i].fromSchema = tableObj[i].fromSchema.map((item: any) => {
-    if ((i === "waitObj" || i === "waitPayObj") && (item.prop === "cAppNo" || item.prop === "cPlyNo")) {
+    if (
+      (i === "waitObj" || i === "waitPayObj") &&
+      (item.prop === "cAppNo" || item.prop === "cPlyNo")
+    ) {
       item.dblFunc = (val: any, row: any) => {
         toQuery2(row);
       };
@@ -427,112 +479,175 @@ let tableconfig = reactive<AppTableConfig>(
   createTableEditConfig(tableObj.notWaitObj)
 );
 
-const echartsService = new EchartsService()
-const { getAnalysis } = echartsService
-const ecahrtsBtnIndex = ref(0)
+const echartsService = new EchartsService();
+const { getAnalysis } = echartsService;
+const ecahrtsBtnIndex = ref(0);
 const echartsOptions = reactive({
   barWidth: "10px",
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
     axisPointer: {
-      type: 'cross',
+      type: "cross",
       label: {
-        backgroundColor: '#6a7985'
-      }
-    }
+        backgroundColor: "#6a7985",
+      },
+    },
   },
-  color: [
-    '#f57c11'
-  ],
+  color: ["#f57c11"],
   grid: {
-    left: '5%',
-    right: '5%',
-    bottom: '10%',
-    top: '10%',
+    left: "5%",
+    right: "5%",
+    bottom: "10%",
+    top: "10%",
     // height: 150,
-    containLabel: true
+    containLabel: true,
   },
   legend: {
-    data: ['每月出单量', '每月出单量同比'],
+    data: ["每月出单量", "每月出单量同比"],
     bottom: 0,
     show: true,
   },
-  xAxis: [{
-    type: 'category',
-    name: "月份",
-    axisLabel: {
-      show: true,
-      // color: 'red'
+  xAxis: [
+    {
+      type: "category",
+      name: "月份",
+      axisLabel: {
+        show: true,
+        // color: 'red'
+      },
+      axisLine: {
+        // x轴的颜色和宽度
+        lineStyle: {
+          // color: 'red',
+          width: 1,
+        },
+      },
+      boundaryGap: false,
+      data: [],
     },
-    axisLine: { // x轴的颜色和宽度
-      lineStyle: {
-        // color: 'red',
-        width: 1
-      }
-    },
-    boundaryGap: false,
-    data: []
-  }],
+  ],
   yAxis: [
     {
-      type: 'value',
+      type: "value",
       name: "总量",
       min: 0,
       // max: 1000,
-      axisLabel: { // y轴的字体样式
+      axisLabel: {
+        // y轴的字体样式
         show: true,
         // color: 'red'
       },
-      axisLine: { // y轴的颜色和宽度
+      axisLine: {
+        // y轴的颜色和宽度
         lineStyle: {
-          
-          width: 0
-        }
-      }
+          width: 0,
+        },
+      },
     },
     {
-      type: 'value',
+      type: "value",
       name: "占比",
       min: 0,
       // max: 50,
-      axisLabel: { // y轴的字体样式
+      axisLabel: {
+        // y轴的字体样式
         show: true,
         // color: 'red'
       },
-      axisLine: { // y轴的颜色和宽度
+      axisLine: {
+        // y轴的颜色和宽度
         lineStyle: {
           // color: 'yellow',
-          width: 0
-        }
-      }
-    }
+          width: 0,
+        },
+      },
+    },
   ],
   series: [
     {
-      type: 'bar',
-      name: '每月出单量',
+      type: "bar",
+      name: "每月出单量",
       data: [],
       itemStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-              offset: 0,
-              color: '#cd1920'// 起始颜色
-          }, {
-              offset: 1,
-              color: 'white' // 结束颜色
-          }]),
-      barBorderRadius: [5, 5, 5, 5]
-      }
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          {
+            offset: 0,
+            color: "#729CFD", // 起始颜色
+          },
+          {
+            offset: 1,
+            color: "#326FFD", // 结束颜色
+          },
+        ]),
+        barBorderRadius: [5, 5, 5, 5],
+      },
     },
     {
-      type: 'line',
-      name: '每月出单量同比',
+      type: "line",
+      name: "每月出单量同比",
       yAxisIndex: 1,
       data: [],
       itemStyle: {
-        color: '#e7b329'
-      }
+        color: "#68D3F8",
+      },
     },
-  ]
+  ],
+});
+const echartsOptionsPie = reactive({
+  title: {
+    text: "",
+    subtext: "",
+    left: "center",
+  },
+  tooltip: {
+    trigger: "item",
+    formatter: "{a} <br/>{b} : {c} ({d}%)",
+  },
+  legend: {
+    left: "center",
+    top: "bottom",
+    data: [],
+  },
+  toolbox: {
+    show: false,
+    feature: {
+      mark: { show: true },
+      dataView: { show: true, readOnly: false },
+      restore: { show: true },
+      saveAsImage: { show: true },
+    },
+  },
+  series: [
+    {
+      name: "每月出单量",
+      type: "pie",
+      radius: [40, 150],
+      center: ["50%", "40%"],
+      roseType: "radius",
+      itemStyle: {
+        borderRadius: 5,
+      },
+      label: {
+        show: false,
+      },
+      emphasis: {
+        label: {
+          show: false,
+        },
+      },
+      data: [],
+    },
+  ],
+  graphic: {
+    type: "text", // 图形类型为文本
+    left: "center", // 文本位置，居中显示
+    top: "40%", // 文本位置，居中显示
+    style: {
+      text: "每月出单量", // 要显示的文字内容
+      fontSize: 14, // 文字大小
+      fill: "#333", // 文字颜色
+    },
+  },
 })
 const echartsOptions1 = reactive({
   barWidth: "10px",
@@ -589,7 +704,7 @@ const echartsOptions1 = reactive({
       },
       axisLine: { // y轴的颜色和宽度
         lineStyle: {
-          
+
           width: 0
         }
       }
@@ -619,10 +734,10 @@ const echartsOptions1 = reactive({
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
               offset: 0,
-              color: '#cd1920'// 起始颜色
+              color: '#729CFD'// 起始颜色
           }, {
               offset: 1,
-              color: 'white' // 结束颜色
+              color: '#326FFD' // 结束颜色
           }]),
       barBorderRadius: [5, 5, 5, 5]
       }
@@ -633,10 +748,66 @@ const echartsOptions1 = reactive({
       yAxisIndex: 1,
       data: [],
       itemStyle: {
-        color: '#e7b329'
+        color: '#68D3F8'
       }
     },
   ]
+});
+const echartsOptions1Pie = reactive({
+  title: {
+    text: "",
+    subtext: "",
+    left: "center",
+  },
+  tooltip: {
+    trigger: "item",
+    formatter: "{a} <br/>{b} : {c} ({d}%)",
+  },
+  legend: {
+    left: "center",
+    top: "bottom",
+    data: [],
+  },
+  toolbox: {
+    show: false,
+    feature: {
+      mark: { show: true },
+      dataView: { show: true, readOnly: false },
+      restore: { show: true },
+      saveAsImage: { show: true },
+    },
+  },
+  series: [
+    {
+      name: "每月保费量",
+      type: "pie",
+      radius: [40, 150],
+      center: ["50%", "40%"],
+      roseType: "radius",
+      itemStyle: {
+        borderRadius: 5,
+      },
+      label: {
+        show: false,
+      },
+      emphasis: {
+        label: {
+          show: false,
+        },
+      },
+      data: [],
+    },
+  ],
+  graphic: {
+    type: "text", // 图形类型为文本
+    left: "center", // 文本位置，居中显示
+    top: "40%", // 文本位置，居中显示
+    style: {
+      text: "每月保费量", // 要显示的文字内容
+      fontSize: 14, // 文字大小
+      fill: "#333", // 文字颜色
+    },
+  },
 })
 const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
@@ -645,174 +816,258 @@ const currentTab = ref("");
 // 今日总录单
 const dayTotalRecords = computed(() => {
   const currentItem = tabDataMap.value[currentTab.value] || [];
-  const dayInfo = currentItem.find((item:any) => item.unit === "day")
-  const num = dayInfo ? dayInfo.num : 0
-  return num
-})
+  const dayInfo = currentItem.find((item: any) => item.unit === "day");
+  const num = dayInfo ? dayInfo.num : 0;
+  return num;
+});
 // 本周总录单
 const weekTotalRecords = computed(() => {
   const currentItem = tabDataMap.value[currentTab.value] || [];
-  const dayInfo = currentItem.find((item:any) => item.unit === "week")
-  const num = dayInfo ? dayInfo.num : 0
-  return num
-})
+  const dayInfo = currentItem.find((item: any) => item.unit === "week");
+  const num = dayInfo ? dayInfo.num : 0;
+  return num;
+});
 // 本月总录单
 const monthTotalRecords = computed(() => {
   const currentItem = tabDataMap.value[currentTab.value] || [];
-  const dayInfo = currentItem.find((item:any) => item.unit === "month")
-  const num = dayInfo ? dayInfo.num : 0
-  return num
-})
+  const dayInfo = currentItem.find((item: any) => item.unit === "month");
+  const num = dayInfo ? dayInfo.num : 0;
+  return num;
+});
 
 function init() {
-  if(!ecahrtsRefInstance) {
-    ecahrtsRefInstance = echarts.init(ecahrtsRef.value)
-    ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value)
+  if (!ecahrtsRefInstance) {
+    ecahrtsRefInstance = echarts.init(ecahrtsRef.value);
+    ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value);
   }
-  getOrderInfo()
+  getOrderInfo();
 }
 
 function getOrderInfo() {
-   getAnalysis({type:'ply_total'}).then((res:any) => {
-    if(res.code === 200) {
-      tabDataMap.value = res.dataMap;
-      const keys = Object.keys(res.dataMap).filter((item:any) => item === '核心页面出单' || item === '复制出单' || item === '模板出单' || item === '方案出单' || item === '询报价转投保');
-      keys.splice(0, 0, keys.splice(keys.indexOf('核心页面出单'), 1)[0]);
-      currentTab.value = keys[0];
-      statisticTabList.value = keys
-      handleRefreshEcharts()
-    } else {
-      ElMessage.error(res.msg)
-    }
-  }).catch(err => {
-    ElMessage.error(err)
-  })
+  getAnalysis({ type: "ply_total" })
+    .then((res: any) => {
+      if (res.code === 200) {
+        tabDataMap.value = res.dataMap;
+        const keys = Object.keys(res.dataMap).filter(
+          (item: any) =>
+            item === "核心页面出单" ||
+            item === "复制出单" ||
+            item === "模板出单" ||
+            item === "方案出单" ||
+            item === "询报价转投保"
+        );
+        keys.splice(0, 0, keys.splice(keys.indexOf("核心页面出单"), 1)[0]);
+        currentTab.value = keys[0];
+        statisticTabList.value = keys;
+        handleRefreshEcharts();
+      } else {
+        ElMessage.error(res.msg);
+      }
+    })
+    .catch((err) => {
+      ElMessage.error(err);
+    });
 }
 
-function handleStatisticTabClick(tab:any) {
-  currentTab.value = tab.props.label
-  handleRefreshEcharts()
+function handleStatisticTabClick(tab: any) {
+  currentTab.value = tab.props.label;
+  handleRefreshEcharts();
 }
-const echartsOptionsData = ref([])
-const echartsOptionsData1 = ref([])
+const echartsOptionsData = ref([]);
+const echartsOptionsData1 = ref([]);
 function handleRefreshEcharts() {
-  if(ecahrtsBtnIndex.value === 0) {
-    issueBtnItem.value.type = "primary"
-    nPrmBtnItem.value.type = "default"
+  if (ecahrtsBtnIndex.value === 0) {
+    issueBtnItem.value.type = "primary";
+    nPrmBtnItem.value.type = "default";
   } else {
-    issueBtnItem.value.type = "default"
-    nPrmBtnItem.value.type = "primary"
+    issueBtnItem.value.type = "default";
+    nPrmBtnItem.value.type = "primary";
   }
-  if(echartsOptionsData.value.length < 1) {
+  if (echartsOptionsData.value.length < 1) {
     const param = {
       // type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
-      type: 'ply'
-    }
-    getAnalysis(param).then((res:any) => {
-      if(res.code === 200) {
-        res.dataMap['方案出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 123
-          item.rate = Math.random() * 3.6
-        })
-        res.dataMap['核心导入'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 18
-          item.rate = Math.random() * 1.2
-        })
-        res.dataMap['核心页面出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 153
-          item.rate = Math.random() * 2.2
-        })
-        res.dataMap['渠道出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 222
-          item.rate = Math.random() * 2.4
-        })
-        res.dataMap['移动端出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 134
-          item.rate = Math.random() * 1.6
-        })
-        res.dataMap['询报价转投保'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 356
-          item.rate = Math.random() * 3.5
-        })
-        echartsOptionsData.value = res.dataMap;
-        const data = res.dataMap[currentTab.value] || [];
-        echartsOptions.xAxis[0].data = data.map((item:any) => item.item)
-        echartsOptions.series[0].data = data.map((item:any) => item.value)
-        echartsOptions.series[1].data = data.map((item:any) => item.rate)
-        ecahrtsRefInstance?.setOption(echartsOptions)
-      } else {
-        ElMessage.error(res.msg)
-      }
-    }).catch(err => {
-      ElMessage.error(err)
-    })
+      type: "ply",
+    };
+    getAnalysis(param)
+      .then((res: any) => {
+        if (res.code === 200) {
+          res.dataMap["方案出单"].forEach((item: any, index: number) => {
+            item.value = Math.random() * 123;
+            item.rate = Math.random() * 3.6;
+          });
+          res.dataMap["核心导入"].forEach((item: any, index: number) => {
+            item.value = Math.random() * 18;
+            item.rate = Math.random() * 1.2;
+          });
+          res.dataMap["核心页面出单"].forEach((item: any, index: number) => {
+            item.value = Math.random() * 153;
+            item.rate = Math.random() * 2.2;
+          });
+          res.dataMap["渠道出单"].forEach((item: any, index: number) => {
+            item.value = Math.random() * 222;
+            item.rate = Math.random() * 2.4;
+          });
+          res.dataMap["移动端出单"].forEach((item: any, index: number) => {
+            item.value = Math.random() * 134;
+            item.rate = Math.random() * 1.6;
+          });
+          res.dataMap["询报价转投保"].forEach((item: any, index: number) => {
+            item.value = Math.random() * 356;
+            item.rate = Math.random() * 3.5;
+          });
+          echartsOptionsData.value = res.dataMap;
+          const data = res.dataMap[currentTab.value] || [];
+          echartsOptions.xAxis[0].data = data.map((item: any) => item.item);
+          echartsOptions.series[0].data = data.map((item: any) => item.value);
+          echartsOptions.series[1].data = data.map((item: any) => item.rate);
+          // 饼状图
+          echartsOptionsPie.series[0].data = data.map((item: any) => ({
+            name: item.item,
+            value: item.value,
+          }));
+          echartsOptionsPie.legend.data = data.map((item: any) => item.item);
+          ecahrtsRefInstance?.clear();
+          ecahrtsRefInstance?.setOption(ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie);
+        } else {
+          ElMessage.error(res.msg);
+        }
+      })
+      .catch((err) => {
+        ElMessage.error(err);
+      });
   } else {
-    echartsOptions.xAxis[0].data = echartsOptionsData.value[currentTab.value].map((item:any) => item.item)
-    echartsOptions.series[0].data = echartsOptionsData.value[currentTab.value].map((item:any) => item.value)
-    echartsOptions.series[1].data = echartsOptionsData.value[currentTab.value].map((item:any) => item.rate)
-    ecahrtsRefInstance?.setOption(echartsOptions)
+    echartsOptions.xAxis[0].data = echartsOptionsData.value[
+      currentTab.value
+    ].map((item: any) => item.item);
+    echartsOptions.series[0].data = echartsOptionsData.value[
+      currentTab.value
+    ].map((item: any) => item.value);
+    echartsOptions.series[1].data = echartsOptionsData.value[
+      currentTab.value
+    ].map((item: any) => item.rate);
+    // 饼状图
+    echartsOptionsPie.series[0].data = echartsOptionsData.value[
+      currentTab.value
+    ].map((item: any) => ({
+      name: item.item,
+      value: item.value,
+    }));
+    echartsOptionsPie.legend.data = echartsOptionsData.value[
+      currentTab.value
+    ].map((item: any) => item.item);
+    ecahrtsRefInstance?.clear();
+    ecahrtsRefInstance?.setOption(ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie);
   }
-  if(echartsOptionsData1.value.length < 1) {
+  if (echartsOptionsData1.value.length < 1) {
     const param1 = {
-      type: 'fee'
-    }
-    getAnalysis(param1).then((res:any) => {
-      if(res.code === 200) {
-        res.dataMap['方案出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 10000
-          item.rate = Math.random() * 0.8
-        })
-        res.dataMap['核心导入'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 1800
-          item.rate = Math.random() * 3.6
-        })
-        res.dataMap['核心页面出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 153000
-          item.rate = Math.random() * 2.8
-        })
-        res.dataMap['渠道出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 22200
-          item.rate = Math.random() * 2.9
-        })
-        res.dataMap['移动端出单'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 134000
-          item.rate = Math.random() * 1.6
-        })
-        res.dataMap['询报价转投保'].forEach((item:any, index:number) => {
-          item.value = Math.random() * 3560
-          item.rate = Math.random() * 3.5
-        })
-        echartsOptionsData1.value = res.dataMap;
-        const data = res.dataMap[currentTab.value] || [];
-        echartsOptions1.xAxis[0].data = data.map((item:any) => item.item)
-        echartsOptions1.series[0].data = data.map((item:any) => item.value)
-        echartsOptions1.series[1].data = data.map((item:any) => item.rate)
-        ecahrtsRefInstance1?.setOption(echartsOptions1)
-      } else {
-        ElMessage.error(res.msg)
-      }
-    }).catch(err => {
-      ElMessage.error(err)
-    })
+      type: "fee",
+    };
+    getAnalysis(param1)
+      .then((res: any) => {
+        if (res.code === 200) {
+          res.dataMap["方案出单"].forEach((item: any, index: number) => {
+            item.value = Math.round(Math.random() * 100);
+            item.rate = Math.random() * 0.8;
+          });
+          res.dataMap["核心导入"].forEach((item: any, index: number) => {
+            item.value = Math.round(Math.random() * 200);
+            item.rate = Math.random() * 3.6;
+          });
+          res.dataMap["核心页面出单"].forEach((item: any, index: number) => {
+            item.value = Math.round(Math.random() * 300);
+            item.rate = Math.random() * 2.8;
+          });
+          res.dataMap["渠道出单"].forEach((item: any, index: number) => {
+            item.value = Math.round(Math.random() * 400);
+            item.rate = Math.random() * 2.9;
+          });
+          res.dataMap["移动端出单"].forEach((item: any, index: number) => {
+            item.value = Math.round(Math.random() * 500);
+            item.rate = Math.random() * 1.6;
+          });
+          res.dataMap["询报价转投保"].forEach((item: any, index: number) => {
+            item.value = Math.round(Math.random() * 600);
+            item.rate = Math.random() * 3.5;
+          });
+          echartsOptionsData1.value = res.dataMap;
+          const data = res.dataMap[currentTab.value] || [];
+          echartsOptions1.xAxis[0].data = data.map((item:any) => item.item)
+          echartsOptions1.series[0].data = data.map((item: any) => item.value);
+          echartsOptions1.series[1].data = data.map((item:any) => item.rate)
+          // 饼状图
+          echartsOptions1Pie.series[0].data = data.map((item: any) => ({
+            name: item.item,
+            value: item.value,
+          }));
+          echartsOptions1Pie.legend.data = data.map((item: any) => item.item);
+          ecahrtsRefInstance1?.clear();
+          ecahrtsRefInstance1?.setOption(ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie);
+        } else {
+          ElMessage.error(res.msg);
+        }
+      })
+      .catch((err) => {
+        ElMessage.error(err);
+      });
   } else {
-    echartsOptions1.xAxis[0].data = echartsOptionsData1.value[currentTab.value].map((item:any) => item.item)
-    echartsOptions1.series[0].data = echartsOptionsData1.value[currentTab.value].map((item:any) => item.value)
-    echartsOptions1.series[1].data = echartsOptionsData1.value[currentTab.value].map((item:any) => item.rate)
-    ecahrtsRefInstance1?.setOption(echartsOptions1)
+    echartsOptions1.xAxis[0].data = echartsOptionsData1.value[
+      currentTab.value
+    ].map((item: any) => item.item);
+    echartsOptions1.series[0].data = echartsOptionsData1.value[
+      currentTab.value
+    ].map((item: any) => item.value);
+    echartsOptions1.series[1].data = echartsOptionsData1.value[
+      currentTab.value
+    ].map((item: any) => item.rate);
+    // 饼状图
+    echartsOptions1Pie.series[0].data = echartsOptionsData1.value[
+      currentTab.value
+    ].map((item: any) => ({
+      name: item.item,
+      value: item.value,
+    }));
+    echartsOptions1Pie.legend.data = echartsOptionsData1.value[
+      currentTab.value
+    ].map((item: any) => item.item);
+    ecahrtsRefInstance1?.clear();
+    ecahrtsRefInstance1?.setOption(ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie);
+  }
+}
+
+function changeEchartsType(type:any) {
+  ecahrtsOptionsType.value = type
+  if(type === "0") {
+    ecahrtsRefInstance?.clear();
+    ecahrtsRefInstance?.setOption(echartsOptions);
+  } else {
+    ecahrtsRefInstance?.clear();
+    ecahrtsRefInstance?.setOption(echartsOptionsPie);
+  }
+}
+
+function changeEcharts1Type(type:any) {
+  ecahrtsOptions1Type.value = type
+  ecahrtsOptionsType.value = type
+  if(type === "0") {
+    ecahrtsRefInstance1?.clear();
+    ecahrtsRefInstance1?.setOption(echartsOptions1);
+  } else {
+    ecahrtsRefInstance1?.clear();
+    ecahrtsRefInstance1?.setOption(echartsOptions1Pie);
   }
 }
 
 onMounted(() => {
-  init()
-  initRoles()
-  getNoticeData()
-  getShortMenuList()
+  init();
+  initRoles();
+  getNoticeData();
+  getShortMenuList();
   getCpayTypList();
 });
 
 const initRoles = () => {
   tabs.value = [];
-  getData(user, roles)
+  getData(user, roles);
 };
 const getData = (user: any, roles: any = []) => {
   let roleCde = "";
@@ -1638,13 +1893,16 @@ function handleReceived(row: any, baseType?: string) {
 }
 
 function updateUdrDetail(row: any, baseType?: string) {
-  const getBaseInfo = baseType === "询价" ? getBaseInfoByInquiryNo({inquiryNo: row.objId}) : getBaseInfoByAppNo({ appNo: row.objId })
+  const getBaseInfo =
+    baseType === "询价"
+      ? getBaseInfoByInquiryNo({ inquiryNo: row.objId })
+      : getBaseInfoByAppNo({ appNo: row.objId });
   getBaseInfo.then((r: any) => {
     if (r.code !== 200) {
       ElMessage.error({ message: r.msg, duration: 6000 });
     } else {
       if (row.bsType === "A") {
-        if(baseType === "询价") {
+        if (baseType === "询价") {
           const en = JSON.stringify({
             // scene: SCENE_PLY_UW_PROCESS,
             cAppNo: row.cAppNo,
@@ -1662,7 +1920,7 @@ function updateUdrDetail(row: any, baseType?: string) {
             cTermNo: row.cTermNo,
             cTermNme: row.cTermNme,
             cProdNmeCn: row.prodName,
-            pageName: 'priceInquiry'
+            pageName: "priceInquiry",
           });
           router.push({
             path: "/pcisapp/pricePage",
@@ -1759,74 +2017,75 @@ function showDetails(row: any, type?: any) {
       });
     }
   } else {
-    const getBaseInfo = type === "询价" ? getBaseInfoByInquiryNo({inquiryNo: row.objId || row.cInquiryNo}) : getBaseInfoByAppNo({ appNo: row.objId || row.cAppNo})
-    getBaseInfo.then(
-      (r: any) => {
-        if (r.code !== 200) {
-          ElMessage.error({ message: r.msg, duration: 6000 });
-        } else {
-          if (cAppTyp === "A") {
-            const p:any = {
-              taskId: row.curtTask,
-              cAppTyp: row.bsType ? row.bsType : row.cAppTyp,
-              cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
-              cCiMrk: r.data.cCiMrk,
-              cGrpMrk: r.data.cGrpMrk,
-              cDptCde: r.data.cDptCde,
-              cDptCnm: row.uwDptName ? row.uwDptName : row.cDptCnm,
-              pageType: "UW_READ_SCENE",
-              cTermNme: row.cTermNme,
-              cTermNo: row.cTermNo,
-              cProdNmeCn: row.prodName,
-              cPolicySource: row.cPolicySource,
-            }
-            if(type === "询价") {
-              p['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
-              p['pageName'] = 'priceInquiry'
-            } else {
-              p['cAppNo'] = row.objId ? row.objId : row.cAppNo
-            }
-            const en = JSON.stringify(p);
-            router.push({
-              path: type === "询价" ? "/pcisapp/pricePage" : "/pcisapp/myPage",
-              query: {
-                param: en,
-              },
-            });
+    const getBaseInfo =
+      type === "询价"
+        ? getBaseInfoByInquiryNo({ inquiryNo: row.objId || row.cInquiryNo })
+        : getBaseInfoByAppNo({ appNo: row.objId || row.cAppNo });
+    getBaseInfo.then((r: any) => {
+      if (r.code !== 200) {
+        ElMessage.error({ message: r.msg, duration: 6000 });
+      } else {
+        if (cAppTyp === "A") {
+          const p: any = {
+            taskId: row.curtTask,
+            cAppTyp: row.bsType ? row.bsType : row.cAppTyp,
+            cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
+            cCiMrk: r.data.cCiMrk,
+            cGrpMrk: r.data.cGrpMrk,
+            cDptCde: r.data.cDptCde,
+            cDptCnm: row.uwDptName ? row.uwDptName : row.cDptCnm,
+            pageType: "UW_READ_SCENE",
+            cTermNme: row.cTermNme,
+            cTermNo: row.cTermNo,
+            cProdNmeCn: row.prodName,
+            cPolicySource: row.cPolicySource,
+          };
+          if (type === "询价") {
+            p["cInquiryNo"] = row.objId ? row.objId : row.cInquiryNo;
+            p["pageName"] = "priceInquiry";
           } else {
-            const p:any = {
-              taskId: row.curtTask,
-              cAppTyp: row.bsType ? row.bsType : row.cAppTyp,
-              cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
-              cCiMrk: r.data.cCiMrk,
-              cRsnCde: r.data.cEdrRsnBundleCde,
-              cEdrType: r.data.cEdrType,
-              cGrpMrk: r.data.cGrpMrk,
-              cDptCde: r.data.cDptCde,
-              cDptCnm: row.uwDptName ? row.uwDptName : row.cDptCnm,
-              pageType: "UW_READ_SCENE",
-              cTermNme: row.cTermNme,
-              cTermNo: row.cTermNo,
-              cProdNmeCn: row.prodName,
-              cPolicySource: row.cPolicySource,
-            }
-            if(type === "询价") {
-              p['cInquiryNo'] = row.objId ? row.objId : row.cInquiryNo
-              p['pageName'] = 'priceInquiry'
-            } else {
-              p['cAppNo'] = row.objId ? row.objId : row.cAppNo
-            }
-            const en = JSON.stringify(p);
-            router.push({
-              path: type === "询价" ? "/pcisapp/pricePage" : "/pcisapp/myPage",
-              query: {
-                param: en,
-              },
-            });
+            p["cAppNo"] = row.objId ? row.objId : row.cAppNo;
           }
+          const en = JSON.stringify(p);
+          router.push({
+            path: type === "询价" ? "/pcisapp/pricePage" : "/pcisapp/myPage",
+            query: {
+              param: en,
+            },
+          });
+        } else {
+          const p: any = {
+            taskId: row.curtTask,
+            cAppTyp: row.bsType ? row.bsType : row.cAppTyp,
+            cProdNo: row.prodNo ? row.prodNo : row.cProdNo,
+            cCiMrk: r.data.cCiMrk,
+            cRsnCde: r.data.cEdrRsnBundleCde,
+            cEdrType: r.data.cEdrType,
+            cGrpMrk: r.data.cGrpMrk,
+            cDptCde: r.data.cDptCde,
+            cDptCnm: row.uwDptName ? row.uwDptName : row.cDptCnm,
+            pageType: "UW_READ_SCENE",
+            cTermNme: row.cTermNme,
+            cTermNo: row.cTermNo,
+            cProdNmeCn: row.prodName,
+            cPolicySource: row.cPolicySource,
+          };
+          if (type === "询价") {
+            p["cInquiryNo"] = row.objId ? row.objId : row.cInquiryNo;
+            p["pageName"] = "priceInquiry";
+          } else {
+            p["cAppNo"] = row.objId ? row.objId : row.cAppNo;
+          }
+          const en = JSON.stringify(p);
+          router.push({
+            path: type === "询价" ? "/pcisapp/pricePage" : "/pcisapp/myPage",
+            query: {
+              param: en,
+            },
+          });
         }
       }
-    );
+    });
   }
 }
 
@@ -1966,21 +2225,27 @@ window.addEventListener("resize", () => {
         width: 100%;
         background: #fff;
         // box-shadow: 0 0 0.4rem #0000001a;
-        box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.1);
+        box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
         border-radius: 5px;
         padding: 1rem 1.5rem;
         display: flex;
         flex-direction: column;
 
         .title-box {
-          .title {
-            font-size: 1.2rem;
-            color: #333333;
-            font-weight: 600;
-            margin-right: 8px;
-          }
-          .icon {
-            width: 1.2rem;
+          .title-line {
+            display: flex;
+            align-items: center;
+            .title {
+              font-size: 18px;
+              color: #333333;
+              font-weight: 600;
+              margin-right: 5px;
+              line-height: 25px;
+            }
+            .icon {
+              width: 18px;
+              height: 11px;
+            }
           }
         }
 
@@ -2018,12 +2283,25 @@ window.addEventListener("resize", () => {
         }
         .content-charts-box {
           margin-top: 10px;
+          .echarts-box {
+            display: flex;
+            justify-content: space-between;
+          }
           .tab-box {
             display: flex;
             justify-content: end;
             align-items: center;
             margin: 20px 0;
             color: #666;
+          }
+          .echarts-title {
+            font-size: 16px;
+            color: #333333;
+            line-height: 22px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
           }
         }
       }
@@ -2125,9 +2403,9 @@ window.addEventListener("resize", () => {
       width: 100%;
       background: #fff;
       // box-shadow: 0 0 0.4rem #0000001a;
-      box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.1);
+      box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
       border-radius: 5px;
-      padding: 2rem;
+      padding: 28px 37px;
       display: flex;
       flex-direction: column;
       margin-bottom: 1.5rem;
@@ -2135,20 +2413,51 @@ window.addEventListener("resize", () => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        .title {
-          font-size: 1.2rem;
-          color: #333333;
-          font-weight: 600;
-          margin-right: 8px;
-        }
-        .icon {
-          width: 1.2rem;
+        .title-line {
+          display: flex;
+          align-items: center;
+          .title {
+            font-size: 18px;
+            color: #333333;
+            font-weight: 600;
+            margin-right: 5px;
+            line-height: 25px;
+          }
+          .icon {
+            width: 18px;
+            height: 11px;
+          }
         }
       }
       .table-box {
         .table {
           display: flex;
           flex-direction: column;
+          :deep(.el-table) {
+            th.el-table__cell {
+              background: rgba(0, 0, 0, 0.02);
+            }
+          }
+        }
+        .tabs-box {
+          .el-tabs__item {
+            font-size: 17px;
+            line-height: 24px;
+            color: #000000;
+          }
+        }
+        .searchbar {
+          border: none;
+          box-shadow: none;
+          :deep(.el-card) {
+            --el-card-border-color: transparent;
+            .el-card__header {
+              display: none;
+            }
+            .el-card__body {
+              padding: 0;
+            }
+          }
         }
       }
     }

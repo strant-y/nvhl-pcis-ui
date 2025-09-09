@@ -24,6 +24,7 @@
           :controls="item.controls ? item.controls : false"
           controls-position="right"
           @change="handleChange"
+          :style="{maxWidth: item.maxWidth || ''}"
       >
         <template #prefix v-if="item.prefix">
           <span>{{ item.prefix }}</span>
