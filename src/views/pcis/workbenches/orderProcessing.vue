@@ -582,7 +582,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "DocumentCopy",
         hideBtns: (row: any) => {
-          if (row.baseType !== "询价") {
+          if (row.baseType !== "询价" && row.cCiMrk !== "联保单") {
             return false;
           } else {
             return true;

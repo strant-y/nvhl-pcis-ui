@@ -1120,16 +1120,14 @@ const tableObj = {
                 tooltip: "复制",
                 size: "large",
                 icon: "DocumentCopy",
-                // hideBtns: (row: any) => {
-                //   if (
-                //     row.cAppStatus == "1" ||
-                //     row.cAppStatus == "5"
-                //   ) {
-                //     return false;
-                //   } else {
-                //     return true;
-                //   }
-                // },
+                hideBtns: (row: any) => {
+                    // 联保单不显示复制按钮
+                    if (row.cCiMrk === "联保单") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
                 tableClick: async (row) => {
                     console.log(row);
                     const r = await row;
