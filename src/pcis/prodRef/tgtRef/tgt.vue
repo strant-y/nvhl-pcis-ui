@@ -356,9 +356,9 @@ const method = {
   cDestCountryChange:(val:any)=>{
     const getFormconfig = opertaor.getTableRefs()['AgentTgt'].getFormconfig()
     getFormconfig.fromSchema?.forEach((item:any) => {
-      if(item.prop == "Tgt.cPayCur" && val === 'CHINA'){
+      if(item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')){
         item.disabled = false;
-      }else if(item.prop == "Tgt.cPayCur" && val !== 'CHINA'){
+      }else if(item.prop == "Tgt.cPayCur"){
         item.disabled = true;
       }
     });
