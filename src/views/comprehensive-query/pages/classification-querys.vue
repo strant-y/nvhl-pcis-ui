@@ -849,10 +849,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtselect",
               title: "项目中类",
               clearable: true,
+              filterable: true,
               hidden: true,
               func: (v) => {
                  if(v){
-                  //   setValue("cPrjCtgSubTyp","")
+                  setValue("cPrjCtgSubTyp","")
                   formconfig1.fromSchema?.forEach((item) => {
                       if (item.prop === "cPrjCtgSubTyp") {
                           item.typeCode = "CPrjCtgTyp_List";
@@ -871,6 +872,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtselect",
               title: "项目子类",
               clearable: true,
+              filterable: true,
               hidden: true,
           },
       ],
