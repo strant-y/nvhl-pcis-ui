@@ -950,7 +950,7 @@ const valideRequired = ()=>{
       for(const rowData of rowItems){
         // 处理业务类型为19001（直销业务）的情况
         if(cBsnsTyp == '19001'){
-          freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
+          // freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
           // 直销业务：业务员必填
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cSlsId", "rules", [getRules("required", {})]
@@ -979,7 +979,7 @@ const valideRequired = ()=>{
         }
         // 处理非直销业务（19002或19003）的情况
         else if(cBsnsTyp == '19002' || cBsnsTyp == '19003'){
-          freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
+          // freeEditRef.value?.setRowFieldProp(rowData._dataId, 'Ci.nComm', 'disabled', true)
           // 非直销业务：代理经纪人和代理业务员必填
           freeEditRef.value?.setRowFieldProp(
             rowData._dataId, "Ci.cBrkrCde", "rules", [getRules("required", {})]
