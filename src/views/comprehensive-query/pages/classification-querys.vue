@@ -360,7 +360,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     if (res.type === "ok") {
                     const selectedProps = res.body.body; // 用户选中的列
                     userAllCheckedColumns.value = selectedProps; // 更新缓存
-                    console.log('userAllCheckedColumns.value', userAllCheckedColumns.value);
                     
                     // 保存到接口
                     const saveParam = {
@@ -373,8 +372,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         type: 'search',
                         cCrtCde: JSON.parse(sessionStorage.getItem("user")).opCde,
                     };
-                    console.log('saveParam',saveParam);
-
                     try {
                         const saveRes = await CustomUserList(saveParam);
                         if (saveRes.code == 200) {
@@ -1880,16 +1877,21 @@ function buildAllCheckboxData() {
     const currentColumns = tableconfig.fromSchema || [];
     const currentProps = currentColumns.map(col => col.prop);
 
+    /* 如果用户曾经保存过配置，则以保存结果为准；否则用“原始列”作为默认显示 */
+    const savedProps = userAllCheckedColumns.value.length
+    ? userAllCheckedColumns.value
+    : normalQueryColumns.map(c => c.prop);
+
     const all = [
         ...normalQueryColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: currentProps.includes(col.prop) || userAllCheckedColumns.value.includes(col.prop),
+            checked: savedProps.includes(col.prop),
         })),
         ...extendColumns.map(col => ({
             label: col.title,
             value: col.prop,
-            checked: currentProps.includes(col.prop) || userAllCheckedColumns.value.includes(col.prop),
+            checked: savedProps.includes(col.prop),
         }))
     ];
     return all;
