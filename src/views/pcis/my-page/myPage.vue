@@ -2714,6 +2714,17 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
+  if(props.param.cProdNo.startsWith('02') ){
+    const term = opertaor.getTableRefByKey("cvrg").getFromValue();
+    term.forEach(item => {
+      if(item["Term.cRdrTyp"] === '0'){
+        if( !item["Term.riskList"] || item["Term.riskList"].length === 0 ){
+          ElMessage.error("至少需要一条责任信息!");
+          r = false;
+        }
+      }
+    });
+  }
   return r;
 }
 /**
