@@ -1,8 +1,8 @@
 <template>
   <el-dialog :close-on-click-modal="false"  v-model="dialogVisible"  @close="close" width="90%" title="反洗钱扩展信息">
     <el-config-provider :locale="locale">
-      <appExtendInfo  v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
-      <insExtendInfo  v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
+      <appExtendInfo  :idxParam="idxParam" v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
+      <insExtendInfo  :idxParam="idxParam" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
     </el-config-provider>
 		<div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
@@ -48,10 +48,11 @@ import {
   MyTableMethod,
 } from "@/shared/app-table-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
+
 import { useAppStore } from "@/store";
 const appStore = useAppStore();
 const locale = computed(() => appStore.locale);
@@ -62,9 +63,12 @@ const props = defineProps({
     required: true, 
   },
   data: Object,
-  type:String
+  type:String,
+  idxParam:Object,
 });
 
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+console.log(opertaor)
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
