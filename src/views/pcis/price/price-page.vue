@@ -3627,9 +3627,9 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   const data = opertaor.getDataAll();
   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
   const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk)
-  let nCiShare= 100;
+  let nCiShare= 1;
   if(nCiOwnPrm){
-       nCiShare = Number(getOwnShare()) || 100 ;
+       nCiShare = Number(getOwnShare()) || 1 ;
   }
   const pay = {};
   if (applicant) {
@@ -3645,7 +3645,7 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
 
 
 
-  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * (nCiShare/100)).toFixed(8))  : 0;
+  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * nCiShare).toFixed(8))  : 0;
 // debugger
 
 
@@ -3681,7 +3681,7 @@ const calcPremiumEdrSurrender = () => {
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
-        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
       }
     })
   }
@@ -3706,7 +3706,7 @@ const calcPremiumEdrSurrender = () => {
       if(ops['ci'] && ops['ci'].length>0){
         ops['ci'].forEach((item:any)=>{
           if(item['Ci.nCiShare']){
-            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
           }
         })
       }
@@ -3763,7 +3763,7 @@ const saveApplicationEdr = () => {
       if(ops['ci'] && ops['ci'].length>0){
         ops['ci'].forEach((item:any)=>{
           if(item['Ci.nCiShare']){
-            item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
           }
         })
       }
@@ -3909,7 +3909,7 @@ const saveEdrPlyInfo = async () => {
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
-        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
       }
     })
   }
@@ -3924,7 +3924,7 @@ const saveEdrPlyInfo = async () => {
     if(ops['ci'] && ops['ci'].length>0){
       ops['ci'].forEach((item:any)=>{
         if(item['Ci.nCiShare']){
-          item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+          item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
         }
       })
     }
@@ -4013,7 +4013,7 @@ const generateEndorse = async () => {
   if(res['ci'] && res['ci'].length>0){
     res['ci'].forEach((item:any)=>{
       if(item['Ci.nCiShare']){
-        item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+        item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
       }
     })
   }
@@ -4204,7 +4204,7 @@ const submitEdrToUndrFun = async () => {
         if(calcData['ci'] && calcData['ci'].length>0){
           calcData['ci'].forEach((item:any)=>{
             if(item['Ci.nCiShare']){
-              item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+              item['Ci.nCiShare'] = Number(item['Ci.nCiShare']);
             }
           })
         }
@@ -4379,6 +4379,10 @@ const validateDistConsistency = async () => {
       const distMap = formconfig1[0].pageInfo.filter(
         (item: any) => item.pageKey === 'dist'
       );
+      const tgtMap = formconfig1[0].pageInfo.filter(
+        (item: any) => item.pageKey === 'tgt'
+      );
+
       if (!distMap.length) {
         return true;
       }
@@ -4387,8 +4391,8 @@ const validateDistConsistency = async () => {
         cProdNo: props.param?.cProdNo,     // 产品号
         cComponentTable: [
             ...distMap.map((item: any) => item.pageCode),
-            'EmployeeTgt040002'
-        ]
+            ...tgtMap.map((item: any) => item.pageCode)
+        ],
       };
 
       if (props.param?.pageName === 'priceInquiry') {
@@ -4399,7 +4403,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
-        ElMessage.error(distRes.msg);
+        ElMessage.success(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示

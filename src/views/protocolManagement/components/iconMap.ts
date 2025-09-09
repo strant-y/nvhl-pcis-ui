@@ -1,3 +1,4 @@
+
 export const iconMap = {
   'ECargoBase': 'icon-wenjianban1',
   'ECargoApplicant': 'icon-mti-huishang',
@@ -9,6 +10,7 @@ export const iconMap = {
   'ECargoFee': 'icon-qitafeiyong',
   'ECargoTransportDist': 'icon-anjian',
   'ECargoGoodsTgt': 'icon-lishicaozuojilu',
+  'ECargoTgtSummary': 'icon-lishicaozuojilu',
   'ECargoTerm': 'icon-chakanmingxi',
   'underwriteurl': 'icon-shenhexinxi',
   'edrbase': 'icon-shujuxiuzheng',

@@ -914,7 +914,7 @@ const premiumCalculation = ()=>{
         AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',0)
         console.log(11111,AgreementFeeWarn.getFormValue())
       }
-      if(props.param?.cEdrType == '1' && (props.param?.pageType == 'EDR_APP_NEW_SCENE' || props?.type == 'EDR_APP_NEW_SCENE')){
+      if(props.param?.pageType == 'EDR_APP_NEW_SCENE' || props?.type == 'EDR_APP_NEW_SCENE'){
         const pgxx = mainRef.value?.getxyedrbaseRefValue()
         if(isBef){
           const xbf =  AgreementFeeWarn.getValue('ECargoBase.nPrm') || 0

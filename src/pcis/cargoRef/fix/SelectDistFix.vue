@@ -219,6 +219,7 @@ function setUnDisabledByKeyList(key: any) {
 }
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
+        console.log('清单666')
     return {
       ...item,
       ...{

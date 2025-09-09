@@ -1,12 +1,12 @@
 <template>
   <div>
-      <app-table
-          :tableConfig="tableconfig"
-          v-model:pageresult="pageresult"
-          @page-change="loadData(false)"
-          ref="distTableRef"
-          @selection-change="handleSelectionChange"
-      />
+    <app-table
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        @page-change="loadDatOne"
+        ref="distTableRef"
+        @selection-change="handleSelectionChange"
+    />
     <comDialog ref="dialog"></comDialog>
   </div>
 </template>
@@ -89,15 +89,6 @@ const selectedRows = ref<any[]>([]);
 function handleSelectionChange(selection: any) {
   selectedRows.value = selection;
 }
-watch(
-    () => pageresult.list,
-    (newVal: any) => {
-      if (newVal) {
-        console.log('发生变化了。。。',newVal)
-        eventBus.emit('matterChange', nCargoSeq.value);
-      }
-    }
-);
 onMounted(async () => {
   formconfig11.value = formInit(
       // JSON.stringify({ ...props.pageSchema, fromSchema: processedFromSchema }),
@@ -109,7 +100,7 @@ onMounted(async () => {
   tableconfig.value.title =formconfig1.value.title;
   tableconfig.value.titleBtnPosition = 'right';
   tableconfig.value.showEdit = true;
-  tableconfig.value.showSelection = true;
+  tableconfig.value.showSelection = false;
   formconfig1.value.fromSchema.forEach((e: any) => {  // 隐藏不需要显示在表格内的数据
     if (e.cShowLocation === '0') {
       e.isShow = false
@@ -136,26 +127,20 @@ onMounted(async () => {
     }
   }
   cComponentTableValue = getCComponentTableValue();
- nextTick(()=>{
-   eventBus.on('goodsChange', loadDatOne);
-   eventBus.on('goodsRefresh', goodsRefresh);
-   const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-   if(agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')){
-     loadData()
-   }
- })
+  nextTick(()=>{
+    eventBus.on('ECargoTgtSummaryChange', loadDatOne);
+  })
 });
 const nCargoSeq = ref()
 const loadDatOne = (val:any)=>{
   nCargoSeq.value = val
   if(!val) return
   const r = distTableRef.value?.getPartnerPage(true); //获取分页数据
-  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || ''}, r);
+  let param = Object.assign({cComponentTable:'ECargoGoodsTgt',cEcAgrAppNo:val || '', isSummary:'1'}, r);
   cargoApi.selectDistNew(param).then((res: any) => {
     if(res.code === 200) {
       pageresult.list = res.data.data
       pageresult.total = res.data.total
-      eventBus.emit('ECargoTgtSummaryChange', nCargoSeq.value);
     }else {
       ElMessage.success(res.msg);
     }
@@ -166,33 +151,19 @@ function hasPropertyWithValue(arr, property) {
       obj && obj.hasOwnProperty(property) && obj[property] != null
   );
 }
-const goodsRefresh = (val:any)=>{
-  nCargoSeq.value = val.cEcAgrAppNo
-  if(hasPropertyWithValue(pageresult.list,'ECargoGoodsTgt.cRowId')) return
-  copyDist(val).then((res:any) => {
-    if(res && res.code === 200) {
-      loadDatOne(val.targetNo)
-    } else {
-      ElMessage.error(res.msg);
+const loadData = (flag = true)=>{
+  const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
+  const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+  let param = Object.assign({cComponentTable:cComponentTableValue,cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
+  cargoApi.selectDistNew(param).then((res: any) => {
+    if(res.code === 200) {
+      pageresult.list = res.data.data
+      pageresult.total = res.data.total
+    }else {
+      ElMessage.success(res.msg);
     }
-  }).catch((err:any) => {
-    ElMessage.error(err.msg);
   })
 }
-const loadData = (flag = true)=>{
-    const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
-    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    let param = Object.assign({cComponentTable:cComponentTableValue,cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''}, r);
-      cargoApi.selectDistNew(param).then((res: any) => {
-        if(res.code === 200) {
-            pageresult.list = res.data.data
-            pageresult.total = res.data.total
-          eventBus.emit('ECargoTgtSummaryChange',agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || '');
-        }else {
-          ElMessage.success(res.msg);
-        }
-      })
-    }
 const saveTgt = async (res:any)=>{
   const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
   const newRow = {
@@ -289,8 +260,8 @@ const method = {
     const param = {
       ...formconfig,
     }
-      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-      param['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    param['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
     if ( param['cEcAgrAppNo'] == '' ||  param['cEcAgrAppNo'] == undefined) {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
@@ -318,8 +289,8 @@ const method = {
     let paramitem  = Object.assign(formconfig, {
       cComponentTable: cComponentTableValue,
     });
-      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-     paramitem['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    paramitem['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
     if ( paramitem['cEcAgrAppNo'] == '' ||  paramitem['cEcAgrAppNo'] == undefined) {
       ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
       return;
@@ -345,8 +316,8 @@ const method = {
     let param  = Object.assign(formconfig1.value, {
       cComponentTable: cComponentTableValue,
     });
-      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-      param['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+    const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+    param['cEcAgrAppNo'] = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
     policyService
         .downloadDistTemplateIncrement(param)
         .then((res) => {
@@ -435,9 +406,9 @@ const method = {
               ElMessage.success(`导入完成：${res.data.msg}`);
               const result:any =  await cargoApi.getRate({cEcAgrAppNo:params['cEcAgrAppNo']})
               if(result.code == 200){
-               await cargoApi.saveRate({cEcAgrAppNo:params['cEcAgrAppNo'],...result.data.data[0].rateDetail})
+                await cargoApi.saveRate({cEcAgrAppNo:params['cEcAgrAppNo'],...result.data.data[0].rateDetail})
               }
-               await loadData()
+              await loadData()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
@@ -544,8 +515,8 @@ const method = {
   // 删除
   delmethod: (row: any) => {
     const result:any = isBiz(row['ECargoGoodsTgt.cPkId'])
-		ElMessageBox.confirm(
-       result.isOk ? `当前货物已经在条款所属组${result.name}中使用否确认删除当前数据？`:'是否确认删除当前数据？',
+    ElMessageBox.confirm(
+        result.isOk ? `当前货物已经在条款所属组${result.name}中使用否确认删除当前数据？`:'是否确认删除当前数据？',
         "提示",
         {
           confirmButtonText: "确定",
@@ -553,19 +524,19 @@ const method = {
           type: "warning",
         }
     ).then(() => {
-			const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-			const param = {
-				cComponentTable: cComponentTableValue,
-				cPkId: [row['ECargoGoodsTgt.cPkId']],
-				cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
-			}
-			deleteDist(param).then((res: any) => {
-				if (res.code === 200) {
-					ElMessage.success("删除成功");
-					loadData()
-				}
-			});
-		}).catch(()=>{})
+      const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+      const param = {
+        cComponentTable: cComponentTableValue,
+        cPkId: [row['ECargoGoodsTgt.cPkId']],
+        cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
+      }
+      deleteDist(param).then((res: any) => {
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          loadData()
+        }
+      });
+    }).catch(()=>{})
   },
 
   handleQuery: () => {
