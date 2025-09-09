@@ -226,6 +226,12 @@ const method = {
   },
   //总保费下拉事件
   cPrmCurChange: (val: any) => {
+    try {
+      const getFormconfig = opertaor.getTableRefs()['AgentTgt']
+      getFormconfig?.setValue('Tgt.cPayCur',val)
+    }catch (err){
+      console.log(err)
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
