@@ -52,6 +52,7 @@
                 <myCard
                   :cardConfig="{
                     title: '主条款信息',
+                    titleClass: 'mainTitle',
                     showInTitle: true,
                   }"
                 >
@@ -170,6 +171,20 @@
           </el-card>
         </div>
       </div>
+      <div class="planInfo">
+        <el-card class="planCard">
+        <template #header>
+          <a style="margin-right: 5px" @click="changeHidden('commonData')">
+            <el-icon v-if="!isHidden('commonData')"><ArrowRightBold /></el-icon>
+            <el-icon v-if="isHidden('commonData')"><ArrowDownBold /></el-icon>
+          </a>
+          {{ '公共信息' }}
+        </template>
+        <template v-if="isHidden('commonData')">
+          <termcommon v-model="planDataCommon" ref="termcommonRef"/>
+        </template>
+      </el-card>
+      </div>
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -186,6 +201,10 @@ const tremAddTemplate3 = defineAsyncComponent(
   () => import("./trem-add3-template.vue")
 );
 
+const termcommon = defineAsyncComponent(
+  () => import("./termCommon.vue")
+);
+
 const dialog = ref<DialogMethod | null>(null);
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
@@ -193,7 +212,7 @@ import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { prodTemple,prodAllPrm } from "./titleTemple";
 import { codeListViewStore } from "@/store";
-import { qryProdRelTermRiskList } from "@/api/prod";
+import { qryProdRelTermRiskList, qryProdTermCf } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
@@ -227,6 +246,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const terconfig = terConfig();
+const termcommonRef = ref("termcommonRef");
 terconfig.configInit(); // 条款配置数据初始化
 
 const tremTemplateRefs = ref<any>({});
@@ -258,7 +278,8 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 
 const cardconfig = ref(creatCardConfig({}));
 const cvrgFormfef = ref("cvrgFormfef");
-const planData = ref<{ [key: string]: { [key: string]: any } }>({});
+const planData = ref<{ [key: string]: { [key: string]: any } }>({});    //私有数据
+const planDataCommon = ref<{ [key: string]: { [key: string]: any } }>({});    //公共信息
 const hiddenFlag = ref<any[]>([]);
 const showTitleMap = ref<{ [key: string]: string }>({});
 
@@ -347,7 +368,6 @@ function addAndinitData() {
             "Term.cClauseCode": item.cTermNo,
             "Term.cRdrTyp": item.cRdrTyp,
             "Term.cUniqueTermNo": item.cUniqueTermNo,
-            "Term.NSeqNo":1,
             "Term.cPlanNo":pl,
             "Term.cDeductibleMethod": "01",
             riskList: riskList,
@@ -359,6 +379,9 @@ function addAndinitData() {
           initTermData(item,data);
           plans.push(data);
         });
+        if(planData.value && Object.keys(planData.value).length >= 1){
+          needrefush.value = false;
+        }
         refushData(pl, plans);
         // 仅在通过funcadd方法调用时显示提示信息
         if (isFuncAddCalled.value) {
@@ -488,8 +511,23 @@ function addTermData(PlanNo: string) {
   const sp = planData.value[PlanNo];
   let seld: any[] = [];
   Object.keys(sp).forEach((k: any) => {
-    seld.push(...sp[k]);
+    const md = JSON.parse(JSON.stringify(sp[k]));
+    if(k === 'm'){
+      if(planDataCommon.value['m'] && planDataCommon.value['m'].length > 0){
+        const r = planDataCommon.value['m'][0];
+        md[0].riskList.push(...r.riskList);
+      }
+    }
+    seld.push(...md);
   });
+  if(planDataCommon.value && Object.keys(planDataCommon.value).length > 0){
+    Object.keys(planDataCommon.value).forEach(k => {
+      if(k !== 'm'){
+        const md = JSON.parse(JSON.stringify(planDataCommon.value[k]));
+        seld.push(...md);
+      }
+    })
+  }
   let parmdata = {
     cProdNo: param.cProdNo,
     isselectData: seld,
@@ -539,7 +577,6 @@ function addTermData(PlanNo: string) {
               "Term.cClauseCode": item.cTermNo,
               "Term.cRdrTyp": item.cRdrTyp,
               "Term.cUniqueTermNo": item.cUniqueTermNo,
-              "Term.NSeqNo": index+1,
               "Term.cPlanNo":PlanNo,
             };
           }
@@ -557,17 +594,101 @@ function addTermData(PlanNo: string) {
     { title: "添加条款", width: 85 }
   );
 }
-function refushData(planNo: string, datas: any) {
+
+const commonCf = ref<{ [key: string]: any } | null>({});
+const needrefush = ref(true);
+async function refushData(planNo: string, datas: any) {
+  if(needrefush.value){
+    planDataCommon.value = {};
+  }
+  needrefush.value = true;
   let pd: { [key: string]: any } = {};
+  let mTerm = null;
+  datas?.forEach((item: any) => {
+    let key = "m";
+    if (item["Term.cRdrTyp"] === "0") {
+      mTerm = item["Term.cClauseCode"];
+    }
+  });
+  if(mTerm && !commonCf.value[mTerm]){
+      const cf = await qryProdTermCf({termNo:mTerm});
+      if(cf.code === 200){ 
+        commonCf.value[mTerm] = cf.data;
+      }
+  }
+  let mterm = null;
+  if(mTerm){
+    mterm = commonCf.value[mTerm];
+  }
+
+  // 拆分公共数据以及独立数据逻辑
+  let commondata = [];
   datas?.forEach((item: any) => {
     let key = "m";
     if (item["Term.cRdrTyp"] !== "0") {
       key = "a" + item["Term.cClauseCategory"];
+    }else{
+      let l = mterm['termRisk'];
+      let ex = [];
+      let ol = [];
+
+      let exterm = {};
+      if(item["riskList"] && item["riskList"].length > 0){
+        item["riskList"].forEach(ris => {
+          let r = false;
+          l.forEach((litem:any) => {
+            if(litem.cRiskNo === ris["TermRisktgt.cLiabCode"]){
+              if(litem.cIsCommon === '1'){
+                r = true;
+              }
+            }
+          });
+          // 如果满足公共条款,则添加到公共条款中,否则保留在原条款数据中
+          if(r){
+            exterm = JSON.parse(JSON.stringify(item));
+            ex.push(ris);
+          }else{
+            ol.push(ris);
+          }
+        });
+      }
+      if(ex && ex.length > 0){
+        exterm.riskList = ex;
+        item.riskList = ol;
+
+        let l = planDataCommon.value[key];
+
+        if(!l || l.length === 0){
+          planDataCommon.value[key] = [exterm];
+        }
+      }
     }
-    if (!pd[key]) {
-      pd[key] = [];
+    
+    let l = mterm['termTerm'];
+    let s = false;
+    l.forEach(e=>{
+      if(e.cTermRdrCde === item["Term.cClauseCode"]){
+        if(e.cIsCommon === '1'){
+          s = true;
+        }
+      }
+    })
+    if(s){
+      let l = planDataCommon.value[key];
+      if(l && l.length > 0){
+        const r = l.filter(e=> e['Term.cClauseCode'] === item['Term.cClauseCode']);
+        if(!r || r.size === 0){
+          l.push(item);
+        }
+      }else{
+        planDataCommon.value[key] = [item];
+      }
+    }else{
+      if (!pd[key]) {
+        pd[key] = [];
+      }
+      pd[key].push(item);
     }
-    pd[key].push(item);
   });
   // 强制刷新组件,对数据进行更新
   delete planData.value[planNo];
@@ -715,18 +836,44 @@ function deleteTermByNo(plan: any, t: any) {
 
 function getFromValue() {
   let redata: any[] = [];
+  let seqNo = 1;
   Object.keys(planData.value).forEach((plan) => {
     Object.keys(planData.value[plan]).forEach((item) => {
       planData.value[plan][item].forEach((d: any) => {
         const i = JSON.parse(JSON.stringify(d));
         i["Term.cPlanNo"] = plan;
+        let list = [];
         if (i["riskList"]) {
-          i["Term.riskList"] = i["riskList"];
+          // i["Term.riskList"] = i["riskList"];
+          list = JSON.parse(JSON.stringify(i["riskList"]));
           delete i["riskList"];
         }
+
+        if( item === 'm' ){  //主条款,查下是否存在公共信息
+          if(planDataCommon.value['m'] && planDataCommon.value['m'].length > 0){
+              const r = planDataCommon.value['m'][0];
+              list.push(...r.riskList);
+            }
+        }
+        i["Term.riskList"] = list;  
+        i["Term.nSeqNo"] = seqNo++;  
         redata.push(i);
       });
     });
+
+    if(planDataCommon.value && Object.keys(planDataCommon.value).length > 0){
+      Object.keys(planDataCommon.value).forEach(k => {
+        if(k !== 'm'){
+          const md = JSON.parse(JSON.stringify(planDataCommon.value[k]));
+          md.forEach((m)=>{
+            m["Term.cPlanNo"] = plan;
+            m["Term.nSeqNo"] = seqNo++;  
+            redata.push(m);
+          })
+          
+        }
+      })
+    }
   });
   return redata;
 }

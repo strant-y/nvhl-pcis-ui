@@ -82,130 +82,6 @@
         </template>
 
         <div v-show="showData">
-          <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
-            <template v-if="termTitleConf.cFactorTabType === 'grid'">
-              <table style="width: 100%">
-                <thead>
-                  <tr class="table-title">
-                    <th>{{ termTitleConf.cFactorTabTitle }}</th>
-                    <th>{{ termTitleConf.cFactorTabValue }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <template v-for="(item, k) in termFactormap" :key="k">
-                    <tr v-if="item.cPorpShowtitle !== '1'">
-                      <td
-                      :class="{
-                          'custom-indent':item.cPropIndent === '1',
-                      }">
-                        <el-text
-                          v-if="isrequired(item)"
-                          class="mx-1"
-                          style="margin-right: 2px"
-                          type="danger"
-                          >*</el-text
-                        >
-                        <span>{{ item.title }}</span>
-                      </td>
-                      <td>
-                        <el-form-item
-                          :rules="isrequired(item) ? getRequired() : undefined"
-                          :prop="item.prop"
-                        >
-                          <from-item
-                            v-model="termdata[item.prop]"
-                            @update:modelValue="update()"
-                            :item="item"
-                          />
-                        </el-form-item>
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
-            </template>
-            <template v-else-if="termTitleConf.cFactorTabType === 'table'">
-              <table style="width: 100%">
-                <thead>
-                  <tr class="table-title">
-                    <th v-if="checkExtendshow" width="20px">
-                    </th>
-                    <template v-for="(item, k) in termFactormap" :key="k">
-                      <th v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1' " :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
-                        <el-text
-                          v-if="isrequired(item)"
-                          class="mx-1"
-                          style="margin-right: 2px"
-                          type="danger"
-                          >*</el-text>
-                        {{ item.title }}
-                      </th>
-                    </template>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                      :class="{'selected': isSelected(termdata)}"
-                      @click="selectRow(termdata)"
-                  >
-                      <th v-if="checkExtendshow">
-                        <a style="margin-right: 5px" @click="showExtend = !showExtend">
-                          <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
-                          <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
-                        </a>
-                        
-                      </th>
-                    <template v-for="(item, k) in termFactormap" :key="k">
-                      <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
-                        <el-form-item
-                          :rules="isrequired(item) ? getRequired() : undefined"
-                          :prop="item.prop"
-                        >
-                          <from-item
-                            v-model="termdata[item.prop]"
-                            @update:modelValue="update()"
-                            :item="item"
-                          />
-                        </el-form-item>
-                      </td>
-                    </template>
-                  </tr>
-                  <template v-if="checkExtendshow">
-                    <tr v-show="showExtend" >
-                      <td :colspan="termFactormap.length" >
-                        <el-row :gutter="20">
-                        <template v-for="(item, k) in termFactormap" :key="k">
-                          <template v-if="item.cPorpExtend === '1'">
-                            <el-col style="margin-top: 5px" :span="12">
-                              <el-form-item
-                                :rules="isrequired(item) ? getRequired() : undefined"
-                                :prop="item.prop"
-                                :label="item.title" 
-                                :label-width ="120">
-                                <from-item
-                                  v-model="termdata[item.prop]"
-                                  @update:modelValue="update()"
-                                  :item="item"
-                                />
-                              </el-form-item>
-                            </el-col>
-                          </template>
-                        </template>
-                      </el-row>
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
-            </template>
-            <template v-else>
-              <app-free-edit
-                :freeEditConfig="formconfig1"
-                ref="termRef"
-                @updateDatas="update"
-              />
-            </template>
-          </template>
           <template v-for="(ginfo, gk) in groupInfo" :key="gk">
             <el-row>
               <el-col :span="22">
@@ -367,6 +243,130 @@
                 </tbody>
               </table>
             </el-row>
+          </template>
+          <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
+            <template v-if="termTitleConf.cFactorTabType === 'grid'">
+              <table style="width: 100%">
+                <thead>
+                  <tr class="table-title">
+                    <th>{{ termTitleConf.cFactorTabTitle }}</th>
+                    <th>{{ termTitleConf.cFactorTabValue }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-for="(item, k) in termFactormap" :key="k">
+                    <tr v-if="item.cPorpShowtitle !== '1'">
+                      <td
+                      :class="{
+                          'custom-indent':item.cPropIndent === '1',
+                      }">
+                        <el-text
+                          v-if="isrequired(item)"
+                          class="mx-1"
+                          style="margin-right: 2px"
+                          type="danger"
+                          >*</el-text
+                        >
+                        <span>{{ item.title }}</span>
+                      </td>
+                      <td>
+                        <el-form-item
+                          :rules="isrequired(item) ? getRequired() : undefined"
+                          :prop="item.prop"
+                        >
+                          <from-item
+                            v-model="termdata[item.prop]"
+                            @update:modelValue="update()"
+                            :item="item"
+                          />
+                        </el-form-item>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template v-else-if="termTitleConf.cFactorTabType === 'table'">
+              <table style="width: 100%">
+                <thead>
+                  <tr class="table-title">
+                    <th v-if="checkExtendshow" width="20px">
+                    </th>
+                    <template v-for="(item, k) in termFactormap" :key="k">
+                      <th v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1' " :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
+                        <el-text
+                          v-if="isrequired(item)"
+                          class="mx-1"
+                          style="margin-right: 2px"
+                          type="danger"
+                          >*</el-text>
+                        {{ item.title }}
+                      </th>
+                    </template>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                      :class="{'selected': isSelected(termdata)}"
+                      @click="selectRow(termdata)"
+                  >
+                      <th v-if="checkExtendshow">
+                        <a style="margin-right: 5px" @click="showExtend = !showExtend">
+                          <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
+                          <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
+                        </a>
+                        
+                      </th>
+                    <template v-for="(item, k) in termFactormap" :key="k">
+                      <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
+                        <el-form-item
+                          :rules="isrequired(item) ? getRequired() : undefined"
+                          :prop="item.prop"
+                        >
+                          <from-item
+                            v-model="termdata[item.prop]"
+                            @update:modelValue="update()"
+                            :item="item"
+                          />
+                        </el-form-item>
+                      </td>
+                    </template>
+                  </tr>
+                  <template v-if="checkExtendshow">
+                    <tr v-show="showExtend" >
+                      <td :colspan="termFactormap.length" >
+                        <el-row :gutter="20">
+                        <template v-for="(item, k) in termFactormap" :key="k">
+                          <template v-if="item.cPorpExtend === '1'">
+                            <el-col style="margin-top: 5px" :span="12">
+                              <el-form-item
+                                :rules="isrequired(item) ? getRequired() : undefined"
+                                :prop="item.prop"
+                                :label="item.title" 
+                                :label-width ="120">
+                                <from-item
+                                  v-model="termdata[item.prop]"
+                                  @update:modelValue="update()"
+                                  :item="item"
+                                />
+                              </el-form-item>
+                            </el-col>
+                          </template>
+                        </template>
+                      </el-row>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template v-else>
+              <app-free-edit
+                :freeEditConfig="formconfig1"
+                ref="termRef"
+                @updateDatas="update"
+              />
+            </template>
           </template>
         </div>
       </el-card>
