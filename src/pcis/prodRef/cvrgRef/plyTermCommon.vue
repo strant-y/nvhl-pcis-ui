@@ -1,8 +1,8 @@
 <template>
   <div class="planInfo">
     <myCard :cardConfig="cardconfig">
-      <template v-if="formData['m'] && formData['m'].length > 0">
-        <myCard :cardConfig="cardMainconfig">
+      <myCard :cardConfig="cardMainconfig">
+        <template v-if="formData['m'] && formData['m'].length > 0">
           <tremTemplatecommon
             v-for="(i, index) in formData['m']"
             :key="index"
@@ -27,16 +27,18 @@
               }
             "
           />
-        </myCard>
-      </template>
+        </template>
+      </myCard>
       <myCard :cardConfig="cardComconfig">
-        <template v-if = "planDataCommon && Object.keys(planDataCommon).length > 0">
+        <template
+          v-if="planDataCommon && Object.keys(planDataCommon).length > 0"
+        >
           <termCommon
-          v-model="planDataCommon"
-          :disabled-flag="disAbledFlag"
-          :faters="faters"
-          ref="termcommonRef"
-        />
+            v-model="planDataCommon"
+            :disabled-flag="disAbledFlag"
+            :faters="faters"
+            ref="termcommonRef"
+          />
         </template>
       </myCard>
     </myCard>
@@ -160,7 +162,6 @@ onMounted(async () => {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
     };
-    console.log(parparam);
     qryProdRelTermRiskList(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -204,13 +205,16 @@ onMounted(async () => {
 
 function addPlanMethod() {
   let maxindex = 0;
-  formData.value["m"].forEach((item: any) => {
-    const pln = item["Term.cPlanNo"];
-    const numberPart = parseInt(pln.replace(/\D/g, ""), 10);
-    if (numberPart > maxindex) {
-      maxindex = numberPart;
-    }
-  });
+  if (formData.value["m"] && formData.value["m"].length > 0) {
+    formData.value["m"].forEach((item: any) => {
+      const pln = item["Term.cPlanNo"];
+      const numberPart = parseInt(pln.replace(/\D/g, ""), 10);
+      if (numberPart > maxindex) {
+        maxindex = numberPart;
+      }
+    });
+  }
+
   const planKey = "P" + (maxindex + 1);
   return planKey;
 }
@@ -218,7 +222,14 @@ function addPlanMethod() {
 function addAndinitData() {
   const param = opertaor.getParam();
   const iss: any[] = [];
-  let mainTerm = formData.value["m"][0]["Term.cClauseCode"];
+  let mainTerm = null;
+  if (formData.value["m"] && formData.value["m"].length > 0) {
+    mainTerm = formData.value["m"][0]["Term.cClauseCode"];
+  }
+  if (!mainTerm) {
+    ElMessage.error("请先选择主条款,再选择附加条款!");
+    return;
+  }
   if (planDataCommon.value) {
     Object.keys(planDataCommon.value).forEach((item: any) => {
       if (item !== "m") {
@@ -332,7 +343,10 @@ const exRules = {};
 
 function addTermData() {
   const param = opertaor.getParam();
-  let mainTerm = formData.value["m"][0]["Term.cClauseCode"];
+  let mainTerm = "";
+  if (formData.value["m"]) {
+    mainTerm = formData.value["m"][0]["Term.cClauseCode"];
+  }
   dialog.value?.open(
     "addtremComView",
     {
@@ -363,7 +377,10 @@ function addTermData() {
           // 数据初始化
           initTermData(item, data);
           data.riskList = riskList;
-          const o = formData.value["m"];
+          let o = formData.value["m"];
+          if(!o){
+            o = [];
+          }
           o.push(data);
           refushData(o);
         });
@@ -531,7 +548,6 @@ async function refushAndData(datas: any) {
   pd["m"] = m;
 
   planDataCommon.value = pd;
-  console.log(planDataCommon.value);
   // setTimeout(() => {
 
   nextTick(() => {
@@ -640,12 +656,12 @@ function showFlush() {
 }
 
 function getPlanNo() {
-  let  plans = [];
-  if(formData.value['m'] && formData.value['m'].length > 0){
-    formData.value['m'].forEach(e => {
-      let d = {label:e['Term.cPlanNo'],value:e['Term.cPlanNo']};
+  let plans = [];
+  if (formData.value["m"] && formData.value["m"].length > 0) {
+    formData.value["m"].forEach((e) => {
+      let d = { label: e["Term.cPlanNo"], value: e["Term.cPlanNo"] };
       plans.push(d);
-    })
+    });
   }
   return plans;
 }

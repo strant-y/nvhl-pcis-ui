@@ -580,6 +580,8 @@ function getRowConfig(groupId: string, riskNo: string) {
         let deter = null;
         if (tgt) {
           deter = tgt.getValue("Tgt.cDeterminingMethod");
+        }else{
+          deter = "1";
         }
         if (deter && deter === "1") {
           if (colconfig["cRiskNo"] === "040042") {
@@ -1118,14 +1120,21 @@ function exChangeFunc() {
     }
     
   }
+  let deter = null;
    // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
-    if (data["tgt"]["Tgt.cDeterminingMethod"]) {
-      if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
-        const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
-        colInfo.value = col;
-      }
+    if(data["tgt"]){
+      deter = data["tgt"]["Tgt.cDeterminingMethod"];
+      
+    }else{
+      deter = "0";
     }
+
+    if (deter === "0") {
+      const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
+      colInfo.value = col;
+    }
+    
   }
 }
 

@@ -176,7 +176,6 @@ const subfilterNode = (value: string, data: Tree) => {
 
 onMounted(async () => {
   const param = props.data.data;
-  console.log(param);
   //添加条款只能查询一条主条款
   param["cTermNo"] = param["mainTerm"];
   let res = null;
@@ -239,8 +238,6 @@ function setNode() {
   mainRef.value?.setCheckedKeys(addMainKey, false);
 }
 
-let ignoreCheckChange = false;
-
 function selectmainMethod(a: any, b: any, c: any) {
   const param = props.data.data;
   let mc = null;
@@ -254,36 +251,31 @@ function selectmainMethod(a: any, b: any, c: any) {
       });
     });
   }
-  if (
-    mc &&
-    mutualExclusionClause.value.includes(mc.cUniqueTermNo) &&
-    param.type !== "ECargo"
-  ) {
-    //对应主条款存在互斥条款
+  // 该模式下, 主条款只能选择一个,针对主条款进行互斥处理
+  if(mc && mc.cRdrTyp === '0'){
     let addkey: any[] = [];
+    // 选择主线之后,限定了选择范围,不在范围内的信息,全部直接反选
+    let seKey : any[] = []; // 临时存储,选中的范围
+    seKey.push(mc.id);
+    mc.children?.forEach((child: any) => {
+      seKey.push(child.id);
+    });
     // 先全量获取已选中数据
     const tree = mainRef.value?.getCheckedNodes(false, true);
     tree.forEach((t: any) => {
-      if (addkey.indexOf(t.id) === -1) {
+      if (addkey.indexOf(t.id) === -1) {  
         addkey.push(t.id);
       }
     });
-    // 筛选出,所有互斥条款,并反选
-    data1.value.forEach((d: any) => {
-      if (d.cUniqueTermNo === mc.cUniqueTermNo) {
-        d.children?.forEach((child: any) => {
-          if (child.id !== a.id) {
-            addkey = addkey.filter((node: any) => child.id !== node);
-          }
-        });
-      }
-    });
+    if(addkey && addkey.length > 0){  // 将选中的数据,不在选中范围内的数据,全部反选
+      addkey = addkey.filter((node: any) => seKey.indexOf(node) !== -1);
+    }
     mainRef.value?.setCheckedKeys(addkey, false);
   }
   // 重新判断,如果勾选责任,自动勾选主条款,如果主条款被反选,自动取消对应责任反选
   let addMainKey: any[] = [];
   const tree = mainRef.value?.getCheckedNodes(false, true);
-  if (!ignoreCheckChange && tree && tree.length > 0) {
+  if (tree && tree.length > 0) {
     tree.forEach((t: any) => {
       if (addMainKey.indexOf(t.id) === -1) {
         addMainKey.push(t.id);
@@ -351,6 +343,8 @@ function flushSelectData() {
 }
 
 async function selectOne() {
+  console.log(data3.value );
+  console.log( data3.value.length);
   props.method.isOk(data3.value);
   emits("handleClose");
 }
