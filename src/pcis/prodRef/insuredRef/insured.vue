@@ -459,6 +459,7 @@ const method = {
         rules: null
       });
       clearValidate('Insured.cSex')
+
       // setValue("Insured.cCertfCls", "");
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -533,16 +534,16 @@ const method = {
         setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] })
       }
 
-      // 性别 、年龄、生日个人必填
-      setFormItem("Insured.tBirthday", {
-        rules: []
-      });
-      setFormItem("Insured.nAge", {
-        rules: []
-      });
-      setFormItem("Insured.cSex", {
-        rules: []
-      });
+      // // 性别 、年龄、生日个人必填
+      // setFormItem("Insured.tBirthday", {
+      //   rules: []
+      // });
+      // setFormItem("Insured.nAge", {
+      //   rules: []
+      // });
+      // setFormItem("Insured.cSex", {
+      //   rules: []
+      // });
 
       codeListStore
         .queryCodeList({
@@ -690,16 +691,16 @@ const method = {
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
 
 
-      // 性别 、年龄、生日个人必填
-      setFormItem("Insured.tBirthday", {
-        rules: [getRules("required", {})]
-      });
-      setFormItem("Insured.nAge", {
-        rules: [getRules("required", {})]
-      });
-      setFormItem("Insured.cSex", {
-        rules: [getRules("required", {})]
-      });
+      // // 性别 、年龄、生日个人必填
+      // setFormItem("Insured.tBirthday", {
+      //   rules: [getRules("required", {})]
+      // });
+      // setFormItem("Insured.nAge", {
+      //   rules: [getRules("required", {})]
+      // });
+      // setFormItem("Insured.cSex", {
+      //   rules: [getRules("required", {})]
+      // });
 
 
 
@@ -1054,9 +1055,6 @@ const method = {
     }
 
     // 回显不执行下方操作
-     if (isInit) return; 
-
-debugger;
      if (isInit || isCoypBtn.value || isOcrEcho) return;
 
     // 切换清空

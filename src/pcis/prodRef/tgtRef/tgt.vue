@@ -137,7 +137,7 @@ onMounted(async () => {
   console.log('询价查询---',params)
    if (params.cProdNo === '043002' && params.pageName ==="priceInquiry") {
         setFormItem("Tgt.nSeatsNumber", {
-          rules: [getRules("phoneNo", {})],
+          rules:[getRules("required", { trigger: 'blur' })]
         });
    }
 
