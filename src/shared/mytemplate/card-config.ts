@@ -1,4 +1,5 @@
 export interface CardConfig {
+  id?: string | null | undefined; // 按钮id
   title?: string | null | undefined; // 功能标题
   production?: boolean; //标题是否显示tooltip
   productionTitle?: string; //标题内容
@@ -34,6 +35,7 @@ export function creatCardConfig(
   config: CardConfig = {}
 ): CardConfig {
   return {
+    id: config.id || null,
     title: config.title || null,
     showBtn: config.showBtn || true,
     shadow: config.shadow || true,
