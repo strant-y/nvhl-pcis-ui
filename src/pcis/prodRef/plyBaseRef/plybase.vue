@@ -462,10 +462,10 @@ const method = {
         data: {
           CDptCde: sessionData.value?.cDptCde,
           cBsnsTyp: getValue("Base.cBsnsTyp"),
-          cChaType: getValue("Base.cChaType"),
+          CChaType: getValue("Base.cChaType"),
           cChaSubtype: getValue("Base.cChaSubtype"),
           CSlsId: getValue("Base.CSlsId"), //业务员员工号
-          CBrkrCde: getValue("Base.CBrkrCde"), //代理(经纪)人
+          CBrkrCde: getValue("Base.cBrkrCde"), //代理(经纪)人
           CDptAttr: getValue("Base.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
           CSlsTyp: cslstyp,
           leading: "CBrkSlsCde",

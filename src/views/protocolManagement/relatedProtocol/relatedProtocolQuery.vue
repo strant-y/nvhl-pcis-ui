@@ -7,24 +7,34 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
         >
-			<!-- policyInfo 列的具名插槽 -->
-			<template #column-policyInfo="{ row, column, index }">
-				<div class="policy-info-cell">
-					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
-						<span>{{ row.cEcAgrAppNo }}</span>
-						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
-							<DocumentCopy />
-						</el-icon>
-					</div>
-					<div v-if="row.cEcAgrNo" class="policy-number-row">
-						<span>{{ row.cEcAgrNo }}</span>
-						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
-							<DocumentCopy />
-						</el-icon>
-					</div>
-				</div>
-			</template>
-		</app-table>
+      <!-- policyInfo 列的具名插槽 -->
+       <template #column-policyInfo="{ row, column, index }">
+            <div class="policy-info-cell">
+                <div v-if="row.cEcAgrAppNo" class="policy-number-row">
+                    <span>{{ row.cEcAgrAppNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                </div>
+                <div v-if="row.cEcAgrNo" class="policy-number-row">
+                    <span>{{ row.cEcAgrNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                </div>
+            </div>
+        </template>
+        <template #column-InsurancePeriod="{ row, column, index }">
+            <div class="policy-info-cell">
+                <div v-if="row.tInsrncBgnTm" class="policy-number-row">
+                    <span>{{ row.tInsrncBgnTm }}</span>
+                </div>
+                <div v-if="row.tInsrncEndTm" class="policy-number-row">
+                    <span>{{ row.tInsrncEndTm }}</span>
+                </div>
+            </div>
+        </template>
+	</app-table>
   </div>
 </template>
 
@@ -64,12 +74,51 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.resetFields();
-					reset()
+			reset()
         },
       }),
     ],
     fromSchema: [
-			{
+      {
+        prop: "cEcAgrNo",
+        inputtype: "rtinput",
+        title: "预约协议号",
+        clearable: true,
+      },
+      {
+        prop: "cAppNme",
+        inputtype: "rtinput",
+        title: "投保人名称",
+        clearable: true,
+      },
+	  {
+        prop: "cInsuredNme",
+        inputtype: "rtinput",
+        title: "被保人名称",
+        clearable: true,
+      },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtselect",
+        title: "任务状态",
+        minWidth: 180,
+        clearable: true,
+        loadData: [
+            {label: "暂存", value: 1},
+            {label: "已提核", value: 2},
+            {label: "核保退回/撤回", value: 3},
+            {label: "已核待缴费", value: 4},
+            {label: "已出单", value: 5},
+            {label: "见费出单退回", value: 8},
+        ]
+      },
+      {
+        prop: "cUdrNme",
+        inputtype: "rtinput",
+        title: "操作员名称",
+        clearable: true,
+      },
+	  {
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "归属机构名称",
@@ -77,98 +126,63 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
         rules: [getRules("required", {})],
         btnItems: {
-					icon: "Search",
-					type: "primary",
-					func: () => {
-						dzmodal.open(DepartmentTree, { type: "Issuer", data: {} }).then((res:any) => {
-							if (res.type === "ok") {
-								if (res.body) {
-									freeEditRef.value?.setValue("cDptCde", res.body.id);
-									setFormItem("cDptCde", {
-										loadData: [
-											{
-												label: `${res.body.id}${res.body.name}`,
-												value: res.body.id,
-											},
-										],
-									});
-								}
-							}
-						});
-					},
-				},
+            icon: "Search",
+            type: "primary",
+            func: () => {
+                dzmodal.open(DepartmentTree, { type: "Issuer", data: {} }).then((res:any) => {
+                    if (res.type === "ok") {
+                        if (res.body) {
+                            freeEditRef.value?.setValue("cDptCde", res.body.id);
+                            setFormItem("cDptCde", {
+                                loadData: [
+                                    {
+                                        label: `${res.body.id}${res.body.name}`,
+                                        value: res.body.id,
+                                    },
+                                ],
+                            });
+                        }
+                    }
+                });
+            },
+		},
       },
-			{
-				prop: "cLoadSub",
-				inputtype: "rtradio",
-				title: "是否包含下级",
-				loadData: [
-					{ label: "是", value: 1 },
-					{ label: "否", value: 0 },
-				],
-				defaultValue: 1,
-			},
-			{
-        prop: "cAppNme",
-        inputtype: "rtinput",
-        title: "投保人名称",
+	  {
+        prop: "cBsnsTyp",
+        inputtype: "rtselect",
+        title: "业务来源",
+        typeCode: "CBsnsTypCode",
+      },
+	  {
+        prop: "tInsrncTm",
+        inputtype: "rtdatepicker",
+        title: "生效日期",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
-      },
-			{
-        prop: "insuredNme",
-        inputtype: "rtinput",
-        title: "被保人名称",
-        clearable: true,
-      },
-			{
-        prop: "cEcAgrAppNo",
-        inputtype: "rtinput",
-        title: "申请单号",
-        clearable: true,
-      },
-			{
-				prop: "cEcAgrNo",
-				inputtype: "rtinput",
-				title: "协议单号",
-				clearable: true,
-			},
-			{
-				prop: "cAppStatus",
-				inputtype: "rtselect",
-				title: "协议状态",
-				minWidth: 180,
-				clearable: true,
-				loadData: [
-						{ label: "暂存", value: 1 },
-						{ label: "已提核", value: 2 },
-						{ label: "核保退回", value: 3 },
-						{ label: "已核保", value: 4 },
-				]
-			},
-			{
-				prop: "tInsrncTm",
-				inputtype: "rtdatepicker",
-				title: "生效日期",
-				format: "YYYY-MM-DD HH:mm:ss",
-				valueFormat: "YYYY-MM-DD HH:mm:ss",
-				clearable: true,
-				type: "datetimerange",
-				func: (val:any) => {
-          handleDateChange(val, "1");
+        type: "datetimerange",
+        func: (val:any) => {
+            handleDateChange(val, "1");
         },
-			},
-			{
-				prop: "tAppTm",
-				inputtype: "rtdatepicker",
-				title: "录入日期",
-				format: "YYYY-MM-DD HH:mm:ss",
-				valueFormat: "YYYY-MM-DD HH:mm:ss",
-				type: "datetimerange",
-				rules: [getRules("required", {})],
-				func: (val:any) => {
-          handleDateChange(val, "2");
+	  },
+      {
+        prop: "cInsuredCde",
+        inputtype: "rtinput",
+        title: "代理人代码",
+        clearable: true,
+      },
+	  {
+        prop: "tAppTm",
+        inputtype: "rtdatepicker",
+        title: "录入日期",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        type: "datetimerange",
+        rules: [getRules("required", {})],
+        func: (val:any) => {
+            handleDateChange(val, "2");
         },
-			},
+	  },
     ],
   })
 );
@@ -184,8 +198,8 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: false,
-		tableBtn: [
-			createFreeButtonBase({
+	tableBtn: [
+	createFreeButtonBase({
         id: "view",
         link: true,
         tooltip: "查看",
@@ -196,8 +210,7 @@ const tableconfig = reactive<AppTableConfig>(
           console.log(row);
           toDtl(row, 'view');
         },
-      }),
-		],
+    })],
     fromSchema: [
       {
         prop: "nSeqNo",
@@ -206,57 +219,67 @@ const tableconfig = reactive<AppTableConfig>(
         showIndex: true,
         fixed: "left",
       },
-			{
-				prop: "policyInfo",
-				inputtype: "rtinput",
-				title: "协议号",
-        fixed: "left",
-				slotName: "policyInfo"
-			},
       {
-        prop: "cEcAgrEdrNo",
+        prop: "policyInfo",
         inputtype: "rtinput",
-        title: "批单号",
-      },
-			{
-        prop: "cEcAgrAppNo",
-        inputtype: "rtinput",
-        title: "申请单号",
+        title: "协议号",
         fixed: "left",
-        isShow: false
-      },
+        minWidth: 300,
+		slotName: "policyInfo"
+	  },
       {
-        prop: "cEcAgrNo",
+        prop: "cSecondDptCnm",
         inputtype: "rtinput",
-        title: "协议单号",
-        fixed: "left",
-        isShow: false
+        title: "二级机构",
+	  },
+      {
+        prop: "third",
+        inputtype: "rtinput",
+        title: "三级机构",
+	  },
+
+      {
+        prop: "cAppNo",
+        inputtype: "rtinput",
+        title: "投保单号",
       },
       {
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "保单号",
+      },
+	  {
         prop: "cAppNme",
         inputtype: "rtinput",
-        title: "投保人名称",
+        title: "投保人",
       },
       {
-        prop: "insuredNme",
+        prop: "cInsuredNme",
         inputtype: "rtinput",
-        title: "被保人名称",
+        title: "被保人",
       },
-			{
-				prop: "InsurancePeriod",
-				inputtype: "rtinput",
-				title: "协议期间",
-			},
-      // {
-      //   prop: "tInsrncBgnTm",
-      //   inputtype: "rtinput",
-      //   title: "协议起期",
-      // },
-      // {
-      //   prop: "tInsrncEndTm",
-      //   inputtype: "rtinput",
-      //   title: "协议止期",
-      // },
+      {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "协议起期",
+      },
+      {
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
+        title: "协议止期",
+      },
+	  {
+        prop: "cUdrNme",
+        inputtype: "rtinput",
+        title: "操作员",
+	  },
+      {
+        prop: "InsurancePeriod",
+        inputtype: "rtinput",
+        title: "输入日期",
+        minWidth: 180,
+        slotName: "InsurancePeriod"
+	  },
       {
         prop: "nRmbPrm",
         inputtype: "rtinput",
@@ -266,6 +289,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nRmbAmt",
         inputtype: "rtinput",
         title: "预估总保额",
+      },
+      {
+        prop: "aaa",
+        inputtype: "rtinput",
+        title: "运输上限(每次)",
       },
       {
         prop: "nLowPrm",
@@ -300,23 +328,22 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cAppStatus",
         inputtype: "rtselect",
-        title: "协议状态",
-				loadData: [
-					{ label: "暂存", value: "1" },
-					{ label: "已提核", value: "2" },
-					{ label: "核保退回", value: "3" },
-					{ label: "已核保", value: "4" },
-					{ label: "已签发保单", value: "5" },
-					{ label: "见费出单退回", value: "8" },
-					{ label: "已拒保", value: "9" },
-				],
+        title: "任务状态",
+        loadData: [
+            {label: "暂存", value: '1'},
+            {label: "已提核", value: '2'},
+            {label: "核保退回/撤回", value: '3'},
+            {label: "已核待缴费", value: '4'},
+            {label: "已出单", value: '5'},
+            {label: "见费出单退回", value: '8'},
+        ],
       },
     ],
   })
 );
 
 const handleQuery = (flag: boolean) => {
-  submitForm(flag);
+   submitForm(flag);
 };
 
 const submitForm = (flag: boolean) => {
@@ -333,24 +360,18 @@ const submitForm = (flag: boolean) => {
 const refreshData = (reset = true) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
-	if (s.cLoadSub == null) {
+	if (s.cLoadSub == null || s.cLoadSub == undefined) {
         s.cLoadSub = "1";
   }
   const params = Object.assign(s, r);
-  cargoApi.queryEcargoList(params).then((res: any) => {
+  cargoApi.queryRelevancePolicy(params).then((res: any) => {
     if (res.code === 200) {
       const pageData = res.data;
       if (pageData) {
-				pageData.data.forEach((item: any, index: number) => {
+		pageData.data.forEach((item: any, index: number) => {
           item.nSeqNo = index + 1;
         });
         pageresult.list = pageData.data;
-				pageresult.list = pageData.data.map((item) => ({
-					...item,
-					// 创建一个新字段合并两个值
-					policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
-					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-				}))
         pageresult.total = pageData.total;
       }
     }
@@ -366,8 +387,8 @@ function reset (){
 		cDptCde: "0200000000000",
 		cAppStatus: 4,
 		tAppTm: [
-			moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
-			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
+            dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+            moment(new Date()).format("YYYY-MM-DD 23:59:59"),
 		],
 	});
 	setFormItem("cDptCde", {
@@ -378,18 +399,8 @@ function reset (){
 			},
 		],
 	});
-  freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
-  setFormItem("cDptCde", {
-    loadData: [
-      {
-        label: JSON.parse(sessionStorage.getItem("user")).companyId+JSON.parse(sessionStorage.getItem("user")).companyCnm,
-        value: JSON.parse(sessionStorage.getItem("user")).companyId,
-      },
-    ],
-  });
 	handleQuery(true)
 }
-
 
 function toDtl(row: any, type: string) {
   router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});

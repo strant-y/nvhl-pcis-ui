@@ -85,8 +85,8 @@ const handelCalculate = (row:any,selectData:any)=>{
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , sum)
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , sum * row['ECargoTerm.nOriginalRate'])
     if(row['ECargoTerm.nRateVal']){
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , (row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000)
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , ((row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000) * row['ECargoTerm.nFeeRate'])
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , parseFloat(((row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000).toFixed(2)))
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , parseFloat((((row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000) * row['ECargoTerm.nFeeRate']).toFixed(2)))
     }
   }
 }

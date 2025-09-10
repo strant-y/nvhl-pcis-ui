@@ -128,7 +128,7 @@ const nPayNumberFun = (isAdd=false)=>{
 
       const data = opertaor.getDataAll();
       
-      let nCiShare = Number(getOwnShare()) || 100 ;
+      let nCiShare = Number(getOwnShare()) || 1 ;
       const totalAmount = Number(data['base']['Base.nPrm']);  
       const splitCount =Number(data.base?.['Base.nPayNum'])
    
@@ -140,11 +140,7 @@ const nPayNumberFun = (isAdd=false)=>{
       if (remainder > 0) {
         result.value[splitCount-1] += remainder;
       }
-
-      // result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
-      // result.value = result.value.map(cent => parseFloat((cent / 100 * (nCiShare/100)).toFixed(8)));
             result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
-      // item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(8)):0,
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
@@ -168,7 +164,7 @@ const nPayNumberFun = (isAdd=false)=>{
             "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
             "Pay.tPayBgnTm": tInsrncBgnTm,
             "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm":result.value[i]? parseFloat((result.value[i] * (nCiShare/100) ).toFixed(8)):0,   // 我司
+            "Pay.nOwnPrm":result.value[i]? parseFloat((result.value[i] * nCiShare ).toFixed(8)):0,   // 我司
             // "Pay.nOwnPrm": result.value[i] || 0 ,   // 我司
             "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
             "Pay.nPayablePrm": result.value[i] || 0, // 应收

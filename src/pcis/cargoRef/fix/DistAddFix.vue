@@ -25,6 +25,7 @@ import {ElMessage} from "element-plus";
 import {ref} from "vue";
 import {useValidator} from "@/typings/useValidator";
 import dayjs from "dayjs";
+import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -103,6 +104,7 @@ onMounted(async  () => {
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
 
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
+        console.log('清单777')
     if(['DistECargo.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
     }else if (props.data.fromSchema[i]["func"]) {
@@ -177,6 +179,10 @@ onMounted(async  () => {
         item.groupList[0]["func"] = getAllPropInsured
         item.groupList[1]["func"] = getcRegisterSuffixAddr
       }
+    }
+
+    if(['ECargoInsuredDist.tOperaterCertfEndTm'].includes(item.prop)) {
+      item["disabledDate"] = tOEndTmDisable;
     }
 
     //  if(['ECargoInsuredDist.cClntMrk'].includes(item.prop)){
@@ -871,6 +877,11 @@ const cOccupCdeChange = () => {
       { title: "职业", width: 85 }
     );
 }
+// 办理人员止期 禁用处理
+const tOEndTmDisable =(date: any) => {
+    return disablePastDates(date);
+  }
+
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {

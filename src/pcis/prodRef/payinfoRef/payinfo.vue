@@ -62,9 +62,9 @@ const nPrmFun = () => {
   if (getFromValue()?.length > 0) {
     const data = opertaor.getDataAll();
     // 比例
-    let nCiShare = Number(getOwnShare()) || 100;
+    let nCiShare = Number(getOwnShare()) || 1;
     const totalAmount = Number(data['base']['Base.nPrm']);
-    const splitCount = Number(data.base?.['Base.nPayNum'])
+    const splitCount = Number(data.base?.['Base.nPayNum']) || 1
     const totalCent = Math.round(totalAmount * 100);
     const result = ref<number[]>([]);
     const quotient = Math.floor(totalCent / splitCount);
@@ -84,7 +84,7 @@ const nPrmFun = () => {
       }
       return {
         ...item, // 保留原有其他属性
-        "Pay.nOwnPrm": item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * (nCiShare / 100)).toFixed(8)) : 0,
+        "Pay.nOwnPrm": item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * nCiShare ).toFixed(8)) : 0,
       };
     });
 
@@ -199,14 +199,13 @@ const method = {
 
     const data = opertaor.getDataAll();
     const cCiMrk = ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
-    let nCiShare = Number(getOwnShare()) || 100;
+    let nCiShare = Number(getOwnShare()) || 1;
     let num = 0;
     getFromValue().forEach((item: any) => {
       item['Pay.nPayablePrm'] = item['Pay.nPayablePrm'] || 0;
-      item['Pay.nOwnPrm'] = item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * (nCiShare / 100)).toFixed(8)) : 0
+      item['Pay.nOwnPrm'] = item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * nCiShare ).toFixed(8)) : 0
       num += item['Pay.nOwnPrm']
-      //  "Pay.nOwnPrm": item['Pay.nPayablePrm']?  parseFloat((item['Pay.nPayablePrm'] * (nCiShare/100) ).toFixed(2)):0,
-    })
+   })
     console.log('差额', getFromValue()[getFromValue().length - 1])
     if (!cCiMrk) {
       const nCiOwnPrm = data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费

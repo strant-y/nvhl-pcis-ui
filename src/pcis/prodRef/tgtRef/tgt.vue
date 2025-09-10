@@ -133,6 +133,14 @@ onMounted(async () => {
     rules: iscHostRequired? []: [getRules("required", { trigger: 'blur' })]
   });
 
+  // 询价出单 核定座位总数 非必填
+  console.log('询价查询---',params)
+   if (params.cProdNo === '043002' && params.pageName ==="priceInquiry") {
+        setFormItem("Tgt.nSeatsNumber", {
+          rules: [getRules("phoneNo", {})],
+        });
+   }
+
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);
@@ -181,6 +189,9 @@ onMounted(async () => {
     }
   })
 });
+function hasEnglish(str:any) {
+  return /[a-zA-Z]/.test(str);
+}
 const handelGoodsMx = (val:any)=>{
   console.log(val)
   if(val.length > 0 ){
@@ -345,9 +356,9 @@ const method = {
   cDestCountryChange:(val:any)=>{
     const getFormconfig = opertaor.getTableRefs()['AgentTgt'].getFormconfig()
     getFormconfig.fromSchema?.forEach((item:any) => {
-      if(item.prop == "Tgt.cPayCur" && val === 'CHINA'){
+      if(item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')){
         item.disabled = false;
-      }else if(item.prop == "Tgt.cPayCur" && val !== 'CHINA'){
+      }else if(item.prop == "Tgt.cPayCur"){
         item.disabled = true;
       }
     });
@@ -704,9 +715,11 @@ const method = {
         const termref = opertaor.getTableRefByKey("cvrg");
         const terms = termref.getFromValue();
         console.log('terms', terms);
+ 
 
         for (let i = 0; i < terms.length; i++) {
             const term = terms[i];
+            console.log(term)
             if ( term['Term.cRdrTyp'] == '1' && term['Term.cClauseCategory']  == '1') { // 判断是附加条款
                termref?.setTermData({
                  termNo: term['Term.cUniqueTermNo'],
@@ -715,6 +728,13 @@ const method = {
               }, val);
             }
         }
+
+
+          // termref?.setTermData({
+          //   termNo:"00425000085",
+          //   planNo:'P1',
+          //   factorProp: 'Term.nSeatTotal',
+          // },123);   
     }
   },
 
@@ -1024,9 +1044,13 @@ const method = {
 
   // 起运港国家 弹框
   countryFun: () => {
+    let isYW = false
+    if(getValue("Tgt.cDeparturePortCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDeparturePortCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             setFormItem('Tgt.cDeparturePort',{disabled:false})
@@ -1034,24 +1058,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
-                  setValue("Tgt.cDeparturePortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDeparturePort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDeparturePort",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
-                  setValue("Tgt.cDeparturePortProvince", res.cCity);
-                  setValue("Tgt.cDeparturePort",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cCityCn);
+                  setValue("Tgt.cDeparturePort",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                  setValue("Tgt.cDeparturePortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDeparturePort",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                  setValue("Tgt.cDeparturePortProvince", res.cCityEn);
+                  setValue("Tgt.cDeparturePort",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
-                  setValue("Tgt.cDeparturePortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDeparturePort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDeparturePortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDeparturePort",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
                   setValue("Tgt.cDeparturePortProvince", res.cAirportCity);
                   setValue("Tgt.cDeparturePort",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                  setValue("Tgt.cDeparturePortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDeparturePort",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                  setValue("Tgt.cDeparturePortProvince", res.cAirportEn);
+                  setValue("Tgt.cDeparturePort",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
             }
@@ -1062,9 +1106,13 @@ const method = {
   },
   // 中转地国家 按钮
   cTransitCountryFun: () => {
+    let isYW = false
+    if(getValue("Tgt.cTransitCountry")){
+      isYW = hasEnglish(getValue("Tgt.cTransitCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             setFormItem('Tgt.cTransitDetail',{disabled:false})
@@ -1072,24 +1120,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cTransitCountry", res.cCountryCn);
-                  setValue("Tgt.cTransitProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cTransitDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cTransitDetail",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cTransitCountry", res.cCountryCn);
-                  setValue("Tgt.cTransitProvince", res.cCity);
-                  setValue("Tgt.cTransitDetail",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cCityCn);
+                  setValue("Tgt.cTransitDetail",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cTransitCountry", res.cCountryEn);
+                  setValue("Tgt.cTransitProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cTransitDetail",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cTransitCountry", res.cCountryEn);
+                  setValue("Tgt.cTransitProvince", res.cCityEn);
+                  setValue("Tgt.cTransitDetail",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cTransitCountry", res.cCountryCn);
-                  setValue("Tgt.cTransitProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cTransitDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cTransitProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cTransitDetail",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cTransitCountry", res.cCountryCn);
                   setValue("Tgt.cTransitProvince", res.cAirportCity);
                   setValue("Tgt.cTransitDetail",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cTransitCountry", res.cCountryEn);
+                  setValue("Tgt.cTransitProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cTransitDetail",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cTransitCountry", res.cCountryEn);
+                  setValue("Tgt.cTransitProvince", res.cAirportEn);
+                  setValue("Tgt.cTransitDetail",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
             }
@@ -1100,9 +1168,13 @@ const method = {
   },
   // 目的港国家 按钮
   cDestinationPortCountryFun: () => {
+    let isYW = false
+    if(getValue("Tgt.cDestinationPortCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDestinationPortCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             setFormItem('Tgt.cDestinationPort',{disabled:false})
@@ -1110,24 +1182,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationPortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDestinationPort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDestinationPort",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationPortProvince", res.cCity);
-                  setValue("Tgt.cDestinationPort",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cCityCn);
+                  setValue("Tgt.cDestinationPort",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationPortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDestinationPort",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationPortProvince", res.cCityEn);
+                  setValue("Tgt.cDestinationPort",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationPortProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDestinationPort",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationPortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDestinationPort",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
                   setValue("Tgt.cDestinationPortProvince", res.cAirportCity);
                   setValue("Tgt.cDestinationPort",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationPortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDestinationPort",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationPortProvince", res.cAirportEn);
+                  setValue("Tgt.cDestinationPort",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
             }
@@ -1138,9 +1230,13 @@ const method = {
   },
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDestinationCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDestinationCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDestinationAirportCountry') && getValue('Tgt.cDestinationAirportCountry') != res.cCountryCn){
@@ -1152,24 +1248,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDestinationCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDestinationDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDestinationDetail",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDestinationCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationProvince", res.cCity);
-                  setValue("Tgt.cDestinationDetail",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cCityCn);
+                  setValue("Tgt.cDestinationDetail",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDestinationDetail",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationProvince", res.cCityEn);
+                  setValue("Tgt.cDestinationDetail",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDestinationCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDestinationDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDestinationDetail",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDestinationCountry", res.cCountryCn);
                   setValue("Tgt.cDestinationProvince", res.cAirportCity);
                   setValue("Tgt.cDestinationDetail",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDestinationDetail",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationProvince", res.cAirportEn);
+                  setValue("Tgt.cDestinationDetail",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
             }
@@ -1180,9 +1296,13 @@ const method = {
   },
   // 起运地国家 按钮
   cDispatchCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDispatchCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDispatchCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn){
@@ -1194,29 +1314,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDispatchCountry", res.cCountryCn);
-                  setValue("Tgt.cDispatchProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDispatchDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDispatchDetail",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDispatchCountry", res.cCountryCn);
-                  setValue("Tgt.cDispatchProvince", res.cCity);
-                  setValue("Tgt.cDispatchDetail",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cCityCn);
+                  setValue("Tgt.cDispatchDetail",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                  setValue("Tgt.cDispatchProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDispatchDetail",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                  setValue("Tgt.cDispatchProvince", res.cCityEn);
+                  setValue("Tgt.cDispatchDetail",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
-              // else {
-              //   setValue("Tgt.cDispatchCountry", res.cCountryEn);
-              //   setValue("Tgt.cDispatchProvince", res.cPortEn);
-              //   setValue("Tgt.cDispatchDetail",res.cPortEn + ','+ res.cCountryEn );
-              // }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDispatchCountry", res.cCountryCn);
-                  setValue("Tgt.cDispatchProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDispatchDetail",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDispatchProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDispatchDetail",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDispatchCountry", res.cCountryCn);
                   setValue("Tgt.cDispatchProvince", res.cAirportCity);
                   setValue("Tgt.cDispatchDetail",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                  setValue("Tgt.cDispatchProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDispatchDetail",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryCnEn);
+                }else {
+                  setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                  setValue("Tgt.cDispatchProvince", res.cAirportEn);
+                  setValue("Tgt.cDispatchDetail",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
               // setValue("Tgt.cDispatchCountry", res.cCountryEn);
@@ -1230,9 +1365,13 @@ const method = {
   },
   // 起运机场国家
   cDepartureAirportCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDepartureAirportCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDepartureAirportCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn){
@@ -1244,24 +1383,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                  setValue("Tgt.cDepartureAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDepartureAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDepartureAirport",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                  setValue("Tgt.cDepartureAirportProvince", res.cCity);
-                  setValue("Tgt.cDepartureAirport",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cCityCn);
+                  setValue("Tgt.cDepartureAirport",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn+ '/' + res.cAddressEn);
+                  setValue("Tgt.cDepartureAirport",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cCityEn);
+                  setValue("Tgt.cDepartureAirport",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                  setValue("Tgt.cDepartureAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDepartureAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDepartureAirport",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
                   setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
                   setValue("Tgt.cDepartureAirport",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else{
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDepartureAirport",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDepartureAirportProvince", res.cAirportEn);
+                  setValue("Tgt.cDepartureAirport",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
             }
@@ -1273,9 +1432,13 @@ const method = {
 
   // 目的地机场国家
   cDestinationAirportCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDestinationAirportCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDestinationAirportCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn){
@@ -1287,24 +1450,44 @@ const method = {
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDestinationAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDestinationAirport",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationAirportProvince", res.cCity);
-                  setValue("Tgt.cDestinationAirport",res.cCity + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cCityCn);
+                  setValue("Tgt.cDestinationAirport",res.cCityCn + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDestinationAirport",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cCityEn);
+                  setValue("Tgt.cDestinationAirport",res.cCityEn + ',' + res.cCountryEn);
                 }
               }
             }else{
               if(res.isCN){
                 if(res.cCountryEn == 'CHINA'){
                   setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
-                  setValue("Tgt.cDestinationAirportProvince", res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/' + res.cAddress);
-                  setValue("Tgt.cDestinationAirport",res.cProvince + '/' + res.cCity + '/' + res.cDistrict + '/'+ res.cAddress + ',' + res.cCountryCn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                  setValue("Tgt.cDestinationAirport",res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/'+ res.cAddressCn + ',' + res.cCountryCn);
                 }else {
                   setValue("Tgt.cDestinationAirportCountry", res.cCountryCn);
                   setValue("Tgt.cDestinationAirportProvince", res.cAirportCity);
                   setValue("Tgt.cDestinationAirport",res.cAirportCity + ',' + res.cCountryCn);
+                }
+              }else {
+                if(res.cCountryEn == 'CHINA'){
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                  setValue("Tgt.cDestinationAirport",res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/'+ res.cAddressEn + ',' + res.cCountryEn);
+                }else {
+                  setValue("Tgt.cDestinationAirportCountry", res.cCountryEn);
+                  setValue("Tgt.cDestinationAirportProvince", res.cAirportEn);
+                  setValue("Tgt.cDestinationAirport",res.cAirportEn + ',' + res.cCountryEn);
                 }
               }
             }

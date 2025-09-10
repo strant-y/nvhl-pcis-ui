@@ -506,6 +506,7 @@ const saveApplicationEdr = async  () => {
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
+    AgreementTgtSummary:null,
     AgreementDistInsured:null,
     AgreementDistTransport:null,
     ...{},
@@ -572,6 +573,7 @@ const saveEdrPlyInfo = async () => {
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
+    AgreementTgtSummary:null,
     AgreementDistInsured:null,
     AgreementDistTransport:null,
     ...{},
@@ -758,6 +760,7 @@ function query() {
       let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
       delete dataForm.AgreementEdrEcargoBase
       delete dataForm.AgreementDistGoods
+      delete dataForm.AgreementTgtSummary
       delete dataForm.AgreementDistInsured
       delete dataForm.AgreementDistTransport
       if(props.type === 'EDR_APP_NEW_SCENE'){
@@ -914,7 +917,7 @@ const premiumCalculation = ()=>{
         AgreementFeeWarn.setValue('ECargoBase.nRecRemPrm',0)
         console.log(11111,AgreementFeeWarn.getFormValue())
       }
-      if(props.param?.cEdrType == '1' && (props.param?.pageType == 'EDR_APP_NEW_SCENE' || props?.type == 'EDR_APP_NEW_SCENE')){
+      if(props.param?.pageType == 'EDR_APP_NEW_SCENE' || props?.type == 'EDR_APP_NEW_SCENE'){
         const pgxx = mainRef.value?.getxyedrbaseRefValue()
         if(isBef){
           const xbf =  AgreementFeeWarn.getValue('ECargoBase.nPrm') || 0
@@ -941,7 +944,7 @@ const premiumCalculation = ()=>{
       }
       ElMessage.success('保费计算成功')
     }else {
-      ElMessage.error('保费计算失败！')
+      ElMessage.error('保费计算失败,请先添加条款!')
     }
     isSuccess = true
   }catch (err:any){
@@ -961,6 +964,7 @@ async function save() {
  const res = await cargoApi.save({
     ...allFromData,
     AgreementDistGoods:null,
+   AgreementTgtSummary:null,
    AgreementDistInsured:null,
    AgreementDistTransport:null,
     ...{},
@@ -974,6 +978,7 @@ async function save() {
       const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
       agreementBaseRef.setValue('ECargoBase.cEcAgrNo', resData.value['ECargoBase.cEcAgrNo'])
       agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
+      agreementBaseRef.setValue('ECargoBase.cAppTyp', resData.value['ECargoBase.cAppTyp'] || '')
     }else {
       isOk = false
       ElMessage.success(res.msg);

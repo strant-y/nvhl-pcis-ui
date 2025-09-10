@@ -493,6 +493,7 @@ import { distRequiredMap } from './requiredDistMap';
 import { ElTable, ElTableColumn } from 'element-plus';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
+import { fa } from 'element-plus/es/locale';
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -885,7 +886,7 @@ const setCusBenefitInfo = () => {
   }
 
   dzmodal
-    .open(amlExtendInfo, { type: "Issuer", controlFlag })
+    .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -1511,10 +1512,12 @@ async function loadAfter() {
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
-      const getFormconfig = edrbase.value?.getFormconfig();
-      getFormconfig.fromSchema?.forEach((item) => {
-        item.disabled = true;
-      });
+      if(props.param.cRsnCde !='99'){
+        const getFormconfig = edrbase.value?.getFormconfig();
+        getFormconfig.fromSchema?.forEach((item) => {
+          item.disabled = true;
+        });
+      }
     }
     bthList.value = uwBtn;
     rightBtnList.value = [
@@ -1922,6 +1925,22 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
+          ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
+          ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
+          ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
+          ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
+          ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+          ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+          ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+          ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
+          ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
+          ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
+          ops.plyBase['Base.cSlsDptcde'] = "" // 业务员机构代码
+          ops.plyBase['Base.cSlsCde'] = "" // 业务员执业证号
+          ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
+          ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
+          ops.plyBase['Base.cRemark'] = "" // 出单员备注
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){
@@ -2073,6 +2092,22 @@ async function loadAfter() {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
+          ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
+          ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
+          ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
+          ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
+          ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+          ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+          ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+          ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
+          ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
+          ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
+          ops.plyBase['Base.cSlsDptcde'] = "" // 业务员机构代码
+          ops.plyBase['Base.cSlsCde'] = "" // 业务员执业证号
+          ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
+          ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
+          ops.plyBase['Base.cRemark'] = "" // 出单员备注
         }
         // if(ops['ci'] && ops['ci'].length>0){
         //   ops['ci'].forEach((item:any)=>{
@@ -2696,12 +2731,24 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
+  if(props.param.cProdNo.startsWith('02') ){
+    const term = opertaor.getTableRefByKey("cvrg").getFromValue();
+    term.forEach(item => {
+      if(item["Term.cRdrTyp"] === '0'){
+        if( !item["Term.riskList"] || item["Term.riskList"].length === 0 ){
+          ElMessage.error("至少需要一条责任信息!");
+          r = false;
+        }
+      }
+    });
+  }
   return r;
 }
 /**
  * 投保保费计算
  */
 const calcPremium = () => {
+    const btn = getBtn("btn010101");
   if(props.param.cRsnCde !== '99'){
     const btn = getBtn("btn010101");
     btn.loading = true;
@@ -2746,6 +2793,7 @@ const calcPremium = () => {
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
+       const btn = getBtn("btn010101");
        btn.loading = false;
     }
     console.log("appCalc-res", res);
@@ -3784,9 +3832,9 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   const data = opertaor.getDataAll();
   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
   const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk)
-  let nCiShare= 100;
+  let nCiShare= 1;
   if(nCiOwnPrm){
-       nCiShare = Number(getOwnShare()) || 100 ;
+       nCiShare = Number(getOwnShare()) || 1;
   }
   const pay = {};
   if (applicant) {
@@ -3802,7 +3850,7 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
 
 
 
-  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * (nCiShare/100)).toFixed(8))  : 0;
+  pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * nCiShare).toFixed(8))  : 0;
 // debugger
 
 
@@ -3835,13 +3883,7 @@ const calcPremiumEdrSurrender = () => {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
-  // if(res['ci'] && res['ci'].length>0){
-  //   res['ci'].forEach((item:any)=>{
-  //     if(item['Ci.nCiShare']){
-  //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-  //     }
-  //   })
-  // }
+
   calcSurrenEdr(res).then((res: any) => {
     btn.loading = false;
     console.log("批改计算", res);
@@ -3860,13 +3902,7 @@ const calcPremiumEdrSurrender = () => {
         ? res["res"]["composition"]["EdrBase"][0]["EdrBase.nPrm"]
         : 0;
       const ops = opertaor.convertData(res);
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
+
       opertaor.setDataAll(ops);
       if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
@@ -4075,11 +4111,33 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  const btn = getBtn("saveEdr");
-  if (btn) {
-    btn.loading = true;
-  }
+  //历史数据补全功能特殊处理
   if(props.param.cTransMrk === '1'){
+    // 获取保存按钮的通用方法
+    const getSaveButton = () => {
+      let btn = getBtn("saveEdr");
+      // 如果通过ID找不到，尝试通过标签查找
+      if (!btn) {
+        btn = bthList.value.find(item => item.label === "保存" || item.id === "saveEdr");
+      }
+      return btn;
+    };
+    
+    // 释放按钮加载状态的通用方法
+    const releaseButtonLoading = () => {
+      try {
+        const btn = getSaveButton();
+        if (btn && btn.loading !== undefined) {
+          btn.loading = false;
+        }
+      } catch (e) {
+        console.warn("释放按钮加载状态时出错:", e);
+      }
+    };
+    const btn = getSaveButton();
+    if (btn) {
+      btn.loading = true;
+    }
     const res = opertaor.getDataAll();
     const resParam = Object.assign(res,{'cTransMrk':'1'})
     // const edrInfo: any = await saveEdrAppPlyInfo(resParam)
@@ -4111,9 +4169,10 @@ const saveEdrPlyInfo = async () => {
       const ops = opertaor.convertData(edrInfo);
       console.log("转换的数据", ops);
       ElMessage.success(edrInfo.msg);
-      if (btn) {
-        btn.loading = false;
-      }
+      btn.loading = false
+      // if (btn === undefined) {
+      //   btn.loading = false;
+      // }
       // if(ops['ci'] && ops['ci'].length>0){
       //   ops['ci'].forEach((item:any)=>{
       //     if(item['Ci.nCiShare']){
@@ -4166,7 +4225,6 @@ const saveEdrPlyInfo = async () => {
       ElMessage.error(edrInfo.msg);
     }
   }else{
-    debugger
     const btn = getBtn("saveEdr");
     btn.loading = true;
     const res = opertaor.getDataAll();
@@ -4178,15 +4236,17 @@ const saveEdrPlyInfo = async () => {
       if (!res.EdrBase) {
         res.EdrBase = [];
       }
-      res.EdrBase.push(edrBaseDatas._value);
+      // res.EdrBase.push(edrBaseDatas._value);
     }else{
+
+      res["EdrBase"] = edrbase.value?.getFromValue();
       if (
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-        Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
+        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
+        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != "" &&
+        Array.isArray(res["EdrBase"]?.["EdrBase.cEdrRsnDetail"])
       ) {
         res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-          res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+          res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
       }
     }
     
@@ -4197,7 +4257,7 @@ const saveEdrPlyInfo = async () => {
     //     }
     //   })
     // }
-    const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
+    const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
     const edrInfo: any = await saveEdrAppPlyInfo(res)
     btn.loading = false;
     if(edrInfo["code"] == "200") {
@@ -4389,8 +4449,8 @@ const submitEdrToUndrFun = async () => {
     // btn.loading = false;
     return;
   }
-  const edrBaseValidate = await edrbase.value?.validate();
-  if(props.param.cTransMrk !== "1"){
+    if(props.param.cTransMrk !== "1" ){
+    const edrBaseValidate = await edrbase.value?.validate();
      if(!edrBaseValidate) {
       ElMessage.warning("请填写批改信息中的必填项")
       return
@@ -4762,6 +4822,10 @@ const validateDistConsistency = async () => {
       const distMap = formconfig1[0].pageInfo.filter(
         (item: any) => item.pageKey === 'dist'
       );
+      const tgtMap = formconfig1[0].pageInfo.filter(
+        (item: any) => item.pageKey === 'tgt'
+      );
+
       if (!distMap.length) {
         return true;
       }
@@ -4770,8 +4834,8 @@ const validateDistConsistency = async () => {
         cProdNo: props.param?.cProdNo,     // 产品号
         cComponentTable: [
             ...distMap.map((item: any) => item.pageCode),
-            'tgt'
-        ]
+            ...tgtMap.map((item: any) => item.pageCode)
+        ],
       };
 
       if (props.param?.pageName === 'priceInquiry') {
@@ -4782,7 +4846,7 @@ const validateDistConsistency = async () => {
       const distRes: any = await checkDistTerm(distParam);
 
       if (distRes.code == 200 && distRes.data == true) {
-        ElMessage.error(distRes.msg);
+        ElMessage.success(distRes.msg);
         return true;          // 通过
       }
       // 构造提示语换行展示

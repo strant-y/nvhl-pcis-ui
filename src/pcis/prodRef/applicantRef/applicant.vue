@@ -75,6 +75,7 @@ const tCertfDate = ref<any[]>([]);
 const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
 const resetLogo = ref<any>(false);   // 重置标识
+let isOcrEcho = false;   // OCR识别标志
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -100,6 +101,10 @@ onMounted(() => {
     ) {
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
 
+    }
+    if (cProdNo === '130003') {
+      setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
+      setFormItem("Applicant.cGreenIndustryList", { hidden: true, rules: null });
     }
     if (!cProdNo.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
@@ -402,9 +407,11 @@ const method = {
 
 
 
+    if(!isInit && !isOcrEcho){
+        checkUser();   // 调用客户信息接口
+        clearValidate('Applicant.cCertfCde')  // 清除报错信息
+    }
 
-    checkUser();   // 调用客户信息接口
-    clearValidate('Applicant.cCertfCde')  // 清除报错信息
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
@@ -461,15 +468,9 @@ const method = {
     }
 
     
-    if (isInit) return; 
-      // if (val === "120001") {
-      //   setFormItem("Applicant.tCertfBgnDate", {
-      //     rules: [getRules("required", {})],
-      //   });
-      //   setFormItem("Applicant.tCertfEndDate", {
-      //     rules: [getRules("required", {})],
-      //   });
-      // }
+ 
+    if (isInit  || isOcrEcho) return;
+
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde"];
@@ -1234,6 +1235,7 @@ function getFormconfig() {
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
+     isOcrEcho = true;
     const file = fileInput.files[0];
     // 处理文件上传逻辑
     const param = {
@@ -1364,10 +1366,14 @@ function handleFileChange(event: Event) {
           }
           checkUser();
           formconfig.value.fileInputType = ""
+            setTimeout(() => {
+              isOcrEcho = false;
+            }, 1000);
         }
       })
       .catch((err) => {
         formconfig.value.fileInputType = ""
+         isOcrEcho = false;
         ElMessage.error(err);
       });
     fileInputRef.value.value = ""; // 清空文件输入框的值

@@ -600,7 +600,7 @@ function setFormValue(data: any, noupdate = false) {
 }
 
 function formsDataUpdate(item:any) {
-  if(item.rules){ // 如果有验证规则,则form表单验证一下值
+  if(item.rules && form[item.prop]){ // 如果有验证规则,则form表单验证一下值
     if(item.prop === 'Applicant.ClntAddrProp'){
       console.log(item);
     }
