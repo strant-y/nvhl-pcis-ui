@@ -201,12 +201,13 @@
               }}</span
             >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
-            <span class="publicStyle">{{productStore.cCiMrk === '0' ? '非共保业务' 
-              : productStore.cCiMrk == '1' ? '外部共保我方主共_主联'
-              : productStore.cCiMrk == '2' ? '外部共保我方从共_主联'
-              : productStore.cCiMrk == '3' ? '外部共保我方主共_无联保'
-              : productStore.cCiMrk == '4' ? '外部共保我方从共_无联保'
-              : productStore.cCiMrk == '5' ? '司内联保_主联'
+            <span class="publicStyle">{{
+                (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
+              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'
+              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'
+              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'
+              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'
+              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'
               : '联保单' }}</span> |
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
@@ -222,11 +223,11 @@
             >&nbsp;<span class="font-weight-500">天</span
             >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
+            >&nbsp;<span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;|&nbsp;<span
               class="font-weight-500"
               >保费: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>&nbsp;
+            >&nbsp;<span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
 							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
@@ -561,10 +562,21 @@ const handleAnchorClick = (event, selector) => {
     }
   }
 };
-
+const cAmtCurLabel = ref('元')
+const cPrmCurLabel = ref('元')
+const setcAmtCur = (val:any) => {
+  // Base.cAmtCur 保额
+  cAmtCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
+}
+const getcPrmCur = (val:any) => {
+  //Base.cPrmCur 保费
+  cPrmCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
+}
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
   handleAnchorClick: handleAnchorClick,
+  setcAmtCur,
+  getcPrmCur
 };
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -2713,6 +2725,17 @@ function baseValite(){
   if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
+  }
+  if(props.param.cProdNo.startsWith('02') ){
+    const term = opertaor.getTableRefByKey("cvrg").getFromValue();
+    term.forEach(item => {
+      if(item["Term.cRdrTyp"] === '0'){
+        if( !item["Term.riskList"] || item["Term.riskList"].length === 0 ){
+          ElMessage.error("至少需要一条责任信息!");
+          r = false;
+        }
+      }
+    });
   }
   return r;
 }

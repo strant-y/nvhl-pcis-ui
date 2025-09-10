@@ -435,6 +435,23 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 return $1.toLowerCase() + $2;
             });
         }
+        /** 判断场景是否可编辑 */
+        const isEditScene = () => {
+            if(param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "EDR_APP_NEW_SCENE" ){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        /** 判断场景是否只读 */
+        const isReadOnlyScene = () => {
+            const param = opertaor.getParam();
+            if(param.pageType === "readonly" || param.pageType === "UW_READ_SCENE"){
+                return true;
+            }else{
+                return false;
+            }
+        }
         return {
             setTableConfig,
             getTableConfig,
@@ -456,6 +473,8 @@ export const dataOpertaor = (props: OpertaorProps) => {
             validateAll,
             setReadOnly,
             mapSetData,
+            isEditScene,
+            isReadOnlyScene
         };
     },
     {

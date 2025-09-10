@@ -189,6 +189,9 @@ onMounted(async () => {
     }
   })
 });
+function hasEnglish(str:any) {
+  return /[a-zA-Z]/.test(str);
+}
 const handelGoodsMx = (val:any)=>{
   console.log(val)
   if(val.length > 0 ){
@@ -353,9 +356,9 @@ const method = {
   cDestCountryChange:(val:any)=>{
     const getFormconfig = opertaor.getTableRefs()['AgentTgt'].getFormconfig()
     getFormconfig.fromSchema?.forEach((item:any) => {
-      if(item.prop == "Tgt.cPayCur" && val === 'CHINA'){
+      if(item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')){
         item.disabled = false;
-      }else if(item.prop == "Tgt.cPayCur" && val !== 'CHINA'){
+      }else if(item.prop == "Tgt.cPayCur"){
         item.disabled = true;
       }
     });
@@ -1041,9 +1044,13 @@ const method = {
 
   // 起运港国家 弹框
   countryFun: () => {
+    let isYW = false
+    if(getValue("Tgt.cDeparturePortCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDeparturePortCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             setFormItem('Tgt.cDeparturePort',{disabled:false})
@@ -1099,9 +1106,13 @@ const method = {
   },
   // 中转地国家 按钮
   cTransitCountryFun: () => {
+    let isYW = false
+    if(getValue("Tgt.cTransitCountry")){
+      isYW = hasEnglish(getValue("Tgt.cTransitCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             setFormItem('Tgt.cTransitDetail',{disabled:false})
@@ -1157,9 +1168,13 @@ const method = {
   },
   // 目的港国家 按钮
   cDestinationPortCountryFun: () => {
+    let isYW = false
+    if(getValue("Tgt.cDestinationPortCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDestinationPortCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             setFormItem('Tgt.cDestinationPort',{disabled:false})
@@ -1215,9 +1230,13 @@ const method = {
   },
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDestinationCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDestinationCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDestinationAirportCountry') && getValue('Tgt.cDestinationAirportCountry') != res.cCountryCn){
@@ -1277,9 +1296,13 @@ const method = {
   },
   // 起运地国家 按钮
   cDispatchCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDispatchCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDispatchCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn){
@@ -1342,9 +1365,13 @@ const method = {
   },
   // 起运机场国家
   cDepartureAirportCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDepartureAirportCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDepartureAirportCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn){
@@ -1405,9 +1432,13 @@ const method = {
 
   // 目的地机场国家
   cDestinationAirportCountryFunc: () => {
+    let isYW = false
+    if(getValue("Tgt.cDestinationAirportCountry")){
+      isYW = hasEnglish(getValue("Tgt.cDestinationAirportCountry"))
+    }
     dialog.value?.open(
         "countryInfoModal",
-        { type: "departure", data: {whichType:whichType.value } },
+        { type: "departure", data: {whichType:whichType.value,isYW } },
         {
           isOk: (res: any) => {
             if(getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn){

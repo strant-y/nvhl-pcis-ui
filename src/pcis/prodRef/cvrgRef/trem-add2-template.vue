@@ -204,7 +204,7 @@ function isdisabled(i: any) {
 }
 
 function getterm(it: any,termdata: any, itkey: any){
-  if(param.cEdrType && !termdata['Term.cRowId']){
+  if(param.cEdrType && !termdata['Term.cRowId'] && opertaor.isEditScene()){
     it.disabled = false || it.disabled ;
   }else{
     it.disabled = props.disabledFlag || it.disabled;
@@ -227,7 +227,7 @@ function checkShowBtn( data: any ){
   Object.keys(btnConf.value).forEach((k: any) => {
     r = r && !btnConf.value[k].hidden;
   });
-  if(param.cEdrType && !data['Term.cRowId']){
+  if(param.cEdrType && !data['Term.cRowId'] && opertaor.isEditScene()){
     r = true;
   }
   return r;

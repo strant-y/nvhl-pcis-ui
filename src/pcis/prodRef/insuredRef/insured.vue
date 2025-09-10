@@ -107,6 +107,10 @@ onMounted(() => {
   ) {
     setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
   }
+  if (cProdNo === '130003') {
+    setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
+    setFormItem("Insured.cGreenIndustryList", { hidden: true, rules: null });
+  }
   if (!cProdNo.startsWith("05")) {
     setFormItem("Insured.cShareholderNature", { hidden: true, rules: null });
     setFormItem("Insured.cShareholderCode", { hidden: true, rules: null });

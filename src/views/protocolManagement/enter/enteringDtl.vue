@@ -944,7 +944,7 @@ const premiumCalculation = ()=>{
       }
       ElMessage.success('保费计算成功')
     }else {
-      ElMessage.error('保费计算失败！')
+      ElMessage.error('保费计算失败,请先添加条款!')
     }
     isSuccess = true
   }catch (err:any){
@@ -978,6 +978,7 @@ async function save() {
       const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
       agreementBaseRef.setValue('ECargoBase.cEcAgrNo', resData.value['ECargoBase.cEcAgrNo'])
       agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
+      agreementBaseRef.setValue('ECargoBase.cAppTyp', resData.value['ECargoBase.cAppTyp'] || '')
     }else {
       isOk = false
       ElMessage.success(res.msg);

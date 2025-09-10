@@ -1179,7 +1179,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
+  if(pageparam.cEdrType && !props.modelValue['Term.cRowId'] && opertaor.isEditScene()){
     // 批改新增条款时，不禁用
     return ;
   }
