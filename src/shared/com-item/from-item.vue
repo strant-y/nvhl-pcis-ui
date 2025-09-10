@@ -152,7 +152,7 @@ defineExpose({
 
 onMounted(() => {
   value.value = props.modelValue;
-  if(props.item.defaultValue){
+  if(props.item.defaultValue && !value.value ){ //只有初始化,数据为空时,才进行初始化动作
     value.value = props.item.defaultValue;
   }
   init(false);
