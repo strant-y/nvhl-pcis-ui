@@ -1758,6 +1758,9 @@ async function loadAfter() {
         ops['plyBase']['Base.cOrigPlyNo'] = cPlyNo
         ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         ops['plyBase']['Base.cAppStatus'] = ''
+        ops['plyBase']['Base.cRiFacMrk'] = null
+        ops['plyBase']['Base.cRiFacOpn'] = null
+        ops['plyBase']['Base.cRiFacCde'] = null
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
@@ -1929,6 +1932,9 @@ async function loadAfter() {
           ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
           ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
           ops.plyBase['Base.cRemark'] = "" // 出单员备注
+          ops.plyBase['Base.cRiFacMrk'] = null
+          ops.plyBase['Base.cRiFacOpn'] = null
+          ops.plyBase['Base.cRiFacCde'] = null
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){
