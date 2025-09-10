@@ -12,7 +12,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { codeListViewStore } from "@/store";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 const codeListStore = codeListViewStore();
 
 const route = useRoute(); // 获取当前路由对象
@@ -48,38 +48,38 @@ onMounted(() => {
   canOperateForm();
 
   nextTick(() => {
-    setFormItem('Acctinfo.cBankRelTyp',{
-        rules: [],
-        clearable: true, 
+    setFormItem('Acctinfo.cBankRelTyp', {
+      rules: [],
+      clearable: true,
     })
 
-    setFormItem('Acctinfo.cBankPro',{
+    setFormItem('Acctinfo.cBankPro', {
 
-        clearable: true, 
+      clearable: true,
     })
-    setFormItem('Acctinfo.cBankCounty',{
-        clearable: true, 
+    setFormItem('Acctinfo.cBankCounty', {
+      clearable: true,
     })
-    setFormItem('Acctinfo.cBankArea',{
-        clearable: true, 
+    setFormItem('Acctinfo.cBankArea', {
+      clearable: true,
     })
-    setFormItem('Acctinfo.cPubPri',{
-        clearable: true, 
+    setFormItem('Acctinfo.cPubPri', {
+      clearable: true,
     })
   })
 
- 
-  let timer =  setInterval(()=>{
-        setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']?.['Applicant.cAppNme'])
-        let cAcctNme =  getValue('Acctinfo.cAcctNme')
-        if (cAcctNme) {
-          clearInterval(timer); //清除定时器
-        }
-      }, 1000)
+
+  let timer = setInterval(() => {
+    setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']?.['Applicant.cAppNme'])
+    let cAcctNme = getValue('Acctinfo.cAcctNme')
+    if (cAcctNme) {
+      clearInterval(timer); //清除定时器
+    }
+  }, 1000)
 });
 
 // 获取开户行省
-const loadSelDataCounty = ()=>{
+const loadSelDataCounty = () => {
 
 }
 
@@ -123,140 +123,272 @@ const canOperateForm = () => {
 // 绑定方法
 const method = {
   // func demo
+  // cBankRelTypFun: (val: any) => {
+  //   console.log('123123',val)
+  //       const param = opertaor.getParam();
+  //       const isInit = param.initFlag; // 是否是初始化状态
+  //     if(isInit)return;
+
+  //   setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
+
+
+
+  //   if (val) {
+  //     para = val.split("_");
+  //     const bankname = para[1]; // 银行名称
+  //     const isdefault = para[2]; // 是否默认值
+  //     const banktype = para[3]; // 银行大类
+  //     // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
+
+
+  //     if (isdefault === "1") {
+  //       setValue("Acctinfo.cBankCnaps", "");
+  //       setValue("Acctinfo.cBankCde", "");
+  //       setValue("Acctinfo.cBankAddr", bankname);
+
+  //       setFormItem("Acctinfo.cBankPro", {
+  //         disabled: false,
+  //         rules: [getRules("required", {})],
+  //       });
+  //       setFormItem("Acctinfo.cBankArea", {
+  //         disabled: false,
+  //         rules: [getRules("required", {})],
+  //       });
+
+  //       // 开户行县
+  //       setFormItem("Acctinfo.cBankCounty", {
+  //         // disabled: true, 
+  //         rules: [],
+  //       });
+
+  //       // 对公对私
+  //       setFormItem("Acctinfo.cPubPri", {
+  //         disabled: false,
+  //         rules: [getRules("required", {})],
+  //       });
+
+  //       // 开户行
+  //       setFormItem("Acctinfo.cBankCde", {
+  //         disabled: true,
+  //         rules: [],
+  //       });
+
+  //     } else  if (isdefault === "0")  {
+  //       setFormItem("Acctinfo.cBankPro", {
+  //         disabled: false,
+  //         rules: [getRules("required", {})],
+  //       });
+  //       setFormItem("Acctinfo.cBankArea", {
+  //          disabled: false,
+  //         rules: [getRules("required", {})],
+  //       });
+
+  //       setFormItem("Acctinfo.cBankCounty", {
+  //         disabled: false,
+  //         rules: [getRules("required", {})],
+  //       });
+
+  //       setFormItem("Acctinfo.cPubPri", {
+  //         rules: [getRules("required", {})],
+  //       });
+  //        setValue("Acctinfo.cBankAddr", null);
+  //       const data = tgtobjEditRef.value?.getFromValue();
+  //       const cBankCde = data["Acctinfo.cBankCde"];
+  //       if (cBankCde !== null && cBankCde !== "" && cBankCde !== undefined) {
+  //         const arrayCBankCde = cBankCde.split("_");
+  //         const codeCBankCde = arrayCBankCde[0];
+  //         const nameCBankCde = arrayCBankCde[1];
+  //         setValue("Acctinfo.cBankAddr", nameCBankCde);
+  //         setValue("Acctinfo.cBankCnaps", codeCBankCde);
+  //       }
+
+
+  //     }
+
+
+
+  //   if(para[3]){
+  //        setFormItem("Acctinfo.cBankCde", {
+  //           disabled: false,
+  //           // rules: [getRules("required", {})],
+  //         });
+
+  //     codeListStore
+  //       .queryCodeList(
+  //         {
+  //           codeListName: "CBankCdeList",
+  //           codeListParam: {
+  //             'banktypecod': para[3], 'areacode': getValue('Acctinfo.cBankCounty') || ""
+  //           },
+  //         },
+  //       )
+  //       .then((res) => {
+  //         tgtobjEditRef.value?.addCodeListMap({
+  //           code: "Acctinfo.cBankCde",
+  //           list: res
+  //         })
+  //         // setFormItem("Acctinfo.cBankCde", {
+  //         //   disabled: false,
+  //         //   // rules: [getRules("required", {})],
+  //         // });
+
+
+  //       });
+  //     }
+
+  //   }else{
+  //       // setValue("Acctinfo.cBankPro", "");
+  //       // setValue("Acctinfo.cBankArea", "");
+  //       // setValue("Acctinfo.cBankCounty", "");
+  //       setValue("Acctinfo.cBankCnaps", "");
+  //       // setValue("Acctinfo.cBankCde", "");
+  //       setValue("Acctinfo.cBankAddr", '');
+  //       setValue("Acctinfo.cPubPri", '');
+  //       setFormItem("Acctinfo.cBankPro", {
+  //         disabled: false,
+  //         rules: [],
+  //       });
+  //        setFormItem("Acctinfo.cBankPro", {
+  //         disabled: false,
+  //         rules: [],
+  //       });
+  //        setFormItem("Acctinfo.cBankArea", {
+  //         disabled: false,
+  //         rules: [],
+  //       });
+  //        setFormItem("Acctinfo.cBankCounty", {
+  //         // disabled: true,
+  //         rules: [],
+  //       });
+  //        setFormItem("Acctinfo.cBankCde", {
+  //         disabled: true,
+  //         rules: [],
+  //       });
+  //        setFormItem("Acctinfo.cBankAddr", {
+  //         disabled: false,
+  //         rules: [],
+  //       });
+  //        setFormItem("Acctinfo.cPubPri", {
+  //         rules: [],
+  //       });
+  //   }
+
+
+  // },
   cBankRelTypFun: (val: any) => {
-    console.log('123123',val)
-    setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'])
-    if (val) {
+    console.log('银行大类值', val);
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否初始化/回显状态
+    console.log('是否初始化/回显状态', isInit);
 
+    // 自动填充账户名称为投保人姓名
+    setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'] || '');
 
-      para = val.split("_");
-      const bankname = para[1]; // 银行名称
-      const isdefault = para[2]; // 是否默认值
-      const banktype = para[3]; // 银行大类
-      // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
-      if (isdefault === "1") {
-             setValue("Acctinfo.cBankCnaps", "");
-        setValue("Acctinfo.cBankCde", "");
-        setValue("Acctinfo.cBankAddr", bankname);
-
-        setFormItem("Acctinfo.cBankPro", {
-          disabled: false,
-          rules: [getRules("required", {})],
+    // 规则：有银行大类值 无值→强制置灰   初始化不做处理  直连银行=1  不必填  非直连=0  必填  
+    const setBankCdeStatusByCategory = (isRequired: any, isDisabled = false) => {
+      setFormItem("Acctinfo.cBankCde", {
+        rules: isRequired ? [getRules("required", {})] : [],
+      });
+      // debugger;
+      // 初始化触发
+      if (!isInit) {
+        setFormItem("Acctinfo.cBankCde", {
+          disabled: isDisabled
         });
-        setFormItem("Acctinfo.cBankArea", {
-          disabled: false,
-          rules: [getRules("required", {})],
-        });
-
-        // 开户行县
-        setFormItem("Acctinfo.cBankCounty", {
-          // disabled: true, 
-          rules: [],
-        });
-
-        // 对公对私
-        setFormItem("Acctinfo.cPubPri", {
-          disabled: false,
-          rules: [getRules("required", {})],
-        });
-
-        // 开户行
-        // setFormItem("Acctinfo.cBankCde", {
-        //   disabled: true,
-        //   rules: [],
-        // });
-
-      } else  if (isdefault === "0")  {
-        setFormItem("Acctinfo.cBankPro", {
-          disabled: false,
-          rules: [getRules("required", {})],
-        });
-        setFormItem("Acctinfo.cBankArea", {
-           disabled: false,
-          rules: [getRules("required", {})],
-        });
-
-        setFormItem("Acctinfo.cBankCounty", {
-          disabled: false,
-          rules: [getRules("required", {})],
-        });
-
-        setFormItem("Acctinfo.cPubPri", {
-          rules: [getRules("required", {})],
-        });
-         setValue("Acctinfo.cBankAddr", null);
-        const data = tgtobjEditRef.value?.getFromValue();
-        const cBankCde = data["Acctinfo.cBankCde"];
-        if (cBankCde !== null && cBankCde !== "" && cBankCde !== undefined) {
-          const arrayCBankCde = cBankCde.split("_");
-          const codeCBankCde = arrayCBankCde[0];
-          const nameCBankCde = arrayCBankCde[1];
-          setValue("Acctinfo.cBankAddr", nameCBankCde);
-          setValue("Acctinfo.cBankCnaps", codeCBankCde);
-        }
       }
+    };
 
- 
+    // 请求银行编码接口
+    const loadBankCodeList = (banktype, countyCode) => {
+      if (!banktype) return;
 
-          if(para[3]){
       codeListStore
-        .queryCodeList(
-          {
-            codeListName: "CBankCdeList",
-            codeListParam: {
-              'banktypecod': para[3], 'areacode': getValue('Acctinfo.cBankCounty') || ""
-            },
+        .queryCodeList({
+          codeListName: "CBankCdeList",
+          codeListParam: {
+            'banktypecod': banktype,
+            'areacode': countyCode || ""
           },
-        )
+        })
         .then((res) => {
           tgtobjEditRef.value?.addCodeListMap({
             code: "Acctinfo.cBankCde",
-            list: res
-          })
-          setFormItem("Acctinfo.cBankCde", {
-            disabled: false,
-            // rules: [getRules("required", {})],
+            list: res || []
           });
         });
+    };
+
+    // 1. 有收款银行大类值（val存在）
+    if (val) {
+      para = val.split("_");
+      const bankname = para[1] || '';
+      const isdefault = para[2] || ''; // 1=直连，0=非直连
+      const banktype = para[3] || '';
+      const countyCode = getValue('Acctinfo.cBankCounty') || '';
+
+      // 1.1 直连银行（特殊场景：即使有大类值也置灰）
+      if (isdefault === "1") {
+        if (!isInit) {
+          setValue("Acctinfo.cBankCnaps", "");
+          setValue("Acctinfo.cBankCde", "");
+        }
+
+        setValue("Acctinfo.cBankAddr", bankname);
+
+        // 省、市、对公对私必填配置
+        setFormItem("Acctinfo.cBankPro", { disabled: false, rules: [getRules("required", {})] });
+        setFormItem("Acctinfo.cBankArea", { disabled: false, rules: [getRules("required", {})] });
+        setFormItem("Acctinfo.cBankCounty", { disabled: false, rules: [] });
+        setFormItem("Acctinfo.cPubPri", { disabled: false, rules: [getRules("required", {})] });
+
+
+        setBankCdeStatusByCategory(false);
+        // 加载下拉列表（即使置灰也需要数据）
+        loadBankCodeList(banktype, countyCode);
       }
-    }else{
-        // setValue("Acctinfo.cBankPro", "");
-        // setValue("Acctinfo.cBankArea", "");
-        // setValue("Acctinfo.cBankCounty", "");
-        setValue("Acctinfo.cBankCnaps", "");
-        // setValue("Acctinfo.cBankCde", "");
-        setValue("Acctinfo.cBankAddr", '');
-        setValue("Acctinfo.cPubPri", '');
-        setFormItem("Acctinfo.cBankPro", {
-          disabled: false,
-          rules: [],
-        });
-         setFormItem("Acctinfo.cBankPro", {
-          disabled: false,
-          rules: [],
-        });
-         setFormItem("Acctinfo.cBankArea", {
-          disabled: false,
-          rules: [],
-        });
-         setFormItem("Acctinfo.cBankCounty", {
-          // disabled: true,
-          rules: [],
-        });
-         setFormItem("Acctinfo.cBankCde", {
-          disabled: true,
-          rules: [],
-        });
-         setFormItem("Acctinfo.cBankAddr", {
-          disabled: false,
-          rules: [],
-        });
-         setFormItem("Acctinfo.cPubPri", {
-          rules: [],
-        });
+
+      // 1.2 非直连银行（根据大类值判断）
+      else if (isdefault === "0") {
+        // 省、市、区县、对公对私必填配置
+        setFormItem("Acctinfo.cBankPro", { disabled: false, rules: [getRules("required", {})] });
+        setFormItem("Acctinfo.cBankArea", { disabled: false, rules: [getRules("required", {})] });
+        setFormItem("Acctinfo.cBankCounty", { disabled: false, rules: [getRules("required", {})] });
+        setFormItem("Acctinfo.cPubPri", { disabled: false, rules: [getRules("required", {})] });
+        setValue("Acctinfo.cBankAddr", null);
+
+        // 处理已有银行编码回显
+        const data = tgtobjEditRef.value?.getFromValue() || {};
+        const cBankCde = data["Acctinfo.cBankCde"] || '';
+        if (cBankCde) {
+          const [codeCBankCde, nameCBankCde] = cBankCde.split("_") || ['', ''];
+          setValue("Acctinfo.cBankAddr", nameCBankCde);
+          setValue("Acctinfo.cBankCnaps", codeCBankCde);
+        }
+
+        // 非直连银行：有大类值且非特殊场景 
+        setBankCdeStatusByCategory(true);
+        // 加载下拉列表
+        loadBankCodeList(banktype, countyCode);
+      }
     }
 
+    // 2. 无收款银行大类值（val不存在）
+    else {
+      // 重置相关字段值
+      setValue("Acctinfo.cBankCnaps", "");
+      setValue("Acctinfo.cBankAddr", '');
+      setValue("Acctinfo.cPubPri", '');
 
+      // 重置其他字段状态
+      setFormItem("Acctinfo.cBankPro", { disabled: false, rules: [] });
+      setFormItem("Acctinfo.cBankArea", { disabled: false, rules: [] });
+      setFormItem("Acctinfo.cBankCounty", { disabled: false, rules: [] });
+      setFormItem("Acctinfo.cBankAddr", { disabled: false, rules: [] });
+      setFormItem("Acctinfo.cPubPri", { disabled: false, rules: [] });
+
+      // 无大类值→强制置灰
+      setBankCdeStatusByCategory(false, true);
+    }
   },
   // 开户行省Acctinfo.cBankPro 
   // 市  Acctinfo.cBankArea
@@ -266,96 +398,134 @@ const method = {
   // 开户行省        
   cProvinceChange: (e: any) => {
     console.log('省', e);
-    if(e){
-          let cBankArea = getValue('Acctinfo.cBankArea');
-          codeListStore
-          .queryCodeList(
-            {
-              codeListName: "CBankAreaList",
-              codeListParam: {
-                areaprovince: e
-              },
+    if (e) {
+      let cBankArea = getValue('Acctinfo.cBankArea');
+
+      codeListStore
+        .queryCodeList(
+          {
+            codeListName: "CBankAreaList",
+            codeListParam: {
+              areaprovince: e
             },
-          )
-          .then((res) => {
-            tgtobjEditRef.value?.addCodeListMap({
-              code: "Acctinfo.cBankArea",
-              list: res
+          },
+        )
+        .then((res) => {
+          tgtobjEditRef.value?.addCodeListMap({
+            code: "Acctinfo.cBankArea",
+            list: res
+          })
+
+          if (res.length > 0) {
+            let delData = true;
+            res.forEach((item: any) => {
+              if (item['value'] == cBankArea) {
+                delData = false;
+              }
             })
 
-              if(res.length>0){
-                let delData = true;
-                res.forEach((item:any)=>{
-                  if(item['value'] == cBankArea){
-                      delData = false;
-                  }
-                })
-                
-                // 判断是否有可以清空的数据
-                if(delData){
-                  setValue('Acctinfo.cBankArea',null)
-                  setValue('Acctinfo.cBankCounty',null)
-                }
-              }
+            // 判断是否有可以清空的数据
+            if (delData) {
+              setValue('Acctinfo.cBankArea', null)
+              setValue('Acctinfo.cBankCounty', null)
+            }
+          }
 
 
-          });
-        }
+        });
+    }
   },
   // 市  
   cCityChange: (e: any) => {
-    console.log('市',e)
-    if(e){
+    console.log('市', e)
+    if (e) {
+
       let cBankCounty = getValue('Acctinfo.cBankCounty');// 县
+      let cBankPro = getValue('Acctinfo.cBankPro')   // 获取省
+      console.log(11, cBankPro)
       codeListStore
-      .queryCodeList(
-        {
-          codeListName: "CBankCountyList",
-          codeListParam: {
-            areaname: e
+        .queryCodeList(
+          {
+            codeListName: "CBankCountyList",
+            codeListParam: { "areaprovince": cBankPro, "areaname": e },
+            // codeListParam: {
+            //   areaname: e
+            // },
           },
-        },
-      )
-      .then((res) => {
-        tgtobjEditRef.value?.addCodeListMap({
-          code: "Acctinfo.cBankCounty",
-          list: res
-        })
-              if(res.length>0){
-                let delData = true;
-                res.forEach((item:any)=>{
-                  if(item['value'] == cBankCounty){
-                      delData = false;
-                  }
-                })
-                
-                // 判断是否有可以清空的数据
-                if(delData){
-                  setValue('Acctinfo.cBankCounty',null)
-                }
+        )
+        .then((res) => {
+          tgtobjEditRef.value?.addCodeListMap({
+            code: "Acctinfo.cBankCounty",
+            list: res
+          })
+          if (res.length > 0) {
+            let delData = true;
+            res.forEach((item: any) => {
+              if (item['value'] == cBankCounty) {
+                delData = false;
               }
-      });
-        }
+            })
+
+            // 判断是否有可以清空的数据
+            if (delData) {
+              setValue('Acctinfo.cBankCounty', null)
+            }
+          }
+        });
+    }
   },
   // 县
   cCountyChange: (val: any) => {
-     if(val && para[3]){
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否初始化/回显状态
+    console.log(val, para[3])
+    if (val && para[3]) {
+      if (!isInit) {
+        setFormItem("Acctinfo.cBankCde", {
+          disabled: false
+        });
+      }
+
+      let cBankCde = getValue('Acctinfo.cBankCde');
+
       codeListStore
         .queryCodeList(
           {
             codeListName: "CBankCdeList",
             codeListParam: {
               'banktypecod': para[3], 'areacode': val
+              //         'banktypecod': banktype,
+              // 'areacode': countyCode || ""
             },
           },
         )
         .then((res) => {
+          console.log('来了里面', res)
           tgtobjEditRef.value?.addCodeListMap({
             code: "Acctinfo.cBankCde",
             list: res
           })
+
+
+          if (res.length > 0) {
+            let delData = true;
+            res.forEach((item: any) => {
+              if (item['value'] == cBankCde) {
+                delData = false;
+              }
+            })
+
+            // 判断是否有可以清空的数据
+            if (delData) {
+              setValue('Acctinfo.cBankCde', null)
+              setValue("Acctinfo.cBankCnaps", null);
+            }
+          }
+
+
+
         });
-      }
+    }
   },
   // 开户行  
   cBankCdeChange: (val: any) => {
@@ -367,6 +537,10 @@ const method = {
     }
   },
 };
+
+
+
+
 
 //给表单下拉项赋值
 const setFormItem = (key: any, obj: any) => {
