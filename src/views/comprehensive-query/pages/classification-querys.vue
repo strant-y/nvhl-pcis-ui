@@ -921,28 +921,28 @@ const normalQueryColumns = [
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 140,
+        maxWidth: 130,
         slotName: "cDptCnm"
     },
     {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
-        maxWidth: 110,
+        maxWidth: 130,
         slotName: "cAppNme"
     },
     {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
-        maxWidth: 110,
+        maxWidth: 130,
         slotName: "cInsuredNme"
     },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
         title: "产品名称",
-        minWidth: 160,
+        minWidth: 150,
         slotName: "cProdNmeCn"
     },
     {
@@ -1028,7 +1028,7 @@ const normalQueryColumns = [
 const extendColumns = [
   { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true },
   { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true, sortable: true},
-  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 160, optional: true, sortable: true, slotName: "tUdrTm" },
+  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 180, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', minWidth: 180, optional: true },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', minWidth: 180, optional: true },
   { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
@@ -2096,8 +2096,12 @@ async function applyCheckedColumns(props: string[]) {
 }
 
 function formatTwoLine(text) {
-  if (!text || text.length <= 13) return text;
-  return text.slice(0, 7) + '<br/>' + text.slice(7, 13) + '…';
+  if (!text) return '';
+  const len = text.length;
+  if (len <= 13) {
+    return `${text.slice(0, 7)}<br/>${text.slice(7)}`;
+  }
+  return `${text.slice(0, 7)}<br/>${text.slice(7, 13)}…`;
 }
 
 function setValue(key: string, value: any) {
