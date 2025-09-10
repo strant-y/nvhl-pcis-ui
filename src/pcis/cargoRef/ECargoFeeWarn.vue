@@ -179,6 +179,7 @@ const method = {
     if(nReceivedPrm['ECargoBase.nReceivedPrm'] && param?.cEdrType && param?.cEdrType == '1'){
      if(nReceivedPrm['ECargoBase.nReceivedPrm'] > val){
        ElMessage.error("预收保费不能小于原保费!");
+       setValue('ECargoBase.nReceivedPrm',nReceivedPrm['ECargoBase.nReceivedPrm'])
        return
      }
     }
