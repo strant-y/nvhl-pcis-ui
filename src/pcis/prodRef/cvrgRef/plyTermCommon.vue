@@ -591,6 +591,11 @@ function getFromValue() {
             md.forEach((m) => {
               m["Term.cPlanNo"] = plan;
               m["Term.nSeqNo"] = seqNo++;
+              if (m["riskList"]) {
+                let l = JSON.parse(JSON.stringify(m["riskList"]));
+                delete m["riskList"];
+                m["Term.riskList"] = l;
+              }
               redata.push(m);
             });
           }
