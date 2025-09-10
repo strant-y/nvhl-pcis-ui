@@ -197,7 +197,7 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log('1212,',val)
+   
    const param = opertaor.getParam();
    if (param.initFlag) {
       return ;
@@ -268,7 +268,7 @@ const method = {
   },
   //保额汇率标识change事件
   cInsExchCdeChange(val: any) {
-    console.log(1122,val)
+ 
     if (val == "0") {// 协议汇率
       setFormItem("Base.nAmtRmbExch", { disabled: false });
       //           Base.nAmtRmbExch
