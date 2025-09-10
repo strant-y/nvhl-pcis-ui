@@ -222,11 +222,11 @@
             >&nbsp;<span class="font-weight-500">天</span
             >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>&nbsp;|&nbsp;<span
+            >&nbsp;<span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;|&nbsp;<span
               class="font-weight-500"
               >保费: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>&nbsp;
+            >&nbsp;<span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
 							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
@@ -561,10 +561,21 @@ const handleAnchorClick = (event, selector) => {
     }
   }
 };
-
+const cAmtCurLabel = ref('元')
+const cPrmCurLabel = ref('元')
+const setcAmtCur = (val:any) => {
+  // Base.cAmtCur 保额
+  cAmtCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
+}
+const getcPrmCur = (val:any) => {
+  //Base.cPrmCur 保费
+  cPrmCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
+}
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
   handleAnchorClick: handleAnchorClick,
+  setcAmtCur,
+  getcPrmCur
 };
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);

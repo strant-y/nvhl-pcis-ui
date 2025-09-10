@@ -226,6 +226,9 @@ const method = {
   },
   //总保费下拉事件
   cPrmCurChange: (val: any) => {
+    if(val && idxParam && idxParam.getcPrmCur) {
+      idxParam.getcPrmCur(val)
+    }
     try {
       const getFormconfig = opertaor.getTableRefs()['AgentTgt']
       getFormconfig?.setValue('Tgt.cPayCur',val)
@@ -247,6 +250,9 @@ const method = {
   },
   //总保额币种下拉事件
   cAmtCurChange(val: any) {
+    if(val && idxParam && idxParam.setcAmtCur) {
+      idxParam.setcAmtCur(val)
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
