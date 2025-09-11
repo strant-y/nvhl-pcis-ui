@@ -115,20 +115,20 @@ const method = {
   // func demo
   func1: () => {},
   cJiAgtNoChange: (val) => {
-    const isPositiveInteger = /^\d+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
     const isValidLength = val.length <= 20;      // 长度不超过20
 
     if (!isPositiveInteger || !isValidLength) {
-      ElMessage.error("请输入不超过20位的正整数");
+      ElMessage.error("请输入不超过20位的正整数或英文字母");
       // 清空当前字段的值
       tgtobjEditRef.value?.setValue("Base.cJiAgtNo", "");
     }
   },
   cCiAgtNoChange: (val) => {
-    const isPositiveInteger = /^\d+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
     const isValidLength = val.length <= 20;      // 长度不超过20
     if (!isPositiveInteger || !isValidLength) {
-      ElMessage.error("请输入不超过20位的正整数");
+      ElMessage.error("请输入不超过20位的正整数或英文字母");
       // 清空当前字段的值
       tgtobjEditRef.value?.setValue("Base.cCiAgtNo", "");
     }
