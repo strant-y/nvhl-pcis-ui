@@ -138,6 +138,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             companyId: user.value.companyId,
             cLoadSub: 1,
             cKindNo: null,
+            cProdNo: null,
+            cTermNo: null,
             cInquiryNo: "",
             cPlyNo: "",
             tm1: [
@@ -399,7 +401,7 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["cStatus"],
     showSelection: true,
     tableBtnType: "btn",
-    tableBtnWidth: 200,
+    tableBtnWidth: 150,
     fixed: true,
     tableBtnPosition: ref<any>(""),
     tableBtnFixed: "right",
@@ -440,7 +442,7 @@ const tableconfig = reactive<AppTableConfig>(
           }
         },
         tableClick: (row) => {
-          if (udrTypeValue.value == "2") updateUdr(row);
+          if (row.udrType === "2") updateUdr(row);
         },
       }),
       createFreeButtonBase({
@@ -468,7 +470,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
-        icon: "RefreshLeft",
+        icon: "return",
         iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
@@ -518,7 +520,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "View",
         iconSize: "25",
         hideBtns: (row: any) => {
-          if (row.udrType === "3" || row.udrType === "4") {
+          if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
           } else {
             return true;
@@ -537,7 +539,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Refresh",
         iconSize: "25",
         hideBtns: (row: any) => {
-          if (row.udrType === "3" || row.udrType === "4") {
+          if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
           } else {
             return true;
@@ -545,7 +547,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
         tableClick: (row) => {
           let data;
-          if (udrTypeValue.value == "3" || udrTypeValue.value == "4") {
+          if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             data = { objId: row.objId, sysType: row.objExt };
           } else {
             data = {
@@ -572,14 +574,14 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "询价申请单号/询价单号",
-        minWidth: 180,
+        minWidth: 170,
+        showCopyIcon: true,
         fixed: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        minWidth: 180,
       },
       {
         prop: "cDptCnm",
@@ -597,40 +599,38 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
-        minWidth: 180,
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
-        minWidth: 180,
       },
       {
-        prop: "curtUserName",
+        prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         showKey: [1, 2, 3, 4],
         minWidth: 180,
       },
       {
-        prop: "crtTm",
+        prop: "bsTm1",
         inputtype: "rtdatepicker",
         title: "询价日期",
         showKey: [1, 2, 3, 4],
-        minWidth: 180,
+        maxWidth: 150,
       },
       {
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "提交时间",
         showKey: [1, 2, 3, 4],
-        minWidth: 180,
+        maxWidth: 150,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
-        minWidth: 180,
+        minWidth: 150,
         loadData: [
           { label: "未接收", value: "0" },
           { label: "已接收", value: "1" },
@@ -845,6 +845,8 @@ function refreshData(flag?: boolean) {
   };
   delete params.tm1;
   delete params.tm2;
+
+  console.log('params>>',params);
 
   getInquiryTask(params)
     .then((res: any) => {
