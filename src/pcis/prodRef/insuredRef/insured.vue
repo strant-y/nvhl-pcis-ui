@@ -1055,8 +1055,6 @@ const method = {
 
     // 回显不执行下方操作
      if (isInit) return; 
-
-debugger;
      if (isInit || isCoypBtn.value || isOcrEcho) return;
 
     // 切换清空

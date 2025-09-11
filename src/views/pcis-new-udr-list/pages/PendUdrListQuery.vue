@@ -171,7 +171,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           Object.keys(selectData.value).forEach((k) => {
             obj[selectData.value[k]["objId"]] = selectData.value[k]["curtTask"];
           });
-          console.log(obj);
           const res = {};
           res["user"] = JSON.parse(sessionStorage.getItem("user"));
           res["user"]["opRelCde"] = "10030892";
@@ -417,7 +416,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "接收",
         type: "info",
         size: "large",
-        iconSize: "25",
+        iconSize:"25",
         icon: "Message",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
@@ -437,7 +436,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "修改",
         type: "success",
         size: "large",
-        iconSize: "25",
+        iconSize:"25",
         icon: "Edit",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -456,7 +455,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "取消接收",
         type: "info",
         size: "large",
-        iconSize: "25",
+        iconSize:"25",
         icon: "Release",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -475,8 +474,8 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
-        icon: "RefreshLeft",
-        iconSize: "23",
+        iconSize:"23",
+        icon: "return",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
             return false;
@@ -502,11 +501,9 @@ const tableconfig = reactive<AppTableConfig>(
           res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
             "userName"
           ]; // 退回指定核保人员名称
-          console.log(res);
           let submitUnder;
           submitUnder = submitUnderwriting(res);
           submitUnder.then((res) => {
-            console.log("submitUnderwriting-res", res);
             if (res["code"] == "200") {
               ElMessage.success(res.msg);
               handleQuery();
@@ -521,11 +518,11 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tooltip: "查看",
         type: "primary",
-        size: "default",
-        iconSize: "25",
+        size: "large",
+        iconSize:"25",
         icon: "View",
         hideBtns: (row: any) => {
-          if (row.udrType === "3" || row.udrType === "4") {
+          if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
           } else {
             return true;
@@ -540,11 +537,11 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tooltip: "承保流程",
         type: "danger",
-        size: "default",
+        size: "large",
+        iconSize:"25",
         icon: "Refresh",
-        iconSize: "25",
         hideBtns: (row: any) => {
-          if (row.udrType === "3" || row.udrType === "4") {
+          if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
           } else {
             return true;
@@ -552,7 +549,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
         tableClick: (row) => {
           let data;
-          if (udrTypeValue.value == "3" || udrTypeValue.value == "4") {
+          if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             data = { objId: row.objId, sysType: row.objExt };
           } else {
             data = {
@@ -578,6 +575,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
+        maxWidth: 110,
         title: "申请单类型",
       },
       {
@@ -628,19 +626,19 @@ const tableconfig = reactive<AppTableConfig>(
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
       },
       {
-        prop: "curtUserName",
+        prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         minWidth: 180,
       },
       {
-        prop: "curtUserName",
+        prop: "udrClsCde",
         inputtype: "rtinput",
         title: "当前核保级别",
         minWidth: 180,
       },
       {
-        prop: "curtUserName",
+        prop: "cMinUndrCls",
         inputtype: "rtinput",
         title: "最终审核级别",
         minWidth: 180,
@@ -649,7 +647,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
-        minWidth: 180,
+        minWidth: 150,
         loadData: [
           { label: "未接收", value: "0" },
           { label: "已接收", value: "1" },
@@ -676,7 +674,6 @@ const loadUndrClsListOptions = async (cProdNo: string) => {
     cEmpCde: user.value.opCde,
     cProdNo,
   });
-  console.log("response", response);
   // undrClsListOptions.value = response.map(item => ({ value: item.value, label: item.label }));
   // if(response.data.length>0) {
   //   response.data.map((item: any) => {value: item.value, label: item.label});
@@ -1076,7 +1073,7 @@ function updateUdrDetail(row: any) {
             r.data.cEdrRsnBundleCde === "BL"
               ? SCENE_PLY_UW_PROCESSBEARER
               : SCENE_PLY_UW_PROCESS,
-          cAppNo: row.objId,
+          cAppNo: row.objId ? row.objId : row.cAppNo,
           taskId: row.curtTask,
           cAppTyp: row.cAppTyp,
           cProdNo: row.cProdNo,
@@ -1263,7 +1260,6 @@ function handle_hasReceived(row: any) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  console.log("selection", selection);
   selectData.value = selection;
   removeIds.value = selection.map((item: any) => item.cPkId);
 }
@@ -1370,7 +1366,7 @@ function handleEdit(row: any) {
   }
   const en = JSON.stringify({
     scene: scene,
-    cAppNo: row.objId,
+    cAppNo: row.objId ? row.objId : row.cAppNo,
     cProdNo: row.cProdNo,
     cAppTyp: row.cAppTyp,
     cJiMrk: row.cJiMrk,
