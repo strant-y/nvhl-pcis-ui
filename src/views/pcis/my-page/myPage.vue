@@ -3166,7 +3166,25 @@ const submitToUndrFn = async () => {
         ElMessage.error(checkDistInfo?.msg);
         return;
       }
-
+      if (checkDistInfo?.data?.code === -1){
+        ElMessage.error(checkDistInfo?.data?.msg);
+        return;
+      }
+      if (checkDistInfo?.data?.code === 1) {
+        try {
+          await ElMessageBox.confirm(
+              checkDistInfo?.data?.msg + "，是否继续",
+              "提示",
+              {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+              }
+          );
+        } catch (e) {
+          return;
+        }
+      }
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
@@ -3706,7 +3724,26 @@ const calcPremiumEdr = async () => {
     ElMessage.error(checkDistInfo?.msg);
     return;
   }
- 
+  if (checkDistInfo?.data?.code === -1){
+    ElMessage.error(checkDistInfo?.data?.msg);
+    return;
+  }
+  if (checkDistInfo?.data?.code === 1) {
+    try {
+      await ElMessageBox.confirm(
+          checkDistInfo?.data?.msg + "，是否继续",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
   const btn = getBtn("btnCalEdr");
   btn.loading = true;
 
