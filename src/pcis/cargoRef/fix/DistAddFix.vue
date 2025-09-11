@@ -440,7 +440,7 @@ const checkUser = () => {
 // 解析身份证
 const idAnalysis = (id:string)=>{
   const applicantValue = freeEditRef.value?.getFromValue() //tabref["AgreementApplicant"].getFormValue();
-  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='120001' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
+  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
@@ -464,7 +464,7 @@ const funCheckUser = (val:any)=>{
  
     checkUser();
       clearValidate('ECargoInsuredDist.cCertfCde')  // 清除报错信息
-   if (val == "120001") {
+   if (val == "111") {
 
      // setValue('ECargoInsuredDist.cCertfCde','')  //选身份证时清空
      setFormItem("ECargoInsuredDist.cCertfCde", {

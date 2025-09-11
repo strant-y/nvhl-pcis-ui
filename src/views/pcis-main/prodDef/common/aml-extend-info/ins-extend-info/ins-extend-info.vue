@@ -451,8 +451,8 @@ const tableconfig = reactive<AppGridEditConfig>(
 const ruleTypeMap: Record<string, string> = {
 	"110001": "orgCode",      // 组织机构编码
 	"110007": "socialCode",   // 统一社会信用代码
-	"120001": "idCard",       // 身份证
-	"120002": "passPort",     // 护照
+	"111": "idCard",       // 身份证
+	"07": "passPort",     // 护照
 	"19": "ariCard",          // 外国人证件号
 };
 

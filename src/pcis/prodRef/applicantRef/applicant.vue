@@ -219,7 +219,7 @@ const idAnalysis = (id: string) => {
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["applicant"].getFromValue();
 
-  if (!validateIdCard(id) || (applicantValue["Applicant.cCertfCls"] !== '120001' && applicantValue["Applicant.cCertfCls"] !== '19')) {
+  if (!validateIdCard(id) || (applicantValue["Applicant.cCertfCls"] !== '111' && applicantValue["Applicant.cCertfCls"] !== '19')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
@@ -418,7 +418,7 @@ const method = {
     setFormItem("Applicant.tEstablishingDate", { rules: null });
 
  
-    if (val == "120001") {
+    if (val == "111") {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
       });
@@ -898,8 +898,8 @@ const method = {
       );
       setFormItem("Applicant.tCertfEndDate", { disabled: true });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
-      // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {  rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [getRules("required", {})],});
       // }else{
@@ -914,8 +914,8 @@ const method = {
       }
       setFormItem("Applicant.tCertfEndDate", { disabled: false });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  120001
-      // if(cCertfCls ==="120001" || cCertfCls ==="110008=7"){
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
 
@@ -1024,7 +1024,7 @@ const method = {
   cCertfCdeChange: (val: any) => {
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
-    if (cCertfCls == "120001") {
+    if (cCertfCls == "111") {
       if (val) {
         const certfCde = applicantEditRef.value?.getValue(
           "Applicant.cCertfCde"
@@ -1130,8 +1130,8 @@ const method = {
     const ruleMap: Record<string, RuleType> = {
       "110001": "orgCode",
       "110007": "socialCode",
-      "120001": "idCard",
-      "120002": "passPort",
+      "111": "idCard",
+      "07": "passPort",
       "19": "ariCard",
     };
     baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
@@ -1284,7 +1284,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Applicant.cCertfCls", "120001");
+            setValue("Applicant.cCertfCls", "111");
             setValue("Applicant.cClntMrk", "1");
             if (cardInfo["id_number"])
               idAnalysis(cardInfo["id_number"])
