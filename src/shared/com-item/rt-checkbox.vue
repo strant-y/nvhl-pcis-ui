@@ -83,6 +83,11 @@ function handleChange(val?: string | number | boolean) {
   // props.item.func ? props.item.func(res) : null;
 }
 onMounted(() => {
+  if (props.item.keymap) {
+    selectedValue.value = props.modelValue === props.item.keymap["y"];
+  } else if (typeof props.modelValue === "boolean") {
+    selectedValue.value = props.modelValue;
+  }
   // 初始化组件数据
   if (props.item) {
   }
