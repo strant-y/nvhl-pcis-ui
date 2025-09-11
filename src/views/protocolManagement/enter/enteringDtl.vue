@@ -757,7 +757,7 @@ function query() {
           });
         }
       }
-      let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
+      let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0] ,AgreementAcctinfo:res.data.composition?.AgreementAcctinfo[0]  }
       delete dataForm.AgreementEdrEcargoBase
       delete dataForm.AgreementDistGoods
       delete dataForm.AgreementTgtSummary
