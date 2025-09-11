@@ -2727,7 +2727,7 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
-  if(props.param.cProdNo.startsWith('02') ){
+  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018'].includes(props.param.cProdNo)){
     const term = opertaor.getTableRefByKey("cvrg").getFromValue();
     term.forEach(item => {
       if(item["Term.cRdrTyp"] === '0'){
@@ -3167,7 +3167,25 @@ const submitToUndrFn = async () => {
         ElMessage.error(checkDistInfo?.msg);
         return;
       }
-
+      if (checkDistInfo?.data?.code === -1){
+        ElMessage.error(checkDistInfo?.data?.msg);
+        return;
+      }
+      if (checkDistInfo?.data?.code === 1) {
+        try {
+          await ElMessageBox.confirm(
+              checkDistInfo?.data?.msg + "，是否继续",
+              "提示",
+              {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+              }
+          );
+        } catch (e) {
+          return;
+        }
+      }
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
@@ -3707,7 +3725,26 @@ const calcPremiumEdr = async () => {
     ElMessage.error(checkDistInfo?.msg);
     return;
   }
- 
+  if (checkDistInfo?.data?.code === -1){
+    ElMessage.error(checkDistInfo?.data?.msg);
+    return;
+  }
+  if (checkDistInfo?.data?.code === 1) {
+    try {
+      await ElMessageBox.confirm(
+          checkDistInfo?.data?.msg + "，是否继续",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
   const btn = getBtn("btnCalEdr");
   btn.loading = true;
 
