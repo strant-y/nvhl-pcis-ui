@@ -111,7 +111,7 @@ const cProdData = ref([]);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "询价核保任务查询",
+    title: "询价任务查询",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -811,8 +811,8 @@ const handleQuery = (flag = true) => {
 
 /** 查询 */
 function refreshData(flag?: boolean) {
-  const date1 = freeEditRef.value?.getValue("tm1"); //询价日期
-  const date2 = freeEditRef.value?.getValue("tm2"); //提核日期
+  const date1 = freeEditRef.value?.getValue("tm1"); //申请日期
+  const date2 = freeEditRef.value?.getValue("tm2"); //签单日期
   let roleCde = "";
   roles.value?.length &&
     roles.value.forEach((role) => {
@@ -843,10 +843,21 @@ function refreshData(flag?: boolean) {
     ...r,
     ...s,
   };
+  
+  // 提取申请日期的开始时间和结束时间
+  const tAppTmBgn = s.tm1 && s.tm1.length > 1 ? s.tm1[0] : null;
+  const tAppTmEnd = s.tm1 && s.tm1.length > 1 ? s.tm1[1] : null;
+  // 提取签单日期的开始时间和结束时间
+  const tIssueTmBgn = s.tm2 && s.tm2.length > 1 ? s.tm2[0] : null;
+  const tIssueTmEnd = s.tm2 && s.tm2.length > 1 ? s.tm2[1] : null;
+
+  params["tAppTmBgn"] = tAppTmBgn; // 添加申请开始时间
+  params["tAppTmEnd"] = tAppTmEnd; // 添加申请结束时间
+  params["tIssueTmBgn"] = tIssueTmBgn; // 添加签单开始时间
+  params["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+
   delete params.tm1;
   delete params.tm2;
-
-  console.log('params>>',params);
 
   getInquiryTask(params)
     .then((res: any) => {
