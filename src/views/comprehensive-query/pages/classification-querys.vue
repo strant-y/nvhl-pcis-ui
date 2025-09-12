@@ -1374,20 +1374,20 @@ async function queryAE( flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据 
-    let expandFlag = '0';
+    let expandFlag = 0;
     let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
     // 09 工程险
     if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
     }
 
     // 08 家庭财产险
     if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
 
@@ -1576,20 +1576,20 @@ async function queryI(flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
-    let expandFlag = '0';
+    let expandFlag = 0;
     let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
     // 09 工程险
     if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
     }
 
     // 08 家庭财产险
     if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
     pageresult.list = [];
@@ -1721,7 +1721,7 @@ async function exportAE( flag?: boolean, isEs) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
-    let expandFlag = '0';
+    let expandFlag = 0;
     let expandVal = {};
 
     if (s.cLoadSub == null) {
@@ -1729,12 +1729,12 @@ async function exportAE( flag?: boolean, isEs) {
     }
     // 09 工程险
     if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
     }
     // 08 家庭财产险
     if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
     pageresult.list = [];
@@ -1837,20 +1837,20 @@ async function exportI(flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
-    let expandFlag = '0';
+    let expandFlag = 0;
     let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
     // 09 工程险
     if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
     }
 
     // 08 家庭财产险
     if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = '1';
+       expandFlag = 1;
        expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
     pageresult.list = [];
