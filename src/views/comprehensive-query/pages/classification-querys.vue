@@ -285,23 +285,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   if (s["cKindNo"] == "09") {
                       formconfig1.fromSchema?.forEach((item) => {
                           if (
-                              item.prop === "CProjectName" ||
-                              item.prop === "CDetailedAddress"
+                              item.prop === "cProjectName" ||
+                              item.prop === "cDetailedAddress"
                           ) {
                               item.hidden = false;
                           }
-                          if (item.prop === "CDetailedAddress") {
+                          if (item.prop === "cDetailedAddress") {
                               item.title = "工程地址";
                           }
                       });
                   } else if (s["cKindNo"] == "08") {
                       formconfig1.fromSchema?.forEach((item) => {
                           if (
-                              item.prop === "CDetailedAddress"
+                              item.prop === "cDetailedAddress"
                           ) {
                               item.hidden = false;
                           }
-                          if (item.prop === "CDetailedAddress") {
+                          if (item.prop === "cDetailedAddress") {
                               item.title = "家庭坐落地址";
                           }
                       });
@@ -309,33 +309,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       if (s["cProdNo"] == "040002") {
                           formconfig1.fromSchema?.forEach((item) => {
                               if (
-                                  item.prop === "CEmployeeName" ||
-                                  item.prop === "CIdentificationNumber" ||
-                                  item.prop === "CPlateNo" ||
-                                  item.prop === "CEngineNo"
+                                  item.prop === "cEmployeeName" ||
+                                  item.prop === "cIdentificationNumber" ||
+                                  item.prop === "cPlateNo" ||
+                                  item.prop === "cEngineNo"
                               ) {
                                   item.hidden = false;
                               }
-                              if (item.prop === "CEmployeeName") {
+                              if (item.prop === "cEmployeeName") {
                                   item.title = "雇员名称";
                               }
                           });
                       } else if (s["cProdNo"] == "043009") {
                           formconfig1.fromSchema?.forEach((item) => {
                               if (
-                                  item.prop === "CEmployeeName" ||
-                                  item.prop === "CIndustryType" ||
-                                  item.prop === "CProjectType" ||
-                                  item.prop === "CProjectName" ||
-                                  item.prop === "CDetailedAddress" ||
-                                  item.prop === "CIdentificationNumber"
+                                  item.prop === "cEmployeeName" ||
+                                  item.prop === "cIndustryType" ||
+                                  item.prop === "cProjectType" ||
+                                  item.prop === "cProjectName" ||
+                                  item.prop === "cDetailedAddress" ||
+                                  item.prop === "cIdentificationNumber"
                               ) {
                                   item.hidden = false;
                               }
-                              if (item.prop === "CEmployeeName") {
+                              if (item.prop === "cEmployeeName") {
                                   item.title = "人员姓名";
                               }
-                              if (item.prop === "CDetailedAddress") {
+                              if (item.prop === "cDetailedAddress") {
                                   item.title = "经营地址";
                               }
                           });
@@ -477,18 +477,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               },
               func: (val) => {
                   setValue("prodCNmeCn","")
+                  setValue("cProjectName","")
+                  setValue("cDetailedAddress","")
                   cTermNo = "";      // 重置条款编码
                   cPard.value = val;
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
-                          item.prop === "CEmployeeName" ||
-                          item.prop === "CIdentificationNumber" ||
-                          item.prop === "CPlateNo" ||
-                          item.prop === "CEngineNo" ||
-                          item.prop === "CIndustryType" ||
-                          item.prop === "CProjectName" ||
-                          item.prop === "CDetailedAddress" ||
-                          item.prop === "CProjectType" ||
+                          item.prop === "cEmployeeName" ||
+                          item.prop === "cIdentificationNumber" ||
+                          item.prop === "cPlateNo" ||
+                          item.prop === "cEngineNo" ||
+                          item.prop === "cIndustryType" ||
+                          item.prop === "cProjectName" ||
+                          item.prop === "cDetailedAddress" ||
+                          item.prop === "cProjectType" ||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
                           item.prop === "cPrjCtgSubTyp"
@@ -525,14 +527,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   cTermNo = "";      // 重置条款编码
                   formconfig1.fromSchema?.forEach((item) => {
                       if (
-                          item.prop === "CEmployeeName" ||
-                          item.prop === "CIdentificationNumber" ||
-                          item.prop === "CPlateNo" ||
-                          item.prop === "CEngineNo" ||
-                          item.prop === "CIndustryType" ||
-                          item.prop === "CProjectName" ||
-                          item.prop === "CDetailedAddress" ||
-                          item.prop === "CProjectType" ||
+                          item.prop === "cEmployeeName" ||
+                          item.prop === "cIdentificationNumber" ||
+                          item.prop === "cPlateNo" ||
+                          item.prop === "cEngineNo" ||
+                          item.prop === "cIndustryType" ||
+                          item.prop === "cProjectName" ||
+                          item.prop === "cDetailedAddress" ||
+                          item.prop === "cProjectType" ||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
                           item.prop === "cPrjCtgSubTyp"
@@ -580,14 +582,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 console.log('条款编码',cTermNo)
                 formconfig1.fromSchema?.forEach((item) => {
                       if (
-                          item.prop === "CEmployeeName" ||
-                          item.prop === "CIdentificationNumber" ||
-                          item.prop === "CPlateNo" ||
-                          item.prop === "CEngineNo" ||
-                          item.prop === "CIndustryType" ||
-                          item.prop === "CProjectName" ||
-                          item.prop === "CDetailedAddress" ||
-                          item.prop === "CProjectType" ||
+                          item.prop === "cEmployeeName" ||
+                          item.prop === "cIdentificationNumber" ||
+                          item.prop === "cPlateNo" ||
+                          item.prop === "cEngineNo" ||
+                          item.prop === "cIndustryType" ||
+                          item.prop === "cProjectName" ||
+                          item.prop === "cDetailedAddress" ||
+                          item.prop === "cProjectType" ||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
                           item.prop === "cPrjCtgSubTyp"
@@ -768,35 +770,35 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               ],
           },
           {
-              prop: "CEmployeeName",
+              prop: "cEmployeeName",
               inputtype: "rtinput",
               title: "雇员名称",
               clearable: true,
               hidden: true,
           },
           {
-              prop: "CIdentificationNumber",
+              prop: "cIdentificationNumber",
               inputtype: "rtinput",
               title: "证件号",
               clearable: true,
               hidden: true,
           },
           {
-              prop: "CPlateNo",
+              prop: "cPlateNo",
               inputtype: "rtinput",
               title: "车牌号",
               clearable: true,
               hidden: true,
           },
           {
-              prop: "CEngineNo",
+              prop: "cEngineNo",
               inputtype: "rtinput",
               title: "发动机号",
               clearable: true,
               hidden: true,
           },
           {
-              prop: "CIndustryType",
+              prop: "cIndustryType",
               inputtype: "rtselect",
               title: "行业类型",
               typeCode: "HANGYE_TYPE",
@@ -804,21 +806,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               hidden: true,
           },
           {
-              prop: "CProjectName",
+              prop: "cProjectName",
               inputtype: "rtinput",
               title: "工程名称",
               clearable: true,
               hidden: true,
           },
           {
-              prop: "CProjectType",
+              prop: "cProjectType",
               inputtype: "rtinput",
               title: "工程类型",
               clearable: true,
               hidden: true,
           },
           {
-              prop: "CDetailedAddress",
+              prop: "cDetailedAddress",
               inputtype: "rtinput",
               title: "家财地址",
               clearable: true,
@@ -1371,10 +1373,24 @@ async function queryAE( flag?: boolean, isEs = false) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
-    const s = freeEditRefs.getFromValue(); //获取表单数据  
+    const s = freeEditRefs.getFromValue(); //获取表单数据 
+    let expandFlag = 0;
+    let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
+    // 09 工程险
+    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
+    }
+
+    // 08 家庭财产险
+    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
+    }
+
     pageresult.list = [];
     // 清空多余参数
     delete s.cProdNo;
@@ -1480,6 +1496,8 @@ async function queryAE( flag?: boolean, isEs = false) {
     param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
+    param["expandFlag"] = expandFlag;  // 扩展列标识    
+    param["expandVal"] = expandVal;    // 扩展列字段  
 
     // 清空询价日期参数
     param.tInquiryTm = null;
@@ -1509,6 +1527,8 @@ async function queryAE( flag?: boolean, isEs = false) {
         param.IndexName = 'ply_insured_ik';
         param.IndexType = 'ply_insured_info';
     }
+
+    console.log('param----------', param);
     if (isESBool.value) {
       queryInsuredList(param)
       .then((res) => {
@@ -1556,8 +1576,21 @@ async function queryI(flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
+    let expandFlag = 0;
+    let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
+    }
+    // 09 工程险
+    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
+    }
+
+    // 08 家庭财产险
+    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
     pageresult.list = [];
     // 清空其他日期参数
@@ -1605,6 +1638,9 @@ async function queryI(flag?: boolean, isEs = false) {
     param["tInquiryTmEnd"] = tInquiryTmEnd; 
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
+    param["expandFlag"] = expandFlag;  // 扩展列标识    
+    param["expandVal"] = expandVal;    // 扩展列字段  
+
       // 清空其他日期参数
     param["tAppTmStart"] = null;
     param["tAppTmEnd"] = null;
@@ -1684,9 +1720,22 @@ async function exportAE( flag?: boolean, isEs) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
-    const s = freeEditRefs.getFromValue(); //获取表单数据  
+    const s = freeEditRefs.getFromValue(); //获取表单数据
+    let expandFlag = 0;
+    let expandVal = {};
+
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
+    }
+    // 09 工程险
+    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
+    }
+    // 08 家庭财产险
+    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
     pageresult.list = [];
     // 清空多余参数
@@ -1734,6 +1783,8 @@ async function exportAE( flag?: boolean, isEs) {
     param["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
+    param["expandFlag"] = expandFlag;  // 扩展列标识    
+    param["expandVal"] = expandVal;    // 扩展列字段
 
     param["type"] = 'search';
     param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
@@ -1786,8 +1837,21 @@ async function exportI(flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
+    let expandFlag = 0;
+    let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
+    }
+    // 09 工程险
+    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
+    }
+
+    // 08 家庭财产险
+    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
+       expandFlag = 1;
+       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
     }
     pageresult.list = [];
     // 清空其他日期参数
@@ -1835,6 +1899,9 @@ async function exportI(flag?: boolean, isEs = false) {
     param["tInquiryTmEnd"] = tInquiryTmEnd; 
     param["queryType"] = queryType.value;
     param["cTermNo"] = cTermNo;        // 条款编码
+    param["expandFlag"] = expandFlag;  // 扩展列标识    
+    param["expandVal"] = expandVal;    // 扩展列字段 
+
     param["type"] = 'search';
     param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
     param["ises"] = isEs;

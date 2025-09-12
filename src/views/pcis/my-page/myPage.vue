@@ -1770,6 +1770,9 @@ async function loadAfter() {
         ops['plyBase']['Base.cOrigPlyNo'] = cPlyNo
         ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         ops['plyBase']['Base.cAppStatus'] = ''
+        ops['plyBase']['Base.cRiFacMrk'] = null
+        ops['plyBase']['Base.cRiFacOpn'] = null
+        ops['plyBase']['Base.cRiFacCde'] = null
         ops['insrnc']['Base.tAppTm'] = moment(new Date(Date.now())).format(
             "YYYY-MM-DD HH:mm:ss"
         )
@@ -1941,6 +1944,9 @@ async function loadAfter() {
           ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
           ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
           ops.plyBase['Base.cRemark'] = "" // 出单员备注
+          ops.plyBase['Base.cRiFacMrk'] = null
+          ops.plyBase['Base.cRiFacOpn'] = null
+          ops.plyBase['Base.cRiFacCde'] = null
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){
@@ -2612,7 +2618,8 @@ const loadAppPlyInfo = async (CAppNo) => {
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
-      if (props.param.cTransMrk === '1' && ops.plyBase) {
+      debugger
+      if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
         ops.plyBase['Base.cAppNo'] = '';
       }
     console.log("转换的数据", ops);
@@ -2726,7 +2733,7 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
-  if(props.param.cProdNo.startsWith('02') ){
+  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018'].includes(props.param.cProdNo)){
     const term = opertaor.getTableRefByKey("cvrg").getFromValue();
     term.forEach(item => {
       if(item["Term.cRdrTyp"] === '0'){
@@ -3166,7 +3173,25 @@ const submitToUndrFn = async () => {
         ElMessage.error(checkDistInfo?.msg);
         return;
       }
-
+      if (checkDistInfo?.data?.code === -1){
+        ElMessage.error(checkDistInfo?.data?.msg);
+        return;
+      }
+      if (checkDistInfo?.data?.code === 1) {
+        try {
+          await ElMessageBox.confirm(
+              checkDistInfo?.data?.msg + "，是否继续",
+              "提示",
+              {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+              }
+          );
+        } catch (e) {
+          return;
+        }
+      }
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
@@ -3706,7 +3731,26 @@ const calcPremiumEdr = async () => {
     ElMessage.error(checkDistInfo?.msg);
     return;
   }
- 
+  if (checkDistInfo?.data?.code === -1){
+    ElMessage.error(checkDistInfo?.data?.msg);
+    return;
+  }
+  if (checkDistInfo?.data?.code === 1) {
+    try {
+      await ElMessageBox.confirm(
+          checkDistInfo?.data?.msg + "，是否继续",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
   const btn = getBtn("btnCalEdr");
   btn.loading = true;
 
@@ -4212,6 +4256,7 @@ const saveEdrPlyInfo = async () => {
         console.log('保存数据555',ops)
         sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
     } else {
+      btn.loading = false;
       ElMessage.error(edrInfo.msg);
     }
   }else{

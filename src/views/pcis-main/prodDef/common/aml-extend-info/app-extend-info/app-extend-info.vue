@@ -151,7 +151,7 @@ const tableconfig = reactive<AppGridEditConfig>(
 
 						// setFieldRules('CCertfCde_A',val,freeEditRef1,formconfig1)
 				    }
-					//  if (val == "120001") {
+					//  if (val == "111") {
 					// 	     setFormItem("cCerftCde", {
 					// 			rules: [getRules("required", {}), getRules("idCard", {
 					// 			})],
@@ -162,7 +162,7 @@ const tableconfig = reactive<AppGridEditConfig>(
 					// 	setFormItem("cCerftCde", {
 					// 		rules: [getRules("required", {}),getRules("socialCode", {})],
 					// 	});
-					//  }else if(val =='120002'){
+					//  }else if(val =='07'){
 					// 	// 护照 
 					// 	setFormItem("cCerftCde", {
 					// 		rules: [getRules("required", {}),getRules("passPort", {})],
@@ -484,8 +484,8 @@ const pageresult = reactive<Pageresult>({
 const ruleTypeMap: Record<string, string> = {
 	"110001": "orgCode",      // 组织机构编码
 	"110007": "socialCode",   // 统一社会信用代码
-    "120001": "idCard",       // 身份证
-  	"120002": "passPort",     // 护照
+    "111": "idCard",       // 身份证
+  	"07": "passPort",     // 护照
     "19": "ariCard",          // 外国人证件号
 };
 
