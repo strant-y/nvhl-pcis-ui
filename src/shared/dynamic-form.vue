@@ -321,6 +321,7 @@
 
 <script setup lang="ts">
 import { FormInstance } from "element-plus";
+import Validator from "async-validator";
 import { AppGridEditMethod } from "./app-grid-edit-config";
 const maxLabelWidth = ref(150); // 默认值
 
@@ -444,10 +445,70 @@ function setPopover(v: any, item: any) {
 }
 
 async function validate() {
-  const promise = await fromRef.value?.validate((valid, fields) => {
-    if (valid) {
-    } else {
+  // 存储验证规则的对象
+  let rules = <any>{};
+  for (const schama in props.fromSchema) {
+    // 如果当前列有验证规则，则将其添加到规则对象中
+    if (props.fromSchema[schama].rules) {
+      let rul = props.fromSchema[schama].rules;
+      if (
+        props.fromSchema[schama].inputtype === "rtnumber" ||
+        (props.fromSchema[schama].inputtype === "rtinput" &&
+          props.fromSchema[schama].type === "number")
+      ) {
+        if (rul && rul.length > 0) {
+          rul.forEach((item: any) => {
+            item.type = "number";
+          });
+        }
+      }
+      if (props.fromSchema[schama].inputtype === "rtcascader") {
+        if (rul && rul.length > 0) {
+          rul.forEach((item: any) => {
+            item.type = "array";
+          });
+        }
+      }
+      rules[props.fromSchema[schama].prop] = rul;
     }
+  }
+  // 创建验证器实例
+  const validator = new Validator(rules);
+  const r = await dovalidate(validator);
+  let l = [];
+  if(r && r.length > 0){
+    const isEx = false;
+    props.fromSchema.filter((item:any) => {
+      const r2 = r.filter((i:any) => i.field === item.prop && (item.expand === true || item.expand === '1'));
+      if(r2 && r2.length > 0 && !l.includes(item.group)){
+        l.push(item.group);
+      }
+    });
+  }
+  if(l && l.length > 0){
+    groupByList.value.forEach((item:any) => {
+      if(l.includes(item.id)){
+        item.disabled = true;
+      }
+    });
+    nextTick(()=>{
+      freeValidate();
+    })
+  }else{
+    freeValidate();
+  }
+  if(r && r.length > 0){
+    return false;
+  }else{
+    return true;
+  }
+}
+
+async function freeValidate(){
+  const promise = await fromRef.value?.validate((valid, fields) => {
+  if (valid) {
+  } else {
+  }
   });
   let fromListbl = promise;
   if (fromListRef.value) {
@@ -460,6 +521,23 @@ async function validate() {
   }
   return fromListbl;
 }
+
+function dovalidate(validator: any) { 
+  const p = new Promise((resolve) => {
+    // 执行验证操作
+    validator.validate(form, (data: any) => {
+      // 根据验证结果进行处理
+      if (data) {
+        resolve(data);
+      } else {
+        // 验证通过
+        resolve(true);
+      }
+    });
+  });
+  return p;
+}
+
 
 async function validateField(fields:any) {
   // 1. 主表单指定字段校验
