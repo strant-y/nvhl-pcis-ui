@@ -223,20 +223,25 @@
             >&nbsp;<span class="font-weight-500">天</span
             >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;|&nbsp;<span
+            >&nbsp;
+<!--            <span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;-->
+            |&nbsp;<span
               class="font-weight-500"
               >保费: </span
             ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;
+            >&nbsp;
+<!--            <span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;-->
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
 							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
-							>&nbsp;<span class="font-weight-500">元</span>
+							>&nbsp;
+<!--              <span class="font-weight-500">元</span>-->
 						</template>
             <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
               |&nbsp;<span class="font-weight-500">协议剩余保额: </span
             ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
-            >&nbsp;<span class="font-weight-500">元</span>
+            >&nbsp;
+<!--              <span class="font-weight-500">元</span>-->
             </template>
           </div>
         </div>

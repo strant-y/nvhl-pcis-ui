@@ -288,13 +288,13 @@ const handleCertificateChange = (value: string) => {
   freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerName')
   console.log('value111', value)
-  if (value == '120001') { // 身份证号
+  if (value == '111') { // 身份证号
     CCertfCdeRules.value = [getRules("required", {}), getRules("idCard", {})]
   } else if (value == '110007') { // 统一社会信用代码
     CCertfCdeRules.value = [getRules("required", {}), getRules("socialCode", {})]
   } else if (value == '110001') { // 组织机构
     CCertfCdeRules.value = [getRules("required", {}), getRules("orgCode", {})]
-  } else if(value == '120002') { // 护照
+  } else if(value == '07') { // 护照
     CCertfCdeRules.value = [getRules("required", {}), getRules("passPort", {})]
   } else if(value == '19') { //外国人永久居留身份证
     CCertfCdeRules.value = [getRules("required", {}), getRules("ariCard", {})]
@@ -311,13 +311,13 @@ const handleCertificateChange2 = (value: string) => {
   freeEditRef.value?.clearValidate('shareholderIdNumber')
   freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderName')
-  if (value == '120001') { // 身份证号
+  if (value == '111') { // 身份证号
     CCertfCdeRules2.value = [getRules("required", {}), getRules("idCard", {})]
   } else if (value == '110007') { // 统一社会信用代码
     CCertfCdeRules2.value = [getRules("required", {}), getRules("socialCode", {})]
   } else if (value == '110001') { // 组织机构
     CCertfCdeRules2.value = [getRules("required", {}), getRules("orgCode", {})]
-  } else if(value == '120002') { // 护照
+  } else if(value == '07') { // 护照
     CCertfCdeRules2.value = [getRules("required", {}), getRules("passPort", {})]
   } else if(value == '19') { //外国人永久居留身份证
     CCertfCdeRules2.value = [getRules("required", {}), getRules("ariCard", {})]

@@ -92,7 +92,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
 	  {
-        prop: "cInsuredNme",
+        prop: "insuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         clearable: true,
@@ -247,7 +247,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人",
       },
       {
-        prop: "cInsuredNme",
+        prop: "insuredNme",
         inputtype: "rtinput",
         title: "被保人",
       },
