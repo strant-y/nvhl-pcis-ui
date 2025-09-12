@@ -123,6 +123,7 @@ function queryOnce(typeList: string[] = undefined){
       if (!!result.value && cache) {
         // setOptionsToCacheMap(param.codeListName, result.value);
       }
+      codeListMap.value[k] = result.value;  // 将数据加入缓存,方便下次直接缓存获取不需要再数据库交互
       resolve(result.value);
     });
   }

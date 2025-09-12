@@ -1,7 +1,7 @@
 <template>
   <div class="freeedit">
     <div class="searchbar">
-      <el-card :class="cardConfig.title === '主条款信息' ? 'mainTitle' : ''">
+      <el-card :class="getClass()">
         <template #header>
           <el-row justify="space-between">
             <el-col :span="6" v-if="!cardConfig.production">
@@ -168,6 +168,12 @@ function changeMyForm(value: any) {
     showMyfrom.value = value;
   }else{
     showMyfrom.value = !showMyfrom.value;
+  }
+}
+
+function getClass(){
+  if(props.cardConfig.titleClass){
+    return props.cardConfig.titleClass;
   }
 }
 

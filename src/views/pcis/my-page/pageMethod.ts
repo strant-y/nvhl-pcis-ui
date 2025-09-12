@@ -2,9 +2,7 @@
 export const pageMethod = {
     isEditScene: function(opertaor: any){
         const param = opertaor.getParam();
-        if(param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "PLY_UW_PROCESS_SCENE"
-            || param.pageType === "PLY_UW_PROCESS_SCENE"
-        ){
+        if(param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "EDR_APP_NEW_SCENE" ){
             return true;
         }else{
             return false;

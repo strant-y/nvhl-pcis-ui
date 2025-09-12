@@ -86,6 +86,7 @@ import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行�
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
 import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
+import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
 
 /** 组合出单公共组件 **/
 import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
@@ -105,6 +106,7 @@ const componentMap = {
   cvrgRef: cvrgRef,
   webPlyCvrg04: plyCvrg04Ref,
   webPlyCvrgPer:plyCvrgPer,
+  webPlyTermCommon:PlyTermCommonRef,
   plyCvrgCross:plyCvrgCross,
   plyCvrgPlanCross:plyCvrgPlanCross,
   plyBaseRef: plybaseRef,

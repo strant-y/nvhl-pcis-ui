@@ -304,7 +304,12 @@ reportBgnTmFn: (v: any) => {
   const start = getValue("Base.tReportBgnTm");
   const end = getValue("Base.tReportEndTm");
   const insEnd = getValue("Base.tInsrncEndTm"); // 保险止期
-  if (!v) return;
+
+  const param = opertaor.getParam();
+  const isInit = param.initFlag; // 是否是初始化状态
+  if (!v || isInit) return;
+
+
 
   // 报告期起始日期必须大于保险止期
   if (insEnd && moment(v).isSameOrBefore(moment(insEnd))) {
@@ -337,7 +342,10 @@ reportBgnTmFn: (v: any) => {
   reportEndTmFn: (v: any) => {
     const start = getValue("Base.tReportBgnTm");
     const insEnd = getValue("Base.tInsrncEndTm"); // 保险止期
-    if (!v || !start) return;
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否是初始化状态
+ 
+    if (!v || !start || isInit) return;
 
     // 先校验起始日期是否合规（必须大于保险止期）
     if (insEnd && moment(start).isSameOrBefore(moment(insEnd))) {

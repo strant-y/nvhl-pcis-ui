@@ -196,7 +196,6 @@ const method = {
   },
   // 缴费计划
   nPayablePrmFun: (val: any) => {
-
     const data = opertaor.getDataAll();
     const cCiMrk = ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
     let nCiShare = Number(getOwnShare()) || 1;

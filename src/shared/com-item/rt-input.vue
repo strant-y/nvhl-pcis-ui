@@ -185,6 +185,7 @@
 <script setup lang="ts">
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import {checkIfTruncated} from "@/utils/common";
+import Decimal from "decimal.js";
 type IconNames = keyof typeof ElementPlusIconsVue;
 const props = defineProps({
   modelValue: {
@@ -241,9 +242,9 @@ watch([() => props.modelValue], ([newModelValue]) => {
       n = newModelValue + "";
     }
   }else if (props.item.type === "percent") {
-    n = newModelValue ? Number(newModelValue) * 100 + "" : "";
+    n = newModelValue? (new Decimal(newModelValue).times(100).toString() + "") : "";
   }else if (props.item.type === "permill") {
-    n = newModelValue ? Number(newModelValue) * 1000 + "" : "";
+    n = newModelValue? (new Decimal(newModelValue).times(1000).toString() + "") : "";
   }else{
     n = newModelValue;
   }
@@ -276,14 +277,14 @@ function handleChange(val?: string | undefined | null) {
   } else if (props.item.type === "percent") {
     nv = val ? Number(val) : null;
     if(nv){
-      nv = (nv / 100).toFixed(3);
+      nv = Number(new Decimal(nv).div(100).toString());
     }
     emits("valueChange", nv);
     emits("update:modelValue", nv);
   } else if (props.item.type === "permill") {
     nv = val ? Number(val) : null;
     if(nv){
-      nv = (nv / 1000).toFixed(3);
+      nv = Number(new Decimal(nv).div(1000).toString());
     }
     emits("valueChange", nv);
     emits("update:modelValue", nv);
@@ -298,9 +299,9 @@ onMounted(() => {
   if (props.item.type === "number") {
     vInput.value = props.modelValue + "";
   }else if (props.item.type === "percent") {
-    vInput.value = props.modelValue? Number(props.modelValue) * 100 + "" : "";
+    vInput.value = props.modelValue? (new Decimal(props.modelValue).times(100).toString() + "") : "";
   }else if (props.item.type === "permill") {
-    vInput.value = props.modelValue? Number(props.modelValue) * 1000 + "" : "";
+    vInput.value = props.modelValue? (new Decimal(props.modelValue).times(1000).toString() + "") : "";
   }else{
     vInput.value = props.modelValue;
   }
