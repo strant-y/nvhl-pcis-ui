@@ -881,14 +881,14 @@ function updateUdr(row: any) {
     objId,
     curtTask,
     cAppTyp,
-    prodNo,
+    cProdNo,
     cRelateBusi,
     cEdrRsnBundleCde,
     plyNo,
   } = row;
   if (row.cAppTyp === "P") {
     // 方案不校验倒签
-    if (row.prodNo === "000000") {
+    if (row.cProdNo === "000000") {
       const data = {
         CPlanNo: row.objId,
         TaskId: row.curtTask,
@@ -905,7 +905,7 @@ function updateUdr(row: any) {
       const en = JSON.stringify({
         CPlanNo: row.objId,
         TaskId: row.curtTask,
-        "Base.CProdNo": row.prodNo,
+        "Base.CProdNo": row.cProdNo,
         scene: SCENE_PLAN_UW_PROCESS,
         cAppTyp: row.cAppTyp,
       });
@@ -968,7 +968,7 @@ function updateUdrDetail(row: any) {
           cInquiryNo: row.cInquiryNo,
           taskId: row.curtTask,
           cAppTyp: row.cAppTyp,
-          cProdNo: row.prodNo,
+          cProdNo: row.cProdNo,
           cCiMrk: r.data.cCiMrk,
           cGrpMrk: r.data.cGrpMrk,
           cDptCde: r.data.cDptCde,
@@ -998,7 +998,7 @@ function updateUdrDetail(row: any) {
           cInquiryNo: row.objId,
           taskId: row.curtTask,
           cAppTyp: row.cAppTyp,
-          cProdNo: row.prodNo,
+          cProdNo: row.cProdNo,
           cCiMrk: r.data.cCiMrk,
           cRsnCde: r.data.cEdrRsnBundleCde,
           cEdrType: r.data.cEdrType,
@@ -1050,7 +1050,7 @@ function handleWorkFlow(row: any, type: any) {
               const en = JSON.stringify({
                 CPlanNo: row.objId,
                 TaskId: row.curtTask,
-                "Base.CProdNo": row.prodNo,
+                "Base.CProdNo": row.cProdNo,
                 scene: SCENE_PLAN_UW_PROCESS,
                 cAppTyp: row.cAppTyp,
                 cTermNo: row.cTermNo,
@@ -1094,7 +1094,7 @@ function handle_hasReceived(row: any) {
     objId,
     curtTask,
     cAppTyp,
-    prodNo,
+    cProdNo,
     cRelateBusi,
     cEdrRsnBundleCde,
     plyNo,
@@ -1126,7 +1126,7 @@ function handle_hasReceived(row: any) {
 
   if (cAppTyp === "P") {
     // 方案不校验倒签
-    if ("000000" === prodNo) {
+    if ("000000" === cProdNo) {
       const param = {
         taskId: curtTask,
         user: user.value,
@@ -1295,7 +1295,7 @@ function handleEdit(row: any) {
   const en = JSON.stringify({
     scene: scene,
     cInquiryNo: row.objId,
-    cProdNo: row.prodNo,
+    cProdNo: row.cProdNo,
     cAppTyp: row.cAppTyp,
     cJiMrk: row.cJiMrk,
     cDptCde: row.cDptCde,
