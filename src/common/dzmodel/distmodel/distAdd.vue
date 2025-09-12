@@ -325,7 +325,7 @@ onMounted(() => {
           const formattedBirthDate = `${birthDateFromId.substring(0, 4)}-${birthDateFromId.substring(4, 6)}-${birthDateFromId.substring(6, 8)}`;
           setValue('Dist.tBirthDate', formattedBirthDate);
         }
-        if(val && val.length === 18 && getValue('Dist.cDocumentType') === '120001') {
+        if(val && val.length === 18 && getValue('Dist.cDocumentType') === '111') {
           const age = calculateAgeFromIdCard(val);
           setValue('Dist.nAge', age);
         }
@@ -580,7 +580,7 @@ const cDocumentTypeChange = (val: any) => {
   const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
 
   const baseRuleMap: Record<string, any[]> = {
-    "120001": [getRules("idCard", {})], // 身份证
+    "111": [getRules("idCard", {})], // 身份证
     "110007": [getRules("socialCode", {})], // 统一社会信用代码
     "19": [getRules("ariCard", {})], // 外国人证件号
     "110001": [getRules("orgCode", {})], // 组织机构编码

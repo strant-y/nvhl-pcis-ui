@@ -217,7 +217,7 @@ function setFormItem(key: string, obj: Record<string, any>): void {
 const idAnalysis = (id: string) => {
   const tabref = opertaor.getTableRefs();
   const insuredValue = tabref["insured"].getFromValue();
-  if (!validateIdCard(id) || (insuredValue["Insured.cCertfCls"] !== '120001' && insuredValue["Insured.cCertfCls"] !== '19')) {
+  if (!validateIdCard(id) || (insuredValue["Insured.cCertfCls"] !== '111' && insuredValue["Insured.cCertfCls"] !== '19')) {
     return false
   }
 
@@ -964,7 +964,7 @@ const method = {
     const isInit = param.initFlag; // 是否是初始化状态
 
     // if (isInit) {
-    //   if (val === "120001") {
+    //   if (val === "111") {
     //     setFormItem("Insured.tCertfBgnDate", {
     //       rules: [getRules("required", {})],
     //     });
@@ -994,7 +994,7 @@ const method = {
     setFormItem("Insured.tCertfEndDate", { rules: null });
     setFormItem("Insured.tEstablishingDate", { rules: null });
 
-    if (val == "120001") {
+    if (val == "111") {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {
 
@@ -1041,7 +1041,7 @@ const method = {
         disabled: true,
       });
 
-    } else if (val === '120002') {
+    } else if (val === '07') {
       // 护照
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("passPort", {})],
@@ -1083,7 +1083,7 @@ const method = {
             checkUser();
             const tabref = opertaor.getTableRefs();
             const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
-            if (cCertfCls == "120001") {
+            if (cCertfCls == "111") {
               if (val) {
                 const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
                 insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
@@ -1256,8 +1256,8 @@ const method = {
     const ruleMap: Record<string, RuleType> = {
       "110001": "orgCode",
       "110007": "socialCode",
-      "120001": "idCard",
-      "120002": "passPort",
+      "111": "idCard",
+      "07": "passPort",
       "19": "ariCard",
     };
     baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
@@ -1423,7 +1423,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Insured.cCertfCls", "120001");
+            setValue("Insured.cCertfCls", "111");
             setValue("Insured.cClntMrk", "1");
             if (cardInfo["id_number"])
               idAnalysis(cardInfo["id_number"])
