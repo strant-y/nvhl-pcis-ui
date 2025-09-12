@@ -124,6 +124,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   loadData: res.data,
                 };
                 setFormItem("CChaSubtype", obj);
+                nextTick(()=>{
+                  setValue("CChaSubtype", props.data.data.cChaSubtype);
+                })
               }
             }
           });
