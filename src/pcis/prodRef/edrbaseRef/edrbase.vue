@@ -267,6 +267,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
         func: (v) => {},
       },
+
+       {
+        prop: "EdrBase.NResvNum3",
+        inputtype: "rtinput",
+        title: "已延期天数",
+         disabled:true,
+      },
+
+
       {
         prop: "EdrBase.cEdrRsnDetail",
         inputtype: "rtcheckboxgroup",

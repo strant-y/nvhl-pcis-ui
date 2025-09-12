@@ -279,7 +279,7 @@
                   : true
               "
             >
-          <!-- {{ k.pageKey }} || {{ k.pageCode }} -->
+          {{ k.pageKey }} || {{ k.pageCode }}
               <component
                 v-if="currentIndex >= i"
                 :ref="
@@ -5069,6 +5069,7 @@ opertaor.setFatherPage({
   getSaveDataParams: getSaveDataParams,
   getEdrbaseValue: getEdrbaseValue,
   getOldProductResData: getOldProductResData,
+  setEdrValue: setEdrValue,
 });
 
 function getEdrbaseValue(key:any) {
@@ -5140,6 +5141,11 @@ function clearCAppNoAndCPkId(res:any) {
 function setnDelayNum(val:any) {
   edrbase.value?.setValue("EdrBase.nDelayNum", val)
 }
+
+function setEdrValue(key:any,val:any) {
+  edrbase.value?.setValue(key, val)
+}
+
 
 function getSaveDataParams() {
   const res = opertaor.getDataAll();

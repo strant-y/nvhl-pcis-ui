@@ -3,25 +3,25 @@
         <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
         <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
             @page-change="handleQuery(false)" @row-click="handleRowClick" @row-dblclick="handleRowDoubleClick"
-            @sort-change="sortChange" >
+            @sort-change="sortChange">
             <!-- policyInfo 列的具名插槽 -->
             <template #column-policyInfo="{ row, column, index }">
                 <div class="policy-info-cell">
-                <div v-if="row.cAppNo" class="policy-number-row">
-                    <span>{{row.cAppNo}}</span>
-                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-                        <DocumentCopy />
-                    </el-icon>
+                    <div v-if="row.cAppNo" class="policy-number-row">
+                        <span>{{ row.cAppNo }}</span>
+                        <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                            <DocumentCopy />
+                        </el-icon>
+                    </div>
+                    <div v-if="row.cPlyNo" class="policy-number-row">
+                        <span>{{ row.cPlyNo }}</span>
+                        <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                            <DocumentCopy />
+                        </el-icon>
+                    </div>
                 </div>
-                <div v-if="row.cPlyNo" class="policy-number-row">
-                    <span>{{row.cPlyNo}}</span>
-                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-                        <DocumentCopy />
-                    </el-icon>
-                </div>
-                </div>
-           </template>
-      	</app-table>
+            </template>
+        </app-table>
     </div>
     <comDialog ref="dialog"></comDialog>
 </template>
@@ -38,7 +38,7 @@ import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import { AppKey } from "@/constants/api";
-import { getProdEnableList } from "@/api/prod/";
+import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde } from "@/api/prod/";
 import {
     DEFERRED_CORRECTION,
     SCENE_EDR_APP_NEW,
@@ -109,10 +109,10 @@ let cTermNo = '';    // 条款编码
 const cPard = ref(null);
 
 // 截取条款请求
-function extractCode(str:string) {
-  // 匹配 "P+数字" 或 "纯数字"
-  const pattern = /^(P\d+|\d+)/;
-  return str.match(pattern)?.[0] || "";
+function extractCode(str: string) {
+    // 匹配 "P+数字" 或 "纯数字"
+    const pattern = /^(P\d+|\d+)/;
+    return str.match(pattern)?.[0] || "";
 }
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -194,58 +194,58 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 defaultValue: 1,
             },
             {
-              prop: "cKindNo",
-              inputtype: "rtselect",
-              title: "产品大类",
-              typeCode: "KIND_LIST_GRT",
-              child: "cProdNo",
-              filterable: true,
-              clearable: true,
-              codeParam: {
-                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-              },
-              func: (val) => {
-                  setValue("cProdNo","")
-                  cTermNo = "";      // 重置条款编码
-                  cPard.value = val;
-                  codeListStore
-                    .queryCodeList({
-                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
-                        codeListParam:{
-                        cParCde: cPard.value,
-                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                    },
-                    })
-                    .then((res) => {
-                        cTermNoList.value = res;
-                        setFormItem("cProdNo", {
-                            loadData: res,
+                prop: "cKindNo",
+                inputtype: "rtselect",
+                title: "产品大类",
+                typeCode: "KIND_LIST_GRT",
+                child: "cProdNo",
+                filterable: true,
+                clearable: true,
+                codeParam: {
+                    cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                    cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                },
+                func: (val) => {
+                    setValue("cProdNo", "")
+                    cTermNo = "";      // 重置条款编码
+                    cPard.value = val;
+                    codeListStore
+                        .queryCodeList({
+                            codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+                            codeListParam: {
+                                cParCde: cPard.value,
+                                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                            },
+                        })
+                        .then((res) => {
+                            cTermNoList.value = res;
+                            setFormItem("cProdNo", {
+                                loadData: res,
+                            });
                         });
-                    });
-              },
+                },
             },
             {
-              prop: "cProdNo",
-              inputtype: "rtselect",
-              title: "条款名称",
-              itemWidth: 1,
-              filterable: true,
-              clearable: true,
-              func: (val:any) => {
-                if(val){
-                        if(cTermNoList.value.length>0){
+                prop: "cProdNo",
+                inputtype: "rtselect",
+                title: "条款名称",
+                itemWidth: 1,
+                filterable: true,
+                clearable: true,
+                func: (val: any) => {
+                    if (val) {
+                        if (cTermNoList.value.length > 0) {
                             cTermNoList.value.forEach((ele) => {
-                                if(ele['value']  === val){
+                                if (ele['value'] === val) {
                                     cTermNo = extractCode(ele['label'])
                                 }
                             });
                         }
-                } else {
-                    cTermNo = "";
-                }
-              },
+                    } else {
+                        cTermNo = "";
+                    }
+                },
             },
             {
                 prop: "cInsuredNme",
@@ -336,16 +336,19 @@ const tableconfig = reactive<AppTableConfig>(
                 size: "large",
                 icon: "Edit",
                 tableClick: (row) => {
-                    if(row.cCiMrk === "5" && row.id[1] === "47" ){
+                    if (row.cCiMrk === "5" && row.id[1] === "47") {
                         ElMessage.warning('出单方式为司内联保时,联共保信息不可批改!');
                         return;
-                    }else{
+                    } else {
                         openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+                        // initQuery(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+                        // console.log(row)
+
                     }
                     // if ("DP" === row.id) {
                     //     ciCoopCorrect(row)
                     // }else{
-                    
+
                     // }
                     // else if ("DP" === rsnCde.value[selected.value["cPlyNo"]]) {
                     //     ciCoopCorrect(selected.value["cPlyNo"])
@@ -419,8 +422,8 @@ const tableconfig = reactive<AppTableConfig>(
                 typeCode: 'EDR_RSN_LIST_NEW',
                 checkStrictly: false,
                 func: (val, row, codeListMap) => {
-                    if(val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
-                        row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item:any) => item.value === val[1]);
+                    if (val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
+                        row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item: any) => item.value === val[1]);
                     }
                 },
             },
@@ -445,7 +448,7 @@ const handleDateChange = (value) => {
 };
 const handleQuery = (flag = true) => {
     // submitForm(flag);
-       freeEditRef.value?.validate().then((isValid) => {
+    freeEditRef.value?.validate().then((isValid) => {
         if (isValid) {
             refreshData(flag);
         }
@@ -461,7 +464,7 @@ const handleQuery = (flag = true) => {
 // };
 
 const refreshData = (reset = true) => {
- 
+
     const formData = freeEditRef.value?.getFromValue();
     if (!formData.cPlyNo) {
         const startTemp =
@@ -507,34 +510,34 @@ const refreshData = (reset = true) => {
     };
     const params = Object.assign(s, r, obj);
     params["cTermNo"] = cTermNo;        // 条款编码
-    console.log('参数1',params)
+    console.log('参数1', params)
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
-      
+
     pcisEdrQueryService.qryEndorseList(params).then((res: any) => {
-        let{code , data }=res;
- 
-        pageresult.list =[];
+        let { code, data } = res;
+
+        pageresult.list = [];
         // if (null != res && null != res["code"]) {
-            if (code === 200) {
-              
-                const pageData = data;
-                if (pageData) {
-                  
-                    pageresult.total = pageData.total;
-                    pageData.result.forEach((item) => {
-                        // changeRsnValue(item);
-                        setTableFormItem("id", {
-                            loadData: [
-                                { label: '一般批改', value: `1-${item.cProdNo.slice(0,2)}` },
-                                { label: '注销', value: `2-${item.cProdNo.slice(0,2)}` },
-                                { label: '退保', value: `3-${item.cProdNo.slice(0,2)}` },
-                            ],
-                        });
+        if (code === 200) {
+
+            const pageData = data;
+            if (pageData) {
+
+                pageresult.total = pageData.total;
+                pageData.result.forEach((item) => {
+                    // changeRsnValue(item);
+                    setTableFormItem("id", {
+                        loadData: [
+                            { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
+                            { label: '注销', value: `2-${item.cProdNo.slice(0, 2)}` },
+                            { label: '退保', value: `3-${item.cProdNo.slice(0, 2)}` },
+                        ],
                     });
-                    pageresult.list = pageData.result;
-                   
-                }
+                });
+                pageresult.list = pageData.result;
+
             }
+        }
         // }
     });
 };
@@ -556,36 +559,36 @@ function handleRsnChange(val, row) {
     if (val === "FZ") {
         // 如果是非涉费批改
         getListByCode("EDR_RSN_LIST", {
-        prodNo: prodNo,
-        rsnTyp: rsnTyp,
-        isGrp: isGrp,
-        isPer: isPer,
-        calcMrk: "0",
-        ZH: "ZH",
-        FZ: "FZ",
-    }).then(
-        (cde2Res) => {
-            cde2Res["data"] = [{ value: 'FZ', label: '非涉费组合批改' }];
-            if (!codeListMap.value[prodNo + val + grpMrk]) {
-                codeListMap.value[prodNo + val + grpMrk] = cde2Res["data"];
-            }
+            prodNo: prodNo,
+            rsnTyp: rsnTyp,
+            isGrp: isGrp,
+            isPer: isPer,
+            calcMrk: "0",
+            ZH: "ZH",
+            FZ: "FZ",
+        }).then(
+            (cde2Res) => {
+                cde2Res["data"] = [{ value: 'FZ', label: '非涉费组合批改' }];
+                if (!codeListMap.value[prodNo + val + grpMrk]) {
+                    codeListMap.value[prodNo + val + grpMrk] = cde2Res["data"];
+                }
 
-            const detailOption = cde2Res["data"].find(
-                (option) => option.value === val
-            );
+                const detailOption = cde2Res["data"].find(
+                    (option) => option.value === val
+                );
 
-            if (detailOption) {
-                row["iddetail"] = [detailOption.label];
-                changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
-            } else {
-                row["iddetail"] = '';
+                if (detailOption) {
+                    row["iddetail"] = [detailOption.label];
+                    changeRsn({ value: val }, row["cPlyNo"], { value: row["iddetail"] });
+                } else {
+                    row["iddetail"] = '';
+                }
+            },
+            (error) => {
+                console.log("出错了", error);
+                ElMessage.error("后台服务异常,请联系管理员");
             }
-        },
-        (error) => {
-            console.log("出错了", error);
-            ElMessage.error("后台服务异常,请联系管理员");
-        }
-    );
+        );
     } else {
         const detailOption = codeListMap.value[prodNo + grpMrk]?.find(
             (option) => option.value === val
@@ -737,7 +740,7 @@ const changeRsnValue = (item) => {
         urlStr = 'EDR_RSN_LIST_ZX';
     } else if (props.activeName === "退保") {
         rsnTyp = "3";
-         urlStr = 'EDR_RSN_LIST_TB';
+        urlStr = 'EDR_RSN_LIST_TB';
     }
     routeData["rsnTyp"] = rsnTyp
     selected.value = item;
@@ -745,7 +748,7 @@ const changeRsnValue = (item) => {
     const prodNo = item["cProdNo"];
     const isGrp = grpMrk !== "0" ? "1" : null;
     const isPer = grpMrk === "0" ? "1" : null;
-//    console.log(rsnTyp,grpMrk,prodNo,codeListMap.value[prodNo + item["id"]])
+    //    console.log(rsnTyp,grpMrk,prodNo,codeListMap.value[prodNo + item["id"]])
     if (
         undefined === codeListMap.value[prodNo + grpMrk] ||
         null === codeListMap.value[prodNo + grpMrk]
@@ -813,14 +816,14 @@ const changeRsnValue = (item) => {
             : codeListMap.value[prodNo + grpMrk][0]["value"];
 
 
-            if (
+        if (
             undefined === codeListMap.value[prodNo + item["id"] + grpMrk] ||
-            null === codeListMap.value[prodNo + item["id"] + grpMrk] 
-            || codeListMap.value[prodNo + item["id"] + grpMrk].length ===0
+            null === codeListMap.value[prodNo + item["id"] + grpMrk]
+            || codeListMap.value[prodNo + item["id"] + grpMrk].length === 0
         ) {
             // 当缓存中无该产品批改原因详细时
             // 处理批改原因详细
-     
+
             getDetailRsn(item);
         } else {
             // 当缓存中有该产品批改原因详细时
@@ -828,21 +831,21 @@ const changeRsnValue = (item) => {
                 detail.push(
                     codeListMap.value[prodNo + item["id"] + grpMrk][0]["value"]
                 );
-             
+
                 setTimeout(() => {
                     item["iddetail"] = detail;
                     // 缓存批改原因
                     changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
                 }, 5);
-                
+
             } else {
-     
+
                 detail.push(item["id"]);
                 setTimeout(() => {
                     item["iddetail"] = detail;
                     // 缓存批改原因
                     changeRsn(item["id"], item["cPlyNo"], item["iddetail"]);
-                    
+
                 }, 5);
             }
         }
@@ -901,7 +904,7 @@ const showDetails = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     });
 };
 
-const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
+const openEdr = async (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     handleRowClick(data);
     const rsnTyp = data['id'] && data['id'].length > 0 ? data['id'][0]?.split('-')[0] : null;
     if (null == data["cPlyNo"] || "" === data["cPlyNo"]) {
@@ -915,7 +918,7 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     //     ElMessage.warning("请选择批改原因");
     //     return;
     // }
-    if(!data['id'] || data['id'].length < 2) {
+    if (!data['id'] || data['id'].length < 2) {
         ElMessage.warning("请选择批改原因");
         return;
     }
@@ -933,14 +936,25 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
         ElMessage.warning("此产品暂不支持延期批改，请选择通用批改");
         return;
     }
-    // if(rsnCde.value[selected.value["cPlyNo"]] == ""){}
+
+    // // 免费延期场景校验
+    // let isExtensionValid = true; // 校验结果默认通过
+    // if (data['id'][1] === "M1"  ) {
+    //     console.log(data['id'][1])
+    //     isExtensionValid = await initQuery(cPlyNo, cProdNo, data);
+    //     if (!isExtensionValid) {
+    //         return; // 校验不通过，拦截后续接口逻辑
+    //     }
+    // }
+
+ 
     const param = {
         plyNo: cPlyNo,
         edrType: rsnTyp,
         prodNo: cProdNo,
         edrRsnCde: data['id'][1],
     };
-
+ 
     pcisEdrQueryService.validEndorse(param).then(
         async (result) => {
             if (200 !== result["code"]) {
@@ -954,11 +968,11 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                         return;
                     } else if ("DP" === data['id'][1]) {
                         const cCiMrk = selected.value["cCiMrk"]
-                            if (cCiMrk ==='0' || cCiMrk ==='5'){
-                                ElMessage.error('非共保或司内联保保单不可以进行补充共保保单编号批改！');
-                                return false;
-                            }
-                             ciCoopCorrect(cAppNo, cPlyNo)
+                        if (cCiMrk === '0' || cCiMrk === '5') {
+                            ElMessage.error('非共保或司内联保保单不可以进行补充共保保单编号批改！');
+                            return false;
+                        }
+                        ciCoopCorrect(cAppNo, cPlyNo)
                     } else if ("2" === rsnTyp) {
                         //注销
                         const en = JSON.stringify({
@@ -978,8 +992,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
                             cPolicySource: selected.value["cPolicySource"],
-                            nRecRemEstAmt:data?.nRecRemEstAmt || 0,
-                            nRecRemPrm:data?.nRecRemPrm || 0,
+                            nRecRemEstAmt: data?.nRecRemEstAmt || 0,
+                            nRecRemPrm: data?.nRecRemPrm || 0,
                         });
                         //预留跳转路径
                         router.push({
@@ -1008,8 +1022,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
                             cPolicySource: selected.value["cPolicySource"],
-                          nRecRemEstAmt:data?.nRecRemEstAmt || 0,
-                          nRecRemPrm:data?.nRecRemPrm || 0,
+                            nRecRemEstAmt: data?.nRecRemEstAmt || 0,
+                            nRecRemPrm: data?.nRecRemPrm || 0,
                         });
                         //预留跳转路径
                         router.push({
@@ -1040,8 +1054,8 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             tInsrncBgnTm: selected.value["tInsrncBgnTm"],
                             tInsrncEndTm: selected.value["tInsrncEndTm"],
                             cPolicySource: selected.value["cPolicySource"],
-                          nRecRemEstAmt:data?.nRecRemEstAmt || 0,
-                          nRecRemPrm:data?.nRecRemPrm || 0,
+                            nRecRemEstAmt: data?.nRecRemEstAmt || 0,
+                            nRecRemPrm: data?.nRecRemPrm || 0,
                         });
                         console.log(en);
                         router.push({
@@ -1063,6 +1077,154 @@ const openEdr = (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
     );
 };
 
+// 免费延期初始化校验 
+const initQuery = async (cPlyNo, cProdNo, data) => {
+    console.log('执行免费延期批改校验',); 
+    
+    try {  
+        const countParam = { cPlyNo };
+        const resCount = await getDelayCount(countParam); // 处理次数返回结果
+        const count = resCount?.code === 200 ? resCount.data : 0;
+
+        console.log('延期批改次数查询结果', resCount, '当前次数', count);
+
+        // 2. 校验承保机构分公司编码
+        const cDptCde = data.cDptCde; // 从传入的 data 中获取机构编码
+        const resCheck = await checkCdeptByCdptCde({ dptCde: cDptCde });
+        const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
+        console.log(' 分公司编码查询结果 ', resCheck, ' 分公司编码 ', subSidiary);
+        if (cProdNo === '043009') {
+            // 陕西分公司：次数不限，仅提示
+            if (subSidiary === "0261010000000") {
+                
+                ElMessage.warning("陕西分公司免费延期批改次数不限！");
+                return true; 
+            } else if (parseInt(count) === 2) {
+                // 第 3 次延期：提示后允许继续
+                ElMessage.warning("每单可延期批改 3 次，此次延期后不再允许免费延期批改！");
+                return true;  
+            } else if (parseInt(count) >= 3) {
+                // 超过 3 次：拦截并提示
+                ElMessage.warning("已进行延期批改 3 次，不允许再进行此操作！");
+                return false;  
+            }
+        } else {
+            // 其他产品规则
+            if (parseInt(count) === 1) {
+                // 第 2 次延期：提示后允许继续
+                ElMessage.warning("每单可延期批改 2 次，此次延期后不再允许免费延期批改！");
+                return true;  
+            } else if (parseInt(count) >= 2) {
+                // 超过 2 次：拦截并提示
+                ElMessage.warning("已进行延期批改 2 次，不允许再进行此操作！");
+                return false; 
+            }
+        }
+
+   ElMessage.warning("每单可延期批改 2 次，此次延期后不再允许免费延期批改！");
+        return true;
+    } catch (error) {
+        // 异常场景：默认拦截，避免报错导致流程混乱
+        console.error(' 免费延期校验异常 ', error);
+        ElMessage.error("免费延期校验失败，请稍后重试！");
+        return false;
+    }
+};
+
+
+// //免费延期初始化校验
+// const initQuery = async (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
+//     console.log('免费延期批改方法')
+//     var plyNo = cPlyNo;
+//     var count = 0;
+//     var cProdNo = cProdNo;
+//     var cust_data = "plyNo=" + plyNo + "###CancelM1=" + 'CancelM1';
+
+//     let countParam = {
+//         cPlyNo: plyNo
+//     }
+//     let resCount = await getDelayCount(countParam);
+//     if (resCount && resCount["code"] === 200) {
+//         count = data
+//     }
+//     console.log('返回值1', resCount)
+
+//     //获得当前承保机构的分公司编码。如：北京02、天津27、重庆15.
+//     var cDptCde = data.cDptCde  //机构部门
+//     var subSidiary = '';  //获取分公司机构代码
+
+//     let resCheck = await checkCdeptByCdptCde({ dptCde: cDptCde });
+//     console.log('返回值2', resCheck)
+//     if (resCheck && resCheck["code"] === 200) {
+//         subSidiary = data
+//     }
+
+//     if (false) {
+
+//     } else {
+//         if (cProdNo == '043009') {
+//             if (subSidiary === "0261010000000") {//陕西分公司免费延期批改最长期限为1年，取消次数限制
+//                 ElMessage.warning("陕西分公司免费延期批改次数不限！");
+//             } else if (parseInt(count) == 2) {
+//                 ElMessage.warning("每单可延期批改3次，此次延期后不再允许免费延期批改！");
+//             } else if (parseInt(count) >= 3) {
+//                 ElMessage.warning("已进行延期批改3次，不允许再进行此操作！");
+//                 // window.close();
+//                 return;
+//             }
+//         } else {
+//             if (parseInt(count) == 1) {
+//                 ElMessage.warning("每单可延期批改2次，此次延期后不再允许免费延期批改！");
+//             } else if (parseInt(count) >= 2) {
+//                 ElMessage.warning("已进行延期批改2次，不允许再进行此操作！");
+//                 // window.close();
+//                 return;
+//             }
+//         }
+//     }
+
+//     // //	tool.alert("延期批改次数方法");	
+//     // 	var plyNo = tool.getAttrValue([dw["edrBase"]], "CPlyNo");
+//     // 	var count = 0;
+//     // 	var cProdNo = tool.getAttrValue([dw["edrBase"]], "CProdNo");
+//     // 	var date = tool.getAttrValue([dw["edrBase"]])
+//     // 	var cust_data = "plyNo="+plyNo+"###CancelM1="+'CancelM1';
+//     // 	if(tool.sendXmlByService([], "endorseAppBizAction", "getDelayCount",plyNo)){
+//     // 		count = tool.getResultMsg();
+//     // 	}
+//     //获得当前承保机构的分公司编码。如：北京02、天津27、重庆15.
+//     //     var cDptCde = tool.getAttrValue([dw["edrBase"]], "CDptCde");//机构部门
+//     //     var subSidiary ='';  //获取分公司机构代码
+
+//     //     if(tool.sendXmlByServiceNoCheck([], 'policyAppBizAction','checkCdeptByCdptCde',cDptCde)){
+//     //         subSidiary = tool.getResultMsg();
+//     //     }
+//     //     if(tool.sendXmlByService([],"endorseAppBizAction","checkCancelM1IsOff",cust_data)){
+//     // //		tool.alert("绕过延期批改次数方法");	
+//     // 		//任务表存在数据，则不校验倒签天数。
+//     // 	}else{
+//     // 		if(cProdNo=='043009'){
+//     // 		    if(subSidiary === "0261010000000"){//陕西分公司免费延期批改最长期限为1年，取消次数限制
+//     //                 tool.alert("陕西分公司免费延期批改次数不限！");
+//     //             }else if(parseInt(count)==2){
+//     // 				tool.alert("每单可延期批改3次，此次延期后不再允许免费延期批改！");
+//     // 			}else if(parseInt(count)>=3){
+//     // 				tool.alert("已进行延期批改3次，不允许再进行此操作！");	
+//     // 				window.close();
+//     // 				return;
+//     // 			}
+//     // 		} else {
+//     // 			if(parseInt(count)==1){
+//     // 				tool.alert("每单可延期批改2次，此次延期后不再允许免费延期批改！");
+//     // 			}else if(parseInt(count)>=2){
+//     // 				tool.alert("已进行延期批改2次，不允许再进行此操作！");	
+//     // 				window.close();
+//     // 				return;
+//     // 			}
+//     // 		}
+//     // 	}
+// }
+
 //变更影像上传方式
 const modifyImageUploadMode = (plyNo) => {
     dzmodal
@@ -1076,8 +1238,8 @@ const modifyImageUploadMode = (plyNo) => {
 const ciCoopCorrect = (cAppNo, cPlyNo) => {
     console.log(3333);
 
-    dialog.value?.open('changeCiPolicynoComponent', 
-    { cAppNo,cPlyNo},{},{ title: "变更联共保保单编号", width: "95" })
+    dialog.value?.open('changeCiPolicynoComponent',
+        { cAppNo, cPlyNo }, {}, { title: "变更联共保保单编号", width: "95" })
     // dzmodal
     //     .open(changeCiPolicynoComponent, { cAppNo,cPlyNo})
     //     .then((res) => {
@@ -1094,7 +1256,7 @@ const transferRsnDetail = (rsnDetail) => {
 };
 
 onMounted(() => {
-   
+
     freeEditRef.value?.setFormValue({
         tAppTm: [
             moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
@@ -1123,7 +1285,7 @@ onMounted(() => {
         }
     });
 
-     handleQuery();  //查询
+    handleQuery();  //查询
 });
 
 watch(dialogVisible, (newValue) => {
@@ -1135,40 +1297,40 @@ watch(dialogVisible, (newValue) => {
 
 // 添加 copyText 方法
 const copyText = (text: any) => {
-  if (!text) {
-    ElMessage.warning('没有可复制的内容');
-    return;
-  }
-
-  // 检查 navigator.clipboard 是否存在
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(
-        () => {
-          ElMessage.success('复制成功');
-        },
-        () => {
-          ElMessage.error('复制失败');
-        }
-    );
-  } else {
-    // 使用 document.execCommand('copy') 方法作为备选方案
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      const result = document.execCommand('copy');
-      if (result) {
-        ElMessage.success('复制成功');
-      } else {
-        ElMessage.error('复制失败');
-      }
-    } catch (err) {
-      ElMessage.error('复制失败，请稍后再试');
-    } finally {
-      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    if (!text) {
+        ElMessage.warning('没有可复制的内容');
+        return;
     }
-  }
+
+    // 检查 navigator.clipboard 是否存在
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(
+            () => {
+                ElMessage.success('复制成功');
+            },
+            () => {
+                ElMessage.error('复制失败');
+            }
+        );
+    } else {
+        // 使用 document.execCommand('copy') 方法作为备选方案
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            const result = document.execCommand('copy');
+            if (result) {
+                ElMessage.success('复制成功');
+            } else {
+                ElMessage.error('复制失败');
+            }
+        } catch (err) {
+            ElMessage.error('复制失败，请稍后再试');
+        } finally {
+            document.body.removeChild(textarea); // 清理创建的 textarea 元素
+        }
+    }
 };
 
 function setValue(key: string, value: any) {
@@ -1176,11 +1338,11 @@ function setValue(key: string, value: any) {
 }
 
 function getValue(key: string) {
-  return freeEditRef?.value?.getValue(key);
+    return freeEditRef?.value?.getValue(key);
 }
 defineExpose({
-  setValue,
-  getValue,
+    setValue,
+    getValue,
 });
 </script>
 
@@ -1188,35 +1350,39 @@ defineExpose({
 .actived {
     background: #a6dbed;
 }
+
 .fc-table-icons {
     i {
         margin-right: 10px;
         cursor: pointer;
     }
 }
+
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
 }
+
 .copy-icon {
-  margin-left: 5px;
-  cursor: pointer;
-  color: #409eff;
+    margin-left: 5px;
+    cursor: pointer;
+    color: #409eff;
 }
 
 .policy-info-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .policy-number-row {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .policy-number-row span {
-  flex: 1;
+    flex: 1;
 }
+
 :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 }

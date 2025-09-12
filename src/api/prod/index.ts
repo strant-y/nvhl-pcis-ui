@@ -1588,3 +1588,19 @@ export function checkDistForSubmit(queryParams: any): AxiosPromise<any> {
   return post(`/policy/checkDistForSubmit`, queryParams);
 }
 
+// 查询当前商品可延期次数校验
+export function getDelayCount(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getDelayCount`, queryParams);
+}
+
+ 
+// 查询当前商品可延期天数校验
+export function getNewSysDays(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getNewSysDays`, queryParams);
+}
+//  
+export function checkCancelM1IsOff(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/checkCancelM1IsOff`, queryParams);
+}
+
+
