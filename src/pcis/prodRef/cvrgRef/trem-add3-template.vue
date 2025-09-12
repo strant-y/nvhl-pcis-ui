@@ -124,7 +124,7 @@ function changeBtn() {
 }
 
 function getterm(it: any,termdata: any){
-  if(param.cEdrType && !termdata['Term.cRowId']){
+  if(param.cEdrType && !termdata['Term.cRowId'] && opertaor.isEditScene()){
     it.disabled = false || it.disabled ;
   }else{
     it.disabled = props.disabledFlag || it.disabled;

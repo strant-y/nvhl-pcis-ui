@@ -1,4 +1,5 @@
 export interface CardConfig {
+  id?: string | null | undefined; // 按钮id
   title?: string | null | undefined; // 功能标题
   production?: boolean; //标题是否显示tooltip
   productionTitle?: string; //标题内容
@@ -8,6 +9,7 @@ export interface CardConfig {
   superFromClose?: string | null; // 高级查询关闭
   showEdit?: boolean; //是否显示表单
   showMyfrom?: boolean; //是否隐藏信息
+  titleClass?: string;  //自定义标题class
   showInTitle?: boolean; //是否显示折叠切换按钮
   showMyfromBtm?: boolean; //是否显示折叠切换按钮
   titleBtns?: Array<FreeButtonBase>; //标题处按钮
@@ -33,6 +35,7 @@ export function creatCardConfig(
   config: CardConfig = {}
 ): CardConfig {
   return {
+    id: config.id || null,
     title: config.title || null,
     showBtn: config.showBtn || true,
     shadow: config.shadow || true,
@@ -42,6 +45,7 @@ export function creatCardConfig(
     showInTitle: config.showInTitle || false,
     production: config.production || false,
     tableBtn: config.tableBtn || [],
+    titleClass:config.titleClass || null,
     productionTitle: config.productionTitle || "",
     superFromShow: config.superFromShow || "点击打开",
     superFromClose: config.superFromClose || "点击折叠",
@@ -50,5 +54,6 @@ export function creatCardConfig(
     showTitleBar: config.showTitleBar || true,
     endBtnsPosition: config.endBtnsPosition || "center",
     formconfig: config.formconfig || null,
+    
   };
 }

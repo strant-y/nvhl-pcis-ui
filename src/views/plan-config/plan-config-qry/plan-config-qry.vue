@@ -140,8 +140,8 @@ const tableconfig = reactive<AppTableConfig>(
             freeEditRef.value?.validate().then((isValid) => {
                 if(isValid) {
                     const param = freeEditRef.value?.getFromValue(); //获取表单数据
-                    param.pageType='app'
-                    openEdit('add', param)
+                    param.pageType='planConfigAdd'
+                    openEdit('planConfigAdd', param)
                 } else {
                     ElMessage.error("请填写必填项");
                 }
@@ -172,7 +172,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
         tableClick: (row) => {
           row['cGrpMrk']='0'
-          openEdit('update', row)
+          openEdit('planConfigupdate', row)
         },
       }),
       createFreeButtonBase({
@@ -213,7 +213,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
           tableClick: (row) => {
               row['cGrpMrk']='0'
-              openEdit('view', row)
+              openEdit('planConfigview', row)
           },
       }),
     ],

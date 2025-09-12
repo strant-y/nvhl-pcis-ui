@@ -462,8 +462,8 @@ onMounted(() => {
   }
   nextTick(()=>{
     setTimeout(()=>{
-      freeEditRef.value?.setValue('isCN',true)
-      freeEditRef.value?.setValue('isEG',false)
+      freeEditRef.value?.setValue('isCN',!(props.data.data?.isYW))
+      freeEditRef.value?.setValue('isEG',props.data.data?.isYW)
     },100)
 handleQuery()
   })
