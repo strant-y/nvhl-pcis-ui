@@ -1634,16 +1634,20 @@ function changeNamt(nAmtVar: any, flag: any) {
     if(params.cCiMrk !== "0") {
       const totalAmt = freeEditRef.value?.getValue("nAmt") // 总保费
       const totalCiAmt = freeEditRef.value?.getValue("nCiAmt") // 共保保费
-      const nPrmRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt))) // 保费变化值与总保费的比例
-      nCiAmt = parseFloat((parseFloat(totalCiAmt) * nPrmRatio).toFixed(2))
+      const nAmtRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt))) // 保费变化值与总保费的比例
+      nCiAmt = parseFloat((parseFloat(totalCiAmt) * nAmtRatio).toFixed(2))
       selectRow1.value.nCiAmt = nCiAmt;
+      selectRow1.value.nCiAmtVar = nCiAmt;
+      freeEditRef1.value?.setValue("nCiAmt", nCiAmt);
+      freeEditRef1.value?.setValue("nCiAmtVar", nCiAmt);
     }
     pageresult1.list.forEach(item => {
       if(item.cPkId === selectRow1.value.cPkId) {
         item.nAmt = parseFloat(nAmtVar);
         item.nAmtVar = parseFloat(nAmtVar);
         if(params.cCiMrk !== "0") {
-          item.nCiPrm = nCiAmt
+          item.nCiAmt = nCiAmt
+          item.nCiAmtVar = nCiAmt
         }
       }
     })
@@ -1743,6 +1747,8 @@ function changePrm(nPrmVar: any, flag: any) {
       selectRow1.value.nCiAddedTaxVar = nCiAddedTax;
       selectRow1.value.nCiNotaxPrm = nCiNotaxPrm;
       selectRow1.value.nCiNotaxPrmVar = nCiNotaxPrm;
+      freeEditRef1.value?.setValue("nCiPrm", nCiPrm);
+      freeEditRef1.value?.setValue("nCiPrmVar", nCiPrm);
     }
     pageresult1.list.forEach(item => {
       if(item.cPkId === selectRow1.value.cPkId) {

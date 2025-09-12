@@ -225,7 +225,8 @@ onMounted(() => {
 function lazyLoadFun(node: any, resolve: Function) {
   const { level, value } = node;
   if (level !== 0 && !!value) {
-    const list = codeListMap[`${props.item.typeCode}-${level}-${value}`];
+    // 一般批改安全生产责任险的选项和别的不一样，所以不取缓存数据，每次都请求接口获取
+    const list = node.label !== "一般批改" ? codeListMap[`${props.item.typeCode}-${level}-${value}`] : '';
     if(list) {
       resolve(list);
       return;
