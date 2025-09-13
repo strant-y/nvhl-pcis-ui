@@ -12,7 +12,7 @@
           >
             <el-anchor :bound="120" :offset="80">
               <el-anchor-link
-                v-if="edrbaseFlag && props.param.cRsnCde !== '99'"
+                v-if="edrbaseFlag && (props.param.cRsnCde !== '99'|| props.param.cTransMrk !== '1')"
                 @click="handleAnchorClick($event, `#edrbase`)"
                 :class="activeAnchor === 'edrbase' ? 'isActive' : ''"
               >
@@ -32,7 +32,7 @@
                 >
               </el-anchor-link>
               <el-anchor-link
-                v-if="edritemFlag && props.param.cRsnCde !== '99'"
+                v-if="edritemFlag && (props.param.cRsnCde !== '99'|| props.param.cTransMrk == '1')"
                 @click="handleAnchorClick($event, `#edritem`)"
                 :class="activeAnchor === 'edritem' ? 'isActive' : ''"
               >
@@ -1003,8 +1003,8 @@ const basicBtn = [
     type: "primary",
     id: "btn010101",
     func: () => {
-      // calcPremium()
-      queryTermRateLimitFun(calcPremium)
+      calcPremium()
+      // queryTermRateLimitFun(calcPremium)
     },
   }),
   createFreeButtonBase({
@@ -1106,7 +1106,7 @@ const edrBtn = [
       // 批改原因是否是费率变更
       if(props.param.cRsnCde === '45') {
         queryTermRateLimitFun(calcPremiumEdr)
-      }else if(props.param.cRsnCde === '99'){
+      }else if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
         queryTermRateLimitFun(calcPremium)
       } else {
         calcPremiumEdr();
@@ -1254,7 +1254,7 @@ const initPage = async () => {
     //退保不显示产品组件信息
     acctinfoFlag.value = false;
   }
-  if(props.param.cRsnCde === '99'){
+  if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
     edrbaseFlag.value = false
     edritemFlag.value = false;
   }
@@ -1380,7 +1380,60 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  if (props.param.pageType === "app") {
+  debugger
+   if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
+    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
+    await loadAppPlyInfo(cAppNo);
+    if (props.param.cAppTyp == "E") {
+      if (props.param.cEdrType == "1") {
+        bthList.value = edrBtn;
+        nextTick(() => {
+          opertaor.setDisabledAll();
+          getEdrRsnItemFun(
+            props.param["cProdNo"],
+            props.param["cDptCde"],
+            props.param["cEdrRsnBundleCde"],
+            props.param["cEdrRsnBundleCde"],
+            props.param["cEdrType"],
+            props.param["cGrpMrk"]
+          );
+
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          if(acctinfoInfo){
+              acctinfoInfo.setDisabledAll(false);  
+              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+                disabled: true
+              })
+              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+                disabled: true
+              })
+          }  
+        });
+        edritem.value?.handleQuery();
+      } else {
+        bthList.value = edrSurrenderBtn;
+      }
+    } else if (props.param.cAppTyp == "A") {
+      bthList.value = basicBtn;
+      rightBtnList.value = basicRightBtn;
+			if(props.param?.pageName === "priceInquiry") {
+				bthList.value.push(
+					createFreeButtonBase({
+						label: "发起风勘",
+						type: "primary",
+						func: () => {
+							if (getNo.value == '暂无') {
+								ElMessage.error('询价单号为空,请保存后操作!');
+								return false;
+							}
+							startWindExploration(); 
+						},
+					}),
+				)
+			}
+    }
+  }else if (props.param.pageType === "app") {
     //获取单号
     // getCAppNoFun();
     // 获取条款信息
@@ -2297,59 +2350,60 @@ async function loadAfter() {
     })
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
-  } else if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
-    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
-    await loadAppPlyInfo(cAppNo);
-    if (props.param.cAppTyp == "E") {
-      if (props.param.cEdrType == "1") {
-        bthList.value = edrBtn;
-        nextTick(() => {
-          opertaor.setDisabledAll();
-          getEdrRsnItemFun(
-            props.param["cProdNo"],
-            props.param["cDptCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrType"],
-            props.param["cGrpMrk"]
-          );
+  } 
+  // else if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
+  //   const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
+  //   await loadAppPlyInfo(cAppNo);
+  //   if (props.param.cAppTyp == "E") {
+  //     if (props.param.cEdrType == "1") {
+  //       bthList.value = edrBtn;
+  //       nextTick(() => {
+  //         opertaor.setDisabledAll();
+  //         getEdrRsnItemFun(
+  //           props.param["cProdNo"],
+  //           props.param["cDptCde"],
+  //           props.param["cEdrRsnBundleCde"],
+  //           props.param["cEdrRsnBundleCde"],
+  //           props.param["cEdrType"],
+  //           props.param["cGrpMrk"]
+  //         );
 
-          // 用于处理 账户信息
-          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-          if(acctinfoInfo){
-              acctinfoInfo.setDisabledAll(false);  
-              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-                disabled: true
-              })
-              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-                disabled: true
-              })
-          }  
-        });
-        edritem.value?.handleQuery();
-      } else {
-        bthList.value = edrSurrenderBtn;
-      }
-    } else if (props.param.cAppTyp == "A") {
-      bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
-			if(props.param?.pageName === "priceInquiry") {
-				bthList.value.push(
-					createFreeButtonBase({
-						label: "发起风勘",
-						type: "primary",
-						func: () => {
-							if (getNo.value == '暂无') {
-								ElMessage.error('询价单号为空,请保存后操作!');
-								return false;
-							}
-							startWindExploration(); 
-						},
-					}),
-				)
-			}
-    }
-  }
+  //         // 用于处理 账户信息
+  //         let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+  //         if(acctinfoInfo){
+  //             acctinfoInfo.setDisabledAll(false);  
+  //             acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
+  //               disabled: true
+  //             })
+  //             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
+  //               disabled: true
+  //             })
+  //         }  
+  //       });
+  //       edritem.value?.handleQuery();
+  //     } else {
+  //       bthList.value = edrSurrenderBtn;
+  //     }
+  //   } else if (props.param.cAppTyp == "A") {
+  //     bthList.value = basicBtn;
+  //     rightBtnList.value = basicRightBtn;
+	// 		if(props.param?.pageName === "priceInquiry") {
+	// 			bthList.value.push(
+	// 				createFreeButtonBase({
+	// 					label: "发起风勘",
+	// 					type: "primary",
+	// 					func: () => {
+	// 						if (getNo.value == '暂无') {
+	// 							ElMessage.error('询价单号为空,请保存后操作!');
+	// 							return false;
+	// 						}
+	// 						startWindExploration(); 
+	// 					},
+	// 				}),
+	// 			)
+	// 		}
+  //   }
+  // }
 
   let imageStr = '影像管理';
   if(pageMethod.isReadOnlyScene(opertaor)){
@@ -2758,11 +2812,9 @@ function baseValite(){
  */
 const calcPremium = () => {
     const btn = getBtn("btn010101");
-  if(props.param.cRsnCde !== '99'){
-    const btn = getBtn("btn010101");
+  if(btn && props.param.cRsnCde !== '99'){
+    // const btn = getBtn("btn010101");
     btn.loading = true;
-  }else{
-
   }
   const res = opertaor.getDataAll();
   res["user"] = user;
@@ -2777,7 +2829,9 @@ const calcPremium = () => {
   // }
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
-    btn.loading = false;
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
     return;
   }
   
@@ -2785,25 +2839,33 @@ const calcPremium = () => {
   const calccheck = termref.calcCheck();
   if(!calccheck['res']){
     ElMessage.error(calccheck['msg']);
-    btn.loading = false;
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
     return;
   }
   if (!baseValite()) {
-    btn.loading = false;
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
     return;
   }
   // 校验标的信息中核定座位总数和投保座位数总数不一致！
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
   if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
     ElMessage.error("核定座位总数和投保座位数总数不一致！");
-    btn.loading = false;
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
     return;
   }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
        const btn = getBtn("btn010101");
-       btn.loading = false;
+        if (btn && props.param.cRsnCde !== '99') {
+        btn.loading = false;
+      }
     }
     console.log("appCalc-res", res);
     if (res["code"] == "200") {
