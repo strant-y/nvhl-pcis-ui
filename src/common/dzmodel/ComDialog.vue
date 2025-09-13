@@ -53,7 +53,7 @@ const open = (c, d, m, t) => {
   if (t?.width) {
     width.value = t.width;
   }
-  if (t.draggable === false || t.draggable === '0') { //拖拽功能配置化,部分弹窗很大,不适合做拖拽
+  if ( t?.draggable === false || t?.draggable === '0') { //拖拽功能配置化,部分弹窗很大,不适合做拖拽
     draggable.value = false;
   }
   componentKey.value += 1; // 改变 key 值以强制重新渲染
