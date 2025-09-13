@@ -266,7 +266,9 @@ const method = {
           getSelected(selectdata: any) {
             if(selectdata && selectdata.length > 0) {
               const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
-              setCargoSeq(ids);
+              const codeNos = selectdata.map(item => item['Dist.cCodeNo']).join(',');
+              const cPkIds = selectdata.map(item => item['Dist.cPkId']).join(',');
+              setCargoSeq(codeNos, cPkIds);
             }else {
               setCargoSeq('');
             }
@@ -623,16 +625,18 @@ function calcCheck(){
     msg: "验证通过",
   };
 }
-const setCargoSeq = (value: string) => {
+const setCargoSeq = (value: string, pkId: string) => {
   const {index, data} = selectedRow.value;
   if(formData.value['m'] && formData.value['m'].length > 0) {
     if(data['Term.cClauseCode']) {
-      formData.value['m'][index]['Term.nCargoSeq'] = value;
+      formData.value['m'][index]['Term.cDistCodeNo'] = value;
+      formData.value['m'][index]['Term.cDistPkId'] = pkId;
       selectedRow.value.data = formData.value['m'][index];
     }else {
       formData.value['m'][index]['riskList'].forEach((item: any) => {
         if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
-          item['TermRisktgt.nCargoSeq'] = value;
+          item['TermRisktgt.cDistCodeNo'] = value;
+          item['TermRisktgt.cDistPkId'] = pkId;
           selectedRow.value.data = item;
         }
       });
