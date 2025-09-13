@@ -390,3 +390,8 @@ defineExpose({
   setChangeInfo
 });
 </script>
+<style lang="scss" scoped>
+:deep(.el-input__wrapper) {
+  padding: 1px 5px;
+}
+</style>

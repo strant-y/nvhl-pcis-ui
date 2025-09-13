@@ -85,10 +85,10 @@
         <div v-show="showData">
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
-              <table style="width: 100%">
+              <table style="width: 50%;margin-left: 100px;">
                 <thead>
                   <tr class="table-title">
-                    <th width="400">{{ termTitleConf.cFactorTabTitle }}</th>
+                    <th width="300">{{ termTitleConf.cFactorTabTitle }}</th>
                     <th>{{ termTitleConf.cFactorTabValue }}</th>
                   </tr>
                 </thead>
@@ -116,7 +116,7 @@
                           <from-item
                             v-model="termdata[item.prop]"
                             @update:modelValue="update()"
-                            :item="{...item, maxWidth: '300px'}"
+                            :item="item"
                           />
                         </el-form-item>
                       </td>
@@ -413,6 +413,10 @@ const props = defineProps({
   rowIndex: {
     type: [Number, String],
   },
+  showHeader: {
+    type: Boolean,
+    default: true,
+  },
   showConf: {
     type: Object,
     default:() =>({}),
@@ -438,9 +442,6 @@ const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
-    type: "primary",
-    size: "small",
-    link: true,
   },
 });
 
@@ -584,8 +585,6 @@ function getRowConfig(groupId: string, riskNo: string) {
         let deter = null;
         if (tgt) {
           deter = tgt.getValue("Tgt.cDeterminingMethod");
-        }else{
-          deter = "1";
         }
         if (deter && deter === "1") {
           if (colconfig["cRiskNo"] === "040042") {
@@ -979,7 +978,11 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(termdata.value[item.prop] === null || termdata.value[item.prop] === undefined){
-      termdata.value[item.prop] = '1';
+      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" || pageparam.cProdNo === "040002" ){
+        termdata.value[item.prop] = '1';
+      }else{
+        termdata.value[item.prop] = '0';
+      }
       return true;
     }
   }
@@ -1124,21 +1127,14 @@ function exChangeFunc() {
     }
     
   }
-  let deter = null;
    // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
-    if(data["tgt"]){
-      deter = data["tgt"]["Tgt.cDeterminingMethod"];
-      
-    }else{
-      deter = "0";
+    if (data["tgt"]["Tgt.cDeterminingMethod"]) {
+      if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
+        const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
+        colInfo.value = col;
+      }
     }
-
-    if (deter === "0") {
-      const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
-      colInfo.value = col;
-    }
-    
   }
 }
 
@@ -1183,7 +1179,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  if(pageparam.cEdrType && !props.modelValue['Term.cRowId'] && opertaor.isEditScene()){
+  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
   }
@@ -1510,20 +1506,11 @@ table {
 .custom-indent {
   padding-left: 30px; /* 空三格 */
   position: relative;
-  &.text-indent {
-    padding-left: calc( 150px + 30px);
-  }
 }
 .custom-indent::before {
   content: "-";
   position: absolute;
   left: 10px;
-}
-.custom-indent.text-indent::before {
-  margin-left: 150px;
-}
-.text-indent {
-  padding-left: 150px;
 }
 
 .custom-left {
@@ -1546,5 +1533,8 @@ td {
 
 .selected {
   background-color: rgba(146, 209, 232, 0.5) !important;
+}
+:deep(.el-input__inner) {
+  text-align: right!important;
 }
 </style>

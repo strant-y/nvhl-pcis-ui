@@ -4,7 +4,7 @@
       <el-card class="cvrg-info">
         <template #header v-if="effectiveShowConf.showHeader">
           <div class="cvrg-hearder">
-            <el-row style="margin-top: 5px;">
+            <el-row>
               <el-col :span="10">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
@@ -83,7 +83,7 @@
 
         <div v-show="showData">
           <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-            <el-row>
+            <el-row style="padding: 5px 10px;">
               <el-col :span="22">
                 <a
                   style="margin-right: 5px"
@@ -437,6 +437,7 @@ const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
+    size: "small"
   },
 });
 
@@ -1453,12 +1454,15 @@ defineExpose({
 </script>
 <style lang="scss" scoped>
 .cvrg-info {
+  box-shadow: none;
+  --el-card-border-color: none;
+  background: #FAFAFA;
   :deep(.el-card__header) {
-    background-color: #eff3f5;
+    // background-color: #eff3f5;
     padding: 5px 10px;
   }
   :deep(.el-card__body) {
-    padding: 5px 10px;
+    padding: 10px 20px;
   }
 }
 .table-title {
@@ -1504,5 +1508,8 @@ td {
 
 .selected {
   background-color: rgba(146, 209, 232, 0.5) !important;
+}
+:deep(.el-input__inner) {
+  text-align: right!important;
 }
 </style>

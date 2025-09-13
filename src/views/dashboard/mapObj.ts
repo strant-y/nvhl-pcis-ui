@@ -28,6 +28,7 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
+        width: 65,
       },
       {
         // prop: "cAppNo",
@@ -36,26 +37,31 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
-        title: "条款名称"
+        title: "条款名称",
+        align: "left"
       },
       {
         prop: "tAppTm",
         inputtype: "rtinput",
-        title: "申请日期"
+        title: "申请日期",
+        width: 140,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left"
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
-        title: "被保人名称"
+        title: "被保人名称",
+        align: "left"
       },
     ],
   },
@@ -68,43 +74,50 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
+        width: 65,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
+        width: 180,
       },
       {
         prop: "cRsnCde",
         inputtype: "rtinput",
-        title: "批改原因"
+        title: "批改原因",
+        width: 120,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
-        title: "条款名称"
+        title: "条款名称",
+        align: "left"
       },
       {
         prop: "tAppTm",
         inputtype: "rtinput",
-        title: "申请日期"
+        title: "申请日期",
+        width: 140,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left"
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
-        title: "被保人名称"
+        title: "被保人名称",
+        align: "left"
       },
       {
         prop: "tInsrncTm",
         inputtype: "rtinput",
         title: "保险期间",
-        minWidth: 310,
+        minWidth: 280,
 				formatter: (val, row)=>{
 				  return row.tInsrncBgnTm+' - '+row.tInsrncEndTm;
 				}
@@ -112,17 +125,20 @@ export const tableObj = {
       {
         prop: "nPrm",
         inputtype: "rtinput",
-        title: "保费"
+        title: "保费",
+        width: 120,
       },
       {
         prop: "taskStatus",
         inputtype: "rtinput",
-        title: "任务状态"
+        title: "任务状态",
+        width: 80,
       },
       {
         prop: "hasReceived",
         inputtype: "rtinput",
-        title: "是否接收"
+        title: "是否接收",
+        width: 65,
       },
     ]
   },
@@ -135,43 +151,50 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
+        width: 65,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
+        width: 180,
       },
       {
         prop: "cRsnCde",
         inputtype: "rtinput",
-        title: "批改原因"
+        title: "批改原因",
+        width: 120,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
-        title: "条款名称"
+        title: "条款名称",
+        align: "left"
       },
       {
         prop: "tAppTm",
         inputtype: "rtinput",
-        title: "申请日期"
+        title: "申请日期",
+        width: 140,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left"
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
-        title: "被保人名称"
+        title: "被保人名称",
+        align: "left"
       },
       {
         prop: "tInsrncTm",
         inputtype: "rtinput",
         title: "保险期间",
-        minWidth: 310,
+        width: 280,
 				formatter: (val, row)=>{
 				  return row.tInsrncBgnTm+' - '+row.tInsrncEndTm;
 				}
@@ -179,7 +202,8 @@ export const tableObj = {
       {
         prop: "nPrm",
         inputtype: "rtinput",
-        title: "保费"
+        title: "保费",
+        width: 120,
       },
     ],
   },
@@ -194,36 +218,43 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "保单号",
         showCopyIcon: true,
+        width: 180,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
+        width: 120,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人",
+        align: "left"
       },
       {
         prop: "cMobile",
         inputtype: "rtinput",
         title: "投保人联系电话",
+        width: 105,
       },
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
         title: "保险起期",
+        width: 140,
       },
       {
         prop: "tInsrncEndTm",
         inputtype: "rtinput",
         title: "保险止期",
+        width: 140,
       },
       {
         prop: "endInsuranceCountdown",
         inputtype: "rtinput",
         title: "终保倒计时(天)",
+        width: 110,
       },
     ],
   },
@@ -237,11 +268,13 @@ export const tableObj = {
 				inputtype: "rtinput",
 				title: "申请单号",
         showCopyIcon: true,
+        width: 180,
 			},
 			{
 				prop: "cAppNme",
 				inputtype: "rtinput",
 				title: "投保人名称",
+        align: "left"
 			},
 			{
 				prop: "cPayTyp",
@@ -249,6 +282,7 @@ export const tableObj = {
 				title: "缴费类型",
         typeCode: "CHARGE_TYPE_CACHE",
         param: {'cCde': [ '2', '3', '5',  '99']},
+        width: 65,
 				// formatter: (val)=>{
 				//   const result = cPayTypList.value.find(item => item.value === val);
 				//   return result ? result.label : val;
@@ -258,16 +292,19 @@ export const tableObj = {
 				prop: "nPrm",
 				inputtype: "rtinput",
 				title: "保费金额",
+        width: 120,
 			},
 			{
 				prop: "nPayAmt",
 				inputtype: "rtinput",
 				title: "应缴金额",
+        width: 120,
 			},
 			{
 				prop: "cCheckSts",
 				inputtype: "rtselect",
 				title: "处理状态",
+        width: 135,
 				loadData:cCheckStsList,
 				formatter: (val)=>{
 				  const result = cCheckStsList.find(item => item.value === val);
@@ -278,11 +315,14 @@ export const tableObj = {
   },
   //核保员-待核保任务
   unUdrObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
-        title: "申请单类型",
+        title: "任务类型",
+        width: 65,
       },
       {
         prop: "cAppNo",
@@ -295,46 +335,56 @@ export const tableObj = {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "分公司",
+        align: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "承保机构",
+        align: "left",
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        align: "left",
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left"
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: "left"
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "提核时间",
+        width: 140,
       },
       {
         prop: "curtUserName",
         inputtype: "rtinput",
         title: "任务提交人",
+        align: "left"
       },
     ],
   },
   //核保员-暂存任务
   udrStagingObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
-        title: "申请单类型",
+        title: "任务类型",
+        width: 65,
       },
       {
         prop: "cAppNo",
@@ -347,46 +397,56 @@ export const tableObj = {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "分公司",
+        align: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "承保机构",
+        align: "left",
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        align: "left",
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left",
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: "left",
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "提核时间",
+        width: 140,
       },
       {
         prop: "curtUserName",
         inputtype: "rtinput",
         title: "任务提交人",
+        align: "left"
       },
     ],
   },
   //核保员-核保退回任务
   udrReturnObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
-        title: "申请单类型",
+        title: "任务类型",
+        width: 65,
       },
       {
         prop: "cAppNo",
@@ -399,41 +459,50 @@ export const tableObj = {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "分公司",
+        align: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "承保机构",
+        align: "left",
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        align: "left",
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left",
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: "left",
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "提核时间",
+        width: 140,
       },
       {
         prop: "curtUserName",
         inputtype: "rtinput",
         title: "任务提交人",
+        align: "left",
       },
     ]
   },
   // 核保员-核保通过任务
   udrPassedObj: {
+    stripe: false,
+    border: false,
     fromSchema: [
       {
         prop: "cInquiryNo",
@@ -460,31 +529,37 @@ export const tableObj = {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "分公司",
+        align: "left"
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "承保机构",
+        align: "left"
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        align: "left"
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left"
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: "left"
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "核保通过时间",
+        width: 140,
       },
     ]
   }

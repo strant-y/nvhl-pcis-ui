@@ -2,9 +2,25 @@
   <div class="dashboard-container">
     <div class="home">
       <div class="top-box">
-        <div class="top-title1">财产险承保系统</div>
-        <div class="top-title2">
-          智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧
+        <div style="display: flex;justify-content: space-between;">
+          <div>
+            <div class="top-title1">财产险承保系统</div>
+            <div class="top-title2">
+              智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧
+            </div>
+          </div>
+          <div class="code-box">
+            <div class="code-inner-box">
+                <span class="title">移动端二维码：</span>
+                <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
+            </div>
+            <div class="code-inner-box">
+                <span class="title">在线缺陷平台: </span>
+                <div>
+                  <a :href="platformUrl" target="_blank" class="link">点击跳转</a>
+                </div>
+            </div>
+          </div>
         </div>
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
@@ -183,7 +199,6 @@
               >
               </el-tab-pane>
             </el-tabs>
-            <!-- <span v-for="item in statisticTabList" :key="item" class="tab-item" @click="handleTabClick(item)">{{ item }}</span> -->
           </div>
           <div class="content-details-box">
             <div class="content-details">
@@ -209,12 +224,20 @@
           </div>
           <div class="content-charts-box">
             <div class="echarts-box">
-              <div style="width: 49%">
+              <div class="echarts-content">
                 <div class="echarts-title">
                   <span>总量统计图</span>
                   <el-button-group>
-                    <el-button @click="changeEchartsType('0')" :type="ecahrtsOptionsType === '0' ? 'primary' : ''">柱状图</el-button>
-                    <el-button @click="changeEchartsType('1')" :type="ecahrtsOptionsType === '1' ? 'primary' : ''">饼状图</el-button>
+                    <el-button
+                      @click="changeEchartsType('1')"
+                      :type="ecahrtsOptionsType === '1' ? 'primary' : ''"
+                      >饼状图</el-button
+                    >
+                    <el-button
+                      @click="changeEchartsType('0')"
+                      :type="ecahrtsOptionsType === '0' ? 'primary' : ''"
+                      >柱状图</el-button
+                    >
                   </el-button-group>
                 </div>
                 <div
@@ -223,12 +246,20 @@
                   :style="{ width: chartWidth, height: chartHeight }"
                 ></div>
               </div>
-              <div style="width: 49%">
+              <div class="echarts-content">
                 <div class="echarts-title">
                   <span>保费统计图</span>
                   <el-button-group>
-                    <el-button @click="changeEcharts1Type('0')" :type="ecahrtsOptions1Type === '0' ? 'primary' : ''">柱状图</el-button>
-                    <el-button @click="changeEcharts1Type('1')" :type="ecahrtsOptions1Type === '1' ? 'primary' : ''">饼状图</el-button>
+                    <el-button
+                      @click="changeEcharts1Type('1')"
+                      :type="ecahrtsOptions1Type === '1' ? 'primary' : ''"
+                      >饼状图</el-button
+                    >
+                    <el-button
+                      @click="changeEcharts1Type('0')"
+                      :type="ecahrtsOptions1Type === '0' ? 'primary' : ''"
+                      >柱状图</el-button
+                    >
                   </el-button-group>
                 </div>
                 <div
@@ -236,6 +267,16 @@
                   class="echarts-container"
                   :style="{ width: chartWidth, height: chartHeight }"
                 ></div>
+              </div>
+              <div class="echarts-list">
+                <div style="margin-bottom: 18px;">
+                  <span>保费月份</span>
+                  <span>保费额（万元）</span>
+                </div>
+                <div v-for="item in echartsOptionsData1[currentTab]" :key="item.item">
+                  <span class="month">{{ item.item }}</span>
+                  <span class="nPrm">{{ item.value }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -451,8 +492,8 @@ const shortListData = ref(null); // 第二模块tabl列表数据
 const headIcon = `/src/assets/images/${userStore.user.cCssStyle === "2" ? "0" : "1"}_.png`;
 const shorMenuList = ref([]); // 快捷菜单列表
 const cPayTypList = ref([]);
-const ecahrtsOptionsType = ref("0")
-const ecahrtsOptions1Type = ref("0")
+const ecahrtsOptionsType = ref("1");
+const ecahrtsOptions1Type = ref("1");
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -482,12 +523,13 @@ let tableconfig = reactive<AppTableConfig>(
 const echartsService = new EchartsService();
 const { getAnalysis } = echartsService;
 const ecahrtsBtnIndex = ref(0);
+// 总量统计图-柱状图
 const echartsOptions = reactive({
   barWidth: "10px",
   tooltip: {
     trigger: "axis",
     axisPointer: {
-      type: "cross",
+      type: "none",
       label: {
         backgroundColor: "#6a7985",
       },
@@ -522,7 +564,7 @@ const echartsOptions = reactive({
           width: 1,
         },
       },
-      boundaryGap: false,
+      boundaryGap: true,
       data: [],
     },
   ],
@@ -583,16 +625,18 @@ const echartsOptions = reactive({
       },
     },
     {
-      type: "line",
+      type: "bar",
       name: "每月出单量同比",
       yAxisIndex: 1,
       data: [],
       itemStyle: {
         color: "#68D3F8",
+        barBorderRadius: [5, 5, 5, 5],
       },
     },
   ],
 });
+// 总量统计图-饼状图
 const echartsOptionsPie = reactive({
   title: {
     text: "",
@@ -606,33 +650,38 @@ const echartsOptionsPie = reactive({
   legend: {
     left: "center",
     top: "bottom",
-    data: [],
-  },
-  toolbox: {
-    show: false,
-    feature: {
-      mark: { show: true },
-      dataView: { show: true, readOnly: false },
-      restore: { show: true },
-      saveAsImage: { show: true },
-    },
   },
   series: [
     {
       name: "每月出单量",
       type: "pie",
-      radius: [40, 150],
-      center: ["50%", "40%"],
-      roseType: "radius",
-      itemStyle: {
-        borderRadius: 5,
-      },
-      label: {
-        show: false,
-      },
+      radius: "60%",
       emphasis: {
-        label: {
-          show: false,
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: "rgba(0, 0, 0, 0.5)",
+        },
+      },
+      itemStyle: {
+        normal: {
+          color: function (colors:any) {
+            var colorList = [
+              '#70A1FF',
+              '#81ACFF',
+              '#90B6FF',
+              '#A0C1FF',
+              '#B0CBFF',
+              '#C0D5FF',
+              '#CFE0FF',
+              '#DFEAFF',
+              '#EFF4FF',
+              '#B0EDFC',
+              '#62DCFA',
+              '#6197FF',
+            ];
+            return colorList[colors.dataIndex];
+          },
         },
       },
       data: [],
@@ -641,118 +690,128 @@ const echartsOptionsPie = reactive({
   graphic: {
     type: "text", // 图形类型为文本
     left: "center", // 文本位置，居中显示
-    top: "40%", // 文本位置，居中显示
+    top: "30%", // 文本位置，居中显示
     style: {
       text: "每月出单量", // 要显示的文字内容
       fontSize: 14, // 文字大小
       fill: "#333", // 文字颜色
     },
   },
-})
+});
+// 保费统计图-柱状图
 const echartsOptions1 = reactive({
   barWidth: "10px",
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
     axisPointer: {
-      type: 'cross',
+      type: "none",
       label: {
-        backgroundColor: '#6a7985'
-      }
-    }
+        backgroundColor: "#6a7985",
+      },
+    },
   },
-  color: [
-    '#f57c11'
-  ],
+  color: ["#f57c11"],
   grid: {
-    left: '5%',
-    right: '5%',
-    bottom: '10%',
-    top: '10%',
+    left: "5%",
+    right: "5%",
+    bottom: "10%",
+    top: "10%",
     // height: 150,
-    containLabel: true
+    containLabel: true,
   },
   legend: {
-    data: ['每月保费量', '每月保费量同比'],
+    data: ["每月保费量", "每月保费量同比"],
     bottom: 0,
     show: true,
   },
-  xAxis: [{
-    type: 'category',
-    name: "月份",
-    axisLabel: {
-      show: true,
-      // color: 'red'
+  xAxis: [
+    {
+      type: "category",
+      name: "月份",
+      axisLabel: {
+        show: true,
+        // color: 'red'
+      },
+      axisLine: {
+        // x轴的颜色和宽度
+        lineStyle: {
+          // color: 'red',
+          width: 1,
+        },
+      },
+      boundaryGap: true,
+      data: [],
     },
-    axisLine: { // x轴的颜色和宽度
-      lineStyle: {
-        // color: 'red',
-        width: 1
-      }
-    },
-    boundaryGap: false,
-    data: []
-  }],
+  ],
   yAxis: [
     {
-      type: 'value',
+      type: "value",
       name: "保费",
       min: 0,
       // max: 1000,
-      axisLabel: { // y轴的字体样式
+      axisLabel: {
+        // y轴的字体样式
         show: true,
         // color: 'red'
       },
-      axisLine: { // y轴的颜色和宽度
+      axisLine: {
+        // y轴的颜色和宽度
         lineStyle: {
-
-          width: 0
-        }
-      }
+          width: 0,
+        },
+      },
     },
     {
-      type: 'value',
+      type: "value",
       name: "占比",
       min: 0,
       // max: 50,
-      axisLabel: { // y轴的字体样式
+      axisLabel: {
+        // y轴的字体样式
         show: true,
         // color: 'red'
       },
-      axisLine: { // y轴的颜色和宽度
+      axisLine: {
+        // y轴的颜色和宽度
         lineStyle: {
           // color: 'yellow',
-          width: 0
-        }
-      }
-    }
+          width: 0,
+        },
+      },
+    },
   ],
   series: [
     {
-      type: 'bar',
-      name: '每月保费量',
+      type: "bar",
+      name: "每月保费量",
       data: [],
       itemStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-              offset: 0,
-              color: '#729CFD'// 起始颜色
-          }, {
-              offset: 1,
-              color: '#326FFD' // 结束颜色
-          }]),
-      barBorderRadius: [5, 5, 5, 5]
-      }
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          {
+            offset: 0,
+            color: "#729CFD", // 起始颜色
+          },
+          {
+            offset: 1,
+            color: "#326FFD", // 结束颜色
+          },
+        ]),
+        barBorderRadius: [5, 5, 5, 5],
+      },
     },
     {
-      type: 'line',
-      name: '每月保费量同比',
+      type: "bar",
+      name: "每月保费量同比",
       yAxisIndex: 1,
       data: [],
       itemStyle: {
-        color: '#68D3F8'
-      }
+        color: "#68D3F8",
+        barBorderRadius: [5, 5, 5, 5],
+      },
     },
-  ]
+  ],
 });
+// 保费统计图-饼状图
 const echartsOptions1Pie = reactive({
   title: {
     text: "",
@@ -766,33 +825,38 @@ const echartsOptions1Pie = reactive({
   legend: {
     left: "center",
     top: "bottom",
-    data: [],
-  },
-  toolbox: {
-    show: false,
-    feature: {
-      mark: { show: true },
-      dataView: { show: true, readOnly: false },
-      restore: { show: true },
-      saveAsImage: { show: true },
-    },
   },
   series: [
     {
       name: "每月保费量",
       type: "pie",
-      radius: [40, 150],
-      center: ["50%", "40%"],
-      roseType: "radius",
-      itemStyle: {
-        borderRadius: 5,
-      },
-      label: {
-        show: false,
-      },
+      radius: "60%",
       emphasis: {
-        label: {
-          show: false,
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: "rgba(0, 0, 0, 0.5)",
+        },
+      },
+      itemStyle: {
+        normal: {
+          color: function (colors:any) {
+            var colorList = [
+              '#70A1FF',
+              '#81ACFF',
+              '#90B6FF',
+              '#A0C1FF',
+              '#B0CBFF',
+              '#C0D5FF',
+              '#CFE0FF',
+              '#DFEAFF',
+              '#EFF4FF',
+              '#B0EDFC',
+              '#62DCFA',
+              '#6197FF',
+            ];
+            return colorList[colors.dataIndex];
+          },
         },
       },
       data: [],
@@ -801,14 +865,14 @@ const echartsOptions1Pie = reactive({
   graphic: {
     type: "text", // 图形类型为文本
     left: "center", // 文本位置，居中显示
-    top: "40%", // 文本位置，居中显示
+    top: "30%", // 文本位置，居中显示
     style: {
       text: "每月保费量", // 要显示的文字内容
       fontSize: 14, // 文字大小
       fill: "#333", // 文字颜色
     },
   },
-})
+});
 const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
 const tabDataMap = ref({});
@@ -927,7 +991,11 @@ function handleRefreshEcharts() {
           }));
           echartsOptionsPie.legend.data = data.map((item: any) => item.item);
           ecahrtsRefInstance?.clear();
-          ecahrtsRefInstance?.setOption(ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie);
+          ecahrtsRefInstance?.setOption(
+            ecahrtsOptionsType.value === "0"
+              ? echartsOptions
+              : echartsOptionsPie
+          );
         } else {
           ElMessage.error(res.msg);
         }
@@ -956,7 +1024,9 @@ function handleRefreshEcharts() {
       currentTab.value
     ].map((item: any) => item.item);
     ecahrtsRefInstance?.clear();
-    ecahrtsRefInstance?.setOption(ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie);
+    ecahrtsRefInstance?.setOption(
+      ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie
+    );
   }
   if (echartsOptionsData1.value.length < 1) {
     const param1 = {
@@ -991,9 +1061,9 @@ function handleRefreshEcharts() {
           });
           echartsOptionsData1.value = res.dataMap;
           const data = res.dataMap[currentTab.value] || [];
-          echartsOptions1.xAxis[0].data = data.map((item:any) => item.item)
+          echartsOptions1.xAxis[0].data = data.map((item: any) => item.item);
           echartsOptions1.series[0].data = data.map((item: any) => item.value);
-          echartsOptions1.series[1].data = data.map((item:any) => item.rate)
+          echartsOptions1.series[1].data = data.map((item: any) => item.rate);
           // 饼状图
           echartsOptions1Pie.series[0].data = data.map((item: any) => ({
             name: item.item,
@@ -1001,7 +1071,11 @@ function handleRefreshEcharts() {
           }));
           echartsOptions1Pie.legend.data = data.map((item: any) => item.item);
           ecahrtsRefInstance1?.clear();
-          ecahrtsRefInstance1?.setOption(ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie);
+          ecahrtsRefInstance1?.setOption(
+            ecahrtsOptions1Type.value === "0"
+              ? echartsOptions1
+              : echartsOptions1Pie
+          );
         } else {
           ElMessage.error(res.msg);
         }
@@ -1030,13 +1104,15 @@ function handleRefreshEcharts() {
       currentTab.value
     ].map((item: any) => item.item);
     ecahrtsRefInstance1?.clear();
-    ecahrtsRefInstance1?.setOption(ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie);
+    ecahrtsRefInstance1?.setOption(
+      ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie
+    );
   }
 }
 
-function changeEchartsType(type:any) {
-  ecahrtsOptionsType.value = type
-  if(type === "0") {
+function changeEchartsType(type: any) {
+  ecahrtsOptionsType.value = type;
+  if (type === "0") {
     ecahrtsRefInstance?.clear();
     ecahrtsRefInstance?.setOption(echartsOptions);
   } else {
@@ -1045,10 +1121,9 @@ function changeEchartsType(type:any) {
   }
 }
 
-function changeEcharts1Type(type:any) {
-  ecahrtsOptions1Type.value = type
-  ecahrtsOptionsType.value = type
-  if(type === "0") {
+function changeEcharts1Type(type: any) {
+  ecahrtsOptions1Type.value = type;
+  if (type === "0") {
     ecahrtsRefInstance1?.clear();
     ecahrtsRefInstance1?.setOption(echartsOptions1);
   } else {
@@ -1109,6 +1184,8 @@ const toChange = (url: string) => {
 //tabs切换
 let clickedTabData = ref({ udrType: "0", refName: "stagingList" });
 const handleTabClick = (tab: any) => {
+  pageresult.list = [];
+  pageresult.total = 0;
   currentTabName.value = tab.props.label;
   let url = "";
   clickedTabData.value = tabs.value.find((t) => t.name === tab.props.label);
@@ -1153,10 +1230,18 @@ function getAuditTableData() {
   } else {
     getList = pcisQueryService.getNewUdrList(pageData.value);
   }
+  const tmMap = ['crtTm','tUdrTm']
   getList
     .then((res: any) => {
       if (res && res.code === 200) {
-        pageresult.list = res.data || [];
+        pageresult.list = res.data.map((item:any) => {
+          tmMap.forEach((i:any) => {
+            if(item[i]) {
+              item[i] = item[i].replace(/T/g, ' ')
+            }
+          })
+          return item;
+        }) || [];
         pageresult.total = res.total || 0;
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
@@ -1191,10 +1276,18 @@ function getIssueTableData() {
   } else if (refNm === "renewalList") {
     getList = pcisQueryService.selectPendingRenewalTask(pageData.value);
   }
+  const tmMap = ['tAppTm','tInsrncBgnTm','tInsrncEndTm',]
   getList
     ?.then((res: any) => {
       if (res && res.code === 200) {
-        pageresult.list = res.data || [];
+        pageresult.list = res.data.map((item:any) => {
+          tmMap.forEach((i:any) => {
+            if(item[i]) {
+              item[i] = item[i].replace(/T/g, ' ')
+            }
+          })
+          return item;
+        }) || [];
         pageresult.total = res.total || 0;
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
@@ -2253,12 +2346,17 @@ window.addEventListener("resize", () => {
           margin: 10px 0;
           color: #666;
           display: flex;
+          :deep(.el-tabs__item) {
+            font-size: 17px;
+            line-height: 24px;
+            color: #000000;
+            &.is-active,&:hover {
+              color: var(--el-color-primary);
+            }
+          }
           .tab-item {
             margin-right: 10px;
             cursor: pointer;
-            &:hover {
-              color: var(--el-color-primary);
-            }
           }
         }
 
@@ -2271,7 +2369,8 @@ window.addEventListener("resize", () => {
             display: flex;
             align-items: center;
             margin: 10px 10px 10px 0;
-
+            font-size: 16px;
+            justify-content: center;
             .round {
               width: 6px;
               height: 6px;
@@ -2279,13 +2378,48 @@ window.addEventListener("resize", () => {
               background-color: #d9d9d9;
               margin-right: 10px;
             }
+            .details-title {
+              color: #666666;
+            }
+            .details-content {
+              color: #333333;
+            }
+            &:first-child {
+              justify-content: left;
+            }
+            &:last-child {
+              justify-content: right;
+            }
           }
         }
         .content-charts-box {
           margin-top: 10px;
           .echarts-box {
             display: flex;
-            justify-content: space-between;
+            // justify-content: space-between;
+            .echarts-content {
+              width: 40%;
+              margin-right: 20px;
+            }
+            .echarts-list {
+              font-size: 16px;
+              color: #999999;
+              width: calc(20% - 40px);
+              div {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                .month::before {
+                  content: '';
+                  width: 12px;
+                  height: 12px;
+                  border-radius: 6px;
+                  background: #D8D8D8;
+                  display: inline-block;
+                  margin-right: 10px;
+                }
+              }
+            }
           }
           .tab-box {
             display: flex;
@@ -2440,10 +2574,13 @@ window.addEventListener("resize", () => {
           }
         }
         .tabs-box {
-          .el-tabs__item {
+          :deep(.el-tabs__item) {
             font-size: 17px;
             line-height: 24px;
             color: #000000;
+            &.is-active,&:hover {
+              color: var(--el-color-primary);
+            }
           }
         }
         .searchbar {
@@ -2528,12 +2665,13 @@ window.addEventListener("resize", () => {
 .policy-info-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  // gap: 4px;
 }
 
 .policy-number-row {
   display: flex;
   align-items: center;
+  line-height: 20px;
 }
 
 .policy-number-row span {
@@ -2557,5 +2695,30 @@ window.addEventListener("resize", () => {
 :deep(.udrReturnList .el-table__body .el-table__row td:nth-child(2) .el-text) {
   color: var(--el-color-primary);
   cursor: pointer;
+}
+
+.code-box {
+  // height: 100px;
+  .code-inner-box {
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: flex-start; /* 左对齐 */
+    gap: 16px; /*间距*/
+    // padding: 16px 14px;
+    .code-img {
+      width: 64px;
+    }
+    .link {
+      color: #3a76c6;
+      text-decoration: none;
+      // padding-left: 6px;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .title {
+      width: 98px;
+    }
+  }
 }
 </style>

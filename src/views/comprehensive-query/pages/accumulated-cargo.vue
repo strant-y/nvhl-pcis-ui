@@ -133,26 +133,31 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cDptCnm",
         inputtype: 'rtinput',
         title: "保单号",
+        width: 180,
       },
       {
         prop: "cAppNo",
         inputtype: 'rtinput',
         title: "出单机构",
+        align: 'left',
       },
       {
         prop: "cPlyNo",
         inputtype: 'rtinput',
         title: "被保险人",
+        align: 'left',
       },
       {
         prop: "cProdNmeCn",
         inputtype: 'rtinput',
         title: "起运日期",
+        width: 140,
       },
       {
         prop: "nPrm",
         inputtype: 'rtinput',
         title: "船名",
+        align: 'left',
       },
       {
         prop: "cAppNme",
@@ -163,26 +168,31 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tAppTm",
         inputtype: 'rtinput',
         title: "起运地",
+        align: 'left',
       },
       {
         prop: "cAppStatus",
         inputtype: 'rtinput',
         title: "目的地",
+        align: 'left',
       },
       {
         prop: "cAppNme",
         inputtype: 'rtinput',
         title: "起保时间",
+        width: 140,
       },
       {
         prop: "tAppTm",
         inputtype: 'rtinput',
         title: "终保时间",
+        width: 140,
       },
       {
         prop: "cAppStatus",
         inputtype: 'rtinput',
         title: "保额/赔偿限额",
+        width: 130,
       },
     ],
   })

@@ -625,60 +625,67 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
+        width: 65,
       },
       {
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cInquiryNo",
-        minWidth: 230,
+        minWidth: 180,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
         slotName: "cPlyNo",
-        minWidth: 230,
+        minWidth: 180,
       },
       {
         prop: "cEdrNo",
         inputtype: "rtselect",
         title: "批改申请单号/批单号",
         slotName: "cEdrNo",
-        minWidth: 230,
+        minWidth: 180,
       },
       {
         prop: "cRsnCdeText",
         inputtype: "rtinput",
         title: "批改原因",
+        align: "left",
+        width: 120,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        align: "left",
       },
       {
         prop: "tAppTm",
         inputtype: "rtinput",
         title: "申请日期",
+        width: 140,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: "left",
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: "left",
       },
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
         title: "保险期间",
-        minWidth: 305,
+        minWidth: 280,
         formatter: (val: any, row: any) => {
-          return val + " - " + row.tInsrncEndTm;
+          return val.replace(/T/g,' ') + " - " + row.tInsrncEndTm.replace(/T/g,' ');
         },
       },
       {
@@ -695,17 +702,20 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tUdrTm",
         inputtype: "rtinput",
         title: "核保日期",
+        width: 140,
       },
       {
         prop: "cUdrCnm",
         inputtype: "rtinput",
         title: "核保人",
+        align: "left",
       },
       {
         prop: "taskStatus",
         inputtype: "rtselect",
         title: "任务状态",
         loadData: taskStatusOptions,
+        width: 95,
       },
     ],
   })

@@ -249,18 +249,11 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
     icon: "CirclePlus",
     type: "primary",
     size: "small",
-    link: true,
   },
-  // delPlan: {
-  //   icon: "Delete",
-  //   type: "danger",
-  //   size: "small",
-  // },
   delPlan: {
-    label: "删除",
-    type: "primary",
+    icon: "Delete",
+    type: "danger",
     size: "small",
-    link: true,
   },
 });
 

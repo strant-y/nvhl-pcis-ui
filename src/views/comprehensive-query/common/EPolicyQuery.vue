@@ -431,62 +431,71 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "policyInfo",
                 inputtype: "rtinput",
                 title: "申请单号\n保单号",
-                minWidth: 180,
+                width: 180,
                 slotName: "policyInfo"
             },
             {
                 prop: 'cAppNo',
                 inputtype: 'rtinput',
                 title: '申请单号',
-                isShow: false
+                isShow: false,
+                width: 180,
             },
             {
                 prop: 'cPlyNo',
                 inputtype: 'rtinput',
                 title: '保单号',
-                isShow: false
+                isShow: false,
+                width: 180,
             },
             {
                 prop: 'cEdrNo',
                 inputtype: 'rtinput',
                 title: '批单号',
-                minWidth: 180,
+                width: 180,
             },
             {
                 prop: 'cAppNme',
                 inputtype: 'rtinput',
                 title: '投保人名称',
                 minWidth: 180,
+                align: 'left',
             },
             {
                 prop: 'nPrm',
                 inputtype: 'rtinput',
-                title: '保险费'
+                title: '保险费',
+                width: 130,
             },
             {
                 prop: 'cProdNmeCn',
                 inputtype: 'rtinput',
-                title: '产品'
+                title: '产品',
+                align: 'left',
             },
             {
                 prop: 'cSlsNme',
                 inputtype: 'rtinput',
-                title: '业务员名称'
+                title: '业务员名称',
+                align: 'left',
             },
             {
                 prop: 'tAppTm',
                 inputtype: 'rtinput',
-                title: '投保申请日期'
+                title: '投保申请日期',
+                width: 140,
             },
             {
                 prop: "InsurancePeriod",
                 inputtype: "rtinput",
                 title: "保险期间",
+                width: 280,
             },
             {
                 prop: 'tUdrTm',
                 inputtype: 'rtinput',
-                title: '核保日期'
+                title: '核保日期',
+                width: 140,
             }
         ]
     })

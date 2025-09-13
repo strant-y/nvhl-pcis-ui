@@ -14,13 +14,13 @@
           <!-- 投保/批改-->
           <template v-if="cAppType !== 'I'">
             <div v-if="row.cAppNo" class="policy-number-row">
-            <span v-html="row.cAppNo"></span>
+            <span v-html="row.cAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
             <div v-if="row.cPlyNo" class="policy-number-row">
-                <span v-html="row.cPlyNo"></span>
+                <span v-html="row.cPlyNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
                    <DocumentCopy />
                 </el-icon>
@@ -29,13 +29,13 @@
           <!-- 询价 -->
           <template v-else>
             <div v-if="row.cAppNo" class="policy-number-row">
-                <span v-html="row.cAppNo"></span>
+                <span v-html="row.cAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
             <div v-if="row.cInquiryNo" class="policy-number-row">
-                <span v-html="row.cInquiryNo"></span>
+                <span v-html="row.cInquiryNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
                    <DocumentCopy />
                 </el-icon>
@@ -79,7 +79,7 @@
       </template>
       <!-- ES查询 查询条件高亮 -->
       <template #column-cEdrNo="{ row }">
-        <span v-html="row.cEdrNo || ''"></span>
+        <span v-html="row.cEdrNo || ''" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
       </template>
       <template #column-cClntAddr="{ row }">
         <span v-html="row.cClntAddr || ''"></span>
@@ -915,55 +915,66 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "分公司",
         maxWidth: 25,
-        slotName: "cSecondDptCnm"
+        width: 60,
+        slotName: "cSecondDptCnm",
+        align: 'left',
     },
     {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
         maxWidth: 140,
-        slotName: "cDptCnm"
+        slotName: "cDptCnm",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         maxWidth: 110,
-        slotName: "cAppNme"
+        slotName: "cAppNme",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         maxWidth: 110,
-        slotName: "cInsuredNme"
+        slotName: "cInsuredNme",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
         title: "产品名称",
         minWidth: 160,
-        slotName: "cProdNmeCn"
+        slotName: "cProdNmeCn",
+        align: 'left',
     },
     {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         maxWidth: 140,
-        slotName: "cTermNme"
+        slotName: "cTermNme",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
-        minWidth: 90,
+        width: 130,
         slotName: "nAmt"
     },
     {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
-        minWidth: 90,
+        width: 140,
         prefix: "¥ ",
         slotName: "nPrm"
     },
@@ -972,6 +983,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "签单日期",
         minWidth: 150,
+        width: 140,
         sortable: true,
         slotName: "tIssueTm"
     },
@@ -980,6 +992,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保险期间",
         minWidth: 180,
+        width: 140,
         slotName: "InsurancePeriod"
     },
     {
@@ -987,6 +1000,7 @@ const normalQueryColumns = [
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 120,
+        width: 95,
         loadData: [
             { label: "暂存", value: "1" },
             { label: "已提核", value: "2" },
@@ -1014,6 +1028,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批改序号",
         maxWidth: 120,
+        width: 70,
         slotName: "nEdrPrjNo"
     },
     {
@@ -1022,20 +1037,22 @@ const normalQueryColumns = [
         title: " 批改原因",
         minWidth: 180,
         typeCode: "EDR_RSN_LIST_KIND",
+        align: 'left',
+        width: 120,
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true },
-  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true, sortable: true},
-  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 160, optional: true, sortable: true, slotName: "tUdrTm" },
-  { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', minWidth: 180, optional: true },
-  { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', minWidth: 180, optional: true },
-  { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
-  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', minWidth: 180, optional: true },
-  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', minWidth: 180, optional: true },
-  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true },
-  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme"},
+  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 180, },
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 140, optional: true, sortable: true},
+  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 140, optional: true, sortable: true, slotName: "tUdrTm" },
+  { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', width: 140, optional: true, align: 'left', },
+  { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', width: 140, optional: true, align: 'left', },
+  { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', width: 140, optional: true, align: 'left', },
+  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', width: 130, optional: true },
+  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 130, optional: true },
+  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left', },
+  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme", align: 'left',},
   { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
   { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
@@ -1049,6 +1066,7 @@ const tableObj = {
         tableBtnType: "btn",
         tableBtnWidth: 150,
         tableBtnPosition: "right",
+        rowDbClickFun: (row:any) => handleRowDoubleClick(row),
         tableBtn: [
             createFreeButtonBase({
                 id: "score",
@@ -2002,6 +2020,22 @@ function handleDelete(row: any) {
       console.log(err);
     });
 }
+// table表格的双击事件
+const handleRowDoubleClick = (row:any) => {
+    if (
+        row.cAppStatus != "1" &&
+        row.cAppStatus != "3" &&
+        row.cAppStatus != "8"
+    ) {
+       const data = row;
+        router.push({
+            path: "/pcisapp/myPage",
+            query: {
+                param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
+            },
+        });
+    }
+};
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {

@@ -5543,7 +5543,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     padding-left: 16px;
     padding-right: 22px;
     &.isActive,&:hover {
-      background: linear-gradient( 180deg, rgba(58, 118, 198, .1) 0%, rgba(57, 117, 198, .1) 100%);
+      background: linear-gradient( 180deg, rgba(58, 118, 198, .3) 0%, rgba(57, 117, 198, .3) 100%);
       :deep(a) {
         color: var(--el-color-primary);
         .iconfont {
@@ -5645,7 +5645,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
-    margin: 12px 10px;
+    margin: 12px 20px;
   }
 }
 :deep(.el-card__header) {
@@ -5657,14 +5657,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
       font-size: 16px;
       font-weight: 500;
     }
-    .el-button-group {
-      .el-button {
-        background: #ffffff;
-        color: var(--el-color-primary);
-        border: none;
-        height: 24px;
-        padding: 0 14px;
-      }
+    .el-col-20 {
+      display: flex;
+      justify-content: right;
+      align-items: center;
     }
   }
 }
@@ -5744,7 +5740,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .right-btns {
   // padding: 0 3rem;
-  margin: 72px 10px 0 0;
+  margin: 72px 20px 0 0;
   // min-width: calc(150px + 6rem);
   .btns-content {
     background: #FFFFFF;

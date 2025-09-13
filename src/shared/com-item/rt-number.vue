@@ -152,4 +152,7 @@ defineExpose({
 ::v-deep .el-input__inner {
   text-align: left !important;
 }
+:deep(.el-input__wrapper) {
+  padding: 1px 5px!important;
+}
 </style>

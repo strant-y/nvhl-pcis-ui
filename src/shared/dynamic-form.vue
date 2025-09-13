@@ -54,13 +54,13 @@
                             :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
                             " >
                 <template #label>
-                   <template v-if="item.title?.length > 5">
+                   <template v-if="item.title?.length > 10">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 5) + "..." }}
+                      {{ item.title.substring(0, 10) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -108,13 +108,13 @@
                 :label-width=" maxLabelWidth + 'px'"
               >
                 <template #label>
-                   <template v-if="item.title?.length > 7">
+                   <template v-if="item.title?.length > 10">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 7) + "..." }}
+                      {{ item.title.substring(0, 10) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -145,7 +145,7 @@
                     >
                       <rt-button
                         :item="item.btnItems"
-                        :style="{ width: '100%' }"
+                        :style="{ width: item.btnItems.label ? '100%' : '32px' }"
                         @closepopover="(rev) => setPopover(rev, item)"
                       />
                     </div>
@@ -265,13 +265,13 @@
                     :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
-                      <template v-if="item.title?.length > 7">
+                      <template v-if="item.title?.length > 10">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
                           placement="top-start"
                         >
-                          {{ item.title.substring(0, 7) + "..." }}
+                          {{ item.title.substring(0, 10) + "..." }}
                         </el-tooltip>
                       </template>
                       <template v-else>
@@ -302,7 +302,7 @@
                         >
                           <rt-button
                             :item="item.btnItems"
-                            :style="{ width: '100%' }"
+                            :style="{ width: '32px' }"
                             @closepopover="(rev) => setPopover(rev, item)"
                           />
                         </div>
@@ -331,11 +331,11 @@ const updateLabelWidth = () => {
   if (screenWidth < 768) {
     // maxLabelWidth.value = "80px"; // 移动端窄屏
   } else if(screenWidth > 1367 && screenWidth <= 1600) {  /*主流笔记本	1367px - 1600px*/
-     maxLabelWidth.value = "150"; // PC 端宽屏
+     maxLabelWidth.value = "175"; // PC 端宽屏
   }else if(screenWidth > 1601 && screenWidth <= 1920) { /*大屏笔记本/台式机*/
-    maxLabelWidth.value = "170"; // PC 端宽屏
+    maxLabelWidth.value = "195"; // PC 端宽屏
   }else if(screenWidth > 1921 && screenWidth <= 3840) {
-    maxLabelWidth.value = "200"; // PC 端宽屏
+    maxLabelWidth.value = "225"; // PC 端宽屏
   }
 };
 
@@ -727,8 +727,8 @@ defineExpose({
 <style lang="css" scoped>
 .rt_group {
   margin-bottom: 10px;
-  background: #FAFAFA;
-  border: 1px solid #D9D9D9;
+  /* background: #FAFAFA; */
+  /* border: 1px solid #D9D9D9; */
   padding: 3px 12px;
 }
 .rt_group_title {

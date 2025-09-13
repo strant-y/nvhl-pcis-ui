@@ -389,17 +389,22 @@ defineExpose({
   /* height: 28px; */
   min-height: 28px;
   line-height: 28px;
+  padding: 4px 6px;
 }
 :deep(.el-select__input) {
   height: 20px;
 }
 :deep(.el-input__wrapper) {
   height: 28px;
+  padding: 1px 5px;
 }
 :deep(.el-form-item__content .el-row) {
   align-items: baseline;
 }
 :deep(.el-form-item__content .el-button) {
   height: 28px;
+}
+:deep(.el-input-number.is-without-controls .el-input__wrapper) {
+  padding: 1px 5px;
 }
 </style>

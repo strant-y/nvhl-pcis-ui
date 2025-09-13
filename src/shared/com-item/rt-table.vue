@@ -193,6 +193,7 @@
             :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
+            :width="i.width"
             :sortable="i.sortable"
           >
             <template #header="header">
@@ -370,7 +371,7 @@ const props = defineProps({
 const getCellStyle = (row: Record<string, any>) => {
   if(!props.item.editFlag) {
     return {
-      padding: '3px'
+      padding: '3px 0px'
     }
   }else {
     return {
@@ -655,6 +656,7 @@ onMounted(() => {
   if (props.item.fromSchema) {
     initUI();
   }
+  console.log(props.item,'111111111111111')
 });
 
 async function tableExvalidate() {
@@ -792,7 +794,7 @@ function getColumnWidth(label: string, prop: any, tableData: any[], itemMinWidth
   //tableData表格数据
   const width = itemWidth || 0 // 列表属性宽度
   const minWidth = itemMinWidth || 80 // 最小宽度
-  const padding = 10 // 列内边距
+  const padding = 0 // 列内边距
   let arr = tableData.map(item => item[prop])
   arr.push(label)//拼接内容和表头数据
   const contentWidths = arr.map(item => {
@@ -895,6 +897,7 @@ function isrequired(i: any) {
 :deep(.el-table .cell) {
   /* white-space: nowrap; */
   line-height: 25px;
+  padding: 0 2px;
 }
 
 :deep(.el-table td.el-table__cell div.cell) {
@@ -908,5 +911,9 @@ function isrequired(i: any) {
 }
 :deep(.el-table__empty-text){
   line-height: 30px !important;
+}
+/* 表头居中对齐 */
+:deep(.el-table th.is-left div.cell) {
+  text-align: center;
 }
 </style>
