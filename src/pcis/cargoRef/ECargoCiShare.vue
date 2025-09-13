@@ -35,30 +35,116 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  if(param?.pageType === "EDR_APP_NEW_SCENE" && (param?.cEdrType == '2' || param?.cEdrType == '3')){
+    setTimeout(() => {
+      formconfig1.fromSchema?.forEach((item) => {
+        item.disabled = true;
+      });
+    }, 1000);
+  }
+});
   watchEffect(() => {
 		const AgreementBase = formPage.getFormDataById('AgreementBase')
 		if(AgreementBase && Object.keys(AgreementBase).length > 0){
-			const cCiMrk = AgreementBase['ECargoECargoBase.cCiMrk'];
-			if(cCiMrk === "1"){
-				setValue("ECargoBase.cCiInpTyp", '600001');
-			}else if(cCiMrk === "2"){
-				setValue("ECargoBase.cCiInpTyp", '600004');
-			}else if(cCiMrk === "3"){
-				setValue("ECargoBase.cCiInpTyp", '600001');
-			}else if(cCiMrk === "4"){
-				setValue("ECargoBase.cCiInpTyp", '600004');
-			}else if(cCiMrk === "5"){
-				setValue("ECargoBase.cCiInpTyp", '600005');
-			}
+			const cCiMrkValue = AgreementBase['ECargoECargoBase.cCiMrk'];
+			// if(cCiMrk === "1"){
+			// 	setValue("ECargoBase.cCiInpTyp", '600001');
+			// }else if(cCiMrk === "2"){
+			// 	setValue("ECargoBase.cCiInpTyp", '600004');
+			// }else if(cCiMrk === "3"){
+			// 	setValue("ECargoBase.cCiInpTyp", '600001');
+			// }else if(cCiMrk === "4"){
+			// 	setValue("ECargoBase.cCiInpTyp", '600004');
+			// }else if(cCiMrk === "5"){
+			// 	setValue("ECargoBase.cCiInpTyp", '600005');
+			// }
+      if(cCiMrkValue === "1"){
+        setValue("Base.cCiInpTyp", '600001');
+      }else if(cCiMrkValue === "2"){
+        setValue("Base.cCiInpTyp", '600004');
+      }else if(cCiMrkValue === "3"){
+        setValue("Base.cCiInpTyp", '600001');
+      }else if(cCiMrkValue === "4"){
+        setValue("Base.cCiInpTyp", '600004');
+      }else if(cCiMrkValue === "5"){
+        setValue("Base.cCiInpTyp", '600005');
+      }
+    if (cCiMrkValue === "3" || cCiMrkValue === "4") {
+      formconfig1.fromSchema?.forEach((item) => {
+        const prop = item.prop;
+        if (
+          prop === "Base.cCiAgtNo" ||
+          prop === "Base.nCiJntAmt" ||
+          prop === "Base.nCiJntPrm" ||
+          prop === "Base.nCiOwnAmt" ||
+          prop === "Base.nCiOwnPrm" ||
+          prop === "Base.cCiInpTyp" ||
+          prop === "Base.cCiPriTyp" || 
+          prop === "Base.cReceiptTitleNme" ||
+          prop === "Base.cReceiptTitleCde"
+        ) {
+          item.hidden = false; // 显示共保字段
+        } else {
+          item.hidden = true; // 隐藏其他字段
+        }
+      });
+      } else if (cCiMrkValue === "5" || cCiMrkValue === "6") {
+        formconfig1.fromSchema?.forEach((item) => {
+          const prop = item.prop;
+          if (
+            prop === "Base.cJiAgtNo" ||
+            prop === "Base.nJiJntAmt" ||
+            prop === "Base.nJiJntPrm" ||
+            prop === "Base.nCiOwnPrm" ||
+            prop === "Base.cCiInpTyp" ||
+            prop === "Base.cCiPriTyp" || 
+            prop === "Base.cReceiptTitleNme" ||
+            prop === "Base.cReceiptTitleCde"
+          ) {
+            item.hidden = false; // 显示联保字段
+          } else {
+            item.hidden = true; // 隐藏其他字段
+          }
+        });
+      }else if(cCiMrkValue === "1" || cCiMrkValue ==="2"){
+        formconfig1.fromSchema?.forEach((item)=>{
+          item.hidden = false;
+        })
+      }
 		}
     
   })
-});
-
 // 绑定方法
 const method = {
   // func demo
   func1: () => {},
+    cJiAgtNoChange: (val) => {
+    const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isValidLength = val.length <= 20;      // 长度不超过20
+
+    if (!isPositiveInteger || !isValidLength) {
+      ElMessage.error("请输入不超过20位的正整数和英文字母");
+      // 清空当前字段的值
+      tgtobjEditRef.value?.setValue("Base.cJiAgtNo", "");
+    }
+  },
+  cCiAgtNoChange: (val) => {
+    const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isValidLength = val.length <= 20;      // 长度不超过20
+    if (!isPositiveInteger || !isValidLength) {
+      ElMessage.error("请输入不超过20位的正整数和英文字母");
+      // 清空当前字段的值
+      tgtobjEditRef.value?.setValue("Base.cCiAgtNo", "");
+    }
+  },
+  cReceiTitleCdeChange:(val)=>{
+    if(val === '3127001'){
+      setFormItem("Base.cReceiptTitleNme", {disabled: true})
+      setValue("Base.cReceiptTitleNme","")
+    }else{
+      setFormItem("Base.cReceiptTitleNme", {disabled: false})
+    }
+  },
 };
 
 // 绑定特殊验证器
@@ -94,6 +180,28 @@ function setDisabledAll(isDisabled: boolean) {
   const formBtn = getFormBtn();
   if(formBtn && Object.keys(formBtn).length > 0) {
     Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = isDisabled;})
+  }
+}
+const setFormItem = (key, obj) => {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
   }
 }
 defineExpose({
