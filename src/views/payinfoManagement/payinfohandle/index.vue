@@ -771,6 +771,12 @@ const tableconfig = reactive<AppTableConfig>(
                         const CCombinationFlag = new Set();
                         let combinationNo = '';
                         multipleSelection.value.forEach((item,i) => {
+                            // 添加联共保业务校验
+                            if (item['cCiMrk'] !== '0') {
+                                isOpen = true;
+                                message='所选记录中包含联共保业务，不允许在线缴费！ 【申请单号='+item['cAppNo']+'】'
+                                return;
+                            }
                             if ('18' !== item['cPayTyp']) {
                                 isOpen = true;
                                 message='该单缴费类型错误，只能对在线支付的单进行在线缴费！ 【申请单号='+item['cAppNo']+'】'

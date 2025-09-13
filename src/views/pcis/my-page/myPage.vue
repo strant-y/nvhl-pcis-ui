@@ -808,6 +808,8 @@ const getRecordTypeText = computed(() => {
       '6':'询报价转投保',
       '8':'复制出单',
       '10':'组合出单',
+      '11':'续保出单',
+
     };
     return recordTypeMap[cRecordType] || '未知录单方式';
   };
