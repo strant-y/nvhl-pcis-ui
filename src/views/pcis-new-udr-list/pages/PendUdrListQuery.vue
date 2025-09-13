@@ -340,7 +340,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cAppNo",
         inputtype: "rtinput",
-        title: "询价/投保/批改申请单号",
+        title: "投保/批改申请单号",
         clearable: true,
       },
       {
@@ -934,6 +934,19 @@ function refreshData(flag?: boolean) {
     ...r,
     ...s,
   };
+  
+  // 提取申请日期的开始时间和结束时间
+  const tAppTmBgn = s.tm1 && s.tm1.length > 1 ? s.tm1[0] : null;
+  const tAppTmEnd = s.tm1 && s.tm1.length > 1 ? s.tm1[1] : null;
+  // 提取签单日期的开始时间和结束时间
+  const tIssueTmBgn = s.tm2 && s.tm2.length > 1 ? s.tm2[0] : null;
+  const tIssueTmEnd = s.tm2 && s.tm2.length > 1 ? s.tm2[1] : null;
+
+  params["tAppTmBgn"] = tAppTmBgn; // 添加申请开始时间
+  params["tAppTmEnd"] = tAppTmEnd; // 添加申请结束时间
+  params["tIssueTmBgn"] = tIssueTmBgn; // 添加签单开始时间
+  params["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+
   delete params.tm1;
   delete params.tm2;
 
