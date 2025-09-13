@@ -368,3 +368,11 @@ export function CustomUserList(queryParams: any): AxiosPromise<any> {
 export function qryPolicyNewList(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/qryPolicyNewList`, queryParams);
 }
+
+/**
+* 02根据清单获取条款
+ * @param queryParams
+ */
+export function getTermDetailByDist(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/getTermDetailByDist`, queryParams);
+}

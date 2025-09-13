@@ -263,12 +263,12 @@ const method = {
           selectList: [],
         },
         {
-          getSelected(selectdata: any) {
+          getSelected(selectdata: any, amount: string) {
             if(selectdata && selectdata.length > 0) {
               const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
               const codeNos = selectdata.map(item => item['Dist.cCodeNo']).join(',');
               const cPkIds = selectdata.map(item => item['Dist.cPkId']).join(',');
-              setCargoSeq(codeNos, cPkIds);
+              setCargoSeq(codeNos, cPkIds, amount);
             }else {
               setCargoSeq('');
             }
@@ -625,18 +625,20 @@ function calcCheck(){
     msg: "验证通过",
   };
 }
-const setCargoSeq = (value: string, pkId: string) => {
+const setCargoSeq = (value: string, pkId: string, amount: string) => {
   const {index, data} = selectedRow.value;
   if(formData.value['m'] && formData.value['m'].length > 0) {
     if(data['Term.cClauseCode']) {
       formData.value['m'][index]['Term.cDistCodeNo'] = value;
       formData.value['m'][index]['Term.cDistPkId'] = pkId;
+      formData.value['m'][index]['Term.nInsuranceAmount'] = amount;
       selectedRow.value.data = formData.value['m'][index];
     }else {
       formData.value['m'][index]['riskList'].forEach((item: any) => {
         if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
           item['TermRisktgt.cDistCodeNo'] = value;
           item['TermRisktgt.cDistPkId'] = pkId;
+          item['TermRisktgt.nInsuranceAmount'] = amount;
           selectedRow.value.data = item;
         }
       });

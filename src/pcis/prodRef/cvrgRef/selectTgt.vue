@@ -32,6 +32,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import { createFreeButtonBase } from "@/shared/button-config";
 const policyService = new PolicyService();
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { getTermDetailByDist } from "@/api/query";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -116,6 +117,8 @@ function setSelected() {
 }
 const distKey = computed(() => Object.keys(opertaor.getTableRefs()).find(f => f.includes('CargoDist')));
 const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
+const nInsuranceA = ref('');
+
 onMounted(async () => {
   const tabref = opertaor.getTableRefs();
   const formconfig11 = tabref[distKey.value].getFormConfig()
@@ -140,12 +143,12 @@ onMounted(async () => {
   tableconfig.value.endBtns =[createFreeButtonBase({
     type: "primary",
     label: "确定",
-    func: () => {
+    func: async() => {
       // if (selectedRows.value.length === 0) {
       //   ElMessage.warning("请先选择数据");
       //   return;
       // }
-        props.method.getSelected(selectedRows.value);
+        await getTermDetailFn();
       },
     }),createFreeButtonBase({
     type: "default",
@@ -186,6 +189,20 @@ const loadData = (flag = true)=>{
   //     ElMessage.success(res.msg);
   //   }
   // })
+}
+function getTermDetailFn(){
+     const res = {
+      cAppNo: cAppNo.value,
+      cPkId: selectedRows.value.map(item => item['Dist.cPkId'])
+    };
+    getTermDetailByDist(res).then((res: any) => {
+      if (res["code"] == "200") {
+        nInsuranceA.value = res.data?.nInsuranceAmount;
+        props.method.getSelected(selectedRows.value, nInsuranceA.value);
+      } else {
+        ElMessage.error(res.msg);
+      }
+    });
 }
 
 function validate() {
