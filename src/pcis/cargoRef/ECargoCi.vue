@@ -131,7 +131,7 @@ const method = {
       }
       const editIndex=selData['_dataId'];
       freeEditRef?.value?.delRow(editIndex);
-      const val = getFormValue();
+      const val = getFromValue();
       val.forEach((key,index) => {
           key['ECargoCi.nSeqNo']=index+1
       });
@@ -366,7 +366,7 @@ const method = {
     const rowId = rowData?._dataId;
     if (!rowData || !rowId) return;
       // 获取所有行数据
-      const allRows = getFormValue();
+      const allRows = getFromValue();
       // 检查是否已有其他行的 cIssueMrk 是 1
       const existingIssueMrk = allRows.some(
         (row) => row._dataId !== rowId && row["ECargoCi.cIssueMrk"] === "1"
@@ -395,7 +395,7 @@ const method = {
         return;
       }
       // 情况2：检查是否已有其他行的主共标志为“是”
-      const allRows = getFormValue();
+      const allRows = getFromValue();
       const existingChief = allRows.some(
         (row) => row._dataId !== rowId && row["ECargoCi.cChiefMrk"] === "1"
       );
@@ -425,7 +425,7 @@ const method = {
       return;
     }
     // 计算当前所有行的总和（排除当前行）
-    const allRows = getFormValue();
+    const allRows = getFromValue();
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
       .reduce((sum, row) => sum + parseFloat(row["ECargoCi.nCiShare"] || 0), 0);
@@ -438,7 +438,7 @@ const method = {
     const cCiMrk = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
     if (cCiMrk === "2" || cCiMrk === "4") {
       updateMasterAgreementValues();
-      const allData =  getFormValue();
+      const allData =  getFromValue();
       for (let i = 1; i < allData.length; i++) {
         const currentRow = allData[i];
         const previousRow = allData[i - 1];
@@ -689,7 +689,7 @@ const setFormItem = (key, obj) => {
 const initCiInfo = (data: any) => {
   const {cCiMrk} = data;
   const cChiefMrk = ['1', '3', '5'].includes(cCiMrk) ? '1' : '0';
-  const dataList = getFormValue();
+  const dataList = getFromValue();
   if(dataList.length > 0) {
     setFormValue([]);
   }
@@ -813,7 +813,7 @@ const ciJiDptOptionsQuery = async (val: string, row: any) => {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFormValue() {
+function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
 function getSelectRow() {
@@ -847,7 +847,7 @@ function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   freeEditRef?.value?.addProvide(key, value);
 }
 defineExpose({
-  getFormValue,
+  getFromValue,
   setFormValue,
   getSelectRow,
   validate,
