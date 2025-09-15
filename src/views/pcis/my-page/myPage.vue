@@ -1156,7 +1156,11 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      calcPremiumEdrSurrender();
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        calcPremium()
+      }else{
+        calcPremiumEdrSurrender();
+      }
     },
   }),
   createFreeButtonBase({
@@ -1164,7 +1168,11 @@ const edrSurrenderBtn = [
     label: "保存",
     type: "primary",
     func: () => {
-      saveApplicationEdr();
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        saveEdrPlyInfo();
+      }else{
+        saveApplicationEdr();
+      }
     },
   }),
   createFreeButtonBase({
@@ -1180,7 +1188,11 @@ const edrSurrenderBtn = [
     label: "申请核保",
     type: "primary",
     func: () => {
-      submitEdrToUndrSurrender();
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        submitEdrToUndrFun();
+      }else{
+        submitEdrToUndrSurrender();
+      }
     },
   }),
 ];
