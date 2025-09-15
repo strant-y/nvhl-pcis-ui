@@ -56,7 +56,7 @@ const insuranceLimit = new InsuranceLimit();
 const codeListMap = reactive<any>({
 	Nature: [],
   persionType: [], //性质选择个人时，证件类型下拉值
-  companyType: [],  //性质选择法人时，证件类型下拉值
+  NV049001: [],  //性质选择法人时，证件类型下拉值
 })
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -218,7 +218,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row?.customerNature == '1') { //个人
             tempData = codeListMap['persionType']
           } else {
-            tempData = codeListMap['companyType']
+            tempData = codeListMap['NV049001']
           }
           const item = tempData.find((item: any) => item.value === val);
           return item ? item.label : val
@@ -252,7 +252,7 @@ const tableconfig = reactive<AppTableConfig>(
           if(row?.shareholderNature == '1') { //个人
             tempData = codeListMap['persionType']
           } else {
-            tempData = codeListMap['companyType']
+            tempData = codeListMap['NV049001']
           }
           const item = tempData.find((item: any) => item.value === val);
           return item ? item.label : val
@@ -314,7 +314,7 @@ const handleNatureChange = (value: string) => {
   if (value === '1') {
     item['loadData'] = codeListMap['persionType']
   } else if (value === '0') {
-    item['loadData'] = codeListMap['companyType']
+    item['loadData'] = codeListMap['NV049001']
   }
 }
 
@@ -324,7 +324,7 @@ const handleNatureChange2 = (value: string) => {
   if (value === '1') {
     item['loadData'] = codeListMap['persionType']
   } else if (value === '0') {
-    item['loadData'] = codeListMap['companyType']
+    item['loadData'] = codeListMap['NV049001']
   }
 }
 
@@ -436,7 +436,7 @@ onMounted(() => {
 		codeListParam: { }
 	}, false, true).then(res => {
 		if (res) {
-			codeListMap['companyType'] = res;
+			codeListMap['NV049001'] = res;
 		}
 	}, () => {
 		ElMessage.error('后台服务异常,请联系管理员');
