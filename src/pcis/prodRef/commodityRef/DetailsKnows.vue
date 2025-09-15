@@ -48,7 +48,7 @@ const tableconfig = reactive<AppTableConfig>(
 const refreshData = (reset = true) => {
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = {
-    codeListName: "Project_Details",
+    codeListName: "project_details",
   }
   const param = Object.assign(s, r);
   // 查询列表数据

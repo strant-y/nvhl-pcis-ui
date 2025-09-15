@@ -1234,7 +1234,7 @@ const ciJiDptOptionsQuery = async (val: string, row: any) => {
   } else {
     // 非永安保险，设置默认值和其他数据
     const list = await codeListStore.queryCodeList({
-      codeListName: "CDptJointCde_List",
+      codeListName: "66",
       codeListParam: {},
     });
     freeEditRef.value?.addCodeListMap(

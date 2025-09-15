@@ -195,25 +195,20 @@ function hasEnglish(str:any) {
 const handelGoodsMx = (val:any)=>{
   console.log(val)
   if(val.length > 0 ){
-    setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
-    setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
-    setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
+    // setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
+    // setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
+    // setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
+    // setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
+    // setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
     setValue('Tgt.nAdditiveCoefficient',val[0]['Dist.nAdditiveCoefficient'])
     setValue('Tgt.cTradeNum',val[0]['Dist.cTradeNum'])
-    setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
     setValue('Tgt.cLadingNum',val[0]['Dist.cBillNum'])
-    setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
     setValue('Tgt.cCreditNum',val[0]['Dist.cLetterNum'])
   }else {
-    setValue('Tgt.cGoodsNo','')
-    setValue('Tgt.nGoodsNum','')
-    setValue('Tgt.nInvoicceValue','')
     setValue('Tgt.nAdditiveCoefficient','')
     setValue('Tgt.cTradeNum','')
-    setValue('Tgt.cInvoiceNum','')
     setValue('Tgt.cLadingNum','')
     setValue('Tgt.cCreditNum','')
-    setValue('Tgt.cWaybillNumber','')
   }
 }
 const selectType = ()=>{
@@ -572,7 +567,7 @@ const method = {
   getcShippingMethodChange: (val: string) => {
     console.log('val', val)
     // if(val === 'NV591001'){
-    if (val === '03') {
+    if (val === '11') {
       tgtIsWaterMatterList.forEach(item => {
         setFormItem(item, {
           hidden: false,
@@ -596,7 +591,7 @@ const method = {
       })
     }
     // if(val === 'NV591003'){
-    if (val === '05') {
+    if (val === '12') {
       tgtOtherMatterList.forEach(item => {
         setFormItem(item, {
           rules: [getRules("required", {})],
@@ -976,12 +971,12 @@ const method = {
     clearValidate('Tgt.cShipClassThree');
     const param = opertaor.getParam();
     if (!param.initFlag) {
-      if (val == '01') {
+      if (val == '1') {
         setValue("Tgt.cShipClassTwo", null);
         setValue("Tgt.cShipClassThree", null);
       }
     }
-    if (val == '01') { //rules: [getRules("required", {})]
+    if (val == '1') { //rules: [getRules("required", {})]
       setFormItem('Tgt.cShipClassTwo', { disabled: true, rules: null });
       setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
 
@@ -990,7 +985,7 @@ const method = {
         setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
       }
     }
-    if (val == '02' || val == '03') {
+    if (val == '2' || val == '03') {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
       let cShipClassTwo = getValue('Tgt.cShipClassTwo');
       setValue("Tgt.cShipClassThree", null);

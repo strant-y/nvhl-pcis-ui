@@ -46,42 +46,31 @@ onMounted(() => {
   watchEffect(() => {
 		const AgreementBase = formPage.getFormDataById('AgreementBase')
 		if(AgreementBase && Object.keys(AgreementBase).length > 0){
-			const cCiMrkValue = AgreementBase['ECargoECargoBase.cCiMrk'];
-			// if(cCiMrk === "1"){
-			// 	setValue("ECargoBase.cCiInpTyp", '600001');
-			// }else if(cCiMrk === "2"){
-			// 	setValue("ECargoBase.cCiInpTyp", '600004');
-			// }else if(cCiMrk === "3"){
-			// 	setValue("ECargoBase.cCiInpTyp", '600001');
-			// }else if(cCiMrk === "4"){
-			// 	setValue("ECargoBase.cCiInpTyp", '600004');
-			// }else if(cCiMrk === "5"){
-			// 	setValue("ECargoBase.cCiInpTyp", '600005');
-			// }
+			const cCiMrkValue = AgreementBase['ECargoBase.cCiMrk'];
       if(cCiMrkValue === "1"){
-        setValue("Base.cCiInpTyp", '600001');
+        setValue("ECargoBase.cCiInpTyp", '600001');
       }else if(cCiMrkValue === "2"){
-        setValue("Base.cCiInpTyp", '600004');
+        setValue("ECargoBase.cCiInpTyp", '600004');
       }else if(cCiMrkValue === "3"){
-        setValue("Base.cCiInpTyp", '600001');
+        setValue("ECargoBase.cCiInpTyp", '600001');
       }else if(cCiMrkValue === "4"){
-        setValue("Base.cCiInpTyp", '600004');
+        setValue("ECargoBase.cCiInpTyp", '600004');
       }else if(cCiMrkValue === "5"){
-        setValue("Base.cCiInpTyp", '600005');
+        setValue("ECargoBase.cCiInpTyp", '600005');
       }
     if (cCiMrkValue === "3" || cCiMrkValue === "4") {
       formconfig1.fromSchema?.forEach((item) => {
         const prop = item.prop;
         if (
-          prop === "Base.cCiAgtNo" ||
-          prop === "Base.nCiJntAmt" ||
-          prop === "Base.nCiJntPrm" ||
-          prop === "Base.nCiOwnAmt" ||
-          prop === "Base.nCiOwnPrm" ||
-          prop === "Base.cCiInpTyp" ||
-          prop === "Base.cCiPriTyp" || 
-          prop === "Base.cReceiptTitleNme" ||
-          prop === "Base.cReceiptTitleCde"
+          prop === "ECargoBase.cCiAgtNo" ||
+          prop === "ECargoBase.nCiJntAmt" ||
+          prop === "ECargoBase.nCiJntPrm" ||
+          prop === "ECargoBase.nCiOwnAmt" ||
+          prop === "ECargoBase.nCiOwnPrm" ||
+          prop === "ECargoBase.cCiInpTyp" ||
+          prop === "ECargoBase.cCiPriTyp" || 
+          prop === "ECargoBase.cReceiptTitleNme" ||
+          prop === "ECargoBase.cReceiptTitleCde"
         ) {
           item.hidden = false; // 显示共保字段
         } else {
@@ -92,14 +81,14 @@ onMounted(() => {
         formconfig1.fromSchema?.forEach((item) => {
           const prop = item.prop;
           if (
-            prop === "Base.cJiAgtNo" ||
-            prop === "Base.nJiJntAmt" ||
-            prop === "Base.nJiJntPrm" ||
-            prop === "Base.nCiOwnPrm" ||
-            prop === "Base.cCiInpTyp" ||
-            prop === "Base.cCiPriTyp" || 
-            prop === "Base.cReceiptTitleNme" ||
-            prop === "Base.cReceiptTitleCde"
+            prop === "ECargoBase.cJiAgtNo" ||
+            prop === "ECargoBase.nJiJntAmt" ||
+            prop === "ECargoBase.nJiJntPrm" ||
+            prop === "ECargoBase.nCiOwnPrm" ||
+            prop === "ECargoBase.cCiInpTyp" ||
+            prop === "ECargoBase.cCiPriTyp" || 
+            prop === "ECargoBase.cReceiptTitleNme" ||
+            prop === "ECargoBase.cReceiptTitleCde"
           ) {
             item.hidden = false; // 显示联保字段
           } else {
@@ -125,7 +114,7 @@ const method = {
     if (!isPositiveInteger || !isValidLength) {
       ElMessage.error("请输入不超过20位的正整数和英文字母");
       // 清空当前字段的值
-      tgtobjEditRef.value?.setValue("Base.cJiAgtNo", "");
+      tgtobjEditRef.value?.setValue("ECargoBase.cJiAgtNo", "");
     }
   },
   cCiAgtNoChange: (val) => {
@@ -134,15 +123,15 @@ const method = {
     if (!isPositiveInteger || !isValidLength) {
       ElMessage.error("请输入不超过20位的正整数和英文字母");
       // 清空当前字段的值
-      tgtobjEditRef.value?.setValue("Base.cCiAgtNo", "");
+      tgtobjEditRef.value?.setValue("ECargoBase.cCiAgtNo", "");
     }
   },
   cReceiTitleCdeChange:(val)=>{
     if(val === '3127001'){
-      setFormItem("Base.cReceiptTitleNme", {disabled: true})
-      setValue("Base.cReceiptTitleNme","")
+      setFormItem("ECargoBase.cReceiptTitleNme", {disabled: true})
+      setValue("ECargoBase.cReceiptTitleNme","")
     }else{
-      setFormItem("Base.cReceiptTitleNme", {disabled: false})
+      setFormItem("ECargoBase.cReceiptTitleNme", {disabled: false})
     }
   },
 };

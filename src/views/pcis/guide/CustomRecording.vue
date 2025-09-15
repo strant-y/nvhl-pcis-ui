@@ -479,8 +479,10 @@ const getDptCdeList = ()=> {
 const cDptCdeLoading = ref(false);
 const getCDptCdeList = (data: any)=> {
     cDptCdeLoading.value = true;
-    formconfig1.value.cDptCde = "";
-    formconfig1.value.cDptCnm = "";
+    if(formconfig1.value.cRecordType !== 9){
+      formconfig1.value.cDptCde = "";
+      formconfig1.value.cDptCnm = "";
+    }
     listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '2'}).then(({data, code}) => {
         if (code === 200) {
             cDptCdeList.value = data.map((item) => ({

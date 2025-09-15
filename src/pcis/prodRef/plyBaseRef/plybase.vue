@@ -457,10 +457,14 @@ const method = {
       cslstyp = "020004";
     };
     
-    dialogRef.value?.open("agentWorker",{
+    console.log('sessionData',sessionData.value)
+    console.log('Base.cDptCde',getValue('Base.cDptCde'))
+    dialogRef.value?.open("agentWorker", {
         type: "show",
         data: {
-          CDptCde: sessionData.value?.cDptCde,
+          // CDptCde: sessionData.value?.cDptCde,
+          // CDptCde: sessionData.value?.cDptCde || param.cDptCde, //机构
+          CDptCde: getValue('Base.cDptCde') || param.cDptCde, //机构
           cBsnsTyp: getValue("Base.cBsnsTyp"),
           CChaType: getValue("Base.cChaType"),
           cChaSubtype: getValue("Base.cChaSubtype"),
@@ -686,7 +690,12 @@ const method = {
         rules: [getRules("required", {})],
         disabled: false,
       });
-    } else {
+      const CDptCde = getValue("Base.cDptCde");
+      if (CDptCde.startsWith('0253')) {
+        setFormItem("Base.cCanclfeersnCde", { typeCode: 'YN_NV_NoPayseeMoeny' });
+
+      }
+        } else {
       setFormItem("Base.cCanclfeersnCde", { rules: null, disabled: true });
       setValue("Base.cCanclfeersnCde", "");
     }
@@ -697,8 +706,8 @@ const method = {
     if (!p.initFlag) {
       setValue("Base.cPrjCtgMidTyp", "");
       setValue("Base.cPrjCtgSubTyp", "");
-     
     }
+
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });

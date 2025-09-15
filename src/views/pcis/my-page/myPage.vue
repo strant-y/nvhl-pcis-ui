@@ -1114,7 +1114,6 @@ const edrBtn = [
     type: "primary",
     id: "btnCalEdr",
     func: () => {
-      debugger
       // calcPremiumEdr();
       // 批改原因是否是费率变更
       if(props.param.cRsnCde === '45') {
@@ -1169,7 +1168,11 @@ const edrSurrenderBtn = [
     label: "保费计算",
     type: "primary",
     func: () => {
-      calcPremiumEdrSurrender();
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        calcPremium()
+      }else{
+        calcPremiumEdrSurrender();
+      }
     },
   }),
   createFreeButtonBase({
@@ -1177,7 +1180,11 @@ const edrSurrenderBtn = [
     label: "保存",
     type: "primary",
     func: () => {
-      saveApplicationEdr();
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        saveEdrPlyInfo();
+      }else{
+        saveApplicationEdr();
+      }
     },
   }),
   createFreeButtonBase({
@@ -1193,7 +1200,11 @@ const edrSurrenderBtn = [
     label: "申请核保",
     type: "primary",
     func: () => {
-      submitEdrToUndrSurrender();
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        submitEdrToUndrFun();
+      }else{
+        submitEdrToUndrSurrender();
+      }
     },
   }),
 ];
@@ -1393,7 +1404,6 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  debugger
    if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -2698,7 +2708,6 @@ const loadAppPlyInfo = async (CAppNo) => {
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
-      debugger
       if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
         ops.plyBase['Base.cAppNo'] = '';
       }
@@ -3079,7 +3088,12 @@ const submitToUndrFn = async () => {
         }
     }
   }
-  
+  // 云南分公司缴费期数特殊校验
+  if (shouldCheckYunnanPaymentRules()) {
+    if (!checkPaymentValidityYN()) {
+      return;
+    }
+  }
   // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
   const cvrgList = opertaor.getTableRefByKey("cvrg")?.getFromValue();
@@ -5202,6 +5216,7 @@ opertaor.setFatherPage({
   getSaveDataParams: getSaveDataParams,
   getEdrbaseValue: getEdrbaseValue,
   getOldProductResData: getOldProductResData,
+  setEdrValue: setEdrValue,
 });
 
 function getEdrbaseValue(key:any) {
@@ -5273,6 +5288,11 @@ function clearCAppNoAndCPkId(res:any) {
 function setnDelayNum(val:any) {
   edrbase.value?.setValue("EdrBase.nDelayNum", val)
 }
+
+function setEdrValue(key:any,val:any) {
+  edrbase.value?.setValue(key, val)
+}
+
 
 function getSaveDataParams() {
   const res = opertaor.getDataAll();
@@ -5590,6 +5610,188 @@ function handleRemoveReceived() {
     });
   });
 }
+
+/**
+ * 检查缴费计划的有效性
+ */
+const checkPaymentValidityYN = () => {
+  const jfcdFlag = isJFCD();
+  let flag = true;
+  const baseRef = opertaor.getTableRefByKey("base");
+  const plybaseRef = opertaor.getTableRefByKey("plyBase");
+  const payInfoRef = opertaor.getTableRefs()["payinfo"];
+  const insrncBeforeRef = opertaor.getTableRefByKey("insrnc");
+
+  if (!baseRef || !payInfoRef ||!payInfoRef ||!insrncBeforeRef) return true;
+
+  const baseValue = baseRef.getFromValue();
+  const payData = payInfoRef.getFromValue();
+  const plybaseValue = plybaseRef.getFromValue();
+  const insrncBefore = insrncBeforeRef.getFromValue();
+
+  const payNum = payData.length; // 缴费计划行数
+
+  if (jfcdFlag) {
+    const nPrm = baseValue["Base.nPrm"] || 0; // 保单保费
+    const nPrmRmbExch = baseValue["Base.nPrmRmbExch"] || 1; // 保费汇率
+    const appTyp = plybaseValue["Base.cAppTyp"]; // 申请类型
+    const edrPrjNo = plybaseValue["Base.nEdrPrjNo"] || 0; // 批改项目号
+
+    if (((payNum > 1 && appTyp === 'A') || ((parseFloat(edrPrjNo) !== (parseFloat(payNum) - 1)) && appTyp === 'E'))) {
+      const calcPrm = parseFloat(nPrm) * parseFloat(nPrmRmbExch);
+
+      if (calcPrm < 500000) {
+        ElMessage.error("云南分公司见费出单时保费小于或等于50万的业务,不允许分期缴费!");
+        flag = false;
+      } else {
+        const insrncBgnTm = insrncBefore["Base.tInsrncBgnTm"];
+        const insrncEndTm = insrncBefore["Base.tInsrncEndTm"];
+
+        if (insrncBgnTm && insrncEndTm) {
+          const bgnDate = new Date(insrncBgnTm);
+          const endDate = new Date(insrncEndTm);
+          const nMonths = monthBetween(bgnDate, endDate);
+          const nYears = Math.floor(nMonths / 12);
+          const restMonths = nMonths % 12;
+
+          let aboutPayNum = 0;
+          if (nYears < 1 || (nYears === 1 && restMonths === 0)) {
+            aboutPayNum = 3;
+          } else if ((nYears === 1 && restMonths > 0) || (nYears === 2 && restMonths === 0)) {
+            aboutPayNum = 4;
+          } else if ((nYears === 2 && restMonths > 0) || (nYears === 3 && restMonths === 0)) {
+            aboutPayNum = 5;
+          } else if ((nYears === 3 && restMonths > 0) || (nYears === 4 && restMonths === 0)) {
+            aboutPayNum = 6;
+          } else {
+            aboutPayNum = 7;
+          }
+
+          if (payNum > aboutPayNum) {
+            if (nMonths <= 12) {
+              ElMessage.error(`云南机构见费出单时，保险期限≤1年的非车险业务，缴期交费期数小于等于${aboutPayNum}期！`);
+            } else if (nMonths > 12 && nMonths <= 24) {
+              ElMessage.error(`云南机构见费出单时，保险期限＞1年且≤2年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+            } else if (nMonths > 24 && nMonths <= 36) {
+              ElMessage.error(`云南机构见费出单时，保险期限＞2年且≤3年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+            } else if (nMonths > 36 && nMonths <= 48) {
+              ElMessage.error(`云南机构见费出单时，保险期限＞3年且≤4年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+            } else if (nMonths > 48 && nMonths <= 60) {
+              ElMessage.error(`云南机构见费出单时，保险期限＞4年且≤5年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+            } else {
+              ElMessage.error(`云南机构见费出单时，保险期限>5年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+            }
+            flag = false;
+          } else {
+            // 检查首期保费
+            if (payData.length > 0) {
+              const firstPayablePrm = payData[0]["Pay.nPayablePrm"] || 0;
+              const fistPrm = parseFloat(firstPayablePrm) * parseFloat(nPrmRmbExch);
+              const calcPrm = parseFloat(nPrm) * 0.4 * parseFloat(nPrmRmbExch);
+
+              if (fistPrm < calcPrm) {
+                ElMessage.error("首期应收保费必须大于或等于总保费的40%");
+                flag = false;
+              }
+            }
+
+            // 检查缴费间隔
+            for (let i = 0; i < payNum - 1; i++) {
+              const beforeDateStr = payData[i]["Pay.tPayEndTm"];
+              const afterBgnTmStr = payData[i + 1]["Pay.tPayBgnTm"];
+
+              if (beforeDateStr && afterBgnTmStr) {
+                const beforeDate = new Date(beforeDateStr);
+                const afterBgnTm = new Date(afterBgnTmStr);
+
+                if (monthBetween(beforeDate, afterBgnTm) > 12) {
+                  ElMessage.error("缴费间隔不得超过12个月!");
+                  return false;
+                }
+              }
+            }
+
+            // 检查最后一期保费
+            if (payData.length > 0) {
+              const lastPayData = payData[payData.length - 1];
+              const lastPayPrm = lastPayData["Pay.nPayablePrm"] || 0;
+              const lastPayPrmCalc = parseFloat(lastPayPrm) * parseFloat(nPrmRmbExch);
+              const lastLowPrm = parseFloat(nPrm) * 0.1;
+
+              if (lastPayPrmCalc > lastLowPrm) {
+                ElMessage.error("最后一期保费必须小于或者等于总保费的10%!");
+                return false;
+              }
+
+              // 检查最后一期缴费时间
+              const tPayEndTm = lastPayData["Pay.tPayEndTm"];
+              const tInsrncEndTm = insrncBefore["Base.tInsrncEndTm"];
+
+              if (tPayEndTm && tInsrncEndTm) {
+                const payEndDate = new Date(tPayEndTm);
+                const insrncEndDate = new Date(tInsrncEndTm);
+
+                if (payEndDate > insrncEndDate) {
+                  ElMessage.error("最后一期缴费时间必须小于等于保单保险止期!");
+                  return false;
+                }
+              }
+            }
+            flag = true;
+          }
+        }
+      }
+    } else {
+      flag = true;
+    }
+  }
+  return flag;
+};
+
+/**
+ * 判断是否走见费出单
+ */
+const isJFCD = () => {
+  const baseRef = opertaor.getTableRefByKey("plyBase");
+  if (!baseRef) return false;
+
+  const baseValue = baseRef.getFromValue();
+
+  const jfcdFlag = baseValue["Base.cNeedfeeFlag"]; // 见费出单标志
+  const canclFlag = baseValue["Base.cCanclfeeFlg"]; // 取消见费出单标志
+
+
+  let flag = false;
+
+  if (jfcdFlag === '1' && canclFlag !== '1') {
+        // 非共保是直接走见费出单
+        flag = true;
+  }
+  return flag;
+};
+
+/**
+ * 计算两个日期之间的月份数
+ */
+const monthBetween = (startDate: Date, endDate: Date) => {
+  const startYear = startDate.getFullYear();
+  const startMonth = startDate.getMonth();
+  const endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth();
+
+  return (endYear - startYear) * 12 + (endMonth - startMonth);
+};
+/**
+ * 判断是否需要进行云南分公司的缴费规则校验
+ */
+const shouldCheckYunnanPaymentRules = () => {
+  // 非车险产品且机构为云南分公司(0253开头)
+  return props.param.cProdNo &&
+      props.param.cDptCde &&
+      !props.param.cProdNo.startsWith('02') &&
+      !props.param.cProdNo.startsWith('12') &&
+      props.param.cDptCde.startsWith('0253');
+};
 </script>
 <style lang="scss" scoped>
 $btn-icon-color-1: #ff3e00;

@@ -194,7 +194,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 title: '产品名称',
                 itemWidth: 1,
                 rules: [getRules('required', {})],
-                typeCode: 'EPolicyProdList',
+                typeCode: 'EPolicy_List',
                 filterable: true,
                 clearable: true,
                 func: (val: any) => {

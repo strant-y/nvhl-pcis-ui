@@ -156,12 +156,14 @@ function handleQuery(flag?: boolean) {
     const user = JSON.parse(sessionStorage.getItem("user"));
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    console.log('参1111‘',props.data)
+    console.log('参2222‘',routeParam)
     const param = Object.assign(s, r);
     const params = Object.assign(param,{
         CurrentUser: user.opCde,
         CurrentUserOrg: user.companyId,
         CBsnsTyp: props.data.data['CBsnsTyp'],
-        CDptCde: props.data.data['CDptCde']  || routeParam.cDptCde,
+        CDptCde: props.data.data['CDptCde'] ? props.data.data['CDptCde']:  routeParam.cDptCde,
         CBrkrCde: props.data.data['CBrkrCde'],
         CSlsTyp: props.data.data['CSlsTyp'],
         CChaType: props.data.data['CChaType'],

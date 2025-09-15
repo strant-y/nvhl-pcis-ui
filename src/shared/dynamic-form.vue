@@ -446,78 +446,92 @@ function setPopover(v: any, item: any) {
 }
 
 async function validate() {
-  const promise = await fromRef.value?.validate((valid, fields) => {
-    if (valid) {
-    } else {
-    }
-  });
-  let fromListbl = promise;
-  if (fromListRef.value) {
-    for (const ref in fromListRef.value) {
-      const exvali = await fromListRef.value[ref].tableExvalidate();
-      if (exvali != null) {
-        fromListbl = fromListbl && exvali;
+  // 存储验证规则的对象
+  let rules = <any>{};
+  for (const schama in props.fromSchema) {
+    // 如果当前列有验证规则，则将其添加到规则对象中
+    if (props.fromSchema[schama].rules) {
+      let rul = props.fromSchema[schama].rules;
+      if (props.fromSchema[schama].inputtype === "rtnumber" ||
+        props.fromSchema[schama].inputtype === "rtinput" ) {
+        // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
+        if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
+          if (rul && rul.length > 0) {
+            rul.forEach((item: any) => {
+              item.type = "number";
+            });
+          }
+        }else{
+          if (rul && rul.length > 0) {
+            rul.forEach((item: any) => {
+              item.type = "string";
+            });
+          }
+        }
       }
+      if(props.fromSchema[schama].inputtype === "rtdatepicker"){
+        if(props.fromSchema[schama]['type'] === 'datetimerange'){
+          if (rul && rul.length > 0) {
+            rul.forEach((item: any) => {
+              item.type = "array";
+            });
+          }
+        }else{
+          if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "number";
+              });
+            }
+          }else{
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "string";
+              });
+            }
+          }
+        }
+      }
+      if (props.fromSchema[schama].inputtype === "rtcascader") {
+        if (rul && rul.length > 0) {
+          rul.forEach((item: any) => {
+            item.type = "array";
+          });
+        }
+      }
+      rules[props.fromSchema[schama].prop] = rul;
     }
   }
-  return fromListbl;
-  // // 存储验证规则的对象
-  // let rules = <any>{};
-  // for (const schama in props.fromSchema) {
-  //   // 如果当前列有验证规则，则将其添加到规则对象中
-  //   if (props.fromSchema[schama].rules) {
-  //     let rul = props.fromSchema[schama].rules;
-  //     if (
-  //       props.fromSchema[schama].inputtype === "rtnumber" ||
-  //       (props.fromSchema[schama].inputtype === "rtinput" &&
-  //         props.fromSchema[schama].type === "number")
-  //     ) {
-  //       if (rul && rul.length > 0) {
-  //         rul.forEach((item: any) => {
-  //           item.type = "number";
-  //         });
-  //       }
-  //     }
-  //     if (props.fromSchema[schama].inputtype === "rtcascader") {
-  //       if (rul && rul.length > 0) {
-  //         rul.forEach((item: any) => {
-  //           item.type = "array";
-  //         });
-  //       }
-  //     }
-  //     rules[props.fromSchema[schama].prop] = rul;
-  //   }
-  // }
-  // // 创建验证器实例
-  // const validator = new Validator(rules);
-  // const r = await dovalidate(validator);
-  // let l = [];
-  // if(r && r.length > 0){
-  //   const isEx = false;
-  //   props.fromSchema.filter((item:any) => {
-  //     const r2 = r.filter((i:any) => i.field === item.prop && (item.expand === true || item.expand === '1'));
-  //     if(r2 && r2.length > 0 && !l.includes(item.group)){
-  //       l.push(item.group);
-  //     }
-  //   });
-  // }
-  // if(l && l.length > 0){
-  //   groupByList.value.forEach((item:any) => {
-  //     if(l.includes(item.id)){
-  //       item.disabled = true;
-  //     }
-  //   });
-  //   nextTick(()=>{
-  //     freeValidate();
-  //   })
-  // }else{
-  //   freeValidate();
-  // }
-  // if(r && r.length > 0){
-  //   return false;
-  // }else{
-  //   return true;
-  // }
+  // 创建验证器实例
+  const validator = new Validator(rules);
+  const r = await dovalidate(validator);
+  let l = [];
+  if(r && r.length > 0){
+    const isEx = false;
+    props.fromSchema.filter((item:any) => {
+      const r2 = r.filter((i:any) => i.field === item.prop && (item.expand === true || item.expand === '1'));
+      if(r2 && r2.length > 0 && !l.includes(item.group)){
+        l.push(item.group);
+      }
+    });
+  }
+  if(l && l.length > 0){
+    groupByList.value.forEach((item:any) => {
+      if(l.includes(item.id)){
+        item.disabled = true;
+      }
+    });
+    nextTick(()=>{
+      freeValidate();
+    })
+  }else{
+    freeValidate();
+  }
+  if(r && r.length > 0){
+    return false;
+  }else{
+    return true;
+  }
 }
 
 async function freeValidate(){
@@ -539,6 +553,7 @@ async function freeValidate(){
 }
 
 function dovalidate(validator: any) { 
+  console.log(form);
   const p = new Promise((resolve) => {
     // 执行验证操作
     validator.validate(form, (data: any) => {

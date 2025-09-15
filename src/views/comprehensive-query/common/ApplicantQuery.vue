@@ -737,7 +737,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "CIndustryType",
               inputtype: "rtselect",
               title: "行业类型",
-              typeCode: "HANGYE_TYPE",
+              typeCode: "Hangye_Type",
               clearable: true,
               hidden: true,
           },

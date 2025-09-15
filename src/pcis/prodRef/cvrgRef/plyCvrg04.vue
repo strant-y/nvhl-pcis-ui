@@ -192,7 +192,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-import { prodTemple,prodAllPrm } from "./titleTemple";
+import { fillTemplate, prodTemple } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
@@ -306,14 +306,6 @@ function updateTitle() {
   });
 }
 
-function fillTemplate(
-  template: string,
-  params: { [key: string]: any }
-): string {
-  return template.replace(/{(\w+)}/g, (match, key) => {
-    return params[key] !== undefined ? params[key] : match;
-  });
-}
 
 onMounted(async () => {
   const formconfig11 = formInit(
