@@ -444,12 +444,25 @@ const method = {
 
   //被保人性质change事件
   cClntMrkFunc: (val) => {
+    console.log(val)
     const param = opertaor.getParam();
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
+        //办理人 4要素  
+      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      setFormItem("Insured.tOperaterCertfEndTm", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cOperaterCertfTyp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cOperaterCertfCde", {
+        rules: [getRules("required", {})],
+      });
+
       setCapitalRequiredRule(getValue, setFormItem, 'Insured');
       setFormItem("Insured.tBirthday", {
         rules: null
@@ -587,7 +600,7 @@ const method = {
       // setFormItem("Insured.cOperaterCertfTyp", {
       //   hidden: true,
       // });
-      // setFormItem("Insured.cOperaterCertfCde", {
+      // setFormItem("Insured.cOperaterCertfCde", { 
       //   hidden: true,
       // });
 
@@ -618,6 +631,12 @@ const method = {
           disabled: true,
         });
       }
+
+      setFormItem("Insured.cCntrNme", { rules: null });
+      setFormItem("Insured.tOperaterCertfEndTm", { rules: null });
+      setFormItem("Insured.cOperaterCertfTyp", { rules: null });
+      setFormItem("Insured.cOperaterCertfCde", { rules: null });
+
 
       //是否个体工商户
       setFormItem("Insured.cIsIndvduBiz", {

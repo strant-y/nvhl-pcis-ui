@@ -66,12 +66,12 @@ const nRatioCoefFunc = () => {
   });
 };
 
-
+//免费延期 方法
 const freeDelay = async (obj: any): Promise<boolean> => {
   const edrbase = opertaor.getFatherPage().getEdrbaseValue();
   const cRsnCde = edrbase['EdrBase.cEdrRsnBundleCde'];
 
-  // 非免费延期场景（M1/M8）：不拦截，直接放行
+  // 非免费延期场景（M1/M8） 
   if (cRsnCde !== 'M1' && cRsnCde !== 'M8') {
     return true;
   }
@@ -84,7 +84,7 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     let newSysTmDay = 365, oldSysTmDay = 365;
     let newInsEndTm = '', oldInsEndTm = '';
 
-    // 1. 接口 1：获取保单时间数据
+    //  获取保单时间数据
     const resDays = await getNewSysDays({ cPlyNo: plyNo });
     if (!resDays || resDays.code !== 200 || !resDays.res) {
       ElMessage.error("获取保单数据失败，无法进行免费延期");
@@ -95,15 +95,11 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     newInsEndTm = name1;
     oldSysTmDay = name2;
 
-    // 2. 获取表单基础数据
+    // 获取表单基础数据
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref?.["insrnc"].getFromValue();
-    if (!baseBefore) {
-      ElMessage.error("获取保单基础信息失败");
-      return false; // 拦截
-    }
-
-    // 3. 时间有效性校验
+    console.log('base---', baseBefore)
+    // 时间有效性校验
     const objDate = toDate(obj);
     const newInsEndTmDate = toDate(newInsEndTm);
     if (isNaN(objDate.getTime()) || isNaN(newInsEndTmDate.getTime())) {
@@ -111,23 +107,26 @@ const freeDelay = async (obj: any): Promise<boolean> => {
       return false; // 拦截
     }
 
-    // 4. 核心规则 1：止期只能延长
+    // 核心规则 1：止期只能延长
     if (objDate.getTime() < newInsEndTmDate.getTime()) {
       resetFreeDelayState(newInsEndTm, newSysTmDay);
       ElMessage.warning("免费延期只能延长保险止期，不能缩短");
       return false; // 拦截
     }
 
-    // 5. 分公司编码获取
+    //  分公司编码获取
     const cDptCde = edrbase['EdrBase.cDptCde'];
     const resCheck = await checkCdeptByCdptCde({ dptCde: cDptCde });
     const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
 
-    // 6. 接口 2：开关校验
+    //  接口  开关校验
     const resOff = await checkCancelM1IsOff({ cPlyNo: plyNo, CancelM1: 'CancelM1' });
     // if (resOff.code !== 200) {
-    if (resOff.code == 200) {
-      // 开关关闭：按产品规则拦截
+    // if (resOff.code == 200) {
+    // 开关关闭：按产品规则拦截
+
+    if (!resOff?.res) {
+
       const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
       const nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);
       const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
@@ -157,11 +156,11 @@ const freeDelay = async (obj: any): Promise<boolean> => {
         }
       }
     }
-
+    debugger;
     // 所有规则通过：更新状态并放行
     const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
     const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
-    opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', sumDelayDay);
+    opertaor.getFatherPage().setEdrValue('EdrBase.nDelayNum', sumDelayDay);
     return true;
 
   } catch (error) {
@@ -173,13 +172,13 @@ const freeDelay = async (obj: any): Promise<boolean> => {
 
 // 辅助：重置免费延期状态
 const resetFreeDelayState = (newInsEndTm: string, newSysTmDay: string) => {
-  setFormItem('Base.tInsrncEndTm', newInsEndTm);
-  setFormItem('Base.cTmSysCde', newSysTmDay);
-  opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', 0);
+  setValue('Base.tInsrncEndTm', newInsEndTm);
+  setValue('Base.cTmSysCde', newSysTmDay);
+  opertaor.getFatherPage().setEdrValue('EdrBase.nDelayNum', 0);
 };
 
 
-//免费延期
+
 // const freeDelay = async (obj: any) => {
 //   // return false;
 //   // //	tool.alert('延长的保期方法');	
@@ -380,14 +379,11 @@ const method = {
     const baseBefore = tabref["insrnc"].getFromValue();
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    if (isInit) return;
- 
-    const isFreeDelayPass = await freeDelay(v);
-    // 核心拦截逻辑：不满足免费延期条件，直接终止后续流程
-      console.log('保险止期',getValue('Base.tInsrncEndTm'))
-    if (!isFreeDelayPass) return;
-  
-  
+
+
+
+
+
 
     if (route.params.param?.cRsnCde != "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
@@ -405,6 +401,11 @@ const method = {
     if (route.params.param?.cRsnCde == "FZ" && !tInsrncEndTm.value) {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
+    if (isInit) return;
+    const isFreeDelayPass = await freeDelay(v);
+    // 核心拦截逻辑：不满足免费延期条件，直接终止后续流程
+    console.log('保险止期', getValue('Base.tInsrncEndTm'))
+    if (!isFreeDelayPass) return;
   },
   // 索赔基础名称change事件
   suopeiFunc: (val: any) => {

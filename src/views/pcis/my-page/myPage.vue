@@ -284,7 +284,7 @@
                   : true
               "
             >
-          {{ k.pageKey }} || {{ k.pageCode }}
+          <!-- {{ k.pageKey }} || {{ k.pageCode }} -->
               <component
                 v-if="currentIndex >= i"
                 :ref="
@@ -1380,7 +1380,6 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  debugger
    if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
