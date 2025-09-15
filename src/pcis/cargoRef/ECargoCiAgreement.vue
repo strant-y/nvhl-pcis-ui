@@ -40,13 +40,6 @@ const method = {
   // func demo
   func1: () => {},
 };
-
-
-
-
-
-
-
 const cCiMrkChangeFun = (data: any) => {
   const { cCiMrk  } = data;
   // formconfig1.value?.fromSchema?.forEach((item) => {
@@ -58,7 +51,13 @@ const cCiMrkChangeFun = (data: any) => {
       if (
           prop === "ECargoBase.cCiAgtNo" ||
           prop === "ECargoBase.nCiJntAmt" ||
-          prop === "ECargoBase.nCiJntPrm"
+          prop === "ECargoBase.nCiJntPrm"  ||
+          prop === "ECargoBase.nCiOwnAmt" ||
+          prop === "ECargoBase.cReceiptTitleNme" ||
+          prop === "ECargoBase.cCiPriTyp" ||
+          prop === "ECargoBase.cReceiptTitleCde" ||
+          prop === "ECargoBase.nCiOwnPrm" ||
+          prop === "ECargoBase.cCiInpTyp"
       ) {
         item.hidden = false; // 显示共保字段
       } else {

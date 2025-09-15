@@ -462,6 +462,7 @@ const tableconfig = reactive<AppTableConfig>(
                                 "OpRelCde": user.value['opCde'],
                                 "CUniqueNo": CUniqueNos
                             };
+                            //这一块儿如果要校验缴费类型的话，请排除云南分公司
                             console.log(param)
                             pcisQueryService.getPaymentNo(param)
                                 .then((res) => {

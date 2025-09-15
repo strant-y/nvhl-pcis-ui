@@ -183,7 +183,7 @@ onMounted(() => {
 //获取风险标识options
 const RiskFlagList = ref([])
 const getRiskFlagOption = () => {
-  getListByCode('Risk_Flag', {}).then((res: any) => {
+  getListByCode('risk_flag', {}).then((res: any) => {
     if (res && res.data) {
       RiskFlagList.value = res.data.map((item: any) => ({ value: item.value, label: item.label }));
 			formconfig1.fromSchema?.forEach((item) => {

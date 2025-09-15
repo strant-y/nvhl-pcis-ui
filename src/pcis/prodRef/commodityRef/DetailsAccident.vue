@@ -67,7 +67,7 @@ const handleSelectionChange = (selection) => {
 
 const refreshData = () => {
   const param = {
-    codeListName: "Project_Details",
+    codeListName: "project_details",
   }
   // 查询列表数据
   codelistQuery(param).then((response) => {

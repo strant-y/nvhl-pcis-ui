@@ -151,6 +151,7 @@ import dayjs from "dayjs";
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+const roles = user.roles;
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
@@ -178,6 +179,7 @@ let isESBool = ref(false); // 是否es查询布尔
 // 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
 let userAllCheckedColumns = ref<string[]>([]);
 let isJumpingFromHome = ref(false); // 是否正在处理首页跳转
+let isCopyButtonVisible = ref(false); // 复制按钮是否显示
 
 const props = defineProps({
   refreshData: {
@@ -801,7 +803,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "cIndustryType",
               inputtype: "rtselect",
               title: "行业类型",
-              typeCode: "HANGYE_TYPE",
+              typeCode: "Hangye_Type",
               clearable: true,
               hidden: true,
           },
@@ -1060,15 +1062,7 @@ const tableObj = {
                 size: "large",
                 icon: "View",
                 hideBtns: (row: any) => {
-                    if (
-                        row.cAppStatus != "1" &&
-                        row.cAppStatus != "3" &&
-                        row.cAppStatus != "8"
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
+                    return false;
                 },
                 tableClick: async (row) => {
                     const r = await row;
@@ -1079,43 +1073,6 @@ const tableObj = {
                             path: "/pcisapp/myPage",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
-                            },
-                        });
-                    } else {
-                        ElMessage.warning("请检查表单！");
-                    }
-                },
-            }),
-            createFreeButtonBase({
-                id: "score",
-                link: true,
-                tooltip: "编辑",
-                type: "success",
-                size: "large",
-                icon: "Edit",
-                hideBtns: (row: any) => {
-                    if (
-                        row.cAppStatus == "1" ||
-                        row.cAppStatus == "3" ||
-                        row.cAppStatus == "8"
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                },
-                tableClick: async (row) => {
-                    console.log(row);
-                    const r = await row;
-                    if (r) {
-                        const data = row;
-                        router.push({
-                            path: "/pcisapp/myPage",
-                            query: {
-                                param: JSON.stringify({
-                                    ...data,
-                                    ...{ pageType: "TEMPORARY_DEPOSIT", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": ""  },
-                                }),
                             },
                         });
                     } else {
@@ -1138,6 +1095,15 @@ const tableObj = {
                         return false;
                     }
                 },
+                hideBtns: (row: any) => {
+                    // 核保岗隐藏复制按钮
+                    if (!isCopyButtonVisible.value) return true;
+
+                    // 联保单不显示
+                    if (row.cCiMrk === "联保单") return true;
+                    return false;
+                },
+
                 tableClick: async (row) => {
                     console.log(row);
                     const r = await row;
@@ -1190,44 +1156,6 @@ const tableObj = {
                         .then((res:any) => {
 
                         })
-                },
-            }),
-            createFreeButtonBase({
-                id: "score",
-                link: true,
-                tooltip: "删除",
-                type: "danger",
-                size: "large",
-                icon: "Delete",
-                hideBtns: (row: any) => {
-                    if (
-                        row.cAppStatus == "1" ||
-                        row.cAppStatus == "3" ||
-                        row.cAppStatus == "8"
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                },
-                tableClick: (row) => {
-                    ElMessageBox.confirm("确认删除数据?", "警告", {
-                        confirmButtonText: "确定",
-                        cancelButtonText: "取消",
-                        type: "warning",
-                    }).then(function () {
-                        const delResult = delTmpPolicy({ cAppNo: row.cAppNo });
-                        delResult.then((res: any) => {
-                            if (null != res && null != res["code"]) {
-                                if (res["code"] === 200) {
-                                    ElMessage.success({ message: res.msg, duration: 3000 });
-                                    handleQuery(true);
-                                } else {
-                                    ElMessage.error({ message: res.msg, duration: 3000 });
-                                }
-                            }
-                        });
-                    });
                 },
             }),
             createFreeButtonBase({
@@ -1336,6 +1264,8 @@ onMounted(async () => {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
     applyCheckedColumns(checkedProps);
+    // 判断用户出单岗 or 核保岗 // 出单岗 ROLE_00000008 ROLE_00000563  // 核保岗 ROLE_00000152
+    updateCopyBtnVisible();
 });
 
 onUnmounted(() => {
@@ -1351,6 +1281,11 @@ const method = {
 };
 // 绑定特殊验证器
 const exRules = {};
+
+const updateCopyBtnVisible = () => {
+  const userRoles = userStore.user?.roles || [];
+  isCopyButtonVisible.value = userRoles.includes("ROLE_00000008") || userRoles.includes("ROLE_00000563"); // 出单岗 ROLE_00000008 ROLE_00000563 
+};
 
 /** 查询 */
 async function handleQuery(flag?: boolean, isEs = false) {

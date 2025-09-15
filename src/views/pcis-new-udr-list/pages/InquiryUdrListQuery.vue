@@ -111,7 +111,7 @@ const cProdData = ref([]);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "询价核保任务查询",
+    title: "询价任务查询",
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -811,8 +811,8 @@ const handleQuery = (flag = true) => {
 
 /** 查询 */
 function refreshData(flag?: boolean) {
-  const date1 = freeEditRef.value?.getValue("tm1"); //询价日期
-  const date2 = freeEditRef.value?.getValue("tm2"); //提核日期
+  const date1 = freeEditRef.value?.getValue("tm1"); //申请日期
+  const date2 = freeEditRef.value?.getValue("tm2"); //签单日期
   let roleCde = "";
   roles.value?.length &&
     roles.value.forEach((role) => {
@@ -843,10 +843,21 @@ function refreshData(flag?: boolean) {
     ...r,
     ...s,
   };
+  
+  // 提取申请日期的开始时间和结束时间
+  const tAppTmBgn = s.tm1 && s.tm1.length > 1 ? s.tm1[0] : null;
+  const tAppTmEnd = s.tm1 && s.tm1.length > 1 ? s.tm1[1] : null;
+  // 提取签单日期的开始时间和结束时间
+  const tIssueTmBgn = s.tm2 && s.tm2.length > 1 ? s.tm2[0] : null;
+  const tIssueTmEnd = s.tm2 && s.tm2.length > 1 ? s.tm2[1] : null;
+
+  params["tAppTmBgn"] = tAppTmBgn; // 添加申请开始时间
+  params["tAppTmEnd"] = tAppTmEnd; // 添加申请结束时间
+  params["tIssueTmBgn"] = tIssueTmBgn; // 添加签单开始时间
+  params["tIssueTmEnd"] = tIssueTmEnd; // 添加签单结束时间
+
   delete params.tm1;
   delete params.tm2;
-
-  console.log('params>>',params);
 
   getInquiryTask(params)
     .then((res: any) => {
@@ -870,14 +881,14 @@ function updateUdr(row: any) {
     objId,
     curtTask,
     cAppTyp,
-    prodNo,
+    cProdNo,
     cRelateBusi,
     cEdrRsnBundleCde,
     plyNo,
   } = row;
   if (row.cAppTyp === "P") {
     // 方案不校验倒签
-    if (row.prodNo === "000000") {
+    if (row.cProdNo === "000000") {
       const data = {
         CPlanNo: row.objId,
         TaskId: row.curtTask,
@@ -894,7 +905,7 @@ function updateUdr(row: any) {
       const en = JSON.stringify({
         CPlanNo: row.objId,
         TaskId: row.curtTask,
-        "Base.CProdNo": row.prodNo,
+        "Base.CProdNo": row.cProdNo,
         scene: SCENE_PLAN_UW_PROCESS,
         cAppTyp: row.cAppTyp,
       });
@@ -957,7 +968,7 @@ function updateUdrDetail(row: any) {
           cInquiryNo: row.cInquiryNo,
           taskId: row.curtTask,
           cAppTyp: row.cAppTyp,
-          cProdNo: row.prodNo,
+          cProdNo: row.cProdNo,
           cCiMrk: r.data.cCiMrk,
           cGrpMrk: r.data.cGrpMrk,
           cDptCde: r.data.cDptCde,
@@ -987,7 +998,7 @@ function updateUdrDetail(row: any) {
           cInquiryNo: row.objId,
           taskId: row.curtTask,
           cAppTyp: row.cAppTyp,
-          cProdNo: row.prodNo,
+          cProdNo: row.cProdNo,
           cCiMrk: r.data.cCiMrk,
           cRsnCde: r.data.cEdrRsnBundleCde,
           cEdrType: r.data.cEdrType,
@@ -1039,7 +1050,7 @@ function handleWorkFlow(row: any, type: any) {
               const en = JSON.stringify({
                 CPlanNo: row.objId,
                 TaskId: row.curtTask,
-                "Base.CProdNo": row.prodNo,
+                "Base.CProdNo": row.cProdNo,
                 scene: SCENE_PLAN_UW_PROCESS,
                 cAppTyp: row.cAppTyp,
                 cTermNo: row.cTermNo,
@@ -1083,7 +1094,7 @@ function handle_hasReceived(row: any) {
     objId,
     curtTask,
     cAppTyp,
-    prodNo,
+    cProdNo,
     cRelateBusi,
     cEdrRsnBundleCde,
     plyNo,
@@ -1115,7 +1126,7 @@ function handle_hasReceived(row: any) {
 
   if (cAppTyp === "P") {
     // 方案不校验倒签
-    if ("000000" === prodNo) {
+    if ("000000" === cProdNo) {
       const param = {
         taskId: curtTask,
         user: user.value,
@@ -1284,7 +1295,7 @@ function handleEdit(row: any) {
   const en = JSON.stringify({
     scene: scene,
     cInquiryNo: row.objId,
-    cProdNo: row.prodNo,
+    cProdNo: row.cProdNo,
     cAppTyp: row.cAppTyp,
     cJiMrk: row.cJiMrk,
     cDptCde: row.cDptCde,
