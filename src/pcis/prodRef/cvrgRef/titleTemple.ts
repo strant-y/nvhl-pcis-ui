@@ -15,6 +15,8 @@ const deductibleTemple = ref<{ [key: string] : string }>(
 
 const deductibleKey = ref<{ [key: string] : string }>(
     {
+        'defterm':{amt:'Term.nDeductibleAmount',rate:'Term.nDeductibleRate',deduct:'Term.cDeductibleNote'},
+
         '040178':{amt:'TermRisktgt.nAccidentDeduct',rate:'TermRisktgt.nAccidentDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
         '040171':{amt:'TermRisktgt.nAccidentDeduct',rate:'TermRisktgt.nAccidentDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
         '040173':{amt:'TermRisktgt.nDeductibleAmount',rate:'TermRisktgt.nDeductibleRate',deduct:'TermRisktgt.cDeductibleNote'},
@@ -24,6 +26,8 @@ const deductibleKey = ref<{ [key: string] : string }>(
         '040179':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
         '040172':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
         '040176':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
+
+        'defrisk':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
     }
 );
 
