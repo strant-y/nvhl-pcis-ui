@@ -58,7 +58,7 @@
                       >
                         <from-item
                           v-model="termdata[item.prop]"
-                          @update:modelValue="update()"
+                          @update:modelValue="termUpdate()"
                           :item="item"
                         />
                       </el-form-item>
@@ -114,7 +114,7 @@
                         >
                           <from-item
                             v-model="termdata[item.prop]"
-                            @update:modelValue="update()"
+                            @update:modelValue="termUpdate()"
                             :item="item"
                           />
                         </el-form-item>
@@ -163,7 +163,7 @@
                         >
                           <from-item
                             v-model="termdata[item.prop]"
-                            @update:modelValue="update()"
+                            @update:modelValue="termUpdate()"
                             :item="item"
                           />
                         </el-form-item>
@@ -184,7 +184,7 @@
                                 :label-width ="120">
                                 <from-item
                                   v-model="termdata[item.prop]"
-                                  @update:modelValue="update()"
+                                  @update:modelValue="termUpdate()"
                                   :item="item"
                                 />
                               </el-form-item>
@@ -202,7 +202,7 @@
               <app-free-edit
                 :freeEditConfig="formconfig1"
                 ref="termRef"
-                @updateDatas="update"
+                @updateDatas="termUpdate()"
               />
             </template>
           </template>
@@ -330,7 +330,7 @@
                                           ].factorItem?.prop
                                         ]
                                       "
-                                      @update:modelValue="update()"
+                                      @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
                                       :item="
                                         riskdata.rowConfig[colinfo.cColId][
                                           n - 1
@@ -353,7 +353,7 @@
                                 >
                                   <from-item
                                     v-model="termdata[v.prop]"
-                                    @update:modelValue="update()"
+                                    @update:modelValue="termUpdate()"
                                     :item="v"
                                   />
                                 </el-form-item>
@@ -386,6 +386,7 @@ import { terConfig } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
+import { deductibleTemple,deductibleKey, fillTemplate } from "./titleTemple";
 import {CommonConstants} from "@/constants/CommonConstants";
 import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
@@ -442,6 +443,81 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 });
 
 const {selectedRow} = storeToRefs(terconfig);
+
+function termUpdate(){
+  console.log('term');
+  termDeductibleNote();
+  update();
+}
+
+function riskUpdate(risk: any){
+  riskDeductibleNote(risk);
+  update();
+}
+
+function termDeductibleNote(){
+  const termData = getDatas();
+  const termNo = termData['Term.cClauseCode'];
+  const k = deductibleKey.value[termNo]?deductibleKey.value[termNo]:deductibleKey.value['defterm'];
+
+  const amt = termFactormap.value.filter(item=>item['prop']==k['amt']);
+  const rate = termFactormap.value.filter(item=>item['prop']==k['rate']);
+  const deduct = termFactormap.value.filter(item=>item['prop']==k['deduct']);
+
+  if(amt && amt.length > 0 
+      && rate && rate.length > 0
+      && deduct && deduct.length > 0
+  ){  // 当以上3项均存在时,则触发自动设置说明的方法
+    const amt_d = termData[k['amt']];
+    const rate_d = termData[k['rate']];
+    const temk = (amt_d !== null && amt_d !== undefined ? '1':'0') + '' + (rate_d !== null && rate_d !== undefined ? '1':'0') ;
+    const strt = deductibleTemple.value[temk];
+    const filledString = fillTemplate(strt, {
+        amount: amt_d,
+        rate: rate_d,
+      });
+    setData({
+      propkey:k['deduct'],
+    },filledString);
+  }
+}
+
+function riskDeductibleNote(risk: any) {
+  const r = risk['TermRisktgt.cLiabCode'];
+  const k = deductibleKey.value[r]?deductibleKey.value[r]:deductibleKey.value['defrisk'];
+  const riskdata = getRiskFactors(r);
+  const amt = riskdata.filter((item: any) => item['factorObj']['prop'] === k['amt']);
+  const rate = riskdata.filter((item: any) => item['factorObj']['prop'] === k['rate']);
+  const deduct = riskdata.filter((item: any) => item['factorObj']['prop'] === k['deduct']);
+  if(amt && amt.length > 0 
+      && rate && rate.length > 0
+      && deduct && deduct.length > 0
+  ){  // 当以上3项均存在时,则触发自动设置说明的方法
+    const amt_d = risk[k['amt']];
+    const rate_d = risk[k['rate']];
+    const temk = (amt_d !== null && amt_d !== undefined ? '1':'0') + '' + (rate_d !== null && rate_d !== undefined ? '1':'0') ;
+    const strt = deductibleTemple.value[temk];
+    const filledString = fillTemplate(strt, {
+        amount: amt_d,
+        rate: rate_d,
+      });
+    setData({
+      propkey:k['deduct'],
+      riskNo:r,
+    },filledString);
+  }
+}
+function getRiskFactors(riskNo: any) { 
+  const col = [];
+  collist.value.forEach((item: any) => { 
+    if(item.cRiskNo === riskNo){
+      let riskd = JSON.parse(JSON.stringify(item));
+      riskd.factorObj = factormap.value[riskd.cFactorId];
+      col.push(riskd);
+    }
+   });
+   return col;
+}
 
 function update() {
   emit("update:modelValue", getDatas());
@@ -1314,6 +1390,26 @@ function riskMethodLink(items: any) {
         items[k]["func"] = methodMap[items[k]["func"]];
       }
     });
+  }
+}
+
+/**
+ * 
+ * @param params 根据参数,对条款数据进行赋值{propkey:赋值的要数key,riskNo:条则标时,需要对应的条则标码值}
+ * @param data 
+ */
+function setData(params: any,data:any){
+  const propkey = params.propkey;
+  if(propkey){
+    if(propkey.startsWith("TermRisktgt")){
+      if(params.riskNo){
+      const riskNo = params.riskNo;
+      riskList.value[riskNo][propkey] = data;
+      }
+      
+    }else if(propkey.startsWith("Term")){ 
+      termdata.value[propkey] = data;
+    }
   }
 }
 
