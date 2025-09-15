@@ -155,7 +155,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "币种",
         disabled: true,
-        typeCode: "CURRENCY_LIST"
+        typeCode: "M03"
       },
       // {
       //   prop: 'CPlyNo',
