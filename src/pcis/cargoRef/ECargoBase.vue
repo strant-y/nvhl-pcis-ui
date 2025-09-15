@@ -56,7 +56,7 @@ onMounted(() => {
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     setFormItem('ECargoBase.cCiOprRel',{ rules: [getRules("contactInformation", {})] })
-    setFormItem('ECargoBase.cCiMrk',{hidden:true})
+    // setFormItem('ECargoBase.cCiMrk',{hidden:true})
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
@@ -425,7 +425,14 @@ const method = {
               });
               setValue("ECargoBase.cBrkrCde", params.CChaCde);
               setValue("ECargoBase.cAgtAgrNo", params.CAgtAgrNo);
-
+              const ciRef = formPage.getComponentRefById('AgreementCi');
+              if (!!ciRef) {
+                ciRef.intiAgentBroker({
+                  CChaCde: params.CChaCde, //代理经纪人代码
+                  CChaNme: params.CChaNme, //代理经纪人名称
+                  loadData:[{value:  params["CChaCde"],label:params["CChaCde"] + params['CChaNme']}],
+                });
+              }
               dialog.value?.handleClose();
             },
           },
@@ -438,6 +445,22 @@ const method = {
       );
     } else {
       ElMessage.warning("渠道分类--请选择非直销业务!");
+    }
+  },
+  cBrkSlsCdeChange: (value: any) =>{
+    const p = opertaor.getParam();
+    if (p.initFlag) {
+      if(value && value != '') {
+        codeListStore.queryCodeList({
+          codeListName: "WEB_ORG_SALES_BY_ID",
+          codeListParam: {value: value}
+        }).then((res) => {
+          plyBaseEditRef.value?.addCodeListMap({
+            code: "Base.cBrkSlsCde",
+            list: res,
+          });
+        });
+      }
     }
   },
     //代理业务员icon事件
@@ -494,6 +517,14 @@ const method = {
 								},
 							],
 						});
+            const ciRef = formPage.getComponentRefById('AgreementCi');
+            if (!!ciRef) {
+              ciRef.initProxySales({
+                cSlsId: params.CSlsCde, //业务员员工号
+                cSlsNme: params.CSlsNme, //业务员名称
+                loadData:[{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']}],
+              });
+            }
           	setValue("ECargoBase.cBrkSlsCde", params.CSlsCde);
             dialog.value?.handleClose();
           },

@@ -26,10 +26,11 @@ import {ref} from "vue";
 import {useValidator} from "@/typings/useValidator";
 import dayjs from "dayjs";
 import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
+import { rule } from "postcss";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-
-const props = defineProps({
+const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
+const props = defineProps({ 
   data: {
     type: Object,
     default: () => ({}),
@@ -184,6 +185,10 @@ onMounted(async  () => {
     if(['ECargoInsuredDist.tOperaterCertfEndTm'].includes(item.prop)) {
       item["disabledDate"] = tOEndTmDisable;
     }
+    // 单位性质
+    if(['ECargoInsuredDist.cWorkDpt'].includes(item.prop)) {
+      item["func"] = cWorkDptChange;
+    }
 
     //  if(['ECargoInsuredDist.cClntMrk'].includes(item.prop)){
        
@@ -268,6 +273,10 @@ onMounted(async  () => {
     setValue('ECargoGoodsTgt.cExchCde',rateDetail.value.cExchCde)
   }, 100);
   console.log(' formconfig1.value', formconfig1.value)
+      nextTick(()=>{
+        setFormItem("ECargoInsuredDist.cMobile", { rules: [getRules("phoneNo", {})] })
+        setFormItem("ECargoInsuredDist.cTel", { rules: [getRules("phone", {})] });
+      })
 });
 
 const funccopyvalue = () => {
@@ -431,7 +440,7 @@ const checkUser = () => {
 // 解析身份证
 const idAnalysis = (id:string)=>{
   const applicantValue = freeEditRef.value?.getFromValue() //tabref["AgreementApplicant"].getFormValue();
-  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='120001' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
+  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
@@ -455,7 +464,7 @@ const funCheckUser = (val:any)=>{
  
     checkUser();
       clearValidate('ECargoInsuredDist.cCertfCde')  // 清除报错信息
-   if (val == "120001") {
+   if (val == "111") {
 
      // setValue('ECargoInsuredDist.cCertfCde','')  //选身份证时清空
      setFormItem("ECargoInsuredDist.cCertfCde", {
@@ -608,98 +617,192 @@ const cIsIndvduBizChange = (val:any)=>{
     setFormItem('ECargoInsuredDist.cTrdCde',{ rules: null})
   }
 }
+// 被保人性质
  const cClntMrkFunc = (val:any)=>{
   console.log(val)
-    if(val === '1'){
+    if(val === '0'){
       setFormItem("ECargoInsuredDist.tBirthday", {
-        rules: [getRules("required", {})],
+         rules: null
       });
-      setFormItem("ECargoInsuredDist.cSex", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("ECargoApplicant.cWorkDpt", {
-        rules: null,
-      });
-      setFormItem("ECargoInsuredDist.cCntrNme", {
-        rules: null,
-      });
-       setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules:  null
-     });
 
-      // setFormItem('ECargoInsuredDist.tBirthday',{disabled:true})
-      // setFormItem('ECargoInsuredDist.nAge',{disabled:true})
-      // setFormItem('ECargoInsuredDist.cSex',{disabled:true})
-      // setFormItem('ECargoInsuredDist.cNation',{disabled:true})
-      codeListStore
-          .queryCodeList({
-            codeListName: "NATURAL_CERTIFICATE_CACHE",
-            codeListParam: {},
-          })
-          .then((res) => {
-            if (
-                !res.some((item) =>
-                    Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
-                )
-            ) {
-              setValue("ECargoInsuredDist.cCertfCls", "");
-            }
-            setFormItem("ECargoInsuredDist.cCertfCls", {
-              loadData: [],
-            });
-            setFormItem("ECargoInsuredDist.cCertfCls", {
-              loadData: res,
-              rules: [getRules("required", {})],
-            });
-          });
-    }else{
-      codeListStore
-          .queryCodeList({
-            codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
-            codeListParam: {},
-          })
-          .then((res) => {
-            if (
-                !res.some((item) =>
-                    Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
-                )
-            ) {
-              setValue("ECargoInsuredDist.cCertfCls", "");
-            }
-            setFormItem("ECargoInsuredDist.cCertfCls", {
-              loadData: [],
-            });
-            setFormItem("ECargoInsuredDist.cCertfCls", {
-              loadData: res,
-              rules: [getRules("required", {})],
-            });
-          });
+      clearValidate('ECargoInsuredDist.tBirthday')
+      setFormItem("ECargoInsuredDist.nAge", {
+        rules: null
+      });
+      clearValidate('ECargoInsuredDist.nAge')
+
+      setFormItem("ECargoInsuredDist.cSex", {
+        rules: null
+      });
+      clearValidate('ECargoInsuredDist.cSex')
+
+      setFormItem("ECargoInsuredDist.cCntrNme", { rules: [getRules("required", {})] });
+      setFormItem("ECargoInsuredDist.cCntrCertfCde", {
+        rules: [getRules("required", {})],
+      });
+
+      setValue("ECargoInsuredDist.cIsIndvduBiz", "");
       setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
-        rules:null,
-      });
-      setFormItem("ECargoApplicant.cWorkDpt", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("ECargoInsuredDist.cCntrNme", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("ECargoInsuredDist.tBirthday", {
         rules: null,
+      });
+
+      setFormItem("ECargoInsuredDist.cGreenIndustryCustomers", {
+        rules: [getRules("required", {})],
+      });
+
+     setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+        rules: [getRules("required", {})],
+      });
+
+       setFormItem("ECargoInsuredDist.RegisterProp", {
+        rules: [getRules("required", {})],
+      });
+
+      setFormItem("ECargoInsuredDist.cTrdCde", {
+        rules: [getRules("required", {})],
+      });
+
+      setFormItem("ECargoInsuredDist.cWorkDpt", {
+        rules: [getRules("required", {})],
+      });
+      // 单位性质 --为企业做必填校验
+      const cWorkDpt = getValue('ECargoInsuredDist.cWorkDpt');
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+      const requiredRule = [getRules("required", {})];
+      //实名认证方式
+      setFormItem("ECargoInsuredDist.cRealnameAuthType", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 法定代表人/责任人
+      setFormItem("ECargoInsuredDist.cLegalRepresentative", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 企业成立日
+      setFormItem("ECargoInsuredDist.tEstablishingDate", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+      // 移动电话
+      let cMobile = getValue('ECargoInsuredDist.cMobile');  // 移动 
+      let cTel = getValue('ECargoInsuredDist.cTel');  // 固定电话    
+      if (!cMobile && !cTel) {
+        setFormItem("ECargoInsuredDist.cMobile", {
+          rules: [getRules("required", {}), getRules("phoneNo", {})],
+        });
+      } else if (cMobile) {
+        setFormItem("ECargoInsuredDist.cTel", { rules: [getRules("phone", {})] });
+        setFormItem("ECargoInsuredDist.cMobile", { rules: [getRules("required", {}), getRules("phoneNo", {})] })
+      } else if (cTel) {
+        setFormItem("ECargoInsuredDist.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
+        setFormItem("ECargoInsuredDist.cMobile", { rules: [getRules("phoneNo", {})] })
+      }
+
+         codeListStore
+        .queryCodeList({
+          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (
+            !res.some((item) =>
+              Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
+            )
+          ) {
+            // setValue("Insured.cCertfCls", "");
+          }
+          freeEditRef.value?.addCodeListMap({
+            code: "ECargoInsuredDist.cCertfCls",
+            list: res
+          })
+          setValue('ECargoInsuredDist.cCertfCls', '110007')
+        });
+    }else{
+
+      // 性别 、年龄、生日个人必填
+      setFormItem("ECargoInsuredDist.tBirthday", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("ECargoInsuredDist.nAge", {
+        rules: [getRules("required", {})],
       });
       setFormItem("ECargoInsuredDist.cSex", {
+        rules: [getRules("required", {})],
+      });
+   
+      //是否个体工商户
+      setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
+        rules: [getRules("required", {})],
+      });
+
+      // 单位性质
+      setFormItem("ECargoInsuredDist.cWorkDpt", { rules: null });
+
+      //注册地址
+      setFormItem("ECargoInsuredDist.cRegisteredcapDre", { rules: null });
+      setFormItem("ECargoInsuredDist.RegisterProp", {
         rules: null,
       });
-              setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
-       rules: [getRules("required", {})],
-     });
-      
-      // setFormItem('ECargoInsuredDist.tBirthday',{disabled:false})
-      // setFormItem('ECargoInsuredDist.nAge',{disabled:false})
-      // setFormItem('ECargoInsuredDist.cSex',{disabled:false})
-      // setFormItem('ECargoInsuredDist.cNation',{disabled:false})
+
+      // 是否绿色产业客户
+      setFormItem("ECargoInsuredDist.cGreenIndustryCustomers", {
+        rules: null,
+        disabled: true,
+      });
+      // 是否绿色详情
+      setFormItem("ECargoInsuredDist.cGreenIndustryList", {
+        rules: null,
+        disabled: true,
+      });
+
+      // 参加社会统筹标志
+      setFormItem("ECargoInsuredDist.cParticiinsocTyp", {
+        rules: null,
+      });
+
+      //实名认证方式
+      setFormItem("ECargoInsuredDist.cRealnameAuthType", {
+        rules: [],
+      });
+      // 法定代表人/责任人
+      setFormItem("ECargoInsuredDist.cLegalRepresentative", {
+        rules: []
+      });
+      //企业成立日期
+      setFormItem("ECargoInsuredDist.tEstablishingDate", {
+        rules: [],
+      });
+
+      setFormItem("ECargoInsuredDist.cCntrNme", { rules: null });
+      setFormItem("ECargoInsuredDist.cCntrCertfCde", { rules: null });
+      //是否分支机构
+      if (!getValue('ECargoInsuredDist.cIsBranch')) {
+        setValue("ECargoInsuredDist.cIsBranch", "1");
+      }
+      // 个人 移动电话必填  
+      setFormItem("ECargoInsuredDist.cMobile", {
+        rules: [getRules("required", {}), getRules("phoneNo", {})],
+      });
+      setFormItem("ECargoInsuredDist.cTel", { rules: [getRules("phone", {})] });
+      codeListStore
+        .queryCodeList({
+          codeListName: "NATURAL_CERTIFICATE_CACHE",
+          codeListParam: {},
+        })
+        .then((res) => {
+          if (
+            !res.some((item) =>
+              Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
+            )
+          ) {
+            if (getValue('ECargoInsuredDist.cCertfCls')) {
+              setValue("ECargoInsuredDist.cCertfCls", "");
+            }
+          }
+          freeEditRef.value?.addCodeListMap({
+            code: "ECargoInsuredDist.cCertfCls",
+            list: res
+          })
+
+        });
     }
   }
 //注册地市是否同上
@@ -877,6 +980,41 @@ const cOccupCdeChange = () => {
       { title: "职业", width: 85 }
     );
 }
+
+  // 单位性质
+  const cWorkDptChange = (val: any) => {
+    console.log(val)
+    // setCapitalRequiredRule(getValue, setFormItem, 'Insured');
+
+    const clientNature = getValue('ECargoInsuredDist.cClntMrk');
+    const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
+    const requiredRule = [getRules("required", {})];
+    //实名认证方式
+    setFormItem("ECargoInsuredDist.cRealnameAuthType", {
+      rules: isSpecialCase ? requiredRule : []
+    });
+    // 法定代表人/责任人
+    setFormItem("ECargoInsuredDist.cLegalRepresentative", {
+      rules: isSpecialCase ? requiredRule : []
+    });
+    // 企业成立日
+    setFormItem("ECargoInsuredDist.tEstablishingDate", {
+      rules: isSpecialCase ? requiredRule : []
+    });
+
+
+    const leiCodeRule = [getRules("leiCode", {})];
+    if (val === '350') {
+      setFormItem("ECargoInsuredDist.cGcidCode", {
+        rules: [...requiredRule, ...leiCodeRule]
+      });
+    } else if (val) {
+      setFormItem("ECargoInsuredDist.cGcidCode", {
+        rules: leiCodeRule
+      });
+    }
+  }
+
 // 办理人员止期 禁用处理
 const tOEndTmDisable =(date: any) => {
     return disablePastDates(date);

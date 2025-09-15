@@ -321,6 +321,7 @@
 
 <script setup lang="ts">
 import { FormInstance } from "element-plus";
+import Validator from "async-validator";
 import { AppGridEditMethod } from "./app-grid-edit-config";
 const maxLabelWidth = ref(150); // 默认值
 
@@ -459,7 +460,99 @@ async function validate() {
     }
   }
   return fromListbl;
+  // // 存储验证规则的对象
+  // let rules = <any>{};
+  // for (const schama in props.fromSchema) {
+  //   // 如果当前列有验证规则，则将其添加到规则对象中
+  //   if (props.fromSchema[schama].rules) {
+  //     let rul = props.fromSchema[schama].rules;
+  //     if (
+  //       props.fromSchema[schama].inputtype === "rtnumber" ||
+  //       (props.fromSchema[schama].inputtype === "rtinput" &&
+  //         props.fromSchema[schama].type === "number")
+  //     ) {
+  //       if (rul && rul.length > 0) {
+  //         rul.forEach((item: any) => {
+  //           item.type = "number";
+  //         });
+  //       }
+  //     }
+  //     if (props.fromSchema[schama].inputtype === "rtcascader") {
+  //       if (rul && rul.length > 0) {
+  //         rul.forEach((item: any) => {
+  //           item.type = "array";
+  //         });
+  //       }
+  //     }
+  //     rules[props.fromSchema[schama].prop] = rul;
+  //   }
+  // }
+  // // 创建验证器实例
+  // const validator = new Validator(rules);
+  // const r = await dovalidate(validator);
+  // let l = [];
+  // if(r && r.length > 0){
+  //   const isEx = false;
+  //   props.fromSchema.filter((item:any) => {
+  //     const r2 = r.filter((i:any) => i.field === item.prop && (item.expand === true || item.expand === '1'));
+  //     if(r2 && r2.length > 0 && !l.includes(item.group)){
+  //       l.push(item.group);
+  //     }
+  //   });
+  // }
+  // if(l && l.length > 0){
+  //   groupByList.value.forEach((item:any) => {
+  //     if(l.includes(item.id)){
+  //       item.disabled = true;
+  //     }
+  //   });
+  //   nextTick(()=>{
+  //     freeValidate();
+  //   })
+  // }else{
+  //   freeValidate();
+  // }
+  // if(r && r.length > 0){
+  //   return false;
+  // }else{
+  //   return true;
+  // }
 }
+
+async function freeValidate(){
+  const promise = await fromRef.value?.validate((valid, fields) => {
+  if (valid) {
+  } else {
+  }
+  });
+  let fromListbl = promise;
+  if (fromListRef.value) {
+    for (const ref in fromListRef.value) {
+      const exvali = await fromListRef.value[ref].tableExvalidate();
+      if (exvali != null) {
+        fromListbl = fromListbl && exvali;
+      }
+    }
+  }
+  return fromListbl;
+}
+
+function dovalidate(validator: any) { 
+  const p = new Promise((resolve) => {
+    // 执行验证操作
+    validator.validate(form, (data: any) => {
+      // 根据验证结果进行处理
+      if (data) {
+        resolve(data);
+      } else {
+        // 验证通过
+        resolve(true);
+      }
+    });
+  });
+  return p;
+}
+
 
 async function validateField(fields:any) {
   // 1. 主表单指定字段校验
@@ -553,17 +646,13 @@ function setFormValue(data: any, noupdate = false) {
             : key.cascaderprops;
         if (props && props.length > 0) {
           let cascd = [];
-          let hv = false;
           for (var i = 0; i < props.length; i++) {
             if (setdata[props[i]]) {
               cascd.push(setdata[props[i]]);
-              hv = true;
             }
             delete setdata[props[i]];
           }
-          if(hv){ //如果有值,再设置,否则不予设置
-            setdata[key.prop] = cascd;
-          }
+          setdata[key.prop] = cascd;
         }
       } else if (key.inputtype === "rtinputgroup") {
         if (key.groupList && key.groupList.length > 0) {
@@ -575,17 +664,13 @@ function setFormValue(data: any, noupdate = false) {
                   : gkey.cascaderprops;
               if (gprops && gprops.length > 0) {
                 let cascd = [];
-                let hv = false;
                 for (var i = 0; i < gprops.length; i++) {
                   if (setdata[gprops[i]]) {
                     cascd.push(setdata[gprops[i]]);
-                    hv = true;
                   }
                   delete setdata[gprops[i]];
                 }
-                if(hv){
-                  setdata[gkey.prop] = cascd;
-                }
+                setdata[gkey.prop] = cascd;
               }
             }
           });
@@ -601,10 +686,13 @@ function setFormValue(data: any, noupdate = false) {
 
 function formsDataUpdate(item:any) {
   if(item.rules && form[item.prop]){ // 如果有验证规则,则form表单验证一下值
-    if(item.prop === 'Applicant.ClntAddrProp'){
-      console.log(item);
+    if(item.inputtype === 'rtcascader'){  // 级联组件,只有有值的时候,才可以执行验证方法
+      if(form[item.prop].length > 0){
+        fromRef.value?.validateField(item.prop);
+      }
+    }else{
+      fromRef.value?.validateField(item.prop);
     }
-    fromRef.value?.validateField(item.prop);
   }
   emits("formsDataUpdate", form);
 }

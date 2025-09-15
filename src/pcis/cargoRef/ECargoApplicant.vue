@@ -250,7 +250,7 @@ const method = {
   // 证件号码change
   cCertfCdeChange: (val) => {
     const cCertfCls = formPage.getFormDataById("AgreementApplicant")["ECargoApplicant.cCertfCls"];
-    if (cCertfCls == "120001") {
+    if (cCertfCls == "111") {
       if (val) {
         const certfCde = applicantEditRef.value?.getValue(
           "ECargoApplicant.cCertfCde"
@@ -714,7 +714,7 @@ const method = {
         disabled: false,
       });
     }
-    if (val == "120001") {
+    if (val == "111") {
       setFormItem("ECargoApplicant.cLongendTyp", {
         hidden:false,
         rules: null,
@@ -870,7 +870,7 @@ if (
 // 解析身份证
 const idAnalysis = (id:string)=>{
       const applicantValue = formPage.getFormDataById("AgreementApplicant") //tabref["AgreementApplicant"].getFormValue();
-      if (  id.length !== 18 || (applicantValue["ECargoApplicant.cCertfCls"] !=='120001' && applicantValue["ECargoApplicant.cCertfCls"] !=='19')) {
+      if (  id.length !== 18 || (applicantValue["ECargoApplicant.cCertfCls"] !=='111' && applicantValue["ECargoApplicant.cCertfCls"] !=='19')) {
         return false
       }
           const birthYear = parseInt(id.substring(6, 10), 10);

@@ -92,12 +92,12 @@ const cardMainconfig = ref(
   creatCardConfig({
     title: "主条款信息",
     showInTitle: true,
-    id: "addPlan_btn",
     titleClass: "mainTitle",
     titleBtns: [
       createFreeButtonBase({
         type: "primary",
         label: "添加条款",
+        id: "addPlan_btn",
         icon: "CirclePlus",
         size: "small",
         func: () => {
@@ -112,11 +112,11 @@ const cardComconfig = ref(
   creatCardConfig({
     title: "公共信息",
     showInTitle: true,
-    id: "addPlan_btn",
     titleClass: "mainTitle",
     titleBtns: [
       createFreeButtonBase({
         type: "primary",
+        id: "addPlan_btn",
         label: "增加附加条款",
         icon: "CirclePlus",
         size: "small",
@@ -591,6 +591,11 @@ function getFromValue() {
             md.forEach((m) => {
               m["Term.cPlanNo"] = plan;
               m["Term.nSeqNo"] = seqNo++;
+              if (m["riskList"]) {
+                let l = JSON.parse(JSON.stringify(m["riskList"]));
+                delete m["riskList"];
+                m["Term.riskList"] = l;
+              }
               redata.push(m);
             });
           }
@@ -676,6 +681,19 @@ function updateBtn() {
       }
     });
     cardconfig.value.titleBtns?.forEach((item: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
+      if (t) {
+        item.hidden = false;
+      }
+    });
+
+    cardMainconfig.value.titleBtns?.forEach((item: any) => {
+      const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
+      if (t) {
+        item.hidden = false;
+      }
+    });
+    cardComconfig.value.titleBtns?.forEach((item: any) => {
       const t = unbut.find((un: any) => un["cEdrItem"] === item.id);
       if (t) {
         item.hidden = false;
@@ -789,16 +807,18 @@ function calcCheck() {
     msg: "验证通过",
   };
 }
-const setCargoSeq = (value: string) => {
+const setCargoSeq = (value: string, pkId: string) => {
   const { index, data } = selectedRow.value;
   if (formData.value["m"] && formData.value["m"].length > 0) {
     if (data["Term.cClauseCode"]) {
-      formData.value["m"][index]["Term.nCargoSeq"] = value;
+      formData.value["m"][index]['Term.cDistCodeNo'] = value;
+      formData.value["m"][index]['Term.cDistPkId'] = pkId;
       selectedRow.value.data = formData.value["m"][index];
     } else {
       formData.value["m"][index]["riskList"].forEach((item: any) => {
         if (item["TermRisktgt.cLiabCode"] === data["TermRisktgt.cLiabCode"]) {
-          item["TermRisktgt.nCargoSeq"] = value;
+          item['TermRisktgt.cDistCodeNo'] = value;
+          item['TermRisktgt.cDistPkId'] = pkId;
           selectedRow.value.data = item;
         }
       });

@@ -197,7 +197,7 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log('1212,',val)
+   
    const param = opertaor.getParam();
    if (param.initFlag) {
       return ;
@@ -226,11 +226,18 @@ const method = {
   },
   //总保费下拉事件
   cPrmCurChange: (val: any) => {
+    if(val && idxParam && idxParam.getcPrmCur) {
+      idxParam.getcPrmCur(val)
+    }
     try {
       const getFormconfig = opertaor.getTableRefs()['AgentTgt']
       getFormconfig?.setValue('Tgt.cPayCur',val)
     }catch (err){
       console.log(err)
+    }
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
     }
     if (val !== "CNY") {
       codeListStore
@@ -247,6 +254,13 @@ const method = {
   },
   //总保额币种下拉事件
   cAmtCurChange(val: any) {
+    if(val && idxParam && idxParam.setcAmtCur) {
+      idxParam.setcAmtCur(val)
+    }
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -262,7 +276,7 @@ const method = {
   },
   //保额汇率标识change事件
   cInsExchCdeChange(val: any) {
-    console.log(1122,val)
+ 
     if (val == "0") {// 协议汇率
       setFormItem("Base.nAmtRmbExch", { disabled: false });
       //           Base.nAmtRmbExch

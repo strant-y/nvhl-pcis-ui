@@ -390,6 +390,7 @@ import { v4 as uuidv4 } from "uuid";
 import {CommonConstants} from "@/constants/CommonConstants";
 import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import Decimal from "decimal.js";
 
 const route = useRoute();
 const templateRef = ref();
@@ -448,8 +449,10 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 const {selectedRow} = storeToRefs(terconfig);
 
 function update() {
+  emit("update:modelValue", getDatas());
+}
+function getDatas(){
   let newData;
-
   if( termTitleConf.value.cFactorTabType === "table" ||  termTitleConf.value.cFactorTabType === 'grid' ){
     newData = termdata.value;
   } else {
@@ -473,7 +476,7 @@ function update() {
     ril.push(riskList.value[k]);
   });
   newData.riskList = ril;
-  emit("update:modelValue", newData);
+  return newData;
 }
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
@@ -1335,7 +1338,6 @@ const methodMap = {
       });
     }
   },
-
 
   InsuranceChange043009:(val: any)=>{
     if (pageparam.cProdNo === "049035") {

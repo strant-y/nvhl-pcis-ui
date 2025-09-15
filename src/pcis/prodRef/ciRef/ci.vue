@@ -327,27 +327,6 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
         return;
       }
-      // if (val === "0") {
-      //   if( cCiMrk["Base.cCiMrk"] == '5' ){
-      //     if(rowData['Ci.cDptCde'] == param.cDptCde){
-      //       ElMessage.error("联保单出单方必须是主联单的分公司！");
-      //       freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-      //     }
-      //   }
-      //   if(cCiMrk["Base.cCiMrk"] == '3'){ 
-      //     if(rowData['Ci.cDptCde'] === param.cDptCde){ 
-      //       ElMessage.error("联保单出单方必须是主联单的分公司！");
-      //       freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-      //     }
-      //   }
-      // }else{
-      //   if(cCiMrk["Base.cCiMrk"] == '1' || cCiMrk["Base.cCiMrk"] == '5'){
-      //     if(rowData['Ci.cDptCde'] !== param.cDptCde){
-      //       ElMessage.error("联保单出单方必须是主联单的分公司！");
-      //       freeEditRef?.value?.setValueByRowKey("Ci.cIssueMrk", rowId, "");
-      //     }
-      //   }
-      // }
        // 根据不同的联共保类型进行校验
       if (val === "1") {
         // 选择"是"时的校验 - 出单方必须是主联单的分公司
@@ -443,9 +422,6 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
         return;
       }
-      // 保留8位小数
-      // const limitedValue = floatValue.toFixed(8);
-      // freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, limitedValue);
     } else {
       // 如果输入为空或其他非数字情况
       if (val === "" || val === null || val === undefined) {
@@ -461,35 +437,13 @@ const method = {
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
       .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
-      // if(totalOther >= 100){
-      //   ElMessage.error("联共保比例不能大于100");
-      //   freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, "");
-      //   return;
-      // }
     // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
     if (Number(val) + totalOther > 1) {
       const maxVal = 1 - totalOther;
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
-    // const cCiMrk = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-    // if (cCiMrk === "2" || cCiMrk === "4") {
-      // updateMasterAgreementValues();
-      // const allData =  getFromValue();
-      // for (let i = 1; i < allData.length; i++) {
-      //   const currentRow = allData[i];
-      //   const previousRow = allData[i - 1];
-      //   const currentPremium = parseFloat(currentRow["Ci.nCiPrm"] || 0);
-      //   const previousPremium = parseFloat(previousRow["Ci.nCiPrm"] || 0);
-      //   const diff = Math.abs(currentPremium - previousPremium);
-      //   if (diff > 1) {
-      //     ElMessage.error('联共保保费之间的误差不能大于1');
-      //     break;
-      //   }
-      // }
-    // }
     updateMasterAgreementValues();
-    // onChiefMrkChange()
     //根据新的联共保保费和出单费比例重新计算出单费用
     const updatedRowData = freeEditRef.value?.getSelectRow();
     const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || '0');
@@ -594,31 +548,6 @@ const method = {
       freeEditRef.value?.setValueByRowKey("Ci.cBankAddr",rowId,backAddr[1])
       freeEditRef.value?.setValueByRowKey("Ci.cBankCnaps",rowId,backAddr[0])
     }
-    // const rowData = freeEditRef.value?.getSelectRow();
-    // const rowId = rowData?._dataId;
-    // dialogRef.value?.open(
-    //     "cBrkrCdeModal",
-    //     {
-    //       type: "show",
-    //       data: {
-    //         rowData:rowData,
-    //       },
-    //       method: {
-    //         getSelected: (params) => {
-    //           console.log("params",params)
-    //           freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde","loadData",[{ label: params.label, value: params.value }])
-    //           freeEditRef.value?.setRowFieldProp(rowId,"Ci.cBankCde",params.value)
-    //           dialogRef.value?.handleClose();
-    //         },
-    //       },
-    //     },
-    //     {
-    //       isOk: (selectdata: any) => {
-    //         console.log("a", selectdata);
-    //       },
-    //     },
-    //     { title: "银行信息", width: 85 }
-    //   );
   },
   //业务员
   cSlsCdeChange:()=>{

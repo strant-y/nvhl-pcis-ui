@@ -92,7 +92,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
 	  {
-        prop: "cInsuredNme",
+        prop: "insuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         clearable: true,
@@ -146,12 +146,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 });
             },
 		},
-      },
-	  {
-        prop: "cBsnsTyp",
-        inputtype: "rtselect",
-        title: "业务来源",
-        typeCode: "CBsnsTypCode",
       },
 	  {
         prop: "tInsrncTm",
@@ -233,11 +227,10 @@ const tableconfig = reactive<AppTableConfig>(
         title: "二级机构",
 	  },
       {
-        prop: "third",
+        prop: "cDptCnm",
         inputtype: "rtinput",
         title: "三级机构",
 	  },
-
       {
         prop: "cAppNo",
         inputtype: "rtinput",
@@ -254,7 +247,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人",
       },
       {
-        prop: "cInsuredNme",
+        prop: "insuredNme",
         inputtype: "rtinput",
         title: "被保人",
       },
@@ -289,11 +282,6 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nRmbAmt",
         inputtype: "rtinput",
         title: "预估总保额",
-      },
-      {
-        prop: "aaa",
-        inputtype: "rtinput",
-        title: "运输上限(每次)",
       },
       {
         prop: "nLowPrm",
