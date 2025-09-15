@@ -15,6 +15,10 @@ import {getEdrRsnItem} from "@/api/query/index"
 import {eventBus} from "@/utils/event-bus";
 import {ref} from "vue";
 import {copyDist} from "@/api/prod";
+import {encryptRouterParam} from "@/router";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import {checkAppBase} from "@/api/prod";
+const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
 const props = defineProps({
@@ -45,7 +49,7 @@ let idxParam = reactive({
   param: { ...props.param, ...{cacheKey:cacheKey.value,acctinfoFlag:true}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
-  readonly: computed(() => ['view','audit'].includes(props?.type) || (props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType) )),
+  readonly: computed(() => ['view','audit'].includes(props?.type || props.param?.type) || (props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType) )),
 });
 
 provide('idxParam', idxParam);
@@ -76,6 +80,14 @@ const basicBtn = [
     id: "submit",
     func: () => {
       submit();
+    },
+  }),
+  createFreeButtonBase({
+    label: "影像管理",
+    type: "success",
+    id: "submit",
+    func: () => {
+      imageUploadManage();
     },
   }),
 ]
@@ -140,7 +152,14 @@ const uwBtn = [
       })
     },
   }),
-
+  createFreeButtonBase({
+    label: "影像查看",
+    type: "success",
+    id: "submit",
+    func: () => {
+      imageView();
+    },
+  }),
   // createFreeButtonBase({
   //   label: "任务痕迹",
   //   type: "primary",
@@ -201,7 +220,14 @@ const edrBtn = [
       submitEdrToUndrFun();
     },
   }),
-
+  createFreeButtonBase({
+    label: "影像管理",
+    type: "success",
+    id: "submit",
+    func: () => {
+      imageUploadManage();
+    },
+  }),
 ];
 /**
  * （退保/注销） 按钮
@@ -240,6 +266,14 @@ const edrSurrenderBtn = [
       submitEdrToUndrSurrender();
     },
   }),
+  createFreeButtonBase({
+    label: "影像管理",
+    type: "success",
+    id: "submit",
+    func: () => {
+      imageUploadManage();
+    },
+  }),
 ];
 onBeforeMount(async () => {
   const res = await cargoApi.getECargoPageView({
@@ -275,7 +309,7 @@ onBeforeMount(async () => {
       idxParam.param.acctinfoFlag = true
     }
   }
-  if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type)){
+  if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type || props.param?.type)){
     nextTick(async ()=>{
       const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
         AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
@@ -479,8 +513,16 @@ const submitEdrToUndrFun = async () => {
  * 原保单查看
  * **/
 const getPlyPolicyFun = () => {
-      const query = new URLSearchParams({ param: JSON.stringify({cEcAgrAppNo:cEcAgrAppNo.value}),type: "view" });
-      const url =window.location.origin + "/#/protocolManagement/enteringDtl?" + query.toString();
+  const params: any = {
+    query: {
+      param:  JSON.stringify({
+        cEcAgrAppNo:cEcAgrAppNo.value,
+       type: "view"
+      })
+    }
+  };
+  encryptRouterParam(params);
+      const url =window.location.origin + "/#/protocolManagement/enteringDtl?param=" + params.query.param;
        console.log('url',url)
       window.open(url, "_blank");
 };
@@ -985,7 +1027,139 @@ async function save() {
     }
     return isOk
 }
+// 影像上传管理
+const imageUploadManage = () => {
+  let param = {cEcAgrAppNo:''};
+  const allFromData = formPage.value?.getAllFormData();
+  const base = allFromData['AgreementBase'];
+  param['cEcAgrAppNo'] = base["ECargoBase.cEcAgrAppNo"]
+  checkAppBase(param).then((res:any) => {
+    if (res.code === 200) {
+      const cEdrType = props.param?.cEdrType;
+      let bussNo;
+      let plyNo;
+      let appTyp;
+      let CDptCde;
+      let COprCde;
+      if (cEdrType === "2" || cEdrType === "3") {
+        // 批改类型 2 注销 3 退保
+        const baseTab = allFromData['AgreementBase'];
+        const edrBaseTab = allFromData['AgreementEdrEcargoBase'];
+        bussNo = baseTab["ECargoBase.cEcAgrAppNo"];
+        plyNo = edrBaseTab["EdrECargoBase.cPlyNo"];
+        appTyp = edrBaseTab["EdrECargoBase.cAppTyp"];
+        CDptCde = edrBaseTab["EdrECargoBase.cDptCde"];
+        COprCde = user.opCde;
+      } else {
+        const baseTab = allFromData['AgreementBase'];
+        bussNo = baseTab["ECargoBase.cEcAgrAppNo"];
+        plyNo = baseTab["ECargoBase.cEcAgrNo"];
+        appTyp = baseTab["ECargoBase.cAppTyp"];
+        CDptCde = baseTab["ECargoBase.cDptCde"];
+        COprCde = baseTab["ECargoBase.cOprCde"];
+      }
 
+      if (!bussNo) {
+        ElMessage.warning("申请单号为空！");
+        return;
+      }
+
+      if (!appTyp) {
+        ElMessage.warning("保单类型为空！");
+        return;
+      }
+
+      if (!CDptCde) {
+        ElMessage.warning("机构为空！");
+        return;
+      }
+
+      if (!COprCde) {
+        ElMessage.warning("操作员为空！");
+        return;
+      }
+      const data = {
+        bussNo: bussNo,
+        viewType: "upload",
+        plyNo: plyNo,
+        appTyp: appTyp,
+        CDptCde: CDptCde,
+        COprCde: COprCde,
+      };
+      policyService
+          .imageInfoUpload(data)
+          .then((res: any) => {
+            if (res.code === 200) {
+              window.open(res.url, "_blank");
+            } else {
+              ElMessage.error(res.msg);
+            }
+          })
+          .catch((err: any) => {
+            ElMessage.error(err);
+          });
+    } else {
+      ElMessage.error("请先保存申请单!");
+    }
+  })
+}
+// 影像查看
+const imageView = () => {
+  let param = {cEcAgrAppNo:''};
+  const allFromData = formPage.value?.getAllFormData();
+  const base = allFromData['AgreementBase'];
+  param['cEcAgrAppNo'] = base["ECargoBase.cEcAgrAppNo"]
+  checkAppBase(param).then((res:any) => {
+    if (res.code === 200) {
+      showImagSys("manager");
+    } else {
+      ElMessage.error("请先保存申请单!");
+    }
+  });
+}
+function showImagSys(viewType: string) {
+  let ParamNo;
+  const CEdrType = props.param?.cEdrType;
+  const allFromData = formPage.value?.getAllFormData();
+  const base = allFromData['AgreementBase'];
+  if ("jino" === viewType) {
+    ParamNo = base["ECargoBase.CJiNo"];
+    const CCiMrk = base["ECargoBase.cCiMrk"];
+    if ("6" === CCiMrk) {
+      if (!ParamNo) {
+        ElMessage.warning("请核实从联单中的主联单申请单号是否正确！");
+        return;
+      }
+    } else {
+      ElMessage.warning("请核实是否为从联单！");
+      return;
+    }
+  } else {
+    if (CEdrType === "2" || CEdrType === "3") {
+      const edrBaseTab = allFromData['AgreementEdrEcargoBase'];
+      ParamNo = edrBaseTab["ECargoBase.cEcAgrAppNo"];
+    } else {
+      ParamNo = base["ECargoBase.cEcAgrAppNo"];
+    }
+
+    if (!ParamNo) {
+      ElMessage.warning("申请单号为空！");
+      return;
+    }
+  }
+  policyService
+      .imageInfoShow({ ParamNo: ParamNo })
+      .then((res: any) => {
+        if (res.code === 200) {
+          window.open(res.url, "_blank");
+        } else {
+          ElMessage.error(res.msg);
+        }
+      })
+      .catch((err: any) => {
+        ElMessage.error(err);
+      });
+}
 async function  submit() {
   const isSuccess = premiumCalculation()
   if(!isSuccess){
