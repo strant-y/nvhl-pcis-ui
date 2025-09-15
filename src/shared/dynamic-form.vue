@@ -452,8 +452,7 @@ async function validate() {
     if (props.fromSchema[schama].rules) {
       let rul = props.fromSchema[schama].rules;
       if (props.fromSchema[schama].inputtype === "rtnumber" ||
-        props.fromSchema[schama].inputtype === "rtinput" ||
-        props.fromSchema[schama].inputtype === "rtdatepicker") {
+        props.fromSchema[schama].inputtype === "rtinput" ) {
         // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
         if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
           if (rul && rul.length > 0) {
@@ -466,6 +465,29 @@ async function validate() {
             rul.forEach((item: any) => {
               item.type = "string";
             });
+          }
+        }
+      }
+      if(props.fromSchema[schama].inputtype === "rtdatepicker"){
+        if(props.fromSchema[schama]['type'] === 'datetimerange'){
+          if (rul && rul.length > 0) {
+            rul.forEach((item: any) => {
+              item.type = "array";
+            });
+          }
+        }else{
+          if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "number";
+              });
+            }
+          }else{
+            if (rul && rul.length > 0) {
+              rul.forEach((item: any) => {
+                item.type = "string";
+              });
+            }
           }
         }
       }
