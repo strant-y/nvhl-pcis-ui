@@ -193,7 +193,7 @@ const method = {
         freeEditRef.value?.setValueByRowKey("ECargoCi.cCoinsurerCde", rowId, "");
         return;
       }  
-    valideRequired();
+    // valideRequired();
     updateMasterAgreementValues()
   },
     //联保机构、出单机构 级联组件懒加载方法
@@ -258,7 +258,7 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cBrkSlsCde", rowId, "");
         
         // 重新校验必填规则
-        valideRequired();
+        // valideRequired();
       }
     }
   },
@@ -436,21 +436,6 @@ const method = {
       return;
     }
     const cCiMrk = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
-    if (cCiMrk === "2" || cCiMrk === "4") {
-      updateMasterAgreementValues();
-      const allData =  getFormValue();
-      for (let i = 1; i < allData.length; i++) {
-        const currentRow = allData[i];
-        const previousRow = allData[i - 1];
-        const currentPremium = parseFloat(currentRow["ECargoCi.nCiPrm"] || 0);
-        const previousPremium = parseFloat(previousRow["ECargoCi.nCiPrm"] || 0);
-        const diff = Math.abs(currentPremium - previousPremium);
-        if (diff > 1) {
-          ElMessage.error('联共保保费之间的误差不能大于1');
-          break;
-        }
-      }
-    }
     updateMasterAgreementValues();
   },
   //出单费比例
@@ -547,9 +532,6 @@ const method = {
         },
         { title: "代理查询", width: 85 }
       );
-    // } else {
-    //   ElMessage.warning("渠道分类--请选择非直销业务!");
-    // }
   },
   //业务员
   cSlsCdeChange:()=>{
@@ -604,6 +586,53 @@ const method = {
 };
 
 const updateMasterAgreementValues = () => {
+  const allRows = getFormValue(); // 获取所有行数据
+  let totalAmt = 0;
+  let totalPrm = 0;
+  debugger
+  // 遍历所有行，只处理 Ci.cCoinsurerCde === "327001" 的行
+  const res = formPage.getFormDataById("AgreementBase");
+  allRows.forEach(row => {
+    if (row["ECargoCi.cCoinsurerCde"] === "327001") {
+      const share = Number(row["ECargoCi.nCiShare"]) || 0;
+      const nAmt = res["ECargoBase.nAmt"] ? Number(res["ECargoBase.nAmt"]) : 0;
+      const nPrm = res["ECargoBase.nPrm"] ? Number(res["ECargoBase.nPrm"]) : 0;
+      const ciAmt = share * nAmt;
+      const ciPrm = share * nPrm;
+      // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
+      freeEditRef?.value?.setValueByRowKey("ECargoCi.nCiAmt", row._dataId, ciAmt.toFixed(2));
+      freeEditRef?.value?.setValueByRowKey("ECargoCi.nCiPrm", row._dataId, ciPrm.toFixed(2));
+      // 累加到总和
+      totalAmt += ciAmt;
+      totalPrm += ciPrm;
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
+    }else{
+      // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
+      const share = Number(row["ECargoCi.nCiShare"]) || 0;
+      const nAmt = res["ECargoBase.nAmt"] ? Number(res["ECargoBase.nAmt"]) : 0;
+      const nPrm = res["ECargoBase.nPrm"] ? Number(res["ECargoBase.nPrm"]) : 0;
+
+      const ciAmt = share * nAmt;
+      const ciPrm = share * nPrm;
+
+      // 更新当前行的 Ci.nCiAmt 和 Ci.nCiPrm
+      freeEditRef?.value?.setValueByRowKey("ECargoCi.nCiAmt", row._dataId, ciAmt.toFixed(2));
+      freeEditRef?.value?.setValueByRowKey("ECargoCi.nCiPrm", row._dataId, ciPrm.toFixed(2));
+    }
+  });
+  // 设置到对应组件字段（仅使用永安保险的总和）
+  allRows.forEach((row) => {
+    if(row['ECargoCi.cCoinsurerCde']){
+      console.log(totalAmt,"totalAmt")
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiJntAmt", totalAmt.toFixed(2));  //共保预估总保额
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiJntPrm", totalPrm.toFixed(2));
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiOwnAmt", totalAmt.toFixed(2));  //我司分额保额
+      formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
+    }
+  });
 };
 /**
  * 主共保标识、主联保标识、我司标识变化
@@ -682,27 +711,49 @@ const setFormItem = (key, obj) => {
     });
   }
 };
-
-
-
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
-  const {cCiMrk} = data;
-  const cChiefMrk = ['1', '3', '5'].includes(cCiMrk) ? '1' : '0';
+    const {cCiMrk} = data;
+  const cChiefMrk = ['1', '3','5'].includes(cCiMrk) ? '1' : '0';
   const dataList = getFormValue();
   if(dataList.length > 0) {
     setFormValue([]);
   }
   nextTick(() => {
+    // const plyBase = formPage.getDataAll()['ECargoBase'];
+    const plyBase = formPage.getFormDataById("AgreementBase");
+    const cSlsId = plyBase['ECargoBase.cSlsId'];
+    const cBrkSlsCde = plyBase['ECargoBase.cBrkSlsCde'];
+    const cBrkrCde = plyBase['ECargoBase.cBrkrCde'];
+    // 联保机构、出单机构 转 级联组件初始化
+    const dptList = [];
+    if(param['dptCde']) {
+      dptList.push(param['dptCde']);
+      if(param['cDptCde']) {
+        dptList.push(param['cDptCde']);
+      }
+    }
     freeEditRef?.value?.addRowByData( {
-      // 'ECargoCi.nSeqNo': 1,
-      // 'ECargoCi.nCiShare': '1.00000000',
-      // 'ECargoCi.nPlyFeeRate': '0.00',
-      // 'ECargoCi.nPlyFee': '0.00',
-      // 'ECargoCi.cChiefMrk': cChiefMrk,
-      // 'ECargoCi.cIssueMrk': '1',
-      // 'ECargoCi.cCoinsurerCde': '327001',
+      'ECargoCi.nSeqNo': 1,
+      'ECargoCi.nCiShare': '1',
+      'ECargoCi.nPlyFeeRate': '0.00',
+      'ECargoCi.nPlyFee': '0.00',
+      'ECargoCi.nComm':'0.00',
+      'ECargoCi.cChiefMrk': cChiefMrk,
+      'ECargoCi.cIssueMrk': '1',
+      'ECargoCi.cCoinsurerCde': '327001',
+      "ECargoCi.cCiSubComp": param.dptCde,
+      'ECargoCi.cDptCde': param.cDptCde,
+      'ECargoCi.cBrkrCde': cBrkrCde,
+      'ECargoCi.cSlsId': cSlsId,
+      'ECargoCi.cBrkSlsCde': cBrkSlsCde,
+      'dptCascader' : dptList,
     });
+    // 联保机构下拉选项查询
+    ciJiDptOptionsQuery('327001', getFormValue()[0]);
+    // 业务员加载
+    slsCodeListLoad(getFormValue()[0]);
+    onChiefMrkChange();
   });
 };
 /**
@@ -846,6 +897,9 @@ function getFormconfig(){
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   freeEditRef?.value?.addProvide(key, value);
 }
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
 defineExpose({
   getFormValue,
   setFormValue,
@@ -863,7 +917,8 @@ defineExpose({
   initProxySales,
   intiAgentBroker,
   // valideRequired,
-  addProvide
+  addProvide,
+  setValue,
 });
 </script>
 
