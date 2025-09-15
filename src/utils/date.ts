@@ -85,8 +85,10 @@ export function toDate(strDate) {
 	var minute;
 	var second;
 	var date = new Date(0);
+		let sTimeArray = [];
 	//TODO校验字符串格式
 	//得到参数日期的年月日数值
+
 	var sDateArray = strDate.substring(0, 10).split("-");
 	if (sDateArray[0] == null) {
 		tool.alert("\u65e5\u671f\u5fc5\u987b\u5305\u542b\u5e74");
@@ -104,7 +106,11 @@ export function toDate(strDate) {
 		date.setDate(day);//设置天份
 	}
 	//得到参数日期的时分秒值
-	sTimeArray = strDate.substring(11).split(":");
+	// sTimeArray = strDate.substring(11).split(":");
+ 
+  const timeStr = strDate.substring(11, 19); 
+  sTimeArray = timeStr.split(":");
+
 	if (sTimeArray[0] != null) {
 		hour = sTimeArray[0];
 		date.setHours(hour);//设置小时

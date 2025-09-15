@@ -1598,7 +1598,7 @@ export function getDelayCount(queryParams: any): AxiosPromise<any> {
 export function getNewSysDays(queryParams: any): AxiosPromise<any> {
   return post(`/policy/getNewSysDays`, queryParams);
 }
-//  
+//  Off 判断接口
 export function checkCancelM1IsOff(queryParams: any): AxiosPromise<any> {
   return post(`/policy/checkCancelM1IsOff`, queryParams);
 }

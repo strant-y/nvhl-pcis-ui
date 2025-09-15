@@ -38,7 +38,7 @@ import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import { AppKey } from "@/constants/api";
-import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde } from "@/api/prod/";
+import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde ,checkCancelM1IsOff} from "@/api/prod/";
 import {
     DEFERRED_CORRECTION,
     SCENE_EDR_APP_NEW,
@@ -341,8 +341,7 @@ const tableconfig = reactive<AppTableConfig>(
                         return;
                     } else {
                         openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
-                        // initQuery(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
-                        // console.log(row)
+        
 
                     }
                     // if ("DP" === row.id) {
@@ -937,15 +936,15 @@ const openEdr = async (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
         return;
     }
 
-    // // 免费延期场景校验
-    // let isExtensionValid = true; // 校验结果默认通过
-    // if (data['id'][1] === "M1"  ) {
-    //     console.log(data['id'][1])
-    //     isExtensionValid = await initQuery(cPlyNo, cProdNo, data);
-    //     if (!isExtensionValid) {
-    //         return; // 校验不通过，拦截后续接口逻辑
-    //     }
-    // }
+    // 免费延期场景校验
+    let isExtensionValid = true; // 校验结果默认通过
+    if (data['id'][1] === "M1"  ) {
+        console.log(data['id'][1])
+        isExtensionValid = await initQuery(cPlyNo, cProdNo, data);
+        if (!isExtensionValid) {
+            return; // 校验不通过，拦截后续接口逻辑
+        }
+    }
 
  
     const param = {
@@ -1081,47 +1080,54 @@ const openEdr = async (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
 const initQuery = async (cPlyNo, cProdNo, data) => {
     console.log('执行免费延期批改校验',); 
     
-    try {  
+    try {   
         const countParam = { cPlyNo };
         const resCount = await getDelayCount(countParam); // 处理次数返回结果
-        const count = resCount?.code === 200 ? resCount.data : 0;
+        const count = resCount?.code === 200 ? resCount.res : 0;
 
-        console.log('延期批改次数查询结果', resCount, '当前次数', count);
+        console.log('延期批改次数查询结果', resCount, '当前次数', parseInt(count));
 
         // 2. 校验承保机构分公司编码
         const cDptCde = data.cDptCde; // 从传入的 data 中获取机构编码
         const resCheck = await checkCdeptByCdptCde({ dptCde: cDptCde });
         const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
-        console.log(' 分公司编码查询结果 ', resCheck, ' 分公司编码 ', subSidiary);
-        if (cProdNo === '043009') {
-            // 陕西分公司：次数不限，仅提示
-            if (subSidiary === "0261010000000") {
-                
-                ElMessage.warning("陕西分公司免费延期批改次数不限！");
-                return true; 
-            } else if (parseInt(count) === 2) {
-                // 第 3 次延期：提示后允许继续
-                ElMessage.warning("每单可延期批改 3 次，此次延期后不再允许免费延期批改！");
-                return true;  
-            } else if (parseInt(count) >= 3) {
-                // 超过 3 次：拦截并提示
-                ElMessage.warning("已进行延期批改 3 次，不允许再进行此操作！");
-                return false;  
-            }
-        } else {
-            // 其他产品规则
-            if (parseInt(count) === 1) {
-                // 第 2 次延期：提示后允许继续
-                ElMessage.warning("每单可延期批改 2 次，此次延期后不再允许免费延期批改！");
-                return true;  
-            } else if (parseInt(count) >= 2) {
-                // 超过 2 次：拦截并提示
-                ElMessage.warning("已进行延期批改 2 次，不允许再进行此操作！");
-                return false; 
+        console.log( 'code--0',cProdNo,' 分公司编码查询结果 ', resCheck, ' 分公司编码 ', subSidiary);
+
+        const resOff = await checkCancelM1IsOff({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
+        console.log(666,resOff)
+        if(false){
+             return false; 
+        }else{
+
+            if (cProdNo === '043009') {
+                // 陕西分公司：次数不限，仅提示
+                if (subSidiary === "0261010000000") {
+                    
+                    ElMessage.warning("陕西分公司免费延期批改次数不限！");
+                    return true; 
+                } else if (parseInt(count) === 2) {
+                    // 第 3 次延期：提示后允许继续
+                    ElMessage.warning("每单可延期批改 3 次，此次延期后不再允许免费延期批改！");
+                    return true;  
+                } else if (parseInt(count) >= 3) {
+                    // 超过 3 次：拦截并提示
+                    ElMessage.warning("已进行延期批改 3 次，不允许再进行此操作！");
+                    return false;  
+                }
+            } else {
+                // 其他产品规则
+                if (parseInt(count) === 1) {
+                    // 第 2 次延期：提示后允许继续
+                    ElMessage.warning("每单可延期批改 2 次，此次延期后不再允许免费延期批改！");
+                    return true;  
+                } else if (parseInt(count) >= 2) {
+                    // 超过 2 次：拦截并提示
+                    ElMessage.warning("已进行延期批改 2 次，不允许再进行此操作！");
+                    return false; 
+                }
             }
         }
 
-   ElMessage.warning("每单可延期批改 2 次，此次延期后不再允许免费延期批改！");
         return true;
     } catch (error) {
         // 异常场景：默认拦截，避免报错导致流程混乱
