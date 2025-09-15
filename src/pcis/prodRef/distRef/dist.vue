@@ -54,6 +54,7 @@ import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-ed
 import {eventBus} from "@/utils/event-bus";
 import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { getTgtDetailByDist } from "@/api/query";
 
 const { getRules } = useValidator();
 const route = useRoute();
@@ -191,6 +192,10 @@ watch(
         console.log('发生变化了。。。',newVal)
         if(isQuery.value) return
         eventBus.emit('goodsMxChange', newVal);
+        // 02开头的货物明细清单，关联标的信息
+        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
+            method.getTgtDetailFn();
+        }
       }
     }
 );
@@ -643,37 +648,6 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
-        // // 刷新条款表格
-        // const termref = opertaor.getTableRefByKey("cvrg");
-        // const hasRel = res.data.hasRel;
-        // const hasPlan = res.data.hasPlan;
-        // const clauseValues = res.data.clauseValues;
-
-        // if(hasRel == false){
-        //     return;
-        // }
-        // if(clauseValues.length == 0){
-        //     return;
-        // }
-        // // 区分方案
-        // if(hasPlan){
-        //     clauseValues.forEach(item => {
-        //         termref.setTermData({
-        //             termNo: route.params.param.cTermNo,
-        //             planNo: item.planNo,
-        //             factorProp: item.field,
-        //         }, item.countNumber);
-        //     });
-        // } else{
-        //     clauseValues.forEach(item => {
-        //         termref.setTermData({
-        //             termNo: route.params.param.cTermNo,
-        //             factorProp: item.field,
-        //         }, item.countNumber);
-        //     });
-        // }
-
-
       }
     });
   },
@@ -691,6 +665,40 @@ const method = {
   //     }
   //   });
   // },
+  getTgtDetailFn:() => {
+        let cappNo = '';
+        // 判断有无批改类型参数，有则是批单
+        if(route.params.param?.cEdrType) {
+         const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+         cappNo = edrbase['EdrBase.cAppNo'];
+        } else if(route.params.param?.pageName === "priceInquiry") {
+         cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+        } else {
+         cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+        }
+        const paramA = {
+          cAppNo: cappNo,
+        };
+        getTgtDetailByDist(paramA).then((res: any) => {
+        if (res["code"] == "200") {
+            let tgtRef = opertaor.getTableRefByKey('tgt');
+            let cWaybillNumber = res.data?.cWaybillNumber;
+            let cGoodsNo = res.data?.cGoodsNo;
+            let nInvoicceValue = res.data?.nInvoicceValue;
+            let cInvoiceNum = res.data?.cInvoiceNum;
+            let nGoodsNum = res.data?.nGoodsNum;
+
+            tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
+            tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
+            tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
+            tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
+            tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
+         
+        } else {
+            ElMessage.error(res.msg);
+        }
+        });
+  },
   carInfoAdd: () => {
     const param = {};
     if(route.params.param?.pageName === "priceInquiry") {

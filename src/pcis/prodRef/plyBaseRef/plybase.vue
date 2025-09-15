@@ -690,7 +690,12 @@ const method = {
         rules: [getRules("required", {})],
         disabled: false,
       });
-    } else {
+      const CDptCde = getValue("Base.cDptCde");
+      if (CDptCde.startsWith('0253')) {
+        setFormItem("Base.cCanclfeersnCde", { typeCode: 'YN_NV_NoPayseeMoeny' });
+
+      }
+        } else {
       setFormItem("Base.cCanclfeersnCde", { rules: null, disabled: true });
       setValue("Base.cCanclfeersnCde", "");
     }
@@ -701,8 +706,8 @@ const method = {
     if (!p.initFlag) {
       setValue("Base.cPrjCtgMidTyp", "");
       setValue("Base.cPrjCtgSubTyp", "");
-     
     }
+
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });

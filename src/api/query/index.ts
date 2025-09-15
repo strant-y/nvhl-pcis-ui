@@ -376,3 +376,11 @@ export function qryPolicyNewList(queryParams: any): AxiosPromise<any> {
 export function getTermDetailByDist(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/getTermDetailByDist`, queryParams);
 }
+
+/**
+* 02根据清单获取标的
+ * @param queryParams
+ */
+export function getTgtDetailByDist(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/getTgtDetailByDist`, queryParams);
+}

@@ -124,7 +124,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cSegment",
         inputtype: 'rtselect',
         title: "环节",
-				typeCode: 'Segment',
+				typeCode: 'segment',
       },
        
     ],

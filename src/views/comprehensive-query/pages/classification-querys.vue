@@ -11,14 +11,23 @@
       <!-- policyInfo 列的具名插槽 -->
        <template #column-policyInfo="{ row, column, index }">
         <div class="policy-info-cell">
-          <!-- 投保/批改-->
-          <template v-if="cAppType !== 'I'">
+          <!-- 投保 (申请单号/保单号)-->
+          <template v-if="cAppType == 'A'">
             <div v-if="row.cAppNo" class="policy-number-row">
             <span v-html="row.cAppNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
+            <div v-if="row.cPlyNo" class="policy-number-row">
+                <span v-html="row.cPlyNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                   <DocumentCopy />
+                </el-icon>
+            </div>
+          </template>
+          <!-- 批改 (保单号)-->
+          <template v-else-if="cAppType == 'E'">
             <div v-if="row.cPlyNo" class="policy-number-row">
                 <span v-html="row.cPlyNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
@@ -41,6 +50,32 @@
                 </el-icon>
             </div>
             </template>
+        </div>
+       </template>
+       <template #column-cEdrNo="{ row }">
+        <div class="policy-info-cell">
+          <template v-if="cAppType == 'A' || cAppType == 'I'">
+            <div v-if="row.cEdrNo" class="policy-number-row">
+                <span v-html="row.cEdrNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="row.cAppNo" class="policy-number-row">
+               <span v-html="row.cAppNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+            <div v-if="row.cEdrNo" class="policy-number-row">
+                <span v-html="row.cEdrNo"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+          </template>
         </div>
       </template>
       <template #column-InsurancePeriod="{ row, column, index }">
@@ -78,9 +113,6 @@
         </el-tooltip>
       </template>
       <!-- ES查询 查询条件高亮 -->
-      <template #column-cEdrNo="{ row }">
-        <span v-html="row.cEdrNo || ''"></span>
-      </template>
       <template #column-cClntAddr="{ row }">
         <span v-html="row.cClntAddr || ''"></span>
       </template>
@@ -629,7 +661,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
-                              item.rules = [getRules("required", {})]; // 设置必填规则
                               // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                               const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
@@ -650,7 +681,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
-                              item.rules = [getRules("required", {})]; // 设置必填规则
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
@@ -803,7 +833,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "cIndustryType",
               inputtype: "rtselect",
               title: "行业类型",
-              typeCode: "HANGYE_TYPE",
+              typeCode: "Hangye_Type",
               clearable: true,
               hidden: true,
           },
@@ -911,7 +941,7 @@ const normalQueryColumns = [
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
-        minWidth: 180,
+        minWidth: 242,
         slotName: "cEdrNo"
     },
     {
@@ -1930,6 +1960,8 @@ function updatePolicyInfoTitle(cAppTyp: string) {
   if (targetColumn) {
     if (cAppTyp === 'I') {
       targetColumn.title = '询价申请单号/询价单号';
+    } else if (cAppTyp === 'E') {
+      targetColumn.title = '保单号';
     } else {
       targetColumn.title = '申请单号/保单号';
     }
@@ -2073,11 +2105,12 @@ async function applyCheckedColumns(props: string[]) {
       const currentAppType = freeEditRef.value?.getFromValue()?.cAppTyp;
       if (currentAppType === 'I') {
         policyInfoCol.title = '询价申请单号/询价单号';
+      } else if (currentAppType === 'E') {
+        policyInfoCol.title = '保单号';
       } else {
         policyInfoCol.title = '申请单号/保单号';
       }
     }
-    
     const newConfig = {
         ...tableObj.notWaitObj,
         fromSchema: finalColumns

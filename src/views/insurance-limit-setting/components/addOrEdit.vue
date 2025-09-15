@@ -59,7 +59,7 @@ const chooseProdName = ref('') //选中的条款名称
 const insuranceLimit = new InsuranceLimit();
 const codeListMap = reactive({
   persionType: [],
-  companyType: []
+  NV049001: []
 })
 
 
@@ -348,7 +348,7 @@ onMounted(() => {
       codeListParam: { }
     }, false, true).then(res => {
       if (res) {
-        codeListMap['companyType'] = res;
+        codeListMap['NV049001'] = res;
       }
     }, () => {
       ElMessage.error('后台服务异常,请联系管理员');
@@ -367,12 +367,12 @@ onMounted(() => {
           if(res.data.customerNature == '1') {
             item.loadData = codeListMap['persionType']
           } else {
-            item.loadData = codeListMap['companyType']
+            item.loadData = codeListMap['NV049001']
           }
           if(res.data.shareholderNature == '1') {
             item2.loadData = codeListMap['persionType']
           } else {
-            item2.loadData = codeListMap['companyType']
+            item2.loadData = codeListMap['NV049001']
           }
         })
       }
