@@ -1101,7 +1101,6 @@ const edrBtn = [
     type: "primary",
     id: "btnCalEdr",
     func: () => {
-      debugger
       // calcPremiumEdr();
       // 批改原因是否是费率变更
       if(props.param.cRsnCde === '45') {
@@ -1380,7 +1379,6 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-  debugger
    if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
@@ -2679,7 +2677,6 @@ const loadAppPlyInfo = async (CAppNo) => {
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
-      debugger
       if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
         ops.plyBase['Base.cAppNo'] = '';
       }
