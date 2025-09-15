@@ -300,7 +300,7 @@ defineExpose({
 <style lang="scss" scoped>
 .searchbar {
   border: 1px solid #ddd;
-  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+  // box-shadow: 0 0 2px rgb(0 0 0 / 30%);
 }
 .table-container ::v-deep .el-card__header {
   // background-color: #d0f3fc4d !important;

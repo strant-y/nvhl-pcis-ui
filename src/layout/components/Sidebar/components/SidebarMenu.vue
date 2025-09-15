@@ -10,6 +10,31 @@
     :collapse-transition="false"
     :mode="layout === 'top' ? 'horizontal' : 'vertical'"
   >
+    <!-- <el-dropdown trigger="click">
+      <span class="el-dropdown-link">
+        <svg-icon icon-class="menu" />
+        <span class="ml-1">系统菜单</span>
+        <el-icon class="el-icon--right">
+          <arrow-down />
+        </el-icon>
+      </span>
+      <template #dropdown>
+        <div class="dropdownContent" :style="{ width:  dropdownContentWidth}">
+          <div class="title-box">
+            <div class="title">财险承保系统</div>
+            <div class="desc">赋能财险业务高质量发展</div>
+          </div>
+          <div class="menu-list-box">
+            <div v-for="item in dropdowmList" :key="item.path" class="menu-list-item">
+              <div class="first-level-title">{{ item.meta.title }}</div>
+              <div class="second-level-list">
+                <span class="second-level-title">{{ i.meta.title }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </el-dropdown> -->
     <SidebarMenuItem
       v-for="route in menuList"
       :key="route.path"
@@ -43,6 +68,15 @@ const props = defineProps({
     required: true,
   },
 });
+const dropdownContentWidth = computed(() => {
+  return window.innerWidth - 10 + 'px';
+});
+const dropdowmList = computed(() => {
+  const list = props.menuList.filter((item:any) => {
+    return item.path !== "/login" && item.path !== "/" && item.path !== "/redirect"
+  })
+  return list;
+});
 
 console.log(props.menuList);
 
@@ -69,5 +103,55 @@ function resolvePath(routePath: string) {
   color: #FFFFFF!important;
   background: var(--el-color-primary);
 }
-
+.el-dropdown-link {
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000000;
+}
+.dropdownContent {
+  background: #f5f5f5;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  .title-box {
+    width: 260px;
+    padding: 70px 0 0 30px;
+    .title {
+      font-size: 34px;
+      color: #333333;
+      line-height: 48px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .desc {
+      font-size: 16px;
+      color: #666666;
+      line-height: 22px;
+    }
+  }
+  .menu-list-box {
+    padding: 30px;
+    .menu-list-item {
+      margin-bottom: 20px;
+      .first-level-title {
+        font-size: 14px;
+        color: #333333;
+        line-height: 20px;
+        font-weight: 600;
+      }
+      .second-level-list {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        .second-level-title {
+          font-size: 12px;
+          color: #666666;
+          line-height: 17px;
+          margin-top: 8px;
+        }
+      }
+    }
+  }
+}
 </style>

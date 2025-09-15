@@ -100,10 +100,10 @@
         <span v-html="row.cProdNmeCn || ''"></span>
       </template>
       <template #column-nAmt="{ row }">
-        <span v-html="row.nAmt || ''"></span>
+        <span v-html="row.nAmt.toLocaleString() || ''"></span>
       </template>
       <template #column-nPrm="{ row }">
-        <span v-html="row.nPrm || ''"></span>
+        <span v-html="row.nPrm.toLocaleString() || ''"></span>
       </template>
       <template #column-cUdrNme="{ row }">
         <span v-html="row.cUdrNme || ''"></span>
@@ -968,7 +968,8 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "保额",
         width: 130,
-        slotName: "nAmt"
+        slotName: "nAmt",
+        align: 'left'
     },
     {
         prop: "nPrm",
@@ -976,7 +977,8 @@ const normalQueryColumns = [
         title: "保费",
         width: 140,
         prefix: "¥ ",
-        slotName: "nPrm"
+        slotName: "nPrm",
+        align: 'left'
     },
     {
         prop: "tIssueTm",

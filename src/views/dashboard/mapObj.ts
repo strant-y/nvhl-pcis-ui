@@ -63,6 +63,18 @@ export const tableObj = {
         title: "被保人名称",
         align: "left"
       },
+      {
+        prop: "nAmt",
+        inputtype: "rtinput",
+        title: "保额",
+        width: 130,
+      },
+      {
+        prop: "nPrm",
+        inputtype: "rtinput",
+        title: "保费",
+        width: 130,
+      },
     ],
   },
   // 出单--已提交任务

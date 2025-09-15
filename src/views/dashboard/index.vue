@@ -271,7 +271,7 @@
               <div class="echarts-list">
                 <div style="margin-bottom: 18px;">
                   <span>保费月份</span>
-                  <span>保费额（万元）</span>
+                  <span>保费（万元）</span>
                 </div>
                 <div v-for="item in echartsOptionsData1[currentTab]" :key="item.item">
                   <span class="month">{{ item.item }}</span>
@@ -525,7 +525,7 @@ const { getAnalysis } = echartsService;
 const ecahrtsBtnIndex = ref(0);
 // 总量统计图-柱状图
 const echartsOptions = reactive({
-  barWidth: "10px",
+  barWidth: "15px",
   tooltip: {
     trigger: "axis",
     axisPointer: {
@@ -700,7 +700,7 @@ const echartsOptionsPie = reactive({
 });
 // 保费统计图-柱状图
 const echartsOptions1 = reactive({
-  barWidth: "10px",
+  barWidth: "15px",
   tooltip: {
     trigger: "axis",
     axisPointer: {
@@ -2269,7 +2269,7 @@ window.addEventListener("resize", () => {
       }
 
       .top-search {
-        width: 100%;
+        width: 66%;
         height: 2.5rem;
         display: flex;
         align-items: center;
@@ -2398,13 +2398,13 @@ window.addEventListener("resize", () => {
             display: flex;
             // justify-content: space-between;
             .echarts-content {
-              width: 40%;
+              width: calc(50% - 120px);
               margin-right: 20px;
             }
             .echarts-list {
               font-size: 16px;
               color: #999999;
-              width: calc(20% - 40px);
+              width: 200px;
               div {
                 display: flex;
                 justify-content: space-between;

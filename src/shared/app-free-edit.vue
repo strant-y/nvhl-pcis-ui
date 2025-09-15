@@ -368,7 +368,7 @@ defineExpose({
 
 .searchbar {
   border: 1px solid #ddd;
-  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+  /* box-shadow: 0 0 2px rgb(0 0 0 / 30%); */
 }
 /* .card-title-style{
   font-weight: 700;

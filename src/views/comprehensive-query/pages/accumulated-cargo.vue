@@ -193,6 +193,10 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: 'rtinput',
         title: "保额/赔偿限额",
         width: 130,
+        align: "left",
+        formatter:(val:any) => {
+          return val.toLocaleString()
+        }
       },
     ],
   })

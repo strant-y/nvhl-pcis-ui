@@ -692,11 +692,19 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
+        align: "left",
+        formatter: (val:any) => {
+          return val.toLocaleString()
+        }
       },
       {
         prop: "nPrmVar",
         inputtype: "rtinput",
         title: "保费变化量",
+        align: "left",
+        formatter: (val:any) => {
+          return val.toLocaleString()
+        }
       },
       {
         prop: "tUdrTm",
