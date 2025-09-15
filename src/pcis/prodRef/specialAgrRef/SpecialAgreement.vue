@@ -261,6 +261,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 const addData =()=>{
+  // debugger;
   let obj = [];
   let isAdd = true;
     formData.value.forEach((item)=>{

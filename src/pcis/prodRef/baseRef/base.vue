@@ -197,7 +197,7 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-   
+    console.log('付费约定',val)
    const param = opertaor.getParam();
    if (param.initFlag) {
       return ;

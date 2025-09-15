@@ -42,7 +42,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "延长天数",
         disabled: true,
-        hidden: params.cRsnCde != "FZ",
+        // hidden:false ,
+        hidden: params.cRsnCde != "FZ" && params.cRsnCde != "M1" ,
       },
       {
         prop: "EdrBase.tRepStopExtBgnTm",
@@ -267,6 +268,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
         func: (v) => {},
       },
+
+      //  {
+      //   prop: "EdrBase.NResvNum3",
+      //   inputtype: "rtinput",
+      //   title: "已延期天数",
+      //    disabled:true,
+      // },
+
+
       {
         prop: "EdrBase.cEdrRsnDetail",
         inputtype: "rtcheckboxgroup",
