@@ -8,7 +8,13 @@
       ref="tableRef"
       @selection-change="handleSelectionChange"
       @page-change="handleQuery(false)"
-    />
+    >
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="formatTwoLine(row.cDptCnm) || ''"></span>
+        </el-tooltip>
+      </template>
+    </app-table>
   </div>
 </template>
 
@@ -401,7 +407,7 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["cStatus"],
     showSelection: true,
     tableBtnType: "btn",
-    tableBtnWidth: 150,
+    tableBtnWidth: 80,
     fixed: true,
     tableBtnPosition: ref<any>(""),
     tableBtnFixed: "right",
@@ -577,60 +583,75 @@ const tableconfig = reactive<AppTableConfig>(
         minWidth: 170,
         showCopyIcon: true,
         fixed: "left",
+        width: 170,
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
+        align: 'left',
+        width: 50,
+        formatter:(val:any) => {
+          return val?.slice(0,2)
+        }
       },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
         minWidth: 180,
+        align: 'left',
+        width: 140,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
-        minWidth: 180,
+        align: 'left',
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: 'left',
+        width: 175,
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: 'left',
+        width: 175,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
-        showKey: [1, 2, 3, 4],
         minWidth: 180,
+        align: 'left',
+        width: 105,
       },
       {
         prop: "bsTm1",
         inputtype: "rtdatepicker",
         title: "询价日期",
-        showKey: [1, 2, 3, 4],
         maxWidth: 150,
+        width: 140,
       },
       {
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "提交时间",
-        showKey: [1, 2, 3, 4],
         maxWidth: 150,
+        width: 140,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 150,
+        width: 65,
+        align: "left",
         loadData: [
           { label: "未接收", value: "0" },
           { label: "已接收", value: "1" },
@@ -1337,6 +1358,15 @@ function handleDelete(id?: string) {
       }
     });
   });
+}
+
+function formatTwoLine(text) {
+  if (!text) return '';
+  const len = text.length;
+  if (len <= 10) {
+    return `${text}`;
+  }
+  return `${text.slice(0, 9)}…`;
 }
 
 //给表单下拉项赋值

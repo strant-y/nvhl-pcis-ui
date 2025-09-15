@@ -1506,13 +1506,13 @@ table {
   margin-bottom: 0px;
 }
 .custom-indent {
-  padding-left: 30px; /* 空三格 */
+  padding-left: 60px; /* 空三格 */
   position: relative;
 }
 .custom-indent::before {
-  content: "-";
+  content: "其中：";
   position: absolute;
-  left: 10px;
+  left: 20px;
 }
 
 .custom-left {

@@ -24,7 +24,7 @@
         </div>
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
-          <rtButton :item="searchBtnItem" />
+          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;" />
         </div>
         <!-- <div class="top-menu">
           <div class="menu-label">
@@ -434,7 +434,7 @@ const searchItem = {
   prefixIcon: "Search",
 };
 const searchBtnItem = {
-  label: "搜  索",
+  label: "搜索",
   type: "primary",
   func: () => {
     handleSearch(searchValue.value);
@@ -667,18 +667,18 @@ const echartsOptionsPie = reactive({
         normal: {
           color: function (colors:any) {
             var colorList = [
-              '#70A1FF',
-              '#81ACFF',
-              '#90B6FF',
-              '#A0C1FF',
-              '#B0CBFF',
-              '#C0D5FF',
-              '#CFE0FF',
-              '#DFEAFF',
-              '#EFF4FF',
-              '#B0EDFC',
-              '#62DCFA',
-              '#6197FF',
+              '#5788E6',
+              '#6794E8',
+              '#79A0EB',
+              '#89ABED',
+              '#9AB8F0',
+              '#ABC3F2',
+              '#BCCFF5',
+              '#CCDBF7',
+              '#DDE7FA',
+              '#EEF3FC',
+              '#ABE2EF',
+              '#58C5E0',
             ];
             return colorList[colors.dataIndex];
           },
@@ -842,18 +842,18 @@ const echartsOptions1Pie = reactive({
         normal: {
           color: function (colors:any) {
             var colorList = [
-              '#70A1FF',
-              '#81ACFF',
-              '#90B6FF',
-              '#A0C1FF',
-              '#B0CBFF',
-              '#C0D5FF',
-              '#CFE0FF',
-              '#DFEAFF',
-              '#EFF4FF',
-              '#B0EDFC',
-              '#62DCFA',
-              '#6197FF',
+              '#5788E6',
+              '#6794E8',
+              '#79A0EB',
+              '#89ABED',
+              '#9AB8F0',
+              '#ABC3F2',
+              '#BCCFF5',
+              '#CCDBF7',
+              '#DDE7FA',
+              '#EEF3FC',
+              '#ABE2EF',
+              '#58C5E0',
             ];
             return colorList[colors.dataIndex];
           },
@@ -2281,6 +2281,9 @@ window.addEventListener("resize", () => {
 
         .el-button {
           margin-right: 10px;
+        }
+        :deep(.el-button>span) {
+          padding-left: 20px;
         }
       }
 

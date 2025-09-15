@@ -1,7 +1,7 @@
 <!-- 查询 -->
 <template>
   <div class="app-container">
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" class="freeEditClass" />
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -56,7 +56,7 @@
       <!-- 展示成2行，第1行7个字，第2行6个字 + 超出部分用...代替，鼠标放上去可展示全部 -->
       <template #column-cDptCnm="{ row, column, index }">
         <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="formatTwoLine(row.cDptCnm) || ''"></span>
+          <span v-html="formatTwoLine(row.cDptCnm, 10) || ''"></span>
         </el-tooltip>
       </template>
       <template #column-cTermNme="{ row, column, index }">
@@ -79,7 +79,20 @@
       </template>
       <!-- ES查询 查询条件高亮 -->
       <template #column-cEdrNo="{ row }">
-        <span v-html="row.cEdrNo || ''" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+        <div class="policy-info-cell">
+            <div v-if="row.cPlyAppNo" class="policy-number-row">
+                <span v-html="row.cPlyAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cPlyAppNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+            <div v-if="row.cEdrNo" class="policy-number-row">
+                <span v-html="row.cEdrNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+                <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
+                    <DocumentCopy />
+                </el-icon>
+            </div>
+        </div>
       </template>
       <template #column-cClntAddr="{ row }">
         <span v-html="row.cClntAddr || ''"></span>
@@ -405,6 +418,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {
                   label: "搜索",
                   type: "primary",
+                  btnStyle: {'font-size': '16px'},
                   func: () => {
                     handleQuery(true, true);
                   },
@@ -421,6 +435,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {
                   icon: "Search",
                   type: "primary",
+                  btnStyle: {width: '100%'},
                   func: () => {
                       dzmodal
                           .open(DepartmentTree, { type: "Issuer", data: {} })
@@ -606,12 +621,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "询价/投保/批改申请单号",
               clearable: true,
+              labelLength: 12,
           },
           {
               prop: "cPlyNo",
               inputtype: "rtinput",
               title: "询价单号/保单号/批单号",
               clearable: true,
+              labelLength: 12,
           },
           {
               prop: "cAppTyp",
@@ -910,7 +927,7 @@ const normalQueryColumns = [
     {
         prop: "cEdrNo",
         inputtype: "rtinput",
-        title: "批单号",
+        title: "批改申请单号/批单号",
         minWidth: 180,
         slotName: "cEdrNo"
     },
@@ -930,7 +947,7 @@ const normalQueryColumns = [
         maxWidth: 140,
         slotName: "cDptCnm",
         align: 'left',
-        width: 112,
+        width: 145,
     },
     {
         prop: "cAppNme",
@@ -971,15 +988,15 @@ const normalQueryColumns = [
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
-        width: 130,
+        width: 105,
         slotName: "nAmt",
-        align: 'left'
+        align: 'left',
     },
     {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
-        width: 140,
+        width: 95,
         prefix: "¥ ",
         slotName: "nPrm",
         align: 'left'
@@ -1006,7 +1023,8 @@ const normalQueryColumns = [
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 120,
-        width: 95,
+        width: 105,
+        align: "left",
         loadData: [
             { label: "暂存", value: "1" },
             { label: "已提核", value: "2" },
@@ -1049,17 +1067,17 @@ const normalQueryColumns = [
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 180, },
+  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 170, },
   { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 140, optional: true, sortable: true},
   { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 140, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', width: 140, optional: true, align: 'left', },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', width: 140, optional: true, align: 'left', },
   { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', width: 140, optional: true, align: 'left', },
-  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', width: 130, optional: true },
-  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 130, optional: true },
-  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left', },
-  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme", align: 'left',},
-  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
+  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
+  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 100, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
+  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left',width: 61, },
+  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme", align: 'left',width: 61,},
+  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true,width:90},
   { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
 
@@ -1070,7 +1088,7 @@ const tableObj = {
         defaultSort: { prop: 'tCrtTm', order: 'descending' },
         defaultSort: { prop: 'tUdrTm', order: 'descending' },
         tableBtnType: "btn",
-        tableBtnWidth: 150,
+        tableBtnWidth: 80,
         tableBtnPosition: "right",
         rowDbClickFun: (row:any) => handleRowDoubleClick(row),
         tableBtn: [
@@ -2133,13 +2151,14 @@ async function applyCheckedColumns(props: string[]) {
     }
 }
 
-function formatTwoLine(text) {
+function formatTwoLine(text, num=7) {
   if (!text) return '';
   const len = text.length;
-  if (len <= 13) {
-    return `${text.slice(0, 7)}<br/>${text.slice(7)}`;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
   }
-  return `${text.slice(0, 7)}<br/>${text.slice(7, 13)}…`;
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
 }
 
 function setValue(key: string, value: any) {
@@ -2183,4 +2202,7 @@ defineExpose({
 /* :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 } */
+:deep(.el-button-group .el-button) {
+    font-size: 16px;
+}
 </style>

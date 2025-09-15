@@ -10,7 +10,12 @@
       @page-change="handleQuery(false)"
     >
       <template #column-nPrm="{ row, column, index }">
-        <span>¥ {{ row.nPrm }}</span>
+        <span>¥ {{ row.nPrm.toLocaleString() }}</span>
+      </template>
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="formatTwoLine(row.cDptCnm) || ''"></span>
+        </el-tooltip>
       </template>
     </app-table>
   </div>
@@ -405,7 +410,7 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["cStatus"],
     showSelection: true,
     tableBtnType: "btn",
-    tableBtnWidth: 150,
+    tableBtnWidth: 80,
     fixed: true,
     tableBtnPosition: "right",
     tableBtnFixed: "right",
@@ -575,8 +580,8 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
-        maxWidth: 110,
-        title: "申请单类型",
+        width: 65,
+        title: "任务类型",
       },
       {
         prop: "cAppNo",
@@ -584,37 +589,55 @@ const tableconfig = reactive<AppTableConfig>(
         title: "申请单号",
         maxWidth: 200,
         showCopyIcon: true,
+        width: 170,
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
+        align: 'left',
+        width: 50,
+        formatter:(val:any) => {
+          return val?.slice(0,2)
+        }
       },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
         maxWidth: 180,
+        align: 'left',
+        width: 140,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        align: 'left',
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        align: 'left',
+        width: 175,
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        align: 'left',
+        width: 175,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
+        align: 'left',
+        width: 130,
+        formatter:(val:any) => {
+          return val.toLocaleString()
+        }
       },
       {
         prop: "crtTm",
@@ -624,30 +647,39 @@ const tableconfig = reactive<AppTableConfig>(
         type: "datetimerange", // 显示日期和时间选择器
         format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
+        width: 140,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         minWidth: 180,
+        align: 'left',
+        width: 105,
       },
       {
         prop: "udrClsCde",
         inputtype: "rtinput",
         title: "当前核保级别",
         minWidth: 180,
+        align: 'left',
+        width: 150,
       },
       {
         prop: "cMinUndrCls",
         inputtype: "rtinput",
         title: "最终审核级别",
         minWidth: 180,
+        align: 'left',
+        width: 155,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 150,
+        width: 65,
+        align: "left",
         loadData: [
           { label: "未接收", value: "0" },
           { label: "已接收", value: "1" },
@@ -1421,6 +1453,15 @@ function handleDelete(id?: string) {
       }
     });
   });
+}
+
+function formatTwoLine(text) {
+  if (!text) return '';
+  const len = text.length;
+  if (len <= 10) {
+    return `${text}`;
+  }
+  return `${text.slice(0, 9)}…`;
 }
 
 //给表单下拉项赋值

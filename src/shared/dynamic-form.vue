@@ -21,6 +21,7 @@
                   : formUi.span
             "
             v-if="!item.group"
+            style="padding-left: 5px;padding-right:5px;"
           >
             <template v-if="item.inputtype === 'rtButton'">
               
@@ -54,13 +55,13 @@
                             :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
                             " >
                 <template #label>
-                   <template v-if="item.title?.length > 10">
+                   <template v-if="item.title?.length > (item.labelLength || 10)">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 10) + "..." }}
+                      {{ item.title.substring(0, item.labelLength || 10) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -108,13 +109,13 @@
                 :label-width=" maxLabelWidth + 'px'"
               >
                 <template #label>
-                   <template v-if="item.title?.length > 10">
+                   <template v-if="item.title?.length > (item.labelLength || 10)">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 10) + "..." }}
+                      {{ item.title.substring(0, item.labelLength || 10) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -265,13 +266,13 @@
                     :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
-                      <template v-if="item.title?.length > 10">
+                      <template v-if="item.title?.length > (item.labelLength || 10)">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
                           placement="top-start"
                         >
-                          {{ item.title.substring(0, 10) + "..." }}
+                          {{ item.title.substring(0, item.labelLength || 10) + "..." }}
                         </el-tooltip>
                       </template>
                       <template v-else>
@@ -332,11 +333,11 @@ const updateLabelWidth = () => {
   if (screenWidth < 768) {
     // maxLabelWidth.value = "80px"; // 移动端窄屏
   } else if(screenWidth > 1367 && screenWidth <= 1600) {  /*主流笔记本	1367px - 1600px*/
-     maxLabelWidth.value = "175"; // PC 端宽屏
+     maxLabelWidth.value = "180"; // PC 端宽屏
   }else if(screenWidth > 1601 && screenWidth <= 1920) { /*大屏笔记本/台式机*/
-    maxLabelWidth.value = "195"; // PC 端宽屏
+    maxLabelWidth.value = "200"; // PC 端宽屏
   }else if(screenWidth > 1921 && screenWidth <= 3840) {
-    maxLabelWidth.value = "225"; // PC 端宽屏
+    maxLabelWidth.value = "230"; // PC 端宽屏
   }
 };
 

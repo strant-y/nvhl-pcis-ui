@@ -141,41 +141,43 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
+            <div class="methodColumn">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
-            <template v-if="item.tableBtnType === 'text'">
-              <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
-                btn.label
-              }}</a>
-            </template>
-            <template v-if="item.tableBtnType === 'btn'">
-              <el-tooltip
-                :disabled="btn.tooltip ? false : true"
-                :content="btn.tooltip"
-                placement="top"
-                effect="light"
-              >
-                <rtButton
-                  @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
-                  :item="btn"
-                />
-              </el-tooltip>
-            </template>
-            <template v-if="item.tableBtnType === 'icon'">
-              <el-tooltip
-                :disabled="btn.tooltip ? false : true"
-                :content="btn.tooltip"
-                placement="top"
-                effect="light"
-              >
-                <a>
-                  <rtIcon :item="btn" />
-                </a>
-              </el-tooltip>
-            </template>
-            <template v-if="index !== item.tableBtn.length - 1">
-              <el-divider direction="vertical" />
-            </template>
+              <template v-if="item.tableBtnType === 'text'">
+                <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
+                  btn.label
+                }}</a>
+              </template>
+              <template v-if="item.tableBtnType === 'btn'">
+                <el-tooltip
+                  :disabled="btn.tooltip ? false : true"
+                  :content="btn.tooltip"
+                  placement="top"
+                  effect="light"
+                >
+                  <rtButton
+                    @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
+                    :item="btn"
+                  />
+                </el-tooltip>
+              </template>
+              <template v-if="item.tableBtnType === 'icon'">
+                <el-tooltip
+                  :disabled="btn.tooltip ? false : true"
+                  :content="btn.tooltip"
+                  placement="top"
+                  effect="light"
+                >
+                  <a>
+                    <rtIcon :item="btn" />
+                  </a>
+                </el-tooltip>
+              </template>
+              <template v-if="index !== item.tableBtn.length - 1">
+                <!-- <el-divider direction="vertical" /> -->
+              </template>
           </template>
+            </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -266,57 +268,59 @@
         "
       >
         <template #default="scope">
+              <div class="methodColumn">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="btn.hidden !== true">
-              <template v-if="item.tableBtnType === 'text'">
-                <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
-                  btn.label
-                }}</a>
-              </template>
-              <template v-if="item.tableBtnType === 'btn'">
-                <el-tooltip
-                  :disabled="btn.tooltip ? false : true"
-                  :content="btn.tooltip"
-                  placement="top"
-                  effect="light"
-                >
-                  <rtButton
-                    @click="
-                      btn.tableClick ? btn.tableClick(scope.row) : () => {}
-                    "
-                    :item="btn"
-                    :disabled="btn.disabled ? btn.disabled(scope.row) : false"
-                    v-if="!btn.hideBtns?.(scope.row) ?? false"
-                  />
-                </el-tooltip>
-              </template>
-              <template v-if="item.tableBtnType === 'icon'">
-                <el-tooltip
-                  :disabled="btn.tooltip ? false : true"
-                  :content="btn.tooltip"
-                  placement="top"
-                  effect="light"
-                >
-                  <a
-                    ><rtIcon
+                <template v-if="item.tableBtnType === 'text'">
+                  <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
+                    btn.label
+                  }}</a>
+                </template>
+                <template v-if="item.tableBtnType === 'btn'">
+                  <el-tooltip
+                    :disabled="btn.tooltip ? false : true"
+                    :content="btn.tooltip"
+                    placement="top"
+                    effect="light"
+                  >
+                    <rtButton
                       @click="
                         btn.tableClick ? btn.tableClick(scope.row) : () => {}
                       "
                       :item="btn"
-                  /></a>
-                </el-tooltip>
-              </template>
-              <template
-                v-if="
-                  index !== item.tableBtn.length - 1 &&
-                  !btn.hideBtns?.(scope.row) &&
-                  item.tableBtn.length > 1
-                "
-              >
-                <el-divider direction="vertical" />
-              </template>
+                      :disabled="btn.disabled ? btn.disabled(scope.row) : false"
+                      v-if="!btn.hideBtns?.(scope.row) ?? false"
+                    />
+                  </el-tooltip>
+                </template>
+                <template v-if="item.tableBtnType === 'icon'">
+                  <el-tooltip
+                    :disabled="btn.tooltip ? false : true"
+                    :content="btn.tooltip"
+                    placement="top"
+                    effect="light"
+                  >
+                    <a
+                      ><rtIcon
+                        @click="
+                          btn.tableClick ? btn.tableClick(scope.row) : () => {}
+                        "
+                        :item="btn"
+                    /></a>
+                  </el-tooltip>
+                </template>
+                <template
+                  v-if="
+                    index !== item.tableBtn.length - 1 &&
+                    !btn.hideBtns?.(scope.row) &&
+                    item.tableBtn.length > 1
+                  "
+                >
+                  <!-- <el-divider direction="vertical" /> -->
+                </template>
             </template>
           </template>
+              </div>
         </template>
       </el-table-column>
     </el-table>
@@ -915,5 +919,12 @@ function isrequired(i: any) {
 /* 表头居中对齐 */
 :deep(.el-table th.is-left div.cell) {
   text-align: center;
+}
+.methodColumn {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+:deep(.methodColumn .el-button+.el-button) {
+  margin-left: 0;
 }
 </style>
