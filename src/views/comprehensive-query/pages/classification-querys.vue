@@ -661,7 +661,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
-                              item.rules = [getRules("required", {})]; // 设置必填规则
                               // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                               const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
@@ -682,7 +681,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
-                              item.rules = [getRules("required", {})]; // 设置必填规则
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
@@ -943,6 +941,7 @@ const normalQueryColumns = [
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
+        minWidth: 242,
         slotName: "cEdrNo"
     },
     {
