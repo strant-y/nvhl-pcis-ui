@@ -152,7 +152,8 @@ function getShortMenuList() {
 }
 .el-dropdown__popper.menuDropdowm {
   box-shadow: none;
-  background: rgba(0,0,0,.7);
+  /* background: rgb(0,0,0,.65); */
+  background-color: #696A6A;
   margin-left: 221px;
   margin-top: -12px;
   min-width: 700px;
