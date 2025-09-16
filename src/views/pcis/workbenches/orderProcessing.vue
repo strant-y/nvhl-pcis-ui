@@ -68,6 +68,31 @@
           </div>
         </div>
       </template>
+      <template #column-cTermNme="{ row, column, index }">
+        <el-tooltip :content="row.cTermNme" placement="top">
+          <span v-html="formatTwoLine(row.cTermNme) || ''"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cAppNme="{ row, column, index }">
+        <el-tooltip :content="row.cAppNme" placement="top">
+          <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cInsuredNme="{ row, column, index }">
+        <el-tooltip :content="row.cInsuredNme" placement="top">
+          <span v-html="formatTwoLine(row.cInsuredNme) || ''"></span>
+        </el-tooltip>
+      </template>
+      <template #column-InsurancePeriod="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.tInsrncBgnTm" class="policy-period-row">
+            <span v-html="row.tInsrncBgnTm"></span>
+          </div>
+          <div v-if="row.tInsrncEndTm" class="policy-period-row">
+            <span v-html="row.tInsrncEndTm"></span>
+          </div>
+        </div>
+      </template>
     </app-table>
   </div>
 </template>
@@ -360,7 +385,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editList: ["cStatus"],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 80,
     tableBtnPosition: "right",
     fixed: true,
     tableBtn: [
@@ -625,28 +650,28 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 65,
+        width: 62,
       },
       {
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cInquiryNo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
         slotName: "cPlyNo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "cEdrNo",
         inputtype: "rtselect",
         title: "批改申请单号/批单号",
         slotName: "cEdrNo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "cRsnCdeText",
@@ -659,7 +684,9 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        slotName: "cTermNme",
         align: "left",
+        width: 112,
       },
       {
         prop: "tAppTm",
@@ -672,29 +699,33 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "投保人名称",
         align: "left",
+        width: 112,
+        slotname: "cAppNme",
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
         align: "left",
+        width: 112,
+        slotname: "cInsuredNme",
       },
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
         title: "保险期间",
         minWidth: 280,
-        formatter: (val: any, row: any) => {
-          return val.replace(/T/g,' ') + " - " + row.tInsrncEndTm.replace(/T/g,' ');
-        },
+        width: 140,
+        slotName: "InsurancePeriod",
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
         align: "left",
+        width: 95,
         formatter: (val:any) => {
-          return val.toLocaleString()
+          return val?.toLocaleString()
         }
       },
       {
@@ -702,8 +733,9 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保费变化量",
         align: "left",
+        width: 100,
         formatter: (val:any) => {
-          return val.toLocaleString()
+          return val?.toLocaleString()
         }
       },
       {
@@ -717,6 +749,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "核保人",
         align: "left",
+        width: 62,
       },
       {
         prop: "taskStatus",
@@ -763,6 +796,7 @@ onMounted(() => {
       dayjs().format("YYYY-MM-DD 23:59:59"),
     ],
   });
+  handleQuery()
 });
 
 // 校验表单查询
@@ -796,6 +830,16 @@ function refreshData(flag?: boolean) {
     .catch((err: any) => {
       ElMessage.error({ message: err.msg, duration: 3000 });
     });
+}
+
+function formatTwoLine(text, num=7) {
+  if (!text) return '';
+  const len = text.length;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
+  }
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
 }
 
 // 添加 copyText 方法
@@ -856,7 +900,7 @@ function setFormItem(key: any, obj: any) {
 </script>
 <style lang="scss" scoped>
 .copy-icon {
-  margin-left: 5px;
+  // margin-left: 5px;
   cursor: pointer;
   color: #409eff;
 }

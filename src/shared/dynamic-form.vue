@@ -830,10 +830,10 @@ defineExpose({
 
 <style lang="css" scoped>
 .rt_group {
-  margin-bottom: 10px;
+  /* margin-bottom: 5px; */
   /* background: #FAFAFA; */
   /* border: 1px solid #D9D9D9; */
-  padding: 3px 12px;
+  padding: 0px 12px;
 }
 .rt_group_title {
   font-weight: 500;

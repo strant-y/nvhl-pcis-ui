@@ -6,7 +6,18 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
-    />
+    >
+      <template #column-cPlyNoInfo="{ row }">
+        <div class="policy-info-cell">
+          <div v-if="row.cPlyNo" class="policy-number-row">
+            <span v-html="row.cPlyNo"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+    </app-table>
   </div>
 </template>
 
@@ -130,10 +141,12 @@ const tableconfig = reactive<AppTableConfig>(
     title: title,
     fromSchema: [
       {
-        prop: "cDptCnm",
+        prop: "cPlyNo",
         inputtype: 'rtinput',
         title: "保单号",
-        width: 180,
+        width: 165,
+        fixed: "left",
+        slotName: "cPlyNoInfo"
       },
       {
         prop: "cAppNo",
@@ -192,7 +205,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppStatus",
         inputtype: 'rtinput',
         title: "保额/赔偿限额",
-        width: 130,
+        width: 105,
         align: "left",
         formatter:(val:any) => {
           return val.toLocaleString()
@@ -246,6 +259,44 @@ const refreshData = (flag = true) => {
       }
     }
   });
+};
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
 };
 
 

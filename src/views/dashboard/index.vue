@@ -178,6 +178,20 @@
                   </div>
                 </div>
               </template>
+              <template #column-cPlyNo="{ row, column, index }">
+                <div class="policy-info-cell">
+                  <div v-if="row.cPlyNo" class="policy-number-row">
+                    <span
+                      v-html="row.cPlyNo"
+                      class="primmaryColor"
+                      @dblclick="toQuery2(row)"
+                    ></span>
+                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                      <DocumentCopy />
+                    </el-icon>
+                  </div>
+                </div>
+              </template>
             </app-table>
           </div>
         </div>
@@ -418,6 +432,10 @@ import {
 } from "@/constants/tab-constants";
 import dayjs from "dayjs";
 import { getAppPolicyList, getInquiryPolicyList } from "@/api/query";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+const policyService = new PolicyService();
+import { delTmpPolicy, delInquiryPolicy } from "@/api/query";
+import { createFreeButtonBase } from "@/shared/button-config";
 
 defineOptions({
   name: "Dashboard",
@@ -429,7 +447,7 @@ const searchItem = {
   prop: "cQueryStr",
   inputtype: "rtinput",
   title: "",
-  placeholder: "输入申请单号进行查询",
+  placeholder: "输入询价/投保批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码查询",
   itemWidth: 2,
   prefixIcon: "Search",
 };
@@ -515,6 +533,62 @@ Object.keys(tableObj).forEach((i: any) => {
     }
     return item;
   });
+  const tableBtnObj:any = {};
+  if(i === "notWaitObj") {
+    tableBtnObj['tableBtnPosition'] = "right"
+    tableBtnObj['fixed'] = true
+    tableBtnObj['tableBtnWidth'] = 40
+    tableBtnObj['tableBtn'] = [
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "删除",
+        type: "danger",
+        size: "large",
+        icon: "Delete",
+        tableClick: (row:any) => {
+          ElMessageBox.confirm("确认删除数据?", "警告", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).then(async function () {
+            // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断
+            if (row.cAppStatus !== "1") {
+              const param = {
+                cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
+                cAppNo: row.cAppNo, // 申请单号
+                cPlyNo: row.plyNo, // 保单号
+                nEdrPrjNo: row.nEdrPrjNo, // 批改序号
+              };
+              const delRisk =
+                row.baseType === "询价"
+                  ? await policyService.delRiskXJ(param)
+                  : await policyService.delRisk(param);
+              if (delRisk && delRisk.code !== 200) {
+                ElMessage.error(delRisk.msg);
+                return;
+              }
+            }
+            const delResult =
+              row.baseType === "询价"
+                ? delInquiryPolicy({ cInquiryNo: row.cInquiryNo })
+                : delTmpPolicy({ cAppNo: row.cAppNo });
+            delResult.then((res: any) => {
+              if (null != res && null != res["code"]) {
+                if (res["code"] === 200) {
+                  ElMessage.success({ message: res.msg, duration: 3000 });
+                  getIssueTableData();
+                } else {
+                  ElMessage.error({ message: res.msg, duration: 3000 });
+                }
+              }
+            });
+          });
+        },
+      }),
+    ]
+  }
+  Object.assign(tableObj[i], tableBtnObj)
 });
 let tableconfig = reactive<AppTableConfig>(
   createTableEditConfig(tableObj.notWaitObj)
@@ -2572,7 +2646,8 @@ window.addEventListener("resize", () => {
           flex-direction: column;
           :deep(.el-table) {
             th.el-table__cell {
-              background: rgba(0, 0, 0, 0.02);
+              // background: rgba(0, 0, 0, 0.02);
+              background: #fafafa;
             }
           }
         }
@@ -2660,7 +2735,7 @@ window.addEventListener("resize", () => {
 }
 
 .copy-icon {
-  margin-left: 5px;
+  // margin-left: 5px;
   cursor: pointer;
   color: #409eff;
 }
@@ -2679,6 +2754,10 @@ window.addEventListener("resize", () => {
 
 .policy-number-row span {
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 .primmaryColor {

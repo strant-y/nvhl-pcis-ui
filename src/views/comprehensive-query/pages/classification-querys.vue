@@ -937,7 +937,7 @@ const normalQueryColumns = [
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
-        minWidth: 180,
+        width: 165,
         fixed: "left",
         slotName: "policyInfo"
     },
@@ -945,23 +945,23 @@ const normalQueryColumns = [
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
-        minWidth: 180,
+        width: 165,
         slotName: "cEdrNo"
     },
     {
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
         title: "分公司",
-        maxWidth: 25,
-        width: 60,
-        slotName: "cSecondDptCnm",
+        width: 48,
         align: 'left',
+        formatter:(val:any)=>{
+            return val?.slice(0,2)
+        }
     },
     {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 140,
         slotName: "cDptCnm",
         align: 'left',
         width: 145,
@@ -1022,7 +1022,6 @@ const normalQueryColumns = [
         prop: "tIssueTm",
         inputtype: "rtinput",
         title: "签单日期",
-        minWidth: 150,
         width: 140,
         sortable: true,
         slotName: "tIssueTm"
@@ -1031,7 +1030,6 @@ const normalQueryColumns = [
         prop: "InsurancePeriod",
         inputtype: "rtinput",
         title: "保险期间",
-        minWidth: 180,
         width: 140,
         slotName: "InsurancePeriod"
     },
@@ -1092,7 +1090,7 @@ const extendColumns = [
   { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', width: 140, optional: true, align: 'left', },
   { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
   { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 100, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
-  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left',width: 61, },
+  { prop: 'CSlsNme', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left',width: 61, },
   { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme", align: 'left',width: 61,},
   { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true,width:90},
   { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },

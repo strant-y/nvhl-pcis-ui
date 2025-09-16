@@ -22,13 +22,12 @@ export const tableObj = {
   // 出单--暂存任务
   notWaitObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 60,
+        width: 62,
       },
       {
         // prop: "cAppNo",
@@ -37,7 +36,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
-        width: 180,
+        width: 165,
       },
       {
         prop: "cTermNme",
@@ -86,30 +85,37 @@ export const tableObj = {
           return val?.toLocaleString()
         }
       },
+      {
+        prop: "tAppTm",
+        inputtype: "rtinput",
+        title: "保险起止期",
+        align: "left",
+        width: 280,
+      },
     ],
   },
   // 出单--已提交任务
   submittedObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 60,
+        width: 62,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
-        width: 180,
+        width: 165,
       },
       {
         prop: "cRsnCde",
         inputtype: "rtinput",
         title: "批改原因",
+        align: "left",
         width: 120,
       },
       {
@@ -162,6 +168,7 @@ export const tableObj = {
         prop: "taskStatus",
         inputtype: "rtinput",
         title: "任务状态",
+        align: "left",
         width: 80,
       },
       {
@@ -175,25 +182,25 @@ export const tableObj = {
   // 出单--待修改任务
   notReviseObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 60,
+        width: 62,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
-        width: 180,
+        width: 165,
       },
       {
         prop: "cRsnCde",
         inputtype: "rtinput",
         title: "批改原因",
+        align: "left",
         width: 120,
       },
       {
@@ -236,6 +243,7 @@ export const tableObj = {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
+        align: "left",
         width: 94,
         formatter:(val:any) => {
           return val?.toLocaleString()
@@ -247,20 +255,21 @@ export const tableObj = {
   //出单-待续保
   waitObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         showCopyIcon: true,
-        width: 180,
+        slotName: "cPlyNo",
+        width: 165,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
         width: 94,
+        align: "left",
         formatter:(val:any) => {
           return val?.toLocaleString()
         }
@@ -301,14 +310,13 @@ export const tableObj = {
   // 出单-待缴费
   waitPayObj: {
     stripe: false,
-    border: false,
     fromSchema: [
 			{
 				prop: "cAppNo",
 				inputtype: "rtinput",
 				title: "申请单号",
-        showCopyIcon: true,
-        width: 180,
+        slotName: "cAppNoInfo",
+        width: 165,
 			},
 			{
 				prop: "cAppNme",
@@ -334,6 +342,7 @@ export const tableObj = {
 				inputtype: "rtinput",
 				title: "保费金额",
         width: 94,
+        align: "left",
         formatter:(val:any) => {
           return val?.toLocaleString()
         }
@@ -343,6 +352,7 @@ export const tableObj = {
 				inputtype: "rtinput",
 				title: "应缴金额",
         width: 94,
+        align: "left",
         formatter:(val:any) => {
           return val?.toLocaleString()
         }
@@ -351,6 +361,7 @@ export const tableObj = {
 				prop: "cCheckSts",
 				inputtype: "rtselect",
 				title: "处理状态",
+        align: "left",
         width: 135,
 				loadData:cCheckStsList,
 				formatter: (val)=>{
@@ -363,20 +374,19 @@ export const tableObj = {
   //核保员-待核保任务
   unUdrObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 60,
+        width: 62,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "preDptName",
@@ -434,20 +444,19 @@ export const tableObj = {
   //核保员-暂存任务
   udrStagingObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 60,
+        width: 62,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "preDptName",
@@ -505,20 +514,19 @@ export const tableObj = {
   //核保员-核保退回任务
   udrReturnObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 60,
+        width: 62,
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cAppNoInfo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "preDptName",
@@ -576,28 +584,27 @@ export const tableObj = {
   // 核保员-核保通过任务
   udrPassedObj: {
     stripe: false,
-    border: false,
     fromSchema: [
       {
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cInquiryNoInfo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
         slotName: "cPlyNoInfo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
         slotName: "cEdrNoInfo",
-        minWidth: 180,
+        width: 165,
       },
       {
         prop: "preDptName",

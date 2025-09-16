@@ -230,6 +230,7 @@
                       v-for="col in getColinfo(ginfo.cGroupId)"
                       :key="col.cColId"
                       :width="col.cColWidth ? col.cColWidth : null"
+                      :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : ''}"
                     >
                       {{ col.cColTitle }}
                     </th>
@@ -1634,5 +1635,8 @@ td {
 }
 :deep(.el-input__inner) {
   text-align: right!important;
+}
+:deep(.el-input) {
+  --el-input-inner-height: 24px;
 }
 </style>

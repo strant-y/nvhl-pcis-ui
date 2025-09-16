@@ -157,7 +157,7 @@ function getShortMenuList() {
   margin-top: -12px;
   min-width: 700px;
   max-width: 60%;
-  max-height: 80%;
+  max-height: 80vh;
   overflow-y: auto;
 }
 .menuDropdowm .el-popper__arrow {

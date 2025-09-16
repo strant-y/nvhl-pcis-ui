@@ -14,7 +14,22 @@
       </template>
       <template #column-cDptCnm="{ row, column, index }">
         <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="formatTwoLine(row.cDptCnm) || ''"></span>
+          <span v-html="formatTwoLine(row.cDptCnm, 10) || ''"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cTermNme="{ row, column, index }">
+        <el-tooltip :content="row.cTermNme" placement="top">
+          <span v-html="formatTwoLine(row.cTermNme) || ''"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cAppNme="{ row, column, index }">
+        <el-tooltip :content="row.cAppNme" placement="top">
+          <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cInsuredNme="{ row, column, index }">
+        <el-tooltip :content="row.cInsuredNme" placement="top">
+          <span v-html="formatTwoLine(row.cInsuredNme) || ''"></span>
         </el-tooltip>
       </template>
     </app-table>
@@ -413,7 +428,6 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 80,
     fixed: true,
     tableBtnPosition: "right",
-    tableBtnFixed: "right",
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -421,7 +435,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "接收",
         type: "info",
         size: "large",
-        iconSize:"25",
         icon: "Message",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
@@ -441,7 +454,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "修改",
         type: "success",
         size: "large",
-        iconSize:"25",
         icon: "Edit",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -460,7 +472,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "取消接收",
         type: "info",
         size: "large",
-        iconSize:"25",
         icon: "Release",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -479,7 +490,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
-        iconSize:"23",
         icon: "return",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
@@ -524,7 +534,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "查看",
         type: "primary",
         size: "large",
-        iconSize:"25",
         icon: "View",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
@@ -543,7 +552,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "承保流程",
         type: "danger",
         size: "large",
-        iconSize:"25",
         icon: "Refresh",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
@@ -580,23 +588,24 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
-        width: 65,
+        width: 63,
         title: "任务类型",
+        align: "left",
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
-        maxWidth: 200,
         showCopyIcon: true,
-        width: 170,
+        width: 165,
+        fixed: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
         align: 'left',
-        width: 50,
+        width: 48,
         formatter:(val:any) => {
           return val?.slice(0,2)
         }
@@ -605,36 +614,40 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 180,
+        slotName: "cDptCnm",
         align: 'left',
-        width: 140,
+        width: 145,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        slotName: "cTermNme",
         align: 'left',
+        width: 112,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        slotName: "cAppNme",
         align: 'left',
-        width: 175,
+        width: 112,
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        slotName: "cInsuredNme",
         align: 'left',
-        width: 175,
+        width: 112,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
         align: 'left',
-        width: 130,
+        width: 95,
         formatter:(val:any) => {
           return val.toLocaleString()
         }
@@ -643,19 +656,17 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "提核时间",
-        minWidth: 180,
         type: "datetimerange", // 显示日期和时间选择器
         format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
-        width: 140,
+        width: 135,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
-        minWidth: 180,
         align: 'left',
-        width: 105,
+        width: 75,
       },
       {
         prop: "udrClsCde",
@@ -1455,13 +1466,14 @@ function handleDelete(id?: string) {
   });
 }
 
-function formatTwoLine(text) {
+function formatTwoLine(text, num=7) {
   if (!text) return '';
   const len = text.length;
-  if (len <= 10) {
-    return `${text}`;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
   }
-  return `${text.slice(0, 9)}…`;
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
 }
 
 //给表单下拉项赋值

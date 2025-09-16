@@ -21,6 +21,24 @@
                     </div>
                 </div>
             </template>
+            <template #column-cProdNmeCn="{ row }">
+                <span v-html="row.cProdNmeCn || ''"></span>
+            </template>
+            <template #column-cAppNme="{ row, column, index }">
+                <el-tooltip :content="row.cAppNme" placement="top">
+                <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+                </el-tooltip>
+            </template>
+            <template #column-InsurancePeriod="{ row, column, index }">
+                <div class="policy-info-cell">
+                <div v-if="row.tInsrncBgnTm" class="policy-period-row">
+                    <span v-html="row.tInsrncBgnTm?.replace(/T/g,' ')"></span>
+                </div>
+                <div v-if="row.tInsrncEndTm" class="policy-period-row">
+                    <span v-html="row.tInsrncEndTm?.replace(/T/g,' ')"></span>
+                </div>
+                </div>
+            </template>
         </app-table>
         <comDialog ref="dialogRef"></comDialog>
     </div>
@@ -431,7 +449,7 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "policyInfo",
                 inputtype: "rtinput",
                 title: "申请单号\n保单号",
-                width: 180,
+                width: 165,
                 slotName: "policyInfo"
             },
             {
@@ -439,33 +457,34 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: 'rtinput',
                 title: '申请单号',
                 isShow: false,
-                width: 180,
+                width: 165,
             },
             {
                 prop: 'cPlyNo',
                 inputtype: 'rtinput',
                 title: '保单号',
                 isShow: false,
-                width: 180,
+                width: 165,
             },
             {
                 prop: 'cEdrNo',
                 inputtype: 'rtinput',
                 title: '批单号',
-                width: 180,
+                width: 165,
             },
             {
                 prop: 'cAppNme',
                 inputtype: 'rtinput',
                 title: '投保人名称',
-                minWidth: 180,
+                slotName: "cAppNme",
                 align: 'left',
+                width: 112,
             },
             {
                 prop: 'nPrm',
                 inputtype: 'rtinput',
                 title: '保险费',
-                width: 130,
+                width: 95,
                 align: "left",
                 formatter: (val:any) => {
                     return val.toLocaleString()
@@ -475,31 +494,41 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: 'cProdNmeCn',
                 inputtype: 'rtinput',
                 title: '产品',
+                minWidth: 160,
+                slotName: "cProdNmeCn",
                 align: 'left',
             },
             {
                 prop: 'cSlsNme',
                 inputtype: 'rtinput',
                 title: '业务员名称',
+                width: 80,
                 align: 'left',
             },
             {
                 prop: 'tAppTm',
                 inputtype: 'rtinput',
                 title: '投保申请日期',
-                width: 140,
+                width: 135,
+                formatter:(val:any) => {
+                    return val?.replace(/T/g,' ')
+                }
             },
             {
                 prop: "InsurancePeriod",
                 inputtype: "rtinput",
                 title: "保险期间",
-                width: 280,
+                width: 135,
+                slotName: "InsurancePeriod"
             },
             {
                 prop: 'tUdrTm',
                 inputtype: 'rtinput',
                 title: '核保日期',
-                width: 140,
+                width: 135,
+                formatter:(val:any) => {
+                    return val?.replace(/T/g,' ')
+                }
             }
         ]
     })
@@ -804,6 +833,16 @@ function downloadEPolicy() {
         .finally(() => {
             setButton(btn, false)
         })
+}
+
+function formatTwoLine(text, num=7) {
+  if (!text) return '';
+  const len = text.length;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
+  }
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
 }
 
 //给表单下拉项赋值
