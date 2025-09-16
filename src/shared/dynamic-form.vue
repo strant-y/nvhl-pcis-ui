@@ -449,7 +449,7 @@ async function validate() {
   let rules = <any>{};
   for (const schama in props.fromSchema) {
     // 如果当前列有验证规则，则将其添加到规则对象中
-    if (props.fromSchema[schama].rules) {
+    if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
       let rul = props.fromSchema[schama].rules;
       if (props.fromSchema[schama].inputtype === "rtnumber" ||
         props.fromSchema[schama].inputtype === "rtinput" ) {
