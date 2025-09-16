@@ -113,22 +113,6 @@
         </el-tooltip>
       </template>
       <!-- ES查询 查询条件高亮 -->
-      <template #column-cEdrNo="{ row }">
-        <div class="policy-info-cell">
-            <div v-if="row.cPlyAppNo" class="policy-number-row">
-                <span v-html="row.cPlyAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
-                <el-icon class="copy-icon" @click="copyText(row.cPlyAppNo)">
-                    <DocumentCopy />
-                </el-icon>
-            </div>
-            <div v-if="row.cEdrNo" class="policy-number-row">
-                <span v-html="row.cEdrNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
-                <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
-                    <DocumentCopy />
-                </el-icon>
-            </div>
-        </div>
-      </template>
       <template #column-cClntAddr="{ row }">
         <span v-html="row.cClntAddr || ''"></span>
       </template>
