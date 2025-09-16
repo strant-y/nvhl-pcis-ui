@@ -475,7 +475,7 @@ import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from '../my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
-import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
+import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { ElTable, ElTableColumn } from 'element-plus';
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -2887,7 +2887,7 @@ const submitToUndrFn = async () => {
       }
     }
 
-         // 校验 地址清单总数 和 学生人数（人）
+  // 校验 地址清单总数 和 学生人数（人）
    if(props.param.cProdNo ==='040005'){
         const isUnEqual = await checkStudentValidity();
         if(isUnEqual){
@@ -2895,6 +2895,15 @@ const submitToUndrFn = async () => {
             return false;
         }
     }
+
+    
+    //040005 校验 地址清单学校人数与 清单 同学校人数校验
+    const result = await validateSchoolPersonWithApi(props.param);
+    if (!result.isValid) {
+      ElMessage.error(result.errorMessages[0]);
+        return false;
+    }
+
 
   // 判断应收保费是否同保费相同
   let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
