@@ -421,6 +421,7 @@ const tableconfig = reactive<AppTableConfig>(
                 typeCode: 'EDR_RSN_LIST_NEW',
                 checkStrictly: false,
                 func: (val, row, codeListMap) => {
+                    console.log(row);
                     if (val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
                         row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item: any) => item.value === val[1]);
                     }
@@ -524,15 +525,23 @@ const refreshData = (reset = true) => {
 
                 pageresult.total = pageData.total;
                 pageData.result.forEach((item) => {
-                    // changeRsnValue(item);
-                    setTableFormItem("id", {
-                        loadData: [
-                            { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
-                            { label: '注销', value: `2-${item.cProdNo.slice(0, 2)}` },
-                            { label: '退保', value: `3-${item.cProdNo.slice(0, 2)}` },
-                        ],
-                    });
+                    if(item.cTransMrk !== '1'){
+                        setTableFormItem("id", {
+                            loadData: [
+                                { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
+                                { label: '注销', value: `2-${item.cProdNo.slice(0, 2)}` },
+                                { label: '退保', value: `3-${item.cProdNo.slice(0, 2)}` },
+                            ],
+                        });
+                    }else{
+                        setTableFormItem("id", {
+                            loadData: [
+                                { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
+                            ],
+                        });
+                    }
                 });
+                console.log(pageData.result);
                 pageresult.list = pageData.result;
 
             }
