@@ -106,6 +106,8 @@ function setSelected() {
 }
 const distKey = computed(() => Object.keys(opertaor.getTableRefs()).find(f => f.includes('CargoDist')));
 const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
+const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
+const pageName = computed(() => opertaor.getParam()['pageName']);
 const nInsuranceA = ref('');
 
 onMounted(async () => {
@@ -147,20 +149,24 @@ onMounted(async () => {
     },
     })
   ];
-    if(cAppNo.value){
+    if(cAppNo.value || cInquiryNo.value){
       await loadData()
     }
 });
 const loadData = async (pageObj: any = {}) => {
-    distTableRef.value?.setPartnerPage(pageObj);
-    let pageOption = distTableRef.value?.getPartnerPage(false) || { pageNum: 1, pageSize: 10 }
-    const selData = {
-            cAppNo: cAppNo.value,
-			cComponentTable: 'CargoDist',
-            cClauseCode: props.cClauseCode, //条款编码  
-            cProdNo: props.cProdNo,  //产品号
-			...pageOption
-    };
+  distTableRef.value?.setPartnerPage(pageObj);
+  let pageOption = distTableRef.value?.getPartnerPage(false) || { pageNum: 1, pageSize: 10 }
+  const selData = {
+    cComponentTable: 'CargoDist',
+    cClauseCode: props.cClauseCode, //条款编码
+    cProdNo: props.cProdNo,  //产品号
+    ...pageOption,
+  };
+  if(pageName.value === "priceInquiry") {
+    selData['cInquiryNo'] = cInquiryNo.value;
+  }else {
+    selData['cAppNo'] = cAppNo.value;
+  }
    await selectDist(selData).then((res: any) => {
       if (res.code === 200) {
         pageresult.list = [];
