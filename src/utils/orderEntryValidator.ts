@@ -1,3 +1,5 @@
+import { selectDist,  } from "@/api/prod";
+
 interface OpertaorType {
   getTableRefByKey: (key: string) => {
     getFromValue: () => PayPlanItem[]; // 缴费计划列表类型
@@ -128,6 +130,87 @@ export const checkPayPlanValidity = ({
     return true;
   }
 };
+
+
+
+// 校验 040005 产品 清单信息与地址信息 问题
+export const validateSchoolPersonWithApi = async (param) => {
+  if (param.cProdNo !== '040005') {
+    return { isValid: true, errorMessages: [] };
+  }
+
+  
+  let personList = [];
+  let schoolList = [];
+
+  try {
+    const selData1 = {
+      cComponentTable: 'EducatorDist',
+      cAppNo: param.cAppNo
+    };
+    const educatorRes = await selectDist(selData1);
+    if (educatorRes.code === 200) {
+      personList = educatorRes.data?.data || [];
+    }
+  } catch (error) {
+    console.warn('人员清单接口请求异常，使用空列表校验:', error);
+  }
+
+  try {
+    const selData2 = {
+      cComponentTable: 'AddressDist',
+      cAppNo: param.cAppNo
+    };
+    const addressRes = await selectDist(selData2);
+    if (addressRes.code === 200) {
+      schoolList = addressRes.data?.data || [];
+    }
+  } catch (error) {
+    console.warn('学校清单接口请求异常，使用空列表校验:', error);
+  }
+
+  return validateSchoolAndPerson(personList, schoolList);
+};
+/**
+ * 校验人员清单与学校清单的匹配性
+ * @param {Array} personList 人员清单数组 
+ * @param {Array} schoolList 学校清单数组 
+ *  
+ */
+export const validateSchoolAndPerson = (personList, schoolList) => {
+    const schoolMap = new Map();
+  schoolList.forEach(school => {
+    schoolMap.set(school['Dist.cSchoolName'], school['Dist.nInsuredNumber']);
+  });
+
+  const personSchoolCount = new Map();
+  personList.forEach(person => {
+    const schoolName = person['Dist.cSchoolName'];
+    personSchoolCount.set(schoolName, (personSchoolCount.get(schoolName) || 0) + 1);
+  });
+
+
+  const errors = [];
+
+  personSchoolCount.forEach((_, schoolName) => {
+    if (!schoolMap.has(schoolName)) {
+      errors.push(`“人员清单”中的学校「${schoolName}」不在“地址清单信息”中`);
+    }
+  });
+
+  schoolMap.forEach((expectedCount, schoolName) => {
+    const actualCount = personSchoolCount.get(schoolName) || 0;
+    if (actualCount !== expectedCount) {
+      errors.push(`清单信息——学校名称「${schoolName}」与 地址清单信息——投保学生人数 不匹配，“地址清单信息”为${expectedCount}人，“清单信息”为${actualCount}人`);
+    }
+  });
+
+  return {
+    isValid: errors.length === 0,
+    errorMessages: errors
+  };
+};
+
 
 export default {
   checkPayPlanValidity,

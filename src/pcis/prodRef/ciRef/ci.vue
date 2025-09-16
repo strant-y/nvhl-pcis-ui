@@ -508,7 +508,7 @@ const method = {
       freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankCde",
         "rules", isRequired ? [getRules("required", {})] : []
       );
-        freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankCde", "disabled", isDisabled)
+      freeEditRef.value?.setRowFieldProp(rowDatas._dataId, "Ci.cBankCde", "disabled", isDisabled)
     };
 
 
@@ -524,7 +524,6 @@ const method = {
           },
         })
         .then((res) => {
-          console.log('触发请求了', res)
           freeEditRef.value?.addCodeListMap({
             code: 'Ci.cBankCde' + rowDatas._dataId,
             list: res,
@@ -593,17 +592,25 @@ const method = {
   },
   //开户行省改变
   cProvinceChange: (val, row) => {
-    setValueByRowKey("Ci.cBankArea", row._dataId, "")
-    setValueByRowKey("Ci.cBankCounty", row._dataId, "")
-    setOptions('Ci.cBankArea', row._dataId, 'CBankAreaList', { "areaprovince": val })
+    if (val) {
+      setValueByRowKey("Ci.cBankArea", row._dataId, "")
+      setValueByRowKey("Ci.cBankCounty", row._dataId, "")
+      setOptions('Ci.cBankArea', row._dataId, 'CBankAreaList', { "areaprovince": val })
+    }
+
   },
   //开户行市改变
   cCityChange: (val, row) => {
-    setValueByRowKey("Ci.cBankCounty", row._dataId, "")
-    setOptions('Ci.cBankCounty', row._dataId, 'CBankCountyList', { "areaname": val })
+    if (val) {
+      debugger;
+      setValueByRowKey("Ci.cBankCounty", row._dataId, "")
+      setOptions('Ci.cBankCounty', row._dataId, 'CBankCountyList', { "areaname": val })
+    }
+
   },
   //开户行县改变
   cCountyChange: (val, row) => {
+    
     if (val && bankRelTypeArr[3]) {
       let cBankCde = freeEditRef.value?.getRowById(row._dataId)?.['Ci.cBankCde'] || '';
       codeListStore
@@ -620,7 +627,6 @@ const method = {
             code: 'Ci.cBankCde' + row._dataId,
             list: res,
           })
-
           let delData = true;
           if (res.length > 0) {
 
@@ -644,18 +650,24 @@ const method = {
   cBankProOnInit: (data: any) => {
     const { value, rowData, config, itemRef } = data;
     if (!value || !rowData || !config || !itemRef) return;
-    setOptions("Ci.cBankArea", rowData._dataId, "CBankAreaList", { "areaprovince": value });
+    if(value){
+       setOptions("Ci.cBankArea", rowData._dataId, "CBankAreaList", { "areaprovince": value });
+    }
+   
   },
   //初始化市
   cBankAreaOnInit: (data: any) => {
     const { value, rowData, config, itemRef } = data;
     if (!value || !rowData || !config || !itemRef) return;
-    setOptions('Ci.cBankCounty', rowData._dataId, 'CBankCountyList', { "areaname": value })
+    if(value){
+       setOptions('Ci.cBankCounty', rowData._dataId, 'CBankCountyList', { "areaname": value })
+    } 
+   
   },
   //初始化县
   cBankCountyOnInit: (data: any) => {
     const { value, rowData, config, itemRef } = data;
-    console.log('初始化', data)
+
     if (!value || !rowData || !config || !itemRef) return;
 
     if (rowData['Ci.cBankRelTyp']) {
@@ -663,7 +675,7 @@ const method = {
       let county = rowData['Ci.cBankCounty'] || '';
       setOptions('Ci.cBankCde', rowData._dataId, 'CBankCdeList', { "banktypecod": bankArr[3], "areacode": county })
     }
- 
+
     // setOptions('Ci.cBankCde', rowData._dataId, 'CBankCdeList', { "banktypecod": bankRelTypeArr[3], "areacode": value })
   },
   // 开户行    CNAPS号 开户行地址
