@@ -517,6 +517,7 @@ async function validate() {
   // 创建验证器实例
   const validator = new Validator(rules);
   const r = await dovalidate(validator);
+  console.log(r);
   let l = [];
   if(r && r.length > 0){
     const isEx = false;
@@ -565,8 +566,6 @@ async function freeValidate(){
 }
 
 function dovalidate(validator: any) { 
-  console.log(form);
-  console.log(validator);
   const p = new Promise((resolve) => {
     // 执行验证操作
     validator.validate(form, (data: any) => {
