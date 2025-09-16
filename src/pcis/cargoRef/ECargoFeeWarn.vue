@@ -113,7 +113,7 @@ const method = {
   cPayWayChange:(val:any)=>{
     const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrmEx","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
     if(val !== '01'){
-      setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
+      // setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
       if(getValue('ECargoBase.nRmbAmt')){
         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt'))
       }
@@ -126,7 +126,7 @@ const method = {
         });
       })
     }else {
-      setFormItem('ECargoBase.nReceivedPrmEx',{ rules: [getRules("required", {})] })
+      // setFormItem('ECargoBase.nReceivedPrmEx',{ rules: [getRules("required", {})] })
       if(getValue('ECargoBase.nRmbAmt')){
         setValue('ECargoBase.nRecRemEstAmt',getValue('ECargoBase.nRmbAmt'))
       }
@@ -256,6 +256,34 @@ const method = {
     } else {
       setValue('ECargoBase.nWhPrmRmbExch',"1.000000")
       setValue('ECargoBase.nWhRmbPrm',getValue('ECargoBase.nWhPrm') * 1)
+    }
+  },
+  cAmtCurChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nAmtRmbExch',res[0].currency_rate)
+          });
+    } else {
+      setValue('ECargoBase.nAmtRmbExch',"1.000000")
+    }
+  },
+  cPrmCurChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nPrmRmbExch',res[0].currency_rate)
+          });
+    } else {
+      setValue('ECargoBase.nPrmRmbExch',"1.000000")
     }
   },
   cPremExchCdeChange:(val:any)=>{

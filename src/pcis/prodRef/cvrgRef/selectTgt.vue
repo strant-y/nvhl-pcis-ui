@@ -7,7 +7,7 @@
     <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
-        @page-change="loadData(false)"
+        @page-change="onPageChange"
         ref="distTableRef"
         @selection-change="handleSelectionChange"
     />
@@ -33,6 +33,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 const policyService = new PolicyService();
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTermDetailByDist } from "@/api/query";
+import { selectDist } from "@/api/prod/index";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -64,6 +65,14 @@ const props = defineProps({
       return {};
     },
   },
+  cClauseCode: {
+    type: String,
+    default: ''
+  },
+  cProdNo: {
+    type: String,
+    default: ''
+  },
 });
 const emits = defineEmits(["handleClose"]);
 // 复选框选中
@@ -85,35 +94,15 @@ function handleSelectionChange(selection: any) {
   selectedRows.value = selection;
 }
 function setSelected() {
-  const lastSelected = props.data.selectedData;
-  let key = undefined;
-  if(lastSelected) {
-    if(lastSelected['Term.nCargoSeq']) {
-      key = 'Term.nCargoSeq';
-    } else {
-      key = 'TermRisktgt.nCargoSeq';
+  const existPkIds = new Set<string>(
+    (props.data.selectList || []).flatMap(id => id.split(','))
+  )
+
+   pageresult.list.forEach(row => {
+    if (existPkIds.has(row['Dist.cPkId'])) {
+      distTableRef.value?.toggleRowSelection(row, true)
     }
-    if(lastSelected[key]) {
-      const nCargoSeqList = lastSelected[key].split(",");
-      nCargoSeqList.forEach((item) => {
-        pageresult.list.forEach((item2) => {
-          if (item === (item2["Dist.nSeqNo"] + '')) {
-            item2["checked"] = true;
-            distTableRef.value?.toggleRowSelection(item2, true);
-          }
-        });
-      });
-    }
-  }
-  const selectList = props.data.selectList;
-  if(selectList) {
-    pageresult.list.forEach((item2) => {
-      const f = selectList.find( f => f === item2["Dist.nSeqNo"]+'' );
-      item2["disabled"] = !!f;
-      // debugger
-      // distTableRef.value?.setValueByRowKey('disabled',item2._dataId,false)
-    });
-  }
+  })
 }
 const distKey = computed(() => Object.keys(opertaor.getTableRefs()).find(f => f.includes('CargoDist')));
 const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
@@ -139,15 +128,15 @@ onMounted(async () => {
     fromSchema: formconfig1.value.distSchema,
   });
   tableconfig.value.endBtnsPosition = "right";
-  tableconfig.value.isPage = false; //先不分页
+  tableconfig.value.isPage = true; //分页
   tableconfig.value.endBtns =[createFreeButtonBase({
     type: "primary",
     label: "确定",
     func: async() => {
-      // if (selectedRows.value.length === 0) {
-      //   ElMessage.warning("请先选择数据");
-      //   return;
-      // }
+       if (selectedRows.value.length === 0) {
+         ElMessage.warning("请至少选择一条数据");
+         return;
+        }
         await getTermDetailFn();
       },
     }),createFreeButtonBase({
@@ -159,37 +148,35 @@ onMounted(async () => {
     })
   ];
     if(cAppNo.value){
-      loadData()
+      await loadData()
     }
 });
-const loadData = (flag = true)=>{
-  const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
-  r.pageSize = 9999
-  // let param = Object.assign({cComponentTable: distKey.value, cAppNo: cAppNo.value}, r);
-  // cargoApi.selectDistNew(param).then((res: any) => {
-  //   if(res.code === 200) {
-  //     if(res.data.data.length > 0 ){
-  //       pageresult.list = res.data.data
-  //       pageresult.total = res.data.total
-  //       pageresult.list.forEach((item) => {
-  //         item.checked = true;
-  //       });
-  const tabref = opertaor.getTableRefs();
-  const list = tabref[distKey.value].getTableData();
-  const arr: any[] = [];
-  for(const i in list){
-    arr.push({...list[i]});
-  }
-  pageresult.list = arr;
-  nextTick(()=> {
-    setSelected();
-  })
-  //     }
-  //   }else {
-  //     ElMessage.success(res.msg);
-  //   }
-  // })
+const loadData = async (pageObj: any = {}) => {
+    distTableRef.value?.setPartnerPage(pageObj);
+    let pageOption = distTableRef.value?.getPartnerPage(false) || { pageNum: 1, pageSize: 10 }
+    const selData = {
+            cAppNo: cAppNo.value,
+			cComponentTable: 'CargoDist',
+            cClauseCode: props.cClauseCode, //条款编码  
+            cProdNo: props.cProdNo,  //产品号
+			...pageOption
+    };
+   await selectDist(selData).then((res: any) => {
+      if (res.code === 200) {
+        pageresult.list = [];
+        pageresult.total = res.data.total;
+        pageresult.list = res.data.data;
+        nextTick(()=> {
+            setSelected();
+        })
+      }
+    });
 }
+
+const onPageChange = (p) => {
+  loadData({ pageNum: p.pageNum, pageSize: p.pageSize })
+}
+
 function getTermDetailFn(){
      const res = {
       cAppNo: cAppNo.value,

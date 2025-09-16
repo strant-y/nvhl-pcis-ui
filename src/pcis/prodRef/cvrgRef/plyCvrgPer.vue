@@ -256,11 +256,31 @@ const method = {
       ElMessage.warning('请先选择一行条款数据!');
       return;
     }
+
+    /* cDistPkId（去重） */
+    const existPkId = [];
+    Object.values(formData.value).flat().forEach((row:any)=>{
+        if(row['Term.cDistPkId']){
+            existPkId.push(row['Term.cDistPkId'])
+        }
+        if(row.riskList){
+            row.riskList.forEach((item:any)=>{
+                if(item['TermRisktgt.cDistPkId']){
+                    existPkId.push(item['TermRisktgt.cDistPkId'])
+                }
+            })
+        }
+    })
+    const uniqueArr = Array.from(new Set(existPkId));
+    console.log(uniqueArr);
+
     dialog.value?.open(
         selectTgtFix,
         {
           selectedData: selectedRow.value.data, //需要把自定义的过滤掉，只传过去从模板中选择的
-          selectList: [],
+          selectList : uniqueArr,   // 已选 cpkId 数组, 去重
+          cProdNo: parparam.cProdNo,
+          cTermNo: parparam.cTermNo,
         },
         {
           getSelected(selectdata: any, amount: string) {
