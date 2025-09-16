@@ -452,6 +452,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "接收",
         type: "info",
         size: "large",
+        iconSize:"25",
         icon: "Message",
         // iconSize: "25",
         hideBtns: (row: any) => {
@@ -472,6 +473,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "修改",
         type: "success",
         size: "large",
+        iconSize:"25",
         icon: "Edit",
         // iconSize: "25",
         hideBtns: (row: any) => {
@@ -491,6 +493,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "取消接收",
         type: "info",
         size: "large",
+        iconSize:"25",
         icon: "Message",
         // iconSize: "25",
         hideBtns: (row: any) => {
@@ -510,6 +513,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "return",
         // iconSize: "25",
         hideBtns: (row: any) => {
@@ -557,6 +561,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "查看",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "View",
         // iconSize: "25",
         hideBtns: (row: any) => {
@@ -576,6 +581,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "承保流程",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "Refresh",
         // iconSize: "25",
         hideBtns: (row: any) => {

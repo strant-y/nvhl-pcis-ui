@@ -447,7 +447,7 @@ const searchItem = {
   prop: "cQueryStr",
   inputtype: "rtinput",
   title: "",
-  placeholder: "输入询价/投保批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码查询",
+  placeholder: "询价/投保批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
   itemWidth: 2,
   prefixIcon: "Search",
 };
