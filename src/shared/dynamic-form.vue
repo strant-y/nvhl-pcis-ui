@@ -444,60 +444,73 @@ function setPopover(v: any, item: any) {
   setValue(item.prop, v);
 }
 
+function setRuleType(rules: any ,schema: any) {
+  if (schema.inputtype === "rtnumber" ||
+    schema.inputtype === "rtinput" ) {
+    // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
+    if(typeof form[schema['prop']] === 'number'){
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "number";
+        });
+      }
+    }else{
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "string";
+        });
+      }
+    }
+  }
+  if(schema.inputtype === "rtdatepicker"){
+    if(schema['type'] === 'datetimerange'){
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "array";
+        });
+      }
+    }else{
+      if(typeof form[schema['prop']] === 'number'){
+        if (rules && rules.length > 0) {
+          rules.forEach((item: any) => {
+            item.type = "number";
+          });
+        }
+      }else{
+        if (rules && rules.length > 0) {
+          rules.forEach((item: any) => {
+            item.type = "string";
+          });
+        }
+      }
+    }
+  }
+  if (schema.inputtype === "rtcascader") {
+    if (rules && rules.length > 0) {
+      rules.forEach((item: any) => {
+        item.type = "array";
+      });
+    }
+  }
+}
+
 async function validate() {
   // 存储验证规则的对象
   let rules = <any>{};
   for (const schama in props.fromSchema) {
-    // 如果当前列有验证规则，则将其添加到规则对象中
-    if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
+    if(props.fromSchema[schama].inputtype === 'rtinputgroup'){
+      const g = props.fromSchema[schama].groupList;
+      g.forEach((gi)=>{
+        if(gi.hidden !== true && gi.rules){
+          let rul = gi.rules;
+        setRuleType(rul,gi);
+        rules[gi.prop] = rul;
+        }
+      })
+    }else if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
+      // 如果当前列有验证规则，则将其添加到规则对象中
       let rul = props.fromSchema[schama].rules;
-      if (props.fromSchema[schama].inputtype === "rtnumber" ||
-        props.fromSchema[schama].inputtype === "rtinput" ) {
-        // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
-        if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "number";
-            });
-          }
-        }else{
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "string";
-            });
-          }
-        }
-      }
-      if(props.fromSchema[schama].inputtype === "rtdatepicker"){
-        if(props.fromSchema[schama]['type'] === 'datetimerange'){
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "array";
-            });
-          }
-        }else{
-          if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
-            if (rul && rul.length > 0) {
-              rul.forEach((item: any) => {
-                item.type = "number";
-              });
-            }
-          }else{
-            if (rul && rul.length > 0) {
-              rul.forEach((item: any) => {
-                item.type = "string";
-              });
-            }
-          }
-        }
-      }
-      if (props.fromSchema[schama].inputtype === "rtcascader") {
-        if (rul && rul.length > 0) {
-          rul.forEach((item: any) => {
-            item.type = "array";
-          });
-        }
-      }
+      setRuleType(rul,props.fromSchema[schama]);
       rules[props.fromSchema[schama].prop] = rul;
     }
   }
@@ -553,6 +566,7 @@ async function freeValidate(){
 
 function dovalidate(validator: any) { 
   console.log(form);
+  console.log(validator);
   const p = new Promise((resolve) => {
     // 执行验证操作
     validator.validate(form, (data: any) => {
