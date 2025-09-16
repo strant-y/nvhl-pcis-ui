@@ -230,7 +230,7 @@ const idAnalysis = (id: string) => {
   // const age = new Date().getFullYear() - birthYear;
   const age = calculateAgeFromIdCard(id);
   if (!getValue("Insured.cNation")) {
-    setValue("Insured.cNation", "1"); // 国籍
+    setValue("Insured.cNation", "CHN"); // 国籍
   }
   setValue("Insured.tBirthday", birthday);
   setValue("Insured.nAge", age);
@@ -1025,7 +1025,7 @@ const method = {
       setFormItem("Insured.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-      setValue("Insured.cNation", "1"); // 国籍
+      setValue("Insured.cNation", "CHN"); // 国籍
 
       personFields.forEach(field => {
         setFormItem(`Insured.${field}`, { disabled: true });
