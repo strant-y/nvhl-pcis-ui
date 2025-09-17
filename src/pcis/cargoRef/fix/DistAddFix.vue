@@ -624,7 +624,10 @@ const cIsIndvduBizChange = (val:any)=>{
       setFormItem("ECargoInsuredDist.tBirthday", {
          rules: null
       });
-
+        //注册地址
+      // setFormItem("ECargoInsuredDist.RegisterProp", { rules: [getRules("required", {})] })
+      // setFormItem("ECargoInsuredDist.cRegisterSuffixAddr", { rules: [getRules("required", {})] })
+      setFormItem("ECargoInsuredDist.cRegisteredcapDre", { rules: [getRules("required", {})] })
       clearValidate('ECargoInsuredDist.tBirthday')
       setFormItem("ECargoInsuredDist.nAge", {
         rules: null
