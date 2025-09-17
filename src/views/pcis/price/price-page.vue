@@ -477,6 +477,8 @@ import { distRequiredMap } from '../my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { ElTable, ElTableColumn } from 'element-plus';
+import {pageMethod} from "./pageMethod";
+import {imageMethod} from "./imageMethod";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2227,7 +2229,20 @@ async function loadAfter() {
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
   }
-
+  let imageStr = '影像管理';
+  if(pageMethod.isReadOnlyScene(opertaor)){
+    imageStr = '影像查看';
+  }
+  bthList.value.push(
+      // {isdivider: true},  //间隔符
+      createFreeButtonBase({
+        label: imageStr,
+        type: "success",
+        func: () => {
+          imageMethod.showImage(opertaor);
+        },
+      }),
+  )
   bthList.value.push(
     createFreeButtonBase({
       label: "返回",
