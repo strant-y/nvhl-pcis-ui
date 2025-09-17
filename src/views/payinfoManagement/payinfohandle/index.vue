@@ -688,73 +688,73 @@ const tableconfig = reactive<AppTableConfig>(
                         }).catch(() => {});
 					},
 				}),
-				createFreeButtonBase({
-					type: "primary",
-					label: "支票登记",
-					func: async () => {
-                        if (multipleSelection.value.length < 1 ) {
-                            ElMessage.warning('所选记录为空！');
-                            return ;
-                        }
-                        let CAppNos = '';
-                        let CUniqueNos = ''; // 所选项的流水号组合
-
-                        let isOpen =  false;
-                        let message = '';
-                        multipleSelection.value.forEach(item => {
-                            if ('2' !== item['cPayTyp']) {
-								isOpen = true;
-                                message='该单缴费类型错误，只能对支票缴费的单进行支票登记！ 【申请单号='+item['cAppNo']+'】'
-								return;
-						  	}
-						  	if ('1' == item['cCheckSts']) {
-								isOpen = true;
-                                message='该单处理状态为待审核状态！ 【申请单号='+item['cAppNo']+'】'
-								return;
-						  	}
-                            
-                            CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
-                            CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
-                        });
-                        
-                        // if (CCombinationFlag.size > 1) {
-                        //  ElMessage.warning('组合产品不能和其他产品单据同时缴费');
-                        //                 return;
-                        // }
-
-
-
-                        if (isOpen) {
-                            ElMessage.warning(message);
-                            return;
-                        }
-
-                        // CAppNos
-                          if (CAppNos.indexOf(',') === -1) {
-                            	dzmodal.open(payConfirmInfoRegister, { type: "edit",data:{   CAppNo: CAppNos,CUniqueNos: CUniqueNos} }).then((res) => {
-                                    if (res.type === "ok") {
-                                        console.log("审核")
-                                    }
-                                });
-
-                          }else{
-                                dzmodal.open(payConfirmInfoRegister, { type: "edit",
-                                data:{   CAppNo: CAppNos,
-                                    CUniqueNos: CUniqueNos,
-                                    CAppNum:  multipleSelection.value.length
-                                } }).then((res) => {
-                                    if (res.type === "ok") {
-                                        console.log("审核")
-                                    }
-                                });
-                          }
-                        // console.log('ssssss',CAppNos)
-                        // console.log('ssssss',CUniqueNos)
-        
-
-					
-					},
-				}),
+				// createFreeButtonBase({
+				// 	type: "primary",
+				// 	label: "支票登记",
+				// 	func: async () => {
+        //                 if (multipleSelection.value.length < 1 ) {
+        //                     ElMessage.warning('所选记录为空！');
+        //                     return ;
+        //                 }
+        //                 let CAppNos = '';
+        //                 let CUniqueNos = ''; // 所选项的流水号组合
+        //
+        //                 let isOpen =  false;
+        //                 let message = '';
+        //                 multipleSelection.value.forEach(item => {
+        //                     if ('2' !== item['cPayTyp']) {
+				// 				isOpen = true;
+        //                         message='该单缴费类型错误，只能对支票缴费的单进行支票登记！ 【申请单号='+item['cAppNo']+'】'
+				// 				return;
+				// 		  	}
+				// 		  	if ('1' == item['cCheckSts']) {
+				// 				isOpen = true;
+        //                         message='该单处理状态为待审核状态！ 【申请单号='+item['cAppNo']+'】'
+				// 				return;
+				// 		  	}
+        //
+        //                     CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
+        //                     CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+        //                 });
+        //
+        //                 // if (CCombinationFlag.size > 1) {
+        //                 //  ElMessage.warning('组合产品不能和其他产品单据同时缴费');
+        //                 //                 return;
+        //                 // }
+        //
+        //
+        //
+        //                 if (isOpen) {
+        //                     ElMessage.warning(message);
+        //                     return;
+        //                 }
+        //
+        //                 // CAppNos
+        //                   if (CAppNos.indexOf(',') === -1) {
+        //                     	dzmodal.open(payConfirmInfoRegister, { type: "edit",data:{   CAppNo: CAppNos,CUniqueNos: CUniqueNos} }).then((res) => {
+        //                             if (res.type === "ok") {
+        //                                 console.log("审核")
+        //                             }
+        //                         });
+        //
+        //                   }else{
+        //                         dzmodal.open(payConfirmInfoRegister, { type: "edit",
+        //                         data:{   CAppNo: CAppNos,
+        //                             CUniqueNos: CUniqueNos,
+        //                             CAppNum:  multipleSelection.value.length
+        //                         } }).then((res) => {
+        //                             if (res.type === "ok") {
+        //                                 console.log("审核")
+        //                             }
+        //                         });
+        //                   }
+        //                 // console.log('ssssss',CAppNos)
+        //                 // console.log('ssssss',CUniqueNos)
+        //
+        //
+				//
+				// 	},
+				// }),
 				createFreeButtonBase({
 					type: "primary",
 					label: "在线缴费",
