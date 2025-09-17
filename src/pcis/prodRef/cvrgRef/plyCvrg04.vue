@@ -908,6 +908,7 @@ defineExpose({
 <style scoped>
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important;
+  height: auto;
 }
 
 ::v-deep .el-card__header {

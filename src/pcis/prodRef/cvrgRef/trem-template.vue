@@ -230,7 +230,7 @@
                       v-for="col in getColinfo(ginfo.cGroupId)"
                       :key="col.cColId"
                       :width="col.cColWidth ? col.cColWidth : null"
-                      :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : ''}"
+                      :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
                     >
                       {{ col.cColTitle }}
                     </th>

@@ -70,17 +70,17 @@
       </template>
       <template #column-cTermNme="{ row, column, index }">
         <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="formatTwoLine(row.cTermNme) || ''"></span>
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cAppNme="{ row, column, index }">
         <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
         <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="formatTwoLine(row.cInsuredNme) || ''"></span>
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-InsurancePeriod="{ row, column, index }">
@@ -924,5 +924,12 @@ function setFormItem(key: any, obj: any) {
 .primmaryColor {
   color: var(--el-color-primary);
   cursor: pointer;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

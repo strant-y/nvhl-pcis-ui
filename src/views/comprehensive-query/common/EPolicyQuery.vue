@@ -26,7 +26,7 @@
             </template>
             <template #column-cAppNme="{ row, column, index }">
                 <el-tooltip :content="row.cAppNme" placement="top">
-                <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+                <span v-html="row.cAppNme || ''" class="twoLine"></span>
                 </el-tooltip>
             </template>
             <template #column-InsurancePeriod="{ row, column, index }">
@@ -957,5 +957,12 @@ defineExpose({
 }
 :deep(.el-table th:nth-child(2) .cell) {
     white-space: pre-line;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

@@ -375,11 +375,11 @@ const props = defineProps({
 const getCellStyle = (row: Record<string, any>) => {
   if(!props.item.editFlag) {
     return {
-      padding: '3px 0px'
+      padding: '0px 0px'
     }
   }else {
     return {
-      padding: '6px'
+      padding: '3px'
     }
   }
 };

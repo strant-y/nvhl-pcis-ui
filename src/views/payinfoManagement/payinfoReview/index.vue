@@ -35,6 +35,11 @@
           </div>
         </div>
       </template>
+      <template #column-cTermName="{ row, column, index }">
+        <el-tooltip :content="row.cTermName" placement="top">
+          <span v-html="row.cTermName || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
   </app-table>
   </div>
 </template>
@@ -81,6 +86,7 @@ const detail = defineAsyncComponent(
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "缴费信息审核",
+    fromUi: {labelWidth: '105px'},
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -247,7 +253,7 @@ const tableconfig = reactive<AppTableConfig>(
     editFlag: true,
     editList: ["cStatus"],
     tableBtnType: "btn",
-    tableBtnWidth: 90,
+    tableBtnWidth: 95,
     tableBtnPosition: "right",
     tableBtnFixed: "right",
     tableBtn: [
@@ -284,7 +290,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号",
-        minWidth: 200,
+        width: 165,
         fixed: "left",
         slotName: "policyInfo"
       },
@@ -292,7 +298,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPayTyp",
         inputtype: "rtselect",
         title: "缴费类型",
-        minWidth: 180,
+        width: 65,
+        fixed: "left",
         typeCode: "CHARGE_TYPE_CACHE",
         param: { cCde: ["2", "3", "5", "99"] },
       },
@@ -300,13 +307,15 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cChqueNo",
         inputtype: "rtinput",
         title: "交易号",
-        minWidth: 180,
+        width: 145,
+        align: "left",
       },
       {
         prop: "nPrm",
         inputtype: "rtnumber",
         title: "保费",
-        minWidth: 180,
+        width: 115,
+        align: "left"
       },
       // {
       //   prop: "nTax",
@@ -318,13 +327,16 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nPayAmt",
         inputtype: "rtnumber",
         title: "缴费金额",
-        minWidth: 180,
+        width: 115,
+        align: "left"
       },
       {
         prop: "cTermName",
         inputtype: "rtinput",
         title: "条款",
-        minWidth: 180,
+        slotName: "cTermName",
+        align: 'left',
+        minWidth: 112,
       },
       // {
       //   prop: "d",
@@ -490,5 +502,12 @@ function setFormItem(key: any, obj: any) {
   margin-left: 5px;
   cursor: pointer;
   color: #409eff;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

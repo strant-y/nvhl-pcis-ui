@@ -106,7 +106,7 @@
                 :label-position="
                   item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
                 "
-                :label-width=" maxLabelWidth + 'px'"
+                :label-width="formUi.labelWidth ? formUi.labelWidth : maxLabelWidth + 'px'"
               >
                 <template #label>
                    <template v-if="item.title?.length > (item.labelLength || 10)">

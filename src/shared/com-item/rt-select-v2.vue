@@ -26,7 +26,7 @@
         :options="options"
         @visible-change="showOptions"
         @change="handleChange"
-        style="min-width: 75px;"
+        :style="{'min-width': item.minWidth || '75px'}"
         :fit-input-width="false"
       >
         <template

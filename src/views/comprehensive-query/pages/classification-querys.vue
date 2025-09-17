@@ -91,12 +91,12 @@
       <!-- 展示成2行，第1行7个字，第2行6个字 + 超出部分用...代替，鼠标放上去可展示全部 -->
       <template #column-cDptCnm="{ row, column, index }">
         <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="formatTwoLine(row.cDptCnm, 10) || ''"></span>
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cTermNme="{ row, column, index }">
         <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="formatTwoLine(row.cTermNme) || ''"></span>
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cSecondDptCnm="{ row, column, index }">
@@ -104,12 +104,12 @@
       </template>
       <template #column-cAppNme="{ row, column, index }">
         <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
         <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="formatTwoLine(row.cInsuredNme) || ''"></span>
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <!-- ES查询 查询条件高亮 -->
@@ -970,7 +970,6 @@ const normalQueryColumns = [
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
-        maxWidth: 110,
         slotName: "cAppNme",
         align: 'left',
         width: 112,
@@ -1103,7 +1102,7 @@ const tableObj = {
         defaultSort: { prop: 'tCrtTm', order: 'descending' },
         defaultSort: { prop: 'tUdrTm', order: 'descending' },
         tableBtnType: "btn",
-        tableBtnWidth: 80,
+        tableBtnWidth: 95,
         tableBtnPosition: "right",
         rowDbClickFun: (row:any) => handleRowDoubleClick(row),
         tableBtn: [
@@ -2222,5 +2221,12 @@ defineExpose({
 } */
 :deep(.el-button-group .el-button) {
     font-size: 16px;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

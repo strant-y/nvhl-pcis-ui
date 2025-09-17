@@ -65,33 +65,33 @@ export const tableObj = {
         align: "left",
         width: 173,
       },
-      {
-        prop: "nAmt",
-        inputtype: "rtinput",
-        title: "保额",
-        align: "left",
-        width: 102,
-        formatter:(val:any) => {
-          return val?.toLocaleString()
-        }
-      },
-      {
-        prop: "nPrm",
-        inputtype: "rtinput",
-        title: "保费",
-        align: "left",
-        width: 94,
-        formatter:(val:any) => {
-          return val?.toLocaleString()
-        }
-      },
-      {
-        prop: "tAppTm",
-        inputtype: "rtinput",
-        title: "保险起止期",
-        align: "left",
-        width: 280,
-      },
+      // {
+      //   prop: "nAmt",
+      //   inputtype: "rtinput",
+      //   title: "保额",
+      //   align: "left",
+      //   width: 102,
+      //   formatter:(val:any) => {
+      //     return val?.toLocaleString()
+      //   }
+      // },
+      // {
+      //   prop: "nPrm",
+      //   inputtype: "rtinput",
+      //   title: "保费",
+      //   align: "left",
+      //   width: 94,
+      //   formatter:(val:any) => {
+      //     return val?.toLocaleString()
+      //   }
+      // },
+      // {
+      //   prop: "tAppTm",
+      //   inputtype: "rtinput",
+      //   title: "保险起止期",
+      //   align: "left",
+      //   width: 280,
+      // },
     ],
   },
   // 出单--已提交任务

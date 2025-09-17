@@ -14,22 +14,22 @@
       </template>
       <template #column-cDptCnm="{ row, column, index }">
         <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="formatTwoLine(row.cDptCnm, 10) || ''"></span>
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cTermNme="{ row, column, index }">
         <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="formatTwoLine(row.cTermNme) || ''"></span>
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cAppNme="{ row, column, index }">
         <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
         <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="formatTwoLine(row.cInsuredNme) || ''"></span>
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
     </app-table>
@@ -1498,5 +1498,15 @@ function setFormItem(key: any, obj: any) {
 <style lang="scss" scoped>
 :deep(.el-table td.el-table__cell div.cell .el-divider--vertical:last-child) {
   display: none;
+}
+:deep(.el-button-group .el-button) {
+  width: 80px;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>
