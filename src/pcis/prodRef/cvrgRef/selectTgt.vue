@@ -184,11 +184,17 @@ const onPageChange = (p) => {
 }
 
 function getTermDetailFn(){
-     const res = {
-      cAppNo: cAppNo.value,
+    const paramA = {
       cPkId: selectedRows.value.map(item => item['Dist.cPkId'])
     };
-    getTermDetailByDist(res).then((res: any) => {
+
+    if(pageName.value === "priceInquiry") {
+        paramA['cInquiryNo'] = cInquiryNo.value;
+    }else {
+        paramA['cAppNo'] = cAppNo.value;
+    }
+     
+    getTermDetailByDist(paramA).then((res: any) => {
       if (res["code"] == "200") {
         nInsuranceA.value = res.data?.nInsuranceAmount;
         props.method.getSelected(selectedRows.value, nInsuranceA.value);
