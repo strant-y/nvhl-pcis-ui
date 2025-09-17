@@ -490,7 +490,7 @@ import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from './requiredDistMap';
 import { ElTable, ElTableColumn } from 'element-plus';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
-import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
+import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { fa } from 'element-plus/es/locale';
 
 //额度明细弹窗
@@ -2977,6 +2977,8 @@ const checkStudentValidity  =  async() => {
         return nStudentsNumber !== totalStudentCount;  
        
 }
+
+
 /**
  * 投保申请核保
  */
@@ -3036,24 +3038,7 @@ const submitToUndrFn = async () => {
    const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
    const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
 
-  // 040002 记名投保标志 选是 校验清单必须录入
-  // const distItem = distRequiredMap[props.param.cProdNo];
-  // if(distItem && tgtValue[distItem.flagKey] === '1') {
-  //   const selectParam = {
-  //     cComponentTable: distItem.cComponentTable,
-  //   }
-  //   if(props.param?.pageName === "priceInquiry") {
-  //     selectParam['cInquiryNo'] = cInquiryNumber
-  //   } else {
-  //     selectParam['cAppNo'] = cAppNo
-  //   }
-  //   const resDist: any = await selectDist(selectParam);
-  //   if(resDist['data']['total'] < 1){
-  //     ElMessage.warning(`${distItem.flagName}选“是” “${distItem.distName}”未录入请确认！`);  
-  //     return false;
-  //   }
-  // }
-// 043013   校验营业场所地址清
+    // 043013   校验营业场所地址清
     if(props.param.cProdNo === '043013') {
     const selectParam = {
       cComponentTable: 'PollutionDist',
@@ -3114,6 +3099,13 @@ const submitToUndrFn = async () => {
             ElMessage.error(`地址清单信息中“投保学生总数”与标的信息中“学生人数（人）”不一致，请核对！`);
             return false;
         }
+    }
+
+    //040005 校验 地址清单学校人数与 清单 同学校人数校验
+    const result = await validateSchoolPersonWithApi(props.param);
+    if (!result.isValid) {
+      ElMessage.error(result.errorMessages[0]);
+        return false;
     }
 
   // 判断应收保费是否同保费相同

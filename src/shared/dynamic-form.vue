@@ -445,6 +445,18 @@ function setPopover(v: any, item: any) {
 }
 
 function setRuleType(rules: any ,schema: any) {
+  if(schema.group){ // 如果群组整个被隐藏,则不再进行校验
+    const uicf = props.fromUi.groupBy.filter((g)=>g.id === schema.group);
+    let h = false;
+    if(uicf && uicf.length > 0){
+      if(uicf[0].hidden === true){
+        h = true;
+      }
+    }
+    if(h){
+      return null;
+    }
+  }
   if (schema.inputtype === "rtnumber" ||
     schema.inputtype === "rtinput" ) {
     // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
@@ -485,6 +497,15 @@ function setRuleType(rules: any ,schema: any) {
       }
     }
   }
+  if (schema.inputtype === "rtSelectV2" || schema.inputtype === "rtSelect") {
+    if(schema.multiple === 1 || schema.multiple === true || schema.multiple === '1' ){
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "array";
+        });
+      }
+    }
+  }
   if (schema.inputtype === "rtcascader") {
     if (rules && rules.length > 0) {
       rules.forEach((item: any) => {
@@ -492,6 +513,7 @@ function setRuleType(rules: any ,schema: any) {
       });
     }
   }
+  return rules;
 }
 
 async function validate() {
@@ -503,15 +525,19 @@ async function validate() {
       g.forEach((gi)=>{
         if(gi.hidden !== true && gi.rules){
           let rul = gi.rules;
-        setRuleType(rul,gi);
-        rules[gi.prop] = rul;
+          const nrul = setRuleType(rul,gi);
+          if(nrul){
+            rules[gi.prop] = nrul;
+          }
         }
       })
     }else if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
       // 如果当前列有验证规则，则将其添加到规则对象中
       let rul = props.fromSchema[schama].rules;
-      setRuleType(rul,props.fromSchema[schama]);
-      rules[props.fromSchema[schama].prop] = rul;
+      const nrul = setRuleType(rul,props.fromSchema[schama]);
+      if(nrul){
+        rules[props.fromSchema[schama].prop] = nrul;
+      }
     }
   }
   // 创建验证器实例
@@ -541,6 +567,9 @@ async function validate() {
     freeValidate();
   }
   if(r && r.length > 0){
+    // console.log(form);
+    // console.log(rules);
+    // console.log(props.fromSchema);
     return false;
   }else{
     return true;

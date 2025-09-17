@@ -258,6 +258,34 @@ const method = {
       setValue('ECargoBase.nWhRmbPrm',getValue('ECargoBase.nWhPrm') * 1)
     }
   },
+  cAmtCurChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nAmtRmbExch',res[0].currency_rate)
+          });
+    } else {
+      setValue('ECargoBase.nAmtRmbExch',"1.000000")
+    }
+  },
+  cPrmCurChange:(val:any)=>{
+    if (val !== "CNY") {
+      codeListStore
+          .queryCodeList({
+            codeListName: "WEB_BAS_CHGRATE",
+            codeListParam: { value: val },
+          })
+          .then((res) => {
+            setValue('ECargoBase.nPrmRmbExch',res[0].currency_rate)
+          });
+    } else {
+      setValue('ECargoBase.nPrmRmbExch',"1.000000")
+    }
+  },
   cPremExchCdeChange:(val:any)=>{
     if(val === '1'){
       setFormItem('ECargoBase.nWhPrmRmbExch',{'disabled': true})
