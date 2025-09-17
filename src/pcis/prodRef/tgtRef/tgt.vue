@@ -231,8 +231,8 @@ const wagesInfoModel = () => {
     }
   });
 }
-//水运规则
-const tgtWaterMatterList: Array<string> = ["Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.cTransportationName", "Tgt.tConstructionYear", "Tgt.nTransportationTotalTonnage", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
+//水运规则    "Tgt.cTransportationName",
+const tgtWaterMatterList: Array<string> = ["Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.tConstructionYear", "Tgt.nTransportationTotalTonnage", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
 //水运外其他规则
 const tgtOtherMatterList: Array<string> = ["Tgt.cLicenseNumber", "Tgt.cFrameNumber", "Tgt.cTransitMode"]
 //非水运隐藏
@@ -1674,7 +1674,7 @@ const method = {
   cRailwayIntermodalChange: (val: any) => {
     console.log('是否联运', val)
     if (val === '1') {
-      setValue('Tgt.cRailwayMode', '2')
+      setValue('Tgt.cRailwayMode', '02')
     }
 
   }
