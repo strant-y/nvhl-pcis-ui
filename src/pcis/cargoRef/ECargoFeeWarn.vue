@@ -111,6 +111,7 @@ function handleFileChange() {
 // 绑定方法
 const method = {
   cPayWayChange:(val:any)=>{
+    if (formPage.init) return
     const list:Array<string>= ["ECargoBase.nLowPrm","ECargoBase.nReceivedPrmEx","ECargoBase.nReceivedPrm","ECargoBase.cReceivedRmb","ECargoBase.nReceivedRate","ECargoBase.nRmbReceivedPrm"]
     if(val !== '01'){
       // setFormItem('ECargoBase.nReceivedPrmEx',{rules: null })
@@ -141,6 +142,7 @@ const method = {
     }
   },
   cReceivedRmbChange:(val:any)=>{
+    if (formPage.init) return
     if (val !== "CNY") {
       codeListStore
           .queryCodeList({
@@ -174,6 +176,7 @@ const method = {
     }
   },
   nReceivedPrmChange:(val:any,data:any)=>{
+    if (formPage.init) return
      const nReceivedPrm =  sessionStorage.getItem("nReceivedPrm") ? JSON.parse(sessionStorage.getItem("nReceivedPrm") || '') : ''
     // props.type === 'EDR_APP_NEW_SCENE'
     if(nReceivedPrm['ECargoBase.nReceivedPrm'] && param?.cEdrType && param?.cEdrType == '1'){
@@ -200,6 +203,7 @@ const method = {
     }
   },
   cWhAmtCurChange:(val:any)=>{
+    if (formPage.init) return
     if (val !== "CNY") {
       codeListStore
           .queryCodeList({
@@ -307,12 +311,14 @@ const method = {
   },
   //折人民币协议预收保费
   nRmbReceivedPrmChange:(val:any)=>{
+    if (formPage.init) return
     if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
        setValue('ECargoBase.nRecRemPrm',val - (getValue('ECargoBase.nWhRmbPrm') || 0))
     }
   },
   //折人民币预扣保费
   nWhRmbPrmChange:(val:any)=>{
+    if (formPage.init) return
     //ECargoBase.nRmbReceivedPrm
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
@@ -322,6 +328,7 @@ const method = {
     }
   },
   nRmbPrmChange:(val:any)=>{
+    if (formPage.init) return
     nextTick(()=>{
       const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
       if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') !== '01'){

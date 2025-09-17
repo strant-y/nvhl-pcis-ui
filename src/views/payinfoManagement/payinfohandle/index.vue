@@ -712,11 +712,11 @@ const tableconfig = reactive<AppTableConfig>(
                                 message='该单处理状态为待审核状态！ 【申请单号='+item['cAppNo']+'】'
 								return;
 						  	}
-                            
+
                             CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
                             CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
                         });
-                        
+
                         // if (CCombinationFlag.size > 1) {
                         //  ElMessage.warning('组合产品不能和其他产品单据同时缴费');
                         //                 return;
@@ -750,9 +750,9 @@ const tableconfig = reactive<AppTableConfig>(
                           }
                         // console.log('ssssss',CAppNos)
                         // console.log('ssssss',CUniqueNos)
-        
 
-					
+
+
 					},
 				}),
 				createFreeButtonBase({

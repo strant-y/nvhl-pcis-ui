@@ -238,8 +238,12 @@ const method = {
     }
   },
   //争议处理选择事件
-  cDisptSttlCdeChange(val) {
-    if (val == 'A') {
+  cDisptSttlCdeChange(val){
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return ;
+    }
+    if(val=='A'){
       // setFormItem("Base.cDisptSttlOrg", { disabled: false,rules: [getRules("required", {})] });
       setFormItem("Base.cDisptSttlOrg", { rules: [getRules("required", {})] });
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
