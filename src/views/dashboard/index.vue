@@ -24,7 +24,7 @@
         </div>
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
-          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;" />
+          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;height: 2.5rem;" />
         </div>
         <!-- <div class="top-menu">
           <div class="menu-label">
@@ -447,8 +447,8 @@ const searchItem = {
   prop: "cQueryStr",
   inputtype: "rtinput",
   title: "",
-  placeholder: "输入询价/投保批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码查询",
-  itemWidth: 2,
+  placeholder: "询价/投保/批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
+  itemWidth: 30,
   prefixIcon: "Search",
 };
 const searchBtnItem = {
@@ -2343,8 +2343,8 @@ window.addEventListener("resize", () => {
       }
 
       .top-search {
-        width: 66%;
-        height: 2.5rem;
+        width: 70%;
+        height: 3rem;
         display: flex;
         align-items: center;
         background: #ffffff;

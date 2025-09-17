@@ -435,6 +435,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "接收",
         type: "info",
         size: "large",
+        iconSize:"25",
         icon: "Message",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
@@ -454,6 +455,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "修改",
         type: "success",
         size: "large",
+        iconSize:"25",
         icon: "Edit",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -472,6 +474,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "取消接收",
         type: "info",
         size: "large",
+        iconSize:"25",
         icon: "Release",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -490,6 +493,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "return",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
@@ -534,6 +538,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "查看",
         type: "primary",
         size: "large",
+        iconSize:"25",
         icon: "View",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
@@ -552,6 +557,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "承保流程",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "Refresh",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
