@@ -2940,15 +2940,9 @@ const calcPremium = () => {
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
       opertaor.getTableRefByKey("base").nPayNumberFun();
-
-//  opertaor.getTableRefs()["base"].setValue("Base.groupPrmCur", 122);
-
-
     } else {
       ElMessage.error(res.msg);
     }
-    // ElMessage.success(res.msg);
-    // history.back();
   });
 };
 const setPayInfo = (base: any, applicant: any, insrnc: any) => {

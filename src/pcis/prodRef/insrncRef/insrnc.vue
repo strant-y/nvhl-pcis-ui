@@ -107,7 +107,7 @@ const freeDelay = async (obj: any): Promise<boolean> => {
       return false; // 拦截
     }
 
-    // 核心规则 1：止期只能延长
+    //止期只能延长
     if (objDate.getTime() < newInsEndTmDate.getTime()) {
       resetFreeDelayState(newInsEndTm, newSysTmDay);
       ElMessage.warning("免费延期只能延长保险止期，不能缩短");
@@ -121,12 +121,10 @@ const freeDelay = async (obj: any): Promise<boolean> => {
 
     //  接口  开关校验
     const resOff = await checkCancelM1IsOff({ cPlyNo: plyNo, CancelM1: 'CancelM1' });
-    // if (resOff.code !== 200) {
-    // if (resOff.code == 200) {
+
     // 开关关闭：按产品规则拦截
 
     if (!resOff?.res) {
-
       const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
       const nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);
       const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
@@ -170,145 +168,14 @@ const freeDelay = async (obj: any): Promise<boolean> => {
   }
 };
 
-// 辅助：重置免费延期状态
+// 重置免费延期状态
 const resetFreeDelayState = (newInsEndTm: string, newSysTmDay: string) => {
   setValue('Base.tInsrncEndTm', newInsEndTm);
   setValue('Base.cTmSysCde', newSysTmDay);
   opertaor.getFatherPage().setEdrValue('EdrBase.nDelayNum', 0);
 };
-
-
-
-// const freeDelay = async (obj: any) => {
-//   // return false;
-//   // //	tool.alert('延长的保期方法');	
-//   // 	if(isPlyEdrEditScene(scene)){
-
-//   const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-
-//   let cRsnCde = edrbase['EdrBase.cEdrRsnBundleCde'];
-
-
-//   // edrbase['edrBase.NResvNum3'] = 112;
-//   // opertaor.getFormDataById('')
-
-//   console.log(edrbase)
-
-//   console.log(opertaor.getTableRefByKey('edrBase'))
-//   // var cRsnCde = tool.getAttrValue(dw['edrBase'],'CEdrRsnBundleCde');
-//   if (cRsnCde == 'M1' || cRsnCde == 'M8') {
-//     var plyNo = edrbase['EdrBase.cPlyNo'];
-//     var newSysTmDay = 365;
-//     var oldSysTmDay = 365;
-//     var newDelayDay = 0;
-//     var newInsEndTm;
-//     var oldInsEndTm;
-//     // var cProdNo = tool.getAttrValue([dw["edrBase"]], "CProdNo");//产品	
-//     var cProdNo = edrbase['EdrBase.cProdNo'] //产品	
-//     var cust_data = "plyNo=" + plyNo + "###CancelM1=" + 'CancelM1';
-
-
-//     const resDays = await getNewSysDays({ cPlyNo: plyNo });
-//     console.log('接口1', resDays, '参数---', plyNo)
-//     if (resDays?.code === 200) {
-//       // var listDays = resDays?.res
-//       // var name = listDays.split('###');
-//       // newSysTmDay = name[0];//最新保单保险天数
-//       // newInsEndTm = name[1];//最新保单止期
-//       // oldSysTmDay = name[2];//原保单保险天数
-//       // newDelayDay = name[3];//延长天数
-//       // oldInsEndTm = name[4];//原始保单的保险止期
-//       const [name0, name1, name2, name3, name4] = resDays.res.split('###');
-//       newSysTmDay = name0; // 最新保单保险天数
-//       newInsEndTm = name1; // 最新保单止期
-//       oldSysTmDay = name2; // 原保单保险天数
-//       newDelayDay = name3; // 延长天数
-//       oldInsEndTm = name4; // 原始保单止期
-//     }
-
-//     const tabref = opertaor.getTableRefs();
-//     const baseBefore = tabref?.["insrnc"].getFromValue();
-
-//     var nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]); //当前批改最新保险天数
-//     var nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);//当前批改延期天数
-//     var sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);//累计延期天数
-
-//     // if(!isLoadDwModel('theTabPage', dw['BaseAfter'])){
-//     // 	loadAllDwModel([dw["BaseAfter"]]);
-//     // 	loadAllDwData([dw["BaseAfter"]]);
-//     // }
-//     console.log('baseBefore', baseBefore)
-//     var newInsBgnTm = baseBefore['Base.tInsrncBgnTm']//原保单起期 	
-//     //  	var OldNRatioCoef = tool.getAttrValue(dw['edrBase'],"NRatioCoef");		    ? 	 
-//     debugger
-//     var nMonths = monthBetween(toDate(newInsBgnTm), toDate(newInsEndTm));//保险月数
-//     var tMonths = monthBetween(toDate(newInsEndTm + 1), toDate(obj));//页面修改的延迟月数
-//     var sxMonths = monthBetween(toDate(oldInsEndTm + 1), toDate(obj));//原保单的止期到本次批改的止期的月数
-
-//     //获得当前承保机构的分公司编码。如：北京02、天津27、重庆15.
-//     var cDptCde = edrbase['EdrBase.cDptCde'] //机构部门
-
-//     const resCheck = await checkCdeptByCdptCde({ dptCde: cDptCde });
-//     const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
-//     if (toDate(obj).getTime() - toDate(newInsEndTm).getTime() < 0) {
-//       setFormItem('Base.tInsrncEndTm', newInsEndTm)   // 
-//       setFormItem('Base.cTmSysCde', newSysTmDay)
-//       opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', 0)
-
-
-//       //  tool.setAttrValue(dw["BaseAfter"], "Base.NRatioCoef", OldNRatioCoef);	    
-
-//       ElMessage.warning("免费延期只能对保险止期进行延长操作!");
-//       return;
-//     }
-
-//     const resOff = await checkCancelM1IsOff({ cPlyNo: plyNo, CancelM1: cust_data });
-//     if (resOff.code == 200) {
-
-//       opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', sumDelayDay)
-
-//     } else {
-//       if (cProdNo == '043009') {
-//         if (subSidiary === "0261010000000") {//陕西分公司免费延期批改最长期限为1年，取消次数限制
-//           if (sxMonths > 24) {
-
-//             // tool.setAttrValue(dw["BaseAfter"], "Base.NRatioCoef", OldNRatioCoef);
-
-//             setFormItem('Base.tInsrncEndTm', newInsEndTm)
-//             setFormItem('Base.cTmSysCde', newSysTmDay)
-//             opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', 0)
-//             ElMessage.warning("延长的保期不允许超过2年！");
-//             return;
-//           }
-//         } else if (tMonths > 6) {
-//           // tool.setAttrValue(dw["BaseAfter"], "Base.NRatioCoef", OldNRatioCoef);
-//           // tool.alert('延长的保期不允许超过6个月');		 
-//           setFormItem('Base.tInsrncEndTm', newInsEndTm)
-//           setFormItem('Base.cTmSysCde', newSysTmDay)
-//           opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', 0)
-//           ElMessage.warning("延长的保期不允许超过6个月");
-//           return;
-//         }
-//         opertaor.getFatherPage().setEdrValue('EdrBase.NResvNum3', nowDelayDay)
-//       } else if (cProdNo != '110002') {
-//         if (nowDelayDay > 180 || sumDelayDay > 180) {
-//           ElMessage.warning("延期天数已超过默认值！");
-//         } else if (nowDelayDay > 90) {
-//           ElMessage.warning("每次免费延期不能超过90天");
-//         }
-//         // tool.setAttrValue(dw['edrBase'],'NResvNum3',parseInt(sumDelayDay));
-//         setFormItem('edrBase.NResvNum3', sumDelayDay)
-//       }
-
-//     }
-//   }
-
-// }
-
-
 // 绑定方法
 const method = {
-  // func demo
   func1: () => {
 
   },
@@ -347,7 +214,7 @@ const method = {
     }
   },
 
-  bgnTmFn: (v) => {
+  bgnTmFn: (v:any) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref?.["insrnc"].getFromValue();
     const startDate = dayjs(v); // 新的开始时间（v是用户选择的开始时间）
@@ -371,6 +238,18 @@ const method = {
     baseBefore["Base.tInsrncEndTm"] = newEndDate;
     baseBefore["Base.cTmSysCde"] = days;
 
+
+    // 起运日期不能大于 保险起期   020014 020018 不参与
+    let tDepartureDate =baseBefore['Base.tDepartureDate']  //起运日期
+    if(tDepartureDate){
+          const timestamp1 = new Date(tDepartureDate).getTime();
+          const timestamp2 = new Date(v).getTime();
+          let cProdNo = route.params.param?.cProdNo;
+          if((timestamp1< timestamp2) && (cProdNo !== "020014" && cProdNo !=="020018") ){
+                 baseBefore["Base.tDepartureDate"] = ''
+          }
+    }
+ 
     setFormValue(baseBefore);
     nRatioCoefFunc()
   },
@@ -379,12 +258,6 @@ const method = {
     const baseBefore = tabref["insrnc"].getFromValue();
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-
-
-
-
-
-
     if (route.params.param?.cRsnCde != "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm = moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
@@ -619,6 +492,23 @@ const method = {
       "Base.nReportDays": days
     });
   },
+
+  // 起运日期控制
+  tDepartureDateDis:(date:any)=>{
+    const fs = insrncEditRef?.value?.getFromValue();
+    if (fs) {
+      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间    
+        let cProdNo = route.params.param?.cProdNo
+        if( cProdNo === "020014" ||cProdNo ==="020018"){
+               return false;
+        }else{
+           return date.getTime() < startDate.getTime()
+        }
+    } else {
+      return false;
+    }
+  }
+
 };
 
 // 绑定特殊验证器
