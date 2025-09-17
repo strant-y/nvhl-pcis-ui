@@ -418,12 +418,39 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: "rtcascader",
                 title: "批改原因",
                 minWidth: 140,
-                typeCode: 'EDR_RSN_LIST_NEW',
                 checkStrictly: false,
                 func: (val, row, codeListMap) => {
                     console.log(row);
                     if (val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
                         row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item: any) => item.value === val[1]);
+                    }
+                },
+                lazyLoad: (node, resolve, row) => {
+                    const { level, value } = node;
+                    if(row.cTransMrk === '1'){
+                        resolve([{c_calc_mrk: "0",label: "数据补全",leaf: true,value: "99"}]);
+                    }else if (level !== 0 && !!value) {
+                        const list = node.label !== "一般批改" ? codeListMap[`EDR_RSN_LIST_NEW-${level}-${value}`] : '';
+                        let codeListParam = {};
+                        codeListParam.rsnTyp = value.split('-')[0];
+                        codeListParam.kindNo = value.split('-')[1];
+                        codeListParam.prodNo = row.cProdNo;
+                        codeListParam.cTransMrk = row.cTransMrk;
+                        codeListStore.queryCodeList(
+                            { codeListName: 'EDR_RSN_LIST_NEW',
+                            codeListParam: codeListParam, },
+                            false, false ).then((res: any) => {
+                            res.forEach((e: any) => {
+                                e.leaf = level >= 1;
+                            });
+                            codeListMap[`EDR_RSN_LIST_NEW-${level}-${value}`] = res;
+                            resolve(res);
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                            });
+                    }else {
+                        resolve([]);
                     }
                 },
             },
@@ -1056,6 +1083,7 @@ const openEdr = async (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cDptCnm: selected.value["cDptCnm"],
                             cEdrType: '1',
                             pageType: "EDR_APP_NEW_SCENE",
+                            cTransMrk: selected.value["cTransMrk"],
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],

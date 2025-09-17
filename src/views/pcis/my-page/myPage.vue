@@ -999,6 +999,14 @@ const copyPolicyNumber = () => {
  */
 const basicBtn = [
   createFreeButtonBase({
+    label: "test",
+    type: "primary",
+    id: "btn010101",
+    func: () => {
+      opertaor.validateAll();
+    },
+  }),
+  createFreeButtonBase({
     label: "保费计算",
     type: "primary",
     id: "btn010101",
@@ -1085,6 +1093,43 @@ const basicRightBtn = [
     },
   }),
 ]
+/**
+ * 数据补全
+ */
+const edrAddDataBtn = [
+  createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "btnCalEdr",
+    func: async () => {
+      calcPremiumEdr();
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: async () => {
+      saveEdrPlyInfo();
+    },
+  }),
+  createFreeButtonBase({
+    label: "比较/生成批文",
+    type: "primary",
+    id: "btnCompare",
+    func: async () => {
+      generateEndorse();
+    },
+  }),
+  createFreeButtonBase({
+    label: "申请核保",
+    type: "warning",
+    id: "btnSubmitEdr",
+    func: async () => {
+      submitEdrToUndrFun();
+    },
+  }),
+];
 /**
  * 一般批改按钮
  */
@@ -1266,8 +1311,8 @@ const initPage = async () => {
     acctinfoFlag.value = false;
   }
   if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
-    edrbaseFlag.value = false
-    edritemFlag.value = false;
+    edrbaseFlag.value = true
+    edritemFlag.value = true;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -1299,19 +1344,21 @@ const initPage = async () => {
 
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
-    if (props.param.cEdrType == "1") {
-      opertaor.setReadOnly(formconfig11);
-    }
+    opertaor.setReadOnly(formconfig11);
   }
   // 只读场景,提前将配置设置为只读
   if (
     props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
     (props.param?.pageType === "EDR_APP_NEW_SCENE" &&
-      props.param.cEdrType == "1") ||
+      props.param.cEdrType == "1" && props.param.cRsnCde !== '99') ||
     props.param?.pageType === "readonly" ||
     props.param?.pageType === "UW_READ_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
+  }
+
+  if(props.param.cEdrType == "1" && props.param.cRsnCde === '99'){    //数据补全,数据状态初始化
+    opertaor.setAddData(formconfig11);
   }
 
   opertaor.setTableConfig(formconfig11);
@@ -1391,58 +1438,11 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-   if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
+   if(props.param?.cTransMrk === '1' && props.param?.pageType === 'EDR_APP_NEW_SCENE'){ //历史数据补全
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
-    if (props.param.cAppTyp == "E") {
-      if (props.param.cEdrType == "1") {
-        bthList.value = edrBtn;
-        nextTick(() => {
-          opertaor.setDisabledAll();
-          getEdrRsnItemFun(
-            props.param["cProdNo"],
-            props.param["cDptCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrType"],
-            props.param["cGrpMrk"]
-          );
-
-          // 用于处理 账户信息
-          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-          if(acctinfoInfo){
-              acctinfoInfo.setDisabledAll(false);  
-              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-                disabled: true
-              })
-              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-                disabled: true
-              })
-          }  
-        });
-        edritem.value?.handleQuery();
-      } else {
-        bthList.value = edrSurrenderBtn;
-      }
-    } else if (props.param.cAppTyp == "A") {
-      bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
-			if(props.param?.pageName === "priceInquiry") {
-				bthList.value.push(
-					createFreeButtonBase({
-						label: "发起风勘",
-						type: "primary",
-						func: () => {
-							if (getNo.value == '暂无') {
-								ElMessage.error('询价单号为空,请保存后操作!');
-								return false;
-							}
-							startWindExploration(); 
-						},
-					}),
-				)
-			}
-    }
+    bthList.value = edrAddDataBtn;
+    edritem.value?.handleQuery();
   }else if (props.param.pageType === "app") {
     //获取单号
     // getCAppNoFun();
@@ -2361,60 +2361,6 @@ async function loadAfter() {
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
   } 
-  // else if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
-  //   const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
-  //   await loadAppPlyInfo(cAppNo);
-  //   if (props.param.cAppTyp == "E") {
-  //     if (props.param.cEdrType == "1") {
-  //       bthList.value = edrBtn;
-  //       nextTick(() => {
-  //         opertaor.setDisabledAll();
-  //         getEdrRsnItemFun(
-  //           props.param["cProdNo"],
-  //           props.param["cDptCde"],
-  //           props.param["cEdrRsnBundleCde"],
-  //           props.param["cEdrRsnBundleCde"],
-  //           props.param["cEdrType"],
-  //           props.param["cGrpMrk"]
-  //         );
-
-  //         // 用于处理 账户信息
-  //         let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-  //         if(acctinfoInfo){
-  //             acctinfoInfo.setDisabledAll(false);  
-  //             acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-  //               disabled: true
-  //             })
-  //             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-  //               disabled: true
-  //             })
-  //         }  
-  //       });
-  //       edritem.value?.handleQuery();
-  //     } else {
-  //       bthList.value = edrSurrenderBtn;
-  //     }
-  //   } else if (props.param.cAppTyp == "A") {
-  //     bthList.value = basicBtn;
-  //     rightBtnList.value = basicRightBtn;
-	// 		if(props.param?.pageName === "priceInquiry") {
-	// 			bthList.value.push(
-	// 				createFreeButtonBase({
-	// 					label: "发起风勘",
-	// 					type: "primary",
-	// 					func: () => {
-	// 						if (getNo.value == '暂无') {
-	// 							ElMessage.error('询价单号为空,请保存后操作!');
-	// 							return false;
-	// 						}
-	// 						startWindExploration(); 
-	// 					},
-	// 				}),
-	// 			)
-	// 		}
-  //   }
-  // }
-
   let imageStr = '影像管理';
   if(pageMethod.isReadOnlyScene(opertaor)){
     imageStr = '影像查看';
@@ -2593,7 +2539,7 @@ const loadAppPlyInfo = async (CAppNo) => {
   } else if (props.param.pageName === "priceInquiry") {
     param["cInquiryNo"] = CAppNo;
   } else if(props.param.cTransMrk === '1'){
-    param['CPlyNo'] = props.param.cPlyNo;
+    param['CPlyNo'] = props.param.cAppNo;
   } else{
      param["cAppNo"] = CAppNo;
   }
@@ -2689,12 +2635,11 @@ const loadAppPlyInfo = async (CAppNo) => {
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
-      if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
-        ops.plyBase['Base.cAppNo'] = '';
-      }
+      // if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
+      //   ops.plyBase['Base.cAppNo'] = '';
+      // }
     console.log("转换的数据", ops);
-    if(props.param.cTransMrk !== '1'){
-      if (res["res"]["composition"]["EdrBase"]) {
+    if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
@@ -2751,7 +2696,6 @@ const loadAppPlyInfo = async (CAppNo) => {
         }
         edrbase.value?.setFormValue(EdrBaseData);
       }
-    }
       
       // 展示保费和保额金额
       if (ops["base"]["Base.nPrm"] && ops["base"]["Base.nPrm"] > 0) {
@@ -2759,21 +2703,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       }
       if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
         nAmt.value = ops["base"]["Base.nAmt"];
-      }
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
+      } 
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
       console.log('缓存的数据6666',ops)
       // 暂存数据
       sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-     
     }
   }
 };
