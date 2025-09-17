@@ -42,7 +42,6 @@ const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
 const fixSpecData = ref([]); //存储已选择的特别约定数据
-let specialAdd = true;
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -98,7 +97,7 @@ const getOwnShare =()=>{
 
 
 // 拆分事件
-const nPayNumberFun = (isAdd=false)=>{
+const nPayNumberFun = ()=>{
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const baseData = opertaor.getDataAll()['base']['needCalc'];
@@ -115,16 +114,9 @@ const nPayNumberFun = (isAdd=false)=>{
       return false
     }
     if(getValue("Base.nPayNum")!=''){
-        let cinstmrk = getValue('Base.cInstMrk');
-      if(specialAdd  && isAdd && cinstmrk =='5'){
-        ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
-        specialAdd = false;
-      }
-    
-      // 用来添加特约信息
-      if(isAdd  && cinstmrk =='5'){
-         eventBus.emit('add-special')
-      }
+
+      // 多期情况 添加特约信息
+      if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
 
       const data = opertaor.getDataAll();
       
@@ -187,7 +179,7 @@ const method = {
 
   //缴费拆分按钮事件
   splitPayNumber() {
-      nPayNumberFun(true);
+      nPayNumberFun();
  
   },
   //付费约定下拉事件
@@ -204,7 +196,7 @@ const method = {
     if (param.initFlag) {
       return ;
     }
-       nPayNumberFun(true);
+       nPayNumberFun();
     }
   },
   //争议处理选择事件

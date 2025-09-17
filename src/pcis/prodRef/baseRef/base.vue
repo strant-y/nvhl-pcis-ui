@@ -20,7 +20,7 @@ const route = useRoute();
 import { ratio } from "@/api/prod"
 import dayjs from "dayjs";
 import { eventBus } from '@/utils/event-bus'
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 
@@ -43,7 +43,6 @@ const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
 const fixSpecData = ref([]); //存储已选择的特别约定数据
-let specialAdd = true;
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -51,7 +50,7 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  
+
   if (sessionStorage.getItem("toMyPageData")) {
     sessionData.value = JSON.parse(sessionStorage.getItem("toMyPageData"));
   }
@@ -62,128 +61,154 @@ onMounted(async () => {
   //   hidden: true
   // });
 
-   // 短期费率类型,以下产品只支持按日的短期费率类型
+  // 短期费率类型,以下产品只支持按日的短期费率类型
   const disabledProducts = [
-    "040016", "059014", "059015", "070002", "043021", 
+    "040016", "059014", "059015", "070002", "043021",
     "120008", "059018", "059017", "059016", "043020",
     "049019", "049020"
   ];
-  
+
   const isDisabled = disabledProducts.includes(params.cProdNo);
   // setFormItem("Base.cRatioTyp", { 
   //   disabled: isDisabled
   // });
-  if(params?.cRecordType === 9 || params.cPolicySource == 9){
-    setFormItem('Base.cRatioTyp',{hidden:true})
-    setFormItem('Base.nRatioCoef',{hidden:true})
+  if (params?.cRecordType === 9 || params.cPolicySource == 9) {
+    setFormItem('Base.cRatioTyp', { hidden: true })
+    setFormItem('Base.nRatioCoef', { hidden: true })
   }
 });
 
 
 // 获取我司比例
-const getOwnShare =()=>{
-  debugger;
-   let ownShare = 0;
-   const data = opertaor.getDataAll();
-   let ciArr = data['ci']
+const getOwnShare = () => {
+  let ownShare = 0;
+  const data = opertaor.getDataAll();
+  let ciArr = data['ci']
   //  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-  if(ciArr && ciArr.length>0){
-    ciArr.forEach((item:any)=>{
+  if (ciArr && ciArr.length > 0) {
+    ciArr.forEach((item: any) => {
       const CDptMrk = item['Ci.cCoinsurerCde']
-      if(!!CDptMrk && CDptMrk ==="327001"){
-        ownShare  += Number(item['Ci.nCiShare'])
-      } 
-   })
+      if (!!CDptMrk && CDptMrk === "327001") {
+        ownShare += Number(item['Ci.nCiShare'])
+      }
+    })
   }
   return ownShare;
 }
 
 
 // 拆分事件
-const nPayNumberFun = (isAdd=false)=>{
-    const tabref = opertaor.getTableRefs();
-    const baseBefore = tabref["base"].getFromValue();
-    const baseData = opertaor.getDataAll()['base']['needCalc'];
-    const payinfoRef =  opertaor.getTableRefByKey("payinfo").getFromValue();
-    console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
+const nPayNumberFun = () => {
+  const tabref = opertaor.getTableRefs();
+  const baseBefore = tabref["base"].getFromValue();
+  const baseData = opertaor.getDataAll()['base']['needCalc'];
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
+  console.log('opertaor', baseData, opertaor.getDataAll(), baseBefore)
 
-    if (!baseData && payinfoRef.length <1) {
-      ElMessage.error("请先进行保费计算!");
-      return false
+  if (!baseData && payinfoRef.length < 1) {
+    ElMessage.error("请先进行保费计算!");
+    return false
+  }
+
+  if (Number(getValue("Base.nPayNum")) > 12) {
+    ElMessage.warning("拆分最多为12期！");
+    return false
+  }
+  if (getValue("Base.nPayNum") != '') {
+
+    // 拆分 添加特约信息
+    if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
+
+              
+    const data = opertaor.getDataAll();
+    let nCiShare = Number(getOwnShare()) || 1;
+    const totalAmount = Number(data['base']['Base.nPrm']) || 0;
+    const splitCount = Number(data.base?.['Base.nPayNum']) || 0;
+
+    const totalCent = Math.round(totalAmount * 100);
+    const result = ref<number[]>([]);
+    const quotient = Math.floor(totalCent / splitCount);
+    const remainder = totalCent % splitCount;
+    // const validSplitCount = Math.max(0, Math.min(Number.MAX_SAFE_INTEGER, Math.floor(Number(splitCount) || 0)));
+    // result.value = Array(validSplitCount).fill(quotient);
+    result.value = Array(splitCount).fill(quotient);
+    if (remainder > 0) {
+      result.value[splitCount - 1] += remainder;
     }
 
-    if (Number(getValue("Base.nPayNum"))>12) {
-      ElMessage.warning("拆分最多为12期！");
-      return false
+    result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(8)));
+    const totalOwnPrm = parseFloat((totalAmount * nCiShare).toFixed(2)); // 总我司保费
+    const ownPrmList = [];
+    let baseOwnTotal = 0; // 前n-1期我司保费总和
+
+    // 计算前n-1期我司保费
+    for (let i = 0; i < splitCount - 1; i++) {
+      const ownPrm = parseFloat((result.value[i] * nCiShare).toFixed(2));
+      ownPrmList.push(ownPrm);
+      baseOwnTotal += ownPrm;
     }
-    if(getValue("Base.nPayNum")!=''){
-        let cinstmrk = getValue('Base.cInstMrk');
-      if(specialAdd  && isAdd && cinstmrk =='5'){
-        ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
-        specialAdd = false;
-      }
-    
-      // 用来添加特约信息
-      if(isAdd  && cinstmrk =='5'){
-         eventBus.emit('add-special')
-      }
 
-      const data = opertaor.getDataAll();
-      
-      let nCiShare = Number(getOwnShare()) || 1;
-      const totalAmount = Number(data['base']['Base.nPrm'])  || 0;
-      const splitCount =Number(data.base?.['Base.nPayNum']) || 0;
-   debugger;
-      const totalCent = Math.round(totalAmount * 100);
-      const result = ref<number[]>([]);
-      const quotient = Math.floor(totalCent / splitCount) ;
-      const remainder = totalCent % splitCount;
-      // const validSplitCount = Math.max(0, Math.min(Number.MAX_SAFE_INTEGER, Math.floor(Number(splitCount) || 0)));
-      // result.value = Array(validSplitCount).fill(quotient);
-      result.value = Array(splitCount).fill(quotient);
-      if (remainder > 0) {
-        result.value[splitCount-1] += remainder;
+    // 最后一期我司保费 = 总我司保费 - 前n-1期总和（确保总额匹配）
+    if (splitCount >= 1) {
+      const lastOwnPrm = parseFloat((totalOwnPrm - baseOwnTotal).toFixed(2));
+      ownPrmList.push(lastOwnPrm);
+    }
+
+    let val = {}
+    let valArr = []
+    for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
+      let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
+      let startDate = new Date(BgnTmDate);
+      let endDate = new Date(BgnTmDate)
+      if (getValue("Base.cInstMrk") == '5') {
+        startDate.setDate(BgnTmDate.getDate() + i * 15);
+        endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15);
+      } else {
+        startDate.setDate(BgnTmDate.getDate() + i * 30);
+        endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30);
       }
 
-            result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
-      let val= {}
-      let valArr=[]
-      for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
-        let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
-        let startDate = new Date(BgnTmDate); 
-        let endDate = new Date(BgnTmDate)
-        if (getValue("Base.cInstMrk")=='5') {
-          startDate.setDate(BgnTmDate.getDate() + i * 15); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15); 
-        } else {
-          startDate.setDate(BgnTmDate.getDate() + i * 30); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30); 
-        }
+      let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
+      // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
 
-        let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
-        // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
+      let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD HH:mm:ss")
+      val = {
+        "_dataId": "",
+        "Pay.nTms": i + 1,
+        "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
+        "Pay.tPayBgnTm": tInsrncBgnTm,
+        "Pay.tPayEndTm": tPayEndTm,
+        "Pay.nOwnPrm":  ownPrmList[i],   // 我司
+        // "Pay.nOwnPrm": result.value[i] ? parseFloat((result.value[i] * nCiShare).toFixed(8)) : 0,   // 我司
+        // "Pay.nOwnPrm": result.value[i] || 0 ,   // 我司
+        "Pay.cPayorNme": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
+        "Pay.nPayablePrm": result.value[i] || 0, // 应收
+        "Pay.nPrmVar": result.value[i]     // 差额
+      }
+      valArr.push(val)
+     
+    }
+
  
-        let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
-           val= { "_dataId": "",
-            "Pay.nTms":i+1 ,
-            "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
-            "Pay.tPayBgnTm": tInsrncBgnTm,
-            "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm":result.value[i]? parseFloat((result.value[i] * nCiShare ).toFixed(8)):0,   // 我司
-            // "Pay.nOwnPrm": result.value[i] || 0 ,   // 我司
-            "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
-            "Pay.nPayablePrm": result.value[i] || 0, // 应收
-            "Pay.nPrmVar": result.value[i]     // 差额
-          }
+    //   let num = 0;
+    //   valArr.forEach((item: any) => {
+    //     item['Pay.nPayablePrm'] = item['Pay.nPayablePrm'] || 0;
+    //     item['Pay.nOwnPrm'] = item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * nCiShare).toFixed(8)) : 0
+    //     num += item['Pay.nOwnPrm']
+    //   })
 
-          valArr.push(val)
-      }
+    //   const cCiMrk = ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
+    //   if (!cCiMrk) {
+    //     const nCiOwnPrm = data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费
+    //     let differNum = nCiOwnPrm - num // 差额
+    //     valArr[valArr.length - 1]['Pay.nOwnPrm'] = valArr[valArr.length - 1]['Pay.nOwnPrm'] + differNum
+    //   }
 
-      console.log('数据',valArr)
-   
-      opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
-    }
- } 
+    console.log('数据', valArr)
+
+    opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
+  }
+}
 
 // 绑定方法
 const method = {
@@ -192,24 +217,24 @@ const method = {
 
   //缴费拆分按钮事件
   splitPayNumber() {
-      nPayNumberFun(true);
- 
+    nPayNumberFun();
+
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log('付费约定',val)
-   const param = opertaor.getParam();
-   if (param.initFlag) {
-      return ;
+    console.log('付费约定', val)
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
     }
-    if(val=='5'){
-      setFormItem("Base.nPayNum", { disabled: false ,  max:12});
-    }else if(val=='0'){
+    if (val == '5') {
+      setFormItem("Base.nPayNum", { disabled: false, max: 12 });
+    } else if (val == '0') {
       setFormItem("Base.nPayNum", { disabled: true, });
-      setValue('Base.nPayNum',1)
+      setValue('Base.nPayNum', 1)
       console.log('执行了吗')
-    
-       nPayNumberFun(true);
+
+      nPayNumberFun();
     }
   },
   //争议处理选择事件
@@ -222,26 +247,26 @@ const method = {
       // setFormItem("Base.cDisptSttlOrg", { disabled: false,rules: [getRules("required", {})] });
       setFormItem("Base.cDisptSttlOrg", { rules: [getRules("required", {})] });
       setValue("Base.cDisptSttlOrg", "提交____仲裁委员会");
-    }else{
-      setFormItem("Base.cDisptSttlOrg", {rules: [] });
-      setValue("Base.cDisptSttlOrg", "");   
+    } else {
+      setFormItem("Base.cDisptSttlOrg", { rules: [] });
+      setValue("Base.cDisptSttlOrg", "");
     }
-    
+
   },
   //总保费下拉事件
   cPrmCurChange: (val: any) => {
-    if(val && idxParam && idxParam.getcPrmCur) {
+    if (val && idxParam && idxParam.getcPrmCur) {
       idxParam.getcPrmCur(val)
     }
     try {
       const getFormconfig = opertaor.getTableRefs()['AgentTgt']
-      getFormconfig?.setValue('Tgt.cPayCur',val)
-    }catch (err){
+      getFormconfig?.setValue('Tgt.cPayCur', val)
+    } catch (err) {
       console.log(err)
     }
     const param = opertaor.getParam();
     if (param.initFlag) {
-      return ;
+      return;
     }
     if (val !== "CNY") {
       codeListStore
@@ -258,12 +283,12 @@ const method = {
   },
   //总保额币种下拉事件
   cAmtCurChange(val: any) {
-    if(val && idxParam && idxParam.setcAmtCur) {
+    if (val && idxParam && idxParam.setcAmtCur) {
       idxParam.setcAmtCur(val)
     }
     const param = opertaor.getParam();
     if (param.initFlag) {
-      return ;
+      return;
     }
     if (val !== "CNY") {
       codeListStore
@@ -280,7 +305,7 @@ const method = {
   },
   //保额汇率标识change事件
   cInsExchCdeChange(val: any) {
- 
+
     if (val == "0") {// 协议汇率
       setFormItem("Base.nAmtRmbExch", { disabled: false });
       //           Base.nAmtRmbExch
@@ -288,7 +313,7 @@ const method = {
       setFormItem("Base.nAmtRmbExch", { disabled: true });
       // setValue("Base.nAmtRmbExch", "1.000000");
       const cAmtCur = getValue("Base.cAmtCur")
-      if(cAmtCur) {
+      if (cAmtCur) {
         method.cAmtCurChange(cAmtCur)
       }
     }
@@ -301,7 +326,7 @@ const method = {
       setFormItem("Base.nPrmRmbExch", { disabled: true });
       // setValue("Base.nPrmRmbExch", "1.000000");
       const cPrmCur = getValue("Base.cPrmCur")
-      if(cPrmCur) {
+      if (cPrmCur) {
         method.cPrmCurChange(cPrmCur)
       }
     }
@@ -345,7 +370,7 @@ const method = {
     );
   },
   // 短期费率类型
-  cRatioTypChange:(val:any)=>{
+  cRatioTypChange: (val: any) => {
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["insrnc"].getFromValue();
     let prodNo = route.params.param?.cProdNo;
@@ -353,13 +378,13 @@ const method = {
       bgnTm: baseBefore["Base.tInsrncBgnTm"],
       endTm: baseBefore["Base.tInsrncEndTm"],
       prodNo,
-      ratioType:val
+      ratioType: val
     }
     policyRatio(param).then((res: any) => {
-      const { code, data, msg } = res;      
+      const { code, data, msg } = res;
       if (code === 200) {
-        setValue("Base.nRatioCoef",Number(data).toFixed(6));
-        }
+        setValue("Base.nRatioCoef", Number(data).toFixed(6));
+      }
     });
   },
   // 总保额(累计赔偿限额)change事件
@@ -382,16 +407,16 @@ const method = {
       }
     }
   },
-  aAmtChange:(val:any)=>{
+  aAmtChange: (val: any) => {
     const namtExch = getValue('Base.nAmtRmbExch');
     if (!!namtExch) {
-        // 计算折人民币保额
-        setValue("Base.nRmbAmt", numMulti(namtExch, val));
-      }
+      // 计算折人民币保额
+      setValue("Base.nRmbAmt", numMulti(namtExch, val));
+    }
   },
   // 总保额(累计赔偿限额)汇率change事件
   nAmtRmbExchChange: (val: any) => {
-    console.log('111',val)
+    console.log('111', val)
     if (!!val) {
       const namt = getValue('Base.nAmt');
       if (!!namt) {
@@ -490,7 +515,7 @@ function setFormItem(key: string, obj: Record<string, any>): void {
   recursiveSetFormItem(formconfig1.fromSchema, key, obj);
 }
 
-function getFormconfig(){
+function getFormconfig() {
   return formconfig1;
 }
 
@@ -506,7 +531,7 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
-function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
+function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   baseEditRef?.value?.addProvide(key, value);
 }
 defineExpose({
