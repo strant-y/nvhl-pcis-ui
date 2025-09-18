@@ -1251,7 +1251,7 @@ onMounted(async () => {
     // 检测首页跳转并加锁
     const hasJumpData = sessionStorage.getItem(AppKey.query.pcis_query_search);
     if (hasJumpData) {
-        isJumpingFromHome.value = true;
+        isJumpingFromHome.value = true;  // 加锁，避免 cAppTyp.func 再触发
     }
     formconfig1.fromSchema?.forEach((item) => {
         if (
@@ -1293,9 +1293,18 @@ onMounted(async () => {
     } else {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
-    applyCheckedColumns(checkedProps);
+    await applyCheckedColumns(checkedProps);
     // 判断用户出单岗 or 核保岗 // 出单岗 ROLE_00000008 ROLE_00000563  // 核保岗 ROLE_00000152
     updateCopyBtnVisible();
+
+    // 首页跳转过来时需要查
+    if (hasJumpData) {
+        const { CAppNo } = JSON.parse(hasJumpData);
+        setValue("cQueryStr", CAppNo);      
+        await handleQuery(true, true);         // ← 首页跳转只查 1 次
+        isJumpingFromHome.value = false;
+        sessionStorage.removeItem(AppKey.query.pcis_query_search);
+    }
 });
 
 onUnmounted(() => {
@@ -2116,18 +2125,7 @@ async function applyCheckedColumns(props: string[]) {
         fromSchema: finalColumns
     };
 
-    Object.assign(tableconfig, newConfig);
-    
-    // 首页跳转过来查询条件赋值并查询
-    const hasJumpData = sessionStorage.getItem(AppKey.query.pcis_query_search);
-    if (hasJumpData) {
-        setValue("cQueryStr", JSON.parse(hasJumpData).CAppNo);
-        await handleQuery(true, true);
-        isJumpingFromHome.value = false;
-        sessionStorage.removeItem(AppKey.query.pcis_query_search);
-    }else{
-        await handleQuery(true);
-    }
+    Object.assign(tableconfig, newConfig); 
 }
 
 function formatTwoLine(text) {
