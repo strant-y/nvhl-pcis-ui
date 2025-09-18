@@ -196,8 +196,7 @@
           <div class="tp" style="background: #ebedfc">
             <span>条款：</span
             ><span class="publicStyle"
-              >{{ props.param.pageType === "orig" ? (props.param?.xbtn || '') : props.param.cTermNo }}&nbsp;&nbsp;{{
-              props.param.pageType === "orig" ? (props.param?.xbtm || '') : props.param.cTermNme
+              >{{props.param.cTermNo }}&nbsp;&nbsp;{{props.param.cTermNme
               }}</span
             >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|

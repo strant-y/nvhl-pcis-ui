@@ -746,7 +746,7 @@ const method = {
     }
     let co = 'NATURAL_CERTIFICATE_CACHE';
 
-    if(val !== '0'){
+    if(val == '0'){
       co = 'UN_NATURAL_CERTIFICATE_CACHE';
     }
     
@@ -765,7 +765,7 @@ const method = {
           code: "Applicant.cCertfCls",
           list: res
         })
-        if(val === '1'){
+        if(val === '0'){
           setValue('Applicant.cCertfCls', '110007');  // 法人默认机构代码
         }
       });
