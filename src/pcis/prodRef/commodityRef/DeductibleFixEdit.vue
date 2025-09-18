@@ -9,7 +9,8 @@
           class="content-item"
         >
           <el-input
-           type="number"
+             
+            type="number"
             v-if="item.match(/^\*+$/)"
             v-model="inputValues[index]" 
             @input="updateCNmeCn(index, $event)"
@@ -70,7 +71,8 @@ console.log('dada',rowData)
   );
 
 const updateCNmeCn = (index: number, value: string) => {
-  inputValues.value[index] = value;
+  // inputValues.value[index] = value;
+  inputValues.value[index]= value.toString().slice(0, 9);
 };
 
 const handleCancel = () => {

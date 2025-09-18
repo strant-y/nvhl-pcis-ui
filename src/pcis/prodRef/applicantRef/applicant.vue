@@ -564,6 +564,9 @@ const method = {
       setFormItem("Applicant.RegisterProp", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Applicant.cRegisterSuffixAddr", {
+        rules: [getRules("required", {})],
+      });
 
       // 单位性质 --为企业做必填校验
       const cWorkDpt = getValue('Applicant.cWorkDpt')
@@ -637,6 +640,9 @@ const method = {
       //注册地址
       // setFormItem("Applicant.cRegisteredcapDre", { rules: null });
       setFormItem("Applicant.RegisterProp", {
+        rules: null,
+      });
+      setFormItem("Applicant.cRegisterSuffixAddr", {
         rules: null,
       });
       //是否个体工商户
