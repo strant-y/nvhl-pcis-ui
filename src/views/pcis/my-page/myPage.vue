@@ -1009,14 +1009,6 @@ const copyPolicyNumber = () => {
  */
 const basicBtn = [
   createFreeButtonBase({
-    label: "test",
-    type: "primary",
-    id: "btn010101",
-    func: () => {
-      opertaor.validateAll();
-    },
-  }),
-  createFreeButtonBase({
     label: "保费计算",
     type: "primary",
     id: "btn010101",
