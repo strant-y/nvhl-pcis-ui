@@ -501,6 +501,7 @@ const method = {
   },
   //业务员
   cSlsCdeChange:()=>{
+    debugger
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
