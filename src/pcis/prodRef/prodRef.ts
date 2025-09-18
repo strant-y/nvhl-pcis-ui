@@ -67,6 +67,8 @@ import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
 import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
 import ciagentPer from "./commodityRef/ciagentPer.vue" //代理(经济)人
 import ciagentWorker from "./commodityRef/ciagentWorker.vue" //代理业务员
+import eCargociagentPer from "./commodityRef/eCargoCiagentPer.vue" //代理(经济)人
+import eCargociagentWorker from "./commodityRef/eCargoCiagentWorker.vue" //代理业务员
 import cBrkrCdeModal from "./commodityRef/cBrkrCdeModal.vue"; //开户行
 import prdFixSpec from "./commodityRef/prd-fix-spec.vue" //特别约定
 import deductibleFix from "./commodityRef/DeductibleFix.vue" //免赔条件选择
@@ -171,6 +173,8 @@ const componentMap = {
   ciagentPer: ciagentPer,
   cBrkrCdeModal:cBrkrCdeModal,
   ciagentWorker: ciagentWorker,
+  eCargociagentPer: eCargociagentPer,
+  eCargociagentWorker: eCargociagentWorker,
   ndustryCateModal:ndustryCateModal,
   cOccupCdeModal:cOccupCdeModal,
   prdFixSpec: prdFixSpec,

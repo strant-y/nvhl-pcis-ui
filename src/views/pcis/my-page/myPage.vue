@@ -196,8 +196,7 @@
           <div class="tp" style="background: #ebedfc">
             <span>条款：</span
             ><span class="publicStyle"
-              >{{ props.param.pageType === "orig" ? (props.param?.xbtn || '') : props.param.cTermNo }}&nbsp;&nbsp;{{
-              props.param.pageType === "orig" ? (props.param?.xbtm || '') : props.param.cTermNme
+              >{{props.param.cTermNo }}&nbsp;&nbsp;{{props.param.cTermNme
               }}</span
             >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
@@ -3846,7 +3845,7 @@ const calcPremiumEdr = async () => {
         // currentPayList = currentPayList.filter(item => {
         //   return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
         // });
-       
+        
           let payInfo = setPayInfoEdr(
                 ops["payinfo"],
                 ops["base"],
@@ -3855,8 +3854,16 @@ const calcPremiumEdr = async () => {
                 ops["plyBase"],
                 currentPayList.length+1
               );
-            currentPayList.push(payInfo); // 插入新条目
-            payinfoRef.setFormValue(currentPayList); // 更新表单数据
+
+            // for (const i in payInfo) {
+                    // const pay = payInfo[i];
+                    // currentPayList.push(pay)
+                   payinfoRef.setFormValue(payInfo);
+            // }
+
+
+            // currentPayList.push(payInfo); // 插入新条目
+            // payinfoRef.setFormValue(currentPayList); // 更新表单数据
           }
       needCalc.value = false;
     } else {
@@ -3885,8 +3892,9 @@ const getOwnShare =()=>{
 }
 
 const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
-  // const payListNew = [];
-  const payListNew = [...payList];
+  console.log('保费---setPay')
+  const payListNew = [];
+  // const payListNew = [...payList];
   const data = opertaor.getDataAll();
   const cCiMrk = data.plyBase?.['Base.cCiMrk'];
   const nCiOwnPrm = ['1', '2', '3','4'].includes(cCiMrk)
@@ -3909,15 +3917,18 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = nPrmVar 
 
-  // for (const i in payList) {
-  //   if (!!payList[i]["Pay.cPkId"]) {
-  //     payListNew.push(payList[i]);
-  //   }
-  // }
+  for (const i in payList) {
+    if (!!payList[i]["Pay.cRowId"]) {
+      payList[i]['Pay.nPrmVar'] = 0;
+      payListNew.push(payList[i]);
+    }
+  }
+  
   pay["Pay.nTms"] = nTms ||plyBase.length+1 ;
-  // payListNew.push(pay);
-  // return payListNew;
-  return pay;
+  payListNew.push(pay);
+  console.log('保费计算后数据----',payListNew)
+  return payListNew;
+  // return pay;
 };
 /**
  * 批改:注销退保保费计算
