@@ -26,7 +26,7 @@
         :options="options"
         @visible-change="showOptions"
         @change="handleChange"
-        style="min-width: 100px;"
+        :style="{'min-width': item.minWidth || '75px'}"
         :fit-input-width="false"
       >
         <template
@@ -475,3 +475,8 @@ defineExpose({
   setChangeInfo
 })
 </script>
+<style lang="scss" scoped>
+:deep(.el-select__wrapper) {
+  padding: 4px 6px;
+}
+</style>

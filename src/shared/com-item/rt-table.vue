@@ -12,7 +12,7 @@
       :data="tableDatas"
       style="width: 100%"
       :default-sort="item.defaultSort"
-      :border="item.border ? item.border : true"
+      :border="item.border || item.border === false ? item.border : true"
       :fit="item.fit ? item.fit : true"
       :stripe="item.stripe === undefined ? true : item.stripe"
       :size="item.size ? item.size : 'default'"
@@ -141,41 +141,43 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
+            <div class="methodColumn">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
-            <template v-if="item.tableBtnType === 'text'">
-              <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
-                btn.label
-              }}</a>
-            </template>
-            <template v-if="item.tableBtnType === 'btn'">
-              <el-tooltip
-                :disabled="btn.tooltip ? false : true"
-                :content="btn.tooltip"
-                placement="top"
-                effect="light"
-              >
-                <rtButton
-                  @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
-                  :item="btn"
-                />
-              </el-tooltip>
-            </template>
-            <template v-if="item.tableBtnType === 'icon'">
-              <el-tooltip
-                :disabled="btn.tooltip ? false : true"
-                :content="btn.tooltip"
-                placement="top"
-                effect="light"
-              >
-                <a>
-                  <rtIcon :item="btn" />
-                </a>
-              </el-tooltip>
-            </template>
-            <template v-if="index !== item.tableBtn.length - 1">
-              <el-divider direction="vertical" />
-            </template>
+              <template v-if="item.tableBtnType === 'text'">
+                <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
+                  btn.label
+                }}</a>
+              </template>
+              <template v-if="item.tableBtnType === 'btn'">
+                <el-tooltip
+                  :disabled="btn.tooltip ? false : true"
+                  :content="btn.tooltip"
+                  placement="top"
+                  effect="light"
+                >
+                  <rtButton
+                    @click="btn.tableClick ? btn.tableClick(scope.row) : () => {}"
+                    :item="btn"
+                  />
+                </el-tooltip>
+              </template>
+              <template v-if="item.tableBtnType === 'icon'">
+                <el-tooltip
+                  :disabled="btn.tooltip ? false : true"
+                  :content="btn.tooltip"
+                  placement="top"
+                  effect="light"
+                >
+                  <a>
+                    <rtIcon :item="btn" />
+                  </a>
+                </el-tooltip>
+              </template>
+              <template v-if="index !== item.tableBtn.length - 1">
+                <!-- <el-divider direction="vertical" /> -->
+              </template>
           </template>
+            </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -193,6 +195,7 @@
             :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
+            :width="i.width"
             :sortable="i.sortable"
           >
             <template #header="header">
@@ -265,57 +268,59 @@
         "
       >
         <template #default="scope">
+              <div class="methodColumn">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="btn.hidden !== true">
-              <template v-if="item.tableBtnType === 'text'">
-                <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
-                  btn.label
-                }}</a>
-              </template>
-              <template v-if="item.tableBtnType === 'btn'">
-                <el-tooltip
-                  :disabled="btn.tooltip ? false : true"
-                  :content="btn.tooltip"
-                  placement="top"
-                  effect="light"
-                >
-                  <rtButton
-                    @click="
-                      btn.tableClick ? btn.tableClick(scope.row) : () => {}
-                    "
-                    :item="btn"
-                    :disabled="btn.disabled ? btn.disabled(scope.row) : false"
-                    v-if="!btn.hideBtns?.(scope.row) ?? false"
-                  />
-                </el-tooltip>
-              </template>
-              <template v-if="item.tableBtnType === 'icon'">
-                <el-tooltip
-                  :disabled="btn.tooltip ? false : true"
-                  :content="btn.tooltip"
-                  placement="top"
-                  effect="light"
-                >
-                  <a
-                    ><rtIcon
+                <template v-if="item.tableBtnType === 'text'">
+                  <a @click="btn.func ? btn.tableClick(scope.row) : () => {}">{{
+                    btn.label
+                  }}</a>
+                </template>
+                <template v-if="item.tableBtnType === 'btn'">
+                  <el-tooltip
+                    :disabled="btn.tooltip ? false : true"
+                    :content="btn.tooltip"
+                    placement="top"
+                    effect="light"
+                  >
+                    <rtButton
                       @click="
                         btn.tableClick ? btn.tableClick(scope.row) : () => {}
                       "
                       :item="btn"
-                  /></a>
-                </el-tooltip>
-              </template>
-              <template
-                v-if="
-                  index !== item.tableBtn.length - 1 &&
-                  !btn.hideBtns?.(scope.row) &&
-                  item.tableBtn.length > 1
-                "
-              >
-                <el-divider direction="vertical" />
-              </template>
+                      :disabled="btn.disabled ? btn.disabled(scope.row) : false"
+                      v-if="!btn.hideBtns?.(scope.row) ?? false"
+                    />
+                  </el-tooltip>
+                </template>
+                <template v-if="item.tableBtnType === 'icon'">
+                  <el-tooltip
+                    :disabled="btn.tooltip ? false : true"
+                    :content="btn.tooltip"
+                    placement="top"
+                    effect="light"
+                  >
+                    <a
+                      ><rtIcon
+                        @click="
+                          btn.tableClick ? btn.tableClick(scope.row) : () => {}
+                        "
+                        :item="btn"
+                    /></a>
+                  </el-tooltip>
+                </template>
+                <template
+                  v-if="
+                    index !== item.tableBtn.length - 1 &&
+                    !btn.hideBtns?.(scope.row) &&
+                    item.tableBtn.length > 1
+                  "
+                >
+                  <!-- <el-divider direction="vertical" /> -->
+                </template>
             </template>
           </template>
+              </div>
         </template>
       </el-table-column>
     </el-table>
@@ -370,11 +375,11 @@ const props = defineProps({
 const getCellStyle = (row: Record<string, any>) => {
   if(!props.item.editFlag) {
     return {
-      padding: '3px'
+      padding: '0px 0px'
     }
   }else {
     return {
-      padding: '6px'
+      padding: '3px'
     }
   }
 };
@@ -655,6 +660,7 @@ onMounted(() => {
   if (props.item.fromSchema) {
     initUI();
   }
+  console.log(props.item,'111111111111111')
 });
 
 async function tableExvalidate() {
@@ -792,7 +798,7 @@ function getColumnWidth(label: string, prop: any, tableData: any[], itemMinWidth
   //tableData表格数据
   const width = itemWidth || 0 // 列表属性宽度
   const minWidth = itemMinWidth || 80 // 最小宽度
-  const padding = 10 // 列内边距
+  const padding = 0 // 列内边距
   let arr = tableData.map(item => item[prop])
   arr.push(label)//拼接内容和表头数据
   const contentWidths = arr.map(item => {
@@ -891,11 +897,13 @@ function isrequired(i: any) {
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
-/*
+
 :deep(.el-table .cell) {
-  white-space: nowrap;
+  /* white-space: nowrap; */
+  line-height: 20px;
+  padding: 0 2px;
 }
-*/
+
 :deep(.el-table td.el-table__cell div.cell) {
   white-space: normal;
 }
@@ -907,5 +915,16 @@ function isrequired(i: any) {
 }
 :deep(.el-table__empty-text){
   line-height: 30px !important;
+}
+/* 表头居中对齐 */
+:deep(.el-table th.is-left div.cell) {
+  text-align: center;
+}
+.methodColumn {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+:deep(.methodColumn .el-button+.el-button) {
+  margin-left: 0;
 }
 </style>

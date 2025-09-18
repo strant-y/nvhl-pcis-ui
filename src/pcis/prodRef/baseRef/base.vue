@@ -76,6 +76,21 @@ onMounted(async () => {
     setFormItem('Base.cRatioTyp', { hidden: true })
     setFormItem('Base.nRatioCoef', { hidden: true })
   }
+  formconfig11.fromSchema?.forEach((item:any) => {
+    if(item.prop === "Base.groupAmtCur") {
+      item.labelLength = 11
+    }
+    if(item.prop === "Base.groupAmtExch") {
+      item.labelLength = 13
+      item.groupList[1].minWidth = "88px"
+    }
+    if(item.prop === "Base.nRmbAmt") {
+      item.labelLength = 15
+    }
+    if(item.prop === "Base.groupPrmExch") {
+      item.groupList[1].minWidth = "88px"
+    }
+  })
 });
 
 

@@ -908,10 +908,11 @@ defineExpose({
 <style scoped>
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important;
+  height: auto;
 }
 
 ::v-deep .el-card__header {
-   padding: 10px 16px !important;
+   /* padding: 10px 16px !important; */
  }
 
 ::v-deep .el-card__body {
@@ -919,6 +920,6 @@ defineExpose({
  }
 
 :deep(.planCard > .el-card__header:first-child) {
-  background: #bfe0f5;
+  background: #FAFAFA;
 }
 </style>
