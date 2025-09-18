@@ -4156,215 +4156,79 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  //历史数据补全功能特殊处理
-  if(props.param.cTransMrk === '1'){
-    // 获取保存按钮的通用方法
-    const getSaveButton = () => {
-      let btn = getBtn("saveEdr");
-      // 如果通过ID找不到，尝试通过标签查找
-      if (!btn) {
-        btn = bthList.value.find(item => item.label === "保存" || item.id === "saveEdr");
-      }
-      return btn;
-    };
-    
-    // 释放按钮加载状态的通用方法
-    const releaseButtonLoading = () => {
-      try {
-        const btn = getSaveButton();
-        if (btn && btn.loading !== undefined) {
-          btn.loading = false;
-        }
-      } catch (e) {
-        console.warn("释放按钮加载状态时出错:", e);
-      }
-    };
-    const btn = getSaveButton();
-    if (btn) {
-      btn.loading = true;
-    }
-    const res = opertaor.getDataAll();
-    const resParam = Object.assign(res,{'cTransMrk':'1'})
-    // const edrInfo: any = await saveEdrAppPlyInfo(resParam)
-    res["user"] = user;
-    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    res["plyBase"]["Base.cEdrRsnBundleCde"] = "99"
-    res["plyBase"]["Base.cEdrType"] = '1'
-    // res["EdrBase"] = edrbase.value?.getFromValue();
-    // const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
-    // if (
-    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-    //   Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
-    // ) {
-    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-    //     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-    // }
-    // if(res['ci'] && res['ci'].length>0){
-    //   res['ci'].forEach((item:any)=>{
-    //     if(item['Ci.nCiShare']){
-    //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-    //     }
-    //   })
-    // }
-    const edrInfo: any = await saveEdrAppPlyInfo(resParam)
-    
-    if(edrInfo["code"] == "200") {
-      const ops = opertaor.convertData(edrInfo);
-      console.log("转换的数据", ops);
-      ElMessage.success(edrInfo.msg);
-      btn.loading = false
-      // if (btn === undefined) {
-      //   btn.loading = false;
-      // }
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
-      opertaor.setDataAll(ops);
-      const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-      EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
-      edrbase.value?.setFormValue(EdrBaseData);
-      saveEdrFlag = true;
-      saveEdrState.value = true;
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
-        // 复制保单清单信息到批单中
-        saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
-      }
-      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-        getAppPolicyList({
-          cAppNo: EdrBaseData["EdrBase.cAppNo"],
-          pageSize: 10,
-          pageNum: 1,
-          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-          cLoadSub: "1",
-          cDataTyp: "app",
-          queryType: "1"
-        }).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            const data = res.data?.result[0];
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            if(data['cEdrRsnBundleCde']){
-                data.cRsnCde = data['cEdrRsnBundleCde'];
-            }
-            router.replace({
-              path: "/pcisapp/myPage",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
-                }),
-              },
-            });
-          }
-        })
-      }
-        console.log('保存数据555',ops)
-        sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-    } else {
-      btn.loading = false;
-      ElMessage.error(edrInfo.msg);
-    }
-  }else{
-    const btn = getBtn("saveEdr");
-    btn.loading = true;
-    const res = opertaor.getDataAll();
-    const dataALl = opertaor.getDataAll();
-    res["user"] = user;
-    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    if(props.param.cRsnCde === '99'){
-      if (!res.EdrBase) {
-        res.EdrBase = [];
-      }
-      // res.EdrBase.push(edrBaseDatas._value);
-    }else{
+  const btn = getBtn("saveEdr");
+  btn.loading = true;
+  const res = opertaor.getDataAll();
+  const dataALl = opertaor.getDataAll();
+  res["user"] = user;
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  
 
-      res["EdrBase"] = edrbase.value?.getFromValue();
-      if (
-        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
-        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != "" &&
-        Array.isArray(res["EdrBase"]?.["EdrBase.cEdrRsnDetail"])
-      ) {
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-          res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
-      }
+  res["EdrBase"] = edrbase.value?.getFromValue();
+  if (
+    res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
+    res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]?.["EdrBase.cEdrRsnDetail"])
+  ) {
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
+  }
+  
+  const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
+  const edrInfo: any = await saveEdrAppPlyInfo(res)
+  btn.loading = false;
+  if(edrInfo["code"] == "200") {
+    const ops = opertaor.convertData(edrInfo);
+    console.log("转换的数据", ops);
+    ElMessage.success(edrInfo.msg);
+    opertaor.setDataAll(ops);
+    const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
+    // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+    //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+    //     ","
+    //   );    //影响二次批改报错,先注释掉待调整
+    edrbase.value?.setFormValue(EdrBaseData);
+    saveEdrFlag = true;
+    saveEdrState.value = true;
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+      // 复制保单清单信息到批单中
+      saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
     }
-    
-    // if(res['ci'] && res['ci'].length>0){
-    //   res['ci'].forEach((item:any)=>{
-    //     if(item['Ci.nCiShare']){
-    //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-    //     }
-    //   })
-    // }
-    const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
-    const edrInfo: any = await saveEdrAppPlyInfo(res)
-    btn.loading = false;
-    if(edrInfo["code"] == "200") {
-      const ops = opertaor.convertData(edrInfo);
-      console.log("转换的数据", ops);
-      ElMessage.success(edrInfo.msg);
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
-      opertaor.setDataAll(ops);
-      const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-      EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
-      // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-      //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
-      //     ","
-      //   );    //影响二次批改报错,先注释掉待调整
-      edrbase.value?.setFormValue(EdrBaseData);
-      saveEdrFlag = true;
-      saveEdrState.value = true;
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
-        // 复制保单清单信息到批单中
-        saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
-      }
-      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-        getAppPolicyList({
-          cAppNo: EdrBaseData["EdrBase.cAppNo"],
-          pageSize: 10,
-          pageNum: 1,
-          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-          cLoadSub: "1",
-          cDataTyp: "app",
-          queryType: "1"
-        }).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            const data = res.data?.result[0];
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            if(data['cEdrRsnBundleCde']){
-                data.cRsnCde = data['cEdrRsnBundleCde'];
-            }
-            router.replace({
-              path: "/pcisapp/myPage",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
-                }),
-              },
-            });
+    // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+      getAppPolicyList({
+        cAppNo: EdrBaseData["EdrBase.cAppNo"],
+        pageSize: 10,
+        pageNum: 1,
+        cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+        cLoadSub: "1",
+        cDataTyp: "app",
+        queryType: "1"
+      }).then((res:any) => {
+        if(res.data?.result && res.data?.result.length > 0) {
+          const data = res.data?.result[0];
+          sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+          if(data['cEdrRsnBundleCde']){
+              data.cRsnCde = data['cEdrRsnBundleCde'];
           }
-        })
-      }
-        console.log('保存数据555',ops)
-        sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-    } else {
-      ElMessage.error(edrInfo.msg);
+          router.replace({
+            path: "/pcisapp/myPage",
+            query: {
+              param: JSON.stringify({
+                ...data,
+                ...{ pageType: "TEMPORARY_DEPOSIT" },
+              }),
+            },
+          });
+        }
+      })
     }
+      console.log('保存数据555',ops)
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+  } else {
+    ElMessage.error(edrInfo.msg);
   }
   console.log('333',opertaor.getDataAll())
   //   btn.loading = false;

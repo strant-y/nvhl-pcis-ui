@@ -111,7 +111,6 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 if (page.pageInfo && page.pageInfo.length > 0) {
                     page.pageInfo.forEach(info => {
                         const fsch = info.pageSchema;
-                        console.log(info);
                         if(readTab.includes(info.pageKey)){
                             setread(fsch);
                         }
@@ -121,11 +120,22 @@ export const dataOpertaor = (props: OpertaorProps) => {
                                     item.disabled = 1;
                                 }
                             })
+                            if(info.pageKey === 'applicant' || info.pageKey === 'insured'|| info.pageKey === 'cvrg'){
+                                if (fsch.titleBtns && fsch.titleBtns.length > 0) {
+                                    fsch.titleBtns.forEach((item) => {
+                                        item.hidden = true;
+                                    });
+                                }
+                                if (fsch.endBtns && fsch.endBtns.length > 0) {
+                                    fsch.endBtns.forEach((item) => {
+                                        item.hidden = true;
+                                    });
+                                }
+                            }
                         }
                     })
                 }
             });
-
         }
 
         const setread = (fsch: any) => {
@@ -193,19 +203,6 @@ export const dataOpertaor = (props: OpertaorProps) => {
                             tableRefs[key].setDisabledAll();
                         }
                     }
-                    // if (
-                    //     f.titleBtns &&
-                    //     f.titleBtns.length > 0
-                    // ) {
-                    //     f.titleBtns.forEach((item) => {
-                    //         item.hidden = true;
-                    //     });
-                    // }
-                    // if (f.endBtns && f.endBtns.length > 0) {
-                    //     f.endBtns.forEach((item) => {
-                    //         item.hidden = true;
-                    //     });
-                    // }
                 }
             });
         }
