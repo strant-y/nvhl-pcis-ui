@@ -576,7 +576,8 @@ function next() {
               router.push({
                 path: "/pcisapp/myPage",
                 query: {
-                  param: JSON.stringify({ ...handleArray(res.res.composition.plyBase[0]), ...{ pageType: "orig" } }),
+                  param: JSON.stringify({ ...handleArray(res.res.composition.plyBase[0]), ...{ pageType: "orig", cTermNme: res["res"]["composition"]["cvrg"][0]["Term.cClauseName"],
+                      cTermNo: res["res"]["composition"]["cvrg"][0]["Term.cClauseCode"], } }),
                 },
               });
             } else {
