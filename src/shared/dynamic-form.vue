@@ -444,7 +444,8 @@ function setPopover(v: any, item: any) {
   setValue(item.prop, v);
 }
 
-function setRuleType(rules: any ,schema: any) {
+function setRuleType(irules: any ,schema: any) {
+  let rules = irules;
   if(schema.group){ // 如果群组整个被隐藏,则不再进行校验
     const uicf = props.fromUi.groupBy.filter((g)=>g.id === schema.group);
     let h = false;
@@ -482,7 +483,7 @@ function setRuleType(rules: any ,schema: any) {
         });
       }
     }else{
-      if(typeof form[schema['prop']] === 'number'){
+      if((typeof form[schema['prop']]) === 'number'){
         if (rules && rules.length > 0) {
           rules.forEach((item: any) => {
             item.type = "number";
