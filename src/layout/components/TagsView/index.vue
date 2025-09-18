@@ -110,6 +110,20 @@ watch(route, (newRoute) => {
   tagsViewStore.addTagView(newRoute)
 });
 
+const currentTitle = computed(() => translateRouteTitle(visitedViews.value.find((i)=>isActive(i))?.title))
+const visitedViewsNew = computed(() => {
+  const list:any = []
+  const lastList:any = []
+  visitedViews.value.forEach((item:any) => {
+    if(isActive(item)) {
+      lastList.push(item)
+    } else {
+      list.push(item)
+    }
+  })
+  return list.concat(lastList)
+})
+
 function toView(tag: TagView) {
   if(tag.keepAlive) {
     router.replace({ path: tag.path, query: tag.query})
@@ -352,10 +366,13 @@ onMounted(() => {
 <style lang="scss" scoped>
 .tags-container {
   width: 100%;
-  height: 34px;
-  background-color: var(--el-bg-color);
+  // height: 34px;
+  // background-color: var(--el-bg-color);
   border: 1px solid var(--el-border-color-light);
   box-shadow: 0 1px 1px var(--el-box-shadow-light);
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
 
   .tags-item {
     display: inline-block;
@@ -439,5 +456,29 @@ onMounted(() => {
   .el-scrollbar__wrap {
     height: 49px;
   }
+}
+
+.current-title {
+  width: 100px;
+  height: 28px;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 20px;
+  color: rgba(0,0,0,0.85);
+  line-height: 28px;
+  text-align: left;
+  font-style: normal;
+  margin: 16px 20px;
+}
+// 面包屑
+.el-breadcrumb {
+  margin: 16px 0 0 20px;
+}
+:deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
+  color: rgba(0,0,0,0.85);
+}
+:deep(.el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner) {
+  color: rgba(0,0,0,0.45);
+  font-weight: 400;
 }
 </style>

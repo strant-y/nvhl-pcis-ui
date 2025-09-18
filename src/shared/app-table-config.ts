@@ -96,6 +96,8 @@ export function createTableEditConfig(
     formconfig: config.formconfig || null,
     maxHeight: config.maxHeight || null,
     rowDbClickFun: config.rowDbClickFun || null,
+    stripe: config.stripe,
+    border: config.border,
   };
 }
 

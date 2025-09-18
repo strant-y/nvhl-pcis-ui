@@ -5215,7 +5215,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   }
 }
 :deep(.el-card__header) {
-  padding: 10px 20px!important;
+  // padding: 10px 20px!important;
   .el-row {
     align-items: center;
     &:first-child {
@@ -5229,7 +5229,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   font-weight: 500;
 }
 :deep(.el-card__body) {
-  padding: 10px 20px;
+  padding: 5px 10px;
 }
 
 .right-sidebar-trigger {

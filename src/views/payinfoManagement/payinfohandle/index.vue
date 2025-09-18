@@ -21,6 +21,11 @@
                     </div>
                 </div>
             </template>
+            <template #column-cAppNmeInvest="{ row, column, index }">
+                <el-tooltip :content="row.cAppNmeInvest" placement="top">
+                <span v-html="row.cAppNmeInvest || ''" class="twoLine"></span>
+                </el-tooltip>
+            </template>
 		</app-table>
 	</div>
 </template>
@@ -840,7 +845,7 @@ const tableconfig = reactive<AppTableConfig>(
 			// }),
 		],
 		tableBtnType: "btn",
-		tableBtnWidth: 150,
+		tableBtnWidth: 95,
 		tableBtnPosition: "right",
 		tableBtnFixed: "right",
         fixed:true,
@@ -895,40 +900,29 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cAppNo",
 				inputtype: "rtinput",
 				title: "申请单号/保单号",
-                width: 200,
+                width: 165,
                 slotName: "cAppNo",
                 fixed: "left",
-                formatter: (val: any) => {
-                    // 格式化显示内容，将申请单号和保单号分行显示
-                    if (val && (val.cAppNo || val.cPlyNo)) {
-                    const appNo = val.cAppNo || '';
-                    const plyNo = val.cPlyNo || '';
-                    if (appNo && plyNo) {
-                        return `${appNo}\n${plyNo}`;
-                    } else {
-                        return appNo || plyNo;
-                    }
-                    }
-                    return '';
-                }
 			},
 			{
 				prop: "nTms",
 				inputtype: "rtinput",
 				title: "期次",
-                width: 100,
+                width: 35,
 			},
 			{
 				prop: "cAppNmeInvest",
 				inputtype: "rtinput",
 				title: "投保人名称",
+                slotName: "cAppNmeInvest",
+                align: "left",
                 width: 150,
 			},
 			{
 				prop: "cPayTyp",
 				inputtype: "rtselect",
 				title: "缴费类型",
-                width: 100,
+                width: 65,
                 typeCode: "CHARGE_TYPE_CACHE",
                 param: {'cCde': [ '2', '3', '5',  '99']},
 				formatter: (val)=>{
@@ -946,19 +940,22 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "nPrm",
 				inputtype: "rtinput",
 				title: "保费金额",
-                width: 100,
+                width: 115,
+                align: "left"
 			},
 			{
 				prop: "nPayAmt",
 				inputtype: "rtinput",
 				title: "应缴金额",
-                width: 100,
+                width: 115,
+                align: "left"
 			},
 			{
 				prop: "cCheckSts",
 				inputtype: "rtselect",
 				title: "处理状态",
-                width: 100,
+                width: 132,
+                align: "left",
 				loadData:cCheckStsList,
 				formatter: (val)=>{
 				  const result = cCheckStsList.find(item => item.value === val);
@@ -969,25 +966,26 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tBgnTm",
 				inputtype: "rtinput",
 				title: "起保日期",
-                width: 150,
+                width: 136,
 			},
 			{
 				prop: "cUniqueNo",
 				inputtype: "rtinput",
 				title: "收据流水号",
-                width: 200,
+                width: 165,
 			},
 			{
 				prop: "cBatchNo",
 				inputtype: "rtinput",
 				title: "批号",
-                width: 200,
+                width: 165,
 			},
 			{
 				prop: "cPayStatus",
 				inputtype: "rtselect",
 				title: "缴费状态",
-                width: 100,
+                width: 62,
+                align: "left",
                 typeCode: "WEB_BAS_CODELIST",
                 codeParam: {'cParCde': 'DY1'},
 				formatter: (val)=>{
@@ -999,13 +997,14 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tUdrTm",
 				inputtype: "rtinput",
 				title: "核保日期",
-                width: 150,
+                width: 136,
 			},
 			{
 				prop: "cChargeCde",
 				inputtype: "rtinput",
 				title: "操作员",
-                width: 100,
+                width: 62,
+                align: "left",
 			}
 		],
 	})
@@ -1297,5 +1296,12 @@ const copyText = (text: any) => {
 
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

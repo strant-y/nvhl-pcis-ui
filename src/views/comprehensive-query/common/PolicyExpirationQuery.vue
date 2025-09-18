@@ -292,7 +292,7 @@ const tableconfig = reactive<AppTableConfig>(
     editFlag: true,
     editList: ["cStatus"],
     tableBtnType: "btn",
-    tableBtnWidth: 90,
+    tableBtnWidth: 80,
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
@@ -313,22 +313,26 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
-        slotName: "cPlyNo"
+        slotName: "cPlyNo",
+        width: 165,
       },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "机构",
+        align: 'left'
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款",
+        align: 'left'
       },
       {
         prop: "nExpirationDays",
         inputtype: "rtinput",
         title: "保单到期剩余天数",
+        width: 120,
       },
     ],
   })
@@ -521,10 +525,15 @@ defineExpose({
 .policy-number-row {
   display: flex;
   align-items: center;
+  line-height: 20px;
 }
 
 .policy-number-row span {
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 </style>
 

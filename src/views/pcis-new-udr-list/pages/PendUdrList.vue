@@ -2014,4 +2014,8 @@
     });
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-button-group .el-button) {
+  width: 80px;
+}
+</style>
