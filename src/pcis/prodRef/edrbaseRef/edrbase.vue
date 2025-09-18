@@ -266,7 +266,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         disabled: true,
-        func: (v) => {},
+        func: (v) => {
+          if(v === '99'){
+            // 如果批改原因是99时,则直接修改自己的下拉选显示具体内容
+            setFormItem("EdrBase.cEdrRsnBundleCde", { typeCode:null,loadData: [{ value: "99", label: "历史数据补全" }] });
+            setFormItem("EdrBase.cEdrRsnDetail", { loadData: [{value:'99',label:'历史数据补全'}] });
+            setValue("EdrBase.cEdrRsnDetail", ['99']);
+          }
+        },
       },
 
       //  {
@@ -427,6 +434,7 @@ onMounted(() => {
         }
         setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
     }else{
+      if(params['cRsnCde'] !== '99'){
         const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
         const isPer = params["CGrpMrk"] === "1" ? "1" : null;
         const param = {
@@ -443,13 +451,14 @@ onMounted(() => {
           param["calcMrk"] = '1'
         }
         codeListStore
-            .queryCodeList({
-                codeListName: "EDR_RSN_LIST_FZ",
-                codeListParam: param,
-            })
-            .then((res) => {
-                setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
-            });
+          .queryCodeList({
+              codeListName: "EDR_RSN_LIST_FZ",
+              codeListParam: param,
+          })
+          .then((res) => {
+              setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
+          });
+      }
     }
   });
 });
