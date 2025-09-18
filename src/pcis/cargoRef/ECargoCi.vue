@@ -477,7 +477,7 @@ const method = {
     const rowId = rowData?._dataId;
     console.log("rowData", rowData);
     dialogRef.value?.open(
-      "ciagentPer",
+      "eCargociagentPer",
       {
         type: "show",
         data: {
@@ -501,11 +501,10 @@ const method = {
   },
   //业务员
   cSlsCdeChange:()=>{
-    debugger
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
-      "eCargoAgentWorker",
+      "eCargociagentWorker",
       {
         type: "show",
         data: {
@@ -533,7 +532,7 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
-      "ciagentWorker",
+      "eCargociagentWorker",
       {
         type: "show",
         data: {
@@ -599,7 +598,6 @@ const updateMasterAgreementValues = () => {
     formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbPrm", totalPrm*res["ECargoBase.nAmtRmbExch"]);
     formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbAmt", totalAmt*res["ECargoBase.nAmtRmbExch"]);
     const resData = formPage.getFormDataById("AgreementFeeWarn")
-    debugger;
     if(res['ECargoBase.cPayWay'] == '01'){ //YY
       //主共保：折人民币协议预收保费-折人民币预扣保费=协议剩余预收保费（人民币）
       if(Number(resData["ECargoBase.nReceivedPrm"] || '0') > Number(resData["ECargoBase.nPrm"] || '0')){

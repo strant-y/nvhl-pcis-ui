@@ -300,7 +300,15 @@ const method = {
         }
       );
       nextTick(() => {
+        const cargoCiRef = formPage.getComponentRefById('AgreementCi');
         if (val === "19002" || val === "19003") {
+          if (cargoCiRef) {
+            const ciData = cargoCiRef.getFormValue();
+            ciData.forEach((row: any) => {
+              cargoCiRef.setValueByRowKey("ECargoCi.cSlsId", row._dataId, "");
+              cargoCiRef.setValueByRowKey("ECargoCi.cSlsNme", row._dataId, "");
+            });
+          }
           //代理业务 | 经纪业务
           const obj = {
             rules: [getRules("required", {})],
@@ -314,6 +322,14 @@ const method = {
           setFormItem("ECargoBase.cBrkrCde", { rules: [getRules("required", {})] }); //代理合作协议
           setFormItem("ECargoBase.cBrkSlsCde", { rules: [getRules("required", {})] }); //代理业务员
         } else {
+          // 直销业务：清空代理业务员和代理经纪人
+          if (ciRef) {
+            const ciData = ciRef.getFormValue();
+            ciData.forEach((row: any) => {
+              ciRef.setValueByRowKey("ECargoCi.cBrkrCde", row._dataId, "");
+              ciRef.setValueByRowKey("ECargoCi.cBrkSlsCde", row._dataId, "");
+            });
+          }
           const obj = {
             rules: [],
             disabled: true,
