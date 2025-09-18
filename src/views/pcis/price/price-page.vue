@@ -475,8 +475,10 @@ import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { distRequiredMap } from '../my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
-import { checkPayPlanValidity } from '@/utils/orderEntryValidator';
+import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { ElTable, ElTableColumn } from 'element-plus';
+import {pageMethod} from "./pageMethod";
+import {imageMethod} from "./imageMethod";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2227,7 +2229,20 @@ async function loadAfter() {
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
   }
-
+  let imageStr = '影像管理';
+  if(pageMethod.isReadOnlyScene(opertaor)){
+    imageStr = '影像查看';
+  }
+  bthList.value.push(
+      // {isdivider: true},  //间隔符
+      createFreeButtonBase({
+        label: imageStr,
+        type: "success",
+        func: () => {
+          imageMethod.showImage(opertaor);
+        },
+      }),
+  )
   bthList.value.push(
     createFreeButtonBase({
       label: "返回",
@@ -2887,7 +2902,7 @@ const submitToUndrFn = async () => {
       }
     }
 
-         // 校验 地址清单总数 和 学生人数（人）
+  // 校验 地址清单总数 和 学生人数（人）
    if(props.param.cProdNo ==='040005'){
         const isUnEqual = await checkStudentValidity();
         if(isUnEqual){
@@ -2895,6 +2910,15 @@ const submitToUndrFn = async () => {
             return false;
         }
     }
+
+    
+    //040005 校验 地址清单学校人数与 清单 同学校人数校验
+    const result = await validateSchoolPersonWithApi(props.param);
+    if (!result.isValid) {
+      ElMessage.error(result.errorMessages[0]);
+        return false;
+    }
+
 
   // 判断应收保费是否同保费相同
   let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
@@ -4373,9 +4397,9 @@ const submitUnderwritingFn = async () => {
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           if(props.param?.pageName === "priceInquiry") {
-            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
           } else {
-            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/PendUdrListQuery" });
           }
         });
       }

@@ -478,13 +478,16 @@ function termDeductibleNote(){
     const rate_d = termData[k['rate']];
     const temk = (amt_d !== null && amt_d !== undefined ? '1':'0') + '' + (rate_d !== null && rate_d !== undefined ? '1':'0') ;
     const strt = deductibleTemple.value[temk];
-    const filledString = fillTemplate(strt, {
+    if(strt){
+      const filledString = fillTemplate(strt, {
         amount: amt_d,
         rate: rate_d,
       });
-    setData({
-      propkey:k['deduct'],
-    },filledString);
+      setData({
+        propkey:k['deduct'],
+      },filledString);
+    }
+    
   }
 }
 
@@ -503,14 +506,16 @@ function riskDeductibleNote(risk: any) {
     const rate_d = risk[k['rate']];
     const temk = (amt_d !== null && amt_d !== undefined ? '1':'0') + '' + (rate_d !== null && rate_d !== undefined ? '1':'0') ;
     const strt = deductibleTemple.value[temk];
-    const filledString = fillTemplate(strt, {
+    if(strt){
+      const filledString = fillTemplate(strt, {
         amount: amt_d,
         rate: rate_d,
       });
-    setData({
-      propkey:k['deduct'],
-      riskNo:r,
-    },filledString);
+      setData({
+        propkey:k['deduct'],
+        riskNo:r,
+      },filledString);
+    }
   }
 }
 function getRiskFactors(riskNo: any) { 

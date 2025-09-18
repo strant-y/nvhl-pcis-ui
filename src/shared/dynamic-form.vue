@@ -445,66 +445,106 @@ function setPopover(v: any, item: any) {
   setValue(item.prop, v);
 }
 
+function setRuleType(rules: any ,schema: any) {
+  if(schema.group){ // 如果群组整个被隐藏,则不再进行校验
+    const uicf = props.fromUi.groupBy.filter((g)=>g.id === schema.group);
+    let h = false;
+    if(uicf && uicf.length > 0){
+      if(uicf[0].hidden === true){
+        h = true;
+      }
+    }
+    if(h){
+      return null;
+    }
+  }
+  if (schema.inputtype === "rtnumber" ||
+    schema.inputtype === "rtinput" ) {
+    // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
+    if(typeof form[schema['prop']] === 'number'){
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "number";
+        });
+      }
+    }else{
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "string";
+        });
+      }
+    }
+  }
+  if(schema.inputtype === "rtdatepicker"){
+    if(schema['type'] === 'datetimerange'){
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "array";
+        });
+      }
+    }else{
+      if(typeof form[schema['prop']] === 'number'){
+        if (rules && rules.length > 0) {
+          rules.forEach((item: any) => {
+            item.type = "number";
+          });
+        }
+      }else{
+        if (rules && rules.length > 0) {
+          rules.forEach((item: any) => {
+            item.type = "string";
+          });
+        }
+      }
+    }
+  }
+  if (schema.inputtype === "rtSelectV2" || schema.inputtype === "rtSelect") {
+    if(schema.multiple === 1 || schema.multiple === true || schema.multiple === '1' ){
+      if (rules && rules.length > 0) {
+        rules.forEach((item: any) => {
+          item.type = "array";
+        });
+      }
+    }
+  }
+  if (schema.inputtype === "rtcascader") {
+    if (rules && rules.length > 0) {
+      rules.forEach((item: any) => {
+        item.type = "array";
+      });
+    }
+  }
+  return rules;
+}
+
 async function validate() {
   // 存储验证规则的对象
   let rules = <any>{};
   for (const schama in props.fromSchema) {
-    // 如果当前列有验证规则，则将其添加到规则对象中
-    if (props.fromSchema[schama].rules) {
+    if(props.fromSchema[schama].inputtype === 'rtinputgroup'){
+      const g = props.fromSchema[schama].groupList;
+      g.forEach((gi)=>{
+        if(gi.hidden !== true && gi.rules){
+          let rul = gi.rules;
+          const nrul = setRuleType(rul,gi);
+          if(nrul){
+            rules[gi.prop] = nrul;
+          }
+        }
+      })
+    }else if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
+      // 如果当前列有验证规则，则将其添加到规则对象中
       let rul = props.fromSchema[schama].rules;
-      if (props.fromSchema[schama].inputtype === "rtnumber" ||
-        props.fromSchema[schama].inputtype === "rtinput" ) {
-        // 因为校验输入的特殊性,有时候是string类型数据,有时候是number类型数据,因此需要根据实际数据类型进行判断
-        if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "number";
-            });
-          }
-        }else{
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "string";
-            });
-          }
-        }
+      const nrul = setRuleType(rul,props.fromSchema[schama]);
+      if(nrul){
+        rules[props.fromSchema[schama].prop] = nrul;
       }
-      if(props.fromSchema[schama].inputtype === "rtdatepicker"){
-        if(props.fromSchema[schama]['type'] === 'datetimerange'){
-          if (rul && rul.length > 0) {
-            rul.forEach((item: any) => {
-              item.type = "array";
-            });
-          }
-        }else{
-          if(typeof form[props.fromSchema[schama]['prop']] === 'number'){
-            if (rul && rul.length > 0) {
-              rul.forEach((item: any) => {
-                item.type = "number";
-              });
-            }
-          }else{
-            if (rul && rul.length > 0) {
-              rul.forEach((item: any) => {
-                item.type = "string";
-              });
-            }
-          }
-        }
-      }
-      if (props.fromSchema[schama].inputtype === "rtcascader") {
-        if (rul && rul.length > 0) {
-          rul.forEach((item: any) => {
-            item.type = "array";
-          });
-        }
-      }
-      rules[props.fromSchema[schama].prop] = rul;
     }
   }
   // 创建验证器实例
   const validator = new Validator(rules);
   const r = await dovalidate(validator);
+  console.log(r);
   let l = [];
   if(r && r.length > 0){
     const isEx = false;
@@ -528,6 +568,9 @@ async function validate() {
     freeValidate();
   }
   if(r && r.length > 0){
+    // console.log(form);
+    // console.log(rules);
+    // console.log(props.fromSchema);
     return false;
   }else{
     return true;
@@ -553,7 +596,6 @@ async function freeValidate(){
 }
 
 function dovalidate(validator: any) { 
-  console.log(form);
   const p = new Promise((resolve) => {
     // 执行验证操作
     validator.validate(form, (data: any) => {

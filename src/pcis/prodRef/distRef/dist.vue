@@ -194,7 +194,7 @@ watch(
         eventBus.emit('goodsMxChange', newVal);
         // 02开头的货物明细清单，关联标的信息
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
-            method.getTgtDetailFn();
+           method.getTgtDetailFn();
         }
       }
     }
@@ -593,10 +593,8 @@ const method = {
               pageresult.list.forEach((item:any)=>{
                     peopleNumber+= item['Dist.nInsuredNumber']  || 0
               })
-              // debugger
                tgtRef.setValue('Tgt.nStudentsNumber',peopleNumber)
              }
-           
         }
 
         // 020001  货物数量 回填
@@ -666,20 +664,24 @@ const method = {
   //   });
   // },
   getTgtDetailFn:() => {
-        let cappNo = '';
-        // 判断有无批改类型参数，有则是批单
-        if(route.params.param?.cEdrType) {
-         const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-         cappNo = edrbase['EdrBase.cAppNo'];
-        } else if(route.params.param?.pageName === "priceInquiry") {
-         cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
-        } else {
-         cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+        const param = opertaor.getParam();
+        let app = "";
+        if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+            app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+        } else if(param.cOrgAppNo){
+            app = param.cOrgAppNo;
+        } else if(param.pageType !== "copy") {
+            app = param.cAppNo
         }
-        const paramA = {
-          cAppNo: cappNo,
-        };
-        getTgtDetailByDist(paramA).then((res: any) => {
+
+        let distParam = {};
+        if(route.params.param?.pageName === "priceInquiry") {
+          distParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+        } else {
+          distParam['cAppNo'] = app;
+        }
+
+        getTgtDetailByDist(distParam).then((res: any) => {
         if (res["code"] == "200") {
             let tgtRef = opertaor.getTableRefByKey('tgt');
             let cWaybillNumber = res.data?.cWaybillNumber;

@@ -230,7 +230,7 @@ const idAnalysis = (id: string) => {
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   const age = calculateAgeFromIdCard(id);
   if (!getValue("Applicant.cNation")) {
-    setValue("Applicant.cNation", "1"); // 国籍
+    setValue("Applicant.cNation", "CHN"); // 国籍
   }
 
   setValue("Applicant.tBirthday", birthday);
@@ -429,7 +429,7 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-      setValue("Applicant.cNation", "1"); // 国籍
+      setValue("Applicant.cNation", "CHN"); // 国籍
 
       personFields.forEach(field => {
          setFormItem(`Applicant.${field}`, { disabled: true });

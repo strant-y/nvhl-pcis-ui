@@ -542,6 +542,7 @@ const method = {
   },
   //开户行市改变
   cCityChange:(val,row)=>{
+    console.log(12,val)
     setValueByRowKey("Ci.cBankCounty",row._dataId,"")
     setOptions('Ci.cBankCounty',row._dataId,'CBankCountyList',{ "areaname": val })
   },
