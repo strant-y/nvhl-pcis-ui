@@ -2913,11 +2913,11 @@ const submitToUndrFn = async () => {
 
     
     //040005 校验 地址清单学校人数与 清单 同学校人数校验
-    const result = await validateSchoolPersonWithApi(props.param);
-    if (!result.isValid) {
-      ElMessage.error(result.errorMessages[0]);
-        return false;
-    }
+    // const result = await validateSchoolPersonWithApi(props.param);
+    // if (!result.isValid) {
+    //   ElMessage.error(result.errorMessages[0]);
+    //     return false;
+    // }
 
 
   // 判断应收保费是否同保费相同
@@ -4397,9 +4397,9 @@ const submitUnderwritingFn = async () => {
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           if(props.param?.pageName === "priceInquiry") {
-            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
           } else {
-            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/PendUdrListQuery" });
           }
         });
       }
@@ -5215,7 +5215,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   }
 }
 :deep(.el-card__header) {
-  padding: 10px 20px!important;
+  // padding: 10px 20px!important;
   .el-row {
     align-items: center;
     &:first-child {
@@ -5229,7 +5229,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   font-weight: 500;
 }
 :deep(.el-card__body) {
-  padding: 10px 20px;
+  padding: 5px 10px;
 }
 
 .right-sidebar-trigger {

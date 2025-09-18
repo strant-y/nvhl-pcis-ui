@@ -55,6 +55,7 @@ onMounted(async () => {
   }
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
+  setValue("Base.cCumulativeLimitManual", "0");
   // 隐藏短期费率类型
   setFormItem("Base.cRatioTyp", { 
     hidden: true
@@ -358,6 +359,14 @@ const method = {
         // 计算折人民币保额
         setValue("Base.nRmbAmt", numMulti(namt, val));
       }
+    }
+  },
+  // 总保额(累计赔偿限额) 是和否change事件
+  nAmtLimitManualChange: (val: any) => {
+    if(val == '0'){
+        setFormItem("Base.nAmt", { disabled: true });
+    } else{
+        setFormItem("Base.nAmt", { disabled: false });
     }
   },
   // 总保费汇率change事件

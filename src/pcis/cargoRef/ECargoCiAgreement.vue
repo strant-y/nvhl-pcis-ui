@@ -39,6 +39,31 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
+  cCiAgtNoChange: (val) => {
+    const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isValidLength = val.length <= 20;      
+    if (!isPositiveInteger || !isValidLength) {
+      ElMessage.error("请输入不超过20位的正整数和英文字母");
+      tgtobjEditRef.value?.setValue("ECargoBase.cCiAgtNo", "");
+    }
+  },
+  cJiAgtNoChange: (val) => {
+    const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
+    const isValidLength = val.length <= 20;      
+
+    if (!isPositiveInteger || !isValidLength) {
+      ElMessage.error("请输入不超过20位的正整数和英文字母");
+      tgtobjEditRef.value?.setValue("ECargoBase.cJiAgtNo", "");
+    }
+  },
+  cReceiTitleCdeChange:(val)=>{
+    if(val === '3127001'){
+      setFormItem("ECargoBase.cReceiptTitleNme", {disabled: true})
+      setValue("ECargoBase.cReceiptTitleNme","")
+    }else{
+      setFormItem("ECargoBase.cReceiptTitleNme", {disabled: false})
+    }
+  },
 };
 const cCiMrkChangeFun = (data: any) => {
   const { cCiMrk  } = data;

@@ -194,12 +194,11 @@
       <el-main class="main-container">
         <div class="main-header">
           <div class="tp" style="background: #ebedfc">
-            <span class="font-weight-500">条款：</span
+            <span>条款：</span
             ><span class="publicStyle"
-              >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
-                props.param.cTermNme
+              >{{props.param.cTermNo }}&nbsp;&nbsp;{{props.param.cTermNme
               }}</span
-            >&nbsp;|&nbsp;<span class="font-weight-500">出单方式：</span
+            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
             <span class="publicStyle">{{
                 (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
@@ -212,16 +211,16 @@
             <span class="publicStyle">{{
               props.param.cGrpMrk == "0" ? "个单" : "团单"
             }}</span
-            >&nbsp;|&nbsp;<span class="font-weight-500">是否互联网出单:</span
-            >&nbsp;<span class="publicStyle">{{
+            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>是否互联网出单:</span
+            >&nbsp;&nbsp;<span class="publicStyle">{{
               props.param.cIsNet == "0" ? "是" : "否"
             }}</span>
           </div>
           <div class="btm" style="background: #ebedfc">
-            <span class="font-weight-500">保险期限：</span
+            <span>保险期限：</span
             ><span class="publicStyle">{{ tmDay }}</span
-            >&nbsp;<span class="font-weight-500">天</span
-            >&nbsp;|&nbsp;<span class="font-weight-500">保额：</span
+            >&nbsp;&nbsp;<span>天</span
+            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>保额：</span
             ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
             >&nbsp;
 <!--            <span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;-->
@@ -232,13 +231,13 @@
             >&nbsp;
 <!--            <span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;-->
 						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-							|&nbsp;<span class="font-weight-500">协议剩余预收保费: </span
+							|&nbsp;&nbsp;<span>协议剩余预收保费: </span
 							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
 							>&nbsp;
 <!--              <span class="font-weight-500">元</span>-->
 						</template>
             <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-              |&nbsp;<span class="font-weight-500">协议剩余保额: </span
+              |&nbsp;&nbsp;<span>协议剩余保额: </span
             ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
             >&nbsp;
 <!--              <span class="font-weight-500">元</span>-->
@@ -353,36 +352,18 @@
           </div>
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
-        <div class="bottom-items">
-          <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
-              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
-              {{ getNo }}
-              </span>
-              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
-                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                </el-button>
-              </el-tooltip>
-            </div>
-          </div>
-          <template v-for="(bth, idx) in bthList" 
-            :key="idx">
-            <template v-if="bth.isdivider">
-              <el-divider direction="vertical" />
-            </template>
-            <template v-else>
-              <rt-button
-                :item="bth"
-                :loading="bth.loading"
-              />
-            </template>
-          </template>
-        </div>
       </el-main>
-      <div class="right-sidebar-trigger">
+      <div class="right-btns">
+        <div class="btns-content" v-if="rightBtnList.length > 0">
+          <rt-button
+            v-for="(bth, idx) in rightBtnList"
+            :item="bth"
+            :key="idx"
+            :loading="bth.loading"
+          />
+        </div>
+      </div>
+      <!-- <div class="right-sidebar-trigger">
         <el-popover
             placement="left"
             trigger="click"
@@ -417,8 +398,36 @@
             </el-button>
           </div>
         </el-popover>
-      </div>
+      </div> -->
     </el-container>
+    <div class="bottom-items">
+      <!--新增的申请单号显示和复制按钮-->
+      <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
+        <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
+          {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
+          <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
+          {{ getNo }}
+          </span>
+          <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
+            <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
+              <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+            </el-button>
+          </el-tooltip>
+        </div>
+      </div>
+      <template v-for="(bth, idx) in bthList" 
+        :key="idx">
+        <!-- <template v-if="bth.isdivider">
+          <el-divider direction="vertical" />
+        </template>
+        <template v-else> -->
+          <rt-button
+            :item="bth"
+            :loading="bth.loading"
+          />
+        <!-- </template> -->
+      </template>
+    </div>
   </div>
 </template>
 
@@ -561,7 +570,7 @@ const handleAnchorClick = (event, selector) => {
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
       mainContent.scrollTo({
-        top: target.offsetTop - 45, // 减去一些偏移量
+        top: target.offsetTop - 75, // 减去一些偏移量
         behavior: 'smooth'
       });
     }
@@ -1058,8 +1067,9 @@ const basicRightBtn = [
     label: "保存模板",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "template2",
-    iconSize: "20",
+    // svgIcon: "template2",
+    // iconSize: "20",
+    icon: "Memo",
     func: () => {
       handleSaveTemplate()
     },
@@ -1068,8 +1078,9 @@ const basicRightBtn = [
     label: "复制出单",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "copy2",
-    iconSize: "25", // 设置图标大小为25px
+    // svgIcon: "copy2",
+    // iconSize: "25", // 设置图标大小为25px
+    icon: "CopyDocument",
     func: () => {
       copyPolicyFun();
     },
@@ -1078,13 +1089,51 @@ const basicRightBtn = [
     label: "额度明细",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "limit",
-    iconSize: "25",
+    // svgIcon: "limit",
+    // iconSize: "25",
+    icon: "Tickets",
     func: () => {
       openLimit();
     },
   }),
 ]
+/**
+ * 数据补全
+ */
+const edrAddDataBtn = [
+  createFreeButtonBase({
+    label: "保费计算",
+    type: "primary",
+    id: "btnCalEdr",
+    func: async () => {
+      calcPremiumEdr();
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: async () => {
+      saveEdrPlyInfo();
+    },
+  }),
+  createFreeButtonBase({
+    label: "比较/生成批文",
+    type: "primary",
+    id: "btnCompare",
+    func: async () => {
+      generateEndorse();
+    },
+  }),
+  createFreeButtonBase({
+    label: "申请核保",
+    type: "warning",
+    id: "btnSubmitEdr",
+    func: async () => {
+      submitEdrToUndrFun();
+    },
+  }),
+];
 /**
  * 一般批改按钮
  */
@@ -1266,8 +1315,8 @@ const initPage = async () => {
     acctinfoFlag.value = false;
   }
   if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
-    edrbaseFlag.value = false
-    edritemFlag.value = false;
+    edrbaseFlag.value = true
+    edritemFlag.value = true;
   }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
@@ -1299,19 +1348,21 @@ const initPage = async () => {
 
   console.log("页面初始化返回数据", formconfig11);
   if (props.param?.cAppTyp == "E") {
-    if (props.param.cEdrType == "1") {
-      opertaor.setReadOnly(formconfig11);
-    }
+    opertaor.setReadOnly(formconfig11);
   }
   // 只读场景,提前将配置设置为只读
   if (
     props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
     (props.param?.pageType === "EDR_APP_NEW_SCENE" &&
-      props.param.cEdrType == "1") ||
+      props.param.cEdrType == "1" && props.param.cRsnCde !== '99') ||
     props.param?.pageType === "readonly" ||
     props.param?.pageType === "UW_READ_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
+  }
+
+  if(props.param.cEdrType == "1" && props.param.cRsnCde === '99'){    //数据补全,数据状态初始化
+    opertaor.setAddData(formconfig11);
   }
 
   opertaor.setTableConfig(formconfig11);
@@ -1391,58 +1442,11 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-   if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
+   if(props.param?.cTransMrk === '1' && props.param?.pageType === 'EDR_APP_NEW_SCENE'){ //历史数据补全
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
-    if (props.param.cAppTyp == "E") {
-      if (props.param.cEdrType == "1") {
-        bthList.value = edrBtn;
-        nextTick(() => {
-          opertaor.setDisabledAll();
-          getEdrRsnItemFun(
-            props.param["cProdNo"],
-            props.param["cDptCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrRsnBundleCde"],
-            props.param["cEdrType"],
-            props.param["cGrpMrk"]
-          );
-
-          // 用于处理 账户信息
-          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-          if(acctinfoInfo){
-              acctinfoInfo.setDisabledAll(false);  
-              acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-                disabled: true
-              })
-              acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-                disabled: true
-              })
-          }  
-        });
-        edritem.value?.handleQuery();
-      } else {
-        bthList.value = edrSurrenderBtn;
-      }
-    } else if (props.param.cAppTyp == "A") {
-      bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
-			if(props.param?.pageName === "priceInquiry") {
-				bthList.value.push(
-					createFreeButtonBase({
-						label: "发起风勘",
-						type: "primary",
-						func: () => {
-							if (getNo.value == '暂无') {
-								ElMessage.error('询价单号为空,请保存后操作!');
-								return false;
-							}
-							startWindExploration(); 
-						},
-					}),
-				)
-			}
-    }
+    bthList.value = edrAddDataBtn;
+    edritem.value?.handleQuery();
   }else if (props.param.pageType === "app") {
     //获取单号
     // getCAppNoFun();
@@ -1596,8 +1600,9 @@ async function loadAfter() {
         label: "费用信息",
         type: "primary",
         id: "modFee",
-        svgIcon: "fee1", // 使用本地图标库
-        iconSize: "22", // 设置图标大小
+        // svgIcon: "fee1", // 使用本地图标库
+        // iconSize: "22", // 设置图标大小
+        icon: "Money",
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
           const params = {};
@@ -1652,8 +1657,9 @@ async function loadAfter() {
         label: "任务痕迹",
         type: "primary",
         id: "taskVestige",
-        svgIcon: "track", // 使用本地图标库
-        iconSize: "20", // 设置图标大小
+        // svgIcon: "track", // 使用本地图标库
+        // iconSize: "20", // 设置图标大小
+        icon: "SetUp",
         func: () => {
           dzmodal
             .open(TaskListVestige, {
@@ -1670,8 +1676,9 @@ async function loadAfter() {
         label: "核保信息",
         type: "primary",
         id: "undrInfo",
-        svgIcon: "Agree", // 使用本地图标库
-        iconSize: "25", // 设置图标大小
+        // svgIcon: "Agree", // 使用本地图标库
+        // iconSize: "25", // 设置图标大小
+        icon: "DocumentChecked",
         func: () => {
           dzmodal
             .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
@@ -1942,8 +1949,6 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "limit",
-        iconSize: "25",
         func: () => {
           openLimit();
         },
@@ -2086,8 +2091,8 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "template2",
-        iconSize: "20",
+        // svgIcon: "template2",
+        // iconSize: "20",
         func: () => {
           handleSaveTemplate()
         },
@@ -2096,8 +2101,8 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "copy2",
-        iconSize: "25", // 设置图标大小为25px
+        // svgIcon: "copy2",
+        // iconSize: "25", // 设置图标大小为25px
         func: () => {
           copyPolicyFun();
         },
@@ -2106,8 +2111,9 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "limit",
-        iconSize: "25",
+        // svgIcon: "limit",
+        // iconSize: "25",
+        icon: "Tickets",
         func: () => {
           openLimit();
         },
@@ -2253,8 +2259,9 @@ async function loadAfter() {
         label: "保存模板",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "template2",
-        iconSize: "20",
+        // svgIcon: "template2",
+        // iconSize: "20",
+        icon: "Memo",
         func: () => {
           handleSaveTemplate()
         },
@@ -2263,8 +2270,9 @@ async function loadAfter() {
         label: "复制出单",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "copy2",
-        iconSize: "25", // 设置图标大小为25px
+        // svgIcon: "copy2",
+        // iconSize: "25", // 设置图标大小为25px
+        icon: "CopyDocument",
         func: () => {
           copyPolicyFun();
         },
@@ -2273,8 +2281,9 @@ async function loadAfter() {
         label: "额度明细",
         type: "primary",
         buttonColor: bottomBtnColor1,
-        svgIcon: "limit",
-        iconSize: "25",
+        // svgIcon: "limit",
+        // iconSize: "25",
+        icon: "Tickets",
         func: () => {
           openLimit();
         },
@@ -2361,66 +2370,12 @@ async function loadAfter() {
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
   } 
-  // else if(props.param?.cTransMrk === '1' && props.param?.pageType == 'TEMPORARY_DEPOSIT'){ //历史数据补全
-  //   const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
-  //   await loadAppPlyInfo(cAppNo);
-  //   if (props.param.cAppTyp == "E") {
-  //     if (props.param.cEdrType == "1") {
-  //       bthList.value = edrBtn;
-  //       nextTick(() => {
-  //         opertaor.setDisabledAll();
-  //         getEdrRsnItemFun(
-  //           props.param["cProdNo"],
-  //           props.param["cDptCde"],
-  //           props.param["cEdrRsnBundleCde"],
-  //           props.param["cEdrRsnBundleCde"],
-  //           props.param["cEdrType"],
-  //           props.param["cGrpMrk"]
-  //         );
-
-  //         // 用于处理 账户信息
-  //         let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-  //         if(acctinfoInfo){
-  //             acctinfoInfo.setDisabledAll(false);  
-  //             acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-  //               disabled: true
-  //             })
-  //             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
-  //               disabled: true
-  //             })
-  //         }  
-  //       });
-  //       edritem.value?.handleQuery();
-  //     } else {
-  //       bthList.value = edrSurrenderBtn;
-  //     }
-  //   } else if (props.param.cAppTyp == "A") {
-  //     bthList.value = basicBtn;
-  //     rightBtnList.value = basicRightBtn;
-	// 		if(props.param?.pageName === "priceInquiry") {
-	// 			bthList.value.push(
-	// 				createFreeButtonBase({
-	// 					label: "发起风勘",
-	// 					type: "primary",
-	// 					func: () => {
-	// 						if (getNo.value == '暂无') {
-	// 							ElMessage.error('询价单号为空,请保存后操作!');
-	// 							return false;
-	// 						}
-	// 						startWindExploration(); 
-	// 					},
-	// 				}),
-	// 			)
-	// 		}
-  //   }
-  // }
-
   let imageStr = '影像管理';
   if(pageMethod.isReadOnlyScene(opertaor)){
     imageStr = '影像查看';
   }
   bthList.value.push(
-    {isdivider: true},  //间隔符
+    // {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: imageStr,
       type: "success",
@@ -2431,7 +2386,7 @@ async function loadAfter() {
   )
 
   bthList.value.push(
-    {isdivider: true},  //间隔符
+    // {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: "返回",
       func: () => {
@@ -2445,8 +2400,9 @@ async function loadAfter() {
       label: "历史赔案",
       type: "primary",
       buttonColor: bottomBtnColor1,
-      svgIcon: "histogram", // 使用本地图标库
-      iconSize: "25", // 设置图标大小
+      // svgIcon: "histogram", // 使用本地图标库
+      // iconSize: "25", // 设置图标大小
+      icon: "Histogram",
       func: () => {
         historyClaimcaseFun();
         // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -2593,7 +2549,7 @@ const loadAppPlyInfo = async (CAppNo) => {
   } else if (props.param.pageName === "priceInquiry") {
     param["cInquiryNo"] = CAppNo;
   } else if(props.param.cTransMrk === '1'){
-    param['CPlyNo'] = props.param.cPlyNo;
+    param['CPlyNo'] = props.param.cAppNo;
   } else{
      param["cAppNo"] = CAppNo;
   }
@@ -2689,12 +2645,11 @@ const loadAppPlyInfo = async (CAppNo) => {
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
       // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
-      if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
-        ops.plyBase['Base.cAppNo'] = '';
-      }
+      // if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
+      //   ops.plyBase['Base.cAppNo'] = '';
+      // }
     console.log("转换的数据", ops);
-    if(props.param.cTransMrk !== '1'){
-      if (res["res"]["composition"]["EdrBase"]) {
+    if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] !=
@@ -2751,7 +2706,6 @@ const loadAppPlyInfo = async (CAppNo) => {
         }
         edrbase.value?.setFormValue(EdrBaseData);
       }
-    }
       
       // 展示保费和保额金额
       if (ops["base"]["Base.nPrm"] && ops["base"]["Base.nPrm"] > 0) {
@@ -2759,21 +2713,13 @@ const loadAppPlyInfo = async (CAppNo) => {
       }
       if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
         nAmt.value = ops["base"]["Base.nAmt"];
-      }
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
+      } 
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
       console.log('缓存的数据6666',ops)
       // 暂存数据
       sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-     
     }
   }
 };
@@ -3160,11 +3106,11 @@ const submitToUndrFn = async () => {
     }
 
     //040005 校验 地址清单学校人数与 清单 同学校人数校验
-    const result = await validateSchoolPersonWithApi(props.param);
-    if (!result.isValid) {
-      ElMessage.error(result.errorMessages[0]);
-        return false;
-    }
+    // const result = await validateSchoolPersonWithApi(props.param);
+    // if (!result.isValid) {
+    //   ElMessage.error(result.errorMessages[0]);
+    //     return false;
+    // }
 
   // 判断应收保费是否同保费相同
   let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
@@ -3718,6 +3664,9 @@ const getPlyPolicyFun = () => {
             cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
             cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
             cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
+            // cTermNme: res["res"]["composition"]["cvrg"][0]["Term.cClauseName"],
+            // cTermNo: res["res"]["composition"]["cvrg"][0]["Term.cClauseCode"],
+            // cPolicySource:res["res"]["composition"]["plyBase"][0]["Base.cPolicySource"],
             pageType: "readonly",
             showBtn: false,
           })
@@ -4226,215 +4175,79 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  //历史数据补全功能特殊处理
-  if(props.param.cTransMrk === '1'){
-    // 获取保存按钮的通用方法
-    const getSaveButton = () => {
-      let btn = getBtn("saveEdr");
-      // 如果通过ID找不到，尝试通过标签查找
-      if (!btn) {
-        btn = bthList.value.find(item => item.label === "保存" || item.id === "saveEdr");
-      }
-      return btn;
-    };
-    
-    // 释放按钮加载状态的通用方法
-    const releaseButtonLoading = () => {
-      try {
-        const btn = getSaveButton();
-        if (btn && btn.loading !== undefined) {
-          btn.loading = false;
-        }
-      } catch (e) {
-        console.warn("释放按钮加载状态时出错:", e);
-      }
-    };
-    const btn = getSaveButton();
-    if (btn) {
-      btn.loading = true;
-    }
-    const res = opertaor.getDataAll();
-    const resParam = Object.assign(res,{'cTransMrk':'1'})
-    // const edrInfo: any = await saveEdrAppPlyInfo(resParam)
-    res["user"] = user;
-    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    res["plyBase"]["Base.cEdrRsnBundleCde"] = "99"
-    res["plyBase"]["Base.cEdrType"] = '1'
-    // res["EdrBase"] = edrbase.value?.getFromValue();
-    // const beforeSaveCappNo = res["EdrBase"]["EdrBase.cAppNo"];
-    // if (
-    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
-    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
-    //   Array.isArray(res["EdrBase"]["EdrBase.cEdrRsnDetail"])
-    // ) {
-    //   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-    //     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-    // }
-    // if(res['ci'] && res['ci'].length>0){
-    //   res['ci'].forEach((item:any)=>{
-    //     if(item['Ci.nCiShare']){
-    //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-    //     }
-    //   })
-    // }
-    const edrInfo: any = await saveEdrAppPlyInfo(resParam)
-    
-    if(edrInfo["code"] == "200") {
-      const ops = opertaor.convertData(edrInfo);
-      console.log("转换的数据", ops);
-      ElMessage.success(edrInfo.msg);
-      btn.loading = false
-      // if (btn === undefined) {
-      //   btn.loading = false;
-      // }
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
-      opertaor.setDataAll(ops);
-      const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-      EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
-      edrbase.value?.setFormValue(EdrBaseData);
-      saveEdrFlag = true;
-      saveEdrState.value = true;
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
-        // 复制保单清单信息到批单中
-        saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
-      }
-      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-        getAppPolicyList({
-          cAppNo: EdrBaseData["EdrBase.cAppNo"],
-          pageSize: 10,
-          pageNum: 1,
-          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-          cLoadSub: "1",
-          cDataTyp: "app",
-          queryType: "1"
-        }).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            const data = res.data?.result[0];
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            if(data['cEdrRsnBundleCde']){
-                data.cRsnCde = data['cEdrRsnBundleCde'];
-            }
-            router.replace({
-              path: "/pcisapp/myPage",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
-                }),
-              },
-            });
-          }
-        })
-      }
-        console.log('保存数据555',ops)
-        sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-    } else {
-      btn.loading = false;
-      ElMessage.error(edrInfo.msg);
-    }
-  }else{
-    const btn = getBtn("saveEdr");
-    btn.loading = true;
-    const res = opertaor.getDataAll();
-    const dataALl = opertaor.getDataAll();
-    res["user"] = user;
-    res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-    res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-    if(props.param.cRsnCde === '99'){
-      if (!res.EdrBase) {
-        res.EdrBase = [];
-      }
-      // res.EdrBase.push(edrBaseDatas._value);
-    }else{
+  const btn = getBtn("saveEdr");
+  btn.loading = true;
+  const res = opertaor.getDataAll();
+  const dataALl = opertaor.getDataAll();
+  res["user"] = user;
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  
 
-      res["EdrBase"] = edrbase.value?.getFromValue();
-      if (
-        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
-        res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != "" &&
-        Array.isArray(res["EdrBase"]?.["EdrBase.cEdrRsnDetail"])
-      ) {
-        res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
-          res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
-      }
+  res["EdrBase"] = edrbase.value?.getFromValue();
+  if (
+    res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
+    res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(res["EdrBase"]?.["EdrBase.cEdrRsnDetail"])
+  ) {
+    res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
+  }
+  
+  const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
+  const edrInfo: any = await saveEdrAppPlyInfo(res)
+  btn.loading = false;
+  if(edrInfo["code"] == "200") {
+    const ops = opertaor.convertData(edrInfo);
+    console.log("转换的数据", ops);
+    ElMessage.success(edrInfo.msg);
+    opertaor.setDataAll(ops);
+    const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
+    EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
+    // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
+    //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
+    //     ","
+    //   );    //影响二次批改报错,先注释掉待调整
+    edrbase.value?.setFormValue(EdrBaseData);
+    saveEdrFlag = true;
+    saveEdrState.value = true;
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
+      // 复制保单清单信息到批单中
+      saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
     }
-    
-    // if(res['ci'] && res['ci'].length>0){
-    //   res['ci'].forEach((item:any)=>{
-    //     if(item['Ci.nCiShare']){
-    //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
-    //     }
-    //   })
-    // }
-    const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
-    const edrInfo: any = await saveEdrAppPlyInfo(res)
-    btn.loading = false;
-    if(edrInfo["code"] == "200") {
-      const ops = opertaor.convertData(edrInfo);
-      console.log("转换的数据", ops);
-      ElMessage.success(edrInfo.msg);
-      // if(ops['ci'] && ops['ci'].length>0){
-      //   ops['ci'].forEach((item:any)=>{
-      //     if(item['Ci.nCiShare']){
-      //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-      //     }
-      //   })
-      // }
-      opertaor.setDataAll(ops);
-      const EdrBaseData = edrInfo["res"]["composition"]["EdrBase"][0];
-      EdrBaseData["EdrBase.cEdrRsnDetail"] = EdrBaseData["EdrBase.cEdrRsnDetail"] ? EdrBaseData["EdrBase.cEdrRsnDetail"].split(",") : ""
-      // res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"] =
-      //   res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnDetail"].split(
-      //     ","
-      //   );    //影响二次批改报错,先注释掉待调整
-      edrbase.value?.setFormValue(EdrBaseData);
-      saveEdrFlag = true;
-      saveEdrState.value = true;
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && saveDistBatchFlag.value) {
-        // 复制保单清单信息到批单中
-        saveDist(EdrBaseData['EdrBase.cAppNo'], props.param?.cRsnCde)
-      }
-      // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
-      if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
-        getAppPolicyList({
-          cAppNo: EdrBaseData["EdrBase.cAppNo"],
-          pageSize: 10,
-          pageNum: 1,
-          cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
-          cLoadSub: "1",
-          cDataTyp: "app",
-          queryType: "1"
-        }).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            const data = res.data?.result[0];
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            if(data['cEdrRsnBundleCde']){
-                data.cRsnCde = data['cEdrRsnBundleCde'];
-            }
-            router.replace({
-              path: "/pcisapp/myPage",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
-                }),
-              },
-            });
+    // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
+    if(props.param.pageType === "EDR_APP_NEW_SCENE" && !beforeSaveCappNo && EdrBaseData["EdrBase.cAppNo"]) {
+      getAppPolicyList({
+        cAppNo: EdrBaseData["EdrBase.cAppNo"],
+        pageSize: 10,
+        pageNum: 1,
+        cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
+        cLoadSub: "1",
+        cDataTyp: "app",
+        queryType: "1"
+      }).then((res:any) => {
+        if(res.data?.result && res.data?.result.length > 0) {
+          const data = res.data?.result[0];
+          sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+          if(data['cEdrRsnBundleCde']){
+              data.cRsnCde = data['cEdrRsnBundleCde'];
           }
-        })
-      }
-        console.log('保存数据555',ops)
-        sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
-    } else {
-      ElMessage.error(edrInfo.msg);
+          router.replace({
+            path: "/pcisapp/myPage",
+            query: {
+              param: JSON.stringify({
+                ...data,
+                ...{ pageType: "TEMPORARY_DEPOSIT" },
+              }),
+            },
+          });
+        }
+      })
     }
+      console.log('保存数据555',ops)
+      sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+  } else {
+    ElMessage.error(edrInfo.msg);
   }
   console.log('333',opertaor.getDataAll())
   //   btn.loading = false;
@@ -4813,7 +4626,7 @@ const submitUnderwritingFn = async () => {
       const param = {
         cAppNo: props.param?.cAppNo,
         cAppTyp: props.param?.cAppTyp,
-        cPlyNo: props.param?.plyNo,
+        cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],
         nEdrPrjNo: plyBase['Base.nEdrPrjNo']
       }
       const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
@@ -4828,7 +4641,7 @@ const submitUnderwritingFn = async () => {
         cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
         cDptCde: props.param?.cDptCde,// 机构代码
         cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
-        cPlyNo: props.param?.plyNo,// 保单号
+        cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
         cProdNme: props.param?.cTermNme,// 产品名称
         cProdNo: props.param?.cProdNo,//产品代码
         cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
@@ -4884,9 +4697,9 @@ const submitUnderwritingFn = async () => {
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           if(props.param?.pageName === "priceInquiry") {
-            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
           } else {
-            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/PendUdrListQuery" });
           }
         });
       }
@@ -5813,10 +5626,11 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   flex-direction: column;
 }
 :deep(.el-main) {
-  padding: 10px 10px 10px 10px;
+  // padding: 10px 10px 10px 10px;
+  padding: 0px;
 }
 .publicStyle {
-  color: red;
+  color: #FF4D4F;
 }
 .mypage-app {
   display: flex;
@@ -5839,31 +5653,36 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   flex: 1;
   // width: 130px;
   :deep(.el-anchor__list) {
-    padding: 20px 10px;
+    padding: 0;
   } 
   .el-anchor__item {
-    margin-bottom: 20px;
-    padding-left: 0;
-    opacity: .6;
+    margin-top: 10px;
+    padding-left: 16px;
+    padding-right: 22px;
     &.isActive,&:hover {
-      opacity: 1;
-      // background: #ffffff1a;
+      background: linear-gradient( 180deg, rgba(58, 118, 198, .3) 0%, rgba(57, 117, 198, .3) 100%);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
+        }
+      }
     }
     :deep(a) {
       display: flex;
       flex-direction: row;
       align-items: center;
-      color: #FFFFFF;
+      color: #595959;
       padding: 0;
+      height: 40px;
       .el-icon {
         font-size: 3rem!important;
         margin: 0 0 10px 0;
       }
       .iconfont {
-        font-size: 1.2rem;
-        color: #FFF;
-        margin-right: 5px;
-        min-width: 24px;
+        font-size: 1rem;
+        color: #595959;
+        margin-right: 8px;
         text-align: center;
       }
       .icon-title {
@@ -5877,20 +5696,20 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 // 高亮图标和标题文字
-:deep(.el-anchor__item.is-active) ,
-:deep(.el-anchor__item.isActive) {
-  opacity: 1 !important;
-}
+// :deep(.el-anchor__item.is-active) ,
+// :deep(.el-anchor__item.isActive) {
+//   opacity: 1 !important;
+// }
 
-:deep(.el-anchor__item.is-active a .iconfont),
-:deep(.el-anchor__item.isActive a .iconfont) {
-  color: #ffa940 !important; /* 橙色 */
-}
+// :deep(.el-anchor__item.is-active a .iconfont),
+// :deep(.el-anchor__item.isActive a .iconfont) {
+//   color: #ffa940 !important; /* 橙色 */
+// }
 
-:deep(.el-anchor__item.is-active a .icon-title),
-:deep(.el-anchor__item.isActive a .icon-title) {
-  color: #ffa940 !important; /* 橙色 */
-}
+// :deep(.el-anchor__item.is-active a .icon-title),
+// :deep(.el-anchor__item.isActive a .icon-title) {
+//   color: #ffa940 !important; /* 橙色 */
+// }
 
 .toggle-button {
   position: absolute;
@@ -5901,7 +5720,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .toggle-nav-button {
-  background: rgba(255, 255, 255, 0.2) !important;
+  // background: rgba(255, 255, 255, 0.2) !important;
+  background: var(--el-color-primary);
   border: none !important;
   color: white !important;
   width: 32px;
@@ -5911,7 +5731,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .toggle-nav-button:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  // background: rgba(255, 255, 255, 0.3) !important;
 }
 
 .toggle-nav-button :deep(.el-icon) {
@@ -5921,12 +5741,9 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .el-aside {
   width: auto;
-  background: var(--el-color-primary);
+  background: #FFFFFF;
   position: relative;
   transition: width 0.3s ease;
-}
-.font-weight-500 {
-  font-weight: 500;
 }
 .main-container {
   display: flex;
@@ -5936,21 +5753,31 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: -10px;
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.85);
   }
   .main-content {
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
+    margin: 12px 20px;
   }
 }
 :deep(.el-card__header) {
-  padding: 10px 20px!important;
   .el-row {
     align-items: center;
+    color: rgba(0,0,0,0.85);
+    font-size: 16px;
     &:first-child {
       font-size: 16px;
       font-weight: 500;
+    }
+    .el-col-20 {
+      display: flex;
+      justify-content: right;
+      align-items: center;
     }
   }
 }
@@ -5959,73 +5786,149 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   font-weight: 500;
 }
 :deep(.el-card__body) {
-  padding: 10px 20px;
+  padding: 5px 10px;
 }
 
-.right-sidebar-trigger {
-  position: fixed;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
-}
-.btns-content {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  .flex-center {
+// .right-sidebar-trigger {
+//   position: fixed;
+//   right: 0;
+//   top: 50%;
+//   transform: translateY(-50%);
+//   z-index: 1000;
+// }
+// .btns-content {
+//   display: flex;
+//   align-items: center;
+//   flex-direction: column;
+//   gap: 8px;
+//   padding: 12px;
+//   .flex-center {
+//     display: flex;
+//     align-items: center;
+//   }
+// }
+
+// .menu-trigger {
+//   background-color: #fff;
+//   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+//   transition: all 0.3s;
+// }
+
+// .menu-trigger:hover {
+//   transform: scale(1.1);
+// }
+
+// .action-menu-popper {
+//   margin-right: 10px !important;
+//   border-radius: 8px;
+//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+// }
+
+// .action-menu-popper .el-button {
+//   justify-content: flex-start;
+//   padding: 10px 12px;
+//   border-radius: 6px;
+//   transition: all 0.3s;
+//   border: none;
+// }
+
+// .action-menu-popper .el-button:hover {
+//   background-color: #f5f7fa;
+//   transform: translateX(4px);
+// }
+
+// .action-menu-popper .el-button.text {
+//   color: #606266;
+// }
+
+// .action-menu-popper .el-button.text:hover {
+//   color: #409eff;
+// }
+
+// .action-menu-popper .el-button .svg-icon,
+// .action-menu-popper .el-button .el-icon {
+//   transition: all 0.3s;
+// }
+
+// .action-menu-popper .el-button:hover .svg-icon,
+// .action-menu-popper .el-button:hover .el-icon {
+//   transform: scale(1.1);
+// }
+
+.right-btns {
+  // padding: 0 3rem;
+  margin: 72px 20px 0 0;
+  // min-width: calc(150px + 6rem);
+  .btns-content {
+    background: #FFFFFF;
+    padding: 10px;
+    border-radius: 5px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: start;
+    // width: 150px;
+    :deep(.el-button) {
+      margin: 0 0 12px 0;
+      border: none;
+      background-color: transparent!important;
+      color: #333;
+      padding: 0;
+      .el-icon {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        border-radius: 2px;
+        margin-right: 10px!important;
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &:nth-child(5n + 1) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-1;
+          svg {
+            color: $btn-icon-color-1;
+          }
+        }
+      }
+      &:nth-child(5n + 2) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-2;
+          svg {
+            color: $btn-icon-color-2;
+          }
+        }
+      }
+      &:nth-child(5n + 3) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-3;
+          svg {
+            color: $btn-icon-color-3;
+          }
+        }
+      }
+      &:nth-child(5n + 4) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-4;
+          svg {
+            color: $btn-icon-color-4;
+          }
+        }
+      }
+      &:nth-child(5n + 5) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-5;
+          svg {
+            color: $btn-icon-color-5;
+          }
+        }
+      }
+    }
   }
-}
-
-.menu-trigger {
-  background-color: #fff;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
-}
-
-.menu-trigger:hover {
-  transform: scale(1.1);
-}
-
-.action-menu-popper {
-  margin-right: 10px !important;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.action-menu-popper .el-button {
-  justify-content: flex-start;
-  padding: 10px 12px;
-  border-radius: 6px;
-  transition: all 0.3s;
-  border: none;
-}
-
-.action-menu-popper .el-button:hover {
-  background-color: #f5f7fa;
-  transform: translateX(4px);
-}
-
-.action-menu-popper .el-button.text {
-  color: #606266;
-}
-
-.action-menu-popper .el-button.text:hover {
-  color: #409eff;
-}
-
-.action-menu-popper .el-button .svg-icon,
-.action-menu-popper .el-button .el-icon {
-  transition: all 0.3s;
-}
-
-.action-menu-popper .el-button:hover .svg-icon,
-.action-menu-popper .el-button:hover .el-icon {
-  transform: scale(1.1);
 }
 </style>
 <style>

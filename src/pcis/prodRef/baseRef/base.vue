@@ -56,6 +56,7 @@ onMounted(async () => {
   }
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
+  setValue("Base.cCumulativeLimitManual", "0");
   // 隐藏短期费率类型
   // setFormItem("Base.cRatioTyp", { 
   //   hidden: true
@@ -76,6 +77,21 @@ onMounted(async () => {
     setFormItem('Base.cRatioTyp', { hidden: true })
     setFormItem('Base.nRatioCoef', { hidden: true })
   }
+  formconfig11.fromSchema?.forEach((item:any) => {
+    if(item.prop === "Base.groupAmtCur") {
+      item.labelLength = 11
+    }
+    if(item.prop === "Base.groupAmtExch") {
+      item.labelLength = 13
+      item.groupList[1].minWidth = "88px"
+    }
+    if(item.prop === "Base.nRmbAmt") {
+      item.labelLength = 15
+    }
+    if(item.prop === "Base.groupPrmExch") {
+      item.groupList[1].minWidth = "88px"
+    }
+  })
 });
 
 
@@ -416,13 +432,20 @@ const method = {
   },
   // 总保额(累计赔偿限额)汇率change事件
   nAmtRmbExchChange: (val: any) => {
-    console.log('111', val)
     if (!!val) {
       const namt = getValue('Base.nAmt');
       if (!!namt) {
         // 计算折人民币保额
         setValue("Base.nRmbAmt", numMulti(namt, val));
       }
+    }
+  },
+  // 总保额(累计赔偿限额) 是和否change事件
+  nAmtLimitManualChange: (val: any) => {
+    if(val == '0'){ // 否 置灰
+        setFormItem("Base.nAmt", { disabled: true }); 
+    } else{  // 是 可编辑
+        setFormItem("Base.nAmt", { disabled: false });
     }
   },
   // 总保费汇率change事件

@@ -444,7 +444,6 @@ const method = {
 
     const res = await deleteDistCheck(param);
     const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
-
     ElMessageBox.confirm(
         checkMsg,
         "提示",
@@ -459,6 +458,10 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+          const cvrgRef = opertaor.getTableRefs()['cvrg'];
+          if(cvrgRef) {
+            cvrgRef.refushCvrgInfo();
+          }
         } else {
           ElMessage.error(res.msg);
         }
@@ -664,6 +667,11 @@ const method = {
   //   });
   // },
   getTgtDetailFn:() => {
+        // 询价转投保
+        if(route.params.param?.pageType === "inquiryToApp") {
+           return;
+        } 
+
         const param = opertaor.getParam();
         let app = "";
         if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
@@ -673,7 +681,6 @@ const method = {
         } else if(param.pageType !== "copy") {
             app = param.cAppNo
         }
-
         let distParam = {};
         if(route.params.param?.pageName === "priceInquiry") {
           distParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
@@ -1083,7 +1090,7 @@ function handleSelectionChange(selection: any) {
 watch(
   () => pageresult.list,
   (item) => {
-    if(params.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+    if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
   }

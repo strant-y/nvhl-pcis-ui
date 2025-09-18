@@ -361,13 +361,14 @@ defineExpose({
 
 <style scoped>
 :deep(.el-card__header) {
-  background-color: #e5f3fa;
-  padding: 15px 20px;
+  height: 32px;
+  padding: 4px 0 4px 12px;
+  background: #ffffff;
 }
 
 .searchbar {
   border: 1px solid #ddd;
-  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+  /* box-shadow: 0 0 2px rgb(0 0 0 / 30%); */
 }
 /* .card-title-style{
   font-weight: 700;
@@ -388,17 +389,22 @@ defineExpose({
   /* height: 28px; */
   min-height: 28px;
   line-height: 28px;
+  padding: 4px 6px;
 }
 :deep(.el-select__input) {
   height: 20px;
 }
 :deep(.el-input__wrapper) {
   height: 28px;
+  padding: 1px 5px;
 }
 :deep(.el-form-item__content .el-row) {
   align-items: baseline;
 }
 :deep(.el-form-item__content .el-button) {
   height: 28px;
+}
+:deep(.el-input-number.is-without-controls .el-input__wrapper) {
+  padding: 1px 5px;
 }
 </style>

@@ -46,7 +46,7 @@ const cacheKey = ref();
 let idxParam = reactive({
   opertaorId: 'enteringDtl',
   formPage: formPage.value,
-  param: { ...props.param, ...{cacheKey:cacheKey.value,acctinfoFlag:true}},
+  param: { ...props.param, ...{cacheKey:cacheKey.value,acctinfoFlag:true,type:props?.type || props.param?.type}},
   user: JSON.parse(sessionStorage.getItem("user")),
   ciJiMrk: '0',
   readonly: computed(() => ['view','audit'].includes(props?.type || props.param?.type) || (props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType) )),

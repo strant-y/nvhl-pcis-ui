@@ -8,7 +8,47 @@
       ref="tableRef"
       @selection-change="handleSelectionChange"
       @page-change="handleQuery(false)"
-    />
+    >
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cTermNme="{ row, column, index }">
+        <el-tooltip :content="row.cTermNme" placement="top">
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cAppNme="{ row, column, index }">
+        <el-tooltip :content="row.cAppNme" placement="top">
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cInsuredNme="{ row, column, index }">
+        <el-tooltip :content="row.cInsuredNme" placement="top">
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template><template #column-cInquiryNo="{ row, column, index }">
+        <div>
+          <div class="policy-number-row" v-if="row.cAppNo">
+            <span v-html="row.cAppNo"></span>
+            <el-icon
+              class="copy-icon"
+              @click="copyText(row.cAppNo)"
+              v-if="row.cAppNo"
+            >
+              <DocumentCopy />
+            </el-icon>
+          </div>
+          <div class="policy-number-row" v-if="row.cInquiryNo">
+            <span v-html="row.cInquiryNo" class="primmaryColor"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
+    </app-table>
   </div>
 </template>
 
@@ -401,7 +441,7 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["cStatus"],
     showSelection: true,
     tableBtnType: "btn",
-    tableBtnWidth: 150,
+    tableBtnWidth: 80,
     fixed: true,
     tableBtnPosition: ref<any>(""),
     tableBtnFixed: "right",
@@ -412,8 +452,9 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "接收",
         type: "info",
         size: "large",
+        iconSize:"25",
         icon: "Message",
-        iconSize: "25",
+        // iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
             return false;
@@ -432,8 +473,9 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "修改",
         type: "success",
         size: "large",
+        iconSize:"25",
         icon: "Edit",
-        iconSize: "25",
+        // iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
             return false;
@@ -451,8 +493,9 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "取消接收",
         type: "info",
         size: "large",
+        iconSize:"25",
         icon: "Message",
-        iconSize: "25",
+        // iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
             return false;
@@ -470,8 +513,9 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "return",
-        iconSize: "25",
+        // iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
             return false;
@@ -517,8 +561,9 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "查看",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "View",
-        iconSize: "25",
+        // iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
@@ -536,8 +581,9 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "承保流程",
         type: "danger",
         size: "large",
+        iconSize:"25",
         icon: "Refresh",
-        iconSize: "25",
+        // iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
@@ -574,63 +620,78 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "询价申请单号/询价单号",
-        minWidth: 170,
-        showCopyIcon: true,
         fixed: "left",
+        width: 165,
+        slotName: "cInquiryNo"
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
+        align: 'left',
+        width: 48,
+        formatter:(val:any) => {
+          return val?.slice(0,2)
+        }
       },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        minWidth: 180,
+        // slotName: "cDptCnm",
+        align: 'left',
+        minWidth: 145,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
-        minWidth: 180,
+        // slotName: "cTermNme",
+        align: 'left',
+        minWidth: 112,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        // slotName: "cAppNme",
+        align: 'left',
+        minWidth: 112,
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        // slotName: "cInsuredNme",
+        align: 'left',
+        minWidth: 112,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
-        showKey: [1, 2, 3, 4],
-        minWidth: 180,
+        align: 'left',
+        width: 75,
       },
       {
         prop: "bsTm1",
         inputtype: "rtdatepicker",
         title: "询价日期",
-        showKey: [1, 2, 3, 4],
-        maxWidth: 150,
+        width: 135,
       },
       {
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "提交时间",
-        showKey: [1, 2, 3, 4],
-        maxWidth: 150,
+        width: 135,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 150,
+        width: 65,
+        align: "left",
         loadData: [
           { label: "未接收", value: "0" },
           { label: "已接收", value: "1" },
@@ -978,7 +1039,7 @@ function updateUdrDetail(row: any) {
           plyNo: row.plyNo === "*" ? "" : row.plyNo,
           cTermNo: row.cTermNo,
           cTermNme: row.cTermNme,
-          cProdNmeCn: row.prodName,
+          cProdNmeCn: row.cProdNmeCn,
           pageName: "priceInquiry",
           cAppNo: row.cAppNo,
           cPolicySource: row.cPolicySource,
@@ -1010,7 +1071,7 @@ function updateUdrDetail(row: any) {
           plyNo: row.plyNo,
           cTermNo: row.cTermNo,
           cTermNme: row.cTermNme,
-          cProdNmeCn: row.prodName,
+          cProdNmeCn: row.cProdNmeCn,
           pageName: "priceInquiry",
           cAppNo: row.cAppNo,
           cPolicySource: row.cPolicySource,
@@ -1055,7 +1116,7 @@ function handleWorkFlow(row: any, type: any) {
                 cAppTyp: row.cAppTyp,
                 cTermNo: row.cTermNo,
                 cTermNme: row.cTermNme,
-                cProdNmeCn: row.prodName,
+                cProdNmeCn: row.cProdNmeCn,
                 cPolicySource: row.cPolicySource,
               });
               router.push({
@@ -1241,7 +1302,7 @@ function showDetails(row: any) {
             pageType: "UW_READ_SCENE",
             cTermNme: row.cTermNme,
             cTermNo: row.cTermNo,
-            cProdNmeCn: row.prodName,
+            cProdNmeCn: row.cProdNmeCn,
             pageName: "priceInquiry",
             cPolicySource: row.cPolicySource,
           });
@@ -1266,7 +1327,7 @@ function showDetails(row: any) {
             pageType: "UW_READ_SCENE",
             cTermNme: row.cTermNme,
             cTermNo: row.cTermNo,
-            cProdNmeCn: row.prodName,
+            cProdNmeCn: row.cProdNmeCn,
             pageName: "priceInquiry",
             cPolicySource: row.cPolicySource,
           });
@@ -1306,7 +1367,7 @@ function handleEdit(row: any) {
     cTermNme: row.cTermNme,
     cTermNo: row.cTermNo,
     pageType: "PLY_UW_PROCESS_SCENE",
-    cProdNmeCn: row.prodName,
+    cProdNmeCn: row.cProdNmeCn,
     pageName: "priceInquiry",
     cPolicySource: row.cPolicySource,
   });
@@ -1339,6 +1400,54 @@ function handleDelete(id?: string) {
   });
 }
 
+function formatTwoLine(text, num=7) {
+  if (!text) return '';
+  const len = text.length;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
+  }
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
+}
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning("没有可复制的内容");
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        ElMessage.success("复制成功");
+      },
+      () => {
+        ElMessage.error("复制失败");
+      }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand("copy");
+      if (result) {
+        ElMessage.success("复制成功");
+      } else {
+        ElMessage.error("复制失败");
+      }
+    } catch (err) {
+      ElMessage.error("复制失败，请稍后再试");
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
+
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -1361,5 +1470,34 @@ function setFormItem(key: any, obj: any) {
 <style lang="scss" scoped>
 :deep(.el-table td.el-table__cell div.cell .el-divider--vertical:last-child) {
   display: none;
+}
+.copy-icon {
+  // margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+  height: 23px;
+}
+
+.policy-number-row span {
+  flex: 1;
+}
+
+.primmaryColor {
+  color: var(--el-color-primary);
+  cursor: pointer;
+}
+:deep(.el-button-group .el-button) {
+  width: 80px;
 }
 </style>

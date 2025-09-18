@@ -1,7 +1,7 @@
 <!-- 查询 -->
 <template>
   <div class="app-container">
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" class="freeEditClass" />
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -14,13 +14,13 @@
           <!-- 投保 (申请单号/保单号)-->
           <template v-if="cAppType == 'A'">
             <div v-if="row.cAppNo" class="policy-number-row">
-            <span v-html="row.cAppNo"></span>
+            <span v-html="row.cAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
             <div v-if="row.cPlyNo" class="policy-number-row">
-                <span v-html="row.cPlyNo"></span>
+                <span v-html="row.cPlyNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
                    <DocumentCopy />
                 </el-icon>
@@ -38,13 +38,13 @@
           <!-- 询价 -->
           <template v-else>
             <div v-if="row.cAppNo" class="policy-number-row">
-                <span v-html="row.cAppNo"></span>
+                <span v-html="row.cAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
             <div v-if="row.cInquiryNo" class="policy-number-row">
-                <span v-html="row.cInquiryNo"></span>
+                <span v-html="row.cInquiryNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
                    <DocumentCopy />
                 </el-icon>
@@ -91,12 +91,12 @@
       <!-- 展示成2行，第1行7个字，第2行6个字 + 超出部分用...代替，鼠标放上去可展示全部 -->
       <template #column-cDptCnm="{ row, column, index }">
         <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="formatTwoLine(row.cDptCnm) || ''"></span>
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cTermNme="{ row, column, index }">
         <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="formatTwoLine(row.cTermNme) || ''"></span>
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cSecondDptCnm="{ row, column, index }">
@@ -104,12 +104,12 @@
       </template>
       <template #column-cAppNme="{ row, column, index }">
         <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="formatTwoLine(row.cAppNme) || ''"></span>
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
         <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="formatTwoLine(row.cInsuredNme) || ''"></span>
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <!-- ES查询 查询条件高亮 -->
@@ -132,10 +132,10 @@
         <span v-html="row.cProdNmeCn || ''"></span>
       </template>
       <template #column-nAmt="{ row }">
-        <span v-html="row.nAmt || ''"></span>
+        <span v-html="row.nAmt.toLocaleString() || ''"></span>
       </template>
       <template #column-nPrm="{ row }">
-        <span v-html="row.nPrm || ''"></span>
+        <span v-html="row.nPrm.toLocaleString() || ''"></span>
       </template>
       <template #column-cUdrNme="{ row }">
         <span v-html="row.cUdrNme || ''"></span>
@@ -437,6 +437,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {
                   label: "搜索",
                   type: "primary",
+                  btnStyle: {'font-size': '16px'},
                   func: () => {
                     handleQuery(true, true);
                   },
@@ -453,6 +454,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {
                   icon: "Search",
                   type: "primary",
+                  btnStyle: {width: '100%'},
                   func: () => {
                       dzmodal
                           .open(DepartmentTree, { type: "Issuer", data: {} })
@@ -638,12 +640,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtinput",
               title: "询价/投保/批改申请单号",
               clearable: true,
+              labelLength: 12,
           },
           {
               prop: "cPlyNo",
               inputtype: "rtinput",
               title: "询价单号/保单号/批单号",
               clearable: true,
+              labelLength: 12,
           },
           {
               prop: "cAppTyp",
@@ -933,79 +937,91 @@ const normalQueryColumns = [
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
-        minWidth: 180,
+        width: 165,
         fixed: "left",
         slotName: "policyInfo"
     },
     {
         prop: "cEdrNo",
         inputtype: "rtinput",
-        title: "批单号",
-        minWidth: 242,
+        title: "批改申请单号/批单号",
+        width: 165,
         slotName: "cEdrNo"
     },
     {
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
         title: "分公司",
-        maxWidth: 25,
-        slotName: "cSecondDptCnm"
+        width: 48,
+        align: 'left',
+        formatter:(val:any)=>{
+            return val?.slice(0,2)
+        }
     },
     {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 130,
-        slotName: "cDptCnm"
+        slotName: "cDptCnm",
+        align: 'left',
+        width: 145,
     },
     {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
-        maxWidth: 130,
-        slotName: "cAppNme"
+        slotName: "cAppNme",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
-        maxWidth: 130,
-        slotName: "cInsuredNme"
+        maxWidth: 110,
+        slotName: "cInsuredNme",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "cProdNmeCn",
         inputtype: "rtinput",
         title: "产品名称",
-        minWidth: 150,
-        slotName: "cProdNmeCn"
+        minWidth: 160,
+        slotName: "cProdNmeCn",
+        align: 'left',
     },
     {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         maxWidth: 140,
-        slotName: "cTermNme"
+        slotName: "cTermNme",
+        align: 'left',
+        width: 112,
     },
     {
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
-        minWidth: 90,
-        slotName: "nAmt"
+        width: 105,
+        slotName: "nAmt",
+        align: 'left',
     },
     {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
-        minWidth: 90,
+        width: 95,
         prefix: "¥ ",
-        slotName: "nPrm"
+        slotName: "nPrm",
+        align: 'left'
     },
     {
         prop: "tIssueTm",
         inputtype: "rtinput",
         title: "签单日期",
-        minWidth: 150,
+        width: 140,
         sortable: true,
         slotName: "tIssueTm"
     },
@@ -1013,7 +1029,7 @@ const normalQueryColumns = [
         prop: "InsurancePeriod",
         inputtype: "rtinput",
         title: "保险期间",
-        minWidth: 180,
+        width: 140,
         slotName: "InsurancePeriod"
     },
     {
@@ -1021,6 +1037,8 @@ const normalQueryColumns = [
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 120,
+        width: 105,
+        align: "left",
         loadData: [
             { label: "暂存", value: "1" },
             { label: "已提核", value: "2" },
@@ -1048,6 +1066,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批改序号",
         maxWidth: 120,
+        width: 70,
         slotName: "nEdrPrjNo"
     },
     {
@@ -1056,21 +1075,23 @@ const normalQueryColumns = [
         title: " 批改原因",
         minWidth: 180,
         typeCode: "EDR_RSN_LIST_KIND",
+        align: 'left',
+        width: 120,
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true },
-  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', minWidth: 180, optional: true, sortable: true},
-  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', minWidth: 180, optional: true, sortable: true, slotName: "tUdrTm" },
-  { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', minWidth: 180, optional: true },
-  { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', minWidth: 180, optional: true },
-  { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', minWidth: 180, optional: true },
-  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', minWidth: 180, optional: true },
-  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', minWidth: 180, optional: true },
-  { prop: 'cOprCde', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true },
-  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme"},
-  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true },
+  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 170, },
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 140, optional: true, sortable: true},
+  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 140, optional: true, sortable: true, slotName: "tUdrTm" },
+  { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', width: 140, optional: true, align: 'left', },
+  { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', width: 140, optional: true, align: 'left', },
+  { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', width: 140, optional: true, align: 'left', },
+  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
+  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 100, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
+  { prop: 'CSlsNme', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left',width: 61, },
+  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme", align: 'left',width: 61,},
+  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true,width:90},
   { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
 ];
 
@@ -1081,8 +1102,9 @@ const tableObj = {
         defaultSort: { prop: 'tCrtTm', order: 'descending' },
         defaultSort: { prop: 'tUdrTm', order: 'descending' },
         tableBtnType: "btn",
-        tableBtnWidth: 150,
+        tableBtnWidth: 95,
         tableBtnPosition: "right",
+        rowDbClickFun: (row:any) => handleRowDoubleClick(row),
         tableBtn: [
             createFreeButtonBase({
                 id: "score",
@@ -1251,7 +1273,7 @@ onMounted(async () => {
     // 检测首页跳转并加锁
     const hasJumpData = sessionStorage.getItem(AppKey.query.pcis_query_search);
     if (hasJumpData) {
-        isJumpingFromHome.value = true;
+        isJumpingFromHome.value = true;  // 加锁，避免 cAppTyp.func 再触发
     }
     formconfig1.fromSchema?.forEach((item) => {
         if (
@@ -1293,9 +1315,18 @@ onMounted(async () => {
     } else {
         checkedProps = normalQueryColumns.map(c => c.prop); // 默认列
     }
-    applyCheckedColumns(checkedProps);
+    await applyCheckedColumns(checkedProps);
     // 判断用户出单岗 or 核保岗 // 出单岗 ROLE_00000008 ROLE_00000563  // 核保岗 ROLE_00000152
     updateCopyBtnVisible();
+
+    // 首页跳转过来时需要查
+    if (hasJumpData) {
+        const { CAppNo } = JSON.parse(hasJumpData);
+        setValue("cQueryStr", CAppNo);      
+        await handleQuery(true, true);         // ← 首页跳转只查 1 次
+        isJumpingFromHome.value = false;
+        sessionStorage.removeItem(AppKey.query.pcis_query_search);
+    }
 });
 
 onUnmounted(() => {
@@ -2036,6 +2067,22 @@ function handleDelete(row: any) {
       console.log(err);
     });
 }
+// table表格的双击事件
+const handleRowDoubleClick = (row:any) => {
+    if (
+        row.cAppStatus != "1" &&
+        row.cAppStatus != "3" &&
+        row.cAppStatus != "8"
+    ) {
+       const data = row;
+        router.push({
+            path: "/pcisapp/myPage",
+            query: {
+                param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
+            },
+        });
+    }
+};
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -2116,27 +2163,17 @@ async function applyCheckedColumns(props: string[]) {
         fromSchema: finalColumns
     };
 
-    Object.assign(tableconfig, newConfig);
-    
-    // 首页跳转过来查询条件赋值并查询
-    const hasJumpData = sessionStorage.getItem(AppKey.query.pcis_query_search);
-    if (hasJumpData) {
-        setValue("cQueryStr", JSON.parse(hasJumpData).CAppNo);
-        await handleQuery(true, true);
-        isJumpingFromHome.value = false;
-        sessionStorage.removeItem(AppKey.query.pcis_query_search);
-    }else{
-        await handleQuery(true);
-    }
+    Object.assign(tableconfig, newConfig); 
 }
 
-function formatTwoLine(text) {
+function formatTwoLine(text, num=7) {
   if (!text) return '';
   const len = text.length;
-  if (len <= 13) {
-    return `${text.slice(0, 7)}<br/>${text.slice(7)}`;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
   }
-  return `${text.slice(0, 7)}<br/>${text.slice(7, 13)}…`;
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
 }
 
 function setValue(key: string, value: any) {
@@ -2180,4 +2217,14 @@ defineExpose({
 /* :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 } */
+:deep(.el-button-group .el-button) {
+    font-size: 16px;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
+}
 </style>

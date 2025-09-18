@@ -260,13 +260,14 @@ defineExpose({
 
 <style scoped>
 :deep(.el-card__header) {
-  background-color: #e5f3fa;
-  padding: 15px 20px;
+  height: 32px;
+  padding: 4px 0 4px 12px;
+  background: #ffffff;
 }
 
 .searchbar {
   border: 1px solid #ddd;
-  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+  /* box-shadow: 0 0 2px rgb(0 0 0 / 30%); */
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */

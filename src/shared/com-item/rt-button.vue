@@ -34,6 +34,7 @@
             backgroundColor: item.buttonColor,
             borderColor: item.buttonColor,
             ...style,
+            ...item.btnStyle,
           }"
               @click="visible = !visible"
           >
@@ -88,6 +89,7 @@
           backgroundColor: item.buttonColor,
           borderColor: item.buttonColor,
           ...style,
+          ...item.btnStyle,
         }"
             @click="handleChange"
         >
@@ -134,6 +136,7 @@
         backgroundColor: item.buttonColor,
         borderColor: item.buttonColor,
         ...style,
+        ...item.btnStyle,
       }"
           :loading="item.loading"
           @click="handleChange"
