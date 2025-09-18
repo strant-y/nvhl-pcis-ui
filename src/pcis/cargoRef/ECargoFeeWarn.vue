@@ -43,7 +43,7 @@ const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
-const initFlag = computed(() => formPage.init);
+const initFlag = computed(() => param?.type ==='add' ? false : formPage.init);
 onMounted(() => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),
@@ -143,8 +143,7 @@ const method = {
     }
   },
   cReceivedRmbChange:(val:any)=>{
-    debugger
-    console.log('param',param)
+    console.log('param',initFlag.value)
     if(initFlag.value) return
     if (val !== "CNY") {
       codeListStore
@@ -198,6 +197,7 @@ const method = {
     }
   },
   nWhAmtChange:(val:any)=>{
+    if(initFlag.value) return
     if(val && getValue('ECargoBase.nWhAmtRmbExch')){
       setValue('ECargoBase.nWhRmbAmt',val * getValue('ECargoBase.nWhAmtRmbExch'))
       if(getValue('ECargoBase.nRmbAmt')){
@@ -237,6 +237,7 @@ const method = {
     }
   },
   nWhAmtRmbExchChange:(val:any)=>{
+    if(initFlag.value) return
     if(val && getValue('ECargoBase.nWhAmt')){
       setValue('ECargoBase.nWhRmbAmt',val * getValue('ECargoBase.nWhAmt'))
       if(getValue('ECargoBase.nRmbAmt')){
