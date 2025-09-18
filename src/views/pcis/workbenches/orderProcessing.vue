@@ -518,7 +518,7 @@ const tableconfig = reactive<AppTableConfig>(
           // 询价转投保按钮只在状态为"已出保单"时可见
           if (
             row.taskStatus == "5" &&
-            row.canConvert === "1" &&
+            row.canConvert == "1" &&
             row.baseType === "询价"
           ) {
             return false;
