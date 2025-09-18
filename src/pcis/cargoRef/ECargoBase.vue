@@ -237,17 +237,33 @@ const method = {
   funcquery: () => {},
 
   cCiMrkChange: (val: string) => {
-    idxParam.ciJiMrk = val;
-    const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
-    if(ciAgreementECargo) {
-      ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
+    if(val == "0" || val == "3" || val =="4"){
+      idxParam.ciJiMrk = val;
+      const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
+      if(ciAgreementECargo) {
+        ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
+      }
+      const cargoCiRef = formPage.getComponentRefById('AgreementCi');
+      if (!!cargoCiRef) {
+        cargoCiRef.initCiInfo({
+          cCiMrk: val
+        });
+      }
+    }else{
+      setValue("ECargoBase.cCiMrk","")
+      return 	ElMessage.warning("所选联共保类型暂时不支持出单业务");
     }
-    const cargoCiRef = formPage.getComponentRefById('AgreementCi');
-    if (!!cargoCiRef) {
-      cargoCiRef.initCiInfo({
-        cCiMrk: val
-      });
-    }
+    // idxParam.ciJiMrk = val;
+    // const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
+    // if(ciAgreementECargo) {
+    //   ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
+    // }
+    // const cargoCiRef = formPage.getComponentRefById('AgreementCi');
+    // if (!!cargoCiRef) {
+    //   cargoCiRef.initCiInfo({
+    //     cCiMrk: val
+    //   });
+    // }
   },
   getcDptCde:(val:any)=>{
     dzmodal
