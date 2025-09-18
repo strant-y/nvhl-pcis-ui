@@ -3179,11 +3179,11 @@ const submitToUndrFn = async () => {
     }
 
     //040005 校验 地址清单学校人数与 清单 同学校人数校验
-    const result = await validateSchoolPersonWithApi(props.param);
-    if (!result.isValid) {
-      ElMessage.error(result.errorMessages[0]);
-        return false;
-    }
+    // const result = await validateSchoolPersonWithApi(props.param);
+    // if (!result.isValid) {
+    //   ElMessage.error(result.errorMessages[0]);
+    //     return false;
+    // }
 
   // 判断应收保费是否同保费相同
   let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
