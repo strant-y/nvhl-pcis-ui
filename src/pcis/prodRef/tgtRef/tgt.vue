@@ -196,7 +196,7 @@ const handelGoodsMx = (val: any) => {
   console.log(val)
   if (val.length > 0) {
     // setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
-    // setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
+    setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
     // setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
     // setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
     // setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
