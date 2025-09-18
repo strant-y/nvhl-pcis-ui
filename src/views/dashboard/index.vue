@@ -409,6 +409,7 @@ const {
   getInquiryNewUdrList,
   backInquiryUdrList,
   getBaseInfoByInquiryNo,
+  withdraw,
 } = NewUdrListService();
 import { SCENE_PLY_APP_MODIFY_BOUNCED } from "@/constants/tab-constants";
 import {
@@ -557,7 +558,7 @@ Object.keys(tableObj).forEach((i: any) => {
               const param = {
                 cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
                 cAppNo: row.cAppNo, // 申请单号
-                cPlyNo: row.plyNo, // 保单号
+                cPlyNo: row.cPlyNo, // 保单号
                 nEdrPrjNo: row.nEdrPrjNo, // 批改序号
               };
               const delRisk =
@@ -584,6 +585,52 @@ Object.keys(tableObj).forEach((i: any) => {
               }
             });
           });
+        },
+      }),
+    ]
+  }
+  if(i === "submittedObj") {
+    tableBtnObj['tableBtnPosition'] = "right"
+    tableBtnObj['fixed'] = true
+    tableBtnObj['tableBtnWidth'] = 40
+    tableBtnObj['tableBtn'] = [
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "撤回",
+        type: "success",
+        size: "large",
+        icon: "return",
+        hideBtns: (row: any) => {
+          if (row.taskStatus == "已提核" && row.hasReceived === "未接收") {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          const { cAppNo, curtTask } = row;
+          const param = {
+            taskId: curtTask,
+            appNo: cAppNo,
+            user: user,
+          };
+          withdraw(param)
+            .then((result: any) => {
+              if (result.code !== 200) {
+                ElMessage.error({ message: result.msg, duration: 3000 });
+              } else {
+                if (result.msg === "撤回成功!") {
+                  ElMessage.success({ message: result.msg, duration: 3000 });
+                  getIssueTableData();
+                } else {
+                  ElMessage.warning({ message: result.msg, duration: 3000 });
+                }
+              }
+            })
+            .catch((error: any) => {
+              ElMessage.error({ message: error.msg, duration: 3000 });
+            });
         },
       }),
     ]
@@ -2802,5 +2849,8 @@ window.addEventListener("resize", () => {
       width: 98px;
     }
   }
+}
+:deep(.methodColumn) {
+  grid-template-columns: repeat(1, 1fr);
 }
 </style>
