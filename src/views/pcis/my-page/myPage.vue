@@ -4872,9 +4872,9 @@ const submitUnderwritingFn = async () => {
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           if(props.param?.pageName === "priceInquiry") {
-            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
           } else {
-            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/PendUdrListQuery" });
           }
         });
       }
