@@ -21,6 +21,7 @@
                   : formUi.span
             "
             v-if="!item.group"
+            style="padding-left: 5px;padding-right:5px;"
           >
             <template v-if="item.inputtype === 'rtButton'">
               
@@ -54,13 +55,13 @@
                             :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑 
                             " >
                 <template #label>
-                   <template v-if="item.title?.length > 5">
+                   <template v-if="item.title?.length > (item.labelLength || 10)">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 5) + "..." }}
+                      {{ item.title.substring(0, item.labelLength || 10) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -105,16 +106,16 @@
                 :label-position="
                   item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
                 "
-                :label-width=" maxLabelWidth + 'px'"
+                :label-width="formUi.labelWidth ? formUi.labelWidth : maxLabelWidth + 'px'"
               >
                 <template #label>
-                   <template v-if="item.title?.length > 7">
+                   <template v-if="item.title?.length > (item.labelLength || 10)">
                     <el-tooltip
                       effect="dark"
                       :content="item.title"
                       placement="top-start"
                     >
-                      {{ item.title.substring(0, 7) + "..." }}
+                      {{ item.title.substring(0, item.labelLength || 10) + "..." }}
                     </el-tooltip>
                   </template>
                   <template v-else>
@@ -145,7 +146,7 @@
                     >
                       <rt-button
                         :item="item.btnItems"
-                        :style="{ width: '100%' }"
+                        :style="{ width: item.btnItems.label ? '100%' : '32px' }"
                         @closepopover="(rev) => setPopover(rev, item)"
                       />
                     </div>
@@ -265,13 +266,13 @@
                     :label-width=  "maxLabelWidth + 'px'"
                   >
                     <template #label>
-                      <template v-if="item.title?.length > 7">
+                      <template v-if="item.title?.length > (item.labelLength || 10)">
                         <el-tooltip
                           effect="dark"
                           :content="item.title"
                           placement="top-start"
                         >
-                          {{ item.title.substring(0, 7) + "..." }}
+                          {{ item.title.substring(0, item.labelLength || 10) + "..." }}
                         </el-tooltip>
                       </template>
                       <template v-else>
@@ -302,7 +303,7 @@
                         >
                           <rt-button
                             :item="item.btnItems"
-                            :style="{ width: '100%' }"
+                            :style="{ width: '32px' }"
                             @closepopover="(rev) => setPopover(rev, item)"
                           />
                         </div>
@@ -332,11 +333,11 @@ const updateLabelWidth = () => {
   if (screenWidth < 768) {
     // maxLabelWidth.value = "80px"; // 移动端窄屏
   } else if(screenWidth > 1367 && screenWidth <= 1600) {  /*主流笔记本	1367px - 1600px*/
-     maxLabelWidth.value = "150"; // PC 端宽屏
+     maxLabelWidth.value = "180"; // PC 端宽屏
   }else if(screenWidth > 1601 && screenWidth <= 1920) { /*大屏笔记本/台式机*/
-    maxLabelWidth.value = "170"; // PC 端宽屏
-  }else if(screenWidth > 1921 && screenWidth <= 3840) {
     maxLabelWidth.value = "200"; // PC 端宽屏
+  }else if(screenWidth > 1921 && screenWidth <= 3840) {
+    maxLabelWidth.value = "230"; // PC 端宽屏
   }
 };
 
@@ -444,7 +445,8 @@ function setPopover(v: any, item: any) {
   setValue(item.prop, v);
 }
 
-function setRuleType(rules: any ,schema: any) {
+function setRuleType(irules: any ,schema: any) {
+  let rules = irules;
   if(schema.group){ // 如果群组整个被隐藏,则不再进行校验
     const uicf = props.fromUi.groupBy.filter((g)=>g.id === schema.group);
     let h = false;
@@ -482,7 +484,7 @@ function setRuleType(rules: any ,schema: any) {
         });
       }
     }else{
-      if(typeof form[schema['prop']] === 'number'){
+      if((typeof form[schema['prop']]) === 'number'){
         if (rules && rules.length > 0) {
           rules.forEach((item: any) => {
             item.type = "number";
@@ -871,14 +873,17 @@ defineExpose({
 
 <style lang="css" scoped>
 .rt_group {
-  background: #f2f2f2;
-  margin-bottom: 10px;
+  /* margin-bottom: 5px; */
+  /* background: #FAFAFA; */
+  /* border: 1px solid #D9D9D9; */
+  padding: 0px 12px;
 }
-/* .rt_group_title {
-  font-weight: bold;
-  font-size: 16px;
-  padding: 12px;
-} */
+.rt_group_title {
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(0,0,0,0.85);
+  line-height: 24px;
+}
 .rt_group_icon {
   float: right;
   margin-right: 10px;

@@ -477,6 +477,8 @@ import { distRequiredMap } from '../my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { ElTable, ElTableColumn } from 'element-plus';
+import {pageMethod} from "./pageMethod";
+import {imageMethod} from "./imageMethod";
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/limitDetails.vue")
@@ -2227,7 +2229,20 @@ async function loadAfter() {
     bthList.value = basicBtn;
     rightBtnList.value = basicRightBtn;
   }
-
+  let imageStr = '影像管理';
+  if(pageMethod.isReadOnlyScene(opertaor)){
+    imageStr = '影像查看';
+  }
+  bthList.value.push(
+      // {isdivider: true},  //间隔符
+      createFreeButtonBase({
+        label: imageStr,
+        type: "success",
+        func: () => {
+          imageMethod.showImage(opertaor);
+        },
+      }),
+  )
   bthList.value.push(
     createFreeButtonBase({
       label: "返回",
@@ -4382,9 +4397,9 @@ const submitUnderwritingFn = async () => {
           "path": "/pcisapp/myPage",
           "fullPath": "/pcisapp/myPage"}).then((res: any) => {
           if(props.param?.pageName === "priceInquiry") {
-            router.replace({ path: "/pcis-new-udr-list/InquiryUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
           } else {
-            router.replace({ path: "/pcis-new-udr-list/PendUdrList" });
+            router.replace({ path: "/pcis-new-udr-list/PendUdrListQuery" });
           }
         });
       }
@@ -5200,7 +5215,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   }
 }
 :deep(.el-card__header) {
-  padding: 10px 20px!important;
+  // padding: 10px 20px!important;
   .el-row {
     align-items: center;
     &:first-child {
@@ -5214,7 +5229,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   font-weight: 500;
 }
 :deep(.el-card__body) {
-  padding: 10px 20px;
+  padding: 5px 10px;
 }
 
 .right-sidebar-trigger {

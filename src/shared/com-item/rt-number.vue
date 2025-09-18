@@ -24,6 +24,7 @@
           :controls="item.controls ? item.controls : false"
           controls-position="right"
           @change="handleChange"
+          :style="{maxWidth: item.maxWidth || ''}"
       >
         <template #prefix v-if="item.prefix">
           <span>{{ item.prefix }}</span>
@@ -150,5 +151,8 @@ defineExpose({
 }
 ::v-deep .el-input__inner {
   text-align: left !important;
+}
+:deep(.el-input__wrapper) {
+  padding: 1px 5px!important;
 }
 </style>

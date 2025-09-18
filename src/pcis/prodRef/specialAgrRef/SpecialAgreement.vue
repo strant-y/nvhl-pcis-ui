@@ -261,7 +261,6 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 const addData =()=>{
-  // debugger;
   let obj = [];
   let isAdd = true;
     formData.value.forEach((item)=>{
@@ -270,6 +269,7 @@ const addData =()=>{
       }
     })
     if(isAdd){
+         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
       obj =[...formData.value, { 
         addIndex: 1,
         cIfEdit: "0",

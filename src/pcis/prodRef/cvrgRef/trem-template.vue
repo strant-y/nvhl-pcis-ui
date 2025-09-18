@@ -4,7 +4,7 @@
       <el-card class="cvrg-info">
         <template #header v-if="effectiveShowConf.showHeader">
           <div class="cvrg-hearder">
-            <el-row style="margin-top: 5px;">
+            <el-row>
               <el-col :span="10">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
@@ -12,26 +12,26 @@
                     <el-icon v-if="showData"><ArrowDownBold /></el-icon>
                   </a>
 
-                  <template v-if="effectiveShowConf.showPlanNo">
-                    {{termdata['Term.cPlanNo']}}方案
-                  </template>
-                  <template v-else>
-                    <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
+                  <!-- <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
                     term.cRdrTyp === "0" ? "主" : "附加"
-                  }}</el-tag>
-                  </template>
+                  }}</el-tag> -->
+                  <div :class="['cvrg-hearder-main-title',term.cRdrTyp === '0' ? 'zhu' : 'fu']">
+                    <img :src="term.cRdrTyp === '0' ? '/src/assets/img/zhu.png' : '/src/assets/img/fu.png'" alt="" srcset="">
+                    <span>{{ term.cNmeCn }}</span>
+                  </div>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
-                    <el-badge value="退" class="item">
+                    <!-- <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                    </el-badge>
+                    </el-badge> -->
                   </template>
                   <template v-else>
-                    <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
+                    <!-- <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag> -->
                     <el-tooltip content="下载条款" placement="top">
                       <el-button
                         type="text"
                         @click="downloadTerm"
                         style="margin-right: 5px"
+                        size="small"
                       ><rt-icon :item="{ icon: 'term' }" />
                     </el-button>
                     </el-tooltip>
@@ -40,6 +40,7 @@
                         type="text"
                         @click="previewTerm"
                         style="margin-right: 5px"
+                        size="small"
                       ><rt-icon :item="{ icon: 'View' }" />
                     </el-button>
                     </el-tooltip>
@@ -84,10 +85,10 @@
         <div v-show="showData">
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
-              <table style="width: 100%">
+              <table style="width: 50%;margin-left: 100px;">
                 <thead>
                   <tr class="table-title">
-                    <th>{{ termTitleConf.cFactorTabTitle }}</th>
+                    <th width="300">{{ termTitleConf.cFactorTabTitle }}</th>
                     <th>{{ termTitleConf.cFactorTabValue }}</th>
                   </tr>
                 </thead>
@@ -97,7 +98,7 @@
                       <td
                       :class="{
                           'custom-indent':item.cPropIndent === '1',
-                      }">
+                      }" class="text-indent">
                         <el-text
                           v-if="isrequired(item)"
                           class="mx-1"
@@ -229,6 +230,7 @@
                       v-for="col in getColinfo(ginfo.cGroupId)"
                       :key="col.cColId"
                       :width="col.cColWidth ? col.cColWidth : null"
+                      :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
                     >
                       {{ col.cColTitle }}
                     </th>
@@ -413,6 +415,10 @@ const props = defineProps({
   },
   rowIndex: {
     type: [Number, String],
+  },
+  showHeader: {
+    type: Boolean,
+    default: true,
   },
   showConf: {
     type: Object,
@@ -664,8 +670,6 @@ function getRowConfig(groupId: string, riskNo: string) {
         let deter = null;
         if (tgt) {
           deter = tgt.getValue("Tgt.cDeterminingMethod");
-        }else{
-          deter = "1";
         }
         if (deter && deter === "1") {
           if (colconfig["cRiskNo"] === "040042") {
@@ -1059,7 +1063,11 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(termdata.value[item.prop] === null || termdata.value[item.prop] === undefined){
-      termdata.value[item.prop] = '1';
+      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" || pageparam.cProdNo === "040002" ){
+        termdata.value[item.prop] = '1';
+      }else{
+        termdata.value[item.prop] = '0';
+      }
       return true;
     }
   }
@@ -1204,21 +1212,14 @@ function exChangeFunc() {
     }
     
   }
-  let deter = null;
    // 040002个性化配置
   if (pageparam.cProdNo === "040002") {
-    if(data["tgt"]){
-      deter = data["tgt"]["Tgt.cDeterminingMethod"];
-      
-    }else{
-      deter = "0";
+    if (data["tgt"]["Tgt.cDeterminingMethod"]) {
+      if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
+        const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
+        colInfo.value = col;
+      }
     }
-
-    if (deter === "0") {
-      const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
-      colInfo.value = col;
-    }
-    
   }
 }
 
@@ -1263,7 +1264,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  if(pageparam.cEdrType && !props.modelValue['Term.cRowId'] && opertaor.isEditScene()){
+  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
   }
@@ -1556,18 +1557,47 @@ defineExpose({
 </script>
 <style lang="scss" scoped>
 .cvrg-info {
+  background: #FAFAFA;
+  box-shadow: none;
+  border: none;
+  --el-card-border-color: transparent;
+  padding: 10px 20px;
   :deep(.el-card__header) {
-    background-color: #eff3f5;
+    // background-color: #eff3f5;
     padding: 5px 10px;
+    background: transparent;
   }
   :deep(.el-card__body) {
     padding: 5px 10px;
   }
+  .cvrg-hearder-main-title {
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    padding: 2px 10px;
+    &.zhu {
+      background: linear-gradient( 180deg, rgba(58, 118, 198, .1) 0%, rgba(57, 117, 198, .1) 100%);
+      color: #3A76C6;
+    }
+    &.fu {
+      background: rgba(198, 105, 58, 0.1);
+      color: #C6693A;
+    }
+    img {
+      width: 16px;
+      height: 18px;
+    }
+    span {
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
 }
 .table-title {
-  background-color: #e6e6e6;
+  // background-color: #e6e6e6;
   th {
     text-align: center;
+    background: rgba(0,0,0,0.04);
   }
 }
 table {
@@ -1578,13 +1608,13 @@ table {
   margin-bottom: 0px;
 }
 .custom-indent {
-  padding-left: 30px; /* 空三格 */
+  padding-left: 60px; /* 空三格 */
   position: relative;
 }
 .custom-indent::before {
-  content: "-";
+  content: "其中：";
   position: absolute;
-  left: 10px;
+  left: 20px;
 }
 
 .custom-left {
@@ -1607,5 +1637,11 @@ td {
 
 .selected {
   background-color: rgba(146, 209, 232, 0.5) !important;
+}
+:deep(.el-input__inner) {
+  text-align: right!important;
+}
+:deep(.el-input) {
+  --el-input-inner-height: 24px;
 }
 </style>

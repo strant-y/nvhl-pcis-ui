@@ -43,6 +43,7 @@ const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
+const initFlag = computed(() => formPage.init);
 onMounted(() => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),

@@ -444,7 +444,6 @@ const method = {
 
     const res = await deleteDistCheck(param);
     const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
-
     ElMessageBox.confirm(
         checkMsg,
         "提示",
@@ -459,6 +458,10 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+          const cvrgRef = opertaor.getTableRefs()['cvrg'];
+          if(cvrgRef) {
+            cvrgRef.refushCvrgInfo();
+          }
         } else {
           ElMessage.error(res.msg);
         }

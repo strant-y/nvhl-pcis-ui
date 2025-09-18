@@ -1,5 +1,6 @@
 <template>
   <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -21,12 +22,12 @@ import {
   getChaSubtypList,
   // getPageList,
 } from "@/api/code-list-service";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 
- 
+
 const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
 // const tabref2 = opertaor.getTableRefByKey("permissionAllo");
 
@@ -34,6 +35,10 @@ const dzmodal = useDzModal();
 const orderIssuer = defineAsyncComponent(() => import("./OrderIssuer.vue"));
 const salesman = defineAsyncComponent(() => import("./Salesman.vue"));
 const agent = defineAsyncComponent(() => import("./Agent.vue"));
+// import agentWorker from "./commodityRef/agentWorker.vue" //代理业务员
+const agentWorker = defineAsyncComponent(() => import("./agentWorker.vue"));//代理业务员
+
+
 const departmentTree = defineAsyncComponent(
   () => import("./DepartmentTree.vue")
 );
@@ -41,6 +46,9 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 
 const { getRules } = useValidator();
 
@@ -90,7 +98,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
-                console.log('row',res)
                 if (res.type === "ok") {
                   const selectObj = res.body;
                   freeEditRef.value.setValue(
@@ -160,7 +167,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .open(departmentTree, { type: "Issuer", data: {} })
               .then((res) => {
                 if (res.type === "ok") {
-                  
+
                   const selectObj = res.body;
                   freeEditRef.value?.setValue(
                     "cDptCde",
@@ -192,11 +199,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
-  
+
             // const ck = freeEditRef.value?.getValue("componentGroup");
             dzmodal
               .open(orderIssuer, { type: "Issuer", data: {} })
-              .then((res:any) => {
+              .then((res: any) => {
                 if (res.type === "ok") {
                   const selectObj = res.body;
                   freeEditRef.value?.setValue(
@@ -229,15 +236,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           icon: "Search",
           type: "primary",
           func: () => {
- 
-              let cDptCde = getValue('cDptCde');
-              if(!cDptCde){
-                ElMessage.warning('出单机构不能为空！')
-                return false;
-              }
- 
-            dzmodal.open(salesman, { type: "sales", data: {...tabref.getFromValue(),...getFromValue()} }).then((res) => {
-              console.log('业务员',res)
+
+            let cDptCde = getValue('cDptCde');
+            if (!cDptCde) {
+              ElMessage.warning('出单机构不能为空！')
+              return false;
+            }
+
+            dzmodal.open(salesman, { type: "sales", data: { ...tabref.getFromValue(), ...getFromValue() } }).then((res) => {
               if (res.type === "ok") {
                 const selectObj = res.body;
                 setFormItem("cSlsId", {
@@ -273,20 +279,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           func: () => {
             // const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
             // 请先保存商品信息
-              let cProdNo= tabref.getValue('cProdNo')
-              console.log(cProdNo)
-              if(!cProdNo){
-                ElMessage.warning('请先保存商品信息！')
-                return false;
-              }
-              let cDptCde = getValue('cDptCde');
-              if(!cDptCde){
-                ElMessage.warning('出单机构不能为空！')
-                return false;
-              }
-            
-            dzmodal.open(agent, { cProdNo:cProdNo, type: "sales", data: getFromValue() }).then((res) => {
-          
+            let cProdNo = tabref.getValue('cProdNo')
+            console.log(cProdNo)
+            if (!cProdNo) {
+              ElMessage.warning('请先保存商品信息！')
+              return false;
+            }
+            let cDptCde = getValue('cDptCde');
+            if (!cDptCde) {
+              ElMessage.warning('出单机构不能为空！')
+              return false;
+            }
+
+            dzmodal.open(agent, { cProdNo: cProdNo, type: "sales", data: getFromValue() }).then((res) => {
+
               if (res.type === "ok") {
                 const selectObj = res.body;
                 freeEditRef.value.setValue(
@@ -307,6 +313,66 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
       },
+
+      {
+        // prop: "cSlsId",
+        prop: "cBrkSlsCde",
+        inputtype: "rtselect",
+        title: "代理业务员",
+        btnWidth: 20,
+        itemWidth: 2,
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            let CDptCde = getValue('cDptCde');
+            if (!CDptCde) {
+              ElMessage.warning('出单机构不能为空！')
+              return false;
+            }
+            dialog.value?.open(
+              "agentWorker",
+              {
+                type: "show",
+                data: {
+                  CDptCde,
+                },
+                method: {
+                  getSelected: (params: any) => {
+                    const codeValData = params["CSlsCde"]
+                    if (codeValData) {
+                      const selectObj = params;
+                      setValue(
+                        "cBrkSlsCde",
+                        selectObj.CSlsCde
+                      );
+                      setFormItem("cBrkSlsCde", {
+                        loadData: [
+                          {
+                            // label: selectObj.CSlsNme + ' ' + selectObj.CSlsCde,
+                            label: selectObj.CSlsNme ,
+                            value: selectObj.CSlsCde,
+                          },
+                        ],
+                      });
+                    }
+                    dialog.value?.handleClose();
+                  },
+                },
+              },
+              {
+                isOk: (selectdata: any) => {
+                  console.log("a", selectdata);
+                },
+              },
+              { title: "业务员", width: 85 }
+            );
+          },
+        },
+      },
+      {},
+
       {
         prop: "cAgtAgrNo",
         inputtype: "rtinput",
@@ -360,9 +426,8 @@ const queryCBsnsTyp = (category) => {
 // 查询  渠道中类
 const queryChaTypeList = (val: any) => {
 
-  getChaTypeList({ BsnsTyp: val ,scene:'' }).then((res) => {
+  getChaTypeList({ BsnsTyp: val, scene: '' }).then((res) => {
     const { code, data, msg } = res;
-    console.log(res)
     if (code === 200) {
       setFormItem("cChaType", {
         loadData: data
@@ -378,7 +443,7 @@ const queryCChaSubtype = (val: any) => {
   const param = {
     CChaType: val,
     flag: 1,
-    scene:''
+    scene: ''
   };
   getChaSubtypList(param).then((res) => {
     const { code, data, msg } = res;
@@ -400,7 +465,7 @@ onMounted(() => {
   }
 
 
-  if (param.editType!== 'add'  &&  param.editType!== 'edit' && param.editType) {
+  if (param.editType !== 'add' && param.editType !== 'edit' && param.editType) {
     // handleQuery();
     // setDisa();
     freeEditRef.value?.setDisabledAll();
@@ -428,7 +493,7 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
+        } else {
           Object.assign(item, obj);
         }
       }
