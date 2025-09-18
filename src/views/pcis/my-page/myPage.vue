@@ -196,8 +196,8 @@
           <div class="tp" style="background: #ebedfc">
             <span>条款：</span
             ><span class="publicStyle"
-              >{{ props.param.cTermNo }}&nbsp;&nbsp;{{
-                props.param.cTermNme
+              >{{ props.param.pageType === "orig" ? (props.param?.xbtn || '') : props.param.cTermNo }}&nbsp;&nbsp;{{
+              props.param.pageType === "orig" ? (props.param?.xbtm || '') : props.param.cTermNme
               }}</span
             >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span
             ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
@@ -3673,6 +3673,9 @@ const getPlyPolicyFun = () => {
             cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
             cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
             cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
+            // cTermNme: res["res"]["composition"]["cvrg"][0]["Term.cClauseName"],
+            // cTermNo: res["res"]["composition"]["cvrg"][0]["Term.cClauseCode"],
+            // cPolicySource:res["res"]["composition"]["plyBase"][0]["Base.cPolicySource"],
             pageType: "readonly",
             showBtn: false,
           })

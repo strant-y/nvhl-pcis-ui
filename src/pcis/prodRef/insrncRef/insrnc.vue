@@ -215,6 +215,9 @@ const method = {
   },
 
   bgnTmFn: (v:any) => {
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否是初始化状态
+    if (isInit) return;
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref?.["insrnc"].getFromValue();
     const startDate = dayjs(v); // 新的开始时间（v是用户选择的开始时间）
