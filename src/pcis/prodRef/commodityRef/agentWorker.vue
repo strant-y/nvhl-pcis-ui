@@ -156,8 +156,7 @@ function handleQuery(flag?: boolean) {
     const user = JSON.parse(sessionStorage.getItem("user"));
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
-    console.log('参1111‘',props.data)
-    console.log('参2222‘',routeParam)
+
     const param = Object.assign(s, r);
     const params = Object.assign(param,{
         CurrentUser: user.opCde,
@@ -174,8 +173,6 @@ function handleQuery(flag?: boolean) {
 
     });
 
-    console.log('param',param, params)
-    console.log('param', props.data.data['CDptCde'])
     policyService.getWebOrgSelsList(params).then((res: any) => {
       if (res && res["code"] === 200) {
         const pageData = res.data;
@@ -188,7 +185,6 @@ function handleQuery(flag?: boolean) {
 }
 
 onMounted(() => {
-    console.log('param', props.data)
     console.log('param', props.data)
     nextTick(() => {
         // setValue('CDptCde', props.data.data.CDptCde)

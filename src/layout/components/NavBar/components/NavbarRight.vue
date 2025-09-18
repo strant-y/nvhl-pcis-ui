@@ -118,6 +118,8 @@
       </div>
       <template #dropdown>
         <el-dropdown-menu>
+          <el-dropdown-item @click="openShortcutEdit"> <el-icon><Menu /></el-icon>
+            <span>快捷菜单</span></el-dropdown-item>
           <el-dropdown-item @click="openDialog" v-if="userStore.user.src == null"> <el-icon><Lock /></el-icon>
             <span>修改密码</span></el-dropdown-item>
           <el-dropdown-item @click="clearRedisCache" v-if="showRedisCache">清除redis缓存</el-dropdown-item>
@@ -189,6 +191,12 @@ import { PcisQueryService } from '@/views/dashboard/service/v1.service';
 // import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 
 import { useRouter, useRoute } from "vue-router";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
+const shortMenuDialog = defineAsyncComponent(
+  () => import("@/views/dashboard/components/shortMenuDialog.vue")
+);
+import { getShortcutDataList, updateShortRoute } from "@/api/menu";
 
 
 
@@ -242,6 +250,7 @@ onMounted(() => {
     showChangeDpt.value = false;
   }
   loadData()
+  getShortMenuList()
 });
 
 
@@ -474,6 +483,27 @@ function logout() {
 const switchTab = (tab) => {
   currentTab.value = tab; // 切换当前选中的 Tab
 };
+
+const shortcutDataList = ref([])
+function getShortMenuList() {
+  getShortcutDataList().then((res: any) => {
+    if (res.code == 200) {
+      shortcutDataList.value = res.data;
+    }
+  });
+}
+const emits = defineEmits(["shortMenu"])
+
+// 编辑快捷菜单
+function openShortcutEdit() {
+  dzmodal
+    .open(shortMenuDialog, { type: "", data: shortcutDataList.value })
+    .then((res: any) => {
+      if (res.type === "ok") {
+        emits("shortMenu")
+      }
+    });
+}
 </script>
 <style lang="scss" scoped>
 .setting-item {
@@ -535,7 +565,7 @@ const switchTab = (tab) => {
   }
 
   .el-select__placeholder,.el-select__caret {
-    color: #FFFFFF;
+    color: #333333;
   }
 }
 

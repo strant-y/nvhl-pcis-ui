@@ -10,7 +10,27 @@
       @page-change="handleQuery(false)"
     >
       <template #column-nPrm="{ row, column, index }">
-        <span>¥ {{ row.nPrm }}</span>
+        <span>¥ {{ row.nPrm.toLocaleString() }}</span>
+      </template>
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cTermNme="{ row, column, index }">
+        <el-tooltip :content="row.cTermNme" placement="top">
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cAppNme="{ row, column, index }">
+        <el-tooltip :content="row.cAppNme" placement="top">
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cInsuredNme="{ row, column, index }">
+        <el-tooltip :content="row.cInsuredNme" placement="top">
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
+        </el-tooltip>
       </template>
     </app-table>
   </div>
@@ -405,10 +425,9 @@ const tableconfig = reactive<AppTableConfig>(
     editList: ["cStatus"],
     showSelection: true,
     tableBtnType: "btn",
-    tableBtnWidth: 150,
+    tableBtnWidth: 80,
     fixed: true,
     tableBtnPosition: "right",
-    tableBtnFixed: "right",
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -474,7 +493,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
-        iconSize:"23",
+        iconSize:"25",
         icon: "return",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
@@ -575,79 +594,109 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
-        maxWidth: 110,
-        title: "申请单类型",
+        width: 63,
+        title: "任务类型",
+        align: "left",
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
-        maxWidth: 200,
         showCopyIcon: true,
+        width: 165,
+        fixed: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
+        align: 'left',
+        width: 48,
+        formatter:(val:any) => {
+          return val?.slice(0,2)
+        }
       },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "承保机构",
-        maxWidth: 180,
+        slotName: "cDptCnm",
+        align: 'left',
+        width: 145,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
+        slotName: "cTermNme",
+        align: 'left',
+        width: 112,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
+        slotName: "cAppNme",
+        align: 'left',
+        width: 112,
       },
       {
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
+        slotName: "cInsuredNme",
+        align: 'left',
+        width: 112,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
+        align: 'left',
+        width: 95,
+        formatter:(val:any) => {
+          return val.toLocaleString()
+        }
       },
       {
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "提核时间",
-        minWidth: 180,
         type: "datetimerange", // 显示日期和时间选择器
         format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
+        width: 135,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
-        minWidth: 180,
+        align: 'left',
+        width: 75,
       },
       {
         prop: "udrClsCde",
         inputtype: "rtinput",
         title: "当前核保级别",
         minWidth: 180,
+        align: 'left',
+        width: 150,
       },
       {
         prop: "cMinUndrCls",
         inputtype: "rtinput",
         title: "最终审核级别",
         minWidth: 180,
+        align: 'left',
+        width: 155,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
         minWidth: 150,
+        width: 65,
+        align: "left",
         loadData: [
           { label: "未接收", value: "0" },
           { label: "已接收", value: "1" },
@@ -1423,6 +1472,16 @@ function handleDelete(id?: string) {
   });
 }
 
+function formatTwoLine(text, num=7) {
+  if (!text) return '';
+  const len = text.length;
+  const maxLen = num * 2 - 1;
+  if (len <= maxLen) {
+    return `${text.slice(0, num)}<br/>${text.slice(num)}`;
+  }
+  return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
+}
+
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -1445,5 +1504,15 @@ function setFormItem(key: any, obj: any) {
 <style lang="scss" scoped>
 :deep(.el-table td.el-table__cell div.cell .el-divider--vertical:last-child) {
   display: none;
+}
+:deep(.el-button-group .el-button) {
+  width: 80px;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

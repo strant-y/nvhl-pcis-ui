@@ -35,8 +35,8 @@ const formconfig1 = reactive(createAppGridEditConfig({}));
 
 const watchSource = computed(() => {
   const data = opertaor.getDataAll();
-  const cCiMrk = data.plyBase?.['Base.cCiMrk'];
-  const nCiOwnPrm = ['1', '2', '3', '4'].includes(cCiMrk) ? data.ciMasterAgreement?.['Base.nCiOwnPrm'] : data.base?.['Base.nPrm'];
+  const cCiMrk = data.plyBase?.['Base.cCiMrk']; 
+  const nCiOwnPrm = ['1', '2', '3', '4'].includes(cCiMrk) ? parseInt( data.ciMasterAgreement?.['Base.nCiOwnPrm']).toFixed(2): parseInt( data.base?.['Base.nPrm']).toFixed(2) ;
   // 返回“值类型”组合（而非新对象），避免引用变化导致的误触发
   return [cCiMrk, nCiOwnPrm];
 });
@@ -44,11 +44,9 @@ const watchSource = computed(() => {
 watch(
   watchSource,
   ([newCCiMrk, newNCiOwnPrm], [oldCCiMrk, oldNCiOwnPrm]) => {
+        console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
-    }
-    if (['1', '2', '3', '4'].includes(newCCiMrk) && newCCiMrk !== oldCCiMrk) {
-      // setFormItem()
     }
     nextTick(() => {
       nPrmFun();
@@ -69,14 +67,17 @@ const nPrmFun = () => {
     const result = ref<number[]>([]);
     const quotient = Math.floor(totalCent / splitCount);
     const remainder = totalCent % splitCount;
+
+
     result.value = Array(splitCount).fill(quotient);
     if (remainder > 0) {
       result.value[0] += remainder;
     }
 
-    result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(8)));
+    result.value = result.value.map(cent => parseFloat((cent / 100).toFixed(2)));
     const formArray = getFromValue();
     const limitLength = Number(data['base']['Base.nPayNum']) || 0; // 示例: 3
+  
     const modifiedArray = formArray.map((item: any, index: any) => {
       // 超出限制长度的元素：直接返回原对象（不修改）
       if (index >= limitLength) {
@@ -84,13 +85,13 @@ const nPrmFun = () => {
       }
       return {
         ...item, // 保留原有其他属性
-        "Pay.nOwnPrm": item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * nCiShare ).toFixed(8)) : 0,
+        "Pay.nOwnPrm": item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * nCiShare ).toFixed(2)) : 0,
       };
     });
 
     const cCiMrk = ['0', '5'].includes(data.plyBase?.['Base.cCiMrk']);  // 是否   联共保
     if (!cCiMrk) {
-      let num = modifiedArray.reduce((sum, item) => {
+      let num = modifiedArray.slice(0, -1).reduce((sum, item) => {
         const amount = Number(item['Pay.nOwnPrm']) || 0;
         return sum + amount
       }, 0)
@@ -98,9 +99,9 @@ const nPrmFun = () => {
       const nCiOwnPrm = data.ciMasterAgreement?.['Base.nCiOwnPrm']   // 联共保 我司保费
       let differNum = nCiOwnPrm - num || 0// 差额
 
-      modifiedArray[splitCount - 1]['Pay.nOwnPrm'] = modifiedArray[splitCount - 1]['Pay.nOwnPrm'] + differNum
+      // modifiedArray[splitCount - 1]['Pay.nOwnPrm'] = modifiedArray[splitCount - 1]['Pay.nOwnPrm'] + differNum
+      modifiedArray[splitCount - 1]['Pay.nOwnPrm'] = differNum
     }
-
     setFormValue(modifiedArray)
   }
 }
@@ -151,10 +152,6 @@ const method = {
       ElMessage.error('“缴费计划”不能超过12期！');
       return false;
     }
-
-
-
-
     payinfoEditRef?.value?.addRow();
     if (val) {
       let obj = {
@@ -166,14 +163,6 @@ const method = {
         'Pay.nOwnPrm': baseBefore['Base.nPrm'],
       }
       val[val.length - 1] = { ...val[val.length - 1], ...obj }
-      //   val.forEach((key, index) => {
-      //     key['Pay.nTms'] = index + 1
-      //     key['Pay.cPayorCde'] =applicantBefore['Applicant.cAppCde'] || null ;
-      //     key['Pay.cPayorNme'] = applicantBefore['Applicant.cAppNme'] || null;
-      //     key['Pay.tPayBgnTm'] = insrncBefore['Base.tInsrncBgnTm'];
-      //     key['Pay.tPayEndTm'] = insrncBefore['Base.tInsrncEndTm'];
-      //     // key['Pay.nOwnPrm'] = baseBefore['Base.nPrm'];
-      // });
     }
 
   },
@@ -212,11 +201,6 @@ const method = {
       getFromValue()[getFromValue().length - 1]['Pay.nOwnPrm'] = getFromValue()[getFromValue().length - 1]['Pay.nOwnPrm'] + differNum
     }
   }
-  // Pay.nPayablePrm
-  //缴费止期控制
-  // tPayEndTmDisabled: (date: any) => {
-  //   return  date.getTime() <new Date( opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncEndTm").replace(/-/g, '/')).getTime()
-  // },
 };
 
 // 绑定特殊验证器

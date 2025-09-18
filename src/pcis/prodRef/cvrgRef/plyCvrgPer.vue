@@ -152,7 +152,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
-import { qryProdRelTermRiskList } from "@/api/prod";
+import {qryProdRelTermRiskList, selectDist} from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 import { terConfig } from "@/store/modules/term-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
@@ -163,6 +163,9 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
+const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
+const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
+const pageName = computed(() => opertaor.getParam()['pageName']);
 
 const props = defineProps({
   pageSchema: {
@@ -469,6 +472,34 @@ function deleteTermByNo(t: any) {
   });
 }
 
+function refushCvrgInfo() {
+  const selData: any = {
+    cComponentTable: 'Term',
+  };
+  if(pageName.value === "priceInquiry") {
+    selData['cInquiryNo'] = cInquiryNo.value;
+  }else {
+    selData['cAppNo'] = cAppNo.value;
+  }
+  selectDist(selData).then((termRes: any) => {
+    if (termRes.code === 200) {
+      const termList = termRes.data.data;
+      selectDist({...selData, cComponentTable: 'TermRisktgt'}).then((termRisktgtRes: any) => {
+        if (termRisktgtRes.code === 200) {
+          const termRisktgtList = termRisktgtRes.data.data;
+          for (const term of termList) {
+            const riskList = termRisktgtList.filter((e: any) => e['TermRisktgt.cClauseCode'] === term['Term.cClauseCode']);
+            if(riskList) {
+              term['Term.riskList'] = [...riskList];
+            }
+          }
+          setFormValue(termList);
+        }
+      });
+    }
+  });
+}
+
 function refushData(datas: any) {
   let pd: { [key: string]: any } = {};
   datas?.forEach((item: any) => {
@@ -683,7 +714,8 @@ defineExpose({
   setDisabledAll,
   setUnDisabledByKeyList,
   calcCheck,
-  setTermData
+  setTermData,
+  refushCvrgInfo
 });
 </script>
 

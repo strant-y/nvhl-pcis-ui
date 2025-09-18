@@ -7,7 +7,7 @@
 
       <router-link v-else class="wh-full logo-title-box" to="/">
         <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
-        <span class="logo-title"> {{ defaultSettings.title }}</span>
+        <!-- <span class="logo-title"> {{ defaultSettings.title }}</span> -->
       </router-link>
     </transition>
   </div>
@@ -26,7 +26,7 @@ defineProps({
   },
 });
 
-const logo = ref(new URL(`../../../../assets/logo1.png`, import.meta.url).href);
+const logo = ref(new URL(`../../../../assets/logo2.png`, import.meta.url).href);
 </script>
 
 <style lang="scss" scoped>
@@ -34,12 +34,13 @@ const logo = ref(new URL(`../../../../assets/logo1.png`, import.meta.url).href);
   // width: 100%;
   height: $navbar-height;
   background-color: $sidebar-logo-background;
+  padding: 0 20px;
 
   .logo-image {
     // margin-bottom: 5px;
     // width: 35px;
     // height: 32px;
-    height: 100%;
+    height: 24px;
   }
 
   .logo-title {

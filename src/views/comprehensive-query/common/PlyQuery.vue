@@ -55,8 +55,18 @@
       <template #column-cAppNme="{ row }">
         <span v-html="row.cAppNme || ''"></span>
       </template>
-      <template #column-cEdrNo="{ row }">
-        <span v-html="row.cEdrNo || ''"></span>
+<!--      <template #column-cEdrNo="{ row }">-->
+<!--        <span v-html="row.cEdrNo || ''"></span>-->
+<!--      </template>-->
+      <template #column-cEdrNo="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div v-if="row.cEdrNo" class="policy-number-row">
+            <span v-html="row.cEdrNo"></span>
+            <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
       </template>
       <template #column-cInsuredNme="{ row }">
         <span v-html="row.cInsuredNme || ''"></span>
@@ -1059,7 +1069,8 @@ const normalQueryColumns = [
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
-        minWidth: 180
+        minWidth: 180,
+      slotName: "cEdrNo"
     },
     {
     prop: "nEdrPrjNo",
