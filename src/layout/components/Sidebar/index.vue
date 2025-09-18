@@ -99,7 +99,7 @@ function getShortMenuList() {
     if (res.code == 200) {
       shorMenuList.value = [];
       res.data.forEach((d: any, i: boolean) => {
-        if (d.select && shorMenuList.value.length < 5) {
+        if (d.select && shorMenuList.value.length < 5 && d.url) {
           shorMenuList.value.push({
             path: d.url,
             meta: {
