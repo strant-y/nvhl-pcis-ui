@@ -4801,7 +4801,7 @@ const submitUnderwritingFn = async () => {
       const param = {
         cAppNo: props.param?.cAppNo,
         cAppTyp: props.param?.cAppTyp,
-        cPlyNo: props.param?.plyNo,
+        cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],
         nEdrPrjNo: plyBase['Base.nEdrPrjNo']
       }
       const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
@@ -4816,7 +4816,7 @@ const submitUnderwritingFn = async () => {
         cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
         cDptCde: props.param?.cDptCde,// 机构代码
         cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
-        cPlyNo: props.param?.plyNo,// 保单号
+        cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
         cProdNme: props.param?.cTermNme,// 产品名称
         cProdNo: props.param?.cProdNo,//产品代码
         cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
