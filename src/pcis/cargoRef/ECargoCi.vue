@@ -322,7 +322,7 @@ const method = {
           );
         });
     }
-    // onChiefMrkChange()
+    onChiefMrkChange()
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
@@ -477,7 +477,7 @@ const method = {
     const rowId = rowData?._dataId;
     console.log("rowData", rowData);
     dialogRef.value?.open(
-      "ciagentPer",
+      "eCargociagentPer",
       {
         type: "show",
         data: {
@@ -501,11 +501,10 @@ const method = {
   },
   //业务员
   cSlsCdeChange:()=>{
-    debugger
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
-      "eCargoAgentWorker",
+      "eCargociagentWorker",
       {
         type: "show",
         data: {
@@ -533,7 +532,7 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     dialogRef.value?.open(
-      "ciagentWorker",
+      "eCargociagentWorker",
       {
         type: "show",
         data: {
@@ -599,7 +598,6 @@ const updateMasterAgreementValues = () => {
     formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbPrm", totalPrm*res["ECargoBase.nAmtRmbExch"]);
     formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbAmt", totalAmt*res["ECargoBase.nAmtRmbExch"]);
     const resData = formPage.getFormDataById("AgreementFeeWarn")
-    debugger;
     if(res['ECargoBase.cPayWay'] == '01'){ //YY
       //主共保：折人民币协议预收保费-折人民币预扣保费=协议剩余预收保费（人民币）
       if(Number(resData["ECargoBase.nReceivedPrm"] || '0') > Number(resData["ECargoBase.nPrm"] || '0')){
@@ -662,24 +660,31 @@ const onChiefMrkChange = () => {
   const ciMrkValue = cCiMrk["ECargoBase.cCiMrk"]; // 获取联共保标识
 
   if (cCoinsurerCde === "327001") {
-    switch (ciMrkValue) {
-      case "1":
-      case "2":
-      case "5":
-        cJiMrkVal = '1'; // 主联方
-        break;
-      default:
-        cJiMrkVal = '0'; // 从联方
+    if (rowData["ECargoBase.cDptCde"] === cDptCde) {
+      cSelfMrkVal = '1';
+      switch (ciMrkValue) {
+        case "1":
+        case "2":
+        case "5":
+          cJiMrkVal = '1'; // 主联方
+          break;
+        default:
+          cJiMrkVal = '0'; // 从联方
+      }
+      switch (ciMrkValue) {
+        case "3":
+        case "1":
+          cChiefMrkVal = '1'; // 主共方
+          break;
+        default:
+          cChiefMrkVal = '0'; // 从共方
+      }
+    } else {
+      cChiefMrkVal = '0'; // 非本分公司
+      cJiMrkVal = '0';    // 从联方
+      cSelfMrkVal = '0';  // 从共方
     }
-    switch (ciMrkValue) {
-      case "3":
-      case "1":
-        cChiefMrkVal = '1'; // 主共方
-        break;
-      default:
-        cChiefMrkVal = '0'; // 从共方
-    }
-  } else {
+  } else{
     switch (ciMrkValue) {
       case "2":
       case "4":
@@ -691,12 +696,10 @@ const onChiefMrkChange = () => {
     cJiMrkVal = '2'; // 外部公司
     cSelfMrkVal = '0'; // 非本分公司
   }
-  // const cChiefMrk = rowData["ECargoCi.cChiefMrk"];
-  // const cSelfMrk = rowData["ECargoCi.cSelfMrk"];
-  // const cJiMrk = rowData["ECargoCi.cJiMrk"];
+  
   freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrk", rowData._dataId, cChiefMrkVal );
   freeEditRef?.value?.setValueByRowKey("ECargoCi.cJiMrkVal", rowData._dataId, cJiMrkVal );
-  freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
+  // freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
 };
 // 初始化联共保信息
 const initCiInfo = (data: any) => {

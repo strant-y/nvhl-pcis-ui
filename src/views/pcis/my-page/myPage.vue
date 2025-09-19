@@ -1012,8 +1012,7 @@ const basicBtn = [
     type: "primary",
     id: "btn010101",
     func: () => {
-      calcPremium()
-      // queryTermRateLimitFun(calcPremium)
+      queryTermRateLimitFun(calcPremium)
     },
   }),
   createFreeButtonBase({

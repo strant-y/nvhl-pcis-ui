@@ -446,7 +446,7 @@ function setPopover(v: any, item: any) {
 }
 
 function setRuleType(irules: any ,schema: any) {
-  let rules = irules;
+  let rules = JSON.parse(JSON.stringify(irules));
   if(schema.group){ // 如果群组整个被隐藏,则不再进行校验
     const uicf = props.fromUi.groupBy.filter((g)=>g.id === schema.group);
     let h = false;
