@@ -1631,10 +1631,10 @@ function changeNamt(nAmtVar: any, flag: any) {
     freeEditRef1.value?.setValue("nAmt", parseFloat(nAmtVar));
     // 共保业务(计算保额和总保额的比例，根据比例计算共保保额的拆分金额)
     let nCiAmt = 0;
+    const totalAmt = freeEditRef.value?.getValue("nAmt") // 总保费
+    const totalCiAmt = freeEditRef.value?.getValue("nCiAmt") // 共保保额
+    const nAmtRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt))) // 保额变化值与总保额的比例
     if(params.cCiMrk !== "0") {
-      const totalAmt = freeEditRef.value?.getValue("nAmt") // 总保费
-      const totalCiAmt = freeEditRef.value?.getValue("nCiAmt") // 共保保费
-      const nAmtRatio = parseFloat((parseFloat(nAmtVar) / parseFloat(totalAmt))) // 保费变化值与总保费的比例
       nCiAmt = parseFloat((parseFloat(totalCiAmt) * nAmtRatio).toFixed(2))
       selectRow1.value.nCiAmt = nCiAmt;
       selectRow1.value.nCiAmtVar = nCiAmt;
@@ -1645,6 +1645,7 @@ function changeNamt(nAmtVar: any, flag: any) {
       if(item.cPkId === selectRow1.value.cPkId) {
         item.nAmt = parseFloat(nAmtVar);
         item.nAmtVar = parseFloat(nAmtVar);
+        item.cProportion = nAmtRatio.toString();
         if(params.cCiMrk !== "0") {
           item.nCiAmt = nCiAmt
           item.nCiAmtVar = nCiAmt
@@ -1653,6 +1654,7 @@ function changeNamt(nAmtVar: any, flag: any) {
     })
     selectRow1.value.nAmt = parseFloat(nAmtVar);
     selectRow1.value.nAmtVar = parseFloat(nAmtVar);
+    selectRow1.value.cProportion = nAmtRatio.toString();
   }
 }
 
