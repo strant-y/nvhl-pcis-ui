@@ -195,11 +195,11 @@ function hasEnglish(str: any) {
 const handelGoodsMx = (val: any) => {
   console.log(val)
   if (val.length > 0) {
-    // setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
+    setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
     setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
-    // setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
-    // setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
-    // setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
+    setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
+    setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
     setValue('Tgt.nAdditiveCoefficient', val[0]['Dist.nAdditiveCoefficient'])
     setValue('Tgt.cTradeNum', val[0]['Dist.cTradeNum'])
     setValue('Tgt.cLadingNum', val[0]['Dist.cBillNum'])
@@ -209,6 +209,11 @@ const handelGoodsMx = (val: any) => {
     setValue('Tgt.cTradeNum', '')
     setValue('Tgt.cLadingNum', '')
     setValue('Tgt.cCreditNum', '')
+    setValue('Tgt.cGoodsNo','')
+    setValue('Tgt.nGoodsNum','')
+    setValue('Tgt.nInvoicceValue','')
+    setValue('Tgt.cInvoiceNum','')
+    setValue('Tgt.cWaybillNumber','')
   }
 }
 const selectType = () => {
