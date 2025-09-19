@@ -152,16 +152,16 @@ const formconfig1 = ref<AppFreeEditConfig>(
 
             const isValid = await freeEditRef.value?.validate();
             if(isValid){
-
-
-
             const s = freeEditRef.value?.getFromValue();
             if(!isObjectValid(s)){
               ElMessage.warning('所有字段都未填写请确认！')
               return false;
             }
-
-         
+            // 车辆清单信息
+            if (s['Dist.nApprovedWeight'] && s['Dist.nApprovedWeight'] > 100000000000000000) {
+                ElMessage.warning("核定载重不能超过 100 万吨，请重新输入")
+                return false;
+            }
             // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
             for (let k in s) {
               if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
