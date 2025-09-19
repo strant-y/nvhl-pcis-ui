@@ -545,6 +545,7 @@ const saveApplicationEdr = async  () => {
     res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
         res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
   }
+  
   const edrInfo: any = await cargoApi.saveEdrEcargo({
     ...res,
     AgreementDistGoods:null,
@@ -1002,14 +1003,28 @@ const premiumCalculation = ()=>{
 }
 async function save() {
   let isOk = false
-  const allFromData = formPage.value?.getAllFormData();
+  // const allFromData = formPage.value?.getAllFormData();
+  let processedData = { ...formPage.value?.getAllFormData() }; 
   const user = JSON.parse(sessionStorage.getItem("user"));
-  console.log('allFromData',allFromData)
-  if(!(allFromData['AgreementBase'] && allFromData['AgreementBase']['ECargoBase.cDptCde'])){
+  // console.log('allFromData',allFromData)
+  const base = processedData['AgreementBase'];
+  if(!(processedData['AgreementBase'] && processedData['AgreementBase']['ECargoBase.cDptCde'])){
      return ElMessage.warning("请选择出单机构")
   }
+  // 根据条件删除指定的对象
+  debugger
+  if(base['ECargoBase.cCiMrk'] === '0') {
+    // 如果是 '0'，删除 AgreementCiTcp、AgreementCiShare、AgreementCi、AgreementAcctinfo
+    const { AgreementCiTcp, AgreementCiShare, AgreementCi, AgreementAcctinfo, ...rest } = processedData;
+    processedData = rest;
+  } else {
+    // 否则只删除 AgreementAcctinfo
+    const { AgreementAcctinfo, ...rest } = processedData;
+    processedData = rest;
+  }
+
  const res = await cargoApi.save({
-    ...allFromData,
+    ...processedData,
     AgreementDistGoods:null,
    AgreementTgtSummary:null,
    AgreementDistInsured:null,
