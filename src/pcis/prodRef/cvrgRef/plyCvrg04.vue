@@ -313,11 +313,21 @@ onMounted(async () => {
     method,
     exRules
   );
+  if(parparam.cRsnCde === "99"){
+    hiddenBtn();
+  }
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
     addAndinitData();
   }
+  
 });
+
+function hiddenBtn(){
+  Object.keys(btnItem.value).forEach((k: any) => {
+    btnItem.value[k].hidden = true;
+  });
+}
 
 function addAndinitData() { 
     const pl = addPlanMethod();

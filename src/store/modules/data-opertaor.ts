@@ -120,17 +120,17 @@ export const dataOpertaor = (props: OpertaorProps) => {
                                     item.disabled = 1;
                                 }
                             })
-                            if(info.pageKey === 'applicant' || info.pageKey === 'insured'|| info.pageKey === 'cvrg'){
-                                if (fsch.titleBtns && fsch.titleBtns.length > 0) {
-                                    fsch.titleBtns.forEach((item) => {
-                                        item.hidden = true;
-                                    });
-                                }
-                                if (fsch.endBtns && fsch.endBtns.length > 0) {
-                                    fsch.endBtns.forEach((item) => {
-                                        item.hidden = true;
-                                    });
-                                }
+                        }
+                        if(info.pageKey === 'applicant' || info.pageKey === 'insured'|| info.pageKey === 'cvrg'){
+                            if (fsch.titleBtns && fsch.titleBtns.length > 0) {
+                                fsch.titleBtns.forEach((item) => {
+                                    item.hidden = true;
+                                });
+                            }
+                            if (fsch.endBtns && fsch.endBtns.length > 0) {
+                                fsch.endBtns.forEach((item) => {
+                                    item.hidden = true;
+                                });
                             }
                         }
                     })

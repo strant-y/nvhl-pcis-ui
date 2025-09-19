@@ -432,12 +432,17 @@ const tableconfig = reactive<AppTableConfig>(
                     }else if (level !== 0 && !!value) {
                         const list = node.label !== "一般批改" ? codeListMap[`EDR_RSN_LIST_NEW-${level}-${value}`] : '';
                         let codeListParam = {};
+                        console.log(value);
                         codeListParam.rsnTyp = value.split('-')[0];
                         codeListParam.kindNo = value.split('-')[1];
                         codeListParam.prodNo = row.cProdNo;
                         codeListParam.cTransMrk = row.cTransMrk;
+                        let codeListName = "EDR_RSN_LIST_NEW";
+                        if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
+                            codeListName = "EDR_RSN_LIST_CANCEL";
+                        }
                         codeListStore.queryCodeList(
-                            { codeListName: 'EDR_RSN_LIST_NEW',
+                            { codeListName: codeListName,
                             codeListParam: codeListParam, },
                             false, false ).then((res: any) => {
                             res.forEach((e: any) => {

@@ -136,12 +136,24 @@ const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
 provide("codeListMap", codeListMap.value);
 
+function hiddenBtn(){
+  cardMainconfig.value.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  cardComconfig.value.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+}
+
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
   );
+  if(parparam.cRsnCde === "99"){
+    hiddenBtn();
+  }
   let deleteId = 0;
   if (formconfig11.titleBtns) {
     formconfig11.titleBtns.forEach((item: any, index: number) => {
