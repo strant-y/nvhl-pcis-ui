@@ -1132,7 +1132,7 @@ const initQuery = async (cPlyNo, cProdNo, data) => {
 
         const resOff = await checkCancelM1IsOff({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
         console.log(666,resOff)
-        if(false){
+        if(resOff.res){
              return false; 
         }else{
 

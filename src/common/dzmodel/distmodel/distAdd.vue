@@ -341,6 +341,12 @@ onMounted(() => {
     if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cIdentificationNumber' ){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
+
+        // 042003 证件号码 必填问题  Dist.cIdentificationNumber
+    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cIdentificationNumber'){
+         item['rules'] = [getRules("idCard", {})];
+    }
+
     if(item.prop =='Dist.cEquipmentTypes'){
       item['btnItems']['func'] =  cEquipmentTypesFunc;
     }
