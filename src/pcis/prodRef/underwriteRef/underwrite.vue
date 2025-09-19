@@ -209,7 +209,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cIsExcluding",
         inputtype: "rtselect",
-        title: "是否再保合约除外业务",
+        title: "是否再保比例分保合同除外业务",
         rules: [{ type: "required" }],
         loadData: [
           { value: "1", label: "是" },
@@ -252,7 +252,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
       },
-            {
+      {
         prop: "cUndrMrk",
         inputtype: "rtselect",
         title: "核保选项",
@@ -301,11 +301,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               hidden: false,
               rules: [getRules("required", {})],
             });
-            formconfig1.fromSchema.forEach((v, index) => {
-              if (index == "5") {
-                v.hidden = false;
-              }
-            });
             const param = {
               usrDptCde: user["companyId"],
               operId: user["opCde"],
@@ -319,11 +314,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             setFormItem("cBckOp", {
               hidden: true,
               rules: "",
-            });
-            formconfig1.fromSchema.forEach((v, index) => {
-              if (index == "5") {
-                v.hidden = true;
-              }
             });
             setValue("cBckOp", "");
           }
@@ -363,7 +353,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "关联交易确认",
         rules: [{ type: "required" }],
-         itemWidth: 1,
+        itemWidth: 1,
         loadData: [
           { value: "1", label: "是" },
           { value: "0", label: "否" },
