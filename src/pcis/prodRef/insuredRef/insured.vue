@@ -513,6 +513,9 @@ const method = {
       setFormItem("Insured.RegisterProp", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Insured.cRegisterSuffixAddr", {
+        rules: [getRules("required", {})],
+      });
 
       // 为法人 国民经济行业必填
       setFormItem("Insured.cTrdCde", {
@@ -649,6 +652,9 @@ const method = {
       //注册地址
       setFormItem("Insured.cRegisteredcapDre", { rules: null });
       setFormItem("Insured.RegisterProp", {
+        rules: null,
+      });
+      setFormItem("Insured.cRegisterSuffixAddr", {
         rules: null,
       });
 
@@ -925,9 +931,9 @@ const method = {
         "Insured.tCertfEndDate",
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
-      if (!param.initFlag) {
+      // if (!param.initFlag) {
         setFormItem("Insured.tCertfEndDate", { disabled: true });
-      }
+      // }
 
     } else {
       if (tCertfDate.value.length > 0) {

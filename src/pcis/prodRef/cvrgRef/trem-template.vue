@@ -451,7 +451,6 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 const {selectedRow} = storeToRefs(terconfig);
 
 function termUpdate(){
-  console.log('term');
   termDeductibleNote();
   update();
 }

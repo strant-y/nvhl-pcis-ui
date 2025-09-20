@@ -1043,7 +1043,7 @@ function updateUdrDetail(row: any) {
           plyNo: row.plyNo === "*" ? "" : row.plyNo,
           cTermNo: row.cTermNo,
           cTermNme: row.cTermNme,
-          cProdNmeCn: row.prodName,
+          cProdNmeCn: row.cProdNmeCn,
           pageName: "priceInquiry",
           cAppNo: row.cAppNo,
           cPolicySource: row.cPolicySource,
@@ -1075,7 +1075,7 @@ function updateUdrDetail(row: any) {
           plyNo: row.plyNo,
           cTermNo: row.cTermNo,
           cTermNme: row.cTermNme,
-          cProdNmeCn: row.prodName,
+          cProdNmeCn: row.cProdNmeCn,
           pageName: "priceInquiry",
           cAppNo: row.cAppNo,
           cPolicySource: row.cPolicySource,
@@ -1120,7 +1120,7 @@ function handleWorkFlow(row: any, type: any) {
                 cAppTyp: row.cAppTyp,
                 cTermNo: row.cTermNo,
                 cTermNme: row.cTermNme,
-                cProdNmeCn: row.prodName,
+                cProdNmeCn: row.cProdNmeCn,
                 cPolicySource: row.cPolicySource,
               });
               router.push({
@@ -1306,7 +1306,7 @@ function showDetails(row: any) {
             pageType: "UW_READ_SCENE",
             cTermNme: row.cTermNme,
             cTermNo: row.cTermNo,
-            cProdNmeCn: row.prodName,
+            cProdNmeCn: row.cProdNmeCn,
             pageName: "priceInquiry",
             cPolicySource: row.cPolicySource,
           });
@@ -1331,7 +1331,7 @@ function showDetails(row: any) {
             pageType: "UW_READ_SCENE",
             cTermNme: row.cTermNme,
             cTermNo: row.cTermNo,
-            cProdNmeCn: row.prodName,
+            cProdNmeCn: row.cProdNmeCn,
             pageName: "priceInquiry",
             cPolicySource: row.cPolicySource,
           });
@@ -1371,7 +1371,7 @@ function handleEdit(row: any) {
     cTermNme: row.cTermNme,
     cTermNo: row.cTermNo,
     pageType: "PLY_UW_PROCESS_SCENE",
-    cProdNmeCn: row.prodName,
+    cProdNmeCn: row.cProdNmeCn,
     pageName: "priceInquiry",
     cPolicySource: row.cPolicySource,
   });

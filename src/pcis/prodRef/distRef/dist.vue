@@ -444,7 +444,6 @@ const method = {
 
     const res = await deleteDistCheck(param);
     const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
-
     ElMessageBox.confirm(
         checkMsg,
         "提示",
@@ -459,6 +458,10 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+          const cvrgRef = opertaor.getTableRefs()['cvrg'];
+          if(cvrgRef) {
+            cvrgRef.refushCvrgInfo();
+          }
         } else {
           ElMessage.error(res.msg);
         }
@@ -567,8 +570,6 @@ const method = {
 		}
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
-
-
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
@@ -581,11 +582,14 @@ const method = {
 					if(!!item['Dist.tOpeningTime']){
 						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
 					}
+          
+            console.log('pageresult.list',pageresult.list);
           return{
             ... item,
             ... data
           };
         });
+       
         // 040005学生人数（人） 地址清单信息人数 回填
         if( props.compKey === 'AddressDist040005' ){
              if(pageresult.list.length>0){
@@ -598,18 +602,16 @@ const method = {
         }
 
         // 020001  货物数量 回填
-        if( props.compKey === 'CargoDist020001' ){
-            if(pageresult.list.length>0){
-              let nGoodsNum: number | null = null;
-                pageresult.list.forEach((item:any)=>{
-                      nGoodsNum+= item['Dist.nNum'] || 0
-                })
-              tgtRef.setValue('Tgt.nGoodsNum',nGoodsNum)
-            }
-        }
-
-
-
+        // if( props.compKey === 'CargoDist020001' ){
+        //     if(pageresult.list.length>0){
+        //         debugger
+        //       let nGoodsNum: number | null = null;
+        //         pageresult.list.forEach((item:any)=>{
+        //               nGoodsNum+= item['Dist.nNum'] || 0
+        //         })
+        //       tgtRef.setValue('Tgt.nGoodsNum',nGoodsNum)
+        //     }
+        // }
 
         if(tgtRef !== undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
@@ -664,6 +666,12 @@ const method = {
   //   });
   // },
   getTgtDetailFn:() => {
+  
+        // 询价转投保
+        if(route.params.param?.pageType === "inquiryToApp") {
+           return;
+        } 
+
         const param = opertaor.getParam();
         let app = "";
         if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
@@ -673,14 +681,13 @@ const method = {
         } else if(param.pageType !== "copy") {
             app = param.cAppNo
         }
-
         let distParam = {};
         if(route.params.param?.pageName === "priceInquiry") {
           distParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
         } else {
           distParam['cAppNo'] = app;
         }
-
+        
         getTgtDetailByDist(distParam).then((res: any) => {
         if (res["code"] == "200") {
             let tgtRef = opertaor.getTableRefByKey('tgt');
@@ -689,7 +696,6 @@ const method = {
             let nInvoicceValue = res.data?.nInvoicceValue;
             let cInvoiceNum = res.data?.cInvoiceNum;
             let nGoodsNum = res.data?.nGoodsNum;
-
             tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
             tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
             tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
@@ -1083,7 +1089,7 @@ function handleSelectionChange(selection: any) {
 watch(
   () => pageresult.list,
   (item) => {
-    if(params.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+    if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
   }

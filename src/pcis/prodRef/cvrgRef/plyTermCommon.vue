@@ -136,12 +136,24 @@ const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
 provide("codeListMap", codeListMap.value);
 
+function hiddenBtn(){
+  cardMainconfig.value.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  cardComconfig.value.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+}
+
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
     exRules
   );
+  if(parparam.cRsnCde === "99"){
+    hiddenBtn();
+  }
   let deleteId = 0;
   if (formconfig11.titleBtns) {
     formconfig11.titleBtns.forEach((item: any, index: number) => {
@@ -575,11 +587,13 @@ function getFromValue() {
           list.push(...r.riskList);
         }
       }
+      const plan = i["Term.cPlanNo"];
+      list.forEach((r: any) => {
+        r["TermRisktgt.cPlanNo"] = plan;
+      });
       i["Term.riskList"] = list;
       i["Term.nSeqNo"] = seqNo++;
       redata.push(i);
-
-      const plan = i["Term.cPlanNo"];
 
       if (
         planDataCommon.value &&

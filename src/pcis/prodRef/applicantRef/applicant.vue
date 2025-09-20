@@ -486,8 +486,8 @@ const method = {
   },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
-    const param = opertaor.getParam();
-    if (val == "0") {
+    const param = opertaor.getParam();``
+    if (val === "0") {
       setCapitalRequiredRule(getValue, setFormItem, 'Applicant');
       setFormItem("Applicant.tBirthday", {
         rules: null
@@ -539,12 +539,13 @@ const method = {
             disabled: false,
           });
         }
+        
+        //是否个体工商户
+        setValue("Applicant.cIsIndvduBiz", "");
       }
       setFormItem("Applicant.cWorkDpt", {
         rules: [getRules("required", {})],
       });
-      //是否个体工商户
-      setValue("Applicant.cIsIndvduBiz", "");
       // 是否绿色产业客户
       setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
@@ -561,6 +562,9 @@ const method = {
 
       // 注册地址
       setFormItem("Applicant.RegisterProp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cRegisterSuffixAddr", {
         rules: [getRules("required", {})],
       });
 
@@ -615,23 +619,6 @@ const method = {
       setFormItem("Applicant.cSex", {
         rules: [],
       });
-
-      codeListStore
-        .queryCodeList({
-          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
-          codeListParam: {},
-        })
-        .then((res) => {
-          if (!res.some((item) => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
-            // setValue("Applicant.cCertfCls", "");
-          }
-
-          applicantEditRef.value?.addCodeListMap({
-            code: "Applicant.cCertfCls",
-            list: res
-          })
-          setValue('Applicant.cCertfCls', '110007')
-        });
     } else {
       setFormItem("Applicant.tBirthday", {
         rules: [getRules("required", {})],
@@ -653,6 +640,9 @@ const method = {
       //注册地址
       // setFormItem("Applicant.cRegisteredcapDre", { rules: null });
       setFormItem("Applicant.RegisterProp", {
+        rules: null,
+      });
+      setFormItem("Applicant.cRegisterSuffixAddr", {
         rules: null,
       });
       //是否个体工商户
@@ -759,6 +749,32 @@ const method = {
             list: res
           })
         });
+    }
+    let co = 'NATURAL_CERTIFICATE_CACHE';
+
+    if(val == '0'){
+      co = 'UN_NATURAL_CERTIFICATE_CACHE';
+    }
+    
+    if (!param.initFlag) {
+      codeListStore
+      .queryCodeList({
+        codeListName: co,
+        codeListParam: {},
+      })
+      .then((res) => {
+        if (!res.some((item) => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+          setValue("Applicant.cCertfCls", "");
+        }
+
+        applicantEditRef.value?.addCodeListMap({
+          code: "Applicant.cCertfCls",
+          list: res
+        })
+        if(val === '0'){
+          setValue('Applicant.cCertfCls', '110007');  // 法人默认机构代码
+        }
+      });
     }
 
     checkUser();

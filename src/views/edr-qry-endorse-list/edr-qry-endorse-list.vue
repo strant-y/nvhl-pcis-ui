@@ -418,11 +418,44 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: "rtcascader",
                 title: "批改原因",
                 minWidth: 140,
-                typeCode: 'EDR_RSN_LIST_NEW',
                 checkStrictly: false,
                 func: (val, row, codeListMap) => {
+                    console.log(row);
                     if (val && val[1] && codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]]) {
                         row["iddetail"] = codeListMap['EDR_RSN_LIST_NEW-1-' + val[0]].find((item: any) => item.value === val[1]);
+                    }
+                },
+                lazyLoad: (node, resolve, row) => {
+                    const { level, value } = node;
+                    if(row.cTransMrk === '1'){
+                        resolve([{c_calc_mrk: "0",label: "数据补全",leaf: true,value: "99"}]);
+                    }else if (level !== 0 && !!value) {
+                        const list = node.label !== "一般批改" ? codeListMap[`EDR_RSN_LIST_NEW-${level}-${value}`] : '';
+                        let codeListParam = {};
+                        console.log(value);
+                        codeListParam.rsnTyp = value.split('-')[0];
+                        codeListParam.kindNo = value.split('-')[1];
+                        codeListParam.prodNo = row.cProdNo;
+                        codeListParam.cTransMrk = row.cTransMrk;
+                        let codeListName = "EDR_RSN_LIST_NEW";
+                        if(codeListParam.rsnTyp == '2' || codeListParam.rsnTyp == '3'){
+                            codeListName = "EDR_RSN_LIST_CANCEL";
+                        }
+                        codeListStore.queryCodeList(
+                            { codeListName: codeListName,
+                            codeListParam: codeListParam, },
+                            false, false ).then((res: any) => {
+                            res.forEach((e: any) => {
+                                e.leaf = level >= 1;
+                            });
+                            codeListMap[`EDR_RSN_LIST_NEW-${level}-${value}`] = res;
+                            resolve(res);
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                            });
+                    }else {
+                        resolve([]);
                     }
                 },
             },
@@ -489,6 +522,10 @@ const refreshData = (reset = true) => {
             return;
         }
     }
+       // 提取投保日期的开始时间和结束时间
+    const tAppTmStart = formData.tAppTm && formData.tAppTm.length > 1 ? formData.tAppTm[0] : null;
+    const tAppTmEnd = formData.tAppTm && formData.tAppTm.length > 1 ? formData.tAppTm[1] : null;
+
     const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {
@@ -509,6 +546,9 @@ const refreshData = (reset = true) => {
     };
     const params = Object.assign(s, r, obj);
     params["cTermNo"] = cTermNo;        // 条款编码
+    params["tAppTmStart"] = tAppTmStart; // 投保开始时间
+    params["tAppTmEnd"] = tAppTmEnd; // 投保结束时间
+
     console.log('参数1', params)
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
 
@@ -524,15 +564,23 @@ const refreshData = (reset = true) => {
 
                 pageresult.total = pageData.total;
                 pageData.result.forEach((item) => {
-                    // changeRsnValue(item);
-                    setTableFormItem("id", {
-                        loadData: [
-                            { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
-                            { label: '注销', value: `2-${item.cProdNo.slice(0, 2)}` },
-                            { label: '退保', value: `3-${item.cProdNo.slice(0, 2)}` },
-                        ],
-                    });
+                    if(item.cTransMrk !== '1'){
+                        setTableFormItem("id", {
+                            loadData: [
+                                { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
+                                { label: '注销', value: `2-${item.cProdNo.slice(0, 2)}` },
+                                { label: '退保', value: `3-${item.cProdNo.slice(0, 2)}` },
+                            ],
+                        });
+                    }else{
+                        setTableFormItem("id", {
+                            loadData: [
+                                { label: '一般批改', value: `1-${item.cProdNo.slice(0, 2)}` },
+                            ],
+                        });
+                    }
                 });
+                console.log(pageData.result);
                 pageresult.list = pageData.result;
 
             }
@@ -1047,6 +1095,7 @@ const openEdr = async (cAppNo, cPlyNo, cProdNo, cKindNo, data) => {
                             cDptCnm: selected.value["cDptCnm"],
                             cEdrType: '1',
                             pageType: "EDR_APP_NEW_SCENE",
+                            cTransMrk: selected.value["cTransMrk"],
                             cTermNme: selected.value["cTermNme"],
                             cTermNo: selected.value["cTermNo"],
                             cProdNmeCn: selected.value["cProdNmeCn"],
@@ -1095,7 +1144,7 @@ const initQuery = async (cPlyNo, cProdNo, data) => {
 
         const resOff = await checkCancelM1IsOff({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
         console.log(666,resOff)
-        if(false){
+        if(resOff.res){
              return false; 
         }else{
 

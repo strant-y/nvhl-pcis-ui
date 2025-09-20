@@ -407,7 +407,6 @@ const method = {
         return;
       }
     }
-
   },
   //联共保比例
   nCiShareChange: (val) => {
@@ -961,7 +960,7 @@ const onChiefMrkChange = () => {
   }
   freeEditRef?.value?.setValueByRowKey("Ci.cSelfMrk", rowData._dataId, cSelfMrkVal);  // 本公司标识
   freeEditRef?.value?.setValueByRowKey("Ci.cJiMrk", rowData._dataId, cJiMrkVal);   // 联保标识
-  freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal);  // 共保标识
+  // freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowData._dataId, cChiefMrkVal);  // 共保标识
 };
 // 初始化联共保信息
 const initCiInfo = (data: any) => {
@@ -1004,7 +1003,6 @@ const initCiInfo = (data: any) => {
     ciJiDptOptionsQuery('327001', getFromValue()[0]);
     // 业务员加载
     slsCodeListLoad(getFromValue()[0]);
-
     onChiefMrkChange();
   });
 };

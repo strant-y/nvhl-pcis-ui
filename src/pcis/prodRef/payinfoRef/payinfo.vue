@@ -44,7 +44,7 @@ const watchSource = computed(() => {
 watch(
   watchSource,
   ([newCCiMrk, newNCiOwnPrm], [oldCCiMrk, oldNCiOwnPrm]) => {
-        console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
+        // console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
     }

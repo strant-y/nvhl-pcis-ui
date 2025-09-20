@@ -93,43 +93,89 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 if (page.pageInfo && page.pageInfo.length > 0) {
                     page.pageInfo.forEach(info => {
                         const fsch = info.pageSchema;
-                        fsch.editFlag = false;
-                        if (fsch.fromSchema && fsch.fromSchema.length > 0) {
-                            fsch.fromSchema.forEach(f => {
-                                if (f.inputtype === 'rtinputgroup') {
-                                    f.groupList.forEach((gkey: any) => {
-                                        gkey.disabled = true;
-                                    });
-                                } else {
-                                    f.disabled = true;
-                                }
-                                if (f.btnItems) {
-                                    f.btnItems.disabled = true;
-                                }
+                        setread(fsch);
+                    })
+                }
+            });
+        }
 
-                            });
+        const readTab = ['plyBase','base','payinfo'];
+        const readAppProp = ['Applicant.cAppNme','Applicant.cClntMrk','Applicant.cCertfCls','Applicant.cCertfCde',
+                             'Insured.cInsuredNme','Insured.cClntMrk','Insured.cCertfCls','Insured.cCertfCde',
+                             'Base.tInsrncBgnTm','Base.tInsrncEndTm'
+                            ];
+        const setAddData = (formconfig: any) => {
+            console.log('数据补全');
+
+            formconfig.forEach(page => {
+                if (page.pageInfo && page.pageInfo.length > 0) {
+                    page.pageInfo.forEach(info => {
+                        const fsch = info.pageSchema;
+                        if(readTab.includes(info.pageKey)){
+                            setread(fsch);
                         }
-                        if (
-                            fsch.titleBtns &&
-                            fsch.titleBtns.length > 0
-                        ) {
-                            fsch.titleBtns.forEach((item) => {
-                                item.hidden = true;
-                            });
+                        if(info.pageKey === 'applicant' || info.pageKey === 'insured' || info.pageKey === 'insrnc'){
+                            fsch.fromSchema.forEach(item => {
+                                if(readAppProp.includes(item.prop)){
+                                    item.disabled = 1;
+                                }
+                            })
                         }
-                        if (fsch.endBtns && fsch.endBtns.length > 0) {
-                            fsch.endBtns.forEach((item) => {
-                                item.hidden = true;
-                            });
-                        }
-                        if (fsch.editBtns && fsch.editBtns.length > 0) {
-                            fsch.editBtns.forEach((item) => {
-                                item.hidden = true;
-                            });
+                        if(info.pageKey === 'applicant' || info.pageKey === 'insured' || info.pageKey === 'cvrg'){
+                            if (fsch.titleBtns && fsch.titleBtns.length > 0) {
+                                fsch.titleBtns.forEach((item) => {
+                                    if(item.id !== 'selectGoods'){
+                                        item.hidden = true;
+                                    }
+                                    
+                                });
+                            }
+                            if (fsch.endBtns && fsch.endBtns.length > 0) {
+                                fsch.endBtns.forEach((item) => {
+                                    item.hidden = true;
+                                });
+                            }
                         }
                     })
                 }
             });
+        }
+
+        const setread = (fsch: any) => {
+            fsch.editFlag = false;
+            if (fsch.fromSchema && fsch.fromSchema.length > 0) {
+                fsch.fromSchema.forEach(f => {
+                    if (f.inputtype === 'rtinputgroup') {
+                        f.groupList.forEach((gkey: any) => {
+                            gkey.disabled = true;
+                        });
+                    } else {
+                        f.disabled = true;
+                    }
+                    if (f.btnItems) {
+                        f.btnItems.disabled = true;
+                    }
+
+                });
+            }
+            if (
+                fsch.titleBtns &&
+                fsch.titleBtns.length > 0
+            ) {
+                fsch.titleBtns.forEach((item) => {
+                    item.hidden = true;
+                });
+            }
+            if (fsch.endBtns && fsch.endBtns.length > 0) {
+                fsch.endBtns.forEach((item) => {
+                    item.hidden = true;
+                });
+            }
+            if (fsch.editBtns && fsch.editBtns.length > 0) {
+                fsch.editBtns.forEach((item) => {
+                    item.hidden = true;
+                });
+            }
         }
         const setDisabledAll = () => {
             Object.keys(tableRefs).forEach(key => {
@@ -160,19 +206,6 @@ export const dataOpertaor = (props: OpertaorProps) => {
                             tableRefs[key].setDisabledAll();
                         }
                     }
-                    // if (
-                    //     f.titleBtns &&
-                    //     f.titleBtns.length > 0
-                    // ) {
-                    //     f.titleBtns.forEach((item) => {
-                    //         item.hidden = true;
-                    //     });
-                    // }
-                    // if (f.endBtns && f.endBtns.length > 0) {
-                    //     f.endBtns.forEach((item) => {
-                    //         item.hidden = true;
-                    //     });
-                    // }
                 }
             });
         }
@@ -469,6 +502,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
             getFatherPage,
             firstCharLower,
             setDisabledAll,
+            setAddData,
             setUnDisabledByKeyList,
             validateAll,
             setReadOnly,
