@@ -623,7 +623,7 @@ const saveEdrPlyInfo = async () => {
     ...{user},
     sence:'save'
   })
-  // debugger
+  // 
   btn.loading = false;
   if(edrInfo["code"] == "200") {
     ElMessage.success(edrInfo.msg);
@@ -888,6 +888,7 @@ const premiumCalculation = ()=>{
   let isBer = false
   let isBef = false
   let isSuccess = false
+  debugger
   try {
     const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
     //协议费用
@@ -990,6 +991,14 @@ const premiumCalculation = ()=>{
           mainRef.value?.setxyedrbaseRefValue('EdrECargoBase.nAmtVar',bfbhl)
         }
       }
+      const agreementCi =formPage.value?.getComponentRefById('AgreementCi');
+      if(agreementCi){
+        const formValue = agreementCi.getFormValue();
+        if (formValue && formValue.length > 0) {
+          // 触发第一行数据的 nCiShareChange 方法
+          agreementCi.setValueByRowKey('ECargoCi.nCiShare', formValue[0]._dataId, formValue[0]['ECargoCi.nCiShare']);
+        }
+      }
       ElMessage.success('保费计算成功')
     }else {
       ElMessage.error('保费计算失败,请先添加条款!')
@@ -1012,7 +1021,7 @@ async function save() {
      return ElMessage.warning("请选择出单机构")
   }
   // 根据条件删除指定的对象
-  debugger
+  
   if(base['ECargoBase.cCiMrk'] === '0') {
     // 如果是 '0'，删除 AgreementCiTcp、AgreementCiShare、AgreementCi、AgreementAcctinfo
     const { AgreementCiTcp, AgreementCiShare, AgreementCi, AgreementAcctinfo, ...rest } = processedData;
@@ -1193,6 +1202,10 @@ async function  submit() {
   if(base['ECargoBase.cCiMrk'] === '0') {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
         ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
+    ]);
+  }else{
+    filter.push(...[
+        'AgreementAcctinfo' // 临时关闭体条款校验
     ]);
   }
   // if(props.type === 'add' || props.type === 'edit'  || (props.type === 'EDR_APP_NEW_SCENE' && props?.param?.cEdrType == '1') ){
