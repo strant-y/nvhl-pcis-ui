@@ -379,4 +379,7 @@ defineExpose({
   justify-content: center;
   background-color: #f3f3f3;
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

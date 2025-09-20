@@ -128,4 +128,7 @@ export default defineComponent({
   .index-blk {
     margin-bottom: 20px;
   }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

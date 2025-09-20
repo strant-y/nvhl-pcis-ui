@@ -86,7 +86,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // title: "免赔信息",
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 96,
     tableBtnPosition: "right",
     align: "left",
     fixed: true,
@@ -200,13 +200,14 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
-        width: 55,
+        width: 35,
       },
       {
         prop: "cIfMust",
         inputtype: "rttag",
         title: "是否可选",
-        width: 85,
+        effect: "light",
+        width: 62,
         loadData: [
           {
             label: "可选",

@@ -5906,9 +5906,9 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 // }
 
 .toggle-button {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
+  position: fixed;
+  bottom: 60px;
+  left: 80px;
   transform: translateX(-50%);
   margin-bottom: 0 !important;
 }
