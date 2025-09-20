@@ -60,6 +60,16 @@ onMounted(() => {
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
+    
+    let eCargoBaseobj = {
+      loadData: [
+        {
+          label: `${param.cDptCde}${param.cDptCnm}`,
+          value: param.cDptCde,
+        },
+      ],
+    };
+    setFormItem("ECargoBase.cIntroDptcde", eCargoBaseobj);
   })
 });
 
@@ -240,6 +250,9 @@ const method = {
     if(val == "0" || val == "3" || val =="4"){
       idxParam.ciJiMrk = val;
       const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
+      console.log("ciAgreementECargo",formPage.getAllFormData())
+      // formPage.getAllFormData()
+    
       if(ciAgreementECargo) {
         ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
       }
@@ -341,11 +354,11 @@ const method = {
           setFormItem("ECargoBase.cBrkSlsCde", { rules: [getRules("required", {})] }); //代理业务员
         } else {
           // 直销业务：清空代理业务员和代理经纪人
-          if (ciRef) {
-            const ciData = ciRef.getFormValue();
+          if (cargoCiRef) {
+            const ciData = cargoCiRef.getFormValue();
             ciData.forEach((row: any) => {
-              ciRef.setValueByRowKey("ECargoCi.cBrkrCde", row._dataId, "");
-              ciRef.setValueByRowKey("ECargoCi.cBrkSlsCde", row._dataId, "");
+              cargoCiRef.setValueByRowKey("ECargoCi.cBrkrCde", row._dataId, "");
+              cargoCiRef.setValueByRowKey("ECargoCi.cBrkSlsCde", row._dataId, "");
             });
           }
           const obj = {
@@ -368,6 +381,9 @@ const method = {
           nextTick(() => {
             baseEditRef.value?.clearValidate("ECargoBase.cBrkSlsCde");
           });
+        }
+        if (!!cargoCiRef) {
+          cargoCiRef.valideRequired();
         }
       });
     }

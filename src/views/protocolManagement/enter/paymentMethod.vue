@@ -173,9 +173,10 @@ function confirm() {
       const param = formData.paymentMethod;
       const dptCde = formData.dptCde;
       const cDptCde = formData.cDptCde;
+      const cDptCnm = formData.cDptCnm;
       if (param) {
         closeDialog();
-        emits("ok", { param,dptCde,cDptCde });
+        emits("ok", { param,dptCde,cDptCde,cDptCnm });
       }
     }
   });
