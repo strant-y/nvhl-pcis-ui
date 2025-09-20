@@ -588,7 +588,7 @@ const props:any = defineProps({
 onBeforeMount(() => {
   // onMounted() 之前
   console.log(props.param);
-  opertaor.setParam(props.param);
+  opertaor.setParam({sysDist:'PRICE',...props.param});
 });
 
 // 当前加载的组件索引

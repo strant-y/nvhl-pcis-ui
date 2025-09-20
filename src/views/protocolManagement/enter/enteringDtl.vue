@@ -45,6 +45,7 @@ const resData = ref({});
 const cacheKey = ref();
 let idxParam = reactive({
   opertaorId: 'enteringDtl',
+  opertaorProps: { id: 'enteringDtl' },
   formPage: formPage.value,
   param: { ...props.param, ...{cacheKey:cacheKey.value,acctinfoFlag:true,type:props?.type || props.param?.type}},
   user: JSON.parse(sessionStorage.getItem("user")),

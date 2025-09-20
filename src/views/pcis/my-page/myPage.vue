@@ -623,7 +623,7 @@ onBeforeMount(() => {
   // onMounted() 之前
   nRecRemPrm.value = props.param?.nRecRemPrm || "0.00"
   nRecRemEstAmt.value = props.param?.nRecRemEstAmt || "0.00"
-  opertaor.setParam(props.param);
+  opertaor.setParam({sysDist:'PCIS',...props.param});
 });
 
 // 当前加载的组件索引

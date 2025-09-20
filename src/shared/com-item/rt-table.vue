@@ -690,7 +690,6 @@ onMounted(() => {
   if (props.item.fromSchema) {
     initUI();
   }
-  console.log(props.item,'111111111111111')
 });
 
 async function tableExvalidate() {
