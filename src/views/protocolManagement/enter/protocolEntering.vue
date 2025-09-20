@@ -458,7 +458,6 @@ function showMethodModal() {
     .open(paymentDialog)
     .then((res: any) => {
       if (res.type === "ok") {
-        debugger
         const selectedPayment = res.body?.param;
         const dptCde = res.body?.dptCde;
         const cDptCde = res.body?.cDptCde;

@@ -60,16 +60,18 @@ onMounted(() => {
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
-    
-    let eCargoBaseobj = {
+    //回显出单机构
+    setFormItem("ECargoBase.cDptCde", {
       loadData: [
-        {
-          label: `${param.cDptCde}${param.cDptCnm}`,
-          value: param.cDptCde,
-        },
+        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
       ],
-    };
-    setFormItem("ECargoBase.cIntroDptcde", eCargoBaseobj);
+    });
+    //回显服务机构数据
+    setFormItem("ECargoBase.cIntroDptcde", {
+      loadData: [
+        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
+      ],
+    });
   })
 });
 
