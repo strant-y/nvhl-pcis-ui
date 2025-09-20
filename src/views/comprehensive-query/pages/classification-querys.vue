@@ -211,6 +211,7 @@ let isESBool = ref(false); // 是否es查询布尔
 // 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
 let userAllCheckedColumns = ref<string[]>([]);
 let isJumpingFromHome = ref(false); // 是否正在处理首页跳转
+let isInitLocked = ref(true); // 加锁初始化 不查询，解决初始化快请求查询内容被【全量查询慢请求】覆盖问题
 let isCopyButtonVisible = ref(false); // 复制按钮是否显示
 
 const props = defineProps({
@@ -677,6 +678,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.loadData = allCAppStatus;
                           }
                       });
+                      // 初始化不查询
+                      if (isInitLocked.value) return; 
+                      // 从首页跳转过来不查询
                       if (!isJumpingFromHome.value) {
                         handleQuery(true);
                       }
@@ -1274,6 +1278,9 @@ onMounted(async () => {
     if (hasJumpData) {
         isJumpingFromHome.value = true;  // 加锁，避免 cAppTyp.func 再触发
     }
+    // 初始化加锁，不查，避免cAppTyp.func触发
+    // isinitPageQuery.value = true;
+
     formconfig1.fromSchema?.forEach((item) => {
         if (
          item.prop === "tInquiryTm" ||
@@ -1326,6 +1333,8 @@ onMounted(async () => {
         isJumpingFromHome.value = false;
         sessionStorage.removeItem(AppKey.query.pcis_query_search);
     }
+    // 初始化完成后解锁
+    isInitLocked.value = false; 
 });
 
 onUnmounted(() => {
