@@ -11,12 +11,11 @@
         label-width="180px"
         :inline="true"
       >
-        <h4 style="margin: 10px 20px">投保向导</h4>
+        <h4 style="margin: 0 20px">投保向导</h4>
 				<el-form-item
           id="cRecordType"
           label="录单方式"
           prop="cRecordType"
-          style="width: 600px"
           :rules="[getRules('required', {})]"
         >
           <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
@@ -27,32 +26,34 @@
             <el-radio :value="10">组合出单</el-radio>
           </el-radio-group>
         </el-form-item>
-				<el-form-item
-          id="tpl"
-          v-if="formconfig1.cRecordType === 7"
-          label="选择模板"
-          prop="tpl"
-          style="width: 400px"
-          :rules="[getRules('required', {})]"
-        >
-          <el-select-v2
-            v-model="formconfig1.tpl"
-            :options="tplOptions"
-            placeholder="选择模板"
-            size="large"
-            filterable
-            @change="selectedTpl"
-          />
-        </el-form-item>
-				<el-form-item
-          id="seldef"
-          v-if="formconfig1.cRecordType === 7"
-          label="模板描述"
-          prop="seldef"
-          style="width: 600px"
-        >
-          <div>{{ formconfig1.seldef }}</div>
-        </el-form-item>
+        <div>
+          <el-form-item
+            id="tpl"
+            v-if="formconfig1.cRecordType === 7"
+            label="选择模板"
+            prop="tpl"
+            style="width: 400px"
+            :rules="[getRules('required', {})]"
+          >
+            <el-select-v2
+              v-model="formconfig1.tpl"
+              :options="tplOptions"
+              placeholder="选择模板"
+              size="large"
+              filterable
+              @change="selectedTpl"
+            />
+          </el-form-item>
+          <el-form-item
+            id="seldef"
+            v-if="formconfig1.cRecordType === 7"
+            label="模板描述"
+            prop="seldef"
+            style="width: 600px"
+          >
+            <div>{{ formconfig1.seldef }}</div>
+          </el-form-item>
+        </div>
 				<div>
 					<el-form-item
             id="dptCde"
@@ -92,7 +93,7 @@
 					</el-form-item>
 				</div>
         <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 9">
-          <h4 style="margin: 10px 20px">投保信息</h4>
+          <h4 style="margin: 0 20px">投保信息</h4>
           <el-form-item
             id="cRenewMrk"
 						v-if="formconfig1.cRecordType == '1'"
@@ -213,7 +214,7 @@
 					</el-row>
         </template>
 				<template v-if="formconfig1.cRecordType != 9">
-					<h4 style="margin: 10px 20px">选择{{ labelNm }}</h4>
+					<h4 style="margin: 0 20px">选择{{ labelNm }}</h4>
 					<el-form-item
             id="cGrpMrk"
 						label="团个属性"
@@ -232,7 +233,7 @@
 							可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
 						</template>
 						<h4
-							style="margin: 10px 20px; width: 200px"
+							style="margin: 0 20px; width: 200px"
 							v-if="formconfig1.cRenewMrk !== '1'"
 						>
 							常用{{ labelNm }}
@@ -332,22 +333,22 @@
                     type="primary"
                 ></el-button>
               </el-form-item>
+              <el-form-item>
+                <rt-button
+                  :item="{
+                    type: 'primary',
+                    label: '下一步',
+                    func: () => {
+                      next();
+                    },
+                  }"
+                />
+              </el-form-item>
             </el-col>
 					</el-row>
 				</template>
 
       </el-form>
-    </div>
-    <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-      <rt-button
-        :item="{
-          type: 'primary',
-          label: '下一步',
-          func: () => {
-            next();
-          },
-        }"
-      />
     </div>
   </div>
 </template>
@@ -1016,5 +1017,8 @@ watch(
   border: 1px solid red;
   border-radius: 50%;
   padding: 2px;
+}
+:deep(.el-form-item--default) {
+  margin-bottom: 5px;
 }
 </style>

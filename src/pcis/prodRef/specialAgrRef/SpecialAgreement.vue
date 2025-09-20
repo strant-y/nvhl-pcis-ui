@@ -79,7 +79,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // title: "特约信息",
     tableBtnType: "btn",
-    tableBtnWidth: 160,
+    tableBtnWidth: 96,
     tableBtnPosition: "right",
     fixed: true,
     tableBtn: [
@@ -205,7 +205,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "index",
         inputtype: "rtinput",
         title: "序号",
-        width: 55,
+        width: 35,
       },
       // {
       //   prop: "cIfEdit",
@@ -227,7 +227,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cIfMust",
         inputtype: "rttag",
         title: "Tag",
-        width: 80,
+        effect: "light",
+        width: 45,
         loadData: [
           {
             label: "可选",

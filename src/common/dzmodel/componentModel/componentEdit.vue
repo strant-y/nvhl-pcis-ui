@@ -464,6 +464,40 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "要素宽度",
       },
+      {
+        prop: "cSysConfig",
+        inputtype: "rtmultiple",
+        title: "可操作域",
+        multipleshow:"select",
+        placeholder:"有效",
+        nullValue:"0",
+        loadData: [
+          {
+            label: "有效",
+            value: "0",
+          },
+          {
+            label: "无验证",
+            value: "1",
+          },
+          {
+            label: "无效",
+            value: "2",
+          },
+        ],
+        multipletitle:[
+          {
+            title:'核心',
+            width:80
+          },{
+            title:'询价',
+            width:80
+          },{
+            title:'移动',
+            width:80
+          }
+        ]
+      },
     ],
   })
 );

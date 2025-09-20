@@ -188,6 +188,7 @@
       />
       <template v-for="(i, index) in item.fromSchema" :key="index">
         <template v-if="i.isShow !== false">
+          
           <el-table-column
             v-if="!i.expand"
             :prop="i.prop"
@@ -209,7 +210,20 @@
               {{ header.column.label }}
             </template>
             <template #default="scope">
-              <template v-if="i.slotName">
+              <template v-if="i.inputtype === 'rtmultiple'">
+                <template v-for="(p,inx) in i.multipletitle" :key="inx">
+                  <el-table-column :label="p.title" :width="p.width">
+                      <template #default="scope_col">
+                        <rtSelectV2 :item="i" :wvalue="scope_col.row[i.prop]?scope_col.row[i.prop][inx]:null"
+                        @valueChange="(r)=>{
+                          const d = multipleget(scope_col.row,i,r,inx);
+                          scope_col.row[i.prop] = d;
+                        }" />
+                      </template>
+                  </el-table-column>
+                </template>
+              </template>
+              <template v-else-if="i.slotName">
                 <slot :name="`column-${i.slotName}`" v-bind="scope" />
               </template>
               <template v-else-if="item.editFlag">
@@ -425,6 +439,22 @@ watch(
   }
 );
 
+function multipleget(row,item,newdata,index){
+  let d = row[item.prop];
+  let nd = '';
+  item.multipletitle.forEach((p,i)=>{
+    if(i === index){
+      nd += newdata;
+    }else{
+      if(d && d[i]){
+        nd += d[i];
+      }else{
+        nd += item.nullValue;
+      }
+    }
+  })
+  return nd;
+}
 function setFormValue(data: any) {
   tableDatas.value = [];
   formItems.value = {};
@@ -660,7 +690,6 @@ onMounted(() => {
   if (props.item.fromSchema) {
     initUI();
   }
-  console.log(props.item,'111111111111111')
 });
 
 async function tableExvalidate() {
