@@ -305,8 +305,8 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "View",
         tableClick: (row) => {
-            console.log(row);
-          toDtl(row, 'view');
+          console.log(row);
+          toDtl({ ...row, sence:'policy' }, 'view');
         },
       }),
       createFreeButtonBase({
@@ -317,8 +317,8 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          console.log(row);
-          toDtl(row, 'edit');
+          console.log('row', { ...row, sence:'app' });
+          toDtl({ ...row, sence:'app' }, 'edit');
         },
       }),
       createFreeButtonBase({

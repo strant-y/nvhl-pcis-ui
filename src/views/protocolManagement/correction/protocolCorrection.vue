@@ -290,7 +290,7 @@ const tableconfig = reactive<AppTableConfig>(
           icon: "View",
           tableClick: (row) => {
             console.log(row);
-            toDtl(row, 'view');
+            toDtl({ ...row, sence:'policy' }, 'view');
           },
         }),
         createFreeButtonBase({
@@ -356,6 +356,7 @@ const tableconfig = reactive<AppTableConfig>(
                         //注销
                         en = {
                           ...row,
+                          sence:'edr',
                           cRsnCde: row['id'][1],
                           cEdrType: '2',
                           pageType: "EDR_APP_NEW_SCENE",
@@ -366,6 +367,7 @@ const tableconfig = reactive<AppTableConfig>(
                         //退保
                         en = {
                           ...row,
+                          sence:'edr',
                           cRsnCde: row['id'][1],
                           cEdrType: '3',
                           pageType: "EDR_APP_NEW_SCENE",
@@ -375,6 +377,7 @@ const tableconfig = reactive<AppTableConfig>(
                         //一般批改
                         en = {
                           ...row,
+                          sence:'edr',
                           cRsnCde: row['id'][1],
                           cEdrType: '1',
                           pageType: "EDR_APP_NEW_SCENE",

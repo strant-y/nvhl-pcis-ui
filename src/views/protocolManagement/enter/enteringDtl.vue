@@ -518,7 +518,8 @@ const getPlyPolicyFun = () => {
     query: {
       param:  JSON.stringify({
         cEcAgrAppNo:cEcAgrAppNo.value,
-       type: "view"
+        sence: 'policy',
+        type: "view"
       })
     }
   };

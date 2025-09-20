@@ -290,7 +290,7 @@ const tableconfig = reactive<AppTableConfig>(
           icon: "Edit",
           tableClick: (row) => {
             console.log(row);
-            toDtl(row, 'audit');
+            toDtl({ ...row, sence:'app' }, 'audit');
           },
         }),
       ],
