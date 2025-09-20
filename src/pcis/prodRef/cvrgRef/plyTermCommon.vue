@@ -587,11 +587,13 @@ function getFromValue() {
           list.push(...r.riskList);
         }
       }
+      const plan = i["Term.cPlanNo"];
+      list.forEach((r: any) => {
+        r["TermRisktgt.cPlanNo"] = plan;
+      });
       i["Term.riskList"] = list;
       i["Term.nSeqNo"] = seqNo++;
       redata.push(i);
-
-      const plan = i["Term.cPlanNo"];
 
       if (
         planDataCommon.value &&

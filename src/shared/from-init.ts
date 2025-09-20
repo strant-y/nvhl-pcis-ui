@@ -182,6 +182,5 @@ export function formInit(
       return true;
     })
   }
-  console.log(newObj.fromSchema);
   return newObj;
 }
