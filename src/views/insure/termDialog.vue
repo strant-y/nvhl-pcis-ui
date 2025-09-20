@@ -211,4 +211,7 @@ function updateTermlist() {
 .custom-re-tree >>> .el-tree-node.is-current > .el-tree-node__content {
   background-color: #ffaaa64d;
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

@@ -178,7 +178,7 @@ function getShortMenuList() {
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .menu-list-item {
   border-bottom: 1px solid #888;
-  padding: 20px 30px 0 30px;
+  padding: 10px 30px 0 30px;
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .first-level-title {
   font-size: 14px;
@@ -190,7 +190,6 @@ function getShortMenuList() {
 .el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin-bottom: 10px;
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list a {
   margin-bottom: 5px;

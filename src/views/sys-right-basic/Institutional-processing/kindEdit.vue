@@ -393,4 +393,7 @@ function handleDeleteAll() {
 .table-container > div:last-child {
   border-bottom: 1px solid #ccc;
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

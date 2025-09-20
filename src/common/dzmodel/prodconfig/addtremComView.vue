@@ -396,4 +396,7 @@ function fail() {
 .node-label {
   margin-left: 8px;
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

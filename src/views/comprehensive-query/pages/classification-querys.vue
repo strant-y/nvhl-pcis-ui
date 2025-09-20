@@ -432,13 +432,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               title: "查询条件",
               placeholder:
                   "询价/投保/批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
-              btnWidth: 10,
+              btnWidth: 16,
               itemWidth: 2,
               showExBtn: true,
               btnItems: {
                   label: "搜索",
                   type: "primary",
-                  btnStyle: {'font-size': '16px'},
+                  btnStyle: {'font-size': '18px','margin-right': '-8%'},
                   func: () => {
                     handleQuery(true, true);
                   },
@@ -949,6 +949,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
         width: 165,
+        fixed: "left",
         slotName: "cEdrNo"
     },
     {
@@ -958,7 +959,11 @@ const normalQueryColumns = [
         width: 48,
         align: 'left',
         formatter:(val:any)=>{
+          if(val?.split("分公司").length > 1) {
+            return val?.split("分公司")[0]
+          } else {
             return val?.slice(0,2)
+          }
         }
     },
     {
@@ -1007,7 +1012,7 @@ const normalQueryColumns = [
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
-        width: 105,
+        width: 106,
         slotName: "nAmt",
         align: 'left',
     },
@@ -1015,7 +1020,7 @@ const normalQueryColumns = [
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
-        width: 95,
+        width: 98,
         prefix: "¥ ",
         slotName: "nPrm",
         align: 'left'
@@ -1024,7 +1029,7 @@ const normalQueryColumns = [
         prop: "tIssueTm",
         inputtype: "rtinput",
         title: "签单日期",
-        width: 140,
+        width: 144,
         sortable: true,
         slotName: "tIssueTm"
     },
@@ -1032,8 +1037,9 @@ const normalQueryColumns = [
         prop: "InsurancePeriod",
         inputtype: "rtinput",
         title: "保险期间",
-        width: 140,
-        slotName: "InsurancePeriod"
+        width: 144,
+        slotName: "InsurancePeriod",
+        align: 'left'
     },
     {
         prop: "cAppStatus",
@@ -1125,7 +1131,7 @@ const tableObj = {
                     if (r) {
                         const data = row;
                         router.push({
-                            path: "/pcisapp/myPage",
+                            path: "/pcisapp/pcisappView",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
                             },
@@ -2199,7 +2205,6 @@ defineExpose({
 
 <style scoped>
 .copy-icon {
-  margin-left: 5px;
   cursor: pointer;
   color: #409eff;
 }
@@ -2215,18 +2220,15 @@ defineExpose({
   align-items: center;
 }
 
-.policy-number-row span {
-  flex: 1;
-}
-
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
 }
 /* :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 } */
-:deep(.el-button-group .el-button) {
+:deep(.el-button-group .el-button:first-child) {
     font-size: 16px;
+    width: 120px;
 }
 .twoLine {
   display: -webkit-box;

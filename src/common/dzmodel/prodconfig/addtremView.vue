@@ -1,88 +1,49 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="7">
-        <div style="background-color: #f3f3f3;line-height:43px;">
-          <span style="font-size: 18px; margin-left: 15px"
-            >必须选择至少一项主条款</span
-          >
-        </div>
-      </el-col>
-      <el-col :span="7">
-        <div class="search-btn" style="line-height: 45px;">
-          <div style="float: right;">
-            <div class="inline-block-div" style="width: 75%">
-              <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
+      <el-col :span="12" style="padding-right: 5px;">
+        <div style="border: 1px solid #D9D9D9;">
+          <div class="header">
+            <div class="flex">
+              <el-icon style="margin: 0 10px;"><ArrowDownBold /></el-icon>
+              <span class="zhu-tag">主险</span>
+              <span class="header-title">必须选择至少一项主条款</span>
             </div>
-            <rtButton
-              :item="{
-                icon: 'Search',
-                func: () => {
-                  mainRef.filter(query.main);
-                },
-              }"
+            <div class="search-btn">
+              <div>
+                <div class="inline-block-div">
+                  <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
+                </div>
+                <rtButton
+                  :item="{
+                    icon: 'Search',
+                    func: () => {
+                      mainRef.filter(query.main);
+                    },
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+          <div style="height: 250px; overflow-y: auto;margin: 12px 20px;" class="left-box">
+            <el-tree
+              ref="mainRef"
+              :props="dataprops"
+              node-key="id"
+              show-checkbox
+              :check-strictly="true"
+              :filter-node-method="mainfilterNode"
+              :data="data1"
+              :default-expanded-keys="expandedKeys"
+              @check-change="selectmainMethod"
             />
           </div>
         </div>
-      </el-col>
-      <el-col :span="10">
-        <div class="search-btn" style="display: flex;align-items: center;">
-          <span style="font-size: 16px;line-height: 32px;"> 请选择附加条款责任 </span>
-          <div style="width: 50%; float: right;flex: 1; display: flex; justify-content: end;">
-            <div class="inline-block-div" style="width: 75%">
-              <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
-            </div>
-            <rtButton
-              :item="{
-                icon: 'Search',
-                func: () => {
-                  additionalRef.filter(query.sub);
-                },
-              }"
-            />
-          </div>
+        <div style="padding-left: 20px;margin-top: 12px;">
+          <span class="header-title">已选择的主条款</span>
         </div>
-      </el-col>
-      <el-col :span="12">
-        <div style="height: 250px; border: 1px solid #f3f3f3; overflow-y: auto">
-          <el-tree
-            ref="mainRef"
-            style="max-width: 600px"
-            :props="dataprops"
-            node-key="id"
-            show-checkbox
-            :check-strictly="true"
-            :filter-node-method="mainfilterNode"
-            :data="data1"
-            :default-expanded-keys="expandedKeys"
-            @check-change="selectmainMethod"
-          />
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div style="height: 250px; border: 1px solid #f3f3f3; overflow-y: auto">
-          <el-tree
-            ref="additionalRef"
-            style="max-width: 600px"
-            :props="dataprops"
-            node-key="id"
-            show-checkbox
-            :data="data2"
-            :filter-node-method="subfilterNode"
-            :check-strictly="true"
-            @check-change="selectadditionMethod"
-          />
-        </div>
-      </el-col>
-      <el-col :span="24">
-        <div style="background-color: #f3f3f3">
-          <span style="font-size: 18px; margin-left: 15px">已选择的条款</span>
-        </div>
-      </el-col>
-      <el-col :span="24">
         <div style="overflow-y: auto; max-height: 250px">
           <el-tree
-            style="max-width: 600px"
             :props="dataprops"
             node-key="id"
             :data="data3"
@@ -99,8 +60,66 @@
           </el-tree>
         </div>
       </el-col>
+      <el-col :span="12" style="padding-left: 5px;">
+        <div style="border: 1px solid #D9D9D9;">
+          <div class="header">
+            <div class="flex">
+              <el-icon style="margin: 0 10px;"><ArrowDownBold /></el-icon>
+              <span class="fu-tag">附加</span>
+              <span class="header-title">请选择附加条款责任</span>
+            </div>
+            <div class="search-btn">
+              <div>
+                <div class="inline-block-div">
+                  <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
+                </div>
+                <rtButton
+                  :item="{
+                    icon: 'Search',
+                    func: () => {
+                      additionalRef.filter(query.sub);
+                    },
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+          <div style="height: 250px; overflow-y: auto;margin: 12px 20px;" class="right-box">
+            <el-tree
+              ref="additionalRef"
+              :props="dataprops"
+              node-key="id"
+              show-checkbox
+              :data="data2"
+              :filter-node-method="subfilterNode"
+              :check-strictly="true"
+              @check-change="selectadditionMethod"
+            />
+          </div>
+        </div>
+        <div style="padding-left: 20px;margin-top: 12px;">
+          <span class="header-title">已选择的附加条款</span>
+        </div>
+        <div style="overflow-y: auto; max-height: 250px">
+          <el-tree
+            :props="dataprops"
+            node-key="id"
+            :data="data4"
+            :default-expand-all="true"
+          >
+            <template #default="{ node, data }">
+              <div class="custom-tree-node">
+                <span v-for="(level, index) in node.level - 1" :key="index" class="tree-indent"></span>
+                <span v-if="node.level > 1" class="tree-line"></span>
+                <span v-if="node.level > 1" class="tree-line-vertical"></span>
+                <span class="node-label">{{ node.label }}</span>
+              </div>
+            </template>
+          </el-tree>
+        </div>
+      </el-col>
       <el-col :span="24">
-        <div style="float: right; margin-right: 20px">
+        <div style="float: right; margin: 10px 20px 0 0;">
           <rtButton
             :item="{
               icon: 'RefreshLeft',
@@ -209,6 +228,8 @@ const data3 = ref<any>([
   //   ],
   // }
 ]);
+
+const data4 = ref<any>({});
 
 // 绑定方法
 const method = {};
@@ -580,6 +601,7 @@ function selectAdditionTerm() {
 
 function flushSelectData() { 
   let selectNode: any[] = [];
+  let selectNode1: any[] = [];
 
   const tree = mainRef.value?.getCheckedNodes(false, true);
   tree?.forEach((item: any) => {
@@ -631,13 +653,14 @@ function flushSelectData() {
       });
       seterm.cRdrTyp = "1";
       seterm.children = childnode;
-      selectNode.push(seterm);
+      selectNode1.push(seterm);
     }
   });
 
   // selectNode.push(addtree);
 
   data3.value = selectNode;
+  data4.value = selectNode1;
 }
 
 async function selectOne() {
@@ -661,7 +684,7 @@ async function selectOne() {
   // } else {
 
   // }
-  props.method.isOk(data3.value);
+  props.method.isOk([...data3.value,...data4.value]);
   emits("handleClose");
 }
 
@@ -675,9 +698,10 @@ function fail() {
   display: inline-block;
 }
 .search-btn {
-  width: 100%;
-  height: 45px;
-  background-color: #f3f3f3;
+  /* width: 100%; */
+  /* height: 45px;
+  background-color: #f3f3f3; */
+  margin-right: 20px;
 }
 .custom-tree-node {
   display: flex;
@@ -711,5 +735,64 @@ function fail() {
 .node-label {
   margin-left: 8px;
 }
-
+.flex {
+  display: flex;
+  align-items: center;
+}
+.header {
+  height: 46px;
+  background: #FAFAFA;
+  border-radius: 2px 2px 0px 0px;
+  border-bottom: 1px solid #D9D9D9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.zhu-tag {
+  width: 37px;
+  height: 22px;
+  background: rgba(58,118,198,0.1);
+  border-radius: 2px;
+  border: 1px solid #3A76C6;
+  color: #3A76C6;
+  text-align: center;
+  line-height: 20px;
+  margin-right: 15px;
+  font-size: 12px;
+}
+.fu-tag {
+  width: 37px;
+  height: 22px;
+  background: rgba(198,105,58,0.1);
+  border-radius: 2px;
+  border: 1px solid #C6693A;
+  color: #C6693A;
+  text-align: center;
+  line-height: 20px;
+  margin-right: 15px;
+  font-size: 12px;
+}
+.header-title {
+  color: #262626;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
+:deep(.el-tree-node__content) {
+  height: 32px;
+  border-bottom: 1px solid #D9D9D9;
+  background: #ffffff;
+}
+:deep(.el-tree-node__content .el-text) {
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0,0,0,0.85);
+  font-weight: 500;
+}
+:deep(.right-box .el-tree-node__content){
+  background: rgba(0,0,0,0.02);
+}
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

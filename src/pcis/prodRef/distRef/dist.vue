@@ -1246,4 +1246,8 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-card__body .freeedit .searchbar .el-card__header) {
+  display: none;
+}
+</style>
