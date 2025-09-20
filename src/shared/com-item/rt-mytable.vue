@@ -92,6 +92,8 @@
                     <th
                       v-if="i.isShow !== false"
                       :width="i.width ? i.width : 100"
+                      :rowspan="getRowSpan(i)"
+                      :colspan="getColSpan(i)"
                     >
                       {{ i.title }}
                     </th>
@@ -107,6 +109,16 @@
                     }"
                   >
                     {{ appgrideditConfig.tableBtnTitle }}
+                  </th>
+                </tr>
+                <tr v-if="ismultiple()">
+                  <th v-for="vth in getmuTitle()" 
+                    :style="{
+                      width: (vth.width ? vth.width : 100) + 'px',
+                      textAlign: 'center',
+                    }"
+                  >
+                    {{ vth.title }}
                   </th>
                 </tr>
               </thead>
@@ -181,77 +193,93 @@
                     v-for="(t, ts) in appgrideditConfig.fromSchema"
                     :key="ts"
                   >
-                    <td
-                      v-if="t.isShow !== false"
-                      :class="
-                        !appgrideditConfig.dragFlag && t.dragFlag
-                          ? 'handle cursor-move'
-                          : null
-                      "
-                      :style="{
-                        textAlign: 'center',
-                      }"
-                    >
-                      <el-form-item
-                        :prop="`${j}.${t.prop}`"
-                        :rules="t.rules ? t.rules : undefined"
-                      >
-                        <div
-                          :style="{
-                            width:
-                              t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                                ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
-                                : '100%',
-                          }"
-                        >
-                          <from-item
-                            v-model="i[t.prop]"
-                            :item="t"
-                            :row="i"
-                            :showLabel="
-                              editIndex !== i._dataId ||
-                              (appgrideditConfig.editList &&
-                              appgrideditConfig.editList.length > 0
-                                ? !appgrideditConfig.editList?.includes(t.prop)
-                                : false)
-                            "
-                            :ref="
-                              (re) => {
-                                if (formRefs[i._dataId]) {
-                                  formRefs[i._dataId][t.prop] = re;
-                                } else {
-                                  formRefs[i._dataId] = {};
-                                  formRefs[i._dataId][t.prop] = re;
-                                }
-                              }
-                            "
-                          />
-                        </div>
-                        <!---       显示组件尾部按钮       --->
-                        <template
-                          v-if="
-                            t.showExBtn &&
-                            !(
-                              editIndex !== i._dataId ||
-                              (appgrideditConfig.editList &&
-                              appgrideditConfig.editList.length > 0
-                                ? !appgrideditConfig.editList?.includes(t.prop)
-                                : false)
-                            )
-                          "
-                        >
-                          <rt-button
-                            v-if="t.inputtype !== 'rttable'"
-                            :style="{
-                              width: (t.btnWidth ? t.btnWidth : 25) + '%',
-                              height: '100%',
-                            }"
-                            :item="t.btnItems"
-                            @closepopover="(rev) => setPopover(rev, i, t)"
-                          />
+                    <template v-if="t.isShow !== false">
+                      <template v-if="t.inputtype === 'rtmultiple'">
+                        <template v-for="(p,inx) in t.multipletitle" :key="inx">
+                          <td :class="
+                            !appgrideditConfig.dragFlag && t.dragFlag
+                              ? 'handle cursor-move' : null " :style="{ textAlign: 'center' }" >
+                              <rtSelectV2 :item="t" :wvalue="i[t.prop]?i[t.prop][inx]:null"
+                              @valueChange="(r)=>{
+                                const d = multipleget(i,t,r,inx);
+                                i[t.prop] = d;
+                              }" />
+                          </td>
                         </template>
-                      </el-form-item>
-                    </td>
+                      </template>
+                      <template v-else>
+                        <td
+                          :class="
+                            !appgrideditConfig.dragFlag && t.dragFlag
+                              ? 'handle cursor-move'
+                              : null
+                          "
+                          :style="{
+                            textAlign: 'center',
+                          }"
+                          >
+                            <el-form-item
+                              :prop="`${j}.${t.prop}`"
+                              :rules="t.rules ? t.rules : undefined"
+                            >
+                              <div
+                                :style="{
+                                  width:
+                                    t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
+                                      ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
+                                      : '100%',
+                                }"
+                              >
+                                <from-item
+                                  v-model="i[t.prop]"
+                                  :item="t"
+                                  :row="i"
+                                  :showLabel="
+                                    editIndex !== i._dataId ||
+                                    (appgrideditConfig.editList &&
+                                    appgrideditConfig.editList.length > 0
+                                      ? !appgrideditConfig.editList?.includes(t.prop)
+                                      : false)
+                                  "
+                                  :ref="
+                                    (re) => {
+                                      if (formRefs[i._dataId]) {
+                                        formRefs[i._dataId][t.prop] = re;
+                                      } else {
+                                        formRefs[i._dataId] = {};
+                                        formRefs[i._dataId][t.prop] = re;
+                                      }
+                                    }
+                                  "
+                                />
+                              </div>
+                              <!---       显示组件尾部按钮       --->
+                              <template
+                                v-if="
+                                  t.showExBtn &&
+                                  !(
+                                    editIndex !== i._dataId ||
+                                    (appgrideditConfig.editList &&
+                                    appgrideditConfig.editList.length > 0
+                                      ? !appgrideditConfig.editList?.includes(t.prop)
+                                      : false)
+                                  )
+                                "
+                              >
+                                <rt-button
+                                  v-if="t.inputtype !== 'rttable'"
+                                  :style="{
+                                    width: (t.btnWidth ? t.btnWidth : 25) + '%',
+                                    height: '100%',
+                                  }"
+                                  :item="t.btnItems"
+                                  @closepopover="(rev) => setPopover(rev, i, t)"
+                                />
+                              </template>
+                            </el-form-item>
+                          </td>
+                      </template>
+                    </template>
                   </template>
                   <td v-if="appgrideditConfig.tableBtnPosition === 'right'">
                     <template
@@ -392,6 +420,19 @@ function pageChange() {
 
 const formUi = reactive<Record<string, any>>({});
 
+function multipleget(row,item,newdata,index){
+  let d = row[item.prop]; let nd = '';
+  item.multipletitle.forEach((p,i)=>{
+    if(i === index){
+      nd += newdata;
+    }else{
+      if(d && d[i]){ nd += d[i]; }else{
+        nd += item.nullValue;
+      }
+    }
+  })
+  return nd;
+}
 function rowClick(row: any) {
   if (appgrideditConfig.editFlag) {
     editIndex.value = row._dataId;
@@ -451,6 +492,48 @@ function updateOption(rowId: string, propKey: string, newOption: any) {
   }, 50);
 }
 
+function ismultiple(){
+  let r = false;
+  appgrideditConfig.fromSchema?.forEach(i =>{
+    if(i.inputtype === 'rtmultiple'){
+      r = true;
+    }
+  })
+  return r;
+}
+function getRowSpan(im: any){
+  let r = null;
+  appgrideditConfig.fromSchema?.forEach(i =>{
+    if(i.inputtype === 'rtmultiple'){
+      if(im.prop !== i.prop){
+        r = 2;
+      }
+    }
+  })
+  return r;
+}
+function getColSpan(im: any){
+  let r = null;
+  appgrideditConfig.fromSchema?.forEach(i =>{
+    if(i.inputtype === 'rtmultiple'){
+      if(im.prop === i.prop){
+        r = i.multipletitle.length;
+      }
+    }
+  })
+  return r;
+}
+function getmuTitle(){
+  let r = [];
+  appgrideditConfig.fromSchema?.forEach(i =>{
+    if(i.inputtype === 'rtmultiple'){
+      i.multipletitle.forEach(j =>{
+        r.push(j)
+      });
+    }
+  })
+  return r;
+}
 function getPartnerPage(flag = true) {
   if (flag) {
     queryParams.pageNum = 1;

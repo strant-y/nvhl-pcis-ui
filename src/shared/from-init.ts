@@ -5,6 +5,9 @@ import {
   GridFromUiConfig,
 } from "./app-grid-edit-config";
 import { createFromUiConfig } from "./app-free-edit-config";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+
 const { getRules } = useValidator();
 
 /**
@@ -19,6 +22,10 @@ export function formInit(
   method: { [key: string]: Function },
   exRules: { [key: string]: any }
 ) {
+  const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+  const opertaor = dataOpertaor(idxParam.opertaorProps);
+  const params = opertaor.getParam();
+  console.log(params);
   const newObj =  JSON.parse(str, function (key, value, ) {
     const parent = this; // `this` 就是当前属性的父对象
     // 按钮绑定
