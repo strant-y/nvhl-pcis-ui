@@ -6,7 +6,7 @@
           <div class="cvrg-hearder">
             <el-row>
               <el-col :span="10">
-                <div style="display: flex; align-items: center;">
+                <div style="display: flex; align-items: center;width: fit-content;">
                   <a style="margin-right: 5px" @click="showData = !showData">
                     <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
                     <el-icon v-if="showData"><ArrowDownBold /></el-icon>
@@ -30,7 +30,6 @@
                       <el-button
                         type="text"
                         @click="downloadTerm"
-                        style="margin-right: 5px"
                         size="small"
                       ><rt-icon :item="{ icon: 'term' }" />
                     </el-button>
@@ -39,7 +38,7 @@
                       <el-button
                         type="text"
                         @click="previewTerm"
-                        style="margin-right: 5px"
+                        style="margin-left: 0px"
                         size="small"
                       ><rt-icon :item="{ icon: 'View' }" />
                     </el-button>
@@ -445,6 +444,7 @@ const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
+    size: "small"
   },
 });
 
@@ -1560,20 +1560,21 @@ defineExpose({
   box-shadow: none;
   border: none;
   --el-card-border-color: transparent;
-  padding: 10px 20px;
+  padding: 5px 20px;
   :deep(.el-card__header) {
     // background-color: #eff3f5;
     padding: 5px 10px;
     background: transparent;
   }
   :deep(.el-card__body) {
-    padding: 5px 10px;
+    padding: 0px 10px;
   }
   .cvrg-hearder-main-title {
     display: flex;
     align-items: center;
     border-radius: 12px;
     padding: 2px 10px;
+    width: max-content;
     &.zhu {
       background: linear-gradient( 180deg, rgba(58, 118, 198, .1) 0%, rgba(57, 117, 198, .1) 100%);
       color: #3A76C6;

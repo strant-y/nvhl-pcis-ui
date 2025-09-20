@@ -114,3 +114,8 @@ async function queryDpt(param){
 }
 
 </script>
+<style scoped>
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
+</style>

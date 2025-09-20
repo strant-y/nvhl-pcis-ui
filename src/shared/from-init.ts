@@ -5,6 +5,9 @@ import {
   GridFromUiConfig,
 } from "./app-grid-edit-config";
 import { createFromUiConfig } from "./app-free-edit-config";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+
 const { getRules } = useValidator();
 
 /**
@@ -19,6 +22,9 @@ export function formInit(
   method: { [key: string]: Function },
   exRules: { [key: string]: any }
 ) {
+  const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+  const opertaor = dataOpertaor(idxParam.opertaorProps);
+  const params = opertaor.getParam();
   const newObj =  JSON.parse(str, function (key, value, ) {
     const parent = this; // `this` 就是当前属性的父对象
     // 按钮绑定
@@ -89,7 +95,30 @@ export function formInit(
   });
 
   if(newObj.fromSchema && newObj.fromSchema.length>0){
-    newObj.fromSchema = newObj.fromSchema.map(item=>{
+    newObj.fromSchema = newObj.fromSchema.filter(item=>{
+      let checkKey = null;
+      const csc = item.cSysConfig;
+      if(params.sysDist === 'PCIS'){    // 核心出单，标记有效性
+        if(csc && csc.length > 0) {
+          checkKey = csc.charAt(0);
+        }
+      }else if(params.sysDist === 'PRICE'){
+        if(csc && csc.length > 1) {
+          checkKey = csc.charAt(1);
+        }
+      }
+      // 协议录入暂不考虑，协议录入使用的配置独立化了
+      // else if(params.sysDist === 'ENTERDING'){ 
+      //   if(csc && csc.length > 2) {
+      //     checkKey = csc.substring(2,1);
+      //   }
+      // }
+      if(checkKey === '2'){  // 无效,删除自己
+        return false; // 过滤掉这个项
+      }
+      if(checkKey === '1'){  // 清除,校验内容
+        item.rules = null;
+      }
       if(item.cShowLocation === '2' ){    //位置隐藏的设置
         item.hidden = true;
       }
@@ -150,7 +179,7 @@ export function formInit(
           }
           item.rules = rules;
       }
-      return item;
+      return true;
     })
   }
   return newObj;

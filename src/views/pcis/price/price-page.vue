@@ -588,7 +588,7 @@ const props:any = defineProps({
 onBeforeMount(() => {
   // onMounted() 之前
   console.log(props.param);
-  opertaor.setParam(props.param);
+  opertaor.setParam({sysDist:'PRICE',...props.param});
 });
 
 // 当前加载的组件索引
@@ -2902,14 +2902,14 @@ const submitToUndrFn = async () => {
       }
     }
 
-  // 校验 地址清单总数 和 学生人数（人）
-   if(props.param.cProdNo ==='040005'){
-        const isUnEqual = await checkStudentValidity();
-        if(isUnEqual){
-            ElMessage.error(`地址清单信息中“投保学生总数”与标的信息中“学生人数（人）”不一致，请核对！`);
-            return false;
-        }
-    }
+// 校验 地址清单总数 和 学生人数（人）
+//    if(props.param.cProdNo ==='040005'){
+//         const isUnEqual = await checkStudentValidity();
+//         if(isUnEqual){
+//             ElMessage.error(`地址清单信息中“投保学生总数”与标的信息中“学生人数（人）”不一致，请核对！`);
+//             return false;
+//         }
+//     }
 
     
     //040005 校验 地址清单学校人数与 清单 同学校人数校验

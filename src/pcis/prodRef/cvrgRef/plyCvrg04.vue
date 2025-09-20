@@ -926,7 +926,7 @@ defineExpose({
  }
 
 ::v-deep .el-card__body {
-   padding: 5px 10px !important;
+   padding: 0px 10px !important;
  }
 
 :deep(.planCard > .el-card__header:first-child) {

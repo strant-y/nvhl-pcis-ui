@@ -283,4 +283,7 @@ function updateTermlist() {
     margin-right: -10px !important;
   }
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>
