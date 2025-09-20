@@ -799,7 +799,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtselect",
               title: "查询范围",
               clearable: true,
-              rules: [getRules("required", {})],
               loadData: [
                   { label: "全部保批单", value: "app" },
                   { label: "最新保批单", value: "ply" },

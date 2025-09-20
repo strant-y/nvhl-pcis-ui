@@ -322,7 +322,7 @@ const method = {
           );
         });
     }
-    // onChiefMrkChange()
+    onChiefMrkChange()
   },
   //出单标志下拉事件
   clssueMrkChange:  (val)=>{
@@ -660,24 +660,31 @@ const onChiefMrkChange = () => {
   const ciMrkValue = cCiMrk["ECargoBase.cCiMrk"]; // 获取联共保标识
 
   if (cCoinsurerCde === "327001") {
-    switch (ciMrkValue) {
-      case "1":
-      case "2":
-      case "5":
-        cJiMrkVal = '1'; // 主联方
-        break;
-      default:
-        cJiMrkVal = '0'; // 从联方
+    if (rowData["ECargoBase.cDptCde"] === cDptCde) {
+      cSelfMrkVal = '1';
+      switch (ciMrkValue) {
+        case "1":
+        case "2":
+        case "5":
+          cJiMrkVal = '1'; // 主联方
+          break;
+        default:
+          cJiMrkVal = '0'; // 从联方
+      }
+      switch (ciMrkValue) {
+        case "3":
+        case "1":
+          cChiefMrkVal = '1'; // 主共方
+          break;
+        default:
+          cChiefMrkVal = '0'; // 从共方
+      }
+    } else {
+      cChiefMrkVal = '0'; // 非本分公司
+      cJiMrkVal = '0';    // 从联方
+      cSelfMrkVal = '0';  // 从共方
     }
-    switch (ciMrkValue) {
-      case "3":
-      case "1":
-        cChiefMrkVal = '1'; // 主共方
-        break;
-      default:
-        cChiefMrkVal = '0'; // 从共方
-    }
-  } else {
+  } else{
     switch (ciMrkValue) {
       case "2":
       case "4":
@@ -689,12 +696,10 @@ const onChiefMrkChange = () => {
     cJiMrkVal = '2'; // 外部公司
     cSelfMrkVal = '0'; // 非本分公司
   }
-  // const cChiefMrk = rowData["ECargoCi.cChiefMrk"];
-  // const cSelfMrk = rowData["ECargoCi.cSelfMrk"];
-  // const cJiMrk = rowData["ECargoCi.cJiMrk"];
+  
   freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrk", rowData._dataId, cChiefMrkVal );
   freeEditRef?.value?.setValueByRowKey("ECargoCi.cJiMrkVal", rowData._dataId, cJiMrkVal );
-  freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
+  // freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
 };
 // 初始化联共保信息
 const initCiInfo = (data: any) => {

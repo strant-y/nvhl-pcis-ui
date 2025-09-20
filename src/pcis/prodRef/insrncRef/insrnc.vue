@@ -80,9 +80,11 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     // 基础参数准备
     const plyNo = edrbase['EdrBase.cPlyNo'];
     const cProdNo = edrbase['EdrBase.cProdNo'];
+      const baseRef = opertaor.getTableRefByKey("plyBase");
     // const cust_data = plyNo = ${ plyNo }###CancelM1 = CancelM1;
     let newSysTmDay = 365, oldSysTmDay = 365;
     let newInsEndTm = '', oldInsEndTm = '';
+    let newDelayDay = 0;
 
     //  获取保单时间数据
     const resDays = await getNewSysDays({ cPlyNo: plyNo });
@@ -90,10 +92,12 @@ const freeDelay = async (obj: any): Promise<boolean> => {
       ElMessage.error("获取保单数据失败，无法进行免费延期");
       return false; // 拦截后续流程
     }
-    const [name0, name1, name2] = resDays?.res.split('###');
+    const [name0, name1, name2, name3, name4] = resDays?.res.split('###');
     newSysTmDay = name0;
     newInsEndTm = name1;
     oldSysTmDay = name2;
+    newDelayDay = name3;//延长天数
+    oldInsEndTm = name4;//原始保单的保险止期
 
     // 获取表单基础数据
     const tabref = opertaor.getTableRefs();
@@ -159,6 +163,7 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
     const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
     opertaor.getFatherPage().setEdrValue('EdrBase.nDelayNum', sumDelayDay);
+    // baseRef.setValue('Base.nRatioCoef',6666)
     return true;
 
   } catch (error) {
@@ -214,7 +219,7 @@ const method = {
     }
   },
 
-  bgnTmFn: (v:any) => {
+  bgnTmFn: (v: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
     if (isInit) return;
@@ -243,16 +248,16 @@ const method = {
 
 
     // 起运日期不能大于 保险起期   020014 020018 不参与
-    let tDepartureDate =baseBefore['Base.tDepartureDate']  //起运日期
-    if(tDepartureDate){
-          const timestamp1 = new Date(tDepartureDate).getTime();
-          const timestamp2 = new Date(v).getTime();
-          let cProdNo = route.params.param?.cProdNo;
-          if((timestamp1< timestamp2) && (cProdNo !== "020014" && cProdNo !=="020018") ){
-                 baseBefore["Base.tDepartureDate"] = ''
-          }
+    let tDepartureDate = baseBefore['Base.tDepartureDate']  //起运日期
+    if (tDepartureDate) {
+      const timestamp1 = new Date(tDepartureDate).getTime();
+      const timestamp2 = new Date(v).getTime();
+      let cProdNo = route.params.param?.cProdNo;
+      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018")) {
+        baseBefore["Base.tDepartureDate"] = ''
+      }
     }
- 
+
     setFormValue(baseBefore);
     nRatioCoefFunc()
   },
@@ -497,16 +502,16 @@ const method = {
   },
 
   // 起运日期控制
-  tDepartureDateDis:(date:any)=>{
+  tDepartureDateDis: (date: any) => {
     const fs = insrncEditRef?.value?.getFromValue();
     if (fs) {
       const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间    
-        let cProdNo = route.params.param?.cProdNo
-        if( cProdNo === "020014" ||cProdNo ==="020018"){
-               return false;
-        }else{
-           return date.getTime() < startDate.getTime()
-        }
+      let cProdNo = route.params.param?.cProdNo
+      if (cProdNo === "020014" || cProdNo === "020018") {
+        return false;
+      } else {
+        return date.getTime() < startDate.getTime()
+      }
     } else {
       return false;
     }

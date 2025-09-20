@@ -570,8 +570,6 @@ const method = {
 		}
     selectDist(selData).then((res: any) => {
       if (res.code === 200) {
-
-
         pageresult.list = [];
         pageresult.total = res.data.total;
         pageresult.list = res.data.data.map((item, index) => {
@@ -584,11 +582,14 @@ const method = {
 					if(!!item['Dist.tOpeningTime']){
 						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
 					}
+          
+            console.log('pageresult.list',pageresult.list);
           return{
             ... item,
             ... data
           };
         });
+       
         // 040005学生人数（人） 地址清单信息人数 回填
         if( props.compKey === 'AddressDist040005' ){
              if(pageresult.list.length>0){
@@ -601,18 +602,16 @@ const method = {
         }
 
         // 020001  货物数量 回填
-        if( props.compKey === 'CargoDist020001' ){
-            if(pageresult.list.length>0){
-              let nGoodsNum: number | null = null;
-                pageresult.list.forEach((item:any)=>{
-                      nGoodsNum+= item['Dist.nNum'] || 0
-                })
-              tgtRef.setValue('Tgt.nGoodsNum',nGoodsNum)
-            }
-        }
-
-
-
+        // if( props.compKey === 'CargoDist020001' ){
+        //     if(pageresult.list.length>0){
+        //         debugger
+        //       let nGoodsNum: number | null = null;
+        //         pageresult.list.forEach((item:any)=>{
+        //               nGoodsNum+= item['Dist.nNum'] || 0
+        //         })
+        //       tgtRef.setValue('Tgt.nGoodsNum',nGoodsNum)
+        //     }
+        // }
 
         if(tgtRef !== undefined){
           tgtRef.setValue("Tgt.nElevatorsNumber",res.data.total)
@@ -667,6 +666,7 @@ const method = {
   //   });
   // },
   getTgtDetailFn:() => {
+  
         // 询价转投保
         if(route.params.param?.pageType === "inquiryToApp") {
            return;
@@ -687,7 +687,7 @@ const method = {
         } else {
           distParam['cAppNo'] = app;
         }
-
+        
         getTgtDetailByDist(distParam).then((res: any) => {
         if (res["code"] == "200") {
             let tgtRef = opertaor.getTableRefByKey('tgt');
@@ -696,7 +696,6 @@ const method = {
             let nInvoicceValue = res.data?.nInvoicceValue;
             let cInvoiceNum = res.data?.cInvoiceNum;
             let nGoodsNum = res.data?.nGoodsNum;
-
             tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
             tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
             tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)

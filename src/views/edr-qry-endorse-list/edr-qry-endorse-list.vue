@@ -522,6 +522,10 @@ const refreshData = (reset = true) => {
             return;
         }
     }
+       // 提取投保日期的开始时间和结束时间
+    const tAppTmStart = formData.tAppTm && formData.tAppTm.length > 1 ? formData.tAppTm[0] : null;
+    const tAppTmEnd = formData.tAppTm && formData.tAppTm.length > 1 ? formData.tAppTm[1] : null;
+
     const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {
@@ -542,6 +546,9 @@ const refreshData = (reset = true) => {
     };
     const params = Object.assign(s, r, obj);
     params["cTermNo"] = cTermNo;        // 条款编码
+    params["tAppTmStart"] = tAppTmStart; // 投保开始时间
+    params["tAppTmEnd"] = tAppTmEnd; // 投保结束时间
+
     console.log('参数1', params)
     sessionStorage.setItem(AppKey.query.pcis_query_endorse, params);
 
@@ -1137,7 +1144,7 @@ const initQuery = async (cPlyNo, cProdNo, data) => {
 
         const resOff = await checkCancelM1IsOff({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
         console.log(666,resOff)
-        if(false){
+        if(resOff.res){
              return false; 
         }else{
 

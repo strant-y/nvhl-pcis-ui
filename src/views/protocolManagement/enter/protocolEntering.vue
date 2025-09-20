@@ -458,10 +458,12 @@ function showMethodModal() {
     .open(paymentDialog)
     .then((res: any) => {
       if (res.type === "ok") {
+        debugger
         const selectedPayment = res.body?.param;
         const dptCde = res.body?.dptCde;
         const cDptCde = res.body?.cDptCde;
-        toDtl({}, 'add', selectedPayment,dptCde,cDptCde);
+        const cDptCnm = res.body?.cDptCnm;
+        toDtl({dptCde,cDptCde,cDptCnm}, 'add', selectedPayment);
       }
     });
 };
@@ -491,11 +493,12 @@ const handelDet = (cEcAgrAppNo:any)=>{
         // 取消删除
       });
 }
-function toDtl(row: any, type: string, payWay: string,dptCde:string,cDptCde:string ) {
+function toDtl(row: any, type: string, payWay: string ) {
+
   if(row.cAppTyp === 'E'){
     router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});
   }else {
-    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type, payWay: payWay,dptCde:dptCde,cDptCde:cDptCde}});
+    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type, payWay: payWay}});
   }
 }
 
