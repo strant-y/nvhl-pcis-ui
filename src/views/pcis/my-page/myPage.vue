@@ -192,58 +192,58 @@
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
-        <div class="main-header">
-          <div class="tp" style="background: #ebedfc">
-            <span>条款：</span
-            ><span class="publicStyle"
-              >{{props.param.cTermNo }}&nbsp;&nbsp;{{props.param.cTermNme
-              }}</span
-            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span
-            ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|
-            <span class="publicStyle">{{
-                (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
-              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'
-              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'
-              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'
-              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'
-              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'
-              : '联保单' }}</span> |
-            <span class="publicStyle">{{
-              props.param.cGrpMrk == "0" ? "个单" : "团单"
-            }}</span
-            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>是否互联网出单:</span
-            >&nbsp;&nbsp;<span class="publicStyle">{{
-              props.param.cIsNet == "0" ? "是" : "否"
-            }}</span>
-          </div>
-          <div class="btm" style="background: #ebedfc">
-            <span>保险期限：</span
-            ><span class="publicStyle">{{ tmDay }}</span
-            >&nbsp;&nbsp;<span>天</span
-            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>保额：</span
-            ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span
-            >&nbsp;
-<!--            <span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;-->
-            |&nbsp;<span
-              class="font-weight-500"
-              >保费: </span
-            ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span
-            >&nbsp;
-<!--            <span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;-->
-						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-							|&nbsp;&nbsp;<span>协议剩余预收保费: </span
-							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
-							>&nbsp;
-<!--              <span class="font-weight-500">元</span>-->
-						</template>
-            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
-              |&nbsp;&nbsp;<span>协议剩余保额: </span
-            ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
-            >&nbsp;
-<!--              <span class="font-weight-500">元</span>-->
-            </template>
-          </div>
-        </div>
+<!--        <div class="main-header">-->
+<!--          <div class="tp" style="background: #ebedfc">-->
+<!--            <span>条款：</span-->
+<!--            ><span class="publicStyle"-->
+<!--              >{{props.param.cTermNo }}&nbsp;&nbsp;{{props.param.cTermNme-->
+<!--              }}</span-->
+<!--            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>出单方式：</span-->
+<!--            ><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;|-->
+<!--            <span class="publicStyle">{{-->
+<!--                (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'-->
+<!--              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'-->
+<!--              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'-->
+<!--              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'-->
+<!--              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'-->
+<!--              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'-->
+<!--              : '联保单' }}</span> |-->
+<!--            <span class="publicStyle">{{-->
+<!--              props.param.cGrpMrk == "0" ? "个单" : "团单"-->
+<!--            }}</span-->
+<!--            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>是否互联网出单:</span-->
+<!--            >&nbsp;&nbsp;<span class="publicStyle">{{-->
+<!--              props.param.cIsNet == "0" ? "是" : "否"-->
+<!--            }}</span>-->
+<!--          </div>-->
+<!--          <div class="btm" style="background: #ebedfc">-->
+<!--            <span>保险期限：</span-->
+<!--            ><span class="publicStyle">{{ tmDay }}</span-->
+<!--            >&nbsp;&nbsp;<span>天</span-->
+<!--            >&nbsp;&nbsp;|&nbsp;&nbsp;<span>保额：</span-->
+<!--            ><span class="publicStyle">{{ nAmt.toLocaleString() }}</span-->
+<!--            >&nbsp;-->
+<!--&lt;!&ndash;            <span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;&ndash;&gt;-->
+<!--            |&nbsp;<span-->
+<!--              class="font-weight-500"-->
+<!--              >保费: </span-->
+<!--            ><span class="publicStyle">{{ nPrm.toLocaleString() }}</span-->
+<!--            >&nbsp;-->
+<!--&lt;!&ndash;            <span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;&ndash;&gt;-->
+<!--						<template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">-->
+<!--							|&nbsp;&nbsp;<span>协议剩余预收保费: </span-->
+<!--							><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span-->
+<!--							>&nbsp;-->
+<!--&lt;!&ndash;              <span class="font-weight-500">元</span>&ndash;&gt;-->
+<!--						</template>-->
+<!--            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">-->
+<!--              |&nbsp;&nbsp;<span>协议剩余保额: </span-->
+<!--            ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span-->
+<!--            >&nbsp;-->
+<!--&lt;!&ndash;              <span class="font-weight-500">元</span>&ndash;&gt;-->
+<!--            </template>-->
+<!--          </div>-->
+<!--        </div>-->
         <div class="main-content" @scroll="handleScroll">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
             <edrbaseRef :ref="(res: any) => {
@@ -354,6 +354,58 @@
         </div>
       </el-main>
       <div class="right-btns">
+        <div class="main-header2">
+          <div class="tp">
+            <span>
+              条款:
+              <span class="publicStyle">{{props.param.cTermNo }}{{props.param.cTermNme}}</span>
+            </span>
+            <br/>
+            <span>出单方式:</span><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;
+            <br/>
+            <span>联共保类型:
+              <span class="publicStyle">{{
+                  (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
+                      : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'
+                          : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'
+                              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'
+                                  : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'
+                                      : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'
+                                          : '联保单' }}
+              </span>
+            </span>
+             <br/>
+            <span>团个属性:
+            <span class="publicStyle">{{
+                props.param.cGrpMrk == "0" ? "个单" : "团单"
+              }}</span>
+            </span>
+            <br/>
+            <span>互联网出单:</span><span class="publicStyle">{{ props.param.cIsNet == "0" ? "是" : "否" }}</span>
+          </div>
+          <div class="btm">
+            <span>保险期限:</span><span class="publicStyle">{{ tmDay }}</span><span>天</span
+          >
+            <br/><span>保额:</span><span class="publicStyle">{{ nAmt.toLocaleString() }}</span>
+            <!--            <span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;-->
+            <br/>
+            <span class="font-weight-500">保费:</span><span class="publicStyle">{{ nPrm.toLocaleString() }}</span>&nbsp;
+            <!--            <span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;-->
+            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
+              <br/><span>协议剩余预收保费:</span
+            ><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
+            >&nbsp;
+              <!--              <span class="font-weight-500">元</span>-->
+            </template>
+            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
+              <br/>&nbsp;&nbsp;<span>协议剩余保额: </span
+            ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
+            >&nbsp;
+              <!--              <span class="font-weight-500">元</span>-->
+            </template>
+          </div>
+        </div>
+
         <div class="btns-content" v-if="rightBtnList.length > 0">
           <rt-button
             v-for="(bth, idx) in rightBtnList"
@@ -807,14 +859,14 @@ const getRecordTypeText = computed(() => {
   return (cRecordType: string) => {
     const actualRecordType = props.param.cPolicySource ?? props.param.cRecordType ?? cRecordType;
     const recordTypeMap: { [key: string]: string } = {
-      '1': '核心页面出单',
+      '1': '核心出单',
       '5': '方案录单',
       '7': '模板录单',
       '9': '协议出单',
       '2':'核心导入',
       '3':'移动端出单',
       '4':'渠道出单',
-      '6':'询报价转投保',
+      '6':'询价转投保',
       '8':'复制出单',
       '10':'组合出单',
       '11':'续保出单',
@@ -5753,17 +5805,25 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     justify-content: center;
     align-items: center;
     margin-top: 12px;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     color: rgba(0, 0, 0, 0.85);
   }
   .main-content {
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
-    margin: 12px 20px;
+    margin: 12px 5px;
   }
 }
+
+.main-header2 {
+  background: #FFFFFF;
+  border-radius: 5px;
+  padding: 6px;
+  font-size: 10px;
+}
+
 :deep(.el-card__header) {
   .el-row {
     align-items: center;
@@ -5780,10 +5840,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     }
   }
 }
-.card-title-style {
-  font-size: 16px;
-  font-weight: 500;
-}
+
 :deep(.el-card__body) {
   padding: 5px 10px;
 }
@@ -5856,9 +5913,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .right-btns {
   // padding: 0 3rem;
-  margin: 72px 20px 0 0;
+  margin: 12px 10px 0 0;
   // min-width: calc(150px + 6rem);
   .btns-content {
+    margin-top: 10px;
     background: #FFFFFF;
     padding: 10px;
     border-radius: 5px;

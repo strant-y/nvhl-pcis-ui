@@ -3,15 +3,15 @@
     <div class="searchbar">
       <el-row :gutter="16">
         <el-col :md="24">
-          <el-card>
+          <el-card shadow="hover" class="card_container">
             <template #header>
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!gridEditConfig.production">
-                  {{ gridEditConfig.title }}
+                  <span class="card-title-style">{{ gridEditConfig.title }}</span>
                 </el-col>
                 <el-col :span="4" v-if="gridEditConfig.production">
                   <el-tooltip :content="gridEditConfig.productionTitle">
-                    {{ gridEditConfig.title }}
+                    <span class="card-title-style">{{ gridEditConfig.title }}</span>
                   </el-tooltip>
                 </el-col>
                 <el-col
@@ -43,7 +43,7 @@
                   >
                     <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
                     <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
-                    {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                    <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                   </a>
                 </el-col>
               </el-row>
@@ -266,8 +266,6 @@ defineExpose({
 }
 
 .searchbar {
-  border: 1px solid #ddd;
-  /* box-shadow: 0 0 2px rgb(0 0 0 / 30%); */
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */

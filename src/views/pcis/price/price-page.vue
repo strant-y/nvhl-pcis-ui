@@ -770,14 +770,14 @@ const getRecordTypeText = computed(() => {
   return (cRecordType: string) => {
     const actualRecordType = props.param.cPolicySource ?? props.param.cRecordType ?? cRecordType;
     const recordTypeMap: { [key: string]: string } = {
-      '1': '核心页面出单',
+      '1': '核心出单',
       '5': '方案录单',
       '7': '模板录单',
       '9': '协议出单',
       '2':'核心导入',
       '3':'移动端出单',
       '4':'渠道出单',
-      '6':'询报价转投保',
+      '6':'询价转投保',
       '8':'复制出单',
       '10':'组合出单',
     };
@@ -5224,10 +5224,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     }
   }
 }
-.card-title-style {
-  font-size: 16px;
-  font-weight: 500;
-}
+
 :deep(.el-card__body) {
   padding: 5px 10px;
 }
