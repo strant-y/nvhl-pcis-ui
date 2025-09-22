@@ -409,6 +409,11 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
+            const cvrgRef = opertaor.getTableRefs()['cvrg'];
+            try {
+              cvrgRef?.refushCvrgInfo();
+            } catch (ignore) {
+            }
           },
         },
         { width: "60" }
