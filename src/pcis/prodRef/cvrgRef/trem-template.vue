@@ -1037,6 +1037,9 @@ function dataInit() {
 }
 
 function getUseData(data: any){
+  if(!data){
+    return null;
+  }
   let redata = JSON.parse(JSON.stringify(data));
   const params = opertaor.getParam();
   if(data && data.length > 0){
