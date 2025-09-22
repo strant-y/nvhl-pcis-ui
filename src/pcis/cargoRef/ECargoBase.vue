@@ -66,12 +66,14 @@ onMounted(() => {
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
       ],
     });
+    setValue("ECargoBase.cDptCde", param.cDptCde);
     //回显服务机构数据
     setFormItem("ECargoBase.cIntroDptcde", {
       loadData: [
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
       ],
     });
+    console.log("ciAgreementECargo",formPage.getAllFormData())
   })
 });
 
