@@ -882,12 +882,12 @@ function dataInit() {
   const r = terconfig.getConfig(queryKey);
   if (r) {
     const d = JSON.parse(r);
-    collist.value = d.collist;
+    collist.value = getUseData(d.collist);
     factormap.value = d.factormap;
     colInfo.value = d.colInfo;
     groupInfo.value = d.groupInfo;
     term.value = d.term;
-    termFactormap.value = d.termFactormap;
+    termFactormap.value = getUseData(d.termFactormap);
     methodLink(termFactormap.value);
     riskMethodLink(factormap.value);
     initshowConfig();
@@ -915,13 +915,12 @@ function dataInit() {
       const { code, data, msg } = res;
       if (200 === code) {
         terconfig.addConfig(queryKey, JSON.stringify(data.data));
-        collist.value = data.data.collist;
+        collist.value = getUseData(data.data.collist);
         factormap.value = data.data.factormap;
         colInfo.value = data.data.colInfo;
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
-        termFactormap.value = data.data.termFactormap;
-
+        termFactormap.value = getUseData(data.data.termFactormap);
         methodLink(termFactormap.value);
         riskMethodLink(factormap.value);
         initshowConfig();
@@ -949,6 +948,34 @@ function dataInit() {
       initMethod();
     });
   }
+}
+
+function getUseData(data: any){
+  let redata = JSON.parse(JSON.stringify(data));
+  const params = opertaor.getParam();
+  if(data && data.length > 0){
+    redata = redata.filter((item:any) => { 
+      let checkKey = null;
+      const csc = item.cSysConfig;
+      if(params.sysDist === 'PCIS'){    // 核心出单，标记有效性
+        if(csc && csc.length > 0) {
+          checkKey = csc.charAt(0);
+        }
+      }else if(params.sysDist === 'PRICE'){
+        if(csc && csc.length > 1) {
+          checkKey = csc.charAt(1);
+        }
+      }
+      if(checkKey === '2'){  // 无效,删除自己
+        return false; // 过滤掉这个项
+      }
+      if(checkKey === '1'){  // 清除,校验内容
+        item.rules = null;
+      }
+      return true;
+    });
+  }
+  return redata;
 }
 
 /** 初始化需要执行的方法,手动触发 */

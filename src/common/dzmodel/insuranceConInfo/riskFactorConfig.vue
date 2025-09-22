@@ -239,6 +239,43 @@ const tableconfig = reactive<AppTableConfig>(
           getFactorConf();
         },
       },
+      {
+        prop: "c_sys_config",
+        inputtype: "rtmultiple",
+        title: "可操作域",
+        multipleshow:"select",
+        placeholder:"有效",
+        nullValue:"0",
+        loadData: [
+          {
+            label: "有效",
+            value: "0",
+          },
+          {
+            label: "无验证",
+            value: "1",
+          },
+          {
+            label: "无效",
+            value: "2",
+          },
+        ],
+        multipletitle:[
+          {
+            title:'核心',
+            width:80
+          },{
+            title:'询价',
+            width:80
+          },{
+            title:'移动',
+            width:80
+          }
+        ],
+        func: (v: any) => {
+          getFactorConf();
+        },
+      },
     ],
   })
 );
@@ -275,6 +312,7 @@ function select(item: any) {
       se.c_porp_disabled = element.c_porp_disabled;
       se.c_prop_indent = element.c_prop_indent;
       se.c_father_key = element.c_father_key;
+      se.c_sys_config = element.c_sys_config;
       newSelectl.push(se);
     }
   });
@@ -308,6 +346,7 @@ function getFactorConf() {
           c_porp_disabled: element.c_porp_disabled,
           c_prop_indent:element.c_prop_indent,
           c_father_key:element.c_father_key,
+          c_sys_config:element.c_sys_config,
         }));
       e.selectFactorList = selectData1;
     }
@@ -315,8 +354,6 @@ function getFactorConf() {
 }
 function saveTitleFactor() {
   const fromValue = freeEditRef.value?.getFromValue();
-
-  console.log(colList.value);
   const param = {
     colInfo: colList.value,
     ...fromValue,
