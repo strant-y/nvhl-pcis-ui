@@ -2899,8 +2899,13 @@ const calcPremium = () => {
           item.nSeqNo = index + 1;
         })
       }
-
-      opertaor.setDataAll(ops);
+      //   opertaor.setDataAll(ops);
+      const whiteList = ['base', 'plyBase', 'applicant', 'insured', 'payinfo', 'EdrBase','insrnc'];
+      Object.keys(ops).forEach(key => {
+        if (whiteList.includes(key) && opertaor.getTableRefByKey(key)?.setFormValue) {
+            opertaor.getTableRefByKey(key).setFormValue(ops[key]);
+        }
+      });
 
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
             nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
