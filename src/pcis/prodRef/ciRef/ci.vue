@@ -1195,11 +1195,13 @@ const handleEdrAppNewSceneRules = () => {
   if (param?.pageType === "EDR_APP_NEW_SCENE" && cCiMrkValue !== "0" && cCiMrkValue !== '5' && param.cRsnCde == "47") {
     tableList.forEach((rowData: any) => {
       const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId);
+      // debugger
       if (rowItem) {
         if (rowData['Ci.cChiefMrk'] == '1') {
           rowItem['Ci.nCiShare'].disabled = false;
         }
-        else if (rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] !== '327001') {
+        // else if (rowData['Ci.cChiefMrk'] == '0' && rowData['Ci.cCoinsurerCde'] != '327001') {
+        else if (rowData['Ci.cCoinsurerCde'] != '327001') {
           rowItem['Ci.nCiShare'].disabled = false;
           rowItem['Ci.nPlyFeeRate'].disabled = false;
           rowItem['Ci.cCoinsurerCde'].disabled = false;
