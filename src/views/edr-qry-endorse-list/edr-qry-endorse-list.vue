@@ -117,7 +117,6 @@ function extractCode(str: string) {
 
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
-        title: "一般批改",
         endBtnsPosition: "right",
         endBtns: [
             createFreeButtonBase({

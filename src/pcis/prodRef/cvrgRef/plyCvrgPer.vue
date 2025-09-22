@@ -202,6 +202,7 @@ onMounted(async () => {
   if(!parparam.cProdNo.startsWith("02") && deleteId > 0){ // 只有货运险,需要选择获取按钮
     formconfig11.titleBtns?.splice(deleteId,1);
   }
+  formconfig11.titleClass = 'card-title-style';
   Object.assign(cardconfig.value, formconfig11);
   selectedRow.value = {}; // 初始化清除选中的缓存数据
   if (parparam.pageType === "app" && parparam.cRecordType != 4) {
