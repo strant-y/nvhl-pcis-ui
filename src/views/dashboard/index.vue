@@ -1,30 +1,40 @@
 <template>
   <div class="dashboard-container">
     <div class="home">
-      <div class="top-box">
-        <div style="display: flex;justify-content: space-between;">
+      <div class="code-box" style="position: absolute;right: 3px;">
+        <div class="code-inner-box">
+          <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
+        </div>
+        <div class="code-inner-box">
           <div>
-            <div class="top-title1">财产险承保系统</div>
-            <div class="top-title2">
-              智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧
-            </div>
-          </div>
-          <div class="code-box">
-            <div class="code-inner-box">
-                <span class="title">移动端二维码：</span>
-                <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
-            </div>
-            <div class="code-inner-box">
-                <span class="title">在线缺陷平台: </span>
-                <div>
-                  <a :href="platformUrl" target="_blank" class="link">点击跳转</a>
-                </div>
-            </div>
+            <a :href="platformUrl" target="_blank" class="link">缺陷平台</a>
           </div>
         </div>
+      </div>
+      <div class="top-box">
+<!--        <div style="display: flex;justify-content: space-between;">-->
+<!--          <div>-->
+<!--            <div class="top-title1">财产险承保系统</div>-->
+<!--            <div class="top-title2">-->
+<!--              智能高效助力承保，精准把控风险，让财险业务开展更顺畅无忧-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="code-box">-->
+<!--            <div class="code-inner-box">-->
+<!--                <span class="title">移动端二维码：</span>-->
+<!--                <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">-->
+<!--            </div>-->
+<!--            <div class="code-inner-box">-->
+<!--                <span class="title">在线缺陷平台: </span>-->
+<!--                <div>-->
+<!--                  <a :href="platformUrl" target="_blank" class="link">点击跳转</a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
-          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;height: 2.5rem;" />
+          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;height: 2.5rem;margin-right: 3px;border-radius: 3px;" />
         </div>
         <!-- <div class="top-menu">
           <div class="menu-label">
@@ -289,7 +299,7 @@
                 </div>
                 <div v-for="item in echartsOptionsData1[currentTab]" :key="item.item">
                   <span class="month">{{ item.item }}</span>
-                  <span class="nPrm">{{ item.value }}</span>
+                  <span class="nPrm">{{ item.value > 0 ? (item.value / 10000).toFixed(2) : item.value }}</span>
                 </div>
               </div>
             </div>
@@ -1035,13 +1045,13 @@ function getOrderInfo() {
         tabDataMap.value = res.dataMap;
         const keys = Object.keys(res.dataMap).filter(
           (item: any) =>
-            item === "核心页面出单" ||
+            item === "核心出单" ||
             item === "复制出单" ||
             item === "模板出单" ||
             item === "方案出单" ||
-            item === "询报价转投保"
+            item === "询价转投保"
         );
-        keys.splice(0, 0, keys.splice(keys.indexOf("核心页面出单"), 1)[0]);
+        keys.splice(0, 0, keys.splice(keys.indexOf("核心出单"), 1)[0]);
         currentTab.value = keys[0];
         statisticTabList.value = keys;
         handleRefreshEcharts();
@@ -1076,30 +1086,6 @@ function handleRefreshEcharts() {
     getAnalysis(param)
       .then((res: any) => {
         if (res.code === 200) {
-          res.dataMap["方案出单"].forEach((item: any, index: number) => {
-            item.value = Math.random() * 123;
-            item.rate = Math.random() * 3.6;
-          });
-          res.dataMap["核心导入"].forEach((item: any, index: number) => {
-            item.value = Math.random() * 18;
-            item.rate = Math.random() * 1.2;
-          });
-          res.dataMap["核心页面出单"].forEach((item: any, index: number) => {
-            item.value = Math.random() * 153;
-            item.rate = Math.random() * 2.2;
-          });
-          res.dataMap["渠道出单"].forEach((item: any, index: number) => {
-            item.value = Math.random() * 222;
-            item.rate = Math.random() * 2.4;
-          });
-          res.dataMap["移动端出单"].forEach((item: any, index: number) => {
-            item.value = Math.random() * 134;
-            item.rate = Math.random() * 1.6;
-          });
-          res.dataMap["询报价转投保"].forEach((item: any, index: number) => {
-            item.value = Math.random() * 356;
-            item.rate = Math.random() * 3.5;
-          });
           echartsOptionsData.value = res.dataMap;
           const data = res.dataMap[currentTab.value] || [];
           echartsOptions.xAxis[0].data = data.map((item: any) => item.item);
@@ -1156,30 +1142,6 @@ function handleRefreshEcharts() {
     getAnalysis(param1)
       .then((res: any) => {
         if (res.code === 200) {
-          res.dataMap["方案出单"].forEach((item: any, index: number) => {
-            item.value = Math.round(Math.random() * 100);
-            item.rate = Math.random() * 0.8;
-          });
-          res.dataMap["核心导入"].forEach((item: any, index: number) => {
-            item.value = Math.round(Math.random() * 200);
-            item.rate = Math.random() * 3.6;
-          });
-          res.dataMap["核心页面出单"].forEach((item: any, index: number) => {
-            item.value = Math.round(Math.random() * 300);
-            item.rate = Math.random() * 2.8;
-          });
-          res.dataMap["渠道出单"].forEach((item: any, index: number) => {
-            item.value = Math.round(Math.random() * 400);
-            item.rate = Math.random() * 2.9;
-          });
-          res.dataMap["移动端出单"].forEach((item: any, index: number) => {
-            item.value = Math.round(Math.random() * 500);
-            item.rate = Math.random() * 1.6;
-          });
-          res.dataMap["询报价转投保"].forEach((item: any, index: number) => {
-            item.value = Math.round(Math.random() * 600);
-            item.rate = Math.random() * 3.5;
-          });
           echartsOptionsData1.value = res.dataMap;
           const data = res.dataMap[currentTab.value] || [];
           echartsOptions1.xAxis[0].data = data.map((item: any) => item.item);
@@ -1275,14 +1237,14 @@ const getData = (user: any, roles: any = []) => {
       if (res === "ROLE_00000008" || res === "ROLE_00000563") {
         isOperate.value = true;
         tabs.value = tab1;
-        moreurl.value = "/query/application-querys";
+        moreurl.value = "/pcis-new-udr-list/orderProcessing";
       }
       // 核保
       if (res === "ROLE_00000152") {
         tableconfig = reactive<AppTableConfig>(
           createTableEditConfig(tableObj.unUdrObj)
         );
-        moreurl.value = "/pcis-new-udr-list/PendUdrList";
+        moreurl.value = "/pcis-new-udr-list/PendUdrListQuery";
         isAudit.value = true;
         tabs.value = tab2;
       }
@@ -1423,74 +1385,62 @@ function getIssueTableData() {
 const toQuery = (url: string) => {
   if (isOperate.value) {
     //出单员
-    //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询）
-    if (url === "/query/application-querys") {
-      let param = {
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        CAppStatus: "1",
-        TIssueTmStart: moment(new Date(Date.now()))
-          .subtract(6, "day")
-          .format("YYYY-MM-DD HH:mm:ss"),
-        TIssueTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      };
-      if (currentTabName.value == "待修改任务") {
-        param = Object.assign({
-          CurrentUser: user.opCde,
-          CurrentUserOrg: user.companyId,
-          startBsTm1: moment(new Date(Date.now()))
-            .subtract(6, "day")
-            .format("YYYY-MM-DD HH:mm:ss"),
-          endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-        });
-        sessionStorage.setItem(
-          AppKey.query.pcis_query_returnudrlist,
-          JSON.stringify(param)
-        );
-      } else {
-        sessionStorage.setItem(
-          AppKey.query.pcis_query_app,
-          JSON.stringify(param)
-        );
-      }
-      router.push({ path: url });
-    } else if (url === "/RenewalManagement/renewal-management") {
-      //待续保 （续保管理）
-      const param = Object.assign({
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        startBsTm1: moment(new Date(Date.now()))
-          .subtract(6, "day")
-          .format("YYYY-MM-DD HH:mm:ss"),
-        endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      });
-      sessionStorage.setItem("renewPolicy", JSON.stringify(param));
+    //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询） 
+    if (url === "/pcis-new-udr-list/orderProcessing") {
+      // let param = {
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   CAppStatus: "1",
+      //   TIssueTmStart: moment(new Date(Date.now()))
+      //     .subtract(6, "day")
+      //     .format("YYYY-MM-DD HH:mm:ss"),
+      //   TIssueTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
+      // };
+      // if (currentTabName.value == "待修改任务") {
+      //   param = Object.assign({
+      //     CurrentUser: user.opCde,
+      //     CurrentUserOrg: user.companyId,
+      //     startBsTm1: moment(new Date(Date.now()))
+      //       .subtract(6, "day")
+      //       .format("YYYY-MM-DD HH:mm:ss"),
+      //     endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
+      //   });
+      //   sessionStorage.setItem(
+      //     AppKey.query.pcis_query_returnudrlist,
+      //     JSON.stringify(param)
+      //   );
+      // } else {
+      //   sessionStorage.setItem(
+      //     AppKey.query.pcis_query_app,
+      //     JSON.stringify(param)
+      //   );
+      // }
       router.push({ path: url });
     }
   } else if (isAudit.value) {
-    if (url === "/pcis-new-udr-list/PendUdrList") {
+    if (url === "/pcis-new-udr-list/PendUdrListQuery") {
       //核保员 （核保任务查询）
-      let param = Object.assign({
-        CurrentUser: user.opCde,
-        CurrentUserOrg: user.companyId,
-        startCrtTm: moment(new Date(Date.now()))
-          .subtract(6, "day")
-          .format("YYYY-MM-DD HH:mm:ss"),
-        TAppTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-        startBsTm1: moment(new Date(Date.now()))
-          .subtract(6, "day")
-          .format("YYYY-MM-DD HH:mm:ss"),
-        endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      });
-      if (currentTabName.value == "暂存任务") {
-        param.type = "temp";
-      } else {
-        param.type = "edit";
-      }
-      sessionStorage.setItem(
-        AppKey.query.pcis_query_newudrlist,
-        JSON.stringify(param)
-      );
+      // let param = Object.assign({
+      //   CurrentUser: user.opCde,
+      //   CurrentUserOrg: user.companyId,
+      //   startCrtTm: moment(new Date(Date.now()))
+      //     .subtract(6, "day")
+      //     .format("YYYY-MM-DD HH:mm:ss"),
+      //   TAppTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
+      //   startBsTm1: moment(new Date(Date.now()))
+      //     .subtract(6, "day")
+      //     .format("YYYY-MM-DD HH:mm:ss"),
+      //   endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
+      // });
+      // if (currentTabName.value == "暂存任务") {
+      //   param.type = "temp";
+      // } else {
+      //   param.type = "edit";
+      // }
+      // sessionStorage.setItem(
+      //   AppKey.query.pcis_query_newudrlist,
+      //   JSON.stringify(param)
+      // );
       router.push({ path: url });
     }
   }
@@ -2366,7 +2316,7 @@ window.addEventListener("resize", () => {
     background-size: 100% 24.06667rem;
     background-position: top;
     background-repeat: no-repeat;
-    padding: 1.5rem 7rem;
+    padding: 0.8rem 4rem;
     overflow-y: auto;
 
     .top-box {
@@ -2390,21 +2340,26 @@ window.addEventListener("resize", () => {
       }
 
       .top-search {
-        width: 70%;
+        width: 75%;
         height: 3rem;
         display: flex;
         align-items: center;
         background: #ffffff;
+        min-width: 840px;
 
         :deep(.el-input__wrapper) {
           box-shadow: none;
         }
 
-        .el-button {
+        :deep(.el-button) {
           margin-right: 10px;
+          font-size: 20px;
         }
         :deep(.el-button>span) {
           padding-left: 20px;
+        }
+        &:hover{
+          border: 1px var(--el-color-primary) solid;
         }
       }
 
@@ -2471,7 +2426,7 @@ window.addEventListener("resize", () => {
           color: #666;
           display: flex;
           :deep(.el-tabs__item) {
-            font-size: 17px;
+            font-size: 15px;
             line-height: 24px;
             color: #000000;
             &.is-active,&:hover {
@@ -2663,7 +2618,7 @@ window.addEventListener("resize", () => {
       // box-shadow: 0 0 0.4rem #0000001a;
       box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
       border-radius: 5px;
-      padding: 28px 37px;
+      padding: 10px 20px;
       display: flex;
       flex-direction: column;
       margin-bottom: 1.5rem;
@@ -2700,7 +2655,7 @@ window.addEventListener("resize", () => {
         }
         .tabs-box {
           :deep(.el-tabs__item) {
-            font-size: 17px;
+            font-size: 15px;
             line-height: 24px;
             color: #000000;
             &.is-active,&:hover {
@@ -2800,7 +2755,6 @@ window.addEventListener("resize", () => {
 }
 
 .policy-number-row span {
-  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2852,5 +2806,8 @@ window.addEventListener("resize", () => {
 }
 :deep(.methodColumn) {
   grid-template-columns: repeat(1, 1fr);
+}
+:deep(.el-text.is-truncated) {
+  vertical-align: middle;
 }
 </style>

@@ -119,6 +119,10 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  wvalue: {
+    type: [String, Number, Array<any>, Boolean],
+    required: false,
+  }
 });
 
 interface OptionTypeBySelect extends OptionType {
@@ -208,6 +212,14 @@ watch(
 );
 
 watch(
+  () => props.wvalue,
+  (n,o) => {
+    selectedValue.value = n;
+  },
+  { deep: true }
+);
+
+watch(
   () => props.item.disabled,
   (newData, oldData) => {
     if (oldData && !newData) {
@@ -224,8 +236,8 @@ watch(
 
 watch(
   [() => props.item.typeCode],
-  ([newtypeCode]) => {
-    if (newtypeCode) {
+  ([newtypeCode,old]) => {
+    if (newtypeCode !== old) {
       uploadOption();
     }
   },
@@ -234,8 +246,8 @@ watch(
 
 watch(
   [() => props.item.codeParam],
-  ([newCodeParam]) => {
-    if (newCodeParam) {
+  ([newCodeParam,old]) => {
+    if (newCodeParam !== old) {
       uploadOption();
     }
   },
@@ -344,6 +356,9 @@ function showOptions(visible: boolean){
 }
 
 onMounted(() => {
+  if(props.wvalue){
+    selectedValue.value = props.wvalue;
+  }
   // 初始化组件数据
   if (props.item) {
     if(getCodeListMapToOption()) return;

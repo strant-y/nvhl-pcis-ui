@@ -447,7 +447,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         hideBtns: (row: any) => {
-          if (row.taskStatus == "1") {
+          if (row.taskStatus == "1" || row.taskStatus == "3" || row.taskStatus == "8") {
             return false;
           } else {
             return true;

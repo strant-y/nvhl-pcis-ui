@@ -1,12 +1,12 @@
 <template>
-  <div v-if="freeEditConfig" class="freeedit">
+  <div v-if="freeEditConfig" class="freeedit free_container">
     <div class="searchbar">
       <el-row :gutter="16">
         <el-col :md="24">
-          <el-card>
+          <el-card shadow="hover" class="card_container">
             <template
               #header
-              v-if=" freeEditConfig.fromUi.showTitleBar "
+              v-if=" freeEditConfig.fromUi.showTitleBar && freeEditConfig.title && freeEditConfig.title.length > 0"
             >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
@@ -14,7 +14,7 @@
                 </el-col>
                 <el-col :span="4" v-if="freeEditConfig.production">
                   <el-tooltip :content="freeEditConfig.productionTitle">
-                    {{ freeEditConfig.title }}
+                    <span class="card-title-style">{{ freeEditConfig.title }}</span>
                   </el-tooltip>
                 </el-col>
                 <el-col
@@ -49,10 +49,10 @@
                   >
                     <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
                     <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
-                    {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                    <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                   </a>
                 </el-col>
-              </el-row> 
+              </el-row>
             </template>
             <div class="form-inner" v-show="showMyfrom">
               <dynamic-forms
@@ -91,7 +91,7 @@
                 />
               </el-card>
               <div
-                style="margin-top: 3px"
+                style="margin-top: 3px; margin-bottom: -5px;"
                 :style="{ textAlign: freeEditConfig.endBtnsPosition }"
                 v-if="
                   freeEditConfig.endBtns && freeEditConfig.endBtns.length > 0
@@ -367,15 +367,10 @@ defineExpose({
 }
 
 .searchbar {
-  border: 1px solid #ddd;
-  /* box-shadow: 0 0 2px rgb(0 0 0 / 30%); */
+
+
 }
-/* .card-title-style{
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: 10px;
-  margin-left: 8px;
-} */
+
 :deep(.el-form-item) {
   margin-bottom: 5px;
 }

@@ -9,12 +9,12 @@
     <!--左侧布局 || 顶部布局 -->
     <template v-else>
       <SidebarLogo v-if="sidebarLogo" :collapse="!appStore.sidebar.opened" />
-      <span class="el-dropdown-link">
+      <!-- <span class="el-dropdown-link">
         <svg-icon icon-class="homepage" />
         <AppLink :to="resolvePath('/', '/')">
           <span class="second-level-title">首页</span>
         </AppLink>
-      </span>
+      </span> -->
       <el-dropdown popper-class="menuDropdowm">
         <span class="el-dropdown-link">
           <svg-icon icon-class="menu" />
@@ -33,6 +33,11 @@
                     <div class="second-level-list">
                       <template v-for="i in item.children" :key="i.path">
                         <AppLink v-if="i.meta && !i.meta.hidden" :to="resolvePath(i.path, item.path)">
+                          <el-icon v-if="i.meta.icon && i.meta.icon.startsWith('el-icon')" class="sub-el-icon">
+                            <component :is="i.meta.icon.replace('el-icon-', '')" />
+                          </el-icon>
+                          <svg-icon v-else-if="i.meta.icon" :icon-class="i.meta.icon" />
+                          <svg-icon v-else icon-class="menu" />
                           <span class="second-level-title">{{ i.meta.title }}</span>
                         </AppLink>
                       </template>
@@ -178,7 +183,7 @@ function getShortMenuList() {
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .menu-list-item {
   border-bottom: 1px solid #888;
-  padding: 20px 30px 0 30px;
+  padding: 10px 30px 0 30px;
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .first-level-title {
   font-size: 14px;
@@ -190,16 +195,31 @@ function getShortMenuList() {
 .el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin-bottom: 10px;
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list a {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
 }
-.el-dropdown__popper.menuDropdowm .menu-list-box .second-level-title {
+.el-dropdown__popper.menuDropdowm .menu-list-box .second-level-title{
   font-size: 12px;
   line-height: 17px;
-  margin-top: 8px;
   cursor: pointer;
-  color: #ffffff;
+  color: rgba(255,255,255,.8);
+}
+.el-dropdown__popper.menuDropdowm .menu-list-box .el-icon,.el-dropdown__popper.menuDropdowm .menu-list-box .svg-icon {
+  font-size: 12px;
+  cursor: pointer;
+  color: rgba(255,255,255,.8);
+  margin-right: 5px;
+}
+.el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list a:hover .second-level-title{
+  color: rgba(255,255,255,1);
+}
+.el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list a:hover .el-icon{
+  color: rgba(255,255,255,1);
+}
+.el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list a:hover .svg-icon{
+  color: rgba(255,255,255,1);
 }
 </style>

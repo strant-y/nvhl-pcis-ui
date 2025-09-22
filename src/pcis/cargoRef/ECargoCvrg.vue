@@ -82,8 +82,8 @@ const handelCalculate = (row:any,selectData:any)=>{
     const cGoodsIds = selectData.map((item: any) => item['ECargoGoodsTgt.cPkId']).join(',')
     cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.cGoodsId',row['_dataId'] , cGoodsIds)
     const sum = selectData.reduce((total, current) => total + current['ECargoGoodsTgt.nInsuranceAmount'], 0);
-    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , sum)
-    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , sum * row['ECargoTerm.nOriginalRate'])
+    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceAmount',row['_dataId'] , toFixTwo(sum))
+    cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , toFixTwo(sum * row['ECargoTerm.nOriginalRate']))
     if(row['ECargoTerm.nRateVal']){
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , parseFloat(((row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000).toFixed(2)))
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , parseFloat((((row['ECargoTerm.nInsuranceAmount'] * row['ECargoTerm.nRateVal'])/1000) * row['ECargoTerm.nFeeRate']).toFixed(2)))
@@ -109,6 +109,8 @@ const handeReset = (row:any)=>{
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , '')
 
 }
+const toFixTwo = (val:any)=> parseFloat(val.toFixed(2))
+
 onMounted(() => {
   nextTick(()=>{
     eventBus.on('matterChange', matterChange)
@@ -229,21 +231,21 @@ const method = {
           })
           .then((res) => {
             cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , res[0].currency_rate)
-            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , row['ECargoTerm.nInsuranceAmount'] * res[0].currency_rate)
+            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , toFixTwo(row['ECargoTerm.nInsuranceAmount'] * res[0].currency_rate) )
           });
     } else {
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nOriginalRate',row['_dataId'] , "1.000000")
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , row['ECargoTerm.nInsuranceAmount'] * 1)
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] ,toFixTwo(row['ECargoTerm.nInsuranceAmount'] * 1) )
     }
   },
   nOriginalRateChange:(val:any,row:any)=>{
     if(val && row['ECargoTerm.nInsuranceAmount']){
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , row['ECargoTerm.nInsuranceAmount'] * val)
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbAmount',row['_dataId'] , toFixTwo(row['ECargoTerm.nInsuranceAmount'] * val))
     }
   },
   nFeeRateChange:(val:any,row:any)=>{
     if(val && row['ECargoTerm.nInsuranceFee']){
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , row['ECargoTerm.nInsuranceFee'] * val)
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , toFixTwo(row['ECargoTerm.nInsuranceFee'] * val))
     }
   },
   cFeeCurrencyChange:(val:any,row:any)=>{
@@ -256,11 +258,11 @@ const method = {
           })
           .then((res) => {
             cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , res[0].currency_rate)
-            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , row['ECargoTerm.nInsuranceFee'] * res[0].currency_rate)
+            cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , toFixTwo(row['ECargoTerm.nInsuranceFee'] * res[0].currency_rate))
           });
     } else {
       cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nFeeRate',row['_dataId'] , "1.000000")
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , row['ECargoTerm.nInsuranceFee'] * 1)
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , toFixTwo(row['ECargoTerm.nInsuranceFee'] * 1))
     }
   },
   cInsExchCdeChange:(val:any,row:any)=>{
@@ -378,8 +380,8 @@ const method = {
   //费率change事件
   nRateValChange:(val:any,row:any)=>{
     if(val){
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , (row['ECargoTerm.nInsuranceAmount'] * val)/1000)
-      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , ((row['ECargoTerm.nInsuranceAmount'] * val)/1000) * row['ECargoTerm.nFeeRate'])
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nInsuranceFee',row['_dataId'] , toFixTwo((row['ECargoTerm.nInsuranceAmount'] * val)/1000))
+      cvrgEditRef?.value?.setValueByRowKey('ECargoTerm.nRmbFee',row['_dataId'] , toFixTwo(((row['ECargoTerm.nInsuranceAmount'] * val)/1000) * row['ECargoTerm.nFeeRate']))
     }
   },
   selectTrem: () => {

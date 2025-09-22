@@ -219,7 +219,7 @@ const idAnalysis = (id: string) => {
   const tabref = opertaor.getTableRefs();
   const applicantValue = tabref["applicant"].getFromValue();
 
-  if (!validateIdCard(id) || (applicantValue["Applicant.cCertfCls"] !== '111' && applicantValue["Applicant.cCertfCls"] !== '19')) {
+  if (!validateIdCard(id) || (applicantValue["Applicant.cCertfCls"] !== '111' && applicantValue["Applicant.cCertfCls"] !== '553')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
@@ -456,7 +456,7 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
       });
-    } else if (val == "19") {
+    } else if (val == "553") {
       // 外国人证件号
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("ariCard", {})],
@@ -1148,7 +1148,7 @@ const method = {
       "110007": "socialCode",
       "111": "idCard",
       "07": "passPort",
-      "19": "ariCard",
+      "553": "ariCard",
     };
     baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
     if (cClntMrk == '0') {
@@ -1342,7 +1342,7 @@ function handleFileChange(event: Event) {
                 cardInfo["period_of_validity"]["value"].split("-")[1]?.replaceAll(".", "-") || null
               );
             }
-            setValue("Applicant.cCertfCls", "19");
+            setValue("Applicant.cCertfCls", "553");
             setValue("Applicant.cClntMrk", "1");
             const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
             const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
@@ -1365,15 +1365,15 @@ function handleFileChange(event: Event) {
               tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
               setValue(
                 "Applicant.tCertfBgnDate",
-                cardInfo["BizLicenseOperatingPeriod"].split("至")[0] //证件有效起期
+                cardInfo["BizLicenseOperatingPeriod"].split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效起期
               );
-              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "长期") { // 证件有效期长期标识
+              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("期限")) { // 证件有效期长期标识
                 setValue("Applicant.cLongendTyp", "1");
               } else {
                 setValue("Applicant.cLongendTyp", "0");
                 setValue(
                   "Applicant.tCertfEndDate",
-                  cardInfo["BizLicenseOperatingPeriod"].split("至")[1] //证件有效止期
+                  cardInfo["BizLicenseOperatingPeriod"].split("至")[1]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效止期
                 );
               }
             }

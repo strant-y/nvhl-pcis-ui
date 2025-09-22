@@ -211,6 +211,7 @@ let isESBool = ref(false); // 是否es查询布尔
 // 用于缓存用户的完整勾选状态（包括原始列 + 扩展列）
 let userAllCheckedColumns = ref<string[]>([]);
 let isJumpingFromHome = ref(false); // 是否正在处理首页跳转
+let isInitLocked = ref(true); // 加锁初始化 不查询，解决初始化快请求查询内容被【全量查询慢请求】覆盖问题
 let isCopyButtonVisible = ref(false); // 复制按钮是否显示
 
 const props = defineProps({
@@ -431,13 +432,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               title: "查询条件",
               placeholder:
                   "询价/投保/批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
-              btnWidth: 10,
+              btnWidth: 16,
               itemWidth: 2,
               showExBtn: true,
               btnItems: {
                   label: "搜索",
                   type: "primary",
-                  btnStyle: {'font-size': '16px'},
+                  btnStyle: {'font-size': '18px','margin-right': '-8%'},
                   func: () => {
                     handleQuery(true, true);
                   },
@@ -677,6 +678,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             item.loadData = allCAppStatus;
                           }
                       });
+                      // 初始化不查询
+                      if (isInitLocked.value) return; 
+                      // 从首页跳转过来不查询
                       if (!isJumpingFromHome.value) {
                         handleQuery(true);
                       }
@@ -945,6 +949,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
         width: 165,
+        fixed: "left",
         slotName: "cEdrNo"
     },
     {
@@ -954,7 +959,11 @@ const normalQueryColumns = [
         width: 48,
         align: 'left',
         formatter:(val:any)=>{
+          if(val?.split("分公司").length > 1) {
+            return val?.split("分公司")[0]
+          } else {
             return val?.slice(0,2)
+          }
         }
     },
     {
@@ -1003,7 +1012,7 @@ const normalQueryColumns = [
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
-        width: 105,
+        width: 106,
         slotName: "nAmt",
         align: 'left',
     },
@@ -1011,7 +1020,7 @@ const normalQueryColumns = [
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
-        width: 95,
+        width: 98,
         prefix: "¥ ",
         slotName: "nPrm",
         align: 'left'
@@ -1020,7 +1029,7 @@ const normalQueryColumns = [
         prop: "tIssueTm",
         inputtype: "rtinput",
         title: "签单日期",
-        width: 140,
+        width: 144,
         sortable: true,
         slotName: "tIssueTm"
     },
@@ -1028,8 +1037,9 @@ const normalQueryColumns = [
         prop: "InsurancePeriod",
         inputtype: "rtinput",
         title: "保险期间",
-        width: 140,
-        slotName: "InsurancePeriod"
+        width: 144,
+        slotName: "InsurancePeriod",
+        align: 'left'
     },
     {
         prop: "cAppStatus",
@@ -1121,7 +1131,7 @@ const tableObj = {
                     if (r) {
                         const data = row;
                         router.push({
-                            path: "/pcisapp/myPage",
+                            path: "/pcisapp/pcisappView",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
                             },
@@ -1139,8 +1149,8 @@ const tableObj = {
                 size: "large",
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
-                    // 联保单不显示复制按钮
-                    if (row.cCiMrk === "联保单") {
+                    // 联保单6不显示复制按钮
+                    if (row.cCiMrk === "6") {
                         return true;
                     } else {
                         return false;
@@ -1151,12 +1161,10 @@ const tableObj = {
                     if (!isCopyButtonVisible.value) return true;
 
                     // 联保单不显示
-                    if (row.cCiMrk === "联保单") return true;
+                    if (row.cCiMrk === "6") return true;
                     return false;
                 },
-
                 tableClick: async (row) => {
-                    console.log(row);
                     const r = await row;
                     if (r) {
                         // 校验出单机构是否复合复制单的机构要求
@@ -1274,6 +1282,9 @@ onMounted(async () => {
     if (hasJumpData) {
         isJumpingFromHome.value = true;  // 加锁，避免 cAppTyp.func 再触发
     }
+    // 初始化加锁，不查，避免cAppTyp.func触发
+    // isinitPageQuery.value = true;
+
     formconfig1.fromSchema?.forEach((item) => {
         if (
          item.prop === "tInquiryTm" ||
@@ -1326,6 +1337,8 @@ onMounted(async () => {
         isJumpingFromHome.value = false;
         sessionStorage.removeItem(AppKey.query.pcis_query_search);
     }
+    // 初始化完成后解锁
+    isInitLocked.value = false; 
 });
 
 onUnmounted(() => {
@@ -2190,7 +2203,6 @@ defineExpose({
 
 <style scoped>
 .copy-icon {
-  margin-left: 5px;
   cursor: pointer;
   color: #409eff;
 }
@@ -2206,18 +2218,15 @@ defineExpose({
   align-items: center;
 }
 
-.policy-number-row span {
-  flex: 1;
-}
-
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {
     white-space: break-spaces;
 }
 /* :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 } */
-:deep(.el-button-group .el-button) {
+:deep(.el-button-group .el-button:first-child) {
     font-size: 16px;
+    width: 120px;
 }
 .twoLine {
   display: -webkit-box;

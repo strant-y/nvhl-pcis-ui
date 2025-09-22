@@ -1281,6 +1281,8 @@ function handleSelectionChange(selection: any) {
       nPrmVar: selection[0].nPrm,
       cAmtCur: freeEditRef.value?.getValue("cAmtCur"),
       cPrmCur: freeEditRef.value?.getValue("cPrmCur"),
+      cCiAmtCur: freeEditRef.value?.getValue("cAmtCur"),
+      nCiPrmCur: freeEditRef.value?.getValue("cPrmCur"),
     });
     setFormItem("nAmtVar", { disabled: false });
     setFormItem("nPrmVar", { disabled: false });

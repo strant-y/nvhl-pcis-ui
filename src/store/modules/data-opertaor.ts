@@ -121,10 +121,13 @@ export const dataOpertaor = (props: OpertaorProps) => {
                                 }
                             })
                         }
-                        if(info.pageKey === 'applicant' || info.pageKey === 'insured'|| info.pageKey === 'cvrg'){
+                        if(info.pageKey === 'applicant' || info.pageKey === 'insured' || info.pageKey === 'cvrg'){
                             if (fsch.titleBtns && fsch.titleBtns.length > 0) {
                                 fsch.titleBtns.forEach((item) => {
-                                    item.hidden = true;
+                                    if(item.id !== 'selectGoods'){
+                                        item.hidden = true;
+                                    }
+                                    
                                 });
                             }
                             if (fsch.endBtns && fsch.endBtns.length > 0) {

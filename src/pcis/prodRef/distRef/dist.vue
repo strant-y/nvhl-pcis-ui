@@ -409,6 +409,11 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
+            const cvrgRef = opertaor.getTableRefs()['cvrg'];
+            try {
+              cvrgRef?.refushCvrgInfo();
+            } catch (ignore) {
+            }
           },
         },
         { width: "60" }
@@ -1246,4 +1251,8 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-card__body .freeedit .searchbar .el-card__header) {
+  display: none;
+}
+</style>

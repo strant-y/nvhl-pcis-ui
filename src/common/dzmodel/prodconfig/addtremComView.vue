@@ -138,6 +138,7 @@ const data1 = ref([]);
 const mainRef = ref<InstanceType<typeof ElTree>>();
 const expandedKeys = ref<string[]>([]);
 
+let selfTerm = {};
 const selectAdditionNodes = ref<any[]>([]);
 props.data.data.isselectData?.forEach((item: any) => {
   let seadd: any = {};
@@ -149,6 +150,9 @@ props.data.data.isselectData?.forEach((item: any) => {
     let list: any[] = [];
     item["riskList"].forEach((risk: any) => {
       list.push({ cRiskNo: risk["TermRisktgt.cLiabCode"] });
+      if(risk["TermRisktgt.selfTermRisk"] === false){
+        selfTerm[item["Term.cClauseCode"]+"_"+risk["TermRisktgt.cLiabCode"]] = risk;
+      }
     });
     seadd["riskList"] = list;
   }
@@ -346,6 +350,16 @@ function flushSelectData() {
 }
 
 async function selectOne() {
+  if(selfTerm && Object.keys(selfTerm).length > 0){
+    Object.keys(selfTerm).forEach((termKey: any) => { 
+      const t_r = termKey.split("_");
+      data3.value.forEach((d: any) => { 
+        if(t_r[0] === d.cTermNo){
+          d.children.push({cRiskNo:t_r[1]});
+        }
+      });
+    });
+  }
   props.method.isOk(data3.value);
   emits("handleClose");
 }
@@ -395,5 +409,8 @@ function fail() {
 
 .node-label {
   margin-left: 8px;
+}
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
 }
 </style>

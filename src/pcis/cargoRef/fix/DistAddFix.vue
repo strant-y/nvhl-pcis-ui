@@ -97,6 +97,7 @@ const rateDetail = ref({
   nAmtExch:[],
   cPrmCur:[]
 })
+const toFixTwo = (val:any)=> parseFloat(val.toFixed(2))
 onMounted(async  () => {
   dataParams.value = formPage.getAllFormData();
 
@@ -839,7 +840,7 @@ function setRegisterAdd() {
 const cAmtCurChange = (val: any)=>{
   const foundItem:any = rateDetail.value.nAmtExch.find((item:any) => item.label === val);
   setValue("ECargoGoodsTgt.nAmtExch", foundItem.value);
-  setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+  setValue('ECargoGoodsTgt.nRmbLimit',toFixTwo(Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch')))
   setValue('ECargoGoodsTgt.cExchCde',rateDetail.value.cExchCde)
   // if (val !== "CNY") {
   //   codeListStore
@@ -912,20 +913,20 @@ const bonusRatio = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
  if( goodsValueData){
-    setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+    setValue('ECargoGoodsTgt.nInsuranceAmount',toFixTwo(goodsValueData * (1 + bonusRatioData/100)))
  }
   if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
-    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+    setValue('ECargoGoodsTgt.nRmbLimit',toFixTwo(Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch')))
   }
 }
 const goodsValue = (val:any)=>{
   const bonusRatioData =  getValue('ECargoGoodsTgt.nAdditiveRatio')
   const goodsValueData = getValue('ECargoGoodsTgt.nGoodsValue')
   if(goodsValueData){
-    setValue('ECargoGoodsTgt.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
+    setValue('ECargoGoodsTgt.nInsuranceAmount',toFixTwo(goodsValueData * (1 + bonusRatioData/100)))
   }
   if(getValue('ECargoGoodsTgt.nInsuranceAmount')){
-    setValue('ECargoGoodsTgt.nRmbLimit',Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch'))
+    setValue('ECargoGoodsTgt.nRmbLimit',toFixTwo(Number(getValue('ECargoGoodsTgt.nInsuranceAmount'))*getValue('ECargoGoodsTgt.nAmtExch')))
   }
 }
   //根据获取的职业类别查询职业等级并绑定下拉框

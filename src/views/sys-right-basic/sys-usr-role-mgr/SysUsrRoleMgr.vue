@@ -116,4 +116,7 @@ onMounted(() => {
 .gutter-row {
   background: var(--el-fill-color-blank);
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

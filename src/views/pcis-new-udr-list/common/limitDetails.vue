@@ -85,49 +85,48 @@ let NRelatePrm =ref("");
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     fromSchema: [
-     {
-        prop: "cSeqNo",
-        inputtype: "rtinput",
-        title: "关联交易审批单编号",
-        minWidth: 180,
-        fixed: 'left',
-      },
       {
         prop: "cRelateNo",
         inputtype: "rtinput",
         title: "关联交易审批单编号",
         minWidth: 180,
         fixed: 'left',
+        align: "left",
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
-        minWidth: 180,
+        width: 167,
+        align: "left",
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
-        minWidth: 180,
+        width: 167,
+        align: "left",
       },
       {
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
-        minWidth: 180,
+        width: 167,
+        align: "left",
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         minWidth: 180,
+        align: "left",
       },
       {
         prop: "cCerCde",
         inputtype: "rtdatepicker",
         title: "证件号码",
         minWidth: 180,
+        align: "left",
       },
       {
         prop: "nUsePrm",
@@ -139,7 +138,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tIssueTm",
         inputtype: "rtdatepicker",
         title: "签单日期",
-        minWidth: 180,
+        width: 140
       },
     ],
   })

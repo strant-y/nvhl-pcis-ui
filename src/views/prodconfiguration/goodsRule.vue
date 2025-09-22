@@ -517,4 +517,7 @@ defineExpose({
   width: 100%;
   height: 100%;
 }
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

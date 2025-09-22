@@ -117,7 +117,6 @@ function extractCode(str: string) {
 
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
-        title: "一般批改",
         endBtnsPosition: "right",
         endBtns: [
             createFreeButtonBase({
@@ -138,13 +137,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             ),
                             moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                         ],
-                        cDptCde: "0200000000000",
+                        cDptCde: user.value?.companyId,
                     });
                     setFormItem("cDptCde", {
                         loadData: [
                             {
-                                label: "0200000000000永安保险公总司",
-                                value: "0200000000000",
+                                label: user.value?.companyId || '' + user.value?.companyCnm || '',
+                                value: user.value?.companyId,
                             },
                         ],
                     });
@@ -1319,13 +1318,13 @@ onMounted(() => {
             ),
             moment(new Date()).format("YYYY-MM-DD 23:59:59"),
         ],
-        cDptCde: "0200000000000",
+        cDptCde: user.value?.companyId,
     });
     setFormItem("cDptCde", {
         loadData: [
             {
-                label: "0200000000000永安保险公总司",
-                value: "0200000000000",
+                label: user.value?.companyId || '' + user.value?.companyCnm || '',
+                value: user.value?.companyId,
             },
         ],
     });

@@ -314,5 +314,7 @@ filter-tree {
   padding: 10px;
   border-right: 1px solid #ccc;
 }
-
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>

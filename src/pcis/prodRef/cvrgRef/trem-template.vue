@@ -5,7 +5,7 @@
         <template #header v-if="effectiveShowConf.showHeader">
           <div class="cvrg-hearder">
             <el-row>
-              <el-col :span="10">
+              <el-col :span="17">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
                     <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
@@ -16,7 +16,7 @@
                     term.cRdrTyp === "0" ? "主" : "附加"
                   }}</el-tag> -->
                   <div :class="['cvrg-hearder-main-title',term.cRdrTyp === '0' ? 'zhu' : 'fu']">
-                    <img :src="term.cRdrTyp === '0' ? '/src/assets/img/zhu.png' : '/src/assets/img/fu.png'" alt="" srcset="">
+                    <img :src="term.cRdrTyp === '0' ? zhuImageUrl : fuImageUrl" alt="" srcset="">
                     <span>{{ term.cNmeCn }}</span>
                   </div>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
@@ -30,7 +30,6 @@
                       <el-button
                         type="text"
                         @click="downloadTerm"
-                        style="margin-right: 5px"
                         size="small"
                       ><rt-icon :item="{ icon: 'term' }" />
                     </el-button>
@@ -39,7 +38,7 @@
                       <el-button
                         type="text"
                         @click="previewTerm"
-                        style="margin-right: 5px"
+                        style="margin-left: 0px"
                         size="small"
                       ><rt-icon :item="{ icon: 'View' }" />
                     </el-button>
@@ -47,8 +46,8 @@
                   </template>
                 </div>
               </el-col>
-              <el-col :span="12">
-                <el-row :gutter="20">
+              <el-col :span="5">
+                <el-row :gutter="10">
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
                       <el-form-item
@@ -85,119 +84,123 @@
         <div v-show="showData">
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
-              <table style="width: 50%;margin-left: 100px;">
-                <thead>
+              <div class="table_overflow_x">
+                <table style="width: 50%;margin-left: 100px;">
+                  <thead>
                   <tr class="table-title">
                     <th width="300">{{ termTitleConf.cFactorTabTitle }}</th>
                     <th>{{ termTitleConf.cFactorTabValue }}</th>
                   </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <tr v-if="item.cPorpShowtitle !== '1'">
                       <td
-                      :class="{
+                          :class="{
                           'custom-indent':item.cPropIndent === '1',
                       }" class="text-indent">
                         <el-text
-                          v-if="isrequired(item)"
-                          class="mx-1"
-                          style="margin-right: 2px"
-                          type="danger"
-                          >*</el-text
+                            v-if="isrequired(item)"
+                            class="mx-1"
+                            style="margin-right: 2px"
+                            type="danger"
+                        >*</el-text
                         >
                         <span>{{ item.title }}</span>
                       </td>
                       <td>
                         <el-form-item
-                          :rules="isrequired(item) ? getRequired() : undefined"
-                          :prop="item.prop"
+                            :rules="isrequired(item) ? getRequired() : undefined"
+                            :prop="item.prop"
                         >
                           <from-item
-                            v-model="termdata[item.prop]"
-                            @update:modelValue="termUpdate()"
-                            :item="item"
+                              v-model="termdata[item.prop]"
+                              @update:modelValue="termUpdate()"
+                              :item="item"
                           />
                         </el-form-item>
                       </td>
                     </tr>
                   </template>
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </template>
             <template v-else-if="termTitleConf.cFactorTabType === 'table'">
-              <table style="width: 100%">
-                <thead>
-                  <tr class="table-title">
-                    <th v-if="checkExtendshow" width="20px">
-                    </th>
-                    <template v-for="(item, k) in termFactormap" :key="k">
-                      <th v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1' " :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
-                        <el-text
-                          v-if="isrequired(item)"
-                          class="mx-1"
-                          style="margin-right: 2px"
-                          type="danger"
-                          >*</el-text>
-                        {{ item.title }}
+              <div class="table_overflow_x">
+                <table style="width: 100%">
+                  <thead>
+                    <tr class="table-title">
+                      <th v-if="checkExtendshow" width="20px">
                       </th>
-                    </template>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                      :class="{'selected': isSelected(termdata)}"
-                      @click="selectRow(termdata)"
-                  >
-                      <th v-if="checkExtendshow">
-                        <a style="margin-right: 5px" @click="showExtend = !showExtend">
-                          <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
-                          <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
-                        </a>
-                        
-                      </th>
-                    <template v-for="(item, k) in termFactormap" :key="k">
-                      <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
-                        <el-form-item
-                          :rules="isrequired(item) ? getRequired() : undefined"
-                          :prop="item.prop"
-                        >
-                          <from-item
-                            v-model="termdata[item.prop]"
-                            @update:modelValue="termUpdate()"
-                            :item="item"
-                          />
-                        </el-form-item>
-                      </td>
-                    </template>
-                  </tr>
-                  <template v-if="checkExtendshow">
-                    <tr v-show="showExtend" >
-                      <td :colspan="termFactormap.length" >
-                        <el-row :gutter="20">
-                        <template v-for="(item, k) in termFactormap" :key="k">
-                          <template v-if="item.cPorpExtend === '1'">
-                            <el-col style="margin-top: 5px" :span="12">
-                              <el-form-item
-                                :rules="isrequired(item) ? getRequired() : undefined"
-                                :prop="item.prop"
-                                :label="item.title" 
-                                :label-width ="120">
-                                <from-item
-                                  v-model="termdata[item.prop]"
-                                  @update:modelValue="termUpdate()"
-                                  :item="item"
-                                />
-                              </el-form-item>
-                            </el-col>
-                          </template>
-                        </template>
-                      </el-row>
-                      </td>
+                      <template v-for="(item, k) in termFactormap" :key="k">
+                        <th v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1' " :style="{ width: item.cPropHeight?item.cPropHeight+'px':null }">
+                          <el-text
+                            v-if="isrequired(item)"
+                            class="mx-1"
+                            style="margin-right: 2px"
+                            type="danger"
+                            >*</el-text>
+                          {{ item.title }}
+                        </th>
+                      </template>
                     </tr>
-                  </template>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    <tr
+                        :class="{'selected': isSelected(termdata)}"
+                        @click="selectRow(termdata)"
+                    >
+                        <th v-if="checkExtendshow">
+                          <a style="margin-right: 5px" @click="showExtend = !showExtend">
+                            <el-icon v-if="!showExtend"><ArrowUpBold /></el-icon>
+                            <el-icon v-if="showExtend"><ArrowDownBold /></el-icon>
+                          </a>
+
+                        </th>
+                      <template v-for="(item, k) in termFactormap" :key="k">
+                        <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
+                          <el-form-item
+                            :rules="isrequired(item) ? getRequired() : undefined"
+                            :prop="item.prop"
+                          >
+                            <from-item
+                              v-model="termdata[item.prop]"
+                              @update:modelValue="termUpdate()"
+                              :item="item"
+                            />
+                          </el-form-item>
+                        </td>
+                      </template>
+                    </tr>
+                    <template v-if="checkExtendshow">
+                      <tr v-show="showExtend" >
+                        <td :colspan="termFactormap.length" >
+                          <el-row :gutter="20">
+                          <template v-for="(item, k) in termFactormap" :key="k">
+                            <template v-if="item.cPorpExtend === '1'">
+                              <el-col style="margin-top: 5px" :span="12">
+                                <el-form-item
+                                  :rules="isrequired(item) ? getRequired() : undefined"
+                                  :prop="item.prop"
+                                  :label="item.title"
+                                  :label-width ="120">
+                                  <from-item
+                                    v-model="termdata[item.prop]"
+                                    @update:modelValue="termUpdate()"
+                                    :item="item"
+                                  />
+                                </el-form-item>
+                              </el-col>
+                            </template>
+                          </template>
+                        </el-row>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
             </template>
             <template v-else>
               <app-free-edit
@@ -208,167 +211,171 @@
             </template>
           </template>
           <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-            <el-row>
-              <el-col :span="22">
-                <a
-                  style="margin-right: 5px"
-                  @click="ginfo.hidden = !ginfo.hidden"
-                >
-                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
-                  <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
-                </a>
-                <span>
-                  {{ ginfo.cGroupTitle }}
-                </span>
-              </el-col>
-            </el-row>
-            <el-row v-if="!ginfo.hidden">
-              <table style="width: 100%">
-                <thead>
-                  <tr class="table-title">
-                    <th
-                      v-for="col in getColinfo(ginfo.cGroupId)"
-                      :key="col.cColId"
-                      :width="col.cColWidth ? col.cColWidth : null"
-                      :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
-                    >
-                      {{ col.cColTitle }}
-                    </th>
-                    <th v-for="v in extermConf" :key="v.c_pk_id">
-                      {{ v.title }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <template v-if="groupconf[ginfo.cGroupId]">
-                    <template
-                      v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
-                      :key="k"
-                    >
-                      <template v-if="riskdata.maxNum > 0">
-                        <tr
-                          v-for="n in riskdata.maxNum"
-                          :key="`${ginfo.cGroupId}-${k}-${n}`"
-                          :class="{'selected': isSelected(k)}"
-                          @click="selectRow(k)"
+            <div style="margin-top: 10px; border: 1px #e3e3e3 solid; padding: 3px;">
+              <el-row style="margin-bottom: 3px; background-color: #eaf4f6; padding: 2px">
+                <el-col :span="22">
+                  <a
+                    style="margin-right: 5px;font-size: 12px;"
+                    @click="ginfo.hidden = !ginfo.hidden"
+                  >
+                    <el-icon v-if="ginfo.hidden" size="11"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="!ginfo.hidden" size="11"><ArrowDownBold /></el-icon>
+                  </a>
+                  <span style="font-size: 13px; font-weight: 450;">
+                    {{ ginfo.cGroupTitle }}
+                  </span>
+                </el-col>
+              </el-row>
+              <el-row v-if="!ginfo.hidden">
+                <div class="table_overflow_x">
+                  <table style="width: 100%">
+                    <thead>
+                      <tr class="table-title">
+                        <th
+                          v-for="col in getColinfo(ginfo.cGroupId)"
+                          :key="col.cColId"
+                          :width="col.cColWidth ? col.cColWidth : null"
+                          :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
                         >
-                          <template
-                            v-for="colinfo in riskdata.col"
-                            :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
-                          >
-                            <template
-                              v-if="
-                                riskdata.rowConfig[colinfo.cColId] &&
-                                riskdata.rowConfig[colinfo.cColId][n - 1]
-                              "
+                          {{ col.cColTitle }}
+                        </th>
+                        <th v-for="v in extermConf" :key="v.c_pk_id">
+                          {{ v.title }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template v-if="groupconf[ginfo.cGroupId]">
+                        <template
+                          v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
+                          :key="k"
+                        >
+                          <template v-if="riskdata.maxNum > 0">
+                            <tr
+                              v-for="n in riskdata.maxNum"
+                              :key="`${ginfo.cGroupId}-${k}-${n}`"
+                              :class="{'selected': isSelected(k)}"
+                              @click="selectRow(k)"
                             >
-                              <td
-                                :rowspan="
-                                  riskdata.rowConfig[colinfo.cColId][n - 1]
-                                    ?.cPorpType === 'rowspan'
-                                    ? riskdata.maxNum
-                                    : null
-                                "
-                                :class="{
-                                    'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
-                                 }"
-                                 style="white-space: nowrap;"
+                              <template
+                                v-for="colinfo in riskdata.col"
+                                :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                               >
                                 <template
                                   v-if="
+                                    riskdata.rowConfig[colinfo.cColId] &&
                                     riskdata.rowConfig[colinfo.cColId][n - 1]
-                                      .cPorpType === 'text'
                                   "
                                 >
-                                  <el-text
-                                    v-if="
-                                      isrequired(
-                                        riskdata.rowConfig[colinfo.cColId][
-                                          n - 1
-                                        ].factorItem
-                                      )
-                                    "
-                                    class="mx-1"
-                                    style="margin-right: 2px"
-                                    type="danger"
-                                    >*</el-text
-                                  >
-                                  <span
-                                    >{{
+                                  <td
+                                    :rowspan="
                                       riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        .factorItem.title
-                                    }}
-                                  </span>
-                                </template>
-                                <template v-else>
-                                  <el-form-item
-                                    :error="
-                                      showError(
-                                        riskdata.rowConfig[colinfo.cColId][
-                                          n - 1
-                                        ],
-                                        riskList[
-                                          riskdata.rowConfig[colinfo.cColId][
-                                            n - 1
-                                          ].cRiskNo
-                                        ][
-                                          riskdata.rowConfig[colinfo.cColId][
-                                            n - 1
-                                          ].factorItem?.prop
-                                        ]
-                                      )
+                                        ?.cPorpType === 'rowspan'
+                                        ? riskdata.maxNum
+                                        : null
                                     "
-                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                    :class="{
+                                        'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
+                                     }"
+                                     style="white-space: nowrap;"
                                   >
-                                    <from-item
-                                      v-model="
-                                        riskList[
-                                          riskdata.rowConfig[colinfo.cColId][
-                                            n - 1
-                                          ].cRiskNo
-                                        ][
-                                          riskdata.rowConfig[colinfo.cColId][
-                                            n - 1
-                                          ].factorItem?.prop
-                                        ]
+                                    <template
+                                      v-if="
+                                        riskdata.rowConfig[colinfo.cColId][n - 1]
+                                          .cPorpType === 'text'
                                       "
-                                      @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
-                                      :item="
-                                        riskdata.rowConfig[colinfo.cColId][
-                                          n - 1
-                                        ].factorItem
-                                      "
-                                    />
-                                  </el-form-item>
+                                    >
+                                      <el-text
+                                        v-if="
+                                          isrequired(
+                                            riskdata.rowConfig[colinfo.cColId][
+                                              n - 1
+                                            ].factorItem
+                                          )
+                                        "
+                                        class="mx-1"
+                                        style="margin-right: 2px"
+                                        type="danger"
+                                        >*</el-text
+                                      >
+                                      <span
+                                        >{{
+                                          riskdata.rowConfig[colinfo.cColId][n - 1]
+                                            .factorItem.title
+                                        }}
+                                      </span>
+                                    </template>
+                                    <template v-else>
+                                      <el-form-item
+                                        :error="
+                                          showError(
+                                            riskdata.rowConfig[colinfo.cColId][
+                                              n - 1
+                                            ],
+                                            riskList[
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].cRiskNo
+                                            ][
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].factorItem?.prop
+                                            ]
+                                          )
+                                        "
+                                        :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                      >
+                                        <from-item
+                                          v-model="
+                                            riskList[
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].cRiskNo
+                                            ][
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].factorItem?.prop
+                                            ]
+                                          "
+                                          @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
+                                          :item="
+                                            riskdata.rowConfig[colinfo.cColId][
+                                              n - 1
+                                            ].factorItem
+                                          "
+                                        />
+                                      </el-form-item>
+                                    </template>
+                                  </td>
                                 </template>
-                              </td>
-                            </template>
+                              </template>
+                              <template v-if="n === 1 && ri === 0">
+                                <template v-for="v in extermConf" :key="v.c_pk_id">
+                                  <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
+                                    <el-form-item
+                                      :rules="
+                                        isrequired(v) ? getRequired() : undefined
+                                      "
+                                      :prop="v.prop"
+                                    >
+                                      <from-item
+                                        v-model="termdata[v.prop]"
+                                        @update:modelValue="termUpdate()"
+                                        :item="v"
+                                      />
+                                    </el-form-item>
+                                  </td>
+                                </template>
+                              </template>
+                            </tr>
                           </template>
-                          <template v-if="n === 1 && ri === 0">
-                            <template v-for="v in extermConf" :key="v.c_pk_id">
-                              <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
-                                <el-form-item
-                                  :rules="
-                                    isrequired(v) ? getRequired() : undefined
-                                  "
-                                  :prop="v.prop"
-                                >
-                                  <from-item
-                                    v-model="termdata[v.prop]"
-                                    @update:modelValue="termUpdate()"
-                                    :item="v"
-                                  />
-                                </el-form-item>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
+                        </template>
                       </template>
-                    </template>
-                  </template>
-                </tbody>
-              </table>
-            </el-row>
+                    </tbody>
+                  </table>
+                </div>
+              </el-row>
+            </div>
           </template>
         </div>
       </el-card>
@@ -445,10 +452,13 @@ const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
+    size: "small"
   },
 });
 
 const {selectedRow} = storeToRefs(terconfig);
+const zhuImageUrl = ref(new URL(`../../../assets/img/zhu.png`, import.meta.url).href);
+const fuImageUrl = ref(new URL(`../../../assets/img/fu.png`, import.meta.url).href);
 
 function termUpdate(){
   termDeductibleNote();
@@ -968,12 +978,12 @@ function dataInit() {
   const r = terconfig.getConfig(queryKey);
   if (r) {
     const d = JSON.parse(r);
-    collist.value = d.collist;
+    collist.value = getUseData(d.collist);
     factormap.value = d.factormap;
     colInfo.value = d.colInfo;
     groupInfo.value = d.groupInfo;
     term.value = d.term;
-    termFactormap.value = d.termFactormap;
+    termFactormap.value = getUseData(d.termFactormap);
     methodLink(termFactormap.value);
     riskMethodLink(factormap.value);
     initshowConfig();
@@ -1001,13 +1011,12 @@ function dataInit() {
       const { code, data, msg } = res;
       if (200 === code) {
         terconfig.addConfig(queryKey, JSON.stringify(data.data));
-        collist.value = data.data.collist;
+        collist.value = getUseData(data.data.collist);
         factormap.value = data.data.factormap;
         colInfo.value = data.data.colInfo;
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
-        termFactormap.value = data.data.termFactormap;
-
+        termFactormap.value = getUseData(data.data.termFactormap);
         methodLink(termFactormap.value);
         riskMethodLink(factormap.value);
         initshowConfig();
@@ -1035,6 +1044,37 @@ function dataInit() {
       initMethod();
     });
   }
+}
+
+function getUseData(data: any){
+  if(!data){
+    return null;
+  }
+  let redata = JSON.parse(JSON.stringify(data));
+  const params = opertaor.getParam();
+  if(data && data.length > 0){
+    redata = redata.filter((item:any) => { 
+      let checkKey = null;
+      const csc = item.cSysConfig;
+      if(params.sysDist === 'PCIS'){    // 核心出单，标记有效性
+        if(csc && csc.length > 0) {
+          checkKey = csc.charAt(0);
+        }
+      }else if(params.sysDist === 'PRICE'){
+        if(csc && csc.length > 1) {
+          checkKey = csc.charAt(1);
+        }
+      }
+      if(checkKey === '2'){  // 无效,删除自己
+        return false; // 过滤掉这个项
+      }
+      if(checkKey === '1'){  // 清除,校验内容
+        item.rules = null;
+      }
+      return true;
+    });
+  }
+  return redata;
 }
 
 /** 初始化需要执行的方法,手动触发 */
@@ -1560,20 +1600,21 @@ defineExpose({
   box-shadow: none;
   border: none;
   --el-card-border-color: transparent;
-  padding: 10px 20px;
+  padding: 5px 20px;
   :deep(.el-card__header) {
     // background-color: #eff3f5;
     padding: 5px 10px;
     background: transparent;
   }
   :deep(.el-card__body) {
-    padding: 5px 10px;
+    padding: 0px 10px;
   }
   .cvrg-hearder-main-title {
     display: flex;
     align-items: center;
     border-radius: 12px;
     padding: 2px 10px;
+    width: max-content;
     &.zhu {
       background: linear-gradient( 180deg, rgba(58, 118, 198, .1) 0%, rgba(57, 117, 198, .1) 100%);
       color: #3A76C6;
@@ -1597,6 +1638,12 @@ defineExpose({
   th {
     text-align: center;
     background: rgba(0,0,0,0.04);
+    white-space: wrap;
+    max-width: 150px;
+    min-width: 80px;
+    font-family: var(--font-family);
+    font-size: 12px;
+    font-weight: 450;
   }
 }
 table {
@@ -1642,5 +1689,10 @@ td {
 }
 :deep(.el-input) {
   --el-input-inner-height: 24px;
+}
+
+.table_overflow_x {
+  width: 100%;
+  overflow-x: auto;
 }
 </style>

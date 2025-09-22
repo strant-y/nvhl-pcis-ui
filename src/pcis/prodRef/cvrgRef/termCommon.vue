@@ -185,9 +185,9 @@ watch(
   () => props.modelValue,
   (newv, oldv) => {
     planData.value = newv;
-    nextTick(()=>{
-      showFlush();
-    })
+    // nextTick(()=>{
+    //   showFlush();
+    // })
   },
   { deep: true }
 );

@@ -631,7 +631,11 @@ const tableconfig = reactive<AppTableConfig>(
         align: 'left',
         width: 48,
         formatter:(val:any) => {
-          return val?.slice(0,2)
+          if(val?.split("分公司").length > 1) {
+            return val?.split("分公司")[0]
+          } else {
+            return val?.slice(0,2)
+          }
         }
       },
       {

@@ -316,6 +316,7 @@ onMounted(async () => {
   if(parparam.cRsnCde === "99"){
     hiddenBtn();
   }
+  formconfig11.titleClass = 'card-title-style';
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
     addAndinitData();
@@ -926,7 +927,7 @@ defineExpose({
  }
 
 ::v-deep .el-card__body {
-   padding: 5px 10px !important;
+   padding: 0px 10px !important;
  }
 
 :deep(.planCard > .el-card__header:first-child) {

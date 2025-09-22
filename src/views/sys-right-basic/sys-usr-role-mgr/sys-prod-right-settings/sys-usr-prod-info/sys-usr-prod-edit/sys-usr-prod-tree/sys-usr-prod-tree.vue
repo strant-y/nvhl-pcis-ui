@@ -165,4 +165,7 @@ const initExpandedKeys = ()=> {
 
 <style scoped lang="scss">
 /* Add your styles here */
+:deep(.el-tree-node__expand-icon) {
+  font-size: 18px;
+}
 </style>
