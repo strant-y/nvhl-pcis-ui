@@ -3663,9 +3663,11 @@ const getPlyPolicyFun = () => {
             cProdNo: res["res"]["composition"]["plyBase"][0]["Base.cProdNo"],
             cGrpMrk: res["res"]["composition"]["plyBase"][0]["Base.cGrpMrk"],
             cDptCde: res["res"]["composition"]["plyBase"][0]["Base.cDptCde"],
-            // cTermNme: res["res"]["composition"]["cvrg"][0]["Term.cClauseName"],
-            // cTermNo: res["res"]["composition"]["cvrg"][0]["Term.cClauseCode"],
-            // cPolicySource:res["res"]["composition"]["plyBase"][0]["Base.cPolicySource"],
+            cTermNo: res["res"]["composition"]["cvrg"] && res["res"]["composition"]["cvrg"].length > 0 
+              ? res["res"]["composition"]["cvrg"][0]["Term.cClauseCode"] : "",
+            cTermNme: res["res"]["composition"]["cvrg"] && res["res"]["composition"]["cvrg"].length > 0 
+              ? res["res"]["composition"]["cvrg"][0]["Term.cClauseName"] : "",
+            cPolicySource:res["res"]["composition"]["plyBase"][0]["Base.cPolicySource"],
             pageType: "readonly",
             showBtn: false,
           })
@@ -3674,6 +3676,7 @@ const getPlyPolicyFun = () => {
       encryptRouterParam(params);
       const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
       window.open(url, "_blank");
+      console.log("查看原保单", params.query.param);
     }
   });
 };
