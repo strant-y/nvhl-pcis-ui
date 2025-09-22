@@ -488,6 +488,7 @@ async function refushData(datas: any) {
   }
 
   datas?.forEach((item: any) => {
+    let exterm = {};
     let key = "m";
     if (item["Term.cRdrTyp"] !== "0") {
       key = "a" + item["Term.cClauseCategory"];
@@ -495,8 +496,6 @@ async function refushData(datas: any) {
       let l = mterm["termRisk"];
       let ex = [];
       let ol = [];
-
-      let exterm = {};
       if (item["riskList"] && item["riskList"].length > 0) {
         item["riskList"].forEach((ris) => {
           let r = false;
@@ -519,12 +518,6 @@ async function refushData(datas: any) {
       if (ex && ex.length > 0) {
         exterm.riskList = ex;
         item.riskList = ol;
-
-        let l = planDataCommon.value[key];
-
-        if (!l || l.length === 0) {
-          planDataCommon.value[key] = [exterm];
-        }
       }
     }
 
@@ -532,6 +525,7 @@ async function refushData(datas: any) {
       pd[key] = [];
     }
     pd[key].push(item);
+    planDataCommon.value[key] = [exterm];
   });
   // 强制刷新组件,对数据进行更新
   formData.value = {};
