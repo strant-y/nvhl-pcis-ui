@@ -378,10 +378,11 @@ onMounted(() => {
     display: inline-block;
     padding: 3px 8px;
     margin: 4px 0 0 5px;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     border: 1px solid var(--el-border-color-light);
-
+    height: 32px;
+    line-height: 26px;
     &:hover {
       color: var(--el-color-primary);
     }

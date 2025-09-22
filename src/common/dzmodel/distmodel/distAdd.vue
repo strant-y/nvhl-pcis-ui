@@ -204,10 +204,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
             }
             saveDist(params).then((res) => {
               if (res.code === 200) {
-                const cvrgRef = opertaor.getTableRefs()['cvrg'];
-                if(cvrgRef) {
-                  cvrgRef.refushCvrgInfo();
-                }
                 ElMessage.success(res.msg);
                 emits("handleClose");
                 const addedPlan = getValue('Dist.cPlanNo');

@@ -125,20 +125,20 @@
                 type="primary"
               ></el-button>
             </el-form-item>
+            <el-form-item>
+              <rt-button
+                :item="{
+                  type: 'primary',
+                  label: '下一步',
+                  func: () => {
+                    next();
+                  },
+                }"
+              />
+            </el-form-item>
           </el-col>
         </el-row>
       </el-form>
-    </div>
-    <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
-      <rt-button
-        :item="{
-          type: 'primary',
-          label: '下一步',
-          func: () => {
-            next();
-          },
-        }"
-      />
     </div>
   </div>
 </template>

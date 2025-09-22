@@ -316,6 +316,7 @@ onMounted(async () => {
   if(parparam.cRsnCde === "99"){
     hiddenBtn();
   }
+  formconfig11.titleClass = 'card-title-style';
   Object.assign(cardconfig.value, formconfig11);
   if (parparam.pageType === "app") {
     addAndinitData();

@@ -72,7 +72,8 @@ const colors = [
   color: white;
 }
 .orange{
-  background: #ff8c03;
+  /* background: #ff8c03; */
+  background: #f57c10;
   color: white;
 }
 .green{

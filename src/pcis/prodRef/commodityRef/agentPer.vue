@@ -66,21 +66,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CDptCde",
-        inputtype: "rtinput",
-        title: "机构部门",
-        disabled: true,
-      },
-      {
-        prop: "CChaMrk",
-        inputtype: "rtselect",
-        title: "业务类型",
-        loadData: [
-          { value: "0", label: "机构" },
-          { value: "1", label: "个人" },
-        ],
-      },
-      {
         prop: "CBsnsTyp",
         inputtype: "rtselect",
         title: "业务来源大类",
@@ -140,14 +125,30 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
+        prop: "CChaMrk",
+        inputtype: "rtselect",
+        title: "业务类型",
+        loadData: [
+          { value: "0", label: "机构" },
+          { value: "1", label: "个人" },
+        ],
+      },
+      {
         prop: "CChaCde",
         inputtype: "rtinput",
-        title: "编码",
+        title: "代理编码",
       },
       {
         prop: "CChaNme",
         inputtype: "rtinput",
         title: "代理(经纪)名称",
+      },
+      {
+        prop: "CDptCde",
+        inputtype: "rtinput",
+        title: "机构部门",
+        disabled: true,
+        itemWidth: 1
       },
     ],
     fromUi: createFromUiConfig({
