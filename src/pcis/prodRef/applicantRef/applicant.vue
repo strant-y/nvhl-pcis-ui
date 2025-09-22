@@ -399,25 +399,28 @@ const method = {
   cardTypeChange: (val: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    console.log(33322,val,isInit)
-        const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
-    personFields.forEach(field => {
-      setFormItem(`Applicant.${field}`, { disabled: false });
-    });
-
-
-
-    if(!isInit && !isOcrEcho){
-        checkUser();   // 调用客户信息接口
-        clearValidate('Applicant.cCertfCde')  // 清除报错信息
+    console.log(33322, val, param)
+ 
+ 
+    if (!isInit && !isOcrEcho) {
+      checkUser();   // 调用客户信息接口
+      clearValidate('Applicant.cCertfCde')  // 清除报错信息
     }
+
+    // if (param.pageType!=="readonly") {
+      const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+      personFields.forEach(field => {
+        setFormItem(`Applicant.${field}`, { disabled: false });
+      });
+    // }
+
 
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
     setFormItem("Applicant.tEstablishingDate", { rules: null });
 
- 
+
     if (val == "111") {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("idCard", {})],
@@ -432,7 +435,7 @@ const method = {
       setValue("Applicant.cNation", "CHN"); // 国籍
 
       personFields.forEach(field => {
-         setFormItem(`Applicant.${field}`, { disabled: true });
+        setFormItem(`Applicant.${field}`, { disabled: true });
       });
 
     } else if (val == "110002") {
@@ -467,9 +470,9 @@ const method = {
       });
     }
 
-    
- 
-    if (isInit  || isOcrEcho) return;
+
+
+    if (isInit || isOcrEcho) return;
 
     // 切换清空
     if (val) {
@@ -486,7 +489,7 @@ const method = {
   },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
-    const param = opertaor.getParam();``
+    const param = opertaor.getParam(); ``
     if (val === "0") {
       setCapitalRequiredRule(getValue, setFormItem, 'Applicant');
       setFormItem("Applicant.tBirthday", {
@@ -539,7 +542,7 @@ const method = {
             disabled: false,
           });
         }
-        
+
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
       }
@@ -752,29 +755,29 @@ const method = {
     }
     let co = 'NATURAL_CERTIFICATE_CACHE';
 
-    if(val == '0'){
+    if (val == '0') {
       co = 'UN_NATURAL_CERTIFICATE_CACHE';
     }
-    
+
     if (!param.initFlag) {
       codeListStore
-      .queryCodeList({
-        codeListName: co,
-        codeListParam: {},
-      })
-      .then((res) => {
-        if (!res.some((item) => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
-          setValue("Applicant.cCertfCls", "");
-        }
-
-        applicantEditRef.value?.addCodeListMap({
-          code: "Applicant.cCertfCls",
-          list: res
+        .queryCodeList({
+          codeListName: co,
+          codeListParam: {},
         })
-        if(val === '0'){
-          setValue('Applicant.cCertfCls', '110007');  // 法人默认机构代码
-        }
-      });
+        .then((res) => {
+          if (!res.some((item) => Object.values(item).includes(getValue("Applicant.cCertfCls")))) {
+            setValue("Applicant.cCertfCls", "");
+          }
+
+          applicantEditRef.value?.addCodeListMap({
+            code: "Applicant.cCertfCls",
+            list: res
+          })
+          if (val === '0') {
+            setValue('Applicant.cCertfCls', '110007');  // 法人默认机构代码
+          }
+        });
     }
 
     checkUser();
@@ -1138,6 +1141,11 @@ const method = {
   },
   // 办理人员证件种类
   cOperaterCertfTypChange: (val: any) => {
+    console.log('证件种类', val)
+    const param = opertaor.getParam();
+    if (!param.initFlag) {
+      return;
+    }
     // 清除报错信息
     clearValidate('Applicant.cOperaterCertfCde')
     let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
@@ -1251,7 +1259,7 @@ function getFormconfig() {
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
-     isOcrEcho = true;
+    isOcrEcho = true;
     const file = fileInput.files[0];
     // 处理文件上传逻辑
     const param = {
@@ -1382,14 +1390,14 @@ function handleFileChange(event: Event) {
           }
           checkUser();
           formconfig.value.fileInputType = ""
-            setTimeout(() => {
-              isOcrEcho = false;
-            }, 1000);
+          setTimeout(() => {
+            isOcrEcho = false;
+          }, 1000);
         }
       })
       .catch((err) => {
         formconfig.value.fileInputType = ""
-         isOcrEcho = false;
+        isOcrEcho = false;
         ElMessage.error(err);
       });
     fileInputRef.value.value = ""; // 清空文件输入框的值

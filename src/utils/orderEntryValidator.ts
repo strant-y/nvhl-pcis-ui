@@ -1,4 +1,5 @@
 import { selectDist,  } from "@/api/prod";
+import dayjs from "dayjs";
 
 interface OpertaorType {
   getTableRefByKey: (key: string) => {
@@ -211,7 +212,87 @@ export const validateSchoolAndPerson = (personList, schoolList) => {
   };
 };
 
+  let  productTermMap = {
+    "020001": 120, // 出口海洋运输货物保险
+    "020002": 90,  // 出口陆上运输货物保险
+    "020003": 90,  // 出口航空货物运输保险
+    "020004": 45,  // 邮包保险
+    "020005": 90,  // 进口海洋运输货物保险
+    "020006": 90,  // 进口陆上运输货物保险
+    "020007": 45,  // 进口航空货物运输保险
+    "020009": 45,  // 国内水路、陆路货物运输保险
+    "020011": 45,  // 国内航空货物运输保险
+    "020013": 45,  // 国内公路货物运输保险
+    "020014": 365, // 公路货物运输定额保险（固定365天）
+    "020016": 45,  // 水路货物运输保险
+    "020017": 45,  // 铁路货物运输保险
+    "020018": 365, // 国内公路货物运输定期保险（固定365天）
+  };
+
+
+// 保险期限设置工具
+export const setInsuranceTerm =(ops, productCode) => {
+   // 确保ops.insrnc存在，避免后续赋值报错
+    if (!ops.insrnc) {
+      ops.insrnc = {};
+    }
+    const currentTime = dayjs();
+    // 计算起始时间（统一为明天0点）
+    const beginTm = currentTime.add(1, 'day').format("YYYY-MM-DD 00:00:00");
+    // 计算结束时间（根据产品类型适配）
+    let endTm;
+    if (this.productTermMap.hasOwnProperty(productCode)) {
+      // 特殊产品：使用映射表中的天数
+      const days = this.productTermMap[productCode];
+      // 结束时间 = 起始日 + 天数 - 1天（确保总天数准确）
+      endTm = currentTime.add(1, 'day').add(days - 1, 'day').format("YYYY-MM-DD 23:59:59");
+    } else {
+      // 其他产品：默认1年
+      endTm = currentTime.add(1, 'year').format("YYYY-MM-DD 23:59:59");
+    }
+
+    // 投保时间（当前时间）
+    const appTm = currentTime.format("YYYY-MM-DD HH:mm:ss");
+    // 设置到操作对象
+    ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+    ops.insrnc["Base.tInsrncEndTm"] = endTm;
+    ops.insrnc["Base.tAppTm"] = appTm;
+    return ops;
+  } ;
+
+
+ 
+
+
+ /**
+   * 单独获取保险期限信息（不修改原对象）
+   * @param {string} productCode - 当前产品编号
+   * @returns {Object} 包含起止时间和投保时间的对象
+   */
+export const getInsuranceTermInfo = (productCode) =>{
+    const currentTime = dayjs();
+    const beginTm = currentTime.add(1, 'day').format("YYYY-MM-DD 00:00:00");
+    let endTm;
+
+    if (this.productTermMap.hasOwnProperty(productCode)) {
+      const days = this.productTermMap[productCode];
+      endTm = currentTime.add(1, 'day').add(days - 1, 'day').format("YYYY-MM-DD 23:59:59");
+    } else {
+      endTm = currentTime.add(1, 'year').format("YYYY-MM-DD 23:59:59");
+    }
+
+    return {
+      beginTm,
+      endTm,
+      appTm: currentTime.format("YYYY-MM-DD HH:mm:ss")
+    };
+  }
+
 
 export default {
   checkPayPlanValidity,
+  setInsuranceTerm,
+  getInsuranceTermInfo
 };
+
+ 

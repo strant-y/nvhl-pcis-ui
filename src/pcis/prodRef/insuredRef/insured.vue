@@ -451,7 +451,7 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-        //办理人 4要素  
+      //办理人 4要素  
       setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.tOperaterCertfEndTm", {
         rules: [getRules("required", {})],
@@ -932,7 +932,7 @@ const method = {
         moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
       // if (!param.initFlag) {
-        setFormItem("Insured.tCertfEndDate", { disabled: true });
+      setFormItem("Insured.tCertfEndDate", { disabled: true });
       // }
 
     } else {
@@ -987,32 +987,18 @@ const method = {
   InsuredCCertfCls: (val: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
+ 
+    if (isInit) {
+      const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+      personFields.forEach(field => {
+        setFormItem(`Insured.${field}`, { disabled: false });
+      });
+    }
 
-    // if (isInit) {
-    //   if (val === "111") {
-    //     setFormItem("Insured.tCertfBgnDate", {
-    //       rules: [getRules("required", {})],
-    //     });
-    //     setFormItem("Insured.tCertfEndDate", {
-    //       rules: [getRules("required", {})],
-    //     });
-    //   }
-    //   return;
-    // }
-
-
-
-    const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
-    personFields.forEach(field => {
-      setFormItem(`Insured.${field}`, { disabled: false });
-    });
-
-    // checkUser();      // 调用客户信息接口
-    // clearValidate('Insured.cCertfCde')    // 清除报错信息
-
+  
     if (!isInit && !isOcrEcho) {
-      checkUser (); // 调用客户信息接口
-      clearValidate ('Insured.cCertfCde'); // 清除报错信息
+      checkUser(); // 调用客户信息接口
+      clearValidate('Insured.cCertfCde'); // 清除报错信息
     }
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
@@ -1084,7 +1070,7 @@ const method = {
     }
 
     // 回显不执行下方操作
-     if (isInit || isCoypBtn.value || isOcrEcho) return;
+    if (isInit || isCoypBtn.value || isOcrEcho) return;
 
     // 切换清空
     if (val) {
@@ -1099,30 +1085,30 @@ const method = {
   },
   // 证件号码 change
   cCertfCdeChange: (val: any) => {
-      setTimeout(()=>{
-            
-            const param = opertaor.getParam();
-            if (param.initFlag) {
-              return;
+    setTimeout(() => {
+
+      const param = opertaor.getParam();
+      if (param.initFlag) {
+        return;
+      }
+      checkUser();
+      const tabref = opertaor.getTableRefs();
+      const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
+      if (cCertfCls == "111") {
+        if (val) {
+          const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
+          insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
+            if (isValid) {
+              idAnalysis(val)
             }
-            checkUser();
-            const tabref = opertaor.getTableRefs();
-            const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
-            if (cCertfCls == "111") {
-              if (val) {
-                const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-                insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
-                  if (isValid) {
-                    idAnalysis(val)
-                  }
-                })
-              }
-            } else if (cCertfCls == '110007') {
-              setValue('Insured.cTaxRegistrationNo', val)
-              setValue('Insured.cOrganizationCode', val)
-            }
-        
-        },10)
+          })
+        }
+      } else if (cCertfCls == '110007') {
+        setValue('Insured.cTaxRegistrationNo', val)
+        setValue('Insured.cOrganizationCode', val)
+      }
+
+    }, 10)
   },
   emailChange: (val) => {
     if (val) {
@@ -1397,8 +1383,8 @@ function clearValidate(key = null) {
 function handleFileChange(event: Event) {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
-      isOcrEcho = true;
- 
+    isOcrEcho = true;
+
     const file = fileInput.files[0];
     // 处理文件上传逻辑
     const param = {
@@ -1530,9 +1516,9 @@ function handleFileChange(event: Event) {
           }
           checkUser();
           formconfig.value.fileInputType = ""
-            setTimeout(() => {
-              isOcrEcho = false;
-            }, 1000);
+          setTimeout(() => {
+            isOcrEcho = false;
+          }, 1000);
         }
       })
       .catch((err) => {
