@@ -85,10 +85,10 @@
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <div class="table_overflow_x">
-                <table style="width: 100%; margin-top: 3px;">
+                <table style="width: 60%; margin-top: 3px;margin-left:10%">
                   <thead>
                   <tr class="table-title">
-                    <th width="300">{{ termTitleConf.cFactorTabTitle }}</th>
+                    <th width="250" style="max-width: 10%;">{{ termTitleConf.cFactorTabTitle }}</th>
                     <th>{{ termTitleConf.cFactorTabValue }}</th>
                   </tr>
                   </thead>
@@ -1697,5 +1697,9 @@ td {
 .table_overflow_x {
   width: 100%;
   overflow-x: auto;
+}
+:deep(.el-form-item__content){
+  line-height: 25px;
+  height: 25px;
 }
 </style>

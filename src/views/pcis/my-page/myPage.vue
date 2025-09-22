@@ -5811,7 +5811,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
-    margin: 12px 5px;
+    margin: 0px 5px;
   }
 }
 
