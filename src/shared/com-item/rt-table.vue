@@ -241,7 +241,12 @@
                 </el-form-item>
               </template>
               <template v-else-if="i.formatter">
-                {{ i.formatter(scope.row[i.prop], scope.row) }}
+                <el-text
+                    class="mx-1 rt-table-formatter-text" truncated
+                    @click="checkIfTruncated($event, i.formatter(scope.row[i.prop], scope.row))"
+                >
+                  {{ i.formatter(scope.row[i.prop], scope.row) }}
+                </el-text>
               </template>
               <template v-else>
                 <el-form-item
@@ -357,6 +362,7 @@ import { v4 as uuidv4 } from "uuid";
 import Validator from "async-validator";
 import { ref, reactive, watch, onMounted, handleError } from "vue";
 import { ElTable } from "element-plus";
+import {checkIfTruncated} from "@/utils/common";
 
 // 定义要触发的事件
 const emits = defineEmits<{
@@ -989,7 +995,6 @@ function isrequired(i: any) {
 
     // 表单项内容区域（与label对应）
     .el-form-item__content {
-      //font-family: inherit;
       // 所有输入控件继承字体样式
       .el-input {
         .el-input__wrapper{
@@ -1063,6 +1068,13 @@ function isrequired(i: any) {
       }
 
     }
+  }
+
+  // 表格组件里处理的值 单独给样式
+  .rt-table-formatter-text {
+    font-family: map-get($form-config, font-family);
+    font-size: map-get($form-config, font-size);
+    color: map-get($form-config, font-color);
   }
 }
 </style>

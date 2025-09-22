@@ -1527,6 +1527,9 @@ td {
   border: 1px solid #e2e2e2; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 450;
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
