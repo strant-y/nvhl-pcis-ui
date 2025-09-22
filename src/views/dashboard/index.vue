@@ -103,7 +103,7 @@
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
-                      @dblclick="toQuery2(row)"
+                      @click="toQuery2(row)"
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -120,7 +120,7 @@
                     <span
                       v-html="row.cAppNo"
                       class="primmaryColor"
-                      @dblclick="toQuery2(row)"
+                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                       <DocumentCopy />
@@ -140,7 +140,7 @@
                     <span
                       v-html="row.cAppNo"
                       class="primmaryColor"
-                      @dblclick="toQuery2(row)"
+                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                       <DocumentCopy />
@@ -160,7 +160,7 @@
                     <span
                       v-html="row.cAppNo"
                       :class="row.baseType !== '询价' ? 'primmaryColor' : ''"
-                      @dblclick="
+                      @click="
                         row.baseType !== '询价' ? toQuery2(row) : () => {}
                       "
                     ></span>
@@ -176,7 +176,7 @@
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
-                      @dblclick="toQuery2(row)"
+                      @click="toQuery2(row)"
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -194,7 +194,7 @@
                     <span
                       v-html="row.cPlyNo"
                       class="primmaryColor"
-                      @dblclick="toQuery2(row)"
+                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
                       <DocumentCopy />
@@ -533,17 +533,6 @@ const pageresult = reactive<Pageresult>({
 });
 // 申请单号、保单号增加双击事件
 Object.keys(tableObj).forEach((i: any) => {
-  tableObj[i].fromSchema = tableObj[i].fromSchema.map((item: any) => {
-    if (
-      (i === "waitObj" || i === "waitPayObj") &&
-      (item.prop === "cAppNo" || item.prop === "cPlyNo")
-    ) {
-      item.dblFunc = (val: any, row: any) => {
-        toQuery2(row);
-      };
-    }
-    return item;
-  });
   const tableBtnObj:any = {};
   if(i === "notWaitObj") {
     tableBtnObj['tableBtnPosition'] = "right"
@@ -648,7 +637,10 @@ Object.keys(tableObj).forEach((i: any) => {
   Object.assign(tableObj[i], tableBtnObj)
 });
 let tableconfig = reactive<AppTableConfig>(
-  createTableEditConfig(tableObj.notWaitObj)
+  createTableEditConfig({
+    ...tableObj.notWaitObj,
+    rowDbClickFun:(row:any)=> toQuery2(row)
+  })
 );
 
 const echartsService = new EchartsService();
@@ -1242,7 +1234,10 @@ const getData = (user: any, roles: any = []) => {
       // 核保
       if (res === "ROLE_00000152") {
         tableconfig = reactive<AppTableConfig>(
-          createTableEditConfig(tableObj.unUdrObj)
+          createTableEditConfig({
+            ...tableObj.unUdrObj,
+            rowDbClickFun:(row:any)=> toQuery2(row),
+          })
         );
         moreurl.value = "/pcis-new-udr-list/PendUdrListQuery";
         isAudit.value = true;
@@ -1275,13 +1270,19 @@ const handleTabClick = (tab: any) => {
   pageData.value.pageNum = 1;
   if (isOperate.value) {
     tableconfig = reactive<AppTableConfig>(
-      createTableEditConfig(tableObj[clickedTabData.value.tableObj])
+      createTableEditConfig({
+        ...tableObj[clickedTabData.value.tableObj],
+        rowDbClickFun:(row:any)=> toQuery2(row),
+      })
     );
     getIssueTableData();
   }
   if (isAudit.value) {
     tableconfig = reactive<AppTableConfig>(
-      createTableEditConfig(tableObj[clickedTabData.value.tableObj])
+      createTableEditConfig({
+        ...tableObj[clickedTabData.value.tableObj],
+        rowDbClickFun:(row:any)=> toQuery2(row),
+      })
     );
     getAuditTableData();
   }
@@ -1447,6 +1448,7 @@ const toQuery = (url: string) => {
 };
 //table的row-click事件
 const toQuery2 = (data: any) => {
+  debugger
   const row = { ...data };
   if (isOperate.value) {
     //出单员
@@ -1531,7 +1533,7 @@ const toQuery2 = (data: any) => {
         });
       }
     } else if (currentTabName.value === "已提交任务") {
-      if (row.baseType !== "询价") {
+      if (row.baseType === "询价") {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
@@ -1747,7 +1749,7 @@ const toQuery2 = (data: any) => {
         });
       }
     } else {
-      if (row.baseType !== "询价") {
+      if (row.baseType === "询价") {
         const requestParam = {
           pageSize: 10,
           pageNum: 1,
