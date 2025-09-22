@@ -511,7 +511,7 @@ const tableconfig = reactive<AppTableConfig>(
           const { cAppNo, curtTask } = row;
           const param = {
             taskId: curtTask,
-            appNo: cAppNo,
+            appNo: row.baseType === "询价" ? row.cInquiryNo : cAppNo,
             user: user,
           };
           withdraw(param)
