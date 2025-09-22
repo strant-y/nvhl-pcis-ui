@@ -9,6 +9,7 @@
         formUi.showMessage ? (formUi.showMessage === '1' ? true : false) : true
     "
         class="custom-form"
+        :label-width="formUi.labelWidth && formUi.labelWidth !== 'auto' ? (formUi.labelWidth + 'px') : maxLabelWidth"
     >
       <el-row :gutter="10">
         <template v-for="(item, index) in props.fromSchema" :key="index">
@@ -26,11 +27,11 @@
               <template v-if="item.inputtype === 'rtButton'">
 
                 <el-form-item
+                    class="custom-form-item"
                     :rules="item.rules ? item.rules : undefined"
                     :prop="item.prop"
-                    :label-position="
-                  item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
-                "
+                    :label-position=" item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
+                                      "
                 >
                   <template #label>
                     <!-- <template v-if="item.title?.length > 8">
@@ -50,10 +51,11 @@
                 </el-form-item>
               </template>
               <template v-else-if="item.inputtype === 'rtinputgroup'">
-                <el-form-item :required="checkRequired(item)"
-                              :label-width=" maxLabelWidth + 'px'"
-                              :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
-                            " >
+                <el-form-item
+                    :required="checkRequired(item)"
+                    :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
+                            "
+                >
                   <template #label>
                     <template v-if="item.title?.length > (item.labelLength || 10)">
                       <el-tooltip
@@ -69,12 +71,8 @@
                     </template>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                   </template>
-                  <div
-                      :style="{
-                    width: '100%',
-                  }"
-                  >
-                    <el-row :gutter="1" v-if="item.groupList.length > 0" style="align-items: flex-start;">
+                  <div class="width-100">
+                    <el-row :gutter="1" v-if="item.groupList.length > 0">
                       <el-col
                           :span="getspan(item, gitem)"
                           v-for="(gitem, index) in item.groupList"
@@ -106,7 +104,6 @@
                     :label-position="
                   item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
                 "
-                    :label-width="formUi.labelWidth ? formUi.labelWidth : maxLabelWidth + 'px'"
                 >
                   <template #label>
                     <template v-if="item.title?.length > (item.labelLength || 10)">
@@ -208,11 +205,12 @@
                   (item.expand ? item.expand && v.disabled : true)
                 "
                 >
+                  <!-- inputgroup -->
                   <template v-if="item.inputtype === 'rtinputgroup'">
-                    <el-form-item :required="checkRequired(item)"
-                                  :label-width=" maxLabelWidth + 'px'"
-                                  :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
-                                "
+                    <el-form-item
+                        :required="checkRequired(item)"
+                        :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
+                        "
                     >
                       <template #label>
                         <!-- <template v-if="item.title?.length > 8">
@@ -229,12 +227,8 @@
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                         <!-- </template> -->
                       </template>
-                      <div
-                          :style="{
-                        width: '100%',
-                      }"
-                      >
-                        <el-row :gutter="10" v-if="item.groupList.length > 0" style="align-items: flex-start;">
+                      <div class="width-100">
+                        <el-row v-if="item.groupList.length > 0">
                           <el-col
                               :span="getspan(item, gitem)"
                               v-for="(gitem, index) in item.groupList"
@@ -263,7 +257,6 @@
                         :prop="item.prop"
                         :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
                     "
-                        :label-width=  "maxLabelWidth + 'px'"
                     >
                       <template #label>
                         <template v-if="item.title?.length > (item.labelLength || 10)">
@@ -325,30 +318,22 @@
 import { FormInstance } from "element-plus";
 import Validator from "async-validator";
 import { AppGridEditMethod } from "./app-grid-edit-config";
-const maxLabelWidth = ref(100); // 默认值
-
+const maxLabelWidth = ref('150px'); // 默认值
 
 
 const updateLabelWidth = () => {
-  const screenWidth = window.innerWidth;
-  const pixelRatio = window.devicePixelRatio;
-
-  // console.log('screenWidth', screenWidth)
-  // console.log('pixelRatio', pixelRatio)
-  if (screenWidth <= 1024) {
-    // console.log('#####', 1024)
-    maxLabelWidth.value = "100"; // 移动端窄屏
-    if(pixelRatio > 1.5625) {
-      maxLabelWidth.value = pixelRatio * 100 - 100  + '';
-    }
-  } else if(screenWidth > 1024 && screenWidth <= 1280) {  /*主流笔记本	1367px - 1600px*/
-    // console.log('#####', 1280)
-     maxLabelWidth.value = "150";
-  }else if(screenWidth > 1280 && screenWidth <= 1920) { /*大屏笔记本/台式机*/
-    // console.log('#####', 1920)
-    maxLabelWidth.value = "180"; // PC 端宽屏
+  const scaleRatio = window.devicePixelRatio;
+  // 转换为百分比（保留整数）
+  const displayPercentage = Math.round(scaleRatio * 100);
+  if(displayPercentage <= 110) {
+    maxLabelWidth.value = "200px";
+  }else if(displayPercentage <= 150) {
+    maxLabelWidth.value = "160px";
+  }else if(displayPercentage <= 175)  {
+    maxLabelWidth.value = "120px"
+  }else {
+    maxLabelWidth.value = "80px"
   }
-  // console.log('maxLabelWidth.value', maxLabelWidth.value)
 };
 
 defineOptions({
@@ -899,7 +884,6 @@ defineExpose({
 
   // 表单项Label样式
   .el-form-item {
-    width: 100%;
     // Label标签样式
     .el-form-item__label {
       font-size: map-get($form-config, label-font-size);
@@ -922,6 +906,14 @@ defineExpose({
 
     // 表单项内容区域（与label对应）
     .el-form-item__content {
+      //.el-input,
+      //.el-input-number,
+      //.el-textarea,
+      //.el-select,
+      //.el-date-picker {
+      //
+      //}
+
       .el-input {
         .el-input__wrapper{
           height: map-get($form-config, item-height);
@@ -968,8 +960,13 @@ defineExpose({
 
       // 日期选择器输入框样式
       .el-date-picker {
-        .el-input__wrapper{
+        .el-input__wrapper {
           height: map-get($form-config, item-height);
+        }
+        .el-date-editor--datetimerange {
+          *{
+              height: map-get($form-config, item-height) !important;
+          }
         }
         .el-input__inner {
           font-family: map-get($form-config, font-family);
