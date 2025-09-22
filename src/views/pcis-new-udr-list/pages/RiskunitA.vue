@@ -1428,12 +1428,19 @@ function viewContInfo() {
 
 // 保存风险单位
 function saveDatas() {
+  const CCiMrk = freeEditRef1.value?.getFromValue()?.cCiMrk; //共保类型
   let rows = pageresult1.list;
   let totalAmt = 0;
   let totalPrm = 0;
   let initCedWay = "";
   let CCiMainNo;
   let CCiMainMrk;
+  let totalAddedTax = 0;
+  let totalNotaxPrm = 0;
+  let totalCiAmt = 0;
+  let totalCiPrm = 0;
+  let totalCiAddedTax = 0;
+  let totalCiNotaxPrm = 0;
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     if(!row.cRiskUnitNme) {
@@ -1454,14 +1461,67 @@ function saveDatas() {
     }
     const amt = row.nAmt;
     const prm = row.nPrm;
-    totalAmt = parseFloat(totalAmt) + parseFloat(amt);
-    totalPrm = parseFloat(totalPrm) + parseFloat(prm);
+    totalAmt = totalAmt + parseFloat(amt);
+    totalPrm = totalPrm + parseFloat(prm);
+    totalAddedTax = totalAddedTax + parseFloat(row.nAddedTax);
+    totalNotaxPrm = totalNotaxPrm + parseFloat(row.nNotaxPrm);
+    if (
+      CCiMrk == "1" ||
+      CCiMrk == "2" ||
+      CCiMrk == "3" ||
+      CCiMrk == "4" ||
+      CCiMrk == "5"
+    ) {
+      totalCiAmt = totalCiAmt + parseFloat(row.nCiAmt);
+      totalCiPrm = totalCiPrm + parseFloat(row.nCiPrm);
+      totalCiAddedTax = totalCiAddedTax + parseFloat(row.nCiAddedTax);
+      totalCiNotaxPrm = totalCiNotaxPrm + parseFloat(row.nCiNotaxPrm);
+    }
+  }
+  if(totalAddedTax !== Number(freeEditRef.value?.getValue("nAddedTax"))) {
+    const nAddedTax = Number(freeEditRef.value?.getValue("nAddedTax")) - pageresult1.list.slice(0,pageresult1.list.length - 1).map(i => i.nAddedTax).reduce((total, current) => total + current, 0)
+    pageresult1.list[pageresult1.list.length - 1].nAddedTax = nAddedTax
+    pageresult1.list[pageresult1.list.length - 1].nAddedTaxVar = nAddedTax
+  }
+  if(totalNotaxPrm !== Number(freeEditRef.value?.getValue("nNotaxPrm"))) {
+    const nNotaxPrm = Number(freeEditRef.value?.getValue("nNotaxPrm")) - pageresult1.list.slice(0,pageresult1.list.length - 1).map(i => i.nNotaxPrm).reduce((total, current) => total + current, 0)
+    pageresult1.list[pageresult1.list.length - 1].nNotaxPrm = nNotaxPrm
+    pageresult1.list[pageresult1.list.length - 1].nNotaxPrmVar = nNotaxPrm
+  }
+  if (
+    CCiMrk == "1" ||
+    CCiMrk == "2" ||
+    CCiMrk == "3" ||
+    CCiMrk == "4" ||
+    CCiMrk == "5"
+  ) {
+    if(totalCiAmt !== Number(freeEditRef.value?.getValue("nCiAmt"))) {
+      const nCiAmt = Number(freeEditRef.value?.getValue("nCiAmt")) - pageresult1.list.slice(0,pageresult1.list.length - 1).map(i => i.nCiAmt).reduce((total, current) => total + current, 0)
+      pageresult1.list[pageresult1.list.length - 1].nCiAmt = nCiAmt
+      pageresult1.list[pageresult1.list.length - 1].nCiAmtVar = nCiAmt
+    }
+    if(totalCiPrm !== Number(freeEditRef.value?.getValue("nCiPrm"))) {
+      const nCiPrm = Number(freeEditRef.value?.getValue("nCiPrm")) - pageresult1.list.slice(0,pageresult1.list.length - 1).map(i => i.nCiPrm).reduce((total, current) => total + current, 0)
+      pageresult1.list[pageresult1.list.length - 1].nCiPrm = nCiPrm
+      pageresult1.list[pageresult1.list.length - 1].nCiPrmVar = nCiPrm
+    }
+    if(totalCiAddedTax !== Number(freeEditRef.value?.getValue("nCiAddedTax"))) {
+      const nCiAddedTax = Number(freeEditRef.value?.getValue("nCiAddedTax")) - pageresult1.list.slice(0,pageresult1.list.length - 1).map(i => i.nCiAddedTax).reduce((total, current) => total + current, 0)
+      pageresult1.list[pageresult1.list.length - 1].nCiAddedTax = nCiAddedTax
+      pageresult1.list[pageresult1.list.length - 1].nCiAddedTaxVar = nCiAddedTax
+    }
+    if(totalCiNotaxPrm !== Number(freeEditRef.value?.getValue("nCiNotaxPrm"))) {
+      const nCiNotaxPrm = Number(freeEditRef.value?.getValue("nCiNotaxPrm")) - pageresult1.list.slice(0,pageresult1.list.length - 1).map(i => i.nCiNotaxPrm).reduce((total, current) => total + current, 0)
+      pageresult1.list[pageresult1.list.length - 1].nCiNotaxPrm = nCiNotaxPrm
+      pageresult1.list[pageresult1.list.length - 1].nCiNotaxPrmVar = nCiNotaxPrm
+    }
+
   }
   var oldAmt = freeEditRef.value?.getValue("nAmt");
   var oldPrm = freeEditRef.value?.getValue("nPrm");
   if (
-    parseFloat(totalAmt).toFixed(2) != parseFloat(oldAmt).toFixed(2) &&
-    parseFloat(totalPrm).toFixed(2) != parseFloat(oldPrm).toFixed(2)
+    totalAmt.toFixed(2) != parseFloat(oldAmt).toFixed(2) &&
+    totalPrm.toFixed(2) != parseFloat(oldPrm).toFixed(2)
   ) {
     ElMessage.error(
       "总保额:" +
@@ -1733,7 +1793,7 @@ function changePrm(nPrmVar: any, flag: any) {
     const totalAddedTax = freeEditRef.value?.getValue("nAddedTax") // 增值税
     const nPrmRatio = parseFloat((parseFloat(nPrmVar) / parseFloat(totalPrm))) // 保费变化值与总保费的比例
     nAddedTax = parseFloat(financial(parseFloat(totalAddedTax) * nPrmRatio)) // 计算后的增值税
-    nNotaxPrm = parseFloat(nPrmVar) - parseFloat(nAddedTax) // 计算后的不含税保费(保费 - 计算后的增值税)
+    nNotaxPrm = (parseFloat(nPrmVar) * 100 - parseFloat(nAddedTax) * 100)/100 // 计算后的不含税保费(保费 - 计算后的增值税)
     freeEditRef1.value?.setValue("nNotaxPrm", nNotaxPrm);
     freeEditRef1.value?.setValue("nNotaxPrmVar", nNotaxPrm);
     freeEditRef1.value?.setValue("nAddedTax", nAddedTax);
@@ -1744,7 +1804,7 @@ function changePrm(nPrmVar: any, flag: any) {
       const totalCiAddedTax = freeEditRef.value?.getValue("nCiAddedTax") // 共保增值税
       nCiPrm = parseFloat(financial(parseFloat(totalCiPrm) * nPrmRatio))
       nCiAddedTax = parseFloat(financial(parseFloat(totalCiAddedTax) * nPrmRatio))
-      nCiNotaxPrm = parseFloat(nCiPrm) - parseFloat(nCiAddedTax)
+      nCiNotaxPrm = (parseFloat(nCiPrm) * 100 - parseFloat(nCiAddedTax) * 100)/100
       selectRow1.value.nCiPrm = nCiPrm;
       selectRow1.value.nCiPrmVar = nCiPrm;
       selectRow1.value.nCiAddedTax = nCiAddedTax;
