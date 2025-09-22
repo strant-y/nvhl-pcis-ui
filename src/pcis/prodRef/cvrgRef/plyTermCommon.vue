@@ -537,9 +537,9 @@ async function refushData(datas: any) {
   formData.value = {};
   setTimeout(() => {
     formData.value = pd;
-    nextTick(() => {
-      showFlush();
-    });
+    // nextTick(() => {
+    //   showFlush();
+    // });
   }, 50);
 }
 
