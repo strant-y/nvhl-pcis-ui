@@ -203,6 +203,7 @@
                               @valueChange="(r)=>{
                                 const d = multipleget(i,t,r,inx);
                                 i[t.prop] = d;
+                                t.func ? t.func(d, i, t) : null;
                               }" />
                           </td>
                         </template>

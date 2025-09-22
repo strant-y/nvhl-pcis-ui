@@ -234,6 +234,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
               ).then(() => {});
             }
+            setFormItem("cIsExcluding", {
+              btnItems: {disabled: false}
+            });
+          } else {
+            setFormItem("cIsExcluding", {
+              btnItems: {disabled: true}
+            });
           }
         },
         itemWidth: 2,
