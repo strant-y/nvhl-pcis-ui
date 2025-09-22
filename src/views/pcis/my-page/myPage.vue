@@ -5665,9 +5665,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   display: inline-block; /* 设置为行内块元素 */
   vertical-align: middle; /* 垂直居中 */
 }
-.card_ {
-  margin-bottom: 10px;
-}
 
 /* 用于包含行内块元素的容器 */
 .navi_container {
@@ -5815,7 +5812,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
-    margin: 12px 5px;
+    margin: 0px 5px;
   }
 }
 

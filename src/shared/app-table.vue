@@ -1,10 +1,16 @@
 <template>
   <div class="searchbar">
     <el-card
-        shadow="never"
+        shadow="hover"
         :class="['card_container', 'table-container',tableConfig.titleBtns.length > 0 ? 'table_header_has-title-btns' : 'table_header']"
     >
-      <template #header v-if="(tableConfig.title && tableConfig.title.length > 0 ) || tableConfig?.formconfig?.titleBtns?.length > 0">
+      <template
+          #header
+          v-if="(tableConfig.title && tableConfig.title.length > 0 ) ||
+              tableConfig?.formconfig?.titleBtns?.length > 0 ||
+              tableConfig?.titleBtns?.length > 0
+          "
+      >
         <el-row justify="space-between" v-if="tableConfig.showEdit && tableConfig.formconfig.fromSchema && tableConfig.formconfig.fromSchema.length > 0">
           <el-col :span="24">
             <dynamic-forms
@@ -17,7 +23,7 @@
         <el-row
           style="padding-right: 3px;"
           justify="space-between"
-          v-if="tableConfig.title || tableConfig.formconfig?.titleBtns.length > 0"
+          v-if="tableConfig.title || tableConfig.formconfig?.titleBtns.length > 0 || tableConfig?.titleBtns?.length > 0"
         >
           <el-col :span="5" v-if="tableConfig.title && tableConfig.title.length > 0">
             <span class="card-title-style">{{ tableConfig.title }}</span>
@@ -302,13 +308,13 @@ defineExpose({
   margin-bottom: 0px;
 }
 .table_header :deep(.el-card__header) {
-  height: 32px;
-  padding: 4px 0 4px 12px;
-  background: #ffffff;
+  //height: 32px;
+  //padding: 4px 0 4px 12px;
+  //background: #ffffff;
 }
 
 .table_header_has-title-btns :deep(.el-card__header) {
-  padding: 10px 20px;
+  //padding: 10px 20px;
 }
 .el-pagination {
   margin-top: 12px;
