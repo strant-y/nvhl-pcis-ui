@@ -16,7 +16,7 @@
                     term.cRdrTyp === "0" ? "主" : "附加"
                   }}</el-tag> -->
                   <div :class="['cvrg-hearder-main-title',term.cRdrTyp === '0' ? 'zhu' : 'fu']">
-                    <img :src="term.cRdrTyp === '0' ? '/src/assets/img/zhu.png' : '/src/assets/img/fu.png'" alt="" srcset="">
+                    <img :src="term.cRdrTyp === '0' ? zhuImageUrl : fuImageUrm" alt="" srcset="">
                     <span>{{ term.cNmeCn }}</span>
                   </div>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
@@ -457,6 +457,8 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 });
 
 const {selectedRow} = storeToRefs(terconfig);
+const zhuImageUrl = ref(new URL(`../../../assets/img/zhu.png`, import.meta.url).href);
+const fuImageUrl = ref(new URL(`../../../assets/img/fu.png`, import.meta.url).href);
 
 function termUpdate(){
   termDeductibleNote();
