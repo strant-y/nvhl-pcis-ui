@@ -104,6 +104,24 @@ watchEffect(() => {
     color: var(--el-color-primary);
   }
 }
+
+* {
+  font-family: map-get($font-config, font-family) !important;
+}
+
+// 这些组件通常挂载在body下，需要单独指定
+.el-select-dropdown,
+.el-date-picker,
+.el-dialog,
+.el-tooltip__popper,
+.el-message-box,
+.el-notification {
+  font-family: map-get($font-config, font-family) !important;
+}
+
+::placeholder {
+  font-family: map-get($font-config, font-family) !important;
+}
 </style>
 <style>
 .el-popper .el-menu--horizontal.el-menu--popup-container {

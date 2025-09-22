@@ -152,7 +152,7 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "CChaCde",
         inputtype: "rtinput",
-        title: "编码",
+        title: "代理编码",
       },
       {
         prop: "CChaNme",

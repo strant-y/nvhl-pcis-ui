@@ -1149,8 +1149,8 @@ const tableObj = {
                 size: "large",
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
-                    // 联保单不显示复制按钮
-                    if (row.cCiMrk === "联保单") {
+                    // 联保单6不显示复制按钮
+                    if (row.cCiMrk === "6") {
                         return true;
                     } else {
                         return false;
@@ -1161,12 +1161,10 @@ const tableObj = {
                     if (!isCopyButtonVisible.value) return true;
 
                     // 联保单不显示
-                    if (row.cCiMrk === "联保单") return true;
+                    if (row.cCiMrk === "6") return true;
                     return false;
                 },
-
                 tableClick: async (row) => {
-                    console.log(row);
                     const r = await row;
                     if (r) {
                         // 校验出单机构是否复合复制单的机构要求
