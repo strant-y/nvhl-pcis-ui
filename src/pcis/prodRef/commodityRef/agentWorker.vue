@@ -33,6 +33,7 @@ const props = defineProps({
     },
 });
 const emits = defineEmits(["handleClose"]);
+const queryLoading = ref(false);         // 控制按钮 loading 图标
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
@@ -50,6 +51,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             createFreeButtonBase({
                 type: "primary",
                 label: "查询",
+                loading: queryLoading,   // 新增
                 func: async () => {
                     freeEditRef.value?.validate().then((isValid) => {
                         if (isValid) {
@@ -153,6 +155,7 @@ function setDisa() {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+    queryLoading.value = true;
     const user = JSON.parse(sessionStorage.getItem("user"));
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
     const s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -179,6 +182,8 @@ function handleQuery(flag?: boolean) {
         if (pageData) {
           pageresult.total = pageData.total;
           pageresult.list = pageData.result;
+          ElMessage.success('查询成功');
+          queryLoading.value = false;
         }
       }
     });

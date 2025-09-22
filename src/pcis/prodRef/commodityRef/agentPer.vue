@@ -36,6 +36,7 @@ const props = defineProps({
   },
 });
 const emits = defineEmits(["handleClose"]);
+const queryLoading = ref(false);         // 控制按钮 loading 图标
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
@@ -53,6 +54,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+        loading: queryLoading,   // 新增
         func: async () => {
           freeEditRef.value?.validate().then((isValid) => {
             if (isValid) {
@@ -357,6 +359,7 @@ function setFormItem(key: any, obj: any) {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+  queryLoading.value = true;
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
@@ -379,11 +382,14 @@ function getAgencyBusinessList(param?: any) {
         if (!!res && !!res["data"]) {
           pageresult.total = res["totalCount"];
           pageresult.list = res["data"];
+          ElMessage.success('查询成功');
+          queryLoading.value = false;
         }
       },
       (error) => {
         console.log("出错了", error);
         ElMessage.error("后台服务异常,请联系管理员");
+        queryLoading.value = false;
       }
     );
   } else if (param.CChaSubtype === "030504") {
@@ -392,11 +398,14 @@ function getAgencyBusinessList(param?: any) {
         if (!!res && !!res["data"]) {
           pageresult.total = res["totalCount"];
           pageresult.list = res["data"];
+          ElMessage.success('查询成功'); 
+          queryLoading.value = false;
         }
       },
       (error) => {
         console.log("出错了", error);
         ElMessage.error("后台服务异常,请联系管理员");
+        queryLoading.value = false;
       }
     );
   } else {
@@ -405,11 +414,14 @@ function getAgencyBusinessList(param?: any) {
         if (!!res && !!res["data"]) {
           pageresult.total = res["totalCount"];
           pageresult.list = res["data"];
+          ElMessage.success('查询成功');
+          queryLoading.value = false;
         }
       },
       (error) => {
         console.log("出错了", error);
         ElMessage.error("后台服务异常,请联系管理员");
+        queryLoading.value = false;
       }
     );
   }
