@@ -1398,14 +1398,10 @@ const initPage = async () => {
   }
 
   console.log("页面初始化返回数据", formconfig11);
-  if (props.param?.cAppTyp == "E") {
-    opertaor.setReadOnly(formconfig11);
-  }
   // 只读场景,提前将配置设置为只读
   if (
     props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
-    (props.param?.pageType === "EDR_APP_NEW_SCENE" &&
-      props.param.cEdrType == "1" && props.param.cRsnCde !== '99') ||
+    (props.param?.cAppTyp == "E" && props.param.cRsnCde !== '99') ||
     props.param?.pageType === "readonly" ||
     props.param?.pageType === "UW_READ_SCENE"
   ) {
@@ -1801,10 +1797,9 @@ async function loadAfter() {
           props.param["cRsnCde"],
         ]);
       }
-      nextTick(() => {
+      if (props.param["cRsnCde"] !== "99") {
+        nextTick(() => {
         opertaor.setDisabledAll();
-
-
         getEdrRsnItemFun(
           props.param["cProdNo"],
           props.param["cDptCde"],
@@ -1824,12 +1819,10 @@ async function loadAfter() {
             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
               disabled: true
             })
-
         }
-        //   CAcctNme
-            // ?.value?.setDisabledAll(isDisabled);
-
-      });
+        });
+      }
+      
       bthList.value = edrBtn;
     } else {
       bthList.value = edrSurrenderBtn;
@@ -2901,8 +2894,13 @@ const calcPremium = () => {
           item.nSeqNo = index + 1;
         })
       }
-
       opertaor.setDataAll(ops);
+    //   const whiteList = ['base', 'plyBase', 'applicant', 'insured', 'payinfo', 'EdrBase','insrnc'];
+    //   Object.keys(ops).forEach(key => {
+    //     if (whiteList.includes(key) && opertaor.getTableRefByKey(key)?.setFormValue) {
+    //         opertaor.getTableRefByKey(key).setFormValue(ops[key]);
+    //     }
+    //   });
 
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
             nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
