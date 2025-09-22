@@ -325,22 +325,51 @@ const method = {
     onChiefMrkChange()
   },
   //出单标志下拉事件
-  clssueMrkChange:  (val)=>{
+  clssueMrkChange: (val) => {
+    //否0,是1
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
+    const cCiMrk = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
+    // const cCiMrk = opertaor.getTableRefByKey("ECargoBase").getFromValue()
     if (!rowData || !rowId) return;
-      // 获取所有行数据
-      const allRows = getFormValue();
-      // 检查是否已有其他行的 cIssueMrk 是 1
-      const existingIssueMrk = allRows.some(
-        (row) => row._dataId !== rowId && row["ECargoCi.cIssueMrk"] === "1"
-      );
-      if (val === "1" && existingIssueMrk) {
-        ElMessage.error("出单方有且只能有一个！");
-        // 回退当前行的值
+    // 获取所有行数据
+    const allRows = getFormValue();
+    // 检查是否已有其他行的 cIssueMrk 是 1
+    const existingIssueMrk = allRows.some(
+      (row) => row._dataId !== rowId && row["ECargoCi.cIssueMrk"] === "1"
+    );
+    if (val === "1" && existingIssueMrk) {
+      ElMessage.error("出单方有且只能有一个！");
+      freeEditRef?.value?.setValueByRowKey("ECargoCi.cIssueMrk", rowId, "");
+      return;
+    }
+    // 根据不同的联共保类型进行校验
+    if (val === "1") {
+      // 选择"是"时的校验 - 出单方必须是主联单的分公司
+      if ((cCiMrk == '1' || cCiMrk == '5')
+        && rowData['ECargoCi.cDptCde'] !== param.cDptCde) {
+        ElMessage.error("联保单出单方必须是主联单的分公司！");
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cIssueMrk", rowId, "");
         return;
       }
+    } else if (val === "0") {
+      // 选择"否"时的校验 - 联保单出单方必须是主联单的分公司
+      if ((cCiMrk == '5' || cCiMrk == '3' || cCiMrk === '1')
+        && rowData['ECargoCi.cDptCde'] == param.cDptCde) {
+        ElMessage.error("联保单出单方必须是主联单的分公司！");
+        freeEditRef?.value?.setValueByRowKey("ECargoCi.cIssueMrk", rowId, "");
+        return;
+      }
+    }
+    allRows.forEach((item: any) => {
+      const rowItem = freeEditRef.value?.getRowAllItemRefById(item._dataId)
+      if (item['ECargoCi.cIssueMrk'] == '1') {
+        rowItem['ECargoCi.nPlyFeeRate'].disabled = true
+        freeEditRef?.value?.setValueByRowKey("ECargoCi.nPlyFeeRate", rowId, "0.00");
+      } else {
+        rowItem['ECargoCi.nPlyFeeRate'].disabled = false
+      }
+    })
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
@@ -353,8 +382,9 @@ const method = {
     // 我方主共或从共的情况
     if (cCiMrk === '1' || cCiMrk === '3') {
       // 情况1：如果选中的是“是”且是永安保险(327001)
-      if (rowData.length>1 && val === "1" && cCoinsurerCde === "327001") {
-        ElMessage.error("我方从共时主共保方不能是我司！");
+      if (rowData && val === "0" && cCoinsurerCde === "327001") {
+        // ElMessage.error("我方从共时主共保方不能是我司！");
+        ElMessage.error("我方主共时主共保方必须是我司！");
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrk", rowId, "");
         return;
       }
@@ -372,7 +402,8 @@ const method = {
     // 我方从共时，主共保方必须是我司
     if (cCiMrk["ECargoBase.cCiMrk"] === '2' || cCiMrk["ECargoBase.cCiMrk"] === '4') {
       if (val === "1" && cCoinsurerCde !== "327001") {
-        ElMessage.error("我方主共时主共保方必须是我司！");
+        ElMessage.error("我方从共时主共保方不能是我司！");
+        // ElMessage.error("我方主共时主共保方必须是我司！");
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrk", rowId, "");
         return;
       }
@@ -658,9 +689,8 @@ const onChiefMrkChange = () => {
   let cJiMrkVal = '0';
   let cChiefMrkVal = '0';
   const ciMrkValue = cCiMrk["ECargoBase.cCiMrk"]; // 获取联共保标识
-
   if (cCoinsurerCde === "327001") {
-    if (rowData["ECargoBase.cDptCde"] === cDptCde) {
+    if (rowData["ECargoCi.cDptCde"] === cDptCde) {
       cSelfMrkVal = '1';
       switch (ciMrkValue) {
         case "1":
@@ -697,9 +727,9 @@ const onChiefMrkChange = () => {
     cSelfMrkVal = '0'; // 非本分公司
   }
   
+  freeEditRef?.value?.setValueByRowKey("ECargoCi.cSelfMrk", rowData._dataId, cSelfMrkVal );
+  freeEditRef?.value?.setValueByRowKey("ECargoCi.cJiMrk", rowData._dataId, cJiMrkVal );
   freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrk", rowData._dataId, cChiefMrkVal );
-  freeEditRef?.value?.setValueByRowKey("ECargoCi.cJiMrkVal", rowData._dataId, cJiMrkVal );
-  // freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrkVal", rowData._dataId, cChiefMrkVal );
 };
 // 初始化联共保信息
 const initCiInfo = (data: any) => {

@@ -13,7 +13,28 @@
         ref="tableRef"
         @selection-change="handleSelectionChange"
         @page-change="handleQuery(false)"
-      />
+      >
+        <template #column-preDptName="{ row, column, index }">
+          <el-tooltip :content="row.preDptName" placement="top">
+            <span v-html="row.preDptName || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+        <template #column-dptName="{ row, column, index }">
+          <el-tooltip :content="row.dptName" placement="top">
+            <span v-html="row.dptName || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+        <template #column-preUserName="{ row, column, index }">
+          <el-tooltip :content="row.preUserName" placement="top">
+            <span v-html="row.preUserName || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+        <template #column-operName="{ row, column, index }">
+          <el-tooltip :content="row.operName" placement="top">
+            <span v-html="row.operName || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+      </app-table>
     </div>
     <template #footer>
       <span class="dialog-footer">
@@ -77,14 +98,16 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "curtTaskName",
         inputtype: "rtinput",
         title: "任务名称",
-        minWidth: 100,
+        width: 62,
         fixed: "left",
+        align: "left",
       },
       {
         prop: "type",
         inputtype: "rtinput",
         title: "任务类型",
-        minWidth: 100,
+        width: 62,
+        align: "left",
         formatter: (val: any) => { 
           if (val === '0') {
             return "新任务";
@@ -105,13 +128,14 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "curtUserName",
         inputtype: "rtinput",
         title: "接收人",
-        minWidth: 120,
+        width: 62,
+        align: "left",
       },
       {
         prop: "acptTm",
         inputtype: "rtdatepicker",
         title: "接收时间",
-        minWidth: 150,
+        width: 145,
         format: "YYYY-MM-DD HH:mm:ss",
         type: "datetime",
       },
@@ -119,7 +143,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cmptTm",
         inputtype: "rtdatepicker",
         title: "完成时间",
-        minWidth: 150,
+        width: 145,
         format: "YYYY-MM-DD HH:mm:ss",
         type: "datetime",
       },
@@ -127,19 +151,23 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preDptName",
         inputtype: "rtinput",
         title: "任务分发机构",
-        minWidth: 180,
+        width: 146,
+        align: "left",
+        slotName: "preDptName"
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务分发人",
-        minWidth: 120,
+        width: 104,
+        align: "left",
+        slotName: "preUserName"
       },
       {
         prop: "crtTm",
         inputtype: "rtdatepicker",
         title: "任务分发时间",
-        minWidth: 150,
+        width: 145,
         format: "YYYY-MM-DD HH:mm:ss",
         type: "datetime",
       },
@@ -147,25 +175,31 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "dptName",
         inputtype: "rtinput",
         title: "下一级机构",
-        minWidth: 180,
+        width: 146,
+        align: "left",
+        slotName: "dptName"
       },
       {
         prop: "opgrpName",
         inputtype: "rtinput",
         title: "下一级角色",
-        minWidth: 180,
+        align: "left",
+        width: 75,
       },
       {
         prop: "level",
         inputtype: "rtinput",
         title: "下一级级别",
-        minWidth: 180,
+        align: "left",
+        width: 75,
       },
       {
         prop: "operName",
         inputtype: "rtinput",
         title: "下一级操作员",
-        minWidth: 180,
+        width: 104,
+        align: "left",
+        slotName: "operName"
       },
     ],
   })
@@ -212,4 +246,21 @@ function handleQuery(flag?: boolean) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-table td.el-table__cell div.cell),:deep(.el-text.is-truncated) {
+  vertical-align: middle;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
+}
+:deep(.el-card__header) {
+  display: none;
+}
+:deep(.el-card__body) {
+  padding: 15px;
+}
+</style>
