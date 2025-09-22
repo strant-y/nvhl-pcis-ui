@@ -197,10 +197,9 @@ function getShortMenuList() {
   grid-template-columns: repeat(5, 1fr);
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .second-level-list a {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
-  margin-top: 8px;
 }
 .el-dropdown__popper.menuDropdowm .menu-list-box .second-level-title{
   font-size: 12px;
