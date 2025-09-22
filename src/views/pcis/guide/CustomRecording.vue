@@ -210,6 +210,17 @@
 									type="primary"
 								></el-button>
 							</el-form-item>
+              <el-form-item>
+                <rt-button
+                  :item="{
+                    type: 'primary',
+                    label: '下一步',
+                    func: () => {
+                      next();
+                    },
+                  }"
+                />
+              </el-form-item>
 						</el-col>
 					</el-row>
         </template>
@@ -226,6 +237,17 @@
 							<!-- <el-radio value="1">团单</el-radio> -->
 						</el-radio-group>
 					</el-form-item>
+          <el-form-item style="margin-left: 170px;" v-if="formconfig1.cRenewMrk == '1'">
+            <rt-button
+              :item="{
+                type: 'primary',
+                label: '下一步',
+                func: () => {
+                  next();
+                },
+              }"
+            />
+          </el-form-item>
 				</template>
 				<template v-if="formconfig1.cRecordType != 9">
 					<el-tooltip placement="top">
@@ -304,6 +326,17 @@
                     icon="Search"
                     type="primary"
                 ></el-button>
+              </el-form-item>
+              <el-form-item>
+                <rt-button
+                  :item="{
+                    type: 'primary',
+                    label: '下一步',
+                    func: () => {
+                      next();
+                    },
+                  }"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="24" v-else>
