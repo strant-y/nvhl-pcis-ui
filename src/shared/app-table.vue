@@ -2,17 +2,10 @@
   <div class="searchbar">
     <el-card
         shadow="never"
-        :class="['table-container',tableConfig.titleBtns.length > 0 ? 'table_header_has-title-btns' : 'table_header']"
+        :class="['card_container', 'table-container',tableConfig.titleBtns.length > 0 ? 'table_header_has-title-btns' : 'table_header']"
     >
-      <template
-        #header
-        v-if="
-          tableConfig.showEdit ||
-          tableConfig.formconfig?.titleBtns.length > 0 ||
-          tableConfig.titleBtns.length > 0
-        "
-      >
-        <el-row justify="space-between" v-if="tableConfig.showEdit">
+      <template #header v-if="(tableConfig.title && tableConfig.title.length > 0 ) || tableConfig?.formconfig?.titleBtns?.length > 0">
+        <el-row justify="space-between" v-if="tableConfig.showEdit && tableConfig.formconfig.fromSchema && tableConfig.formconfig.fromSchema.length > 0">
           <el-col :span="24">
             <dynamic-forms
               :fromSchema="tableConfig.formconfig.fromSchema"
@@ -22,16 +15,17 @@
           </el-col>
         </el-row>
         <el-row
+          style="padding-right: 3px;"
           justify="space-between"
           v-if="tableConfig.title || tableConfig.formconfig?.titleBtns.length > 0"
         >
           <el-col :span="5" v-if="tableConfig.title && tableConfig.title.length > 0">
-              {{ tableConfig.title }}
+            <span class="card-title-style">{{ tableConfig.title }}</span>
           </el-col>
           <el-col
               v-if="tableConfig.formconfig?.titleBtns.length > 0"
               :span="tableConfig.title && tableConfig.title.length > 0 ? 19 : 24"
-              :style="{textAlign:tableConfig.titleBtnPosition}"
+              :style="{textAlign: tableConfig.tableBtnPosition ? tableConfig.tableBtnPosition : 'right', lineHeight: '20px'}"
           >
             <el-button-group>
               <template
@@ -61,18 +55,16 @@
       <template
         #header
         v-else-if="
-          tableConfig.fromUi.showTitleBar
-            ? tableConfig.fromUi.showTitleBar
-            : true
+          tableConfig.fromUi.showTitleBar && tableConfig.title && tableConfig.title.length > 0
         "
       >
         <el-row justify="space-between">
           <el-col :span="4" v-if="!tableConfig.production">
-            {{ tableConfig.title }}
+            <span class="card-title-style">{{ tableConfig.title }}</span>
           </el-col>
           <el-col :span="4" v-if="tableConfig.production">
             <el-tooltip :content="tableConfig.productionTitle">
-              {{ tableConfig.title }}
+              <span class="card-title-style">{{ tableConfig.title }}</span>
             </el-tooltip>
           </el-col>
         </el-row>
@@ -299,8 +291,8 @@ defineExpose({
 
 <style lang="scss" scoped>
 .searchbar {
-  border: 1px solid #ddd;
-  // box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+
+
 }
 .table-container ::v-deep .el-card__header {
   // background-color: #d0f3fc4d !important;

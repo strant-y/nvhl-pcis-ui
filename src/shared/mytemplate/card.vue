@@ -1,7 +1,7 @@
 <template>
-  <div class="freeedit">
+  <div class="freeedit card_container">
     <div class="searchbar">
-      <el-card :class="getClass()">
+      <el-card :class="getClass()" shadow="hover">
         <template #header>
           <el-row justify="space-between">
             <el-col :span="6" v-if="!cardConfig.production">
@@ -13,7 +13,7 @@
                 <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
                 <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
               </a>
-              {{ cardConfig.title }}
+              <span class="card-title-style">{{ cardConfig.title }}</span>
             </el-col>
             <el-col :span="6" v-if="cardConfig.production">
               <a
@@ -25,12 +25,12 @@
                 <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
               </a>
               <el-tooltip :content="cardConfig.productionTitle">
-                {{ cardConfig.title }}
+                <span class="card-title-style">{{ cardConfig.title }}</span>
               </el-tooltip>
             </el-col>
             <el-col
               :span="18"
-              style="text-align: right"
+              style="text-align: right; padding-right: 10px;"
             >
               <!-- 控制cardConfig.showEdit状态的按钮 -->
               <template v-if="showMyfrom">
@@ -46,8 +46,9 @@
                 </el-tooltip>
               </template>
               <template
-              v-if=" (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||
-                (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)" >
+                v-if=" (cardConfig.titleBtns && cardConfig.titleBtns.length > 0) ||
+                (cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false)"
+              >
                 <el-button-group>
                   <template
                     v-for="(item, index) in cardConfig.titleBtns"
@@ -59,15 +60,15 @@
                   </template>
                 </el-button-group>
                 <a
-                  style="margin-left: 20px"
+                  style="margin-left: 10px"
                   @click="showMyfrom = !showMyfrom"
                   v-if="
                     cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
                   "
                 >
-                  <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                  <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
-                  {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                  <el-icon v-if="!showMyfrom" size="10"><ArrowUpBold /></el-icon>
+                  <el-icon v-if="showMyfrom" size="10"><ArrowDownBold /></el-icon>
+                  <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                 </a>
               </template>
             </el-col>
@@ -75,8 +76,8 @@
         </template>
 
         <div class="form-inner" v-show="showMyfrom">
-          <div v-if="cardConfig.showEdit">
-            <app-free-edit :freeEditConfig="formconfig" ref="editRef" />
+          <div v-if="cardConfig.showEdit" style="padding-bottom: 5px">
+            <app-free-edit :freeEditConfig="formconfig" ref="editRef"/>
           </div>
           <slot />
           <div
@@ -276,5 +277,4 @@ defineExpose({
   background: rgba(0, 0, 0, 0.1);
   bottom: -3px;
 }
-
 </style>

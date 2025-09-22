@@ -432,9 +432,11 @@ const method = {
       ElMessage.warning("渠道分类--请选择非直销业务!");
     }
   },
-  cBrkSlsCdeChange: (value: any) =>{
+  cBrkSlsCdeChange: (value: any, row: any, item: any) =>{
     const p = opertaor.getParam();
-    if (p.initFlag) {
+    console.log('cBrkSlsCdeChange-value', value)
+    console.log('cBrkSlsCdeChange-item', item)
+    // if (p.initFlag) {
       if(value && value != '') {
         codeListStore.queryCodeList({
           codeListName: "WEB_ORG_SALES_BY_ID",
@@ -444,9 +446,12 @@ const method = {
             code: "Base.cBrkSlsCde",
             list: res,
           });
+
+          const codeMap = plyBaseEditRef.value?.getCodeListMap();
+          console.log('cBrkSlsCdeChange-codeMap', codeMap)
         });
       }
-    }
+    // }
   },
   //代理业务员icon事件
   agentSaleFuncA: () => {
