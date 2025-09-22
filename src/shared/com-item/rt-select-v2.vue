@@ -236,8 +236,8 @@ watch(
 
 watch(
   [() => props.item.typeCode],
-  ([newtypeCode]) => {
-    if (newtypeCode) {
+  ([newtypeCode,old]) => {
+    if (newtypeCode !== old) {
       uploadOption();
     }
   },
@@ -246,8 +246,8 @@ watch(
 
 watch(
   [() => props.item.codeParam],
-  ([newCodeParam]) => {
-    if (newCodeParam) {
+  ([newCodeParam,old]) => {
+    if (newCodeParam !== old) {
       uploadOption();
     }
   },

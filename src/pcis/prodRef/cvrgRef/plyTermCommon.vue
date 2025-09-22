@@ -537,9 +537,9 @@ async function refushData(datas: any) {
   formData.value = {};
   setTimeout(() => {
     formData.value = pd;
-    nextTick(() => {
-      showFlush();
-    });
+    // nextTick(() => {
+    //   showFlush();
+    // });
   }, 50);
 }
 
@@ -579,12 +579,11 @@ function getFromValue() {
         list = JSON.parse(JSON.stringify(i["riskList"]));
         delete i["riskList"];
       }
-
       if (item === "m") {
         //主条款,查下是否存在公共信息
         if (planDataCommon.value["m"] && planDataCommon.value["m"].length > 0) {
           const r = planDataCommon.value["m"][0];
-          list.push(...r.riskList);
+          list.push(...JSON.parse(JSON.stringify(r.riskList)));
         }
       }
       const plan = i["Term.cPlanNo"];
@@ -594,7 +593,6 @@ function getFromValue() {
       i["Term.riskList"] = list;
       i["Term.nSeqNo"] = seqNo++;
       redata.push(i);
-
       if (
         planDataCommon.value &&
         Object.keys(planDataCommon.value).length > 0
@@ -608,6 +606,9 @@ function getFromValue() {
               if (m["riskList"]) {
                 let l = JSON.parse(JSON.stringify(m["riskList"]));
                 delete m["riskList"];
+                l.forEach((r: any) => {
+                  r["TermRisktgt.cPlanNo"] = plan;
+                });
                 m["Term.riskList"] = l;
               }
               redata.push(m);
@@ -617,7 +618,6 @@ function getFromValue() {
       }
     });
   });
-
   return redata;
 }
 

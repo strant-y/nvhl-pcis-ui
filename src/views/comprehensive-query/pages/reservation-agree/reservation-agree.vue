@@ -194,7 +194,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "View",
         tableClick: (row) => {
           console.log(row);
-          toDtl(row, 'view');
+          toDtl({ ...row, sence:'policy' }, 'view');
         },
       }),
 		],

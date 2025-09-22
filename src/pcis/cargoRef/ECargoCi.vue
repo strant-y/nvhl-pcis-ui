@@ -626,8 +626,8 @@ const updateMasterAgreementValues = () => {
     }
   });
   nextTick(()=>{
-    formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbPrm", totalPrm*res["ECargoBase.nAmtRmbExch"]);
-    formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbAmt", totalAmt*res["ECargoBase.nAmtRmbExch"]);
+    formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbPrm", (totalPrm*res["ECargoBase.nAmtRmbExch"]).toFixed(2));
+    formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbAmt", (totalAmt*res["ECargoBase.nAmtRmbExch"]).toFixed(2));
     const resData = formPage.getFormDataById("AgreementFeeWarn")
     if(res['ECargoBase.cPayWay'] == '01'){ //YY
       //主共保：折人民币协议预收保费-折人民币预扣保费=协议剩余预收保费（人民币）
