@@ -20,9 +20,9 @@
                     <span>{{ term.cNmeCn }}</span>
                   </div>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
-                    <!-- <el-badge value="退" class="item">
+                    <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                    </el-badge> -->
+                    </el-badge>
                   </template>
                   <template v-else>
                     <!-- <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag> -->
