@@ -14,13 +14,13 @@
           <!-- 投保 (申请单号/保单号)-->
           <template v-if="cAppType == 'A'">
             <div v-if="row.cAppNo" class="policy-number-row">
-            <span v-html="row.cAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+            <span v-html="row.cAppNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
             <div v-if="row.cPlyNo" class="policy-number-row">
-                <span v-html="row.cPlyNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+                <span v-html="row.cPlyNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
                    <DocumentCopy />
                 </el-icon>
@@ -38,13 +38,13 @@
           <!-- 询价 -->
           <template v-else>
             <div v-if="row.cAppNo" class="policy-number-row">
-                <span v-html="row.cAppNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+                <span v-html="row.cAppNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                     <DocumentCopy />
                 </el-icon>
             </div>
             <div v-if="row.cInquiryNo" class="policy-number-row">
-                <span v-html="row.cInquiryNo" @click="handleRowDoubleClick(row)" style="cursor: pointer;"></span>
+                <span v-html="row.cInquiryNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cInquiryNo)">
                    <DocumentCopy />
                 </el-icon>
