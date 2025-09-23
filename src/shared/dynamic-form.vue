@@ -6,8 +6,8 @@
         :size="formUi.size"
         :label-position="formUi.labelPosition"
         :show-message="
-        formUi.showMessage ? (formUi.showMessage === '1' ? true : false) : true
-    "
+            formUi.showMessage ? (formUi.showMessage === '1' ? true : false) : true
+        "
         class="custom-form"
         :label-width="formUi.labelWidth && formUi.labelWidth !== 'auto' ? (formUi.labelWidth + 'px') : maxLabelWidth"
     >
@@ -27,25 +27,17 @@
               <template v-if="item.inputtype === 'rtButton'">
 
                 <el-form-item
-                    class="custom-form-item"
                     :rules="item.rules ? item.rules : undefined"
                     :prop="item.prop"
-                    :label-position=" item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
-                                      "
+                    :label-position="
+                      item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
+                    "
+                    :label-width="calculatedLabelWidth()"
                 >
                   <template #label>
-                    <!-- <template v-if="item.title?.length > 8">
-                      <el-tooltip
-                        effect="dark"
-                        :content="item.title"
-                        placement="top-start"
-                      >
-                        {{ item.title.substring(0, 8) + "..." }}
-                      </el-tooltip>
-                    </template>
-                    <template v-else> -->
-                    {{ item.title }}
-                    <!-- </template> -->
+                    <el-text class="mx-1" truncated @mouseover="checkIfTruncated($event, item.title)">
+                      {{item.title}}
+                    </el-text>
                   </template>
                   <rtButton :item="item.btnItems" />
                 </el-form-item>
@@ -53,27 +45,22 @@
               <template v-else-if="item.inputtype === 'rtinputgroup'">
                 <el-form-item
                     :required="checkRequired(item)"
-                    :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
-                            "
+                    :for="
+                      item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
+                    "
+                    :label-width="calculatedLabelWidth()"
+                    class="group-input__items"
                 >
                   <template #label>
-                    <template v-if="item.title?.length > (item.labelLength || 10)">
-                      <el-tooltip
-                          effect="dark"
-                          :content="item.title"
-                          placement="top-start"
-                      >
-                        {{ item.title.substring(0, item.labelLength || 10) + "..." }}
-                      </el-tooltip>
-                    </template>
-                    <template v-else>
-                      {{ item.title }}
-                    </template>
+                    <el-text class="mx-1" truncated @mouseover="checkIfTruncated($event, item.title)">
+                      {{item.title}}
+                    </el-text>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                   </template>
                   <div class="width-100">
-                    <el-row :gutter="1" v-if="item.groupList.length > 0">
+                    <el-row class="show-group__row" v-if="item.groupList.length > 0" style="padding-top: 5px;">
                       <el-col
+                          class="show-group__col"
                           :span="getspan(item, gitem)"
                           v-for="(gitem, index) in item.groupList"
                           :key="index"
@@ -81,6 +68,11 @@
                         <el-form-item
                             :rules="gitem.rules ? gitem.rules : undefined"
                             :prop="gitem.prop"
+                            :class="{
+                              'show-group-left__item': index === 0,
+                              'show-group-center__item': index > 0 && index < item.groupList.length - 1,
+                              'show-group-right__item': index === item.groupList.length - 1
+                            }"
                         >
                           <from-item
                               ref="fromListRef"
@@ -99,28 +91,21 @@
                 <el-form-item
                     :rules="item.rules ? item.rules : undefined"
                     :prop="item.prop"
-                    :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
-                "
+                    :for="
+                      item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
+                    "
                     :label-position="
-                  item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
-                "
+                      item.inputtype === 'rttable' ? 'top' : undefined // table 组件,默认标题显示在top上
+                    "
+                    :label-width="calculatedLabelWidth()"
                 >
                   <template #label>
-                    <template v-if="item.title?.length > (item.labelLength || 10)">
-                      <el-tooltip
-                          effect="dark"
-                          :content="item.title"
-                          placement="top-start"
-                      >
-                        {{ item.title.substring(0, item.labelLength || 10) + "..." }}
-                      </el-tooltip>
-                    </template>
-                    <template v-else>
-                      {{ item.title }}
-                    </template>
+                    <el-text class="mx-1" truncated @mouseover="checkIfTruncated($event, item.title)">
+                      {{item.title}}
+                    </el-text>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                   </template>
-                  <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
+                  <div :class="{'show-right-btn': item.showExBtn}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                     <div
                         :style="item.showExBtn && item.inputtype !== 'rttable' ? {flex: 1} : {width: '100%'}"
                     >
@@ -194,16 +179,16 @@
               <template v-if="!item.hidden">
                 <el-col
                     :span="
-                  item.inputtype === 'rttable' // table 组件单独占满一行
-                    ? 24
-                    : item.itemWidth
-                      ? item.itemWidth * formUi.span
-                      : formUi.span
-                "
+                      item.inputtype === 'rttable' // table 组件单独占满一行
+                        ? 24
+                        : item.itemWidth
+                          ? item.itemWidth * formUi.span
+                          : formUi.span
+                    "
                     v-if="
-                  item.group === v.id &&
-                  (item.expand ? item.expand && v.disabled : true)
-                "
+                      item.group === v.id &&
+                      (item.expand ? item.expand && v.disabled : true)
+                    "
                 >
                   <!-- inputgroup -->
                   <template v-if="item.inputtype === 'rtinputgroup'">
@@ -211,25 +196,19 @@
                         :required="checkRequired(item)"
                         :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
                         "
+                        :label-width="calculatedLabelWidth()"
+                        class="group-input__items"
                     >
                       <template #label>
-                        <!-- <template v-if="item.title?.length > 8">
-                          <el-tooltip
-                            effect="dark"
-                            :content="item.title"
-                            placement="top-start"
-                          >
-                            {{ item.title.substring(0, 8) + "..." }}
-                          </el-tooltip>
-                        </template>
-                        <template v-else> -->
-                        {{ item.title }}
+                        <el-text class="mx-1" truncated @mouseover="checkIfTruncated($event, item.title)">
+                          {{item.title}}
+                        </el-text>
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
-                        <!-- </template> -->
                       </template>
                       <div class="width-100">
-                        <el-row v-if="item.groupList.length > 0">
+                        <el-row class="show-group__row" v-if="item.groupList.length > 0">
                           <el-col
+                              class="show-group__col"
                               :span="getspan(item, gitem)"
                               v-for="(gitem, index) in item.groupList"
                               :key="index"
@@ -237,6 +216,11 @@
                             <el-form-item
                                 :rules="gitem.rules ? gitem.rules : undefined"
                                 :prop="gitem.prop"
+                                :class="{
+                                  'show-group-left__item': index === 0,
+                                  'show-group-center__item': index > 0 && index < item.groupList.length - 1,
+                                  'show-group-right__item': index === item.groupList.length - 1
+                                }"
                             >
                               <from-item
                                   ref="fromListRef"
@@ -255,25 +239,18 @@
                     <el-form-item
                         :rules="item.rules ? item.rules : undefined"
                         :prop="item.prop"
-                        :for="item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
-                    "
+                        :for="
+                          item.notes ? '-' : undefined // 当存在 提示信息时，防止点击label触发默认选中逻辑
+                        "
+                        :label-width="calculatedLabelWidth()"
                     >
                       <template #label>
-                        <template v-if="item.title?.length > (item.labelLength || 10)">
-                          <el-tooltip
-                              effect="dark"
-                              :content="item.title"
-                              placement="top-start"
-                          >
-                            {{ item.title.substring(0, item.labelLength || 10) + "..." }}
-                          </el-tooltip>
-                        </template>
-                        <template v-else>
-                          {{ item.title }}
-                        </template>
+                        <el-text class="mx-1" truncated @mouseover="checkIfTruncated($event, item.title)">
+                          {{item.title}}
+                        </el-text>
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                       </template>
-                      <div :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
+                      <div :class="{'show-right-btn': item.showExBtn}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                         <div
                             :style="item.showExBtn && item.inputtype !== 'rttable' ? {flex: 1} : {width: '100%'}"
                         >
@@ -290,9 +267,9 @@
                           <div
                               v-if="item.inputtype !== 'rttable'"
                               :style="{
-                            display: 'inline-block',
-                            'min-width': item.btnWidth ? item.btnWidth + '%' : 'auto',
-                          }"
+                                display: 'inline-block',
+                                'min-width': item.btnWidth ? item.btnWidth + '%' : 'auto',
+                              }"
                           >
                             <rt-button
                                 :item="item.btnItems"
@@ -318,22 +295,58 @@
 import { FormInstance } from "element-plus";
 import Validator from "async-validator";
 import { AppGridEditMethod } from "./app-grid-edit-config";
+import {checkIfTruncated} from "@/utils/common";
 const maxLabelWidth = ref('150px'); // 默认值
 
 
 const updateLabelWidth = () => {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
   const scaleRatio = window.devicePixelRatio;
-  // 转换为百分比（保留整数）
   const displayPercentage = Math.round(scaleRatio * 100);
+  let px;
+
+  // 不同缩放比率适配
   if(displayPercentage <= 110) {
-    maxLabelWidth.value = "200px";
+    px = 220;
   }else if(displayPercentage <= 150) {
-    maxLabelWidth.value = "160px";
+    px = 200;
   }else if(displayPercentage <= 175)  {
-    maxLabelWidth.value = "120px"
+    px = 180
   }else {
-    maxLabelWidth.value = "80px"
+    px = 160
   }
+
+  // 不同分辨率适配
+  if(viewportWidth < 1280) {
+    maxLabelWidth.value = px - 50 + 'px';
+  } else if(viewportWidth < 1920) {
+    maxLabelWidth.value = px - 30 + 'px';
+  } else if (viewportWidth === 1920) {
+    maxLabelWidth.value = px + 'px';
+  } else if(viewportWidth >= 1920 && viewportWidth <= 3840) {
+    maxLabelWidth.value = px + 80 + 'px';
+  } else if(viewportWidth > 3840 && viewportWidth <= 5120 ) {
+    maxLabelWidth.value = px + 160 + 'px';
+  }else {
+    maxLabelWidth.value = px + 240 + 'px';
+  }
+};
+
+// 计算label宽度
+const calculatedLabelWidth = () => {
+  let originalWidth;
+  if (formUi.labelWidth && formUi.labelWidth !== 'auto') {
+    originalWidth = formUi.labelWidth.includes('px')
+        ? formUi.labelWidth
+        : `${formUi.labelWidth}px`;
+  } else {
+    originalWidth = maxLabelWidth.value;
+  }
+  const widthValue = parseFloat(originalWidth);
+  const finalValue = Math.max( widthValue, 0);
+  return `${finalValue}px`;
 };
 
 defineOptions({
@@ -866,126 +879,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-
-// 表单容器
-.form-container {
-  max-width: 100%;
-  padding: 3px;
-  background: #fff;
-  //border-radius: 8px;
-  //box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-// 自定义表单样式
-:deep(.custom-form) {
-  // 应用全局表单字体样式
-  font-size: map-get($form-config, font-size);
-  line-height: map-get($form-config, line-height);
-
-  // 表单项Label样式
-  .el-form-item {
-    // Label标签样式
-    .el-form-item__label {
-      font-size: map-get($form-config, label-font-size);
-      font-weight: map-get($form-config, label-font-weight);
-      color: map-get($form-config, label-color);
-      padding: map-get($form-config, label-padding);
-      //font-family: map-get($form-config, font-family);
-
-      // 如果启用边框，则添加边框样式
-      @if map-get($form-config, label-border) {
-        border: map-get($form-config, label-border-width) solid map-get($form-config, label-border-color);
-        border-radius: map-get($form-config, label-border-radius);
-        background-color: map-get($form-config, label-bg-color);
-        padding: 8px 12px; // 调整带边框时的内边距
-        display: inline-flex;
-        align-items: center;
-        height: 100%;
-      }
-    }
-
-    // 表单项内容区域（与label对应）
-    .el-form-item__content {
-      //.el-input,
-      //.el-input-number,
-      //.el-textarea,
-      //.el-select,
-      //.el-date-picker {
-      //
-      //}
-
-      .el-input {
-        .el-input__wrapper{
-          height: map-get($form-config, item-height);
-        }
-        .el-input__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-input__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      .el-textarea {
-        .el-textarea__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-textarea__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      // 下拉选择器样式
-      .el-select {
-        .el-select__wrapper {
-          height: map-get($form-config, item-height) !important;
-          min-height: map-get($form-config, item-height) !important;
-          font-family: map-get($form-config, font-family);
-        }
-        .el-select__input {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-
-        .el-select__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-
-      // 日期选择器输入框样式
-      .el-date-picker {
-        .el-input__wrapper {
-          height: map-get($form-config, item-height);
-        }
-        .el-date-editor--datetimerange {
-          *{
-              height: map-get($form-config, item-height) !important;
-          }
-        }
-        .el-input__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-input__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      .el-button {
-        font-family: inherit;
-        font-size: inherit;
-      }
-
-    }
-  }
-}
+@import "src/styles/custom-index.scss";
 </style>
 <style lang="css" scoped>
 .rt_group {

@@ -68,22 +68,22 @@
                   "
                       style="margin-bottom: 18px"
                   >
-                    <div style="display: flex; width: 100%;">
+                    <div style="display: flex; width: 100%;" :class="{'show-right-btn': formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId}">
                       <div
                           :style="{
-                      width:
-                        // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
-                        formItems[props.row._dataId][i.prop].showExBtn &&
-                        formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
-                        editIndex === props.row._dataId
-                          ? (formItems[props.row._dataId][i.prop].btnWidth
-                              ? 100 -
-                                formItems[props.row._dataId][i.prop].btnWidth
-                              : 75) + '%'
-                          : '100%',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                    }"
+                            width:
+                              // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
+                              formItems[props.row._dataId][i.prop].showExBtn &&
+                              formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
+                              editIndex === props.row._dataId
+                                ? (formItems[props.row._dataId][i.prop].btnWidth
+                                    ? 100 -
+                                      formItems[props.row._dataId][i.prop].btnWidth
+                                    : 75) + '%'
+                                : '100%',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                          }"
                       >
                         <from-item
                             v-model="props.row[i.prop]"
@@ -926,13 +926,14 @@ function isrequired(i: any) {
 }
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index.scss";
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
 
 :deep(.el-table .cell) {
   /* white-space: nowrap; */
-  line-height: 20px;
+  line-height: 16px;
   padding: 0 2px;
 }
 
@@ -960,121 +961,5 @@ function isrequired(i: any) {
 }
 :deep(.methodColumn .el-button+.el-button) {
   margin-left: 0;
-}
-
-
-// 自定义表单样式
-:deep(.custom-table) {
-  // 应用全局表单字体样式
-  font-size: map-get($form-config, font-size);
-  line-height: map-get($form-config, line-height);
-
-  // 表单项Label样式
-  .el-form-item {
-    width: 100%;
-    display: flex;
-    // Label标签样式
-    .el-form-item__label {
-      font-size: map-get($form-config, label-font-size);
-      font-weight: map-get($form-config, label-font-weight);
-      color: map-get($form-config, label-color);
-      padding: map-get($form-config, label-padding);
-      //font-family: map-get($form-config, font-family);
-
-      // 如果启用边框，则添加边框样式
-      @if map-get($form-config, label-border) {
-        border: map-get($form-config, label-border-width) solid map-get($form-config, label-border-color);
-        border-radius: map-get($form-config, label-border-radius);
-        background-color: map-get($form-config, label-bg-color);
-        padding: 8px 12px; // 调整带边框时的内边距
-        display: inline-flex;
-        align-items: center;
-        height: 100%;
-      }
-    }
-
-    // 表单项内容区域（与label对应）
-    .el-form-item__content {
-      // 所有输入控件继承字体样式
-      .el-input {
-        .el-input__wrapper{
-          height: map-get($form-config, item-height);
-        }
-        .el-input__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-input__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      .el-textarea {
-        .el-textarea__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-textarea__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      // 下拉选择器样式
-      .el-select {
-        .el-select__wrapper {
-          height: map-get($form-config, item-height) !important;
-          min-height: map-get($form-config, item-height) !important;
-          font-family: map-get($form-config, font-family);
-        }
-        .el-select__input {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-
-        .el-select__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-
-      // 日期选择器输入框样式
-      .el-date-picker {
-        .el-input__wrapper{
-          height: map-get($form-config, item-height);
-        }
-        .el-input__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-input__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-
-      .el-text {
-        font-family: map-get($form-config, font-family);
-        font-size: map-get($form-config, font-size);
-        color: map-get($form-config, font-color);
-      }
-
-      .el-button {
-        font-family: inherit;
-        font-size: inherit;
-      }
-
-    }
-  }
-
-  // 表格组件里处理的值 单独给样式
-  .rt-table-formatter-text {
-    font-family: map-get($form-config, font-family);
-    font-size: map-get($form-config, font-size);
-    color: map-get($form-config, font-color);
-  }
 }
 </style>

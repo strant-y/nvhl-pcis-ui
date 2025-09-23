@@ -357,7 +357,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 prop: 'TAppTm',
                 inputtype: 'rtdatepicker',
                 title: '投保申请日期',
-                format: 'YYYY-MM-DD HH:mm:ss',
+                format: 'YYYY-MM-DD',
                 valueFormat: 'YYYY-MM-DD HH:mm:ss',
                 clearable: true,
                 type: 'datetimerange'
@@ -366,7 +366,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 prop: 'TEdrAppTm',
                 inputtype: 'rtdatepicker',
                 title: '批改申请日期',
-                format: 'YYYY-MM-DD HH:mm:ss',
+                format: 'YYYY-MM-DD',
                 valueFormat: 'YYYY-MM-DD HH:mm:ss',
                 clearable: true,
                 type: 'datetimerange'
@@ -375,7 +375,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 prop: 'TIssueTm',
                 inputtype: 'rtdatepicker',
                 title: '签单日期',
-                format: 'YYYY-MM-DD HH:mm:ss',
+                format: 'YYYY-MM-DD',
                 valueFormat: 'YYYY-MM-DD HH:mm:ss',
                 clearable: true,
                 type: 'datetimerange'
@@ -583,6 +583,15 @@ function handleQuery(flag?: boolean) {
         if (isValid) {
             const r = tableRef.value?.getPartnerPage(flag) //获取分页数据
             const s = freeEditRef.value?.getFromValue() //获取表单数据
+            if(s.TAppTm && s.TAppTm[1]) {
+                s.TAppTm[1] = dayjs(s.TAppTm[1]).format("YYYY-MM-DD 23:59:59")
+            }
+            if(s.TEdrAppTm && s.TEdrAppTm[1]) {
+                s.TEdrAppTm[1] = dayjs(s.TEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
+            }
+            if(s.TIssueTm && s.TIssueTm[1]) {
+                s.TIssueTm[1] = dayjs(s.TIssueTm[1]).format("YYYY-MM-DD 23:59:59")
+            }
             const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
             const appNme = freeEditRef.value?.getValue('CAppNme')
             if (!!appNme && appNme.length < 2) {
@@ -940,16 +949,19 @@ defineExpose({
 .policy-info-cell {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
 .policy-number-row {
     display: flex;
     align-items: center;
+  height: 16px;
 }
 
 .policy-number-row span {
-    flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {

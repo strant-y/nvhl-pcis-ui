@@ -44,7 +44,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -128,7 +128,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -214,7 +214,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -275,7 +275,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "nPrm",
@@ -347,7 +347,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
 			{
 				prop: "cAppNme",
@@ -428,7 +428,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -443,7 +442,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -458,14 +456,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -505,7 +503,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -520,7 +517,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -535,14 +531,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -582,7 +578,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -596,7 +591,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -611,14 +605,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -678,7 +672,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -693,14 +686,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -730,31 +723,31 @@ export const tab1 = [{
   name: '暂存任务',
   refName: 'stagingList',
   tableObj: 'notWaitObj',
-  url: '/query/application-querys',
+  url: '/pcis-new-udr-list/orderProcessing',
 },
 {
   name: '已提交任务',
   refName: 'submittedList',
   tableObj: "submittedObj",
-  url: '/query/application-querys',
+  url: '/pcis-new-udr-list/orderProcessing',
 },
 {
   name: '待修改任务',
   refName: 'reviseList',
   tableObj: "notReviseObj",
-  url: '/query/application-querys',
+  url: '/pcis-new-udr-list/orderProcessing',
 },
 {
   name: '待缴费',
   refName: 'pendingPaymentList',
   tableObj: 'waitPayObj',
-  url: '/RenewalManagement/renewal-management',
+  url: '/payinfoManagement/payinfohandle',
 },
 {
   name: '待续保',
   refName: 'renewalList',
   tableObj: 'waitObj',
-  url: '/RenewalManagement/renewal-management',
+  url: '/pcis-new-udr-list/orderProcessing',
 },
 ]
 
@@ -763,28 +756,28 @@ export const tab2 = [{
   name: '待核保任务',
   refName: 'unUdrList',
   tableObj: 'unUdrObj',
-  url: '/pcis-new-udr-list/PendUdrList',
+  url: '/pcis-new-udr-list/PendUdrListQuery',
   udrType: "0",
 },
 {
   name: '暂存任务',
   refName: 'udrStagingList',
   tableObj: "udrStagingObj",
-  url: '/pcis-new-udr-list/PendUdrList',
+  url: '/pcis-new-udr-list/PendUdrListQuery',
   udrType: "1",
 },
 {
   name: '核保退回任务',
   refName: 'udrReturnList',
   tableObj: "udrReturnObj",
-  url: '/pcis-new-udr-list/PendUdrList',
+  url: '/pcis-new-udr-list/PendUdrListQuery',
   udrType: "3",
 },
 {
   name: '核保通过任务',
   refName: 'udrPassedList',
   tableObj: "udrPassedObj",
-  url: '/pcis-new-udr-list/PendUdrList',
+  url: '/pcis-new-udr-list/PendUdrListQuery',
   udrType: "4",
 }
 ]
