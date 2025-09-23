@@ -790,15 +790,26 @@ onMounted(() => {
       },
     ],
   });
-  freeEditRef.value?.setFormValue({
+  const param:any = {
     cLoadSub: 1,
     cDptCde: user.companyId,
     tAppTm: [
       dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       dayjs().format("YYYY-MM-DD 23:59:59"),
     ],
-  });
+  }
+  if (sessionStorage.getItem("navToOrderProcessing")) {
+    param['taskStatus'] = JSON.parse(
+      sessionStorage.getItem("navToOrderProcessing") || "{}"
+    )?.taskStatus
+  }
+  freeEditRef.value?.setFormValue(param);
   handleQuery()
+});
+onUnmounted(() => {
+  //组件销毁，清除sessionStorage数据
+  sessionStorage.getItem("navToOrderProcessing") &&
+    sessionStorage.removeItem("navToOrderProcessing");
 });
 
 // 校验表单查询

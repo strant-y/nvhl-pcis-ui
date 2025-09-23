@@ -808,7 +808,7 @@ onMounted(async () => {
       },
     ],
   });
-  freeEditRef.value?.setFormValue({
+  const param = {
     companyId: user.value.companyId,
     cLoadSub: 1,
     tm1: [
@@ -818,7 +818,13 @@ onMounted(async () => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ],
     udrType: "1",
-  });
+  }
+  if (sessionStorage.getItem("navToOrderUdrListQuery")) {
+    param['udrType'] = JSON.parse(
+      sessionStorage.getItem("navToOrderUdrListQuery") || "{}"
+    )?.udrType
+  }
+  freeEditRef.value?.setFormValue(param);
 
   //首页跳转过来的逻辑 Start
   if (sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)) {
@@ -862,6 +868,8 @@ onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
   sessionStorage.getItem(AppKey.query.pcis_query_newudrlist) &&
     sessionStorage.removeItem(AppKey.query.pcis_query_newudrlist);
+  sessionStorage.getItem("navToOrderUdrListQuery") &&
+    sessionStorage.removeItem("navToOrderUdrListQuery");
 });
 
 // 绑定方法

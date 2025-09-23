@@ -1363,67 +1363,44 @@ const toQuery = (url: string) => {
     //出单员
     //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询） 
     if (url === "/pcis-new-udr-list/orderProcessing") {
-      // let param = {
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   CAppStatus: "1",
-      //   TIssueTmStart: moment(new Date(Date.now()))
-      //     .subtract(6, "day")
-      //     .format("YYYY-MM-DD HH:mm:ss"),
-      //   TIssueTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      // };
-      // if (currentTabName.value == "待修改任务") {
-      //   param = Object.assign({
-      //     CurrentUser: user.opCde,
-      //     CurrentUserOrg: user.companyId,
-      //     startBsTm1: moment(new Date(Date.now()))
-      //       .subtract(6, "day")
-      //       .format("YYYY-MM-DD HH:mm:ss"),
-      //     endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      //   });
-      //   sessionStorage.setItem(
-      //     AppKey.query.pcis_query_returnudrlist,
-      //     JSON.stringify(param)
-      //   );
-      // } else {
-      //   sessionStorage.setItem(
-      //     AppKey.query.pcis_query_app,
-      //     JSON.stringify(param)
-      //   );
-      // }
-      router.push({ path: url });
+      let param = {};
+      if(currentTabName.value == "暂存任务") {
+        param = { taskStatus: '1' }
+      } else if(currentTabName.value == "已提交任务") {
+        param = { taskStatus: '2' }
+      } else if(currentTabName.value == "待修改任务") {
+        param = { taskStatus: '3' }
+      } else if(currentTabName.value == "待续保") {
+        param = { taskStatus: '5' }
+      }
+      sessionStorage.setItem(
+        'navToOrderProcessing',
+        JSON.stringify(param)
+      );
     }
+    router.push({ path: url });
   } else if (isAudit.value) {
     if (url === "/pcis-new-udr-list/PendUdrListQuery") {
-      //核保员 （核保任务查询）
-      // let param = Object.assign({
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   startCrtTm: moment(new Date(Date.now()))
-      //     .subtract(6, "day")
-      //     .format("YYYY-MM-DD HH:mm:ss"),
-      //   TAppTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      //   startBsTm1: moment(new Date(Date.now()))
-      //     .subtract(6, "day")
-      //     .format("YYYY-MM-DD HH:mm:ss"),
-      //   endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      // });
-      // if (currentTabName.value == "暂存任务") {
-      //   param.type = "temp";
-      // } else {
-      //   param.type = "edit";
-      // }
-      // sessionStorage.setItem(
-      //   AppKey.query.pcis_query_newudrlist,
-      //   JSON.stringify(param)
-      // );
+      let param = {};
+      if(currentTabName.value == "待核保任务") {
+        param = { udrType: '1' }
+      } else if(currentTabName.value == "暂存任务") {
+        param = { udrType: '2' }
+      } else if(currentTabName.value == "核保退回任务") {
+        param = { udrType: '4' }
+      } else if(currentTabName.value == "核保通过任务") {
+        param = { udrType: '5' }
+      }
+      sessionStorage.setItem(
+        'navToOrderUdrListQuery',
+        JSON.stringify(param)
+      );
       router.push({ path: url });
     }
   }
 };
 //table的row-click事件
 const toQuery2 = (data: any) => {
-  debugger
   const row = { ...data };
   if (isOperate.value) {
     //出单员
