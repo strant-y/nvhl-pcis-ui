@@ -172,7 +172,7 @@ export function showTooltip(event: MouseEvent, value: any, mouseleaveClose: bool
         event.currentTarget?.removeEventListener('mouseleave', closeListener);
         setTimeout(() => {
           res.close();
-        }, 500)
+        }, 300)
       };
       event.currentTarget?.addEventListener('mouseleave', closeListener);
     }

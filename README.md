@@ -91,7 +91,7 @@ pnpm run dev
 pnpm run build:prod
 
 # 上传文件至远程服务器
-将打包生成在 `dist` 目录下的文件拷贝至 `/usr/share/nginx/html` 目录
+将打包生成在 `distRef` 目录下的文件拷贝至 `/usr/share/nginx/html` 目录
 
 # nginx.cofig 配置
 server {

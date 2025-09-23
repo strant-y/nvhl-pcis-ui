@@ -353,7 +353,7 @@
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
       </el-main>
-      <div class="right-btns">
+      <div class="right-btns" v-if="pageLoaded">
         <div class="main-header2">
           <div class="tp">
             <span>
@@ -1161,19 +1161,19 @@ const edrAddDataBtn = [
     },
   }),
   createFreeButtonBase({
-    label: "保存",
-    type: "primary",
-    id: "saveEdr",
-    func: async () => {
-      saveEdrPlyInfo();
-    },
-  }),
-  createFreeButtonBase({
     label: "比较/生成批文",
     type: "primary",
     id: "btnCompare",
     func: async () => {
       generateEndorse();
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: async () => {
+      saveEdrPlyInfo();
     },
   }),
   createFreeButtonBase({
@@ -1213,19 +1213,19 @@ const edrBtn = [
     },
   }),
   createFreeButtonBase({
-    label: "保存",
-    type: "primary",
-    id: "saveEdr",
-    func: () => {
-      saveEdrPlyInfo();
-    },
-  }),
-  createFreeButtonBase({
     label: "比较/生成批文",
     type: "primary",
     id: "btnCompare",
     func: () => {
       generateEndorse();
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: () => {
+      saveEdrPlyInfo();
     },
   }),
   createFreeButtonBase({
@@ -1263,6 +1263,14 @@ const edrSurrenderBtn = [
     },
   }),
   createFreeButtonBase({
+    id: "btnCompare",
+    label: "比较/生成批文",
+    type: "primary",
+    func: () => {
+      getSurrenderPrecisFun();
+    },
+  }),
+  createFreeButtonBase({
     id: "btn010102",
     label: "保存",
     type: "primary",
@@ -1272,14 +1280,6 @@ const edrSurrenderBtn = [
       }else{
         saveApplicationEdr();
       }
-    },
-  }),
-  createFreeButtonBase({
-    id: "btnCompare",
-    label: "比较/生成批文",
-    type: "primary",
-    func: () => {
-      getSurrenderPrecisFun();
     },
   }),
   createFreeButtonBase({
@@ -2430,7 +2430,7 @@ async function loadAfter() {
     // {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: imageStr,
-      type: "success",
+      type: "warning",
       func: () => {
        imageMethod.showImage(opertaor);
       },
@@ -2903,13 +2903,6 @@ const calcPremium = () => {
         })
       }
       opertaor.setDataAll(ops);
-    //   const whiteList = ['base', 'plyBase', 'applicant', 'insured', 'payinfo', 'EdrBase','insrnc'];
-    //   Object.keys(ops).forEach(key => {
-    //     if (whiteList.includes(key) && opertaor.getTableRefByKey(key)?.setFormValue) {
-    //         opertaor.getTableRefByKey(key).setFormValue(ops[key]);
-    //     }
-    //   });
-
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
             nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
 

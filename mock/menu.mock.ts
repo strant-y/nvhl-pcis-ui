@@ -103,7 +103,7 @@ export default defineMock([
             },
             {
               path: "underwritinglist",
-              component: "safety-prevention/prevention-accident/pre-acc-check/index",
+              component: "safety-prevention/prevention-accident/pre-acc-review/index",
               name: "underwritinglist",
               meta: {
                 title: "事故预防审核",
@@ -114,7 +114,7 @@ export default defineMock([
             },
             {
               path: "underwritingdetails",
-              component: "safety-prevention/prevention-accident/pre-acc-check/details/index",
+              component: "safety-prevention/prevention-accident/pre-acc-review/details/index",
               name: "underwritingdetails",
               meta: {
                 title: "事故预防审核详情",
@@ -147,7 +147,7 @@ export default defineMock([
             },
             {
               path: "reportunderwriting",
-              component: "safety-prevention/prevention-plan/pre-plan-check/index",
+              component: "safety-prevention/prevention-plan/pre-plan-review/index",
               name: "reportunderwriting",
               meta: {
                 title: "预防方案审核",
@@ -158,7 +158,7 @@ export default defineMock([
             },
             {
               path: "reportunderwritingdetails",
-              component: "safety-prevention/prevention-plan/pre-plan-check/details/index",
+              component: "safety-prevention/prevention-plan/pre-plan-review/details/index",
               name: "reportunderwritingdetails",
               meta: {
                 title: "预防方案审核详情",
@@ -191,7 +191,7 @@ export default defineMock([
             },
             {
               path: "Examine",
-              component: "safety-prevention/prevention-disaster-loss/pre-dis-loss-check/index",
+              component: "safety-prevention/prevention-disaster-loss/pre-dis-loss-review/index",
               name: "Examine",
               meta: {
                 title: "防灾防损任务审核",
@@ -202,7 +202,7 @@ export default defineMock([
             },
             {
               path: "examinedetails",
-              component: "safety-prevention/prevention-disaster-loss/pre-dis-loss-check/details/index",
+              component: "safety-prevention/prevention-disaster-loss/pre-dis-loss-review/details/index",
               name: "examinedetails",
               meta: {
                 title: "任务审核详情",

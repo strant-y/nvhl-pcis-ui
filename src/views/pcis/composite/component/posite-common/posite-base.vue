@@ -449,7 +449,8 @@ defineExpose({
   getValue,
   getFormconfig,
   nPayNumberFun,
-  addProvide
+  addProvide,
+  setFormItem
 });
 </script>
 

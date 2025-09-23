@@ -103,7 +103,6 @@
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -120,7 +119,6 @@
                     <span
                       v-html="row.cAppNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                       <DocumentCopy />
@@ -140,7 +138,6 @@
                     <span
                       v-html="row.cAppNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                       <DocumentCopy />
@@ -160,9 +157,6 @@
                     <span
                       v-html="row.cAppNo"
                       :class="row.baseType !== '询价' ? 'primmaryColor' : ''"
-                      @click="
-                        row.baseType !== '询价' ? toQuery2(row) : () => {}
-                      "
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -176,7 +170,6 @@
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -194,7 +187,6 @@
                     <span
                       v-html="row.cPlyNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
                       <DocumentCopy />
@@ -552,23 +544,6 @@ Object.keys(tableObj).forEach((i: any) => {
             cancelButtonText: "取消",
             type: "warning",
           }).then(async function () {
-            // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断
-            if (row.cAppStatus !== "1") {
-              const param = {
-                cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
-                cAppNo: row.cAppNo, // 申请单号
-                cPlyNo: row.cPlyNo, // 保单号
-                nEdrPrjNo: row.nEdrPrjNo, // 批改序号
-              };
-              const delRisk =
-                row.baseType === "询价"
-                  ? await policyService.delRiskXJ(param)
-                  : await policyService.delRisk(param);
-              if (delRisk && delRisk.code !== 200) {
-                ElMessage.error(delRisk.msg);
-                return;
-              }
-            }
             const delResult =
               row.baseType === "询价"
                 ? delInquiryPolicy({ cInquiryNo: row.cInquiryNo })
@@ -1388,67 +1363,44 @@ const toQuery = (url: string) => {
     //出单员
     //暂存任务 （综合查询-投保单）、待修改任务 （综合查询-待修改单查询） 
     if (url === "/pcis-new-udr-list/orderProcessing") {
-      // let param = {
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   CAppStatus: "1",
-      //   TIssueTmStart: moment(new Date(Date.now()))
-      //     .subtract(6, "day")
-      //     .format("YYYY-MM-DD HH:mm:ss"),
-      //   TIssueTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      // };
-      // if (currentTabName.value == "待修改任务") {
-      //   param = Object.assign({
-      //     CurrentUser: user.opCde,
-      //     CurrentUserOrg: user.companyId,
-      //     startBsTm1: moment(new Date(Date.now()))
-      //       .subtract(6, "day")
-      //       .format("YYYY-MM-DD HH:mm:ss"),
-      //     endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      //   });
-      //   sessionStorage.setItem(
-      //     AppKey.query.pcis_query_returnudrlist,
-      //     JSON.stringify(param)
-      //   );
-      // } else {
-      //   sessionStorage.setItem(
-      //     AppKey.query.pcis_query_app,
-      //     JSON.stringify(param)
-      //   );
-      // }
-      router.push({ path: url });
+      let param = {};
+      if(currentTabName.value == "暂存任务") {
+        param = { taskStatus: '1' }
+      } else if(currentTabName.value == "已提交任务") {
+        param = { taskStatus: '2' }
+      } else if(currentTabName.value == "待修改任务") {
+        param = { taskStatus: '3' }
+      } else if(currentTabName.value == "待续保") {
+        param = { taskStatus: '5' }
+      }
+      sessionStorage.setItem(
+        'navToOrderProcessing',
+        JSON.stringify(param)
+      );
     }
+    router.push({ path: url });
   } else if (isAudit.value) {
     if (url === "/pcis-new-udr-list/PendUdrListQuery") {
-      //核保员 （核保任务查询）
-      // let param = Object.assign({
-      //   CurrentUser: user.opCde,
-      //   CurrentUserOrg: user.companyId,
-      //   startCrtTm: moment(new Date(Date.now()))
-      //     .subtract(6, "day")
-      //     .format("YYYY-MM-DD HH:mm:ss"),
-      //   TAppTmEnd: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      //   startBsTm1: moment(new Date(Date.now()))
-      //     .subtract(6, "day")
-      //     .format("YYYY-MM-DD HH:mm:ss"),
-      //   endBsTm1: moment(new Date(Date.now())).format("YYYY-MM-DD HH:mm:ss"),
-      // });
-      // if (currentTabName.value == "暂存任务") {
-      //   param.type = "temp";
-      // } else {
-      //   param.type = "edit";
-      // }
-      // sessionStorage.setItem(
-      //   AppKey.query.pcis_query_newudrlist,
-      //   JSON.stringify(param)
-      // );
+      let param = {};
+      if(currentTabName.value == "待核保任务") {
+        param = { udrType: '1' }
+      } else if(currentTabName.value == "暂存任务") {
+        param = { udrType: '2' }
+      } else if(currentTabName.value == "核保退回任务") {
+        param = { udrType: '4' }
+      } else if(currentTabName.value == "核保通过任务") {
+        param = { udrType: '5' }
+      }
+      sessionStorage.setItem(
+        'navToOrderUdrListQuery',
+        JSON.stringify(param)
+      );
       router.push({ path: url });
     }
   }
 };
 //table的row-click事件
 const toQuery2 = (data: any) => {
-  debugger
   const row = { ...data };
   if (isOperate.value) {
     //出单员
@@ -2753,7 +2705,7 @@ window.addEventListener("resize", () => {
 .policy-number-row {
   display: flex;
   align-items: center;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .policy-number-row span {

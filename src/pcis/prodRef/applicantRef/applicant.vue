@@ -152,7 +152,7 @@ onMounted(() => {
     // 经常居住地校验
     setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
     // 证件号码
-    setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
+    // setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
   });
 });
 // //给表单下拉项赋值

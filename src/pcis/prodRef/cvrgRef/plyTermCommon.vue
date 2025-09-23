@@ -488,6 +488,7 @@ async function refushData(datas: any) {
   }
 
   datas?.forEach((item: any) => {
+    let exterm = {};
     let key = "m";
     if (item["Term.cRdrTyp"] !== "0") {
       key = "a" + item["Term.cClauseCategory"];
@@ -495,8 +496,6 @@ async function refushData(datas: any) {
       let l = mterm["termRisk"];
       let ex = [];
       let ol = [];
-
-      let exterm = {};
       if (item["riskList"] && item["riskList"].length > 0) {
         item["riskList"].forEach((ris) => {
           let r = false;
@@ -519,12 +518,6 @@ async function refushData(datas: any) {
       if (ex && ex.length > 0) {
         exterm.riskList = ex;
         item.riskList = ol;
-
-        let l = planDataCommon.value[key];
-
-        if (!l || l.length === 0) {
-          planDataCommon.value[key] = [exterm];
-        }
       }
     }
 
@@ -532,6 +525,9 @@ async function refushData(datas: any) {
       pd[key] = [];
     }
     pd[key].push(item);
+    if(exterm && Object.keys(exterm).length > 0) {
+      planDataCommon.value[key] = [exterm];
+    }
   });
   // 强制刷新组件,对数据进行更新
   formData.value = {};
@@ -583,7 +579,15 @@ function getFromValue() {
         //主条款,查下是否存在公共信息
         if (planDataCommon.value["m"] && planDataCommon.value["m"].length > 0) {
           const r = planDataCommon.value["m"][0];
-          list.push(...JSON.parse(JSON.stringify(r.riskList)));
+          const nr = [];
+          if(r && r.riskList && r.riskList.length > 0){
+            r.riskList.forEach((l: any) => {
+              let d = JSON.parse(JSON.stringify(l));
+              d["TermRisktgt.cIsCommon"] = '1';
+              list.push(d);
+            });
+          }
+          
         }
       }
       const plan = i["Term.cPlanNo"];
@@ -603,11 +607,13 @@ function getFromValue() {
             md.forEach((m) => {
               m["Term.cPlanNo"] = plan;
               m["Term.nSeqNo"] = seqNo++;
+              m["Term.cIsCommon"] = '1';
               if (m["riskList"]) {
                 let l = JSON.parse(JSON.stringify(m["riskList"]));
                 delete m["riskList"];
                 l.forEach((r: any) => {
                   r["TermRisktgt.cPlanNo"] = plan;
+                  r["TermRisktgt.cIsCommon"] = '1';
                 });
                 m["Term.riskList"] = l;
               }
@@ -862,7 +868,8 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "src/styles/custom-index.scss";
 .planInfo ::v-deep .el-card__header {
   padding: 2px 15px !important;
 }
