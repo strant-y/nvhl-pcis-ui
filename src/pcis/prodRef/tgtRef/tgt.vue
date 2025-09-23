@@ -516,14 +516,14 @@ const method = {
 
   getcMemberLogoChange: (val: string) => {
     if (val === '1') {
-      setFormItem('Tgt.cBareboatLessee', {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem('Tgt.cBareboatLessee', {
+      //   rules: [getRules("required", {})],
+      // });
       setFormItem('Tgt.P&I_CLUB', { rules: [getRules("required", {})] })
     } else {
-      setFormItem('Tgt.cBareboatLessee', {
-        rules: null
-      });
+      // setFormItem('Tgt.cBareboatLessee', {
+      //   rules: null
+      // });
       setFormItem('Tgt.P&I_CLUB', { rules: [] })
     }
   },

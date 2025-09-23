@@ -2663,6 +2663,8 @@ const loadAppPlyInfo = async (CAppNo) => {
       }
       if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
         nAmt.value = ops["base"]["Base.nAmt"];
+
+
       }
       pageData.value = ops;
       ElMessage.success(res.msg);

@@ -60,6 +60,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
         };
 
         const setDataAll = (alldata: any) => {
+
             param.initFlag = true;
             Object.keys(alldata).forEach((key) => {
                 if (tableRefs[key] && tableRefs[key].setFormValue && Object.keys(alldata[key]).length != 0) {
