@@ -1407,13 +1407,13 @@ function handleDelete(id?: string) {
 
 // 行双击事件
 function rowDbClick(row:any) {
-  if(row.cAppStatus === "1") {// 待核保任务
+  if(row.udrType === "1") {// 待核保任务
     handle_hasReceived(row);
-  } else if(row.cAppStatus === "2") {// 暂存任务
+  } else if(row.udrType === "2") {// 暂存任务
     updateUdr(row)
-  } else if(row.cAppStatus === "2") {// 核保退回任务
+  } else if(row.udrType === "4") {// 核保退回任务
     showDetails(row);
-  } else if(row.cAppStatus === "5") {// 核保通过任务
+  } else if(row.udrType === "5") {// 核保通过任务
     showDetails(row);
   }
 }
