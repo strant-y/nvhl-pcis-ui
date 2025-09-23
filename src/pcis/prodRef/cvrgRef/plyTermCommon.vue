@@ -525,7 +525,9 @@ async function refushData(datas: any) {
       pd[key] = [];
     }
     pd[key].push(item);
-    planDataCommon.value[key] = [exterm];
+    if(exterm && Object.keys(exterm).length > 0) {
+      planDataCommon.value[key] = [exterm];
+    }
   });
   // 强制刷新组件,对数据进行更新
   formData.value = {};
