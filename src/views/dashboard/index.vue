@@ -552,23 +552,6 @@ Object.keys(tableObj).forEach((i: any) => {
             cancelButtonText: "取消",
             type: "warning",
           }).then(async function () {
-            // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断
-            if (row.cAppStatus !== "1") {
-              const param = {
-                cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
-                cAppNo: row.cAppNo, // 申请单号
-                cPlyNo: row.cPlyNo, // 保单号
-                nEdrPrjNo: row.nEdrPrjNo, // 批改序号
-              };
-              const delRisk =
-                row.baseType === "询价"
-                  ? await policyService.delRiskXJ(param)
-                  : await policyService.delRisk(param);
-              if (delRisk && delRisk.code !== 200) {
-                ElMessage.error(delRisk.msg);
-                return;
-              }
-            }
             const delResult =
               row.baseType === "询价"
                 ? delInquiryPolicy({ cInquiryNo: row.cInquiryNo })
