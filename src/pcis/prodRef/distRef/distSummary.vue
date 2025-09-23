@@ -142,6 +142,14 @@ onMounted(async () => {
     method,
     exRules
   );
+  formconfig11.value?.fromSchema.forEach((item:any) => {
+    if(item.title === "投保从业人员人数") {
+      item.width = 110
+    }
+    if(item.title === "方案号") {
+      item.width = 80
+    }
+  })
   // 如果团个单标识为团单则展示关联被保险人，否则隐藏
   if(route.params.param?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'DistSummary.cRelatedInsured')
@@ -411,3 +419,10 @@ defineExpose({
   setDistCompKey
 });
 </script>
+<style scoped>
+:deep(.table-container > .el-card__header) {
+  height: 32px;
+  padding: 4px 0 4px 12px;
+  background: #ffffff;
+}
+</style>

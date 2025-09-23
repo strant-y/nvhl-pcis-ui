@@ -8,15 +8,17 @@
     :close-on-press-escape ="false"
     :draggable ="draggable"
   >
-    <component
-      :is="contentComponent"
-      :key="componentKey"
-      v-if="contentComponent"
-      :data="data"
-      :method="method"
-      @handleClose="handleClose"
-      ref="contentRef"
-    />
+    <div class="dialog-body">
+      <component
+          :is="contentComponent"
+          :key="componentKey"
+          v-if="contentComponent"
+          :data="data"
+          :method="method"
+          @handleClose="handleClose"
+          ref="contentRef"
+      />
+    </div>
   </el-dialog>
 </template>
 
@@ -65,3 +67,10 @@ defineExpose({
   contentRef,
 });
 </script>
+<style lang="scss" scoped>
+.dialog-body {
+  border-radius: 5px;
+  border: #eee 1px solid;
+  padding: 5px;
+}
+</style>

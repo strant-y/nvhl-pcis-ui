@@ -1078,19 +1078,19 @@ const edrBtn = [
     },
   }),
   createFreeButtonBase({
-    label: "保存",
-    type: "primary",
-    id: "saveEdr",
-    func: () => {
-      saveEdrPlyInfo();
-    },
-  }),
-  createFreeButtonBase({
     label: "比较/生成批文",
     type: "primary",
     id: "btnCompare",
     func: () => {
       generateEndorse();
+    },
+  }),
+  createFreeButtonBase({
+    label: "保存",
+    type: "primary",
+    id: "saveEdr",
+    func: () => {
+      saveEdrPlyInfo();
     },
   }),
   createFreeButtonBase({
@@ -1117,19 +1117,19 @@ const edrSurrenderBtn = [
     },
   }),
   createFreeButtonBase({
-    id: "btn010102",
-    label: "保存",
-    type: "primary",
-    func: () => {
-      saveApplicationEdr();
-    },
-  }),
-  createFreeButtonBase({
     id: "btnCompare",
     label: "比较/生成批文",
     type: "primary",
     func: () => {
       getSurrenderPrecisFun();
+    },
+  }),
+  createFreeButtonBase({
+    id: "btn010102",
+    label: "保存",
+    type: "primary",
+    func: () => {
+      saveApplicationEdr();
     },
   }),
   createFreeButtonBase({

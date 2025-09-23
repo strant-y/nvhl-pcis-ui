@@ -519,13 +519,12 @@ defineExpose({
 .policy-info-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .policy-number-row {
   display: flex;
   align-items: center;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .policy-number-row span {

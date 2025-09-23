@@ -40,6 +40,7 @@ const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
 const params = opertaor.getParam();
+const firstInvoiceCur = ref('');
 
 const props = defineProps({
   data: {
@@ -358,9 +359,20 @@ onMounted(() => {
     if(item.prop =='Dist.cDocumentType'){
       item['func'] =  cDocumentTypeChange;
     }
-    if(item.prop =='Dist.cInvoiceCur'){
-      item['func'] =  InvoiceCurrencyChange;
+    if(item.prop == 'Dist.cInvoiceCur'){
+        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+        const cargoList = distTableRef?.getTableData() || [];
+        // 02开头的货物明细清单
+        if(cComponentTable.value == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && cargoList.length > 0 ){
+            const firstRow = cargoList[0];
+            firstInvoiceCur.value = firstRow['Dist.cInvoiceCur'] || 'CNY';
+            // 已存在一条记录 → 后续新增只能选择该币种
+            item.disabled = true;
+            nextTick(() => setValue('Dist.cInvoiceCur', firstInvoiceCur.value))
+        }
+        item['func'] = InvoiceCurrencyChange;
     }
+
     if(item.prop =='Dist.nAdditiveCoefficient'){
       item['func'] =  nAdditiveCoefficientChange;
     }
