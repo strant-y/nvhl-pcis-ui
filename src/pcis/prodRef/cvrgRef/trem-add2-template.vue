@@ -186,8 +186,8 @@ function setDisabledAll() {
 }
 function isrequired(i: any) {
   if (
-    i.required === "1" || i.required === 1 || i.required === true || i.cPropRequired === "1" ||
-    i.cPropRequired === 1 || i.cPropRequired === true
+    i.required === "1" || i.required === 1 || i.required === true || i.cPorpRequired === "1" ||
+    i.cPorpRequired === 1 || i.cPorpRequired === true
   ) {
     return true;
   }
