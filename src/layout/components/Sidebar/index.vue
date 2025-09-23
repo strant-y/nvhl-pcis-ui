@@ -104,7 +104,7 @@ function getShortMenuList() {
     if (res.code == 200) {
       shorMenuList.value = [];
       res.data.forEach((d: any, i: boolean) => {
-        if (d.select && shorMenuList.value.length < 5 && d.url) {
+        if (d.select && shorMenuList.value.length < 5 && d.url && d.cOpAct !== "Layout") {
           shorMenuList.value.push({
             path: d.url,
             meta: {
