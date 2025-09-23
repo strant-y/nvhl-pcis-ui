@@ -58,12 +58,12 @@
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                   </template>
                   <div class="width-100">
-                    <el-row :gutter="1" v-if="item.groupList.length > 0" style="padding-top: 5px;">
+                    <el-row class="show-group__row" v-if="item.groupList.length > 0" style="padding-top: 5px;">
                       <el-col
+                          class="show-group__col"
                           :span="getspan(item, gitem)"
                           v-for="(gitem, index) in item.groupList"
                           :key="index"
-                          style="height: 32px !important;"
                       >
                         <el-form-item
                             :rules="gitem.rules ? gitem.rules : undefined"
@@ -206,8 +206,9 @@
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
                       </template>
                       <div class="width-100">
-                        <el-row v-if="item.groupList.length > 0">
+                        <el-row class="show-group__row" v-if="item.groupList.length > 0">
                           <el-col
+                              class="show-group__col"
                               :span="getspan(item, gitem)"
                               v-for="(gitem, index) in item.groupList"
                               :key="index"
@@ -897,6 +898,12 @@ defineExpose({
   .group-input__items {
     .el-form-item {
       margin-top: 4px;
+    }
+    .show-group__row {
+      align-items: center !important;
+      .show-group__col {
+        height: map-get($form-config, item-height) !important;
+      }
     }
   }
   // 表单项样式

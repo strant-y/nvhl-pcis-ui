@@ -353,7 +353,7 @@
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
       </el-main>
-      <div class="right-btns">
+      <div class="right-btns" v-if="pageLoaded">
         <div class="main-header2">
           <div class="tp">
             <span>
