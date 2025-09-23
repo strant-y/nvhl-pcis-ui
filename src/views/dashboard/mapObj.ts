@@ -44,7 +44,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -128,7 +128,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -214,7 +214,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -275,7 +275,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "nPrm",
@@ -347,7 +347,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
 			{
 				prop: "cAppNme",
@@ -456,14 +456,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -531,14 +531,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -605,14 +605,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -686,14 +686,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
