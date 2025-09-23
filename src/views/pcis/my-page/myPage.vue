@@ -2006,11 +2006,13 @@ async function loadAfter() {
         const ops = clearCAppNo(opertaor.convertData(res));
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
-          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
-          const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
-          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
-          ops.insrnc["Base.tInsrncEndTm"] = endTm;
-          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+          // const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          // const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          // ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          // ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          // ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+          let productCode = route.params.param?.cProdNo;
+          setInsuranceTerm(ops,productCode);
         }
         // 条款信息中的cPkId删除
         if(ops.cvrg && ops.cvrg.length > 0) {
@@ -2176,11 +2178,15 @@ async function loadAfter() {
         const ops = clearCAppNo(JSON.parse(cTplCtnt));
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
-          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
-          const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
-          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
-          ops.insrnc["Base.tInsrncEndTm"] = endTm;
-          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+          // const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          // const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          // ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          // ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          // ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+          let productCode = route.params.param?.cProdNo;
+    
+          setInsuranceTerm(ops,productCode);
+
         }
         // 条款信息中的cPkId删除
         if(ops.cvrg && ops.cvrg.length > 0) {
@@ -2340,11 +2346,13 @@ async function loadAfter() {
         const ops = clearCAppNo(opertaor.convertData(res), clearKey);
         // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
         if(ops.insrnc) {
-          const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
-          const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
-          ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
-          ops.insrnc["Base.tInsrncEndTm"] = endTm;
-          ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+          // const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+          // const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
+          // ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+          // ops.insrnc["Base.tInsrncEndTm"] = endTm;
+          // ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+          let productCode = route.params.param?.cProdNo;
+          setInsuranceTerm(ops,productCode);
         }
         // 条款信息中的cPkId删除
         if(ops.cvrg && ops.cvrg.length > 0) {
@@ -2982,6 +2990,49 @@ const setCiInfo = (base: any) => {
   ci["Ci.cCiSubComp"] = props.param.cDptCde
   ciList.push(ci)
   return ciList;
+};
+
+
+const setInsuranceTerm = (ops, productCode) => {
+  // 定义特殊产品的保险期限映射表
+  const productTermMap = {
+    "020001": 120, // 出口海洋运输货物保险
+    "020002": 90, // 出口陆上运输货物保险
+    "020003": 90, // 出口航空货物运输保险
+    "020004": 45, // 邮包保险
+    "020005": 90, // 进口海洋运输货物保险
+    "020006": 90, // 进口陆上运输货物保险
+    "020007": 45, // 进口航空货物运输保险
+    "020009": 45, // 国内水路、陆路货物运输保险
+    "020011": 45, // 国内航空货物运输保险
+    "020013": 45, // 国内公路货物运输保险
+    "020014": 365, // 公路货物运输定额保险（固定365天）
+    "020016": 45, // 水路货物运输保险
+    "020017": 45, // 铁路货物运输保险
+    "020018": 365, // 国内公路货物运输定期保险（固定365天）
+  };
+
+
+  const currentTime = dayjs();
+  const beginTm = currentTime.add(1, 'day').format("YYYY-MM-DD 00:00:00");
+  let endTm;
+
+  if (productTermMap.hasOwnProperty(productCode)) {
+    // 特殊产品：使用映射表中的天数
+    const days = productTermMap[productCode];
+    endTm = currentTime.add(1, 'day').add(days - 1, 'day').format("YYYY-MM-DD 23:59:59");
+  } else {
+    // 使用默认1年（保持原有逻辑）
+    endTm = currentTime.add(1, 'year').format("YYYY-MM-DD 23:59:59");
+  }
+  const appTm = currentTime.format("YYYY-MM-DD HH:mm:ss");
+
+  ops.insrnc["Base.tDepartureDate"] = beginTm;
+  ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+  ops.insrnc["Base.tInsrncEndTm"] = endTm;
+  ops.insrnc["Base.tAppTm"] = appTm;
+
+  console.log(`保险期限设置完成：产品${productCode}，从${beginTm}到${endTm}`);
 };
 
 

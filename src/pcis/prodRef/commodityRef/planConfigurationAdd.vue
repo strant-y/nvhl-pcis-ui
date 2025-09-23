@@ -26,16 +26,25 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-const dzmodal = useDzModal();
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
-const tabProref = opertaor.getTableRefByKey("productBasicInfo");
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+// import { dataOpertaor } from "@/store/modules/data-opertaor";
 const route = useRoute();
 const query = ref(route.query);
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const dzmodal = useDzModal();
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
+
+// const idxParam: IdxParamProps = {
+//   opertaorProps: { id: route.name },
+//   // handleAnchorClick: handleAnchorClick,
+// };
+// console.log(1111222,idxParam,route)
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
+// const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
+// const tabProref = opertaor.getTableRefByKey("productBasicInfo");
+
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+
 const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}"); 
 // const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}"); 
 const emits = defineEmits(["ok", "cancel"]);
@@ -209,7 +218,7 @@ function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const dptCde = JSON.parse(sessionStorage.getItem("user"));
-  const c = tabref.getFromValue().cCommodityNo;
+  // const c = tabref.getFromValue().cCommodityNo;
   // CCommodityNo    companyId
   const param = {
     codeListName: "Commodity_PLAN_LIST",

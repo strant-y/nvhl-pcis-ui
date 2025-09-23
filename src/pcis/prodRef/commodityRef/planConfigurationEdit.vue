@@ -38,13 +38,22 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const props = defineProps<{
+    // visible: boolean;
+    data: object,
+    idxParam: object,
+}>();
 const dzmodal = useDzModal();
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
+const opertaor = dataOpertaor(props.idxParam.opertaorProps);
+console.log('11122223',props.idxParam)
 const tabref = opertaor.getTableRefByKey("commodityBasicInfo");
 const tabProref = opertaor.getTableRefByKey("productBasicInfo");
+
+
 const route = useRoute();
 const query = ref(route.query);
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
@@ -67,10 +76,7 @@ import {
 import { ref, reactive } from "vue";
 import { on } from "events";
 
-const props = defineProps<{
-    // visible: boolean;
-    data: object;
-}>();
+
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
     const freeEditRef2 = ref<AppGridEditMethod | null>(null);

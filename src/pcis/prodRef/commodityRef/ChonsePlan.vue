@@ -270,7 +270,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
         tableClick: (row) => {
           console.log(row);
-          dzmodal.open(planConfigurationEdit, { type: "edit", data: row }).then((res) => {
+          dzmodal.open(planConfigurationEdit, { type: "edit", data: row ,idxParam: idxParam }).then((res) => {
             if (res.type === "ok") {
               handleQuery();
             }
