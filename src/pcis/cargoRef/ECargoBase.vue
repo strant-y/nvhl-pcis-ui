@@ -267,7 +267,6 @@ const method = {
         });
       }
     }else{
-      // ElMessage.warning("所选联共保类型暂时不支持出单业务");
       ElMessage.error("所选联共保类型暂时不支持出单业务");
       setValue("ECargoBase.cCiMrk","")
       return false;

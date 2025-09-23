@@ -76,6 +76,13 @@ onMounted(async () => {
   setTimeout(() => {
     valideRequired();
     handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
+    if(param.pageType === "inquiryToApp"){
+      const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+      // 调用联共保信息初始化方法
+      initCiInfo({
+        cCiMrk: plyBaseData["Base.cCiMrk"]
+      });
+    }
   }, 3000);
   formconfig1.fromSchema?.forEach((item: any) => {
     if (item.prop === 'Ci.cCoinsurerCde') {
@@ -100,7 +107,7 @@ const method = {
     const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const nCiAmt = parseFloat(productStore.nAmt)
     if (param?.pageType !== "EDR_APP_NEW_SCENE" && nCiAmt == "0") {
-      ElMessage.warning("总保额为0,请先进行保费计算!");
+      ElMessage.warning("请先进行保费计算!");
       return;
     }
     const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);

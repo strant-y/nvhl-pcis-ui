@@ -95,13 +95,6 @@ onMounted(async () => {
     });
     //禁用不见费出单原因
     setFormItem("Base.cCanclfeersnCde", { disabled: true });
-    //保单来源赋值
-    // console.log("param.pageType",param, param.pageType);
-    // const policySource = param?.pageType === "copy" 
-    //   ? "8" 
-    //   : (param?.cPolicySource ?? param?.cRecordType);
-    // setValue("Base.cPolicySource", policySource);
-
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
@@ -154,6 +147,7 @@ onMounted(async () => {
     //   })
     // }
   });
+
 });
 // 添加处理联共保标识显示逻辑的函数
 const handleCiMrkDisplay = () => {
@@ -626,11 +620,14 @@ const method = {
   },
   //服务机构ICON事件
   saleDptFunc: () => {
-    dzmodal.open(DepartmentTree, {}).then((res) => {
+    dzmodal.open(DepartmentTree, {type: "Issuer", data: {} ,isXY:true}).then((res) => {
       if (res.type === "ok") {
         console.log("选中的回显", res);
         if (res.body) {
           const selectObj = res.body;
+          if(!(selectObj.cSignDptMrk) ||  selectObj.cSignDptMrk === '' || selectObj.cSignDptMrk === null || selectObj.cSignDptMrk === undefined || selectObj.cSignDptMrk === '0'){
+              return 	ElMessage.warning("所选机构不是出单机构");
+            }
           let obj = {
             loadData: [
               {
