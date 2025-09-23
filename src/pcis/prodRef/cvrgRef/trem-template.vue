@@ -1070,6 +1070,8 @@ function getUseData(data: any){
       }
       if(checkKey === '1'){  // 清除,校验内容
         item.rules = null;
+        item.cPorpRequired = null;
+        item.required = null;
       }
       return true;
     });
