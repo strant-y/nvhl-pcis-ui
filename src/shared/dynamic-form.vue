@@ -942,7 +942,7 @@ defineExpose({
       // 下拉选择器样式
       .el-select {
         .el-select__wrapper {
-          height: map-get($form-config, item-height) !important;
+          // height: map-get($form-config, item-height) !important;
           min-height: map-get($form-config, item-height) !important;
           font-family: map-get($form-config, font-family);
         }
@@ -950,11 +950,19 @@ defineExpose({
           font-family: map-get($form-config, font-family);
           font-size: map-get($form-config, font-size);
           color: map-get($form-config, font-color);
+          line-height: 100%;
+          height: 100%;
         }
 
         .el-select__placeholder {
           font-family: map-get($form-config, font-family);
           font-size: map-get($form-config, font-size);
+        }
+        .el-select__selection.is-near {
+          margin-left: 0px;
+        }
+        .el-select__selection .el-tag {
+          height: 100%;
         }
       }
 
