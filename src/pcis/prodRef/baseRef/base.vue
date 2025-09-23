@@ -557,6 +557,7 @@ function numMulti(num1, num2) {
 function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   baseEditRef?.value?.addProvide(key, value);
 }
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -565,7 +566,8 @@ defineExpose({
   getValue,
   getFormconfig,
   nPayNumberFun,
-  addProvide
+  addProvide,
+  setFormItem
 });
 </script>
 
