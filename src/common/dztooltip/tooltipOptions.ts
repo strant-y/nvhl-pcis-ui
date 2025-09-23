@@ -17,6 +17,7 @@ const injectStyles = () => {
 
     const style = document.createElement('style');
     style.id = 'tooltip-final-styles';
+    style.lang = 'scss';
     style.textContent = `
         .global-tooltip-container {
             position: fixed !important;
@@ -33,12 +34,13 @@ const injectStyles = () => {
             position: absolute !important;
             padding: 10px 12px !important; /* 略微增大提示框，与大箭头协调 */
             border-radius: 4px !important;
-            font-size: 13px !important;
             max-width: 300px !important;
             box-sizing: border-box !important;
             pointer-events: auto !important;
             opacity: 0;
             animation: tooltipShow 0.2s ease-out forwards !important;
+            font-size: 12px !important;
+            font-family: var(--font-family) !important;
         }
 
         @keyframes tooltipShow {

@@ -5,68 +5,67 @@
         :disabled="!changeContent"
         placement="top"
     >
-      <div>
-        <el-date-picker
-            ref="datepickerRef"
-            v-model="vInput"
-            :class="[
-            ...customClass,
-            ...[isReQuired() ? 're-quired-flag' : '']
-          ]"
-            :type="item.type ? item.type : 'date'"
-            :readonly="
-            item.readonly
-              ? typeof item.readonly === 'boolean'
-                ? item.readonly
-                : item.readonly === 1
-                  ? true
-                  : false
-              : false
-          "
-            :disabled="
-            item.disabled
-              ? typeof item.disabled === 'boolean'
-                ? item.disabled
-                : item.disabled === 1
-                  ? true
-                  : false
-              : false
-          "
-            :placeholder="item.placeholder"
-            :disabledDate="
-            item.disabledDate && typeof item.disabledDate === 'function'
-              ? item.disabledDate
-              : (data) => false
-          "
-            :shortcuts="item.shortcuts"
-            :size="item.size"
-            :format="item.format ? item.format : getValueFormat()"
-            :clearable="
-            item.clearable
-              ? typeof item.clearable === 'boolean'
-                ? item.clearable
-                : item.clearable === 1
-                  ? true
-                  : false
-              : false
-          "
-            :dateFormat="'YYYY-MM-DD'"
-            :timeFormat="'HH:mm:ss'"
-            :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
-            @change="handleChange"
-            @blur="blur"
-            :style="{'min-width': item.type === 'datetime' ? '180px' : '120px'}"
-        />
-      </div>
+      <el-date-picker
+          ref="datepickerRef"
+          v-model="vInput"
+          :class="[
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+        ]"
+          :type="item.type ? item.type : 'date'"
+          :readonly="
+          item.readonly
+            ? typeof item.readonly === 'boolean'
+              ? item.readonly
+              : item.readonly === 1
+                ? true
+                : false
+            : false
+        "
+          :disabled="
+          item.disabled
+            ? typeof item.disabled === 'boolean'
+              ? item.disabled
+              : item.disabled === 1
+                ? true
+                : false
+            : false
+        "
+          :placeholder="item.placeholder"
+          :disabledDate="
+          item.disabledDate && typeof item.disabledDate === 'function'
+            ? item.disabledDate
+            : (data) => false
+        "
+          :shortcuts="item.shortcuts"
+          :size="item.size"
+          :format="item.format ? item.format : getValueFormat()"
+          :clearable="
+          item.clearable
+            ? typeof item.clearable === 'boolean'
+              ? item.clearable
+              : item.clearable === 1
+                ? true
+                : false
+            : false
+        "
+          :dateFormat="'YYYY-MM-DD'"
+          :timeFormat="'HH:mm:ss'"
+          :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
+          @change="handleChange"
+          @blur="blur"
+          :style="{width: '100%'}"
+      />
     </el-tooltip>
   </template>
-  <span v-else style="width: 100%">
+  <el-text v-else class="mx-1" truncated @click="checkIfTruncated($event, vInputShow())">
     {{ vInputShow() }}
-  </span>
+  </el-text>
 </template>
 
 <script setup lang="ts">
 import moment from "moment";
+import {checkIfTruncated} from "@/utils/common";
 const props = defineProps({
   modelValue: {
     type: [Number, String, Array],

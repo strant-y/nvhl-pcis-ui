@@ -135,26 +135,29 @@ $font-config: (
   font-color: #000,
 );
 
+
 // 字体和标签样式配置变量
 $form-config: (
   // 统一高度
-        item-height: 25px,
-  // 表单全局字体设置
-        font-family: var(--font-family),
-        font-size: 12px,
-        font-color: #222,
-        line-height: 1.5,
+  item-height: 25px,
+// 表单全局字体设置
+  font-family: var(--font-family),
+  font-size: 11.5px,
+  font-color: #222,
+  line-height: 1.4,
 
-  // Label标签样式
-        label-font-size: 12px,
-        label-font-weight: 400, // 中等加粗
-        label-color: #000,      // 标签文字颜色
-        label-padding: 0 5px 0 0, // 标签内边距
+// Label标签样式
+  label-font-size: 11.5px,
+  label-font-weight: 400, // 中等加粗
+  label-color: #000,      // 标签文字颜色
+  label-padding: 0 5px 0 0, // 标签内边距
 
-  // Label容器边框样式
-        label-border: false,       // 是否显示边框
-        label-border-width: 1px,
-        label-border-color: #e5e7eb,
-        label-border-radius: 3px,
-        label-bg-color: #f9fafb   // 标签背景色
+// Label容器边框样式
+  label-border: false,       // 是否显示边框
+  label-border-width: 1px,
+  label-border-color: #e5e7eb,
+  label-border-radius: 3px,
+  label-bg-color: #f9fafb,   // 标签背景色
+
+  form-item-content-width: 65% !important,
 );

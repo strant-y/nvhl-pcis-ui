@@ -20,9 +20,9 @@
                     <span>{{ term.cNmeCn }}</span>
                   </div>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
-                    <!-- <el-badge value="退" class="item">
+                    <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
-                    </el-badge> -->
+                    </el-badge>
                   </template>
                   <template v-else>
                     <!-- <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag> -->
@@ -85,10 +85,10 @@
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <div class="table_overflow_x">
-                <table style="width: 50%;margin-left: 100px;">
+                <table style="width: 60%; margin-top: 3px;margin-left:10%">
                   <thead>
                   <tr class="table-title">
-                    <th width="300">{{ termTitleConf.cFactorTabTitle }}</th>
+                    <th width="250" style="max-width: 10%;">{{ termTitleConf.cFactorTabTitle }}</th>
                     <th>{{ termTitleConf.cFactorTabValue }}</th>
                   </tr>
                   </thead>
@@ -1672,6 +1672,9 @@ td {
   border: 1px solid #e2e2e2; /* 设置边框样式 */
   padding: 2px;
   text-align: left;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 450;
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
@@ -1694,5 +1697,9 @@ td {
 .table_overflow_x {
   width: 100%;
   overflow-x: auto;
+}
+:deep(.el-form-item__content){
+  line-height: 25px;
+  height: 25px;
 }
 </style>

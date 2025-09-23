@@ -1233,6 +1233,9 @@ const tableObj = {
                 size: "large",
                 icon: "Edit",
                 hideBtns: (row: any) => {
+
+                  
+
                     if (
                         row.cAppStatus == "1" ||
                         row.cAppStatus == "3" ||
@@ -1245,7 +1248,7 @@ const tableObj = {
                     }
                 },
                 tableClick: async (row) => {
-                    console.log(row);
+     console.log('编辑row',row)
                     const r = await row;
                     if (r) {
                         const data = row;

@@ -428,6 +428,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 80,
     fixed: true,
     tableBtnPosition: "right",
+    rowDbClickFun:(row:any)=> rowDbClick(row),
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -1474,6 +1475,21 @@ function handleDelete(id?: string) {
       }
     });
   });
+}
+
+// 行双击事件
+function rowDbClick(row:any) {
+  if(row.cAppStatus === "1") {// 待核保任务
+    handle_hasReceived(row)
+  } else if(row.cAppStatus === "2") {// 暂存任务
+    if (row.state == "1") {
+      updateUdr(row);
+    }
+  } else if(row.cAppStatus === "2") {// 核保退回任务
+    showDetails(row);
+  } else if(row.cAppStatus === "5") {// 核保通过任务
+    showDetails(row);
+  }
 }
 
 function formatTwoLine(text, num=7) {
