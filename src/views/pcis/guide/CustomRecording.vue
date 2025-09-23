@@ -989,6 +989,18 @@ watch(
     }
   }
 );
+watch(
+  () => formconfig1.value.cEcAgrNo,
+  () => {
+    // 协议号变化，立即清空后续三项
+    formconfig1.value.cProdNo   = '';
+    formconfig1.value.cProdNme  = '';
+    formconfig1.value.cTermNo   = '';
+    formconfig1.value.cTermNme  = '';
+    formconfig1.value.cInsuredCde = '';
+    formconfig1.value.cInsuredNme = '';
+  }
+);
 </script>
 
 <style scoped>
