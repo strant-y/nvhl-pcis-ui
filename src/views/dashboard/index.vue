@@ -103,7 +103,6 @@
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -120,7 +119,6 @@
                     <span
                       v-html="row.cAppNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                       <DocumentCopy />
@@ -140,7 +138,6 @@
                     <span
                       v-html="row.cAppNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
                       <DocumentCopy />
@@ -160,9 +157,6 @@
                     <span
                       v-html="row.cAppNo"
                       :class="row.baseType !== '询价' ? 'primmaryColor' : ''"
-                      @click="
-                        row.baseType !== '询价' ? toQuery2(row) : () => {}
-                      "
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -176,7 +170,6 @@
                     <span
                       v-html="row.cInquiryNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon
                       class="copy-icon"
@@ -194,7 +187,6 @@
                     <span
                       v-html="row.cPlyNo"
                       class="primmaryColor"
-                      @click="toQuery2(row)"
                     ></span>
                     <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
                       <DocumentCopy />
@@ -2753,7 +2745,7 @@ window.addEventListener("resize", () => {
 .policy-number-row {
   display: flex;
   align-items: center;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .policy-number-row span {

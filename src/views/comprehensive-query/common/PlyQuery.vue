@@ -1233,6 +1233,9 @@ const tableObj = {
                 size: "large",
                 icon: "Edit",
                 hideBtns: (row: any) => {
+
+                  
+
                     if (
                         row.cAppStatus == "1" ||
                         row.cAppStatus == "3" ||
@@ -1245,7 +1248,7 @@ const tableObj = {
                     }
                 },
                 tableClick: async (row) => {
-                    console.log(row);
+     console.log('编辑row',row)
                     const r = await row;
                     if (r) {
                         const data = row;
@@ -1791,16 +1794,19 @@ defineExpose({
 .policy-info-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .policy-number-row {
   display: flex;
   align-items: center;
+  height: 16px;
 }
 
 .policy-number-row span {
-  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {

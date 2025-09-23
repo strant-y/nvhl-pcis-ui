@@ -960,15 +960,15 @@ const method = {
       setFormItem("Insured.cNation", {
         disabled: false,
       });
-      setFormItem("Insured.tBirthday", {
-        disabled: false,
-      });
-      setFormItem("Insured.nAge", {
-        disabled: false,
-      });
-      setFormItem("Insured.cSex", {
-        disabled: false,
-      });
+      // setFormItem("Insured.tBirthday", {
+      //   disabled: false,
+      // });
+      // setFormItem("Insured.nAge", {
+      //   disabled: false,
+      // });
+      // setFormItem("Insured.cSex", {
+      //   disabled: false,
+      // });
            setFormItem("Insured.cTaxRegistrationNo", {
           disabled: false,
       });
@@ -996,15 +996,15 @@ const method = {
         setFormItem("Insured.cNation", {
           disabled: true,
         });
-        setFormItem("Insured.tBirthday", {
-          disabled: true,
-        });
-        setFormItem("Insured.nAge", {
-          disabled: true,
-        });
-        setFormItem("Insured.cSex", {
-          disabled: true,
-        });
+        // setFormItem("Insured.tBirthday", {
+        //   disabled: true,
+        // });
+        // setFormItem("Insured.nAge", {
+        //   disabled: true,
+        // });
+        // setFormItem("Insured.cSex", {
+        //   disabled: true,
+        // });
         setFormItem("Insured.cTaxRegistrationNo", {
           disabled: false,
         });

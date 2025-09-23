@@ -932,7 +932,7 @@ function isrequired(i: any) {
 
 :deep(.el-table .cell) {
   /* white-space: nowrap; */
-  line-height: 20px;
+  line-height: 16px;
   padding: 0 2px;
 }
 

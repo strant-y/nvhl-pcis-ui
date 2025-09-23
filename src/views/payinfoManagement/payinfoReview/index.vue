@@ -169,7 +169,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         rules: [getRules("required", {})],
         type: "datetimerange",
-        format: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         // defaultValue: [
         //   moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
@@ -438,6 +438,9 @@ function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const tmArr = freeEditRef.value?.getValue("dateRange");
+      if(tmArr[1]) {
+        tmArr[1] = moment(tmArr[1]).format("YYYY-MM-DD 23:59:59")
+      }
       const startDate = Date.parse(tmArr[0]);
       const endDate = Date.parse(tmArr[1]);
       // if (startDate - endDate > 0) {
@@ -460,7 +463,8 @@ function handleQuery(flag?: boolean) {
           CurrentUserOrg: user.value.companyId,
         },
         s,
-        r
+        r,
+        {dateRange: tmArr}
       );
       pcisQueryService.getPayConfirmInfoAuditList(param).then((res: any) => {
         const { code, data, msg } = res;

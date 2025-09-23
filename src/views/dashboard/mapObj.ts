@@ -44,7 +44,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -128,7 +128,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -214,7 +214,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "tAppTm",
@@ -275,7 +275,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "nPrm",
@@ -347,7 +347,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
 			{
 				prop: "cAppNme",
@@ -428,7 +428,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -443,7 +442,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -458,14 +456,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -505,7 +503,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -520,7 +517,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -535,14 +531,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -582,7 +578,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -596,7 +591,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -611,14 +605,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
@@ -678,7 +672,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -693,14 +686,14 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 187,
+        width: 180,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
         align: "left",
-        width: 308,
+        width: 296,
       },
       {
         prop: "cAppNme",
