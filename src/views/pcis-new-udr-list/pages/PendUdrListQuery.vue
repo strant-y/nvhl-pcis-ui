@@ -32,6 +32,22 @@
           <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
+      <template #column-cAppNoInfo="{ row, column, index }">
+        <div class="policy-info-cell">
+          <div class="policy-number-row">
+            <span
+              v-html="row.cAppNo"
+              class="primmaryColor"
+            ></span>
+            <el-icon
+              class="copy-icon"
+              @click="copyText(row.cAppNo)"
+            >
+              <DocumentCopy />
+            </el-icon>
+          </div>
+        </div>
+      </template>
     </app-table>
   </div>
 </template>
@@ -393,7 +409,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tm1",
         inputtype: "rtdatepicker",
         title: "申请日期",
-        format: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "datetimerange",
@@ -402,7 +418,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tm2",
         inputtype: "rtdatepicker",
         title: "签单日期",
-        format: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "datetimerange",
@@ -436,7 +452,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "接收",
         type: "info",
         size: "large",
-        iconSize:"25",
         icon: "Message",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
@@ -456,7 +471,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "修改",
         type: "success",
         size: "large",
-        iconSize:"25",
         icon: "Edit",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -475,7 +489,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "取消接收",
         type: "info",
         size: "large",
-        iconSize:"25",
         icon: "Release",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
@@ -494,7 +507,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "撤回",
         type: "danger",
         size: "large",
-        iconSize:"25",
         icon: "return",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
@@ -539,7 +551,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "查看",
         type: "primary",
         size: "large",
-        iconSize:"25",
         icon: "View",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
@@ -558,7 +569,6 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "承保流程",
         type: "danger",
         size: "large",
-        iconSize:"25",
         icon: "Refresh",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
@@ -595,24 +605,22 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
-        width: 63,
+        width: 57,
         title: "任务类型",
-        align: "left",
       },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
-        showCopyIcon: true,
-        width: 165,
+        slotName: "cAppNoInfo",
+        width: 131,
         fixed: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: 'left',
-        width: 48,
+        width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -635,7 +643,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         slotName: "cTermNme",
         align: 'left',
-        width: 112,
+        width: 122,
       },
       {
         prop: "cAppNme",
@@ -643,7 +651,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         slotName: "cAppNme",
         align: 'left',
-        width: 112,
+        width: 122,
       },
       {
         prop: "cInsuredNme",
@@ -651,14 +659,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         slotName: "cInsuredNme",
         align: 'left',
-        width: 112,
+        width: 122,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
         align: 'left',
-        width: 95,
+        width: 79,
         formatter:(val:any) => {
           return val.toLocaleString()
         }
@@ -670,14 +678,14 @@ const tableconfig = reactive<AppTableConfig>(
         type: "datetimerange", // 显示日期和时间选择器
         format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
-        width: 135,
+        width: 112,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        width: 75,
+        width: 67,
       },
       {
         prop: "udrClsCde",
@@ -685,7 +693,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "当前核保级别",
         minWidth: 180,
         align: 'left',
-        width: 150,
+        width: 112,
       },
       {
         prop: "cMinUndrCls",
@@ -693,13 +701,12 @@ const tableconfig = reactive<AppTableConfig>(
         title: "最终审核级别",
         minWidth: 180,
         align: 'left',
-        width: 155,
+        width: 112,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
-        minWidth: 150,
         width: 65,
         align: "left",
         loadData: [
@@ -958,6 +965,12 @@ const handleQuery = (flag = true) => {
 function refreshData(flag?: boolean) {
   const date1 = freeEditRef.value?.getValue("tm1"); //申请日期
   const date2 = freeEditRef.value?.getValue("tm2"); //签单日期
+  if(date1 && date1[1]) {
+    date1[1] = moment(date1[1]).format("YYYY-MM-DD 23:59:59")
+  }
+  if(date2 && date2[1]) {
+    date2[1] = moment(date2[1]).format("YYYY-MM-DD 23:59:59")
+  }
   let roleCde = "";
   roles.value?.length &&
     roles.value.forEach((role) => {
@@ -987,6 +1000,8 @@ function refreshData(flag?: boolean) {
   const params = {
     ...r,
     ...s,
+    tm1: date1,
+    tm2: date2,
   };
   
   // 提取申请日期的开始时间和结束时间
@@ -1534,5 +1549,35 @@ function setFormItem(key: any, obj: any) {
   -webkit-line-clamp: 2;
   word-break: break-all;
   overflow: hidden;
+}
+
+.copy-icon {
+  // margin-left: 5px;
+  cursor: pointer;
+  color: #409eff;
+}
+
+.policy-info-cell {
+  display: flex;
+  flex-direction: column;
+  // gap: 4px;
+}
+
+.policy-number-row {
+  display: flex;
+  align-items: center;
+  line-height: 16px;
+}
+
+.policy-number-row span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.primmaryColor {
+  color: var(--el-color-primary);
+  cursor: pointer;
 }
 </style>

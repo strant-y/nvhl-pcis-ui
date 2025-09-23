@@ -1425,16 +1425,19 @@ defineExpose({
 .policy-info-cell {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
 .policy-number-row {
     display: flex;
     align-items: center;
+    height: 16px;
 }
 
 .policy-number-row span {
-    flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 :deep(.el-table th:nth-child(1) .cell) {

@@ -765,7 +765,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "tAppTm",
               inputtype: "rtdatepicker",
               title: "申请日期",  // 投保日期
-              format: "YYYY-MM-DD HH:mm:ss",
+              format: "YYYY-MM-DD",
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
@@ -774,7 +774,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "tEdrAppTm",
               inputtype: "rtdatepicker",
               title: "申请日期", // 批改申请日期
-              format: "YYYY-MM-DD HH:mm:ss",
+              format: "YYYY-MM-DD",
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
@@ -783,7 +783,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "tInquiryTm",
               inputtype: "rtdatepicker",
               title: "申请日期",  // 询价投保日期
-              format: "YYYY-MM-DD HH:mm:ss",
+              format: "YYYY-MM-DD",
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
@@ -793,7 +793,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "tIssueTm",
               inputtype: "rtdatepicker",
               title: "签单日期",
-              format: "YYYY-MM-DD HH:mm:ss",
+              format: "YYYY-MM-DD",
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
@@ -1382,6 +1382,15 @@ async function queryAE( flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据 
+    if(s.tIssueTm && s.tIssueTm[1]) {
+        s.tIssueTm[1] = dayjs(s.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
+    if(s.tAppTm && s.tAppTm[1]) {
+        s.tAppTm[1] = dayjs(s.tAppTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
+    if(s.tEdrAppTm && s.tEdrAppTm[1]) {
+        s.tEdrAppTm[1] = dayjs(s.tEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
     let expandFlag = 0;
     let expandVal = {};
     if (s.cLoadSub == null) {
@@ -1584,6 +1593,9 @@ async function queryI(flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
+    if(s.tInquiryTm && s.tInquiryTm[1]) {
+        s.tInquiryTm[1] = dayjs(s.tInquiryTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
     let expandFlag = 0;
     let expandVal = {};
     if (s.cLoadSub == null) {
@@ -2210,12 +2222,19 @@ defineExpose({
 .policy-info-cell {
   display: flex;
   flex-direction: column;
-  gap: 0px;
 }
 
 .policy-number-row {
   display: flex;
   align-items: center;
+  height: 16px;
+}
+
+.policy-number-row span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 :deep(.el-table__body .el-table__row .el-table__cell:first-child .cell) {

@@ -364,7 +364,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tAppTm",
         inputtype: "rtdatepicker",
         title: "申请日期",
-        format: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "datetimerange",
@@ -373,7 +373,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tIssueTm",
         inputtype: "rtdatepicker",
         title: "签单日期",
-        format: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD",
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "datetimerange",
@@ -650,35 +650,35 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 62,
+        width: 55,
       },
       {
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cInquiryNo",
-        width: 165,
+        width: 131,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
         slotName: "cPlyNo",
-        width: 165,
+        width: 131,
       },
       {
         prop: "cEdrNo",
         inputtype: "rtselect",
         title: "批改申请单号/批单号",
         slotName: "cEdrNo",
-        width: 165,
+        width: 131,
       },
       {
         prop: "cRsnCdeText",
         inputtype: "rtinput",
         title: "批改原因",
         align: "left",
-        width: 120,
+        width: 99,
       },
       {
         prop: "cTermNme",
@@ -686,20 +686,20 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         slotName: "cTermNme",
         align: "left",
-        width: 112,
+        width: 122,
       },
       {
         prop: "tAppTm",
         inputtype: "rtinput",
         title: "申请日期",
-        width: 140,
+        width: 112,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         align: "left",
-        width: 112,
+        width: 122,
         slotname: "cAppNme",
       },
       {
@@ -707,15 +707,15 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "被保人名称",
         align: "left",
-        width: 112,
+        width: 122,
         slotname: "cInsuredNme",
       },
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
         title: "保险期间",
-        minWidth: 280,
-        width: 140,
+        align: "left",
+        width: 112,
         slotName: "InsurancePeriod",
       },
       {
@@ -723,7 +723,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保费",
         align: "left",
-        width: 95,
+        width: 79,
         formatter: (val:any) => {
           return val?.toLocaleString()
         }
@@ -733,7 +733,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保费变化量",
         align: "left",
-        width: 100,
+        width: 82,
         formatter: (val:any) => {
           return val?.toLocaleString()
         }
@@ -742,21 +742,23 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tUdrTm",
         inputtype: "rtinput",
         title: "核保日期",
-        width: 140,
+        align: "left",
+        width: 112,
       },
       {
         prop: "cUdrCnm",
         inputtype: "rtinput",
         title: "核保人",
         align: "left",
-        width: 62,
+        width: 54,
       },
       {
         prop: "taskStatus",
         inputtype: "rtselect",
         title: "任务状态",
         loadData: taskStatusOptions,
-        width: 95,
+        width: 81,
+        align: "left",
       },
     ],
   })
@@ -818,6 +820,12 @@ function refreshData(flag?: boolean) {
     ...r,
     ...s,
   };
+  if(param.tAppTm && param.tAppTm[1]) {
+    param.tAppTm[1] = dayjs(param.tAppTm[1]).format("YYYY-MM-DD 23:59:59")
+  }
+  if(param.tIssueTm && param.tIssueTm[1]) {
+    param.tIssueTm[1] = dayjs(param.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
+  }
   selectTask(param)
     .then((res: any) => {
       if (res.code === 200) {
@@ -908,17 +916,19 @@ function setFormItem(key: any, obj: any) {
 .policy-info-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .policy-number-row {
   display: flex;
   align-items: center;
-  height: 23px;
+  height: 16px;
 }
 
 .policy-number-row span {
-  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 .primmaryColor {

@@ -2753,7 +2753,7 @@ window.addEventListener("resize", () => {
 .policy-number-row {
   display: flex;
   align-items: center;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .policy-number-row span {

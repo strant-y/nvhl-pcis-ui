@@ -428,7 +428,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -443,7 +442,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -505,7 +503,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -520,7 +517,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -582,7 +578,6 @@ export const tableObj = {
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        align: "left",
         width: 57,
       },
       {
@@ -596,7 +591,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
@@ -678,7 +672,6 @@ export const tableObj = {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        align: "left",
         width: 45,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
