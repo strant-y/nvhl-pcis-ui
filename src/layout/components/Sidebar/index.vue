@@ -138,6 +138,9 @@ function getShortMenuList() {
     background: var(--el-color-primary);
     color: #ffffff;
   }
+  &:focus-visible {
+    outline: unset;
+  }
 }
 :deep(.dropdownContent) {
   overflow-y: auto;
