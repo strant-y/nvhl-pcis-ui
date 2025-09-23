@@ -926,6 +926,7 @@ function isrequired(i: any) {
 }
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index.scss";
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
@@ -960,130 +961,5 @@ function isrequired(i: any) {
 }
 :deep(.methodColumn .el-button+.el-button) {
   margin-left: 0;
-}
-
-
-// 自定义表单样式
-:deep(.custom-table) {
-  // 应用全局表单字体样式
-  font-size: map-get($form-config, font-size);
-  line-height: map-get($form-config, line-height);
-
-  // 表单项样式
-  .el-form-item {
-    width: 100%;
-    display: flex;
-    // Label标签样式
-    .el-form-item__label {
-      font-size: map-get($form-config, label-font-size);
-      font-weight: map-get($form-config, label-font-weight);
-      color: map-get($form-config, label-color);
-      padding: map-get($form-config, label-padding);
-      //font-family: map-get($form-config, font-family);
-    }
-
-    // 表单项内容区域（与label对应）
-    .el-form-item__content {
-      // 所有输入控件继承字体样式
-      .el-input {
-        .el-input__wrapper{
-          height: map-get($form-config, item-height);
-        }
-        .el-input__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-input__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      .el-textarea {
-        .el-textarea__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-textarea__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-      // 下拉选择器样式
-      .el-select {
-        .el-select__wrapper {
-          height: map-get($form-config, item-height) !important;
-          min-height: map-get($form-config, item-height) !important;
-          font-family: map-get($form-config, font-family);
-        }
-        .el-select__input {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-
-        .el-select__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-
-      // 日期选择器输入框样式
-      .el-date-picker {
-        .el-input__wrapper{
-          height: map-get($form-config, item-height);
-        }
-        .el-input__inner {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-        }
-        .el-input__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-      }
-
-      .el-text {
-        font-family: map-get($form-config, font-family);
-        font-size: map-get($form-config, font-size);
-        color: map-get($form-config, font-color);
-      }
-
-      .el-button {
-        font-family: inherit;
-        font-size: inherit;
-      }
-
-      // input + btn 样式
-      .show-right-btn {
-        .el-input,
-        .el-input-number,
-        .el-textarea,
-        .el-select,
-        .el-date-picker {
-          .el-select__wrapper {
-            border-radius: 3px 0 0 3px;
-          }
-          .el-input__wrapper {
-            border-radius: 3px 0 0 3px;
-          }
-        }
-        .el-button {
-          border-radius: 0 3px 3px 0;
-          height: calc(map-get($form-config, item-height) + 0.5px) !important;
-        }
-      }
-
-    }
-  }
-
-  // 表格组件里处理的值 单独给样式
-  .rt-table-formatter-text {
-    font-family: map-get($form-config, font-family);
-    font-size: map-get($form-config, font-size);
-    color: map-get($form-config, font-color);
-  }
 }
 </style>
