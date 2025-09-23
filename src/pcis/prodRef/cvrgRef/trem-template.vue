@@ -1305,7 +1305,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
   }
