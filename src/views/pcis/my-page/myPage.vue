@@ -2422,7 +2422,7 @@ async function loadAfter() {
     // {isdivider: true},  //间隔符
     createFreeButtonBase({
       label: imageStr,
-      type: "success",
+      type: "warning",
       func: () => {
        imageMethod.showImage(opertaor);
       },
