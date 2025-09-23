@@ -68,22 +68,22 @@
                   "
                       style="margin-bottom: 18px"
                   >
-                    <div style="display: flex; width: 100%;">
+                    <div style="display: flex; width: 100%;" :class="{'show-right-btn': formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId}">
                       <div
                           :style="{
-                      width:
-                        // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
-                        formItems[props.row._dataId][i.prop].showExBtn &&
-                        formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
-                        editIndex === props.row._dataId
-                          ? (formItems[props.row._dataId][i.prop].btnWidth
-                              ? 100 -
-                                formItems[props.row._dataId][i.prop].btnWidth
-                              : 75) + '%'
-                          : '100%',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                    }"
+                            width:
+                              // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
+                              formItems[props.row._dataId][i.prop].showExBtn &&
+                              formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
+                              editIndex === props.row._dataId
+                                ? (formItems[props.row._dataId][i.prop].btnWidth
+                                    ? 100 -
+                                      formItems[props.row._dataId][i.prop].btnWidth
+                                    : 75) + '%'
+                                : '100%',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                          }"
                       >
                         <from-item
                             v-model="props.row[i.prop]"
@@ -969,7 +969,7 @@ function isrequired(i: any) {
   font-size: map-get($form-config, font-size);
   line-height: map-get($form-config, line-height);
 
-  // 表单项Label样式
+  // 表单项样式
   .el-form-item {
     width: 100%;
     display: flex;
@@ -980,17 +980,6 @@ function isrequired(i: any) {
       color: map-get($form-config, label-color);
       padding: map-get($form-config, label-padding);
       //font-family: map-get($form-config, font-family);
-
-      // 如果启用边框，则添加边框样式
-      @if map-get($form-config, label-border) {
-        border: map-get($form-config, label-border-width) solid map-get($form-config, label-border-color);
-        border-radius: map-get($form-config, label-border-radius);
-        background-color: map-get($form-config, label-bg-color);
-        padding: 8px 12px; // 调整带边框时的内边距
-        display: inline-flex;
-        align-items: center;
-        height: 100%;
-      }
     }
 
     // 表单项内容区域（与label对应）
@@ -1065,6 +1054,26 @@ function isrequired(i: any) {
       .el-button {
         font-family: inherit;
         font-size: inherit;
+      }
+
+      // input + btn 样式
+      .show-right-btn {
+        .el-input,
+        .el-input-number,
+        .el-textarea,
+        .el-select,
+        .el-date-picker {
+          .el-select__wrapper {
+            border-radius: 3px 0 0 3px;
+          }
+          .el-input__wrapper {
+            border-radius: 3px 0 0 3px;
+          }
+        }
+        .el-button {
+          border-radius: 0 3px 3px 0;
+          height: calc(map-get($form-config, item-height) + 0.5px) !important;
+        }
       }
 
     }
