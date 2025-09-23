@@ -159,7 +159,7 @@ onMounted(() => {
   // 税务登记号
   // setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
   // 证件号码
-  setFormItem("Insured.cCertfCde", {minWidth: '165px'});
+  // setFormItem("Insured.cCertfCde", {minWidth: '165px'});
 });             
 // function setFormItem(key: any, obj: any) {
 //   if (obj && Object.keys(obj).length) {

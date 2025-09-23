@@ -9,9 +9,10 @@
           ref="datepickerRef"
           v-model="vInput"
           :class="[
-          ...customClass,
-          ...[isReQuired() ? 're-quired-flag' : '']
-        ]"
+            'custom-date-picker',
+            ...customClass,
+            ...[isReQuired() ? 're-quired-flag' : '']
+          ]"
           :type="item.type ? item.type : 'date'"
           :readonly="
           item.readonly
