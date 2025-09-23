@@ -577,7 +577,15 @@ function getFromValue() {
         //主条款,查下是否存在公共信息
         if (planDataCommon.value["m"] && planDataCommon.value["m"].length > 0) {
           const r = planDataCommon.value["m"][0];
-          list.push(...JSON.parse(JSON.stringify(r.riskList)));
+          const nr = [];
+          if(r && r.riskList && r.riskList.length > 0){
+            r.riskList.forEach((l: any) => {
+              let d = JSON.parse(JSON.stringify(l));
+              d["TermRisktgt.cIsCommon"] = '1';
+              list.push(d);
+            });
+          }
+          
         }
       }
       const plan = i["Term.cPlanNo"];
@@ -597,11 +605,13 @@ function getFromValue() {
             md.forEach((m) => {
               m["Term.cPlanNo"] = plan;
               m["Term.nSeqNo"] = seqNo++;
+              m["Term.cIsCommon"] = '1';
               if (m["riskList"]) {
                 let l = JSON.parse(JSON.stringify(m["riskList"]));
                 delete m["riskList"];
                 l.forEach((r: any) => {
                   r["TermRisktgt.cPlanNo"] = plan;
+                  r["TermRisktgt.cIsCommon"] = '1';
                 });
                 m["Term.riskList"] = l;
               }
