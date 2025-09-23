@@ -209,7 +209,7 @@ const tableconfig = reactive<AppTableConfig>(
     //       });
     //     },
     //   }),
-    // ],
+    // ], 
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
@@ -386,6 +386,11 @@ const tableconfig = reactive<AppTableConfig>(
         title: "代理(经纪)协议",
       },
     ],
+     rowDbClickFun:(row: any)=>{
+      console.log('4444',row)
+              emit("ok",row);
+          dialogVisible.value=false;
+    }
   })
 );
 

@@ -126,10 +126,61 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         func: (val: any) => {
           if (val) {
+            console.log('大类‘“，', val)
+            console.log('pppp， editType', param)
             //  查询中类 selelct
             // setValue("cChaType", "");
             // setValue("cChaSubType", "");
             queryChaTypeList(val)
+
+
+            nextTick(() => {
+              //  if (val === "19002"){
+              //     setFormItem("Base.cIntroDptcde", {btnItems: {
+              //         disabled: true,
+              //       },});
+              //   }else {
+              //     setFormItem("Base.cIntroDptcde", {btnItems: {
+              //         disabled: false,
+              //       }});
+              //   }
+              if (val === "19002" || val === "19003") {
+                // if(getValue('cOperId')){
+
+                // }
+                const obj = {
+                  rules: [getRules("required", {})],
+                  btnItems: {
+                    disabled: false,
+                  },
+                };
+
+                setFormItem("cBrkrCde", { ...obj, disabled: 0 }); //代理(经纪)人
+                setFormItem("cBrkSlsCde", obj); //代理业务员
+
+
+              } else {
+
+                const obj = {
+                  rules: [],
+                  disabled: true,
+                  btnItems: {
+                    disabled: true,
+                  },
+                };
+                setFormItem("cBrkrCde", obj); //代理(经纪)人
+                setFormItem("cBrkSlsCde", obj); //代理业务员
+
+                if (param.editType) {
+                  setValue("cBrkrCde", "");
+                  setValue("cBrkSlsCde", "");
+                }
+
+              }
+
+
+
+            })
           }
         }
       },
@@ -206,14 +257,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               .then((res: any) => {
                 if (res.type === "ok") {
                   const selectObj = res.body;
-                  freeEditRef.value?.setValue(
+                  setValue(
                     "cOperId",
                     selectObj.cSlsCde
                   );
+
+                  setValue('cOperNme',
+                     selectObj.cSlsNme
+                  )
+                  
+                  
                   setFormItem("cOperId", {
                     loadData: [
                       {
-                        label: selectObj.cSlsNme,
+                        label:selectObj.cSlsCde + selectObj.cSlsNme,
                         value: selectObj.cSlsCde,
                       },
                     ],
@@ -246,6 +303,18 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             dzmodal.open(salesman, { type: "sales", data: { ...tabref.getFromValue(), ...getFromValue() } }).then((res) => {
               if (res.type === "ok") {
                 const selectObj = res.body;
+
+
+                setValue(
+                  "cSlsId",
+                  selectObj.CSlsCde
+                );
+                
+
+                setValue(
+                  "cSlsNme",
+                  selectObj.CSlsNme
+                );
                 setFormItem("cSlsId", {
                   loadData: [
                     {
@@ -254,11 +323,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     },
                   ],
                 });
-
-                freeEditRef.value.setValue(
-                  "cSlsId",
-                  selectObj.CSlsCde
-                );
+          
+                
 
               }
 
@@ -273,9 +339,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         btnWidth: 20,
         itemWidth: 3,
         showExBtn: true,
+        disabled: 1,
         btnItems: {
           icon: "Search",
           type: "primary",
+          disabled: true,
           func: () => {
             // const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
             // 请先保存商品信息
@@ -295,14 +363,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
               if (res.type === "ok") {
                 const selectObj = res.body;
-                freeEditRef.value.setValue(
+                setValue(
                   "cBrkrCde",
+                  selectObj.CChaCde
+                );
+
+                 setValue(
+                  "cBrkrName",
                   selectObj.CChaNme
                 );
                 setFormItem("cBrkrCde", {
                   loadData: [
                     {
-                      label: selectObj.CChaNme,
+                      label: selectObj.CChaCde + selectObj.CChaNme,
                       value: selectObj.CChaCde,
                     },
                   ],
@@ -322,9 +395,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         btnWidth: 20,
         itemWidth: 2,
         showExBtn: true,
+        disabled: 1,
         btnItems: {
           icon: "Search",
           type: "primary",
+          disabled: true,
           func: () => {
             let CDptCde = getValue('cDptCde');
             if (!CDptCde) {
@@ -341,17 +416,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 method: {
                   getSelected: (params: any) => {
                     const codeValData = params["CSlsCde"]
+
+                    console.log('选中“，',params)
                     if (codeValData) {
                       const selectObj = params;
                       setValue(
                         "cBrkSlsCde",
                         selectObj.CSlsCde
                       );
+                           setValue(
+                        "cBrkSlsName",
+                        selectObj.CSlsNme
+                      );
                       setFormItem("cBrkSlsCde", {
                         loadData: [
                           {
                             // label: selectObj.CSlsNme + ' ' + selectObj.CSlsCde,
-                            label: selectObj.CSlsNme ,
+                            label:  selectObj.CSlsCde + selectObj.CSlsNme,
                             value: selectObj.CSlsCde,
                           },
                         ],

@@ -399,6 +399,7 @@ const method = {
   cardTypeChange: (val: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
+       const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
     console.log(33322, val, param)
  
  
@@ -407,12 +408,12 @@ const method = {
       clearValidate('Applicant.cCertfCde')  // 清除报错信息
     }
 
-    // if (param.pageType!=="readonly") {
-      const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+    if (param.pageType!=="readonly") {
+   
       personFields.forEach(field => {
         setFormItem(`Applicant.${field}`, { disabled: false });
       });
-    // }
+    }
 
 
 
