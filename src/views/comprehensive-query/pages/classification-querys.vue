@@ -249,6 +249,13 @@ const allCAppStatus = [
   {label: "见费出单退回", value: "8"},
 ]
 
+const inquiryStatus = [
+  {label: "暂存", value: "1"},
+  {label: "已提交", value: "2"},
+  {label: "询价退回/撤回", value: "3"},
+  {label: "询价通过", value: "5"},
+]
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -432,13 +439,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               title: "查询条件",
               placeholder:
                   "询价/投保/批改申请单号 询价单号 保单号 批单号 产品名称 条款名称 投/被保人名称 投/被保人证件号码",
-              btnWidth: 16,
+              btnWidth: 10,
               itemWidth: 2,
               showExBtn: true,
               btnItems: {
                   label: "搜索",
                   type: "primary",
-                  btnStyle: {'font-size': '18px','margin-right': '-8%'},
+                  btnStyle: {'font-size': '16px'},
                   func: () => {
                     handleQuery(true, true);
                   },
@@ -716,10 +723,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           } else if (item.prop == "cPlyNo") {
                               item.hidden = false;
                           } else if (item.prop === "cAppStatus") {
-                            item.loadData = allCAppStatus.filter(o => o.value !== "4");
+                            // item.loadData = allCAppStatus.filter(o => o.value !== "4");
+                            item.loadData = inquiryStatus
                           }
                       });
                        handleQuery(true);
+
                   } else if(!val) {
                     // 清空选中值
                     formconfig1.fromSchema?.forEach((item) => {
@@ -1043,7 +1052,7 @@ const normalQueryColumns = [
     },
     {
         prop: "cAppStatus",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "任务状态",
         minWidth: 120,
         width: 105,
@@ -1069,6 +1078,13 @@ const normalQueryColumns = [
             return true;
             }
         },
+        formatter:(val:any, row:any) => {
+            if(row.taskTyp === "I") {
+                return inquiryStatus.find((item:any) => item.value === val)?.label
+            } else {
+                return allCAppStatus.find((item:any) => item.value === val)?.label
+            }
+        }
     },
     {
         prop: "nEdrPrjNo",
@@ -2217,6 +2233,7 @@ defineExpose({
 .copy-icon {
   cursor: pointer;
   color: #409eff;
+  margin-left: 5px;
 }
 
 .policy-info-cell {
@@ -2243,10 +2260,6 @@ defineExpose({
 /* :deep(.el-table th:nth-child(1) .cell) {
     white-space: pre-line;
 } */
-:deep(.el-button-group .el-button:first-child) {
-    font-size: 16px;
-    width: 120px;
-}
 .twoLine {
   display: -webkit-box;
   -webkit-box-orient: vertical;

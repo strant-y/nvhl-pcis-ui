@@ -1673,7 +1673,7 @@ td {
   padding: 2px;
   text-align: left;
   font-family: var(--font-family);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 450;
 }
 ::v-deep .el-form-item {

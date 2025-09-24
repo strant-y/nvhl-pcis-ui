@@ -174,7 +174,7 @@
               </a>
             </template>
           </div>
-          <el-row :gutter="10">
+          <el-row :gutter="10" style="margin-bottom: 10px;">
             <template v-for="(item, index) in props.fromSchema" :key="index">
               <template v-if="!item.hidden">
                 <el-col

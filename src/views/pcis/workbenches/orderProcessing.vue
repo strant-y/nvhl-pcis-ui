@@ -919,7 +919,7 @@ function setFormItem(key: any, obj: any) {
 </script>
 <style lang="scss" scoped>
 .copy-icon {
-  // margin-left: 5px;
+  margin-left: 5px;
   cursor: pointer;
   color: #409eff;
 }

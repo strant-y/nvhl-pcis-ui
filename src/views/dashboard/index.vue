@@ -34,7 +34,7 @@
 <!--        </div>-->
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
-          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;height: 2.5rem;margin-right: 3px;border-radius: 3px;" />
+          <rtButton :item="searchBtnItem" style="width: 150px;letter-spacing: 20px;height: 2.5rem;margin-right: 3px;border-radius: 3px;" />
         </div>
         <!-- <div class="top-menu">
           <div class="menu-label">
@@ -2338,7 +2338,7 @@ window.addEventListener("resize", () => {
 
         :deep(.el-button) {
           margin-right: 10px;
-          font-size: 20px;
+          font-size: 18px;
         }
         :deep(.el-button>span) {
           padding-left: 20px;
@@ -2724,7 +2724,7 @@ window.addEventListener("resize", () => {
 }
 
 .copy-icon {
-  // margin-left: 5px;
+  margin-left: 5px;
   cursor: pointer;
   color: var(--el-color-primary);
 }
