@@ -13,6 +13,8 @@
   //--font-family: 'Noto Sans SC', sans-serif;
   --wrapper-required-bg-color:  #FEFAF1 !important;
   --rt-bg-color: #FFFFFF !important;
+  --rt-border: rgb(100 100 100 / 20%) 1px solid !important;
+  --rt-overlay-color: rgb(20 20 20 / 10%) !important;
 
   --dashboard-bg: url("@/assets/img/home_bg1.png");
   --el-text-color-regular: #000;
@@ -103,6 +105,9 @@ html.dark {
   --card-group-header-bg-color: rgb(0 0 0 / 80%);
 
   --rt-bg-color: rgb(0 0 0 / 85%) !important;
+  --rt-border: rgb(200 200 200 / 30%) 1px solid !important;
+  --rt-overlay-color: rgb(200 200 200 / 10%) !important;
+
   --el-mypage-right-menu-border-color: rgb(150 150 150 / 40%);
   --el-menu-border-color: rgb(100 100 100 / 20%);
   --wrapper-required-bg-color: rgb(0 0 0 / 80%) !important;

@@ -1026,8 +1026,8 @@ watch(
   cursor: pointer;
 }
 .checked {
-  border: 3px solid rgb(178, 31, 41);
-  background: rgb(255, 232, 230);
+  border: 2px solid var(--el-color-primary);
+  background: var(--rt-overlay-color);
 }
 .el-card.eachItems >>> .el-card__body,
 .el-card.eachItems_checked >>> .el-card__body {

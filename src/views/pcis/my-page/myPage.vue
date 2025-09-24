@@ -5811,8 +5811,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .main-header2 {
-  background: var(--cvrg-sub-header-bg-color);
-  border: 1px var(--el-mypage-right-menu-border-color) solid;
+  background: var(--rt-bg-color);
+  border: var(--rt-border);
   border-radius: 5px;
   padding: 6px;
   font-size: 10px;
@@ -5915,8 +5915,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   // min-width: calc(150px + 6rem);
   .btns-content {
     margin-top: 5px;
-    background: var(--cvrg-sub-header-bg-color);
-    border: 1px var(--el-mypage-right-menu-border-color) solid;
+    background: var(--rt-bg-color);
+    border: var(--rt-border);
     padding: 10px;
     border-radius: 5px;
     display: flex;
