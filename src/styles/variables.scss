@@ -15,13 +15,17 @@
   --rt-bg-color: #FFFFFF !important;
 
   --dashboard-bg: url("@/assets/img/home_bg1.png");
+  --el-text-color-regular: #000;
+  --card-group-header-bg-color: #f2f2f2;
+
+  --cvrg-sub-header-bg-color: #FFFFFF;
 }
 
 // 主题
 html.sentimental {
   --menu-background: #bad7df;
-  --sidebar-logo-background: #bad7df;
   --menu-active-text: #FFAAA6;
+  --sidebar-logo-background: #bad7df;
   --menu-hover: #FFAAA6;
   --menu-text: #333;
 }
@@ -90,7 +94,7 @@ html.dark {
   --menu-hover: rgb(0 0 0 / 20%);
   --sidebar-logo-background: rgba(255, 255, 255, 0.6);
   --el-text-color: #b9b9b9 !important;
-  --el-card-header-bg-color: rgb(0 0 0 / 80%);
+  --el-card-header-bg-color: rgb(0 0 0 / 90%);
   .el-menu-item.is-active {
     background-color: rgb(0 0 0 / 20%) !important;
   }
@@ -105,6 +109,7 @@ html.dark {
   --wrapper-required-bg-color: rgb(0 0 0 / 80%) !important;
 
   --dashboard-bg: rgb(0 0 0 / 85%) !important;
+  --el-text-color-regular: #b9b9b9;
 }
 
 $menu-background: var(--menu-background); // 菜单背景色

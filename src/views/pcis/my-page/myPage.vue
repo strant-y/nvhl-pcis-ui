@@ -5911,10 +5911,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .right-btns {
   // padding: 0 3rem;
-  margin: 12px 10px 0 0;
+  margin: 5px 5px 0 0;
   // min-width: calc(150px + 6rem);
   .btns-content {
-    margin-top: 10px;
+    margin-top: 5px;
     background: var(--cvrg-sub-header-bg-color);
     border: 1px var(--el-mypage-right-menu-border-color) solid;
     padding: 10px;

@@ -557,15 +557,17 @@ function openShortcutEdit() {
 :deep(.v1-select-input) {
   width: 150px;
   margin: auto;
-
   .el-select__wrapper {
     text-align: end;
     background-color: transparent;
     box-shadow: none;
+    height: map-get($form-config, item-height) !important;
+    min-height: map-get($form-config, item-height) !important;
+    font-family: map-get($form-config, font-family);
   }
-
-  .el-select__placeholder,.el-select__caret {
-    color: #333333;
+  .el-select__input {
+    font-family: map-get($form-config, font-family);
+    color: map-get($form-config, font-color);
   }
 }
 
