@@ -1164,6 +1164,9 @@ function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
 function setValue(key: string, value: any) {
   freeEditRef?.value?.setValue(key, value);
 }
+function getFormConfig() {
+  return formconfig1;
+}
 defineExpose({
   getFormValue,
   setFormValue,
@@ -1181,7 +1184,9 @@ defineExpose({
   intiAgentBroker,
   valideRequired,
   addProvide,
+  getFormConfig,
   setValue,
+  
 });
 </script>
 
