@@ -1128,8 +1128,32 @@ const tableObj = {
                 tableClick: async (row) => {
                     const r = await row;
 
-                    if (r) {
-                        const data = row;
+                    // 把ES带html的字段洗净
+                    const cleanRow = {
+                        ...r,
+                        cAppNo: stripHtml(r.cAppNo),
+                        cPlyNo: stripHtml(r.cPlyNo),
+                        cEdrNo: stripHtml(r.cEdrNo),
+                        cDptCnm: stripHtml(r.cDptCnm),
+                        nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+                        cInquiryNo: stripHtml(r.cInquiryNo),
+                        tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+                        tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+                        cTermNme: stripHtml(r.cTermNme),
+                        cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+                        cAppNme: stripHtml(r.cAppNme),
+                        cInsuredNme: stripHtml(r.cInsuredNme),
+                        cClntAddr: stripHtml(r.cClntAddr),
+                        cNmeCn: stripHtml(r.cNmeCn),
+                        tUdrTm: stripHtml(r.tUdrTm),
+                        tIssueTm: stripHtml(r.tIssueTm),
+                        cProdNmeCn: stripHtml(r.cProdNmeCn),
+                        nAmt: stripHtml(r.nAmt),
+                        nPrm: stripHtml(r.nPrm),
+                        cUdrNme: stripHtml(r.cUdrNme),
+                    };
+                    if (cleanRow) {
+                        const data = cleanRow;
                         router.push({
                             path: "/pcisapp/pcisappView",
                             query: {
@@ -1166,25 +1190,48 @@ const tableObj = {
                 },
                 tableClick: async (row) => {
                     const r = await row;
-                    if (r) {
+                    // 把ES带html的字段洗净
+                    const cleanRow = {
+                        ...r,
+                        cAppNo: stripHtml(r.cAppNo),
+                        cPlyNo: stripHtml(r.cPlyNo),
+                        cEdrNo: stripHtml(r.cEdrNo),
+                        cDptCnm: stripHtml(r.cDptCnm),
+                        nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+                        cInquiryNo: stripHtml(r.cInquiryNo),
+                        tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+                        tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+                        cTermNme: stripHtml(r.cTermNme),
+                        cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+                        cAppNme: stripHtml(r.cAppNme),
+                        cInsuredNme: stripHtml(r.cInsuredNme),
+                        cClntAddr: stripHtml(r.cClntAddr),
+                        cNmeCn: stripHtml(r.cNmeCn),
+                        tUdrTm: stripHtml(r.tUdrTm),
+                        tIssueTm: stripHtml(r.tIssueTm),
+                        cProdNmeCn: stripHtml(r.cProdNmeCn),
+                        nAmt: stripHtml(r.nAmt),
+                        nPrm: stripHtml(r.nPrm),
+                        cUdrNme: stripHtml(r.cUdrNme),
+                    };
+                    if (cleanRow) {
                         // 校验出单机构是否复合复制单的机构要求
                         const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
-                        if(row.cRenewMrk === "1") {
-                            queryProdDptCdeParam['cPlyNo'] = row.cPlyNo
+                        if(cleanRow.cRenewMrk === "1") {
+                            queryProdDptCdeParam['cPlyNo'] = cleanRow.cPlyNo
                         } else {
-                            queryProdDptCdeParam['cProdNo'] = row.cProdNo
+                            queryProdDptCdeParam['cProdNo'] = cleanRow.cProdNo
                         }
                         const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
                         if(queryProdDptCde.data !== true) {
                             ElMessage.error(queryProdDptCde.msg)
                             return
                         }
-                        row.cPolicySource = '8'
-                        const data = row;
+                        cleanRow.cPolicySource = '8'
                         router.push({
                             path: "/pcisapp/myPage",
                             query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "copy", cAppTyp: 'A' } }),
+                                param: JSON.stringify({ ...cleanRow, pageType: 'copy', cAppTyp: 'A' }),
                             },
                         });
                     } else {
@@ -2026,6 +2073,12 @@ function updatePolicyInfoTitle(cAppTyp: string) {
 // 多选事件
 function handleSelectionChange(selection: any) {
   removeIds.value = selection.map((item: any) => item.cPkId);
+}
+
+// ES查询在点击行数据的复制按钮时，去掉所有 HTML 标签，返回纯文本
+function stripHtml(html: string): string {
+  if (typeof html !== 'string') {return String(html ?? '')}; 
+  return html.replace(/<[^>]+>/g, '');
 }
 
 // 查看详情
