@@ -41,8 +41,8 @@
                         : false
                     "
                   >
-                    <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                    <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+                    <el-icon v-if="!showMyfrom" color="var(--el-text-color)"><ArrowUpBold/></el-icon>
+                    <el-icon v-if="showMyfrom" color="var(--el-text-color)"><ArrowDownBold/></el-icon>
                     <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                   </a>
                 </el-col>
@@ -262,7 +262,6 @@ defineExpose({
 :deep(.el-card__header) {
   height: 32px;
   padding: 4px 0 4px 12px;
-  background: #ffffff;
 }
 
 .searchbar {

@@ -2,7 +2,7 @@
   <div>
     <el-row>
       <el-col :span="12">
-        <div style="background-color: #f3f3f3; line-height: 43px">
+        <div style="background-color: var(--cvrg-sub-header-bg-color);; line-height: 43px">
           <span style="font-size: 18px; margin-left: 15px">
             必须选择至少一项条款
           </span>
@@ -45,7 +45,7 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="background-color: #f3f3f3">
+        <div style="background-color: var(--cvrg-sub-header-bg-color);">
           <span style="font-size: 18px; margin-left: 15px">已选择的条款</span>
         </div>
       </el-col>
@@ -376,7 +376,7 @@ function fail() {
 .search-btn {
   width: 100%;
   height: 45px;
-  background-color: #f3f3f3;
+  background-color: var(--cvrg-sub-header-bg-color);;
 }
 .custom-tree-node {
   display: flex;

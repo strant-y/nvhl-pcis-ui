@@ -66,8 +66,8 @@
                     cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
                   "
                 >
-                  <el-icon v-if="!showMyfrom" size="10"><ArrowUpBold /></el-icon>
-                  <el-icon v-if="showMyfrom" size="10"><ArrowDownBold /></el-icon>
+                  <el-icon v-if="!showMyfrom" size="10" color="var(--el-text-color)"><ArrowUpBold/></el-icon>
+                  <el-icon v-if="showMyfrom" size="10" color="var(--el-text-color)"><ArrowDownBold/></el-icon>
                   <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                 </a>
               </template>
@@ -190,7 +190,6 @@ defineExpose({
 :deep(.searchbar .el-card__header) {
   height: 32px;
   padding: 4px 0 4px 12px;
-  background: #ffffff;
 }
 
 .searchbar {

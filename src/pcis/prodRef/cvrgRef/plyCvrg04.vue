@@ -932,6 +932,6 @@ defineExpose({
  }
 
 :deep(.planCard > .el-card__header:first-child) {
-  background: #FAFAFA;
+  //background: #FAFAFA;
 }
 </style>

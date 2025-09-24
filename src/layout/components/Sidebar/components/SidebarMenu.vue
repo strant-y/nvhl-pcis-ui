@@ -108,7 +108,7 @@ function resolvePath(routePath: string) {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #000000;
+  color: var(--menu-active-text);
 }
 .dropdownContent {
   background: #f5f5f5;

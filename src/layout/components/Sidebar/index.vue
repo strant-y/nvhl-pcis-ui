@@ -133,7 +133,7 @@ function getShortMenuList() {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #000000;
+  color: var(--el-menu-text-color);
   &:hover {
     background: var(--el-color-primary);
     color: #ffffff;
@@ -150,9 +150,9 @@ function getShortMenuList() {
 </style>
 <style>
 :deep(.el-dropdown) {
-  --el-dropdown-menu-box-shadow: none!important;
-  --el-dropdown-menuItem-hover-fill: none!important;
-  --el-dropdown-menuItem-hover-color: none!important;
+  //--el-dropdown-menu-box-shadow: none!important;
+  //--el-dropdown-menuItem-hover-fill: none!important;
+  //--el-dropdown-menuItem-hover-color: var(--el-color-primary);
 }
 :deep(.el-dropdown__popper.el-popper) {
   margin-top: -10px;
@@ -161,7 +161,7 @@ function getShortMenuList() {
 .el-dropdown__popper.menuDropdowm {
   box-shadow: none;
   /* background: rgb(0,0,0,.65); */
-  background-color: #696A6A;
+  background-color: rgba(0, 0, 0, 0.85);
   margin-left: 221px;
   margin-top: -12px;
   min-width: 700px;

@@ -884,14 +884,14 @@ defineExpose({
 <style lang="css" scoped>
 .rt_group {
    margin-bottom: 5px;
-   background: #f2f2f2;
+   background: var(--card-group-header-bg-color);
   /* border: 1px solid #D9D9D9; */
   padding: 0px 12px;
 }
 .rt_group_title {
   font-weight: 500;
   font-size: 14px;
-  color: rgba(0,0,0,0.85);
+  color: var(--el-text-color);
   line-height: 24px;
 }
 .rt_group_icon {

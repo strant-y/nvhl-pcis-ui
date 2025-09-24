@@ -423,6 +423,5 @@ defineExpose({
 :deep(.table-container > .el-card__header) {
   height: 32px;
   padding: 4px 0 4px 12px;
-  background: #ffffff;
 }
 </style>

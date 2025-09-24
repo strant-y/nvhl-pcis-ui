@@ -1,3 +1,8 @@
+// 左侧锚点样式
+:deep(.custom-anchor) {
+  background-color: var(--menu-background);
+}
+
 // 表单项
 :deep(.el-form-item) {
   margin-bottom: 0px !important;
@@ -60,7 +65,6 @@
 .form-container {
   max-width: 100%;
   padding: 3px;
-  background: #fff;
   //border-radius: 8px;
   //box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
@@ -264,6 +268,13 @@
   font-size: map-get($form-config, font-size);
   line-height: map-get($form-config, line-height);
 
+  // 表头字体颜色
+  .el-table__header {
+    .el-table__cell {
+     color: map-get($form-config, label-color) !important;
+    }
+  }
+
   // 表单项样式
   .el-form-item {
     width: 100%;
@@ -368,6 +379,7 @@
         .el-button {
           border-radius: 0 3px 3px 0;
           height: calc(map-get($form-config, item-height) + 0.5px) !important;
+          background-color: var(--el-color-primary);
         }
       }
 

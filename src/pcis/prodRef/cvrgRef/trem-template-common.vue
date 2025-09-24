@@ -1486,9 +1486,7 @@ defineExpose({
 .cvrg-info {
   box-shadow: none;
   --el-card-border-color: none;
-  background: #FAFAFA;
   :deep(.el-card__header) {
-    // background-color: #eff3f5;
     padding: 5px 10px;
   }
   :deep(.el-card__body) {
@@ -1496,7 +1494,7 @@ defineExpose({
   }
 }
 .table-title {
-  background-color: #e6e6e6;
+  background-color: var(--el-border-color-lighter);
   th {
     text-align: center;
   }
@@ -1524,7 +1522,7 @@ table {
 table,
 th,
 td {
-  border: 1px solid #e2e2e2; /* 设置边框样式 */
+  border: 1px solid var(--el-border-color-lighter); /* 设置边框样式 */
   padding: 2px;
   text-align: left;
   font-family: var(--font-family);

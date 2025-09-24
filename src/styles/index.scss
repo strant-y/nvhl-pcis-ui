@@ -11,7 +11,6 @@
 
 .table-container > .el-card__header {
   padding: calc(var(--el-card-padding) - 12px) var(--el-card-padding);
-  background-color: var(--el-card-header-bg-color);
 }
 
 .table-container{
@@ -105,11 +104,11 @@
 }
 
 .re-quired-flag .el-input__wrapper{
-  background-color: #FEFAF1 !important;
+  background-color: var(--wrapper-required-bg-color);
 }
 
 .re-quired-flag .el-select__wrapper{
-  background-color: #FEFAF1 !important;
+  background-color: var(--wrapper-required-bg-color);
 }
 .el-form-item__error{
   position: initial !important;
@@ -136,13 +135,13 @@
 // 全局卡片样式
 .card_container{
   .card-title-style {
-    font-size: 15px;
-    color: #444;
+    font-size: var(--card-header-title-size);
+    color: var(--card-header-title-color);
     font-weight: 550;
   }
   .right-arrow_text {
-    font-size: 12px;
-    color: #666;
+    font-size: map-get($form-config, font-size);
+    color: var(--el-text-color);
   }
   margin-bottom: 5px;
 }
