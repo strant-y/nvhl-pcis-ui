@@ -435,7 +435,22 @@ onMounted(() => {
         }
         setFormItem("EdrBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
     }else{
-      if(params['cRsnCde'] !== '99'){
+      if(params['cRsnCde'] !== "FZ") {
+        const param = {
+          rsnTyp: "1",
+          kindNo: params["cProdNo"]?.slice(0,2),
+          prodNo: params["cProdNo"],
+          cTransMrk: params["cTransMrk"] || null
+        }
+        codeListStore
+          .queryCodeList({
+            codeListName: "EDR_RSN_LIST_NEW",
+            codeListParam: param,
+          })
+          .then((res) => {
+            setFormItem("EdrBase.cEdrRsnDetail", { loadData: res.filter((item:any) => item.value !== "FZ") });
+          });
+      } else if(params['cRsnCde'] !== '99'){
         const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
         const isPer = params["CGrpMrk"] === "1" ? "1" : null;
         const param = {
