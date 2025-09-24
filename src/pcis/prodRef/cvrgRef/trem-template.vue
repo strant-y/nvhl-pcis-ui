@@ -211,8 +211,8 @@
             </template>
           </template>
           <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-            <div style="margin-top: 10px; border: 1px #e3e3e3 solid; padding: 3px;">
-              <el-row style="margin-bottom: 3px; background-color: #eaf4f6; padding: 2px">
+            <div style="margin-top: 10px; border: 1px var(--el-border-color-lighter) solid; padding: 3px;">
+              <el-row style="margin-bottom: 3px; background-color: var( --cvrg-sub-header-bg-color); padding: 2px">
                 <el-col :span="22">
                   <a
                     style="margin-right: 5px;font-size: 12px;"
@@ -1603,7 +1603,7 @@ defineExpose({
 </script>
 <style lang="scss" scoped>
 .cvrg-info {
-  background: #FAFAFA;
+  //background: #FAFAFA;
   box-shadow: none;
   border: none;
   --el-card-border-color: transparent;
@@ -1628,7 +1628,7 @@ defineExpose({
     }
     &.fu {
       background: rgba(198, 105, 58, 0.1);
-      color: #C6693A;
+      color: var(--el-color-primary);
     }
     img {
       width: 16px;
@@ -1676,18 +1676,18 @@ table {
 table,
 th,
 td {
-  border: 1px solid #e2e2e2; /* 设置边框样式 */
+  border: 1px solid var(--el-border-color-lighter); /* 设置边框样式 */
   padding: 2px;
   text-align: left;
   font-family: var(--font-family);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 450;
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }
 .table tr:hover {
-  background-color: #f5f5f5;
+  background-color: var(--el-color-primary);
   cursor: pointer;
 }
 

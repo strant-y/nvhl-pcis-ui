@@ -174,7 +174,7 @@
               </a>
             </template>
           </div>
-          <el-row :gutter="10">
+          <el-row :gutter="10" style="margin-bottom: 10px;">
             <template v-for="(item, index) in props.fromSchema" :key="index">
               <template v-if="!item.hidden">
                 <el-col
@@ -883,15 +883,16 @@ defineExpose({
 </style>
 <style lang="css" scoped>
 .rt_group {
-   margin-bottom: 5px;
-   background: #f2f2f2;
+   margin-top: 6px;
+   margin-bottom: 6px;
+   background: var(--card-group-header-bg-color);
   /* border: 1px solid #D9D9D9; */
   padding: 0px 12px;
 }
 .rt_group_title {
   font-weight: 500;
   font-size: 14px;
-  color: rgba(0,0,0,0.85);
+  color: var(--el-text-color);
   line-height: 24px;
 }
 .rt_group_icon {

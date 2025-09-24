@@ -385,7 +385,7 @@ function updateQuery() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   padding: 20px;
 }
@@ -420,8 +420,8 @@ function updateQuery() {
   cursor: pointer;
 }
 .checked {
-  border: 3px solid rgb(178, 31, 41);
-  background: rgb(255, 232, 230);
+  border: 2px solid var(--el-color-primary);
+  background: var(--rt-overlay-color);
 }
 .el-card.eachItems >>> .el-card__body,
 .el-card.eachItems_checked >>> .el-card__body {
@@ -437,6 +437,6 @@ function updateQuery() {
   padding-left: 10px;
 }
 .eachCon .eachItems .txt {
-  color: #838a90;
+  color: var(--el-text-color);
 }
 </style>

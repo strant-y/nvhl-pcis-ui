@@ -5131,7 +5131,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
         text-align: center;
       }
       .icon-title {
-        font-size: 14px;
+        // font-size: 14px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

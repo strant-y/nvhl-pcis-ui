@@ -34,7 +34,7 @@
 <!--        </div>-->
         <div class="top-search">
           <rtinput v-model="searchValue" :item="searchItem" />
-          <rtButton :item="searchBtnItem" style="width: 200px;letter-spacing: 20px;height: 2.5rem;margin-right: 3px;border-radius: 3px;" />
+          <rtButton :item="searchBtnItem" style="width: 150px;letter-spacing: 20px;height: 2.5rem;margin-right: 3px;border-radius: 3px;" />
         </div>
         <!-- <div class="top-menu">
           <div class="menu-label">
@@ -626,6 +626,11 @@ const echartsOptions = reactive({
   barWidth: "15px",
   tooltip: {
     trigger: "axis",
+    backgroundColor: 'var(--rt-bg-color)',
+    borderColor: 'var(--el-color-primary)',
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    },
     axisPointer: {
       type: "none",
       label: {
@@ -646,6 +651,9 @@ const echartsOptions = reactive({
     data: ["每月出单量", "每月出单量同比"],
     bottom: 0,
     show: true,
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    },
   },
   xAxis: [
     {
@@ -744,10 +752,18 @@ const echartsOptionsPie = reactive({
   tooltip: {
     trigger: "item",
     formatter: "{a} <br/>{b} : {c} ({d}%)",
+    backgroundColor: 'var(--rt-bg-color)',
+    borderColor: 'var(--el-color-primary)',
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    }
   },
   legend: {
     left: "center",
     top: "bottom",
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    },
   },
   series: [
     {
@@ -765,7 +781,7 @@ const echartsOptionsPie = reactive({
         normal: {
           color: function (colors:any) {
             var colorList = [
-              '#5788E6',
+              '#3f77e4',
               '#6794E8',
               '#79A0EB',
               '#89ABED',
@@ -773,9 +789,9 @@ const echartsOptionsPie = reactive({
               '#ABC3F2',
               '#BCCFF5',
               '#CCDBF7',
-              '#DDE7FA',
-              '#EEF3FC',
-              '#ABE2EF',
+              '#bcd0f4',
+              '#afdcef',
+              '#9adcec',
               '#58C5E0',
             ];
             return colorList[colors.dataIndex];
@@ -801,6 +817,11 @@ const echartsOptions1 = reactive({
   barWidth: "15px",
   tooltip: {
     trigger: "axis",
+    backgroundColor: 'var(--rt-bg-color)',
+    borderColor: 'var(--el-color-primary)',
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    },
     axisPointer: {
       type: "none",
       label: {
@@ -821,6 +842,9 @@ const echartsOptions1 = reactive({
     data: ["每月保费量", "每月保费量同比"],
     bottom: 0,
     show: true,
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    },
   },
   xAxis: [
     {
@@ -919,10 +943,18 @@ const echartsOptions1Pie = reactive({
   tooltip: {
     trigger: "item",
     formatter: "{a} <br/>{b} : {c} ({d}%)",
+    backgroundColor: 'var(--rt-bg-color)',
+    borderColor: 'var(--el-color-primary)',
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    }
   },
   legend: {
     left: "center",
     top: "bottom",
+    textStyle: {
+      color: 'var(--el-text-color)' // 提示框文字颜色
+    },
   },
   series: [
     {
@@ -940,7 +972,7 @@ const echartsOptions1Pie = reactive({
         normal: {
           color: function (colors:any) {
             var colorList = [
-              '#5788E6',
+              '#3f77e4',
               '#6794E8',
               '#79A0EB',
               '#89ABED',
@@ -948,9 +980,9 @@ const echartsOptions1Pie = reactive({
               '#ABC3F2',
               '#BCCFF5',
               '#CCDBF7',
-              '#DDE7FA',
-              '#EEF3FC',
-              '#ABE2EF',
+              '#bcd0f4',
+              '#afdcef',
+              '#9adcec',
               '#58C5E0',
             ];
             return colorList[colors.dataIndex];
@@ -2265,11 +2297,9 @@ window.addEventListener("resize", () => {
   .home {
     width: 100%;
     height: 100%;
-    background-color: #fff;
-    background-image: url("@/assets/img/home_bg1.png");
+    background-image: var(--dashboard-bg);
     background-size: 100% 24.06667rem;
     background-position: top;
-    background-repeat: no-repeat;
     padding: 0.8rem 4rem;
     overflow-y: auto;
 
@@ -2281,7 +2311,7 @@ window.addEventListener("resize", () => {
         font-weight: 600;
         margin-bottom: 6px;
         font-size: 34px;
-        color: #333333;
+        color: var(--el-text-color);
         line-height: 48px;
       }
 
@@ -2289,7 +2319,7 @@ window.addEventListener("resize", () => {
         font-weight: 600;
         margin-bottom: 1.5rem;
         font-size: 16px;
-        color: #333333;
+        color: var(--el-text-color);
         line-height: 22px;
       }
 
@@ -2298,7 +2328,8 @@ window.addEventListener("resize", () => {
         height: 3rem;
         display: flex;
         align-items: center;
-        background: #ffffff;
+        background: var(--rt-bg-color);
+        border: var(--el-mypage-right-menu-border-color) 1px solid;
         min-width: 840px;
 
         :deep(.el-input__wrapper) {
@@ -2307,7 +2338,7 @@ window.addEventListener("resize", () => {
 
         :deep(.el-button) {
           margin-right: 10px;
-          font-size: 20px;
+          font-size: 18px;
         }
         :deep(.el-button>span) {
           padding-left: 20px;
@@ -2320,7 +2351,7 @@ window.addEventListener("resize", () => {
       .top-menu {
         display: flex;
         padding: 15px 0;
-        color: #333;
+        color: var(--el-text-color);
         font-weight: bold;
         .menu-label {
           display: flex;
@@ -2349,7 +2380,7 @@ window.addEventListener("resize", () => {
 
       .center-content1 {
         width: 100%;
-        background: #fff;
+        background-color: var(--rt-bg-color);
         // box-shadow: 0 0 0.4rem #0000001a;
         box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
         border-radius: 5px;
@@ -2363,7 +2394,7 @@ window.addEventListener("resize", () => {
             align-items: center;
             .title {
               font-size: 18px;
-              color: #333333;
+              color: var(--el-text-color);
               font-weight: 600;
               margin-right: 5px;
               line-height: 25px;
@@ -2377,12 +2408,12 @@ window.addEventListener("resize", () => {
 
         .statistic-tab-box {
           margin: 10px 0;
-          color: #666;
+          color: var(--el-text-color);
           display: flex;
           :deep(.el-tabs__item) {
             font-size: 15px;
             line-height: 24px;
-            color: #000000;
+            color: var(--el-text-color);
             &.is-active,&:hover {
               color: var(--el-color-primary);
             }
@@ -2396,7 +2427,7 @@ window.addEventListener("resize", () => {
         .content-details-box {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          color: #666;
+          color: var(--el-text-color);
 
           .content-details {
             display: flex;
@@ -2408,14 +2439,14 @@ window.addEventListener("resize", () => {
               width: 6px;
               height: 6px;
               border-radius: 50%;
-              background-color: #d9d9d9;
+              background-color: var(--rt-bg-color);
               margin-right: 10px;
             }
             .details-title {
-              color: #666666;
+              color: var(--el-text-color);
             }
             .details-content {
-              color: #333333;
+              color: var(--el-text-color);
             }
             &:first-child {
               justify-content: left;
@@ -2436,7 +2467,7 @@ window.addEventListener("resize", () => {
             }
             .echarts-list {
               font-size: 16px;
-              color: #999999;
+              color: var(--el-text-color);
               width: 200px;
               div {
                 display: flex;
@@ -2447,9 +2478,10 @@ window.addEventListener("resize", () => {
                   width: 12px;
                   height: 12px;
                   border-radius: 6px;
-                  background: #D8D8D8;
+                  background: var(--rt-bg-color);
                   display: inline-block;
                   margin-right: 10px;
+                  color: var(--el-text-color);
                 }
               }
             }
@@ -2459,11 +2491,11 @@ window.addEventListener("resize", () => {
             justify-content: end;
             align-items: center;
             margin: 20px 0;
-            color: #666;
+            color: var(--el-text-color);
           }
           .echarts-title {
             font-size: 16px;
-            color: #333333;
+            color: var(--el-text-color);
             line-height: 22px;
             font-weight: 500;
             display: flex;
@@ -2475,7 +2507,8 @@ window.addEventListener("resize", () => {
 
       .center-content2 {
         width: 24%;
-        background: #fff;
+        //background: #fff;
+        background-color: var(--rt-bg-color);
         box-shadow: 0 0 0.4rem #0000001a;
         border-radius: 5px;
         padding: 1rem;
@@ -2508,7 +2541,7 @@ window.addEventListener("resize", () => {
             justify-content: space-between;
             align-items: center;
             .title {
-              color: #333;
+              color: var(--el-text-color);
               font-weight: bold;
               margin-right: 5px;
               font-size: 18px;
@@ -2522,7 +2555,7 @@ window.addEventListener("resize", () => {
               .item-title {
                 display: flex;
                 align-items: center;
-                color: #333;
+                color: var(--el-text-color);
                 .point {
                   width: 6px;
                   height: 6px;
@@ -2533,7 +2566,7 @@ window.addEventListener("resize", () => {
               }
               .item-content {
                 font-size: 14px;
-                color: #999;
+                color: var(--el-text-color);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -2555,7 +2588,7 @@ window.addEventListener("resize", () => {
               height: 28%;
             }
             .link {
-              color: #3a76c6;
+              color: var(--el-color-primary);
               text-decoration: none;
               padding-left: 6px;
             }
@@ -2568,7 +2601,8 @@ window.addEventListener("resize", () => {
     }
     .bottom-box {
       width: 100%;
-      background: #fff;
+      //background: #fff;
+      background-color: var(--rt-bg-color);
       // box-shadow: 0 0 0.4rem #0000001a;
       box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
       border-radius: 5px;
@@ -2585,7 +2619,7 @@ window.addEventListener("resize", () => {
           align-items: center;
           .title {
             font-size: 18px;
-            color: #333333;
+            color: var(--el-text-color);
             font-weight: 600;
             margin-right: 5px;
             line-height: 25px;
@@ -2602,8 +2636,7 @@ window.addEventListener("resize", () => {
           flex-direction: column;
           :deep(.el-table) {
             th.el-table__cell {
-              // background: rgba(0, 0, 0, 0.02);
-              background: #fafafa;
+              background: var(--rt-bg-color);
             }
           }
         }
@@ -2611,7 +2644,7 @@ window.addEventListener("resize", () => {
           :deep(.el-tabs__item) {
             font-size: 15px;
             line-height: 24px;
-            color: #000000;
+            color: var(--el-text-color);
             &.is-active,&:hover {
               color: var(--el-color-primary);
             }
@@ -2665,7 +2698,7 @@ window.addEventListener("resize", () => {
 }
 
 .index-blk {
-  background: #fff;
+  background: var(--rt-bg-color);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   //padding:20px;
   border-radius: 5px;
@@ -2691,9 +2724,9 @@ window.addEventListener("resize", () => {
 }
 
 .copy-icon {
-  // margin-left: 5px;
+  margin-left: 5px;
   cursor: pointer;
-  color: #409eff;
+  color: var(--el-color-primary);
 }
 
 .policy-info-cell {
@@ -2746,7 +2779,7 @@ window.addEventListener("resize", () => {
       width: 64px;
     }
     .link {
-      color: #3a76c6;
+      color: var(--el-color-primary);
       text-decoration: none;
       // padding-left: 6px;
     }

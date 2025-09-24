@@ -2,7 +2,7 @@
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
-      <el-aside :width="NavigaShow ? '200px' : '70px'" class="mypage-aside">
+      <el-aside :width="NavigaShow ? '200px' : '70px'" class="custom-anchor">
         <!-- <el-affix :offset="100"> -->
         <div class="navi_container">
           <div
@@ -447,13 +447,13 @@
     <div class="bottom-items">
       <!--新增的申请单号显示和复制按钮-->
       <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
-        <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
+        <div style="display: flex; align-items: center; background: var(--rt-bg-color);; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
           {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
           <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
           {{ getNo }}
           </span>
           <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
-            <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
+            <el-button @click="copyPolicyNumber" circle size="small" style="color: var(--el-color-primary);margin-right: 0;">
               <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
             </el-button>
           </el-tooltip>
@@ -5682,6 +5682,8 @@ const shouldCheckYunnanPaymentRules = () => {
 };
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index.scss";
+
 $btn-icon-color-1: #ff3e00;
 $btn-icon-color-2: #0060ff;
 $btn-icon-color-3: #4500ff;
@@ -5694,11 +5696,12 @@ $btn-icon-bg-color-4: rgb(255, 242, 212);
 $btn-icon-bg-color-5: rgb(230, 251, 234);
 .bottom-items {
   height: 45px;
-  background-color: #fff;
+  background-color: var(--rt-bg-color);
   display: flex;
   justify-content: end;
   align-items: center;
   // padding-right: 20px;
+  border-top: 1px var(--el-mypage-right-menu-border-color) solid;
   .el-button {
     padding: 8px;
     margin-right: 8px;
@@ -5735,10 +5738,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .dynamic-container {
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
-}
-
-.mypage-aside {
-  background: var(--el-color-primary);
 }
 
 .el-anchor {
@@ -5780,7 +5779,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
         text-align: center;
       }
       .icon-title {
-        font-size: 14px;
+        // font-size: 14px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -5835,7 +5834,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .el-aside {
   width: auto;
-  background: #FFFFFF;
   position: relative;
   transition: width 0.3s ease;
 }
@@ -5861,10 +5859,15 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .main-header2 {
-  background: #FFFFFF;
+  background: var(--rt-bg-color);
+  border: var(--rt-border);
   border-radius: 5px;
   padding: 6px;
   font-size: 10px;
+
+  .tp, .btm {
+    color: var(--el-text-color);
+  }
 }
 
 :deep(.el-card__header) {
@@ -5956,11 +5959,12 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .right-btns {
   // padding: 0 3rem;
-  margin: 12px 10px 0 0;
+  margin: 5px 5px 0 0;
   // min-width: calc(150px + 6rem);
   .btns-content {
-    margin-top: 10px;
-    background: #FFFFFF;
+    margin-top: 5px;
+    background: var(--rt-bg-color);
+    border: var(--rt-border);
     padding: 10px;
     border-radius: 5px;
     display: flex;
@@ -5971,7 +5975,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
       margin: 0 0 12px 0;
       border: none;
       background-color: transparent!important;
-      color: #333;
+      color: var(--el-text-color);
       padding: 0;
       .el-icon {
         width: 32px;

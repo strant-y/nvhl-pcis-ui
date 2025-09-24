@@ -29,7 +29,7 @@
         >
           <!-- 用户名 -->
           <el-form-item prop="username">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <svg-icon icon-class="user" class="mx-2" />
               </span>
@@ -46,7 +46,7 @@
           </el-form-item>
           <!-- 密码 -->
           <el-form-item prop="password">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <el-icon class="mx-2"><Lock /></el-icon>
               </span>
@@ -70,7 +70,7 @@
           </el-form-item>
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box captcha-icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
@@ -133,7 +133,7 @@
         >
           <!-- 手机号 -->
           <el-form-item prop="mobile">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <el-icon class="mx-2"><Iphone /></el-icon>
               </span>
@@ -150,7 +150,7 @@
           </el-form-item>
           <!-- 图形验证码-->
           <el-form-item prop="imageCaptchaCode" v-if="!verifyFlag">
-            <div class="flex-y-center w-full justify-between">
+            <div class="input_item__ flex-y-center w-full justify-between">
               <span class="icon-box">
                 <el-icon class="mx-2"><Lock /></el-icon>
               </span>
@@ -173,7 +173,7 @@
           </el-form-item>
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
@@ -627,13 +627,13 @@ function handleLoginChange() {
       border-radius: 8px;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
-
+      border: 1px solid #e4e4e4;
       h2 {
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 20px;
-        color: #141414;
+        color: #333;
         font-weight: 600;
         margin: 25px 0;
       }
@@ -660,10 +660,11 @@ function handleLoginChange() {
   }
 }
 
-.el-form-item {
+:deep(.el-form-item) {
   border: 1px solid #d0d2d9;
   border-radius: 8px;
   width: 243px;
+
   .icon-box {
     border-radius: 8px 0 0 8px;
     display: flex;
@@ -672,7 +673,6 @@ function handleLoginChange() {
     width: 21%;
     height: 48px;
     font-size: 18px;
-    // background-color: #e3e3e3;
     &.captcha-icon-box {
       width: calc(21% - 10.5px);
     }
@@ -688,9 +688,11 @@ function handleLoginChange() {
     &:hover {
       box-shadow: none !important;
     }
-
     input:-webkit-autofill {
       transition: background-color 1000s ease-in-out 0s;
+    }
+    .el-input__inner {
+      color: #333 !important;
     }
   }
   .el-input__suffix {

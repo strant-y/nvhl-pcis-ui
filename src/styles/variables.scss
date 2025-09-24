@@ -1,36 +1,32 @@
 /** 全局SCSS变量 */
 :root {
-  // --menu-background: #f0f5f9;
-  // --menu-active-text: #FF8C00;
-  // --menu-hover:  #FF8C00;
-  // --sidebar-logo-background: #f0f5f9;
-  // --el-text-color: #333 !important;
-  // --menu-active-bg-color: rgba(229, 224, 224, 0.45);
-  // --menu-text: #333;
-  // --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
+   --menu-background: #f0f5f9;
+   --menu-active-text: #FF8C00;
+   --menu-hover:  #FF8C00;
+   --menu-active-bg-color: rgba(229, 224, 224, 0.45);
+   --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
 
   // 只读状态字体颜色调整
   --el-disabled-text-color: #777;
-
-  --menu-background: #FFFFFF;
-  --menu-active-text: #3a76c6;
-  --menu-hover:  #3a76c6;
-  // --sidebar-logo-background: #f0f5f9;
-  --el-text-color: #333333 !important;
-  // --menu-active-bg-color: rgba(229, 224, 224, 0.45);
-  --menu-text: #000000;
-  --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
-
   --font-family: "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
   //--font-family: 'Source code Pro', monospace;
   //--font-family: 'Noto Sans SC', sans-serif;
+  --wrapper-required-bg-color:  #FEFAF1 !important;
+  --rt-bg-color: #FFFFFF !important;
+  --rt-border: rgb(100 100 100 / 20%) 1px solid !important;
+  --rt-overlay-color: rgb(20 20 20 / 10%) !important;
+
+  --dashboard-bg: url("@/assets/img/home_bg1.png");
+  --el-text-color-regular: #000;
+  --card-group-header-bg-color: #f2f2f2;
+  --cvrg-sub-header-bg-color: rgba(214, 254, 255, 0.6);
 }
 
 // 主题
 html.sentimental {
   --menu-background: #bad7df;
-  --sidebar-logo-background: #bad7df;
   --menu-active-text: #FFAAA6;
+  --sidebar-logo-background: #bad7df;
   --menu-hover: #FFAAA6;
   --menu-text: #333;
 }
@@ -75,8 +71,6 @@ html.blue {
   --el-text-color: #000 !important;
 }
 html.orange {
-  // --menu-background: #ff8c03;
-  // --sidebar-logo-background: #ff8c03;
   --menu-background: #f57c10;
   --sidebar-logo-background: #f57c10;
   --menu-active-text: #ff6f5e;
@@ -96,16 +90,30 @@ html.green {
 
 /** 暗黑主题 */
 html.dark {
-  --menu-background: var(--el-bg-color-overlay);
-  --menu-text: #fff;
-  --menu-active-text: var(--el-menu-active-color);
+  --menu-background: rgb(0 0 0 / 80%);
+  --menu-text: #fff !important;
   --menu-hover: rgb(0 0 0 / 20%);
-  --sidebar-logo-background: rgb(0 0 0 / 20%);
-  --el-text-color: #fff !important;
-  --el-card-header-bg-color: rgb(0 0 0 / 80%);
+  --sidebar-logo-background: rgba(255, 255, 255, 0.6);
+  --el-text-color: #b9b9b9 !important;
+  --el-card-header-bg-color: rgb(0 0 0 / 90%);
   .el-menu-item.is-active {
     background-color: rgb(0 0 0 / 20%) !important;
   }
+  --card-header-title-size: 15px;
+  --card-header-title-color: #ccc !important;
+  --cvrg-sub-header-bg-color: rgb(0 0 0 / 80%);
+  --card-group-header-bg-color: rgb(0 0 0 / 80%);
+
+  --rt-bg-color: rgb(0 0 0 / 85%) !important;
+  --rt-border: rgb(200 200 200 / 30%) 1px solid !important;
+  --rt-overlay-color: rgb(200 200 200 / 10%) !important;
+
+  --el-mypage-right-menu-border-color: rgb(150 150 150 / 40%);
+  --el-menu-border-color: rgb(100 100 100 / 20%);
+  --wrapper-required-bg-color: rgb(0 0 0 / 80%) !important;
+
+  --dashboard-bg: rgb(0 0 0 / 85%) !important;
+  --el-text-color-regular: #b9b9b9;
 }
 
 $menu-background: var(--menu-background); // 菜单背景色
@@ -132,7 +140,7 @@ $tags-view-height: 34px; // TagsView 高度
 
 $font-config: (
   font-family: var(--font-family),
-  font-color: #000,
+  font-color: var(--el-text-color),
 );
 
 
@@ -143,13 +151,13 @@ $form-config: (
 // 表单全局字体设置
   font-family: var(--font-family),
   font-size: 11.5px,
-  font-color: #222,
+  font-color: var(--el-text-color),
   line-height: 1.4,
 
 // Label标签样式
   label-font-size: 11.5px,
   label-font-weight: 400, // 中等加粗
-  label-color: #000,      // 标签文字颜色
+  label-color: var(--el-text-color),      // 标签文字颜色
   label-padding: 0 5px 0 0, // 标签内边距
 
 // Label容器边框样式
@@ -158,6 +166,4 @@ $form-config: (
   label-border-color: #e5e7eb,
   label-border-radius: 3px,
   label-bg-color: #f9fafb,   // 标签背景色
-
-  form-item-content-width: 65% !important,
 );

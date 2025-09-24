@@ -13,10 +13,10 @@
                   </a>
                   {{ k }}方案</el-col
                 >
-                <el-col :span="16">
+                <el-col :span="14">
                   {{ showTitleMap[k] ? showTitleMap[k] : "" }}
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="6">
                   <rt-button
                     v-if="!btnItem.addPlan.hidden"
                     @click="addTermData(k)"
@@ -932,6 +932,6 @@ defineExpose({
  }
 
 :deep(.planCard > .el-card__header:first-child) {
-  background: #FAFAFA;
+  //background: #FAFAFA;
 }
 </style>

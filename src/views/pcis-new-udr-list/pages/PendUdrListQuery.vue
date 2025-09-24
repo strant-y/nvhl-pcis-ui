@@ -1560,7 +1560,7 @@ function setFormItem(key: any, obj: any) {
 }
 
 .copy-icon {
-  // margin-left: 5px;
+  margin-left: 5px;
   cursor: pointer;
   color: #409eff;
 }

@@ -70,7 +70,7 @@ defineExpose({
 <style lang="scss" scoped>
 .dialog-body {
   border-radius: 5px;
-  border: #eee 1px solid;
+  border: var(--rt-border);
   padding: 5px;
 }
 </style>

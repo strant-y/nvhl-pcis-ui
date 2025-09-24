@@ -739,7 +739,7 @@ function fail() {
   top: 50%;
   width: 24px;
   height: 1px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--el-menu-border-color);
 }
 
 .tree-line-vertical {
@@ -748,7 +748,7 @@ function fail() {
   top: 0;
   width: 1px;
   height: 100%;
-  border-left: 1px solid #ccc;
+  border-left: 1px solid var(--el-menu-border-color);
 }
 
 .node-label {
@@ -760,9 +760,9 @@ function fail() {
 }
 .header {
   height: 46px;
-  background: #FAFAFA;
+  background: var(--cvrg-sub-header-bg-color);
   border-radius: 2px 2px 0px 0px;
-  border-bottom: 1px solid #D9D9D9;
+  border-bottom: 1px solid var(--el-menu-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -792,15 +792,15 @@ function fail() {
   font-size: 12px;
 }
 .header-title {
-  color: #262626;
+  color: var(--el-text-color);
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
 }
 :deep(.el-tree-node__content) {
   height: 32px;
-  border-bottom: 1px solid #D9D9D9;
-  background: #ffffff;
+  border-bottom: 1px solid var(--el-menu-border-color);
+  background: var(--rt-bg-color);
 }
 :deep(.el-tree-node__content .el-text) {
   font-size: 14px;
@@ -809,7 +809,7 @@ function fail() {
   font-weight: 500;
 }
 :deep(.right-box .el-tree-node__content){
-  background: rgba(0,0,0,0.02);
+  background: var(--rt-bg-color);
 }
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;

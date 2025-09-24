@@ -366,11 +366,9 @@ onMounted(() => {
 <style lang="scss" scoped>
 .tags-container {
   width: 100%;
-  // height: 34px;
-  // background-color: var(--el-bg-color);
+  background-color: var(--el-bg-color);
   border: 1px solid var(--el-border-color-light);
   box-shadow: 0 1px 1px var(--el-box-shadow-light);
-  background: #ffffff;
   display: flex;
   flex-direction: column;
 

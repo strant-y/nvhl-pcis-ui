@@ -409,7 +409,7 @@ defineExpose({
         margin-right: 5px;
       }
       .icon-title {
-        font-size: 14px;
+        // font-size: 14px;
       }
     }
   }
