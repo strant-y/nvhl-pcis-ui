@@ -88,11 +88,13 @@
   }
   // 表单项样式
   .el-form-item, .group-input__items {
+    .el-form-item__label:before {
+      margin-top: 4px;
+    }
     // Label标签样式
     .el-form-item__label {
       .el-text, span {
-        text-align: end;
-        height: map-get($form-config, item-height);
+        height: calc(map-get($form-config, item-height) + 5px);
         font-size: map-get($form-config, label-font-size);
         font-weight: map-get($form-config, label-font-weight);
         color: map-get($form-config, label-color);
