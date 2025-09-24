@@ -74,7 +74,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "登记",
         func: async () => {
-            freeEditRef.value?.validate().then((isValid) => {
+           const fieldsToValidate:any = ['CSeqNo','CPayNme','CChequeNo',]
+          freeEditRef.value?.validateField(fieldsToValidate).then((isValid) => {
+
+            // freeEditRef.value?.validate().then((isValid) => { 
+                      console.log('测试校验',isValid) 
                 if (isValid) {
                     let param = freeEditRef.value?.getFromValue(); //获取表单数据
                     console.log(param)
@@ -100,7 +104,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         type: "primary",
         label: "提交审核",
         func: async () => {
-            freeEditRef.value?.validate().then((isValid) => {
+            // freeEditRef.value?.validate().then((isValid) => {
+          const fieldsToValidate:any = ['CSeqNo','CPayNme','CChequeNo',]
+          freeEditRef.value?.validateField(fieldsToValidate).then((isValid) => {
                 if (isValid) {
                     let param = freeEditRef.value?.getFromValue(); //获取表单数据
                     console.log(param)
@@ -258,6 +264,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: '支票号',
         inputtype: "rtinput",
         rules: [getRules("required", {}),getRules("chequeNumberValidation",{})],
+        // rules: [getRules("required", {}),getRules("idCard",{})],1
       },
       // {
       //   prop: 'TPayConfTm',

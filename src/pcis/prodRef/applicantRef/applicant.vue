@@ -460,6 +460,11 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
       });
+    } else     if (val === '07') {
+      // 护照
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}), getRules("passPort", {})],
+      });
     } else if (val == "553") {
       // 外国人证件号
       setFormItem("Applicant.cCertfCde", {

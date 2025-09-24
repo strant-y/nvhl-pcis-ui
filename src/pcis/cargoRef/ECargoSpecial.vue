@@ -40,7 +40,16 @@ const props = defineProps({
   },
 });
 import { FormPage } from "@/views/protocolManagement/utils/form-page";
+import router from "@/router";
+
 const rttableFrom = ref<any>(null);
+
+
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { useRouter, useRoute } from 'vue-router';
+const route = useRoute();
+const query = ref(route.query);
+const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const idxParam = inject('idxParam');
 const formPage: FormPage = idxParam?.formPage;
@@ -56,7 +65,7 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
-const originalData =  ref<any[]>([]);
+const originalData = ref<any[]>([]);
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
@@ -70,52 +79,54 @@ const tableconfig = reactive<AppTableConfig>(
       createFreeButtonBase({
         id: "score",
         link: true,
-        tooltip: "编辑", 
+        tooltip: "编辑",
         type: "success",
         size: "default",
         icon: "Edit",
         hideBtns: (row) => {
           // if (!row.cSpecialContent.includes("*")) return true;
-           return row.cIfEdit !== '1';
+          return row.cIfEdit !== '1';
         },
         tableClick: (row) => {
-          if(originalData.value.length==0){
-              originalData.value  =    deepClone(formData.value)
+          if (originalData.value.length == 0) {
+            originalData.value = deepClone(formData.value)
           }
           let param = {};
-          if(row['cIfMust'] !== '9') {
-            
-            let rid = row.cSpecialCode|| row.cSpecialCode
+          if (row['cIfMust'] !== '9') {
+
+            let rid = row.cSpecialCode || row.cSpecialCode
             const f = originalData.value.find(f => rid === f.cSpecialCode);
             // cSpecialContent
             Object.assign(param, f);
-            
-          }else {
+
+          } else {
             Object.assign(param, row)
           }
 
-          if(row.editList && row.editList.length>0){
+          if (row.editList && row.editList.length > 0) {
             param['editList'] = row.editList
           }
-          dzmodal.open(specEdit, { type: "view", data: param,
-          callback: (res: any) => {
+          dzmodal.open(specEdit, {
+            type: "view", data: param,
+            callback: (res: any) => {
               if (res.type === "ok") {
                 // row.cSpecialContent = res.data.cSpecialContent
                 // row['editList']= res.data['editList']
 
-                 let list = formData.value;
-                 const index = list.findIndex(
-                    item => item.cSpecialCode === row.cSpecialCode
-                  );
-                    if (index !== -1) {
-                      nextTick(()=>{
-                        list[index]['cSpecialContent'] = res.data.cSpecialContent;
-                        list[index]['editList'] =res.data['editList']
-                        formData.value = list
-                      })
-                    }      
+                let list = formData.value;
+                const index = list.findIndex(
+                  item => item.cSpecialCode === row.cSpecialCode
+                );
+                if (index !== -1) {
+                  nextTick(() => {
+                    list[index]['cSpecialContent'] = res.data.cSpecialContent;
+                    list[index]['editList'] = res.data['editList']
+                    formData.value = list
+                  })
                 }
-            } })
+              }
+            }
+          })
         },
       }),
       // createFreeButtonBase({
@@ -254,6 +265,34 @@ const tableconfig = reactive<AppTableConfig>(
 
 // 获取默认信息
 
+const addData = () => {
+  debugger
+  // 等于江苏分公司加上此条跳跃
+  if (params.dptCde !== "0232010000000") return;
+  let obj = [];
+  let isAdd = true;
+  formData.value.forEach((item) => {
+    if (item.cSpecialCode === "fenqi02") {
+      isAdd = false;
+    }
+  })
+  if (isAdd) {
+    //  ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
+    obj = [...formData.value, {
+      addIndex: 1,
+      cIfEdit: "0",
+      cIfFix: "1",
+      cIfMust: "1",
+      cSpecialCode: "fenqi02",
+      isAdd: true,
+      cSpecialContent: "尊敬的客户，如有疑问或问题，您可拨打公司客户服务（咨询、投诉）电话95502，也可向江苏保险行业协会（投诉受理热线：4008012378）反映，必要时还可以根据合同约定，申请仲裁或向法院起诉。",
+      // index: formData.value.length+1
+    }]
+    setFormValue(obj)
+  }
+}
+
+
 const refreshData = () => {
 
   const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
@@ -263,22 +302,26 @@ const refreshData = () => {
   // 查询列表数据
   getpSpecialAgreement({
     cProdNo: cProdNo,
-    cDptCde: cDptCde,
+    // cDptCde: cDptCde,
+    cDptCde:params.cDptCde,
     pageNum: 1,
     pageSize: 999,
   }).then((res) => {
     if (res.data?.result) {
       let len = 0;
       let sel: any[] = [];
-         res.data.result.forEach((item: any,index:number) => {
-                  if(item["cIfMust"] == "1"){
-                      item.index = len + 1;
-                      sel.push(item);
-                      len++;
-                  }
-                });
-                originalData.value =    deepClone(sel)
-                formData.value = sel
+      res.data.result.forEach((item: any, index: number) => {
+        if (item["cIfMust"] == "1") {
+          item.index = len + 1;
+          sel.push(item);
+          len++;
+        }
+      });
+      originalData.value = deepClone(sel)
+      formData.value = sel
+
+
+      // addData();
       // res.data.result.forEach((item: any, index: number) => {
       //   if (item["cIfMust"] == "1") {
       //     item.index = len + 1;
@@ -296,6 +339,9 @@ const refreshData = () => {
 
 
 onMounted(async () => {
+
+
+
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
     method,
@@ -310,6 +356,10 @@ onMounted(async () => {
   refreshData();
 
 
+  console.log('router', params)
+  console.log('formPage', route.query)
+
+
 });
 
 // 绑定方法
@@ -319,8 +369,8 @@ const method = {
   },
   //获取特约按钮
   getSpecialAgree: () => {
- let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem('AgreementSpecial'));
-        console.log(sessionSpecialAgreement)
+    let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem('AgreementSpecial'));
+    console.log(sessionSpecialAgreement)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
     if (!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')) {
       return ElMessage.warning('请先保存');
@@ -337,16 +387,16 @@ const method = {
           let len = formData.value.length;
           let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem('AgreementSpecial')) || [];
           const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cSpecialCode', ['cSpecialContent']);
-           
+
 
           result.forEach((item: any, index: number) => {
             item.index = index + 1;
-    
+
             len++;
           });
 
-            originalData.value =deepClone(result)
-            formData.value = result
+          originalData.value = deepClone(result)
+          formData.value = result
         },
       },
       { title: "添加特约", width: 85 }

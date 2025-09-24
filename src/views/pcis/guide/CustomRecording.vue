@@ -710,6 +710,7 @@ function handleQuery() {
 }
 // 条款列表选中
 function handleChange() {
+  console.log('选中')
   // 如果下拉数据不存在list中，则清除list所有选中数据
   if (
     !termList.value.some(
@@ -840,12 +841,18 @@ function getTplOptions() {
     pageSize: 1000,
   }
   policyService.searchTemplate(param).then((res:any) => {
+    console.log(res.res)
     if (res.code === 200) {
       tplOptions.value = res.res.map((item:any) => ({
         value: item.cPkId,
         label: item.cTplNme,
         desc: item.cDesc,
+        cTplCtnt: JSON.parse(item.cTplCtnt)
+
       }));
+
+      console.log(' tplOptions.value', tplOptions.value)
+
     } else {
       ElMessage.error(res.msg);
     }
@@ -854,6 +861,8 @@ function getTplOptions() {
 
 // 选择模板
 function selectedTpl(value:any) {
+  console.log('模版---',formconfig1)
+  console.log('模版---',tplOptions)
   if(value) {
     const item: any = tplOptions.value.filter(f => f.value === value)[0];
     formconfig1.value.seldef = item?.desc;
