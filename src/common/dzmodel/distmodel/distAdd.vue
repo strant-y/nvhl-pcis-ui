@@ -276,9 +276,6 @@ onMounted(() => {
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
-    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
-             item['rules'] = [];
-    }
 
     // 040002 证件号码 必填问题
     if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
