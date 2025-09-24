@@ -102,4 +102,10 @@ export const FIELD_MAP = {
   t_next_edr_end_tm: 'tNextEdrEndTm',
   t_udr_tm: 'tUdrTm',
   t_upd_tm: 'tUpdTm',
+  c_ply_app_no: 'cPlyAppNo',
+  c_edr_rsn_detail: 'cEdrRsnDetail',
+  c_prj_ctg_mid_typ: 'cPrjCtgMidTyp',
+  c_prj_ctg_sub_typ: 'cPrjCtgSubTyp',
+  c_prj_ctg_typ: 'cPrjCtgTyp'
+
 } as const;

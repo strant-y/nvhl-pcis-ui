@@ -263,15 +263,7 @@
                   ? k.pageCode
                   : k.pageKey
               "
-              v-show="
-                k.pageKey !== 'acctinfo'
-                  ? ['ciMasterAgreement', 'ci', 'ourCompanyCiShare'].includes(
-                      k.pageKey
-                    )
-                    ? isCiJiMrk
-                    : acctinfoFlag
-                  : true
-              "
+              v-show="checkShow(k)"
             >
           <!-- {{ k.pageKey }} || {{ k.pageCode }} -->
               <component
@@ -3640,7 +3632,9 @@ function checkShow(k:any){
         r = isCiJiMrk.value;
     }else if (k.pageKey === 'distSummary') {  //隐藏全部汇总清单组件
       r = false;
-    }else{
+    }else if(k.pageKey === 'payinfo' && props.param?.pageName === "priceInquiry") {// 询价隐藏缴费计划
+      r = false;
+    } else{
       r = acctinfoFlag.value;
     }
   }

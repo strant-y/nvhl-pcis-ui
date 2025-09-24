@@ -150,7 +150,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 return; // 阻止后续保存逻辑
                 }
             }
-
             const isValid = await freeEditRef.value?.validate();
             if(isValid){
             const s = freeEditRef.value?.getFromValue();
@@ -275,9 +274,6 @@ onMounted(() => {
     // 040001产品 必填项问题
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
-    }
-    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
-             item['rules'] = [];
     }
 
     // 040002 证件号码 必填问题
@@ -458,6 +454,17 @@ onMounted(() => {
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
     setFormItem("Dist.nSeqNo", { disabled: true });
+    setFormItem("Dist.nSalesRevenue", { disabled: true });
+    // 如果 接口返回cSalesRegion 是字符串，需转成数组才能通过表单校验
+    const salesKey = 'Dist.cSalesRegion';
+    const raw = props.data.rowData[salesKey];
+    if (typeof raw === 'string') {
+        try {
+            props.data.rowData[salesKey] = JSON.parse(raw);   // 转成数组
+        } catch {
+            props.data.rowData[salesKey] = props.data.rowData[salesKey];               
+        }
+    }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);

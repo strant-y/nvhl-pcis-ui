@@ -552,6 +552,11 @@ function getDatas(){
   if( !newData ){
     newData = termdata.value;
   }
+  if( extermConf.value && extermConf.value.length > 0 ){
+    extermConf.value.forEach((v: any) => {
+      newData[v.prop] = termdata.value[v.prop];
+    });
+  }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
   );
@@ -1305,7 +1310,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
   }
