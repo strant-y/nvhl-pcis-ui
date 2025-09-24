@@ -552,6 +552,11 @@ function getDatas(){
   if( !newData ){
     newData = termdata.value;
   }
+  if( extermConf.value && extermConf.value.length > 0 ){
+    extermConf.value.forEach((v: any) => {
+      newData[v.prop] = termdata.value[v.prop];
+    });
+  }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
   );
