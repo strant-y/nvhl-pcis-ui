@@ -883,8 +883,8 @@ defineExpose({
 </style>
 <style lang="css" scoped>
 .rt_group {
-   margin-top: 5px;
-   margin-bottom: 5px;
+   margin-top: 6px;
+   margin-bottom: 6px;
    background: var(--card-group-header-bg-color);
   /* border: 1px solid #D9D9D9; */
   padding: 0px 12px;
