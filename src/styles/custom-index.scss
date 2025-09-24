@@ -273,7 +273,9 @@
   // 表头字体颜色
   .el-table__header {
     .el-table__cell {
-     color: map-get($form-config, label-color) !important;
+      .cell {
+        color: map-get($form-config, label-color) !important;
+      }
     }
   }
 
