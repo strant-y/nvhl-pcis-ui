@@ -890,7 +890,6 @@ const premiumCalculation = ()=>{
   let isBer = false
   let isBef = false
   let isSuccess = false
-  debugger
   try {
     const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
     //协议费用
@@ -994,7 +993,8 @@ const premiumCalculation = ()=>{
         }
       }
       const agreementCi =formPage.value?.getComponentRefById('AgreementCi');
-      if(agreementCi){
+      const cCiMrk = agreementBaseRef.value?.getValue('EdrECargoBase.cCiMrk');
+      if(agreementCi && cCiMrk !='0'){
         const formValue = agreementCi.getFormValue();
         if (formValue && formValue.length > 0) {
           // 触发第一行数据的 nCiShareChange 方法
