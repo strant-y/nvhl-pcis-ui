@@ -1189,20 +1189,12 @@ const tableObj = {
                 size: "large",
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
-                    // 联保单6不显示复制按钮
-                    if (row.cCiMrk === "6") {
+                    // 联保单6不显示复制按钮;询价单没有复制;核保岗隐藏复制按钮
+                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value) {
                         return true;
                     } else {
                         return false;
                     }
-                },
-                hideBtns: (row: any) => {
-                    // 核保岗隐藏复制按钮
-                    if (!isCopyButtonVisible.value) return true;
-
-                    // 联保单不显示
-                    if (row.cCiMrk === "6") return true;
-                    return false;
                 },
                 tableClick: async (row) => {
                     const r = await row;
