@@ -464,7 +464,7 @@ const tableconfig = reactive<AppTableConfig>(
               const param = {
                 cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
                 cAppNo: row.cAppNo, // 申请单号
-                cPlyNo: row.plyNo, // 保单号
+                cPlyNo: row.cPlyNo, // 保单号
                 nEdrPrjNo: row.nEdrPrjNo, // 批改序号
               };
               const delRisk =
