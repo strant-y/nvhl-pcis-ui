@@ -1466,6 +1466,12 @@ function setData(params: any,data:any){
 }
 
 const methodMap = {
+  excludeLimitChang:(val:any,row:any,item:any) => {
+    if (pageparam.cProdNo === "040015") {
+      termdata.value['Term.nInsuranceAmount'] = val;
+    }
+    update();
+  },
   unifiedPremiumChange: (val: any) => {
     if (pageparam.cProdNo === "040006") {
       termFactormap.value.forEach((item: any) => {
