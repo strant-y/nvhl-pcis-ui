@@ -4,20 +4,21 @@
       <el-card class="cvrg-info">
         <template #header v-if="effectiveShowConf.showHeader">
           <div class="cvrg-hearder">
-            <el-row>
-              <el-col :span="17">
+            <el-row justify="start">
+              <el-col :span="16">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
                     <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
                     <el-icon v-if="showData"><ArrowDownBold /></el-icon>
                   </a>
-
                   <!-- <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
                     term.cRdrTyp === "0" ? "主" : "附加"
                   }}</el-tag> -->
                   <div :class="['cvrg-hearder-main-title',term.cRdrTyp === '0' ? 'zhu' : 'fu']">
                     <img :src="term.cRdrTyp === '0' ? zhuImageUrl : fuImageUrl" alt="" srcset="">
-                    <span>{{ term.cNmeCn }}</span>
+                    <el-text class="mx-1" truncated @click="checkIfTruncated($event, term.cNmeCn)">
+                      {{ term.cNmeCn }}
+                    </el-text>
                   </div>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
                     <el-badge value="退" class="item">
@@ -30,7 +31,7 @@
                       <el-button
                         type="text"
                         @click="downloadTerm"
-                        size="small"
+                        style="margin-left: 5px"
                       ><rt-icon :item="{ icon: 'term' }" />
                     </el-button>
                     </el-tooltip>
@@ -38,92 +39,100 @@
                       <el-button
                         type="text"
                         @click="previewTerm"
-                        style="margin-left: 0px"
-                        size="small"
+                        style="margin-left: 3px"
                       ><rt-icon :item="{ icon: 'View' }" />
                     </el-button>
                     </el-tooltip>
                   </template>
                 </div>
               </el-col>
-              <el-col :span="5">
-                <el-row :gutter="10">
-                  <template v-for="(item, k) in termFactormap" :key="k">
-                    <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
-                      <el-form-item
-                        :label="item.title"
+              <el-col :span="6">
+                <template v-for="(item, k) in termFactormap" :key="k">
+                  <el-row v-if="item.cPorpShowtitle === '1'" align="center" justify="start">
+                    <el-form-item
+                        :label="`${item.title}:`"
                         class="show_title"
                         :prop="item.prop"
                         :rules="isrequired(item) ? getRequired() : undefined"
-                      >
-                        <from-item
+                    >
+                      <from-item
                           v-model="termdata[item.prop]"
                           @update:modelValue="termUpdate()"
                           :item="item"
-                        />
-                      </el-form-item>
-                    </el-col>
-                  </template>
-                </el-row>
+                      />
+                    </el-form-item>
+                  </el-row>
+                </template>
               </el-col>
-              <el-col :span="2">
+              <el-col :span="2" justify="end">
                 <rtButton
-                  v-if="!btnItem.delete.hidden"
-                  @click="
-                    () => {
-                      emit('delete', termdata);
-                    }
-                  "
-                  :item="btnItem.delete"
+                    v-if="!btnItem.delete.hidden"
+                    @click="
+                  () => {
+                    emit('delete', termdata);
+                  }
+                "
+                    :item="btnItem.delete"
                 />
               </el-col>
             </el-row>
           </div>
         </template>
 
-        <div v-show="showData">
+        <div class="cvrg-body__" v-show="showData">
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <div class="table_overflow_x">
-                <table style="width: 60%; margin-top: 3px;margin-left:10%">
-                  <thead>
-                  <tr class="table-title">
-                    <th width="250" style="max-width: 10%;">{{ termTitleConf.cFactorTabTitle }}</th>
-                    <th>{{ termTitleConf.cFactorTabValue }}</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <template v-for="(item, k) in termFactormap" :key="k">
-                    <tr v-if="item.cPorpShowtitle !== '1'">
-                      <td
-                          :class="{
+                <el-row>
+                  <el-col :span="17">
+                    <div class="showData_left__">
+                      <table>
+                        <thead>
+                        <tr class="table-title">
+                          <th width="250" style="max-width: 10%;">{{ termTitleConf.cFactorTabTitle }}</th>
+                          <th>{{ termTitleConf.cFactorTabValue }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(item, k) in termFactormap" :key="k">
+                          <tr v-if="item.cPorpShowtitle !== '1'">
+                            <td
+                                :class="{
                           'custom-indent':item.cPropIndent === '1',
                       }" class="text-indent">
-                        <el-text
-                            v-if="isrequired(item)"
-                            class="mx-1"
-                            style="margin-right: 2px"
-                            type="danger"
-                        >*</el-text
-                        >
-                        <span>{{ item.title }}</span>
-                      </td>
-                      <td>
-                        <el-form-item
-                            :rules="isrequired(item) ? getRequired() : undefined"
-                            :prop="item.prop"
-                        >
-                          <from-item
-                              v-model="termdata[item.prop]"
-                              @update:modelValue="termUpdate()"
-                              :item="item"
-                          />
-                        </el-form-item>
-                      </td>
-                    </tr>
-                  </template>
-                  </tbody>
-                </table>
+                              <el-text
+                                  v-if="isrequired(item)"
+                                  class="mx-1"
+                                  style="margin-right: 2px"
+                                  type="danger"
+                              >*</el-text
+                              >
+                              <span>{{ item.title }}</span>
+                            </td>
+                            <td>
+                              <el-form-item
+                                  class="custom-table-item__"
+                                  :rules="isrequired(item) ? getRequired() : undefined"
+                                  :prop="item.prop"
+                              >
+                                <from-item
+                                    v-model="termdata[item.prop]"
+                                    @update:modelValue="termUpdate()"
+                                    :item="item"
+                                />
+                              </el-form-item>
+                            </td>
+                          </tr>
+                        </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </el-col>
+                  <el-col :span="7">
+                    <div class="showData_right__">
+                    </div>
+                  </el-col>
+                </el-row>
               </div>
             </template>
             <template v-else-if="termTitleConf.cFactorTabType === 'table'">
@@ -161,6 +170,7 @@
                       <template v-for="(item, k) in termFactormap" :key="k">
                         <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
                           <el-form-item
+                            class="custom-table-item__"
                             :rules="isrequired(item) ? getRequired() : undefined"
                             :prop="item.prop"
                           >
@@ -181,6 +191,7 @@
                             <template v-if="item.cPorpExtend === '1'">
                               <el-col style="margin-top: 5px" :span="12">
                                 <el-form-item
+                                    class="custom-table-item__"
                                   :rules="isrequired(item) ? getRequired() : undefined"
                                   :prop="item.prop"
                                   :label="item.title"
@@ -307,6 +318,7 @@
                                     </template>
                                     <template v-else>
                                       <el-form-item
+                                          class="custom-table-item__"
                                         :error="
                                           showError(
                                             riskdata.rowConfig[colinfo.cColId][
@@ -353,6 +365,7 @@
                                 <template v-for="v in extermConf" :key="v.c_pk_id">
                                   <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
                                     <el-form-item
+                                        class="custom-table-item__"
                                       :rules="
                                         isrequired(v) ? getRequired() : undefined
                                       "
@@ -400,6 +413,7 @@ import {CommonConstants} from "@/constants/CommonConstants";
 import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import Decimal from "decimal.js";
+import {checkIfTruncated} from "@/utils/common";
 
 const route = useRoute();
 const templateRef = ref();
@@ -1609,12 +1623,46 @@ defineExpose({
   :deep(.el-card__body) {
     padding: 0px 10px;
   }
+  .cvrg-hearder {
+    border-bottom: var(--rt-border);
+    padding-bottom: 3px;
+
+    :deep(.el-form-item) {
+      .el-form-item__label {
+        text-align: right;
+        align-items: center;
+        width: 50%;
+        line-height: 12px;
+        font-weight: 450 !important;
+        font-size: 11px;
+        color: map-get($form-config, font-color);
+      }
+      .el-form-item__content {
+        .el-select {
+          width: 50%;
+          .el-select__wrapper {
+            font-weight: 450 !important;
+            font-size: map-get($form-config, font-size);
+            color: map-get($form-config, font-color);
+            box-shadow: none;
+          }
+          .el-select__input {
+            font-family: map-get($form-config, font-family);
+            font-size: map-get($form-config, font-size);
+            color: map-get($form-config, font-color);
+            line-height: 100%;
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
   .cvrg-hearder-main-title {
     display: flex;
     align-items: center;
     border-radius: 12px;
     padding: 2px 10px;
-    width: max-content;
+    max-width: 85%;
     &.zhu {
       background: linear-gradient( 180deg, rgba(58, 118, 198, .1) 0%, rgba(57, 117, 198, .1) 100%);
       color: #3A76C6;
@@ -1633,8 +1681,39 @@ defineExpose({
     }
   }
 }
+.cvrg-body__ {
+  margin-top: 10px;
+  :deep(.custom-table-item__){
+    .el-form-item__content {
+      line-height: 25px;
+      height: 25px;
+      .el-select {
+        .el-select__wrapper {
+          min-height: map-get($form-config, item-height) !important;
+          font-family: map-get($form-config, font-family);
+        }
+        .el-select__input {
+          font-family: map-get($form-config, font-family);
+          font-size: map-get($form-config, font-size);
+          color: map-get($form-config, font-color);
+          line-height: 100%;
+          height: 100%;
+        }
+        .el-select__placeholder {
+          font-family: map-get($form-config, font-family);
+          font-size: map-get($form-config, font-size);
+        }
+        .el-select__selection.is-near {
+          margin-left: 0px;
+        }
+        .el-select__selection .el-tag {
+          height: 100%;
+        }
+      }
+    }
+  }
+}
 .table-title {
-  // background-color: #e6e6e6;
   th {
     text-align: center;
     background: rgba(0,0,0,0.04);
@@ -1698,8 +1777,12 @@ td {
   width: 100%;
   overflow-x: auto;
 }
-:deep(.el-form-item__content){
-  line-height: 25px;
-  height: 25px;
+
+.showData_left__ {
+  margin: 5px 0 0 10%;
 }
+.showData_right__ {
+  margin: 30px 10px 10px 20px;
+}
+
 </style>
