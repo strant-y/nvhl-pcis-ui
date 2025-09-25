@@ -2129,6 +2129,7 @@ async function loadAfter() {
         buttonColor: bottomBtnColor1,
         // svgIcon: "template2",
         // iconSize: "20",
+        icon: "Memo",
         func: () => {
           handleSaveTemplate()
         },
@@ -2139,6 +2140,7 @@ async function loadAfter() {
         buttonColor: bottomBtnColor1,
         // svgIcon: "copy2",
         // iconSize: "25", // 设置图标大小为25px
+        icon: "CopyDocument",
         func: () => {
           copyPolicyFun();
         },
