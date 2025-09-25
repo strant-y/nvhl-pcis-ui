@@ -768,8 +768,7 @@ function query() {
         //协议费用
         // const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
         // AgreementFeeWarn.setItemShow()
-        if (props.type === 'EDR_APP_NEW_SCENE') {
-         
+        if (props.type === 'EDR_APP_NEW_SCENE') {        
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
@@ -784,10 +783,14 @@ function query() {
           }
           if (props.param?.cEdrType == "1") {
             sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
+            const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
+            const newcEdrRsnDetail = JSON.parse(res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail']);
             if (props.param["cRsnCde"] != "FZ") {
-              mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-                props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
-              ]);
+            //   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
+            //     props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+            //   ]);
+              mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", newcEdrRsnDetail);
+              mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrCtnt", newcEdrCtnt);
             }
           }
           formPage.value?.setPageReadOnly(true, [], {
