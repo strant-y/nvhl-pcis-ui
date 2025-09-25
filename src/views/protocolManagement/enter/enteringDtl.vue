@@ -18,6 +18,7 @@ import {copyDist} from "@/api/prod";
 import {encryptRouterParam} from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import {checkAppBase} from "@/api/prod";
+import { cloneDeep } from "lodash-es";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
@@ -614,9 +615,10 @@ const saveEdrPlyInfo = async () => {
     res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
         res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
   }
-  console.log('参数',res)
+  const resToSave = cloneDeep(res);
+  resToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
   const edrInfo: any = await cargoApi.saveEdrEcargo({
-    ...res,
+    ...resToSave,
     AgreementDistGoods:null,
     AgreementTgtSummary:null,
     AgreementDistInsured:null,
@@ -1014,10 +1016,8 @@ const premiumCalculation = ()=>{
 }
 async function save() {
   let isOk = false
-  // const allFromData = formPage.value?.getAllFormData();
   let processedData = { ...formPage.value?.getAllFormData() }; 
   const user = JSON.parse(sessionStorage.getItem("user"));
-  // console.log('allFromData',allFromData)
   const base = processedData['AgreementBase'];
   if(!(processedData['AgreementBase'] && processedData['AgreementBase']['ECargoBase.cDptCde'])){
      return ElMessage.warning("请选择出单机构")
@@ -1033,9 +1033,10 @@ async function save() {
     const { AgreementAcctinfo, ...rest } = processedData;
     processedData = rest;
   }
-
- const res = await cargoApi.save({
-    ...processedData,
+  const dataToSave = cloneDeep(processedData);
+  dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
+  const res = await cargoApi.save({
+    ...dataToSave,
     AgreementDistGoods:null,
    AgreementTgtSummary:null,
    AgreementDistInsured:null,
