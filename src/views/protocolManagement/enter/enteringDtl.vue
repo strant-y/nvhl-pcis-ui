@@ -472,6 +472,10 @@ const submitEdrToUndrFun = async () => {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
       ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
+  }else{
+    ilter.push(...[
+        'AgreementAcctinfo' // 临时关闭账号校验
+    ]);
   }
   const validateAll = await formPage.value?.validateAll(filter);
   if(!validateAll.flag) {

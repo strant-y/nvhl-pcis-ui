@@ -69,11 +69,11 @@ onMounted(() => {
      })
      if(param.cEdrFlag =='AY'){
        setFormItem('ECargoBase.nLowPrm', {hidden: true});
-       setFormItem('ECargoBase.nReceivedPrm', {hidden: true});
+       setFormItem('ECargoBase.nReceivedPrmEx', {hidden: true});
      }
      else{
        setFormItem('ECargoBase.nLowPrm', {hidden: false});
-       setFormItem('ECargoBase.nReceivedPrm', {hidden: false});
+       setFormItem('ECargoBase.nReceivedPrmEx', {hidden: false});
      }
   });
 });

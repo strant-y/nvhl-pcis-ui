@@ -111,7 +111,6 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "共保公司",
                 minWidth: 180,
                 func: (v: any, row: any) => {
-
                 },
             },
             {
@@ -175,6 +174,16 @@ const getTableFun = async (isSave = false) => {
                 pageresult.total = res['total'];
                 nextTick(() => {
                     for (let i = 0; i < pageresult.list.length; i++) {
+                        const newCodeParam = pageresult.list[i].cCoinsurerCde === '327001' 
+                            ? { "CParCde": "subdpt" } 
+                            : { "CParCde": "66" };
+                        
+                        tableRef.value?.setFormSchema(
+                            pageresult.list[i]._dataId, 
+                            "cCiSubComp", 
+                            "codeParam", 
+                            newCodeParam
+                        );
                         if (pageresult.list[i].cCoinsurerCde == '327001') {
                             tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "cPolicyNo", 'disabled', true);
 
