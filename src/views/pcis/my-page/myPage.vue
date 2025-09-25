@@ -1197,9 +1197,7 @@ const edrBtn = [
       // 批改原因是否是费率变更
       if(props.param.cRsnCde === '45') {
         queryTermRateLimitFun(calcPremiumEdr)
-      }else if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
-        queryTermRateLimitFun(calcPremium)
-      } else {
+      }else {
         calcPremiumEdr();
       }
     },
