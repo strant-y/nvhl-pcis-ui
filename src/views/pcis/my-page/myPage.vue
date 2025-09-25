@@ -1752,10 +1752,11 @@ async function loadAfter() {
               ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
               return;
             }
+            const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
             dzmodal
               .open(PreviousdrOpnList, {
                 type: "Issuer",
-                objId: props.param?.plyNo,
+                objId: props.param?.plyNo || plyBase['Base.cPlyNo'],
                 prodNo: props.param?.cProdNo,
               })
               .then((res: any) => {
