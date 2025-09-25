@@ -1106,7 +1106,17 @@ const normalQueryColumns = [
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 170, },
+  { prop: 'cCiMrk', inputtype: "rtselect", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 170,
+   loadData: [
+        { label: "非共保业务", value: "0" },
+        { label: "外部共保我方主共_主联", value: "1" },
+        { label: '外部共保我方从共_主联', value: "2" },
+        { label: "外部共保我方主共_无联保", value: "3" },
+        { label: "外部共保我方从共_无联保", value: "4" },
+        { label: "司内联保_主联", value: "5" },
+        { label: "联保单", value: "6" },
+    ]
+  },
   { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 140, optional: true, sortable: true},
   { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 140, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', width: 140, optional: true, align: 'left', },
@@ -1345,9 +1355,6 @@ onMounted(async () => {
     if (hasJumpData) {
         isJumpingFromHome.value = true;  // 加锁，避免 cAppTyp.func 再触发
     }
-    // 初始化加锁，不查，避免cAppTyp.func触发
-    // isinitPageQuery.value = true;
-
     formconfig1.fromSchema?.forEach((item) => {
         if (
          item.prop === "tInquiryTm" ||
