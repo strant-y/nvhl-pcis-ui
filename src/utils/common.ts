@@ -187,6 +187,7 @@ export function showTooltip(event: MouseEvent, value: any, mouseleaveClose: bool
  * @param value 显示内容
  */
 export function checkIfTruncated(event: MouseEvent, value: any) {
+  if(!value || value === '') return;
   if (event && event.currentTarget) {
     const element: any = event.currentTarget;
     if(element.scrollWidth > element.clientWidth) {
