@@ -501,7 +501,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "return",
         hideBtns: (row: any) => {
-          if (row.taskStatus == "2") {
+          if (row.taskStatus == "2" && row.state === "0") {
             return false;
           } else {
             return true;
