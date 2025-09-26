@@ -110,7 +110,12 @@ const method = {
       ElMessage.warning("请先进行保费计算!");
       return;
     }
-    const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
+    const totalCiShare = dataList.reduce((sum, row) => {
+      const share = parseFloat(row['Ci.nCiShare'] || 0);
+      // 保留8位小数避免浮点数精度问题
+      return Math.round((sum + share) * 100000000) / 100000000;
+    }, 0);
+    // const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
     // 判断总和是否等于 1
     if (totalCiShare >= 1) {
       ElMessage.warning("共保总保额已被全部分完!不能新增");
@@ -442,7 +447,13 @@ const method = {
     const allRows = getFromValue();
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
-      .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
+      .reduce((sum, row) => {
+        const share = Number(row["Ci.nCiShare"] || 0);
+        return Math.round((sum + share) * 100000000) / 100000000;
+      }, 0);
+    // const totalOther = allRows
+    //   .filter(row => row._dataId !== rowId)
+    //   .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
     // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
     if (Number(val) + totalOther > 1) {
       const maxVal = 1 - totalOther;
@@ -957,7 +968,7 @@ const onChiefMrkChange = () => {
     switch (ciMrkValue) {
       case "2":
       case "4":
-        // cChiefMrkVal = '1'; // 主共方（注释掉的代码表示不需要设置）
+        // cChiefMrkVal = '1'; // 主共方（）
         break;
       default:
         cChiefMrkVal = '0'; // 从共方
@@ -1290,9 +1301,10 @@ const intiAgentBroker = (row: any) => {
   if (rowData.length > 0) {
     const rowId = rowData[0]._dataId;
     setValueByRowKey('Ci.cBrkrCde', rowId, row.CChaCde);
+    setValueByRowKey('Ci.CChaNme', rowId, row.CChaNme)
     freeEditRef.value?.addCodeListMap({
       code: 'Ci.cBrkrCde' + rowId,
-      list: rowData.loadData,
+      list: row.loadData,
     })
   }
 };

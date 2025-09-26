@@ -462,6 +462,9 @@ const method = {
       setFormItem("Insured.cOperaterCertfCde", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Insured.cEnterpriseTel", {
+        rules: [getRules("required", {})],
+      });
 
       setCapitalRequiredRule(getValue, setFormItem, 'Insured');
       setFormItem("Insured.tBirthday", {
@@ -619,6 +622,9 @@ const method = {
       });
       setFormItem("Insured.cSex", {
         rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cEnterpriseTel", {
+        rules: [],
       });
       if (!param.initFlag) {
         setFormItem("Insured.cWorkDpt", {

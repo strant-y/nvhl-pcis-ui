@@ -144,6 +144,10 @@ onMounted(() => {
       setFormItem("Applicant.cAgencyReason", { hidden: true });
       setFormItem("Applicant.cLegalRepresentative", { hidden: true });
       setFormItem("Applicant.cEnterpriseTel", { hidden: true });
+    }else{
+      setFormItem("Applicant.cAgencyReason", { hidden: false });
+      setFormItem("Applicant.cLegalRepresentative", { hidden: false });
+      setFormItem("Applicant.cEnterpriseTel", { hidden: false });
     }
 
     setFormItem("Applicant.cGcidCode", { rules: [getRules("leiCode", {})] });
@@ -241,8 +245,6 @@ const idAnalysis = (id: string) => {
 };
 // 防抖定时器
 let debounceTimer = <any>null;
-
-
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
   const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk', "Applicant.cCertfCde", "Applicant.cCertfCls"];
@@ -460,7 +462,7 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
       });
-    } else     if (val === '07') {
+    } else if (val === '07') {
       // 护照
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("passPort", {})],
@@ -521,6 +523,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cOperaterCertfCde", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cEnterpriseTel", {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cCntrCertfCde", {
@@ -672,7 +677,9 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
-
+      setFormItem("Applicant.cEnterpriseTel", {
+        rules: [],
+      });
       //是否分支机构
       if (!getValue('Applicant.cIsBranch')) {
         setValue("Applicant.cIsBranch", "1");
