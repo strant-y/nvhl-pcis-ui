@@ -5189,12 +5189,21 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     margin-top: 5px;
     padding-left: 16px;
     padding-right: 22px;
-    &.isActive,&:hover {
-      background: var(--el-color-primary);
+    &.isActive{
+      background: var(--menu-active-bg-color);
       :deep(a) {
-        color: #ffffff;
+        color: var(--menu-active-text);
         .iconfont {
-          color: #ffffff;
+          color: var(--menu-active-text);
+        }
+      }
+    }
+    &:hover {
+      background: var(--menu-hover);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
         }
       }
     }

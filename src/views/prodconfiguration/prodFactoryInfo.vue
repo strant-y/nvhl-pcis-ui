@@ -299,8 +299,23 @@ const iconMap = {
         padding: 0;
         opacity: 0.6;
         display: flex;
-        &.is-active,&:hover {
-          opacity: 1;
+        &.isActive{
+          background: var(--menu-active-bg-color);
+          :deep(a) {
+            color: var(--menu-active-text);
+            .iconfont {
+              color: var(--menu-active-text);
+            }
+          }
+        }
+        &:hover {
+          background: var(--menu-hover);
+          :deep(a) {
+            color: var(--el-color-primary);
+            .iconfont {
+              color: var(--el-color-primary);
+            }
+          }
         }
         .iconfont {
           font-size: 1.2rem;

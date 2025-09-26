@@ -76,7 +76,7 @@
         </template>
 
         <div class="form-inner" v-show="showMyfrom">
-          <div v-if="cardConfig.showEdit" style="padding-bottom: 5px">
+          <div v-if="cardConfig.showEdit">
             <app-free-edit :freeEditConfig="formconfig" ref="editRef"/>
           </div>
           <slot />

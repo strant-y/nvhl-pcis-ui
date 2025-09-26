@@ -1,9 +1,7 @@
 /** 全局SCSS变量 */
 :root {
    --menu-background: #f0f5f9;
-   --menu-active-text: #FF8C00;
-   --menu-hover:  #FF8C00;
-   --menu-active-bg-color: rgba(229, 224, 224, 0.45);
+   --menu-active-text: #FFF;
    --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
 
   // 只读状态字体颜色调整
@@ -39,7 +37,8 @@
 html.default {
   --menu-background: #f0f5f9;;
   --menu-active-text: #FFFFFF;
-  --menu-hover: #3a76c6;
+  --menu-hover: rgba(171, 212, 253, 0.4);
+  --menu-active-bg-color: #3a76c6;
   --menu-text: #000000;
   --el-text-color: #000 !important;
 
@@ -49,7 +48,8 @@ html.default {
 html.orange {
   --menu-background: #f0f5f9;;
   --menu-active-text: #FFFFFF;
-  --menu-hover: #f57c10;
+  --menu-hover: rgba(236, 177, 148, 0.4);
+  --menu-active-bg-color: #FF8C00;
   --menu-text: #000000;
   --el-text-color: #000 !important;
 
@@ -59,7 +59,8 @@ html.orange {
 html.green {
   --menu-background: #f0f5f9;
   --menu-active-text: #FFFFFF;
-  --menu-hover: #09d067;
+  --menu-hover: rgba(184, 248, 218, 0.4);
+  --menu-active-bg-color: #09d067;
   --menu-text: #fff;
   --el-text-color: #000 !important;
 
@@ -72,7 +73,9 @@ html.green {
 html.dark {
   --menu-background: rgb(0 0 0 / 80%);
   --menu-text: #fff !important;
-  --menu-hover: rgb(0 0 0 / 20%);
+  --menu-hover: rgb(220 220 220 / 30%);
+  --menu-active-bg-color: #3a76c6;
+
   --sidebar-logo-background: rgba(255, 255, 255, 0.6);
   --el-text-color: #b9b9b9 !important;
   --el-card-header-bg-color: rgb(0 0 0 / 90%);
