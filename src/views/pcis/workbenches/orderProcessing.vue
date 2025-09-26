@@ -464,7 +464,7 @@ const tableconfig = reactive<AppTableConfig>(
               const param = {
                 cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
                 cAppNo: row.cAppNo, // 申请单号
-                cPlyNo: row.plyNo, // 保单号
+                cPlyNo: row.cPlyNo, // 保单号
                 nEdrPrjNo: row.nEdrPrjNo, // 批改序号
               };
               const delRisk =
@@ -501,7 +501,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "return",
         hideBtns: (row: any) => {
-          if (row.taskStatus == "2") {
+          if (row.taskStatus == "2" && row.state === "0") {
             return false;
           } else {
             return true;

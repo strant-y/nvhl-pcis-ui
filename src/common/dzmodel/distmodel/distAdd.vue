@@ -40,6 +40,7 @@ const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
 const codeListStore = codeListViewStore();
 const params = opertaor.getParam();
+const firstInvoiceCur = ref('');
 
 const props = defineProps({
   data: {
@@ -149,7 +150,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 return; // 阻止后续保存逻辑
                 }
             }
-
             const isValid = await freeEditRef.value?.validate();
             if(isValid){
             const s = freeEditRef.value?.getFromValue();
@@ -275,9 +275,6 @@ onMounted(() => {
     if(item.prop =='Dist.cPlanNo' ||item.prop =='Dist.tOpeningTime' ||item.prop =='Dist.cLocationSigns' ||item.prop =='Dist.cFacilitySigns' ||item.prop =='Dist.cVenueSign' || item.prop =='Dist.cBuildingStructure'  ){
       item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];   
     }
-    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cPlanNo' ){
-             item['rules'] = [];
-    }
 
     // 040002 证件号码 必填问题
     if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
@@ -358,9 +355,20 @@ onMounted(() => {
     if(item.prop =='Dist.cDocumentType'){
       item['func'] =  cDocumentTypeChange;
     }
-    if(item.prop =='Dist.cInvoiceCur'){
-      item['func'] =  InvoiceCurrencyChange;
+    if(item.prop == 'Dist.cInvoiceCur'){
+        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+        const cargoList = distTableRef?.getTableData() || [];
+        // 02开头的货物明细清单
+        if(cComponentTable.value == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && cargoList.length > 0 ){
+            const firstRow = cargoList[0];
+            firstInvoiceCur.value = firstRow['Dist.cInvoiceCur'] || 'CNY';
+            // 已存在一条记录 → 后续新增只能选择该币种
+            item.disabled = true;
+            nextTick(() => setValue('Dist.cInvoiceCur', firstInvoiceCur.value))
+        }
+        item['func'] = InvoiceCurrencyChange;
     }
+
     if(item.prop =='Dist.nAdditiveCoefficient'){
       item['func'] =  nAdditiveCoefficientChange;
     }
@@ -446,6 +454,17 @@ onMounted(() => {
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
     setFormItem("Dist.nSeqNo", { disabled: true });
+    setFormItem("Dist.nSalesRevenue", { disabled: true });
+    // 如果 接口返回cSalesRegion 是字符串，需转成数组才能通过表单校验
+    const salesKey = 'Dist.cSalesRegion';
+    const raw = props.data.rowData[salesKey];
+    if (typeof raw === 'string') {
+        try {
+            props.data.rowData[salesKey] = JSON.parse(raw);   // 转成数组
+        } catch {
+            props.data.rowData[salesKey] = props.data.rowData[salesKey];               
+        }
+    }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);

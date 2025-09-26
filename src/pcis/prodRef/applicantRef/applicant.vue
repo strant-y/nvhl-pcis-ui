@@ -399,6 +399,7 @@ const method = {
   cardTypeChange: (val: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
+       const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
     console.log(33322, val, param)
  
  
@@ -407,12 +408,12 @@ const method = {
       clearValidate('Applicant.cCertfCde')  // 清除报错信息
     }
 
-    // if (param.pageType!=="readonly") {
-      const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
+    if (param.pageType!=="readonly") {
+   
       personFields.forEach(field => {
         setFormItem(`Applicant.${field}`, { disabled: false });
       });
-    // }
+    }
 
 
 
@@ -458,6 +459,11 @@ const method = {
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
+      });
+    } else     if (val === '07') {
+      // 护照
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}), getRules("passPort", {})],
       });
     } else if (val == "553") {
       // 外国人证件号

@@ -5137,6 +5137,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .NavigaList_card {
   display: inline-block; /* 设置为行内块元素 */
   vertical-align: middle; /* 垂直居中 */
+  position: relative;
+  z-index: 9999;
 }
 .card_ {
   margin-bottom: 10px;
@@ -5149,6 +5151,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 9999;
 }
 :deep(.el-main) {
   // padding: 10px 10px 10px 10px;

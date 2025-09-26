@@ -629,7 +629,17 @@ const formconfig3 = reactive<AppFreeEditConfig>(
       rules: [getRules("required", {})],
       func: (v: any) => {
       }
-    }, {
+    },
+    {
+      "prop": "cCvrgNo",
+      "inputtype": "rtinput",
+      "title": "条款代码",
+      func: (v: any) => {
+      }
+    },
+    
+    
+    {
 
       // "readonly": 1,
       "prop": "cAmtFormula",

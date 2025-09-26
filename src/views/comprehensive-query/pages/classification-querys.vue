@@ -1094,7 +1094,7 @@ const normalQueryColumns = [
     },
     {
         prop: "cRsnCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: " 批改原因",
         typeCode: "EDR_RSN_LIST_KIND",
         align: 'left',
@@ -1103,7 +1103,16 @@ const normalQueryColumns = [
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'cCiMrk', inputtype: "rtselect", title: '共保类型', optional: true, align: 'left', width: 139, typeCode: "joint_insurance_business" },
+  { prop: 'cCiMrk', inputtype: "rtselect", title: '共保类型', optional: true, align: 'left', width: 139, loadData: [
+        { label: "非共保业务", value: "0" },
+        { label: "外部共保我方主共_主联", value: "1" },
+        { label: '外部共保我方从共_主联', value: "2" },
+        { label: "外部共保我方主共_无联保", value: "3" },
+        { label: "外部共保我方从共_无联保", value: "4" },
+        { label: "司内联保_主联", value: "5" },
+        { label: "联保单", value: "6" },
+    ] 
+  },
   { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 112, optional: true, sortable: true},
   { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 112, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', width: 140, optional: true, align: 'left', },
@@ -1141,8 +1150,32 @@ const tableObj = {
                 tableClick: async (row) => {
                     const r = await row;
 
-                    if (r) {
-                        const data = row;
+                    // 把ES带html的字段洗净
+                    const cleanRow = {
+                        ...r,
+                        cAppNo: stripHtml(r.cAppNo),
+                        cPlyNo: stripHtml(r.cPlyNo),
+                        cEdrNo: stripHtml(r.cEdrNo),
+                        cDptCnm: stripHtml(r.cDptCnm),
+                        nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+                        cInquiryNo: stripHtml(r.cInquiryNo),
+                        tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+                        tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+                        cTermNme: stripHtml(r.cTermNme),
+                        cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+                        cAppNme: stripHtml(r.cAppNme),
+                        cInsuredNme: stripHtml(r.cInsuredNme),
+                        cClntAddr: stripHtml(r.cClntAddr),
+                        cNmeCn: stripHtml(r.cNmeCn),
+                        tUdrTm: stripHtml(r.tUdrTm),
+                        tIssueTm: stripHtml(r.tIssueTm),
+                        cProdNmeCn: stripHtml(r.cProdNmeCn),
+                        nAmt: stripHtml(r.nAmt),
+                        nPrm: stripHtml(r.nPrm),
+                        cUdrNme: stripHtml(r.cUdrNme),
+                    };
+                    if (cleanRow) {
+                        const data = cleanRow;
                         router.push({
                             path: "/pcisapp/pcisappView",
                             query: {
@@ -1162,42 +1195,57 @@ const tableObj = {
                 size: "large",
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
-                    // 联保单6不显示复制按钮
-                    if (row.cCiMrk === "6") {
+                    // 联保单6不显示复制按钮;询价单没有复制;核保岗隐藏复制按钮
+                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value) {
                         return true;
                     } else {
                         return false;
                     }
                 },
-                hideBtns: (row: any) => {
-                    // 核保岗隐藏复制按钮
-                    if (!isCopyButtonVisible.value) return true;
-
-                    // 联保单不显示
-                    if (row.cCiMrk === "6") return true;
-                    return false;
-                },
                 tableClick: async (row) => {
                     const r = await row;
-                    if (r) {
+                    // 把ES带html的字段洗净
+                    const cleanRow = {
+                        ...r,
+                        cAppNo: stripHtml(r.cAppNo),
+                        cPlyNo: stripHtml(r.cPlyNo),
+                        cEdrNo: stripHtml(r.cEdrNo),
+                        cDptCnm: stripHtml(r.cDptCnm),
+                        nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+                        cInquiryNo: stripHtml(r.cInquiryNo),
+                        tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+                        tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+                        cTermNme: stripHtml(r.cTermNme),
+                        cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+                        cAppNme: stripHtml(r.cAppNme),
+                        cInsuredNme: stripHtml(r.cInsuredNme),
+                        cClntAddr: stripHtml(r.cClntAddr),
+                        cNmeCn: stripHtml(r.cNmeCn),
+                        tUdrTm: stripHtml(r.tUdrTm),
+                        tIssueTm: stripHtml(r.tIssueTm),
+                        cProdNmeCn: stripHtml(r.cProdNmeCn),
+                        nAmt: stripHtml(r.nAmt),
+                        nPrm: stripHtml(r.nPrm),
+                        cUdrNme: stripHtml(r.cUdrNme),
+                    };
+                    if (cleanRow) {
                         // 校验出单机构是否复合复制单的机构要求
                         const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
-                        if(row.cRenewMrk === "1") {
-                            queryProdDptCdeParam['cPlyNo'] = row.cPlyNo
+                        if(cleanRow.cRenewMrk === "1") {
+                            queryProdDptCdeParam['cPlyNo'] = cleanRow.cPlyNo
                         } else {
-                            queryProdDptCdeParam['cProdNo'] = row.cProdNo
+                            queryProdDptCdeParam['cProdNo'] = cleanRow.cProdNo
                         }
                         const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
                         if(queryProdDptCde.data !== true) {
                             ElMessage.error(queryProdDptCde.msg)
                             return
                         }
-                        row.cPolicySource = '8'
-                        const data = row;
+                        cleanRow.cPolicySource = '8'
                         router.push({
                             path: "/pcisapp/myPage",
                             query: {
-                                param: JSON.stringify({ ...data, ...{ pageType: "copy", cAppTyp: 'A' } }),
+                                param: JSON.stringify({ ...cleanRow, pageType: 'copy', cAppTyp: 'A' }),
                             },
                         });
                     } else {
@@ -1252,33 +1300,33 @@ const tableObj = {
                     })
                 },
             }),
-            createFreeButtonBase({
-                id: "score",
-                link: true,
-                tooltip: "询价转投保",
-                type: "primary",
-                size: "large",
-                icon: "Right",
-                hideBtns: (row: any) => {
-                    // 询价转投保按钮只在状态为"已出保单"时可见
-                    if (
-                        row.cAppStatus == "5" && row.canConvert === "1"
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                },
-                tableClick: (row) => {
-                    row.cPolicySource = '6'
-                    router.push({
-                        path: "/pcisapp/myPage",
-                        query: {
-                            param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
-                        },
-                    });
-                },
-            }),
+            // createFreeButtonBase({
+            //     id: "score",
+            //     link: true,
+            //     tooltip: "询价转投保",
+            //     type: "primary",
+            //     size: "large",
+            //     icon: "Right",
+            //     hideBtns: (row: any) => {
+            //         // 询价转投保按钮只在状态为"已出保单"时可见
+            //         if (
+            //             row.cAppStatus == "5" && row.canConvert === "1"
+            //         ) {
+            //             return false;
+            //         } else {
+            //             return true;
+            //         }
+            //     },
+            //     tableClick: (row) => {
+            //         row.cPolicySource = '6'
+            //         router.push({
+            //             path: "/pcisapp/myPage",
+            //             query: {
+            //                 param: JSON.stringify({ ...row, ...{ pageType: "inquiryToApp" } }),
+            //             },
+            //         });
+            //     },
+            // }),
         ],
         fromSchema: []
     },
@@ -1295,9 +1343,6 @@ onMounted(async () => {
     if (hasJumpData) {
         isJumpingFromHome.value = true;  // 加锁，避免 cAppTyp.func 再触发
     }
-    // 初始化加锁，不查，避免cAppTyp.func触发
-    // isinitPageQuery.value = true;
-
     formconfig1.fromSchema?.forEach((item) => {
         if (
          item.prop === "tInquiryTm" ||
@@ -2039,6 +2084,12 @@ function updatePolicyInfoTitle(cAppTyp: string) {
 // 多选事件
 function handleSelectionChange(selection: any) {
   removeIds.value = selection.map((item: any) => item.cPkId);
+}
+
+// ES查询在点击行数据的复制按钮时，去掉所有 HTML 标签，返回纯文本
+function stripHtml(html: string): string {
+  if (typeof html !== 'string') {return String(html ?? '')}; 
+  return html.replace(/<[^>]+>/g, '');
 }
 
 // 查看详情

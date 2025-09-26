@@ -276,15 +276,63 @@ function handleQuery() {
         tabref3.setValue('cChaSubType', dataS.cChaSubType);
         getNmeByCde(dataS.cDptCde, "cDptCde", "permissionAllo")
         tabref3.setValue('cDptCde', dataS.cDptCde);
+
+        // 出单员
         tabref3.setValue('cOperId', dataS.cOperId);
+        let cOperNme =  dataS.cOperNme? dataS.cOperNme:'';
+            tabref3.setFormItem("cOperId", {
+                    loadData: [
+                      {
+                        label:dataS.cOperId + cOperNme ,
+                        value: dataS.cOperId,
+                      },
+                    ],
+                  });
         // tabref3.setValue('cSlsGroup', dataS.cSlsGroup);
+
+        // 业务员/产险专员
         tabref3.setValue('cSlsId', dataS.cSlsId);
+        let cSlsNme =  dataS.cSlsNme? dataS.cSlsNme:'';
+        tabref3.setFormItem("cSlsId", {
+                  loadData: [
+                    {
+                      label: dataS.cSlsId + cSlsNme,
+                      value: dataS.cSlsId,
+                    },
+                  ],
+                });          
+
+        // 代理人/经纪人
         tabref3.setValue('cBrkrCde', dataS.cBrkrCde);
+        let cBrkrName =  dataS.cBrkrName?dataS.cBrkrName: '' 
+          tabref3.setFormItem("cBrkrCde", {
+                  loadData: [
+                    {
+                      label: dataS.cBrkrCde +cBrkrName ,
+                      value: dataS.cBrkrCde,
+                    },
+                  ],
+                });        
+
+
         tabref3.setValue('cAgtAgrNo', dataS.cAgtAgrNo);
         tabref3.setValue('nPropFeeRate', dataS.nPropFeeRate);
         tabref3.setValue('cBusinessTel', dataS.cBusinessTel);
         tabref3.setValue('cEvenJointTel', dataS.cEvenJointTel);
-
+        
+        // 业务员
+         tabref3.setValue('cBrkSlsCde', dataS.cBrkSlsCde);
+         let cBrkSlsName = dataS.cBrkSlsName? dataS.cBrkSlsName : ''
+        tabref3.setFormItem("cBrkSlsCde", {
+                        loadData: [
+                          {
+                            label:  dataS.cBrkSlsCde + cBrkSlsName ,
+                            value:  dataS.cBrkSlsCde
+                          },
+                        ],
+                      });
+   
+        
         TestData.value = data['result'][0];
 
         //  测试报告说明
@@ -535,9 +583,7 @@ onMounted(async () => {
   if (queryParam.editType !== 'add' && queryParam.editType) {
     handleQuery();
   }
-
   if (queryParam.editType === 'handle' || queryParam.editType === 'review') {
-
     isShowReview.value = true;
     processinfoQuery()
 
@@ -546,10 +592,6 @@ onMounted(async () => {
     //    tabref5.setDisabledAll()
     // }    
   }
-
-
-
-
 });
 // 根据机构编码获取机构名称
 const getNmeByCde = async(val:any, key: string, pageKey: string) => {

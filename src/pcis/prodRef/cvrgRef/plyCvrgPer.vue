@@ -232,7 +232,7 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
-          if(item.cUniqueTermNo && mutualExclusionClause.value.includes(item.cUniqueTermNo)){
+          if(item.cUniqueTermNo && item.cPrimaryMrk === '1'){
             // 部分条款责任互斥,所以互斥条款,不再加载对应的责任信息
             data.riskList = [];
           }else{  

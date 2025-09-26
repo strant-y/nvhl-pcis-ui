@@ -138,6 +138,7 @@ const method = {
           key['ECargoCi.nSeqNo']=index+1
       });
   },
+  
   // 共保公司下拉初始化事件 from-init 会自动绑定
   cCoinsurerCdeOnInit: (data: any) => {
     const {value, rowData, config, itemRef} = data;
@@ -259,7 +260,6 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cSlsNme", rowId, "");
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cBrkrCde", rowId, "");
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cBrkSlsCde", rowId, "");
-        
         // 重新校验必填规则
         valideRequired();
       }
@@ -1164,6 +1164,9 @@ function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
 function setValue(key: string, value: any) {
   freeEditRef?.value?.setValue(key, value);
 }
+function getFormConfig() {
+  return formconfig1;
+}
 defineExpose({
   getFormValue,
   setFormValue,
@@ -1181,7 +1184,9 @@ defineExpose({
   intiAgentBroker,
   valideRequired,
   addProvide,
+  getFormConfig,
   setValue,
+  
 });
 </script>
 

@@ -488,7 +488,7 @@ const shortcutDataList = ref([])
 function getShortMenuList() {
   getShortcutDataList().then((res: any) => {
     if (res.code == 200) {
-      shortcutDataList.value = res.data;
+      shortcutDataList.value = res.data.filter((item:any) => item.cOpAct !== "Layout");
     }
   });
 }

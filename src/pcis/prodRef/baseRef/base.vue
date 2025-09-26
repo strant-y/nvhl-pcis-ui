@@ -57,6 +57,7 @@ onMounted(async () => {
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
   setValue("Base.cCumulativeLimitManual", "0");
+  setValue("Base.cAccidentLimitManual", "0");
   // 隐藏短期费率类型
   // setFormItem("Base.cRatioTyp", { 
   //   hidden: true
@@ -440,12 +441,20 @@ const method = {
       }
     }
   },
-  // 总保额(累计赔偿限额) 是和否change事件
+  // 是否修改每次事故赔偿限额 是和否change事件
   nAmtLimitManualChange: (val: any) => {
-    if(val == '0'){ // 否 置灰
-        setFormItem("Base.nAmt", { disabled: true }); 
-    } else{  // 是 可编辑
-        setFormItem("Base.nAmt", { disabled: false });
+    if(val == '0'){
+        setFormItem("Base.nCumulativeLimitModified", { rules: [] });
+    } else{
+        setFormItem("Base.nCumulativeLimitModified", { rules: [getRules("required", {})] });
+    }
+  },
+   // 是否修改累计赔偿限额
+  cAccidentLimitChange: (val: any) => {
+    if(val == '0'){ // 否 
+        setFormItem("Base.nModifiedAccidentLimit", { rules: [] });
+    } else{  // 是 必填
+        setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})] });
     }
   },
   // 总保费汇率change事件
@@ -557,6 +566,7 @@ function numMulti(num1, num2) {
 function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   baseEditRef?.value?.addProvide(key, value);
 }
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -565,7 +575,8 @@ defineExpose({
   getValue,
   getFormconfig,
   nPayNumberFun,
-  addProvide
+  addProvide,
+  setFormItem
 });
 </script>
 
