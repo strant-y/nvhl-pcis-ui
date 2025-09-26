@@ -27,14 +27,14 @@
                   </template>
                   <template v-else>
                     <!-- <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag> -->
-                    <el-tooltip content="下载条款" placement="top">
+                    <!-- <el-tooltip content="下载条款" placement="top">
                       <el-button
                         type="text"
                         @click="downloadTerm"
                         style="margin-left: 5px"
                       ><rt-icon :item="{ icon: 'term' }" />
                     </el-button>
-                    </el-tooltip>
+                    </el-tooltip> -->
                     <el-tooltip content="预览条款" placement="top">
                       <el-button
                         type="text"
