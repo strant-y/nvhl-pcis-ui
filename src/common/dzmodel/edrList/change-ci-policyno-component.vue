@@ -38,7 +38,7 @@ const props = defineProps({
 });
 
 const { getRules } = useValidator();
-const emits = defineEmits(["ok", "cancel"]);
+const emits = defineEmits(["ok", "cancel","handleClose"]);
 import { conforms, forEach } from "lodash";
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const pcisEdrQueryService = new PcisEdrQueryService();
@@ -218,6 +218,7 @@ const saveProdDataFun = () => {
         let { code, data, msg } = response
         if (code === 200) {
             ElMessage.success('保存成功！')
+            emits("handleClose");
             getTableFun(true)
         } else {
             ElMessage.error(msg);
