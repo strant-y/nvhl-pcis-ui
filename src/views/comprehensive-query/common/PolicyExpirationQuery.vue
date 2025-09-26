@@ -19,6 +19,16 @@
           </div>
         </div>
       </template>
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cTermNme="{ row, column, index }">
+        <el-tooltip :content="row.cTermNme" placement="top">
+          <span v-html="row.cTermNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
 		</app-table>
   </div>
 </template>
@@ -314,25 +324,29 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         slotName: "cPlyNo",
-        width: 165,
+        width: 136,
       },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "机构",
-        align: 'left'
+        slotName: "cDptCnm",
+        align: 'left',
+        minWidth: 145,
       },
       {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款",
-        align: 'left'
+        slotName: "cTermNme",
+        align: 'left',
+        minWidth: 157,
       },
       {
         prop: "nExpirationDays",
         inputtype: "rtinput",
         title: "保单到期剩余天数",
-        width: 120,
+        width: 102,
       },
     ],
   })
@@ -533,6 +547,13 @@ defineExpose({
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>
 

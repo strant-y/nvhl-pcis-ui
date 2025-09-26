@@ -11,13 +11,13 @@
        <template #column-policyInfo="{ row, column, index }">
             <div class="policy-info-cell">
                 <div v-if="row.cEcAgrAppNo" class="policy-number-row">
-                    <span>{{ row.cEcAgrAppNo }}</span>
+                    <span style="width: 119px;">{{ row.cEcAgrAppNo }}</span>
                     <el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
                         <DocumentCopy />
                     </el-icon>
                 </div>
                 <div v-if="row.cEcAgrNo" class="policy-number-row">
-                    <span>{{ row.cEcAgrNo }}</span>
+                    <span style="width: 119px;">{{ row.cEcAgrNo }}</span>
                     <el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
                         <DocumentCopy />
                     </el-icon>
@@ -33,6 +33,46 @@
                     <span>{{ row.tInsrncEndTm }}</span>
                 </div>
             </div>
+        </template>
+        <template #column-cDptCnm="{ row, column, index }">
+          <el-tooltip :content="row.cDptCnm" placement="top">
+            <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+        <template #column-cSecondDptCnm="{ row, column, index }">
+          <el-tooltip :content="row.cSecondDptCnm" placement="top">
+            <span v-html="row.cSecondDptCnm || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+        <template #column-cAppNo="{ row, column, index }">
+            <div class="policy-info-cell">
+                <div v-if="row.cAppNo" class="policy-number-row">
+                    <span>{{ row.cAppNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                </div>
+            </div>
+        </template>
+        <template #column-cPlyNo="{ row, column, index }">
+            <div class="policy-info-cell">
+                <div v-if="row.cPlyNo" class="policy-number-row">
+                    <span>{{ row.cPlyNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                        <DocumentCopy />
+                    </el-icon>
+                </div>
+            </div>
+        </template>
+        <template #column-cAppNme="{ row, column, index }">
+          <el-tooltip :content="row.cAppNme" placement="top">
+            <span v-html="row.cAppNme || ''" class="twoLine"></span>
+          </el-tooltip>
+        </template>
+        <template #column-cInsuredNme="{ row, column, index }">
+          <el-tooltip :content="row.cInsuredNme" placement="top">
+            <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
+          </el-tooltip>
         </template>
 	</app-table>
   </div>
@@ -212,54 +252,73 @@ const tableconfig = reactive<AppTableConfig>(
         title: "序号",
         showIndex: true,
         fixed: "left",
+        width: 33,
       },
       {
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "协议号",
         fixed: "left",
-        minWidth: 300,
-		slotName: "policyInfo"
+				width: 142,
+		    slotName: "policyInfo"
 	  },
       {
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
         title: "二级机构",
+        slotName: "cSecondDptCnm",
+        align: 'left',
+        minWidth: 145,
 	  },
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
         title: "三级机构",
+        slotName: "cDptCnm",
+        align: 'left',
+        minWidth: 145,
 	  },
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
+        width: 136,
+        slotName: "cAppNo"
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
+        width: 136,
+        slotName: "cPlyNo"
       },
 	  {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人",
+        slotName: "cAppNme",
+        align: "left",
+        width: 112,
       },
       {
         prop: "insuredNme",
         inputtype: "rtinput",
         title: "被保人",
+        slotName: "insuredNme",
+        align: "left",
+        width: 112,
       },
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
         title: "协议起期",
+        width: 112,
       },
       {
         prop: "tInsrncEndTm",
         inputtype: "rtinput",
         title: "协议止期",
+        width: 112,
       },
 	  {
         prop: "cUdrNme",
@@ -270,48 +329,64 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "InsurancePeriod",
         inputtype: "rtinput",
         title: "输入日期",
-        minWidth: 180,
+        width: 112,
         slotName: "InsurancePeriod"
 	  },
       {
         prop: "nRmbPrm",
         inputtype: "rtinput",
         title: "预估总保费",
+        width: 77,
+        align: "left",
       },
       {
         prop: "nRmbAmt",
         inputtype: "rtinput",
         title: "预估总保额",
+        width: 83,
+        align: "left",
       },
       {
         prop: "nLowPrm",
         inputtype: "rtinput",
         title: "最低保费",
+        width: 77,
+        align: "left",
       },
       {
         prop: "nWhRmbAmt",
         inputtype: "rtinput",
         title: "预扣保额",
+        width: 83,
+        align: "left",
       },
       {
         prop: "nRecRemEstAmt",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保额",
+        width: 132,
+        align: "left",
       },
       {
         prop: "nRmbReceivedPrm",
         inputtype: "rtinput",
         title: "预收保费",
+        width: 77,
+        align: "left",
       },
       {
         prop: "nWhRmbPrm",
         inputtype: "rtinput",
         title: "预扣保费",
+        width: 77,
+        align: "left",
       },
       {
         prop: "nRecRemPrm",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保费",
+        width: 132,
+        align: "left",
       },
       {
         prop: "cAppStatus",
@@ -325,6 +400,8 @@ const tableconfig = reactive<AppTableConfig>(
             {label: "已出单", value: '5'},
             {label: "见费出单退回", value: '8'},
         ],
+        width: 76,
+        align: "left"
       },
     ],
   })
@@ -500,6 +577,13 @@ const copyText = (text: any) => {
 
 .col-button {
   flex: 0 0 100%;
+}
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>
 <style lang="scss">

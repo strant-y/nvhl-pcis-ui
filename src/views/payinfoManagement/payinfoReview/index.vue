@@ -290,7 +290,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号",
-        width: 165,
+        width: 136,
         fixed: "left",
         slotName: "policyInfo"
       },
@@ -314,7 +314,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nPrm",
         inputtype: "rtnumber",
         title: "保费",
-        width: 115,
+        width: 77,
         align: "left"
       },
       // {
@@ -327,7 +327,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nPayAmt",
         inputtype: "rtnumber",
         title: "缴费金额",
-        width: 115,
+        width: 77,
         align: "left"
       },
       {
@@ -336,7 +336,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款",
         slotName: "cTermName",
         align: 'left',
-        minWidth: 112,
+        minWidth: 157,
       },
       // {
       //   prop: "d",
