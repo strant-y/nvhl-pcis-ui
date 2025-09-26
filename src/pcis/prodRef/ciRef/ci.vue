@@ -110,7 +110,12 @@ const method = {
       ElMessage.warning("请先进行保费计算!");
       return;
     }
-    const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
+    const totalCiShare = dataList.reduce((sum, row) => {
+      const share = parseFloat(row['Ci.nCiShare'] || 0);
+      // 保留8位小数避免浮点数精度问题
+      return Math.round((sum + share) * 100000000) / 100000000;
+    }, 0);
+    // const totalCiShare = dataList.reduce((sum, row) => sum + parseFloat(row['Ci.nCiShare'] || 0), 0);
     // 判断总和是否等于 1
     if (totalCiShare >= 1) {
       ElMessage.warning("共保总保额已被全部分完!不能新增");
@@ -442,7 +447,13 @@ const method = {
     const allRows = getFromValue();
     const totalOther = allRows
       .filter(row => row._dataId !== rowId)
-      .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
+      .reduce((sum, row) => {
+        const share = Number(row["Ci.nCiShare"] || 0);
+        return Math.round((sum + share) * 100000000) / 100000000;
+      }, 0);
+    // const totalOther = allRows
+    //   .filter(row => row._dataId !== rowId)
+    //   .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
     // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
     if (Number(val) + totalOther > 1) {
       const maxVal = 1 - totalOther;
