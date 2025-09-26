@@ -10,8 +10,8 @@
                 @click="showMyfrom = !showMyfrom"
                 v-if="cardConfig.showInTitle ? cardConfig.showInTitle : false"
               >
-                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+                <el-icon v-if="!showMyfrom" color="var(--el-text-color)"><ArrowUpBold /></el-icon>
+                <el-icon v-if="showMyfrom" color="var(--el-text-color)"><ArrowDownBold /></el-icon>
               </a>
               <span class="card-title-style">{{ cardConfig.title }}</span>
             </el-col>
@@ -21,8 +21,8 @@
                 @click="showMyfrom = !showMyfrom"
                 v-if="cardConfig.showInTitle ? cardConfig.showInTitle : false"
               >
-                <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
+                <el-icon v-if="!showMyfrom" color="var(--card-header-title-color)"><ArrowUpBold /></el-icon>
+                <el-icon v-if="showMyfrom" color="var(--card-header-title-color)"><ArrowDownBold /></el-icon>
               </a>
               <el-tooltip :content="cardConfig.productionTitle">
                 <span class="card-title-style">{{ cardConfig.title }}</span>
@@ -66,8 +66,8 @@
                     cardConfig.showMyfromBtm ? cardConfig.showMyfromBtm : false
                   "
                 >
-                  <el-icon v-if="!showMyfrom" size="10" color="var(--el-text-color)"><ArrowUpBold/></el-icon>
-                  <el-icon v-if="showMyfrom" size="10" color="var(--el-text-color)"><ArrowDownBold/></el-icon>
+                  <el-icon v-if="!showMyfrom" size="10" color="var(--card-header-title-color)"><ArrowUpBold/></el-icon>
+                  <el-icon v-if="showMyfrom" size="10" color="var(--card-header-title-color)"><ArrowDownBold/></el-icon>
                   <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                 </a>
               </template>

@@ -197,5 +197,5 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 </style>

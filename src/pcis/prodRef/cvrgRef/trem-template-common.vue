@@ -8,12 +8,14 @@
               <el-col :span="10">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
-                    <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
-                    <el-icon v-if="showData"><ArrowDownBold /></el-icon>
+                    <el-icon v-if="!showData" color="var(--el-text-color)"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="showData" color="var(--el-text-color)"><ArrowDownBold /></el-icon>
                   </a>
 
                   <template v-if="effectiveShowConf.showPlanNo">
-                    {{termdata['Term.cPlanNo']}}方案
+                    <span style="color: var(--el-text-color); margin-right: 3px;">
+                      {{termdata['Term.cPlanNo']}}方案
+                    </span>
                   </template>
                   <template v-else>
                     <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
@@ -81,30 +83,31 @@
           </div>
         </template>
 
-        <div v-show="showData">
+        <div class="cvrg-body__" v-show="showData">
           <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-            <el-row style="padding: 5px 10px;">
-              <el-col :span="22">
-                <a
-                  style="margin-right: 5px"
-                  @click="ginfo.hidden = !ginfo.hidden"
-                >
-                  <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
-                  <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
-                </a>
-                <span>
+            <div class="body-group-info">
+              <el-row class="group-header">
+                <el-col :span="22">
+                  <a
+                      style="margin-right: 5px"
+                      @click="ginfo.hidden = !ginfo.hidden"
+                  >
+                    <el-icon v-if="ginfo.hidden"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="!ginfo.hidden"><ArrowDownBold /></el-icon>
+                  </a>
+                  <span>
                   {{ ginfo.cGroupTitle }}
                 </span>
-              </el-col>
-            </el-row>
-            <el-row v-if="!ginfo.hidden">
-              <table style="width: 100%">
-                <thead>
+                </el-col>
+              </el-row>
+              <el-row v-if="!ginfo.hidden">
+                <table style="width: 100%">
+                  <thead>
                   <tr class="table-title">
                     <th
-                      v-for="col in getColinfo(ginfo.cGroupId)"
-                      :key="col.cColId"
-                      :width="col.cColWidth ? col.cColWidth : null"
+                        v-for="col in getColinfo(ginfo.cGroupId)"
+                        :key="col.cColId"
+                        :width="col.cColWidth ? col.cColWidth : null"
                     >
                       {{ col.cColTitle }}
                     </th>
@@ -112,71 +115,72 @@
                       {{ v.title }}
                     </th>
                   </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                   <template v-if="groupconf[ginfo.cGroupId]">
                     <template
-                      v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
-                      :key="k"
+                        v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
+                        :key="k"
                     >
                       <template v-if="riskdata.maxNum > 0">
                         <tr
-                          v-for="n in riskdata.maxNum"
-                          :key="`${ginfo.cGroupId}-${k}-${n}`"
-                          :class="{'selected': isSelected(k)}"
-                          @click="selectRow(k)"
+                            v-for="n in riskdata.maxNum"
+                            :key="`${ginfo.cGroupId}-${k}-${n}`"
+                            :class="{'selected': isSelected(k)}"
+                            @click="selectRow(k)"
                         >
                           <template
-                            v-for="colinfo in riskdata.col"
-                            :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
+                              v-for="colinfo in riskdata.col"
+                              :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                           >
                             <template
-                              v-if="
+                                v-if="
                                 riskdata.rowConfig[colinfo.cColId] &&
                                 riskdata.rowConfig[colinfo.cColId][n - 1]
                               "
                             >
                               <td
-                                :rowspan="
+                                  :rowspan="
                                   riskdata.rowConfig[colinfo.cColId][n - 1]
                                     ?.cPorpType === 'rowspan'
                                     ? riskdata.maxNum
                                     : null
                                 "
-                                :class="{
+                                  :class="{
                                     'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
                                  }"
-                                 style="white-space: nowrap;"
+                                  style="white-space: nowrap;"
                               >
                                 <template
-                                  v-if="
+                                    v-if="
                                     riskdata.rowConfig[colinfo.cColId][n - 1]
                                       .cPorpType === 'text'
                                   "
                                 >
                                   <el-text
-                                    v-if="
+                                      v-if="
                                       isrequired(
                                         riskdata.rowConfig[colinfo.cColId][
                                           n - 1
                                         ].factorItem
                                       )
                                     "
-                                    class="mx-1"
-                                    style="margin-right: 2px"
-                                    type="danger"
-                                    >*</el-text
+                                      class="mx-1"
+                                      style="margin-right: 2px"
+                                      type="danger"
+                                  >*</el-text
                                   >
                                   <span
-                                    >{{
+                                  >{{
                                       riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        .factorItem.title
+                                          .factorItem.title
                                     }}
                                   </span>
                                 </template>
                                 <template v-else>
                                   <el-form-item
-                                    :error="
+                                      class="custom-table-item__"
+                                      :error="
                                       showError(
                                         riskdata.rowConfig[colinfo.cColId][
                                           n - 1
@@ -192,10 +196,10 @@
                                         ]
                                       )
                                     "
-                                    :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                      :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
                                   >
                                     <from-item
-                                      v-model="
+                                        v-model="
                                         riskList[
                                           riskdata.rowConfig[colinfo.cColId][
                                             n - 1
@@ -206,8 +210,8 @@
                                           ].factorItem?.prop
                                         ]
                                       "
-                                      @update:modelValue="update()"
-                                      :item="
+                                        @update:modelValue="update()"
+                                        :item="
                                         riskdata.rowConfig[colinfo.cColId][
                                           n - 1
                                         ].factorItem
@@ -222,15 +226,16 @@
                             <template v-for="v in extermConf" :key="v.c_pk_id">
                               <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
                                 <el-form-item
-                                  :rules="
+                                    class="custom-table-item__"
+                                    :rules="
                                     isrequired(v) ? getRequired() : undefined
                                   "
-                                  :prop="v.prop"
+                                    :prop="v.prop"
                                 >
                                   <from-item
-                                    v-model="termdata[v.prop]"
-                                    @update:modelValue="update()"
-                                    :item="v"
+                                      v-model="termdata[v.prop]"
+                                      @update:modelValue="update()"
+                                      :item="v"
                                   />
                                 </el-form-item>
                               </td>
@@ -240,9 +245,10 @@
                       </template>
                     </template>
                   </template>
-                </tbody>
-              </table>
-            </el-row>
+                  </tbody>
+                </table>
+              </el-row>
+            </div>
           </template>
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
@@ -271,6 +277,7 @@
                       </td>
                       <td>
                         <el-form-item
+                            class="custom-table-item__"
                           :rules="isrequired(item) ? getRequired() : undefined"
                           :prop="item.prop"
                         >
@@ -320,6 +327,7 @@
                     <template v-for="(item, k) in termFactormap" :key="k">
                       <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
                         <el-form-item
+                            class="custom-table-item__"
                           :rules="isrequired(item) ? getRequired() : undefined"
                           :prop="item.prop"
                         >
@@ -340,6 +348,7 @@
                           <template v-if="item.cPorpExtend === '1'">
                             <el-col style="margin-top: 5px" :span="12">
                               <el-form-item
+                                  class="custom-table-item__"
                                 :rules="isrequired(item) ? getRequired() : undefined"
                                 :prop="item.prop"
                                 :label="item.title" 
@@ -361,11 +370,13 @@
               </table>
             </template>
             <template v-else>
-              <app-free-edit
-                :freeEditConfig="formconfig1"
-                ref="termRef"
-                @updateDatas="update"
-              />
+              <div class="crvg_form__">
+                <app-free-edit
+                    :freeEditConfig="formconfig1"
+                    ref="termRef"
+                    @updateDatas="update"
+                />
+              </div>
             </template>
           </template>
         </div>
@@ -1483,6 +1494,8 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index";
+
 .cvrg-info {
   box-shadow: none;
   --el-card-border-color: none;
@@ -1494,7 +1507,7 @@ defineExpose({
   }
 }
 .table-title {
-  background-color: var(--el-border-color-lighter);
+  background: var(--cvrg-group-header-bg-color);
   th {
     text-align: center;
   }
@@ -1525,9 +1538,9 @@ td {
   border: 1px solid var(--el-border-color-lighter); /* 设置边框样式 */
   padding: 2px;
   text-align: left;
-  font-family: var(--font-family);
   font-size: 12px;
   font-weight: 450;
+  color: var(--el-text-color)
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
@@ -1542,5 +1555,37 @@ td {
 }
 :deep(.el-input__inner) {
   text-align: right!important;
+}
+
+.cvrg-hearder {
+  border-bottom: var(--rt-border);
+  padding-bottom: 3px;
+}
+.cvrg-body__ {
+  margin-top: 5px;
+  .body-group-info {
+    margin-top: 5px;
+    border: 1px var(--el-border-color-lighter) solid;
+    padding: 3px;
+    .group-header {
+      margin-bottom: 3px;
+      background-color: var( --cvrg-sub-header-bg-color);
+      //padding: 2px
+      padding: 5px 10px;
+    }
+  }
+
+  :deep(.custom-table-item__){
+    .el-form-item__content {
+      line-height: 25px;
+      height: 25px;
+      @extend .rt-custom-input;
+      @extend .rt-custom-select;
+    }
+  }
+}
+
+.crvg_form__ {
+  margin-top: 5px;
 }
 </style>

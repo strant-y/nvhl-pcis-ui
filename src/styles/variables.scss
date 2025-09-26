@@ -18,73 +18,53 @@
 
   --dashboard-bg: url("@/assets/img/home_bg1.png");
   --el-text-color-regular: #000;
+
   --card-group-header-bg-color: #f2f2f2;
   --cvrg-sub-header-bg-color: rgba(214, 254, 255, 0.6);
+  --cvrg-group-header-bg-color: rgba(0,0,0,0.04);
+
+  --rt-form-content-font-size: 11.5px; // 表单content字体大小
+  --rt-form-content-font-weight: 450;
+  --rt-form-content-height: 25px; // 表单content高
+  --rt-form-content-line-height: 1.4;
+  --rt-form-label-font-size: 11.5px; // 表单label字体大小
+  --rt-form-label-font-weight: 400;
+  --rt-form-label-font-color: #000000;
+  --rt-form-label-padding: 0 5px 0 0, // 标签内边距
+
 }
 
-// 主题
-html.sentimental {
-  --menu-background: #bad7df;
-  --menu-active-text: #FFAAA6;
-  --sidebar-logo-background: #bad7df;
-  --menu-hover: #FFAAA6;
-  --menu-text: #333;
-}
-html.simple {
-  --menu-background: #52616b;
-  --sidebar-logo-background: #52616b;
-  --menu-active-text: #838a90;
-  --menu-hover: #c9d6df;
-  --menu-text: #fff;
-}
-html.linen {
-  --menu-background: #476d7c;
-  --sidebar-logo-background: #476d7c;
-  --menu-active-text: #62929a;
-  --menu-hover: #62929a;
-  --menu-text: #fff;
-  --el-text-color: #000 !important;
-}
 
-html.graceful {
-  --menu-background: #596e79;
-  --sidebar-logo-background: #596e79;
-  --menu-active-text: #c7b198;
-  --menu-hover: #c7b198;
-  --menu-text: #fff;
+
+html.default {
+  --menu-background: #f0f5f9;;
+  --menu-active-text: #FFFFFF;
+  --menu-hover: #3a76c6;
+  --menu-text: #000000;
   --el-text-color: #000 !important;
-}
-html.summer {
-  --menu-background: #40bfc1;
-  --sidebar-logo-background: #40bfc1;
-  --menu-active-text: #ff6f5e;
-  --menu-hover: #ff6f5e;
-  --menu-text: #fff;
-  --el-text-color: #000 !important;
-}
-html.blue {
-  --menu-background: #3a76c6;
-  --sidebar-logo-background: #3a76c6;
-  --menu-active-text: #ff6f5e;
-  --menu-hover: #ff6f5e;
-  --menu-text: #fff;
-  --el-text-color: #000 !important;
+
+  --cvrg-sub-header-bg-color: rgba(165, 204, 255, 0.3);
+  --rt-select-row-bg-color: rgba(165, 204, 255, 0.1);
 }
 html.orange {
-  --menu-background: #f57c10;
-  --sidebar-logo-background: #f57c10;
-  --menu-active-text: #ff6f5e;
-  --menu-hover: #ff6f5e;
-  --menu-text: #fff;
+  --menu-background: #f0f5f9;;
+  --menu-active-text: #FFFFFF;
+  --menu-hover: #f57c10;
+  --menu-text: #000000;
   --el-text-color: #000 !important;
+
+  --cvrg-sub-header-bg-color: rgba(255, 211, 169, 0.3);
+  --rt-select-row-bg-color: rgba(255, 211, 169, 0.1);
 }
 html.green {
-  --menu-background: #09d067;
-  --sidebar-logo-background: #09d067;
-  --menu-active-text: #ff6f5e;
-  --menu-hover: #ff6f5e;
+  --menu-background: #f0f5f9;
+  --menu-active-text: #FFFFFF;
+  --menu-hover: #09d067;
   --menu-text: #fff;
   --el-text-color: #000 !important;
+
+  --cvrg-sub-header-bg-color: rgba(168, 251, 207, 0.3);
+  --rt-select-row-bg-color: rgba(168, 251, 207, 0.1);
 }
 
 
@@ -103,17 +83,20 @@ html.dark {
   --card-header-title-color: #ccc !important;
   --cvrg-sub-header-bg-color: rgb(0 0 0 / 80%);
   --card-group-header-bg-color: rgb(0 0 0 / 80%);
+  --cvrg-group-header-bg-color: rgb(0 0 0 / 60%);
 
   --rt-bg-color: rgb(0 0 0 / 85%) !important;
   --rt-border: rgb(200 200 200 / 30%) 1px solid !important;
   --rt-overlay-color: rgb(200 200 200 / 10%) !important;
+  --rt-select-row-bg-color: rgba(255, 255, 255, 0.1);
 
   --el-mypage-right-menu-border-color: rgb(150 150 150 / 40%);
   --el-menu-border-color: rgb(100 100 100 / 20%);
   --wrapper-required-bg-color: rgb(0 0 0 / 80%) !important;
 
   --dashboard-bg: rgb(0 0 0 / 85%) !important;
-  --el-text-color-regular: #b9b9b9;
+  --el-text-color-regular: #bababa;
+  --rt-form-label-font-color: rgba(220, 220, 220, 0.5);
 }
 
 $menu-background: var(--menu-background); // 菜单背景色
@@ -135,35 +118,3 @@ $sidebar-width: 210px; // 侧边栏宽度
 $sidebar-width-collapsed: 54px; // 侧边栏收缩宽度
 $navbar-height: 45px; // 导航栏高度
 $tags-view-height: 34px; // TagsView 高度
-
-
-
-$font-config: (
-  font-family: var(--font-family),
-  font-color: var(--el-text-color),
-);
-
-
-// 字体和标签样式配置变量
-$form-config: (
-  // 统一高度
-  item-height: 25px,
-// 表单全局字体设置
-  font-family: var(--font-family),
-  font-size: 11.5px,
-  font-color: var(--el-text-color),
-  line-height: 1.4,
-
-// Label标签样式
-  label-font-size: 11.5px,
-  label-font-weight: 400, // 中等加粗
-  label-color: var(--el-text-color),      // 标签文字颜色
-  label-padding: 0 5px 0 0, // 标签内边距
-
-// Label容器边框样式
-  label-border: false,       // 是否显示边框
-  label-border-width: 1px,
-  label-border-color: #e5e7eb,
-  label-border-radius: 3px,
-  label-bg-color: #f9fafb,   // 标签背景色
-);

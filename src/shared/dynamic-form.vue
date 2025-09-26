@@ -879,7 +879,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 </style>
 <style lang="css" scoped>
 .rt_group {

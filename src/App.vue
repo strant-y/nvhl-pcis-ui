@@ -106,7 +106,7 @@ watchEffect(() => {
 }
 
 * {
-  font-family: map-get($font-config, font-family) !important;
+  font-family: var(--font-family),serif !important;
 }
 
 // 这些组件通常挂载在body下，需要单独指定
@@ -116,11 +116,11 @@ watchEffect(() => {
 .el-tooltip__popper,
 .el-message-box,
 .el-notification {
-  font-family: map-get($font-config, font-family) !important;
+  font-family: var(--font-family),serif !important;
 }
 
 ::placeholder {
-  font-family: map-get($font-config, font-family) !important;
+  font-family: var(--font-family),serif !important;
 }
 </style>
 <style>

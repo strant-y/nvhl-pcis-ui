@@ -226,13 +226,13 @@ onMounted(() => {
   height: 40px;
   line-height: 40px;
   padding-left: 20px;
-  background: #fefce7;
-  border: 1px solid #f3e4b9;
+  background: var(--cvrg-sub-header-bg-color);
+  border: var(--rt-border);
   margin-bottom: 10px;
 }
 
 :deep .el-table .checkedSty {
-  background-color: #ffe8e6;
+  background-color: var(--rt-select-row-bg-color);
 }
 
 .addSty {

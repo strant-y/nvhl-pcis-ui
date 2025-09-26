@@ -5634,7 +5634,7 @@ const shouldCheckYunnanPaymentRules = () => {
 };
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+
 
 $btn-icon-color-1: #ff3e00;
 $btn-icon-color-2: #0060ff;
@@ -5698,9 +5698,11 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   // width: 130px;
   :deep(.el-anchor__list) {
     padding: 0;
+    margin-top: 15px;
   } 
   .el-anchor__item {
-    margin-top: 5px;
+    height: 32px;
+    margin-top: 2px;
     padding-left: 16px;
     padding-right: 22px;
     &.isActive,&:hover {
