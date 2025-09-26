@@ -293,7 +293,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-
+                @savePlyInfo="savePlyInfo"
               />
             </div>
           </template>
@@ -2583,6 +2583,10 @@ const saveDist = (appNo:any, cRsnCde?:any) => {
         opertaor.getTableRefs()[item.pageCode].handleQuery();
       });
       saveDistBatchFlag.value = false;
+      const cvrgRef = opertaor.getTableRefs()['cvrg'];
+      try {
+        cvrgRef?.refushCvrgInfo();
+      } catch (ignore) {}
     } else {
       ElMessage.error(res.msg);
     }
