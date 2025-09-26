@@ -56,12 +56,14 @@ import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTgtDetailByDist } from "@/api/query";
 
+
 const { getRules } = useValidator();
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam(); 
+const queryLoading = ref(false);         // 控制按钮 loading 图标
 
 const props = defineProps({
   pageSchema: {
@@ -165,26 +167,7 @@ const oldPageSchema = ref<any>({});
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 const addedPlans = ref<string[]>([]);
 const isQuery = ref(false)
-// 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
-// 有值的时候再填充到方案号的loadData中
-// const cvrg = computed(() => {
-//   if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
-//     return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
-//   } else {
-//     return [];
-//   }
-// })
-// watch(cvrg, (val) => {
-//   if(val && val.length > 0) {
-//     formconfig11.value.fromSchema.forEach((r:any) => {
-//     //   方案号
-//       if(r['prop'] == 'Dist.cPlanNo'){
-//         r.typeCode = null;
-//         r.loadData = val;
-//       }
-//     });
-//   }
-// });
+
 watch(
     () => pageresult.list,
     (newVal: any) => {
@@ -653,6 +636,10 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
+
+        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
+           method.getTgtDetailFn();
+        }
       }
     });
   },
@@ -695,18 +682,21 @@ const method = {
         
         getTgtDetailByDist(distParam).then((res: any) => {
         if (res["code"] == "200") {
-            let tgtRef = opertaor.getTableRefByKey('tgt');
-            let cWaybillNumber = res.data?.cWaybillNumber;
-            let cGoodsNo = res.data?.cGoodsNo;
-            let nInvoicceValue = res.data?.nInvoicceValue;
-            let cInvoiceNum = res.data?.cInvoiceNum;
-            let nGoodsNum = res.data?.nGoodsNum;
-            tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
-            tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
-            tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
-            tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
-            tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
-         
+              nextTick(()=>{
+                    setTimeout(()=>{
+                         let tgtRef = opertaor.getTableRefByKey('tgt');
+                        let cWaybillNumber = res.data?.cWaybillNumber;
+                        let cGoodsNo = res.data?.cGoodsNo;
+                        let nInvoicceValue = res.data?.nInvoicceValue;
+                        let cInvoiceNum = res.data?.cInvoiceNum;
+                        let nGoodsNum = res.data?.nGoodsNum;
+                        tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
+                        tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
+                        tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
+                        tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
+                        tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
+                    },100)
+              })
         } else {
             ElMessage.error(res.msg);
         }
@@ -944,6 +934,7 @@ const method = {
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
             console.error("导入错误：", error);
+            
           });
         };
 
