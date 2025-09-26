@@ -12,6 +12,7 @@
               :type="item.type"
               :size="item.size"
               :placeholder="item.placeholder"
+              :loading="item.loading"
               :link="
             item.link
               ? typeof item.link === 'boolean'
@@ -62,6 +63,7 @@
             ref="buttonRef"
             :type="item.type"
             :size="item.size"
+            :loading="item.loading"
             :disabled="
           item.disabled ||
           (typeof item.disabled === 'function' ? item.disabled(row) : false)
