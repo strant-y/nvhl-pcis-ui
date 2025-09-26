@@ -226,6 +226,17 @@
   }
 }
 
+:deep(.sub-header-search-btn) {
+  background: var(--cvrg-sub-header-bg-color);
+  .search-btn-item {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    @extend .rt-input__btn;
+    @extend .rt-custom-input;
+  }
+}
+
 // 输入框块样式
 .rt-custom-input {
   .el-input {

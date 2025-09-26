@@ -5681,7 +5681,7 @@ const shouldCheckYunnanPaymentRules = () => {
 };
 </script>
 <style lang="scss" scoped>
-
+@import "@/styles/custom-index";
 
 $btn-icon-color-1: #ff3e00;
 $btn-icon-color-2: #0060ff;
@@ -5711,7 +5711,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   display: inline-block; /* 设置为行内块元素 */
   vertical-align: middle; /* 垂直居中 */
   position: relative;
-  z-index: 9999;
+  z-index: 998;
 }
 
 /* 用于包含行内块元素的容器 */
@@ -5721,7 +5721,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  z-index: 9999;
 }
 :deep(.el-main) {
   // padding: 10px 10px 10px 10px;
@@ -5749,7 +5748,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   :deep(.el-anchor__list) {
     padding: 0;
     margin-top: 15px;
-  } 
+  }
   .el-anchor__item {
     height: 32px;
     margin-top: 2px;
@@ -5814,6 +5813,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   left: 80px;
   transform: translateX(-50%);
   margin-bottom: 0 !important;
+  z-index: 999;
 }
 
 .toggle-nav-button {

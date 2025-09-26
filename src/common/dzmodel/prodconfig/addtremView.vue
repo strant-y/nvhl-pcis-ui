@@ -2,18 +2,16 @@
   <div>
     <el-row>
       <el-col :span="12" style="padding-right: 5px;">
-        <div style="border: 1px solid #D9D9D9;">
+        <div style="border: var(--rt-border);padding: 1px;">
           <div class="header">
             <div class="flex">
               <el-icon style="margin: 0 10px;"><ArrowDownBold /></el-icon>
               <span class="zhu-tag">主险</span>
               <span class="header-title">必须选择至少一项主条款</span>
             </div>
-            <div class="search-btn">
-              <div>
-                <div class="inline-block-div">
-                  <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
-                </div>
+            <div class="sub-header-search-btn">
+              <div class="search-btn-item">
+                <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
                 <rtButton
                   :item="{
                     icon: 'Search',
@@ -39,7 +37,7 @@
             />
           </div>
         </div>
-        <div style="padding-left: 20px;margin-top: 12px;">
+        <div style="padding: 5px;margin: 10px 0 5px 0;background: var(--cvrg-sub-header-bg-color);">
           <span class="header-title">已选择的主条款</span>
         </div>
         <div style="overflow-y: auto; max-height: 250px">
@@ -61,18 +59,16 @@
         </div>
       </el-col>
       <el-col :span="12" style="padding-left: 5px;">
-        <div style="border: 1px solid #D9D9D9;">
+        <div style="border: var(--rt-border);padding: 1px;">
           <div class="header">
             <div class="flex">
               <el-icon style="margin: 0 10px;"><ArrowDownBold /></el-icon>
               <span class="fu-tag">附加</span>
               <span class="header-title">请选择附加条款责任</span>
             </div>
-            <div class="search-btn">
-              <div>
-                <div class="inline-block-div">
-                  <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
-                </div>
+            <div class="sub-header-search-btn">
+              <div class="search-btn-item">
+                <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
                 <rtButton
                   :item="{
                     icon: 'Search',
@@ -97,7 +93,7 @@
             />
           </div>
         </div>
-        <div style="padding-left: 20px;margin-top: 12px;">
+        <div style="padding: 5px;margin: 10px 0 5px 0;background: var(--cvrg-sub-header-bg-color);">
           <span class="header-title">已选择的附加条款</span>
         </div>
         <div style="overflow-y: auto; max-height: 250px">
@@ -713,15 +709,6 @@ function fail() {
 </script>
 
 <style scoped>
-.inline-block-div {
-  display: inline-block;
-}
-.search-btn {
-  /* width: 100%; */
-  /* height: 45px;
-  background-color: #f3f3f3; */
-  margin-right: 20px;
-}
 .custom-tree-node {
   display: flex;
   align-items: center;
@@ -759,10 +746,9 @@ function fail() {
   align-items: center;
 }
 .header {
-  height: 46px;
+  height: 32px;
   background: var(--cvrg-sub-header-bg-color);
   border-radius: 2px 2px 0px 0px;
-  border-bottom: 1px solid var(--el-menu-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -770,7 +756,7 @@ function fail() {
 .zhu-tag {
   width: 37px;
   height: 22px;
-  background: rgba(58,118,198,0.1);
+  background: var(--cvrg-sub-header-bg-color);
   border-radius: 2px;
   border: 1px solid #3A76C6;
   color: #3A76C6;
@@ -782,7 +768,7 @@ function fail() {
 .fu-tag {
   width: 37px;
   height: 22px;
-  background: rgba(198,105,58,0.1);
+  background: var(--cvrg-sub-header-bg-color);
   border-radius: 2px;
   border: 1px solid #C6693A;
   color: #C6693A;
