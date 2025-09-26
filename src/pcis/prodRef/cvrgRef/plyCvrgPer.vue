@@ -166,6 +166,7 @@ const {selectedRow} = storeToRefs(termConfig);
 const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
 const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
 const pageName = computed(() => opertaor.getParam()['pageName']);
+const emit = defineEmits(['savePlyInfo']);
 
 const props = defineProps({
   pageSchema: {
@@ -696,6 +697,7 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
       });
     }
   }
+  emit('savePlyInfo');
 };
 
 onActivated(() => {

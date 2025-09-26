@@ -56,6 +56,7 @@ import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTgtDetailByDist } from "@/api/query";
 
+
 const { getRules } = useValidator();
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
@@ -165,26 +166,7 @@ const oldPageSchema = ref<any>({});
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 const addedPlans = ref<string[]>([]);
 const isQuery = ref(false)
-// 列表数据反显时，方案号的下拉选项渲染需要条款加载后根据条款获取，所以通过计算属性获取getPlanNo的值
-// 有值的时候再填充到方案号的loadData中
-// const cvrg = computed(() => {
-//   if(opertaor.getTableRefByKey("cvrg") && opertaor.getTableRefByKey("cvrg").getPlanNo) {
-//     return opertaor.getTableRefByKey("cvrg")?.getPlanNo()
-//   } else {
-//     return [];
-//   }
-// })
-// watch(cvrg, (val) => {
-//   if(val && val.length > 0) {
-//     formconfig11.value.fromSchema.forEach((r:any) => {
-//     //   方案号
-//       if(r['prop'] == 'Dist.cPlanNo'){
-//         r.typeCode = null;
-//         r.loadData = val;
-//       }
-//     });
-//   }
-// });
+
 watch(
     () => pageresult.list,
     (newVal: any) => {
@@ -653,6 +635,10 @@ const method = {
         if(idxParam && isChange) { // 保存清单表格在屏幕中间
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
+
+        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
+           method.getTgtDetailFn();
+        }
       }
     });
   },
@@ -695,18 +681,21 @@ const method = {
         
         getTgtDetailByDist(distParam).then((res: any) => {
         if (res["code"] == "200") {
-            let tgtRef = opertaor.getTableRefByKey('tgt');
-            let cWaybillNumber = res.data?.cWaybillNumber;
-            let cGoodsNo = res.data?.cGoodsNo;
-            let nInvoicceValue = res.data?.nInvoicceValue;
-            let cInvoiceNum = res.data?.cInvoiceNum;
-            let nGoodsNum = res.data?.nGoodsNum;
-            tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
-            tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
-            tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
-            tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
-            tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
-         
+              nextTick(()=>{
+                    setTimeout(()=>{
+                         let tgtRef = opertaor.getTableRefByKey('tgt');
+                        let cWaybillNumber = res.data?.cWaybillNumber;
+                        let cGoodsNo = res.data?.cGoodsNo;
+                        let nInvoicceValue = res.data?.nInvoicceValue;
+                        let cInvoiceNum = res.data?.cInvoiceNum;
+                        let nGoodsNum = res.data?.nGoodsNum;
+                        tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
+                        tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
+                        tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
+                        tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
+                        tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
+                    },100)
+              })
         } else {
             ElMessage.error(res.msg);
         }
@@ -903,10 +892,13 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    tableconfig.value.formconfig.titleBtns[2].loading = true;
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
     input.onchange = () => {
+      ElMessage.warning('正在导入中，请稍候…')
       if (input.files?.length) {
         const file = input.files[0];
         const reader = new FileReader();
@@ -931,24 +923,30 @@ const method = {
           }
 
           policyService.importDistIncrement(params).then((res) => {
+            
             if (res.code === 200) {
               titleInfo.value = {
                 successes: res.data.successes,
                 fails: res.data.fails,
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
+              tableconfig.value.formconfig.titleBtns[2].loading = false;
               method.handleQuery();
             } else {
               ElMessage.error(res.msg || "增量导入失败");
+              tableconfig.value.formconfig.titleBtns[2].loading = false;
             }
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
+            tableconfig.value.formconfig.titleBtns[2].loading = false;
             console.error("导入错误：", error);
+            
           });
         };
 
         reader.onerror = (e) => {
           ElMessage.error("文件读取失败");
+          tableconfig.value.formconfig.titleBtns[2].loading = false;
         };
 
         reader.readAsDataURL(file); // 启动读取

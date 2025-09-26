@@ -144,6 +144,10 @@ onMounted(() => {
       setFormItem("Applicant.cAgencyReason", { hidden: true });
       setFormItem("Applicant.cLegalRepresentative", { hidden: true });
       setFormItem("Applicant.cEnterpriseTel", { hidden: true });
+    }else{
+      setFormItem("Applicant.cAgencyReason", { hidden: false });
+      setFormItem("Applicant.cLegalRepresentative", { hidden: false });
+      setFormItem("Applicant.cEnterpriseTel", { hidden: false });
     }
 
     setFormItem("Applicant.cGcidCode", { rules: [getRules("leiCode", {})] });
@@ -241,8 +245,6 @@ const idAnalysis = (id: string) => {
 };
 // 防抖定时器
 let debounceTimer = <any>null;
-
-
 //  根据 客户名称 / 被保人性质/ 证件类型 / 证件号码 获取客户信息
 const checkUser = () => {
   const fieldsToValidate = ['Applicant.cAppNme', 'Applicant.cClntMrk', "Applicant.cCertfCde", "Applicant.cCertfCls"];
@@ -460,7 +462,7 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
       });
-    } else     if (val === '07') {
+    } else if (val === '07') {
       // 护照
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("passPort", {})],
@@ -493,6 +495,29 @@ const method = {
       });
     }
   },
+  //证件有效期开始时间事件改变
+  tCertfBgnDateChange: (val) => {
+    const tableData = opertaor.getTableRefs();
+    const tcertfEndDate = tableData["applicant"].getFromValue()["Applicant.TcertfEndDate"]  //证件有效止期
+    const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
+    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.TInsrncBgnTm"] //保险起期
+  },
+  //证件有效期止期时间事件改变
+  tCertfEndDateChange: (val) => {
+    const tableData = opertaor.getTableRefs();
+    const tcertfEndDate = tableData["applicant"].getFromValue()["Applicant.TcertfEndDate"]  //证件有效止期
+    const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
+    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.TInsrncBgnTm"] //保险起期
+    if (val && tIssueTm && tinsrncBgnTm) {
+      if (val < tinsrncBgnTm) {
+        ElMessage.error("投保人证件有效期小于保单签单时间，请关注!");
+        setValue("Applicant.TcertfEndDate", tinsrncBgnTm);
+      }
+      if (val < tIssueTm) {
+        ElMessage.error("投保人证件有效期小于保单起保时间，请关注!");
+      }
+    }
+  },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
     const param = opertaor.getParam(); ``
@@ -521,6 +546,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cOperaterCertfCde", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cEnterpriseTel", {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cCntrCertfCde", {
@@ -617,6 +645,18 @@ const method = {
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Applicant.cIsMicroEntpris", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.nRegisteredCapital", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cLegalRepresentative", {
+        rules: [getRules("required", {})],
+      });
 
       // 性别 、年龄、生日个人必填
       setFormItem("Applicant.tBirthday", {
@@ -672,7 +712,9 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: null,
       });
-
+      setFormItem("Applicant.cEnterpriseTel", {
+        rules: [],
+      });
       //是否分支机构
       if (!getValue('Applicant.cIsBranch')) {
         setValue("Applicant.cIsBranch", "1");
@@ -730,6 +772,18 @@ const method = {
       });
       setFormItem("Applicant.cSex", {
         rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cIsMicroEntpris", {
+        rules: [],
+      });
+      setFormItem("Applicant.nRegisteredCapital", {
+        rules: [],
+      });
+      setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [],
+      });
+      setFormItem("Applicant.cLegalRepresentative", {
+        rules: [],
       });
 
       codeListStore
@@ -1132,6 +1186,21 @@ const method = {
     setFormItem("Applicant.tEstablishingDate", {
       rules: isSpecialCase ? requiredRule : []
     });
+    if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
+      setFormItem("Applicant.nRegisteredCapital", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [getRules("required", {})],
+      });
+    }else{
+      setFormItem("Applicant.nRegisteredCapital", {
+        rules: []
+      });
+      setFormItem("Applicant.cFirmscaleTyp", {
+        rules: []
+      });
+    }
 
 
     const leiCodeRule = [getRules("leiCode", {})];

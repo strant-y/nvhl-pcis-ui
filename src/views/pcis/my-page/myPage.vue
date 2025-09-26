@@ -293,7 +293,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-
+                @savePlyInfo="savePlyInfo"
               />
             </div>
           </template>
@@ -1310,13 +1310,22 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
-  const getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage({
+  let exParams = {};
+  if(props.param.cTermNo === "0421070701"){
+    exParams = { exp:'3' }
+  }
+  if(props.param.cTermNo === "0420092701"){
+    exParams = { exp:'1' }
+  }
+  let pageparams = {
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
-  }) : await getProductPage({
-    CProdNo: props.param.cProdNo,
-    CGrpMrk: props.param.cGrpMrk,
-  });
+  };
+  
+  if(exParams && Object.keys(exParams).length > 0){
+    pageparams.cExParams = JSON.stringify(exParams);
+  }
+  let getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage(pageparams) : await getProductPage(pageparams);
 
   // const getRenewalAppPolicyres = await getRenewalAppPolicy({
   //   cPlyNo: props.param.cPlyNo,
@@ -2574,6 +2583,10 @@ const saveDist = (appNo:any, cRsnCde?:any) => {
         opertaor.getTableRefs()[item.pageCode].handleQuery();
       });
       saveDistBatchFlag.value = false;
+      const cvrgRef = opertaor.getTableRefs()['cvrg'];
+      try {
+        cvrgRef?.refushCvrgInfo();
+      } catch (ignore) {}
     } else {
       ElMessage.error(res.msg);
     }

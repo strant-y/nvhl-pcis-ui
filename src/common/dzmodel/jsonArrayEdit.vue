@@ -90,7 +90,6 @@ const tableconfig = reactive<AppTableConfig>(
           if(data && data.length !== 0 ){
             jsonData = JSON.stringify(data);
           }
-          console.log(jsonData);
           emits("ok", jsonData);
           dialogVisible.value = false;
         },
@@ -128,9 +127,16 @@ onMounted(() => {
       setTimeout(() => {
         tableRef.value?.setFormValue(obj);
       }, 40);
+    }else{
+      initdata();
     }
   } else {
-    if (props.inititle && props.inititle.length > 0) {
+    initdata();
+  }
+});
+
+function initdata(){
+if (props.inititle && props.inititle.length > 0) {
       props.inititle.forEach((e) => {
         const params = {
           prop: e,
@@ -140,8 +146,7 @@ onMounted(() => {
         tableconfig.fromSchema?.push(params);
       });
     }
-  }
-});
+}
 defineExpose({});
 </script>
 

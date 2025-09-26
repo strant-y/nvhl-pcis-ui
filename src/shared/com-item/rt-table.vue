@@ -228,16 +228,45 @@
                 <slot :name="`column-${i.slotName}`" v-bind="scope" />
               </template>
               <template v-else-if="item.editFlag">
+                
                 <el-form-item
                   :prop="[scope.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"
                 >
-                  <from-item
-                    v-model="scope.row[i.prop]"
-                    :item="formItems[scope.row._dataId][i.prop]"
-                    :showLabel="formItems[scope.row._dataId][i.prop]?.disableColEdit || editIndex !== scope.row._dataId"
-                    :row="scope.row"
+                  <div :style="{
+                      width:
+                        // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
+                        formItems[scope.row._dataId][i.prop].showExBtn &&
+                        formItems[scope.row._dataId][i.prop].inputtype !== 'rttable' &&
+                        editIndex === scope.row._dataId
+                          ? (formItems[scope.row._dataId][i.prop].btnWidth
+                              ? 100 -
+                                formItems[scope.row._dataId][i.prop].btnWidth
+                              : 75) + '%'
+                          : '100%',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                    }" >
+                    <from-item
+                      v-model="scope.row[i.prop]"
+                      :item="formItems[scope.row._dataId][i.prop]"
+                      :showLabel="formItems[scope.row._dataId][i.prop]?.disableColEdit || editIndex !== scope.row._dataId"
+                      :row="scope.row"
                   />
+                </div>
+                  <!---       显示组件尾部按钮       --->
+                  <template
+                      v-if="formItems[scope.row._dataId][i.prop].showExBtn && editIndex === scope.row._dataId"
+                  >
+                    <rt-button
+                        v-if=" formItems[scope.row._dataId][i.prop].btnItems "
+                        :style="{ width:
+                      (formItems[scope.row._dataId][i.prop].btnWidth
+                        ? formItems[scope.row._dataId][i.prop].btnWidth
+                        : 25) + '%', height: '100%', }"
+                        :item="formItems[scope.row._dataId][i.prop].btnItems"
+                    />
+                  </template>
                 </el-form-item>
               </template>
               <template v-else-if="i.formatter">

@@ -32,6 +32,9 @@ const prodPageComponent = defineAsyncComponent(
 const prodPageComFactor = defineAsyncComponent(
   () => import("./prodPageComFactor.vue")
 );
+const jsonArrayEdit = defineAsyncComponent(
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
+);
 const dialog = ref<DialogMethod | null>(null);
 const { getRules } = useValidator();
 
@@ -159,6 +162,47 @@ const gridconfig = reactive<AppGridEditConfig>(
           },
         ],
       },
+      {
+      prop: "cExParams",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "额外配置参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          const r = gridEditRef.value?.getSelectRow();
+          const ck = r.cExParams;
+          let l = [];
+          const d = ck?JSON.parse(ck):{};
+          if(d && Object.keys(d).length > 0){
+            Object.keys(d).forEach((key) => {
+              l.push({
+                key: key,
+                value: d[key],
+              });
+            });
+          };
+          dzmodal
+            .open(jsonArrayEdit, {
+              data: JSON.stringify(l),
+              inititle: ["key", "value"],
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+                let nk = {};
+                JSON.parse(res.body).forEach((element) => {
+                  nk[element.key] = element.value;
+                });
+                gridEditRef.value?.setValueByRowKey("cExParams", r._dataId ,nk?JSON.stringify(nk):"");
+              }
+            });
+        },
+      }),
+    },
     ],
     fromUi: createGridFromUiConfig({
       cols: 3,

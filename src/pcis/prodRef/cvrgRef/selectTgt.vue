@@ -131,7 +131,8 @@ onMounted(async () => {
   });
   tableconfig.value.endBtnsPosition = "right";
   tableconfig.value.isPage = true; //分页
-  tableconfig.value.endBtns =[createFreeButtonBase({
+  tableconfig.value.endBtns =[
+    createFreeButtonBase({
     type: "primary",
     label: "确定",
     func: async() => {
@@ -141,7 +142,8 @@ onMounted(async () => {
         }
         await getTermDetailFn();
       },
-    }),createFreeButtonBase({
+    }),
+    createFreeButtonBase({
     type: "default",
     label: "取消",
     func: () => {
