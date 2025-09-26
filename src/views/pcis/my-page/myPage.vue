@@ -4698,8 +4698,8 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)
-  if(res.cUndrMrk === "A" && props.param.cPolicySource === "6") {
+  // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)(批单核保不需要走这一步)
+  if(res.cUndrMrk === "A" && props.param.cPolicySource === "6" && props.param?.cAppTyp !== "E") {
     const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
     if(checkoutnInfo?.code !== "1") {
       ElMessage.warning(checkoutnInfo.message);

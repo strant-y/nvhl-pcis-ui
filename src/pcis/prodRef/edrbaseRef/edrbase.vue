@@ -192,7 +192,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         hidden: params.cRsnCde != "FZ" && params.cRsnCde != "M1" ,
       },
       {
-        prop: "EdrBase.tRepStopExtBgnTm",
+        prop: "EdrBase.tRepstopextBgnTm",
         inputtype: "rtdatepicker",
         type: "datetime",
         title: "报停起期",
@@ -204,19 +204,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           return time.getTime() < new Date(tInsrncBgnTm).getTime()
         },
         func: (v) => {
-          const tRepStopExtEndTm = getValue("EdrBase.tRepStopExtEndTm")
-          if(v && tRepStopExtEndTm && new Date(v).getTime() > new Date(tRepStopExtEndTm).getTime()) {
+          const tRepstopextEndTm = getValue("EdrBase.tRepstopextEndTm")
+          if(v && tRepstopextEndTm && new Date(v).getTime() > new Date(tRepstopextEndTm).getTime()) {
             ElMessage.warning("报停起期不能晚于报停止期")
-            setValue("EdrBase.tRepStopExtBgnTm", null)
-          } else if(v && tRepStopExtEndTm) {
+            setValue("EdrBase.tRepstopextBgnTm", null)
+          } else if(v && tRepstopextEndTm) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
-            const time = dayjs(tRepStopExtEndTm).diff(dayjs(v))
+            const time = dayjs(tRepstopextEndTm).diff(dayjs(v))
             opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(params.tInsrncEndTm).add(time))
           }
         },
       },
       {
-        prop: "EdrBase.tRepStopExtEndTm",
+        prop: "EdrBase.tRepstopextEndTm",
         inputtype: "rtdatepicker",
         type: "datetime",
         title: "报停止期",
@@ -228,13 +228,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           return time.getTime() > new Date(tInsrncEndTm).getTime()
         },
         func: (v) => {
-          const tRepStopExtBgnTm = getValue("EdrBase.tRepStopExtBgnTm")
-          if(v && tRepStopExtBgnTm && new Date(v).getTime() < new Date(tRepStopExtBgnTm).getTime()) {
+          const tRepstopextBgnTm = getValue("EdrBase.tRepstopextBgnTm")
+          if(v && tRepstopextBgnTm && new Date(v).getTime() < new Date(tRepstopextBgnTm).getTime()) {
             ElMessage.warning("报停止期不能早于报停起期")
-            setValue("EdrBase.tRepStopExtEndTm", null)
-          } else if(v && tRepStopExtBgnTm) {
+            setValue("EdrBase.tRepstopextEndTm", null)
+          } else if(v && tRepstopextBgnTm) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
-            const time = dayjs(v).diff(dayjs(tRepStopExtBgnTm))
+            const time = dayjs(v).diff(dayjs(tRepstopextBgnTm))
             opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(params.tInsrncEndTm).add(time))
           }
         },
