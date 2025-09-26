@@ -1096,10 +1096,9 @@ const normalQueryColumns = [
     },
     {
         prop: "cRsnCde",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: " 批改原因",
         minWidth: 180,
-        typeCode: "EDR_RSN_LIST_KIND",
         align: 'left',
         width: 120,
     }
