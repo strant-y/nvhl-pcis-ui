@@ -2,7 +2,7 @@
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
-      <el-aside :width="NavigaShow ? '200px' : '70px'" class="mypage-aside">
+      <el-aside :width="NavigaShow ? '200px' : '70px'" class="mypage-aside custom-anchor">
         <!-- <el-affix :offset="100"> -->
         <div class="navi_container">
           <div
@@ -192,7 +192,7 @@
         <!-- </el-affix> -->
       </el-aside>
       <el-main class="main-container">
-        <div class="main-header">
+        <!-- <div class="main-header">
           <div class="tp" style="background: #ebedfc">
             <span class="font-weight-500">条款：</span
             ><span class="publicStyle"
@@ -233,7 +233,7 @@
 							>&nbsp;<span class="font-weight-500">元</span>
 						</template>
           </div>
-        </div>
+        </div> -->
         <div class="main-content" @scroll="handleScroll">
           <div id="edrbase" v-if="edrbaseFlag" style="margin-bottom: 10px">
             <edrbaseRef :ref="(res: any) => {
@@ -334,30 +334,70 @@
           </div>
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
-        <div class="bottom-items">
-          <!--新增的申请单号显示和复制按钮-->
-          <div style="margin-right: 5px; width: 100%; display: flex; justify-content: flex-end; align-items: center;" v-if="pageLoaded">
-            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
-              {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
-              {{ getNo }}
+      </el-main>
+      <div class="right-btns" v-if="pageLoaded">
+        <div class="main-header2">
+          <div class="tp">
+            <span>
+              条款:
+              <span class="publicStyle">{{props.param.cTermNo }}{{props.param.cTermNme}}</span>
+            </span>
+            <br/>
+            <span>出单方式:</span><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;
+            <br/>
+            <span>联共保类型:
+              <span class="publicStyle">{{
+                  (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
+                      : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'
+                          : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'
+                              : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'
+                                  : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'
+                                      : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'
+                                          : '联保单' }}
               </span>
-              <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
-                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                </el-button>
-              </el-tooltip>
-            </div>
+            </span>
+             <br/>
+            <span>团个属性:
+            <span class="publicStyle">{{
+                props.param.cGrpMrk == "0" ? "个单" : "团单"
+              }}</span>
+            </span>
+            <br/>
+            <span>互联网出单:</span><span class="publicStyle">{{ props.param.cIsNet == "0" ? "是" : "否" }}</span>
           </div>
+          <div class="btm">
+            <span>保险期限:</span><span class="publicStyle">{{ tmDay }}</span><span>天</span
+          >
+            <br/><span>保额:</span><span class="publicStyle">{{ nAmt.toLocaleString() }}</span>
+            <!--            <span class="font-weight-500">{{ cAmtCurLabel }}</span>&nbsp;-->
+            <br/>
+            <span class="font-weight-500">保费:</span><span class="publicStyle">{{ nPrm.toLocaleString() }}</span>&nbsp;
+            <!--            <span class="font-weight-500">{{ cPrmCurLabel }}</span>&nbsp;-->
+            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
+              <br/><span>协议剩余预收保费:</span
+            ><span class="publicStyle">{{ nRecRemPrm.toLocaleString() }}</span
+            >&nbsp;
+              <!--              <span class="font-weight-500">元</span>-->
+            </template>
+            <template v-if="props.param?.cRecordType === 9 || props.param.cPolicySource == 9">
+              <br/>&nbsp;&nbsp;<span>协议剩余保额: </span
+            ><span class="publicStyle">{{ nRecRemEstAmt.toLocaleString() }}</span
+            >&nbsp;
+              <!--              <span class="font-weight-500">元</span>-->
+            </template>
+          </div>
+        </div>
+
+        <div class="btns-content" v-if="rightBtnList.length > 0">
           <rt-button
-            v-for="(bth, idx) in bthList"
+            v-for="(bth, idx) in rightBtnList"
             :item="bth"
             :key="idx"
             :loading="bth.loading"
           />
         </div>
-      </el-main>
-      <div class="right-sidebar-trigger">
+      </div>
+      <!-- <div class="right-sidebar-trigger">
         <el-popover
             placement="left"
             trigger="click"
@@ -392,8 +432,36 @@
             </el-button>
           </div>
         </el-popover>
-      </div>
+      </div> -->
     </el-container>
+    <div class="bottom-items">
+      <!--新增的申请单号显示和复制按钮-->
+      <div style="margin-right: auto; display: flex; align-items: center;" v-if="pageLoaded">
+        <div style="display: flex; align-items: center; background: var(--rt-bg-color);; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">
+          {{ props.param?.pageName === "priceInquiry" ? "询价单号:" : "申请单号:" }}
+          <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
+          {{ getNo }}
+          </span>
+          <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">
+            <el-button @click="copyPolicyNumber" circle size="small" style="color: var(--el-color-primary);margin-right: 0;">
+              <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+            </el-button>
+          </el-tooltip>
+        </div>
+      </div>
+      <template v-for="(bth, idx) in bthList" 
+        :key="idx">
+        <!-- <template v-if="bth.isdivider">
+          <el-divider direction="vertical" />
+        </template>
+        <template v-else> -->
+          <rt-button
+            :item="bth"
+            :loading="bth.loading"
+          />
+        <!-- </template> -->
+      </template>
+    </div>
   </div>
 </template>
 
@@ -1017,8 +1085,9 @@ const basicRightBtn = [
     label: "保存模板",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "template2",
-    iconSize: "20",
+    // svgIcon: "template2",
+    // iconSize: "20",
+    icon: "Memo",
     func: () => {
       handleSaveTemplate()
     },
@@ -1027,8 +1096,9 @@ const basicRightBtn = [
     label: "复制出单",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "copy2",
-    iconSize: "25", // 设置图标大小为25px
+    // svgIcon: "copy2",
+    // iconSize: "25", // 设置图标大小为25px
+    icon: "CopyDocument",
     func: () => {
       copyPolicyFun();
     },
@@ -1037,8 +1107,9 @@ const basicRightBtn = [
     label: "额度明细",
     type: "primary",
     buttonColor: bottomBtnColor1,
-    svgIcon: "limit",
-    iconSize: "25",
+    // svgIcon: "limit",
+    // iconSize: "25",
+    icon: "Tickets",
     func: () => {
       openLimit();
     },
@@ -1513,8 +1584,9 @@ async function loadAfter() {
         label: "费用信息",
         type: "primary",
         id: "modFee",
-        svgIcon: "fee1", // 使用本地图标库
-        iconSize: "22", // 设置图标大小
+        // svgIcon: "fee1", // 使用本地图标库
+        // iconSize: "22", // 设置图标大小
+        icon: "Money",
         func: () => {
           //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
           const params = {};
@@ -2250,8 +2322,9 @@ async function loadAfter() {
       label: "历史赔案",
       type: "primary",
       buttonColor: bottomBtnColor1,
-      svgIcon: "histogram", // 使用本地图标库
-      iconSize: "25", // 设置图标大小
+      // svgIcon: "histogram", // 使用本地图标库
+      // iconSize: "25", // 设置图标大小
+      icon: "Histogram",
       func: () => {
         historyClaimcaseFun();
         // src\views\pcis-new-udr-list\common\history-claimcase-model.vue
@@ -5049,11 +5122,12 @@ $btn-icon-bg-color-4: rgb(255, 242, 212);
 $btn-icon-bg-color-5: rgb(230, 251, 234);
 .bottom-items {
   height: 45px;
-  background-color: #fff;
+  background-color: var(--rt-bg-color);
   display: flex;
   justify-content: end;
   align-items: center;
   // padding-right: 20px;
+  border-top: 1px var(--el-mypage-right-menu-border-color) solid;
   .el-button {
     padding: 8px;
     margin-right: 8px;
@@ -5080,10 +5154,11 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   z-index: 9999;
 }
 :deep(.el-main) {
-  padding: 10px 10px 10px 10px;
+  // padding: 10px 10px 10px 10px;
+  padding: 0px;
 }
 .publicStyle {
-  color: red;
+  color: #FF4D4F;
 }
 .mypage-app {
   display: flex;
@@ -5098,7 +5173,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .mypage-aside {
-  background: var(--el-color-primary);
+  // background: var(--el-color-primary);
 }
 
 .el-anchor {
@@ -5106,31 +5181,37 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   flex: 1;
   // width: 130px;
   :deep(.el-anchor__list) {
-    padding: 20px 10px;
+    // padding: 20px 10px;
+    padding: 0;
   } 
   .el-anchor__item {
-    margin-bottom: 20px;
-    padding-left: 0;
-    opacity: .6;
+    margin-top: 5px;
+    padding-left: 16px;
+    padding-right: 22px;
     &.isActive,&:hover {
-      opacity: 1;
-      // background: #ffffff1a;
+      background: var(--el-color-primary);
+      :deep(a) {
+        color: #ffffff;
+        .iconfont {
+          color: #ffffff;
+        }
+      }
     }
     :deep(a) {
       display: flex;
       flex-direction: row;
       align-items: center;
-      color: #FFFFFF;
+      color: #595959;
       padding: 0;
+      height: 40px;
       .el-icon {
         font-size: 3rem!important;
         margin: 0 0 10px 0;
       }
       .iconfont {
-        font-size: 1.2rem;
-        color: #FFF;
-        margin-right: 5px;
-        min-width: 24px;
+        font-size: 1rem;
+        color: #595959;
+        margin-right: 8px;
         text-align: center;
       }
       .icon-title {
@@ -5144,31 +5225,32 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 // 高亮图标和标题文字
-:deep(.el-anchor__item.is-active) ,
-:deep(.el-anchor__item.isActive) {
-  opacity: 1 !important;
-}
+// :deep(.el-anchor__item.is-active) ,
+// :deep(.el-anchor__item.isActive) {
+//   opacity: 1 !important;
+// }
 
-:deep(.el-anchor__item.is-active a .iconfont),
-:deep(.el-anchor__item.isActive a .iconfont) {
-  color: #ffa940 !important; /* 橙色 */
-}
+// :deep(.el-anchor__item.is-active a .iconfont),
+// :deep(.el-anchor__item.isActive a .iconfont) {
+//   color: #ffa940 !important; /* 橙色 */
+// }
 
-:deep(.el-anchor__item.is-active a .icon-title),
-:deep(.el-anchor__item.isActive a .icon-title) {
-  color: #ffa940 !important; /* 橙色 */
-}
+// :deep(.el-anchor__item.is-active a .icon-title),
+// :deep(.el-anchor__item.isActive a .icon-title) {
+//   color: #ffa940 !important; /* 橙色 */
+// }
 
 .toggle-button {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
+  position: fixed;
+  bottom: 60px;
+  left: 80px;
   transform: translateX(-50%);
   margin-bottom: 0 !important;
 }
 
 .toggle-nav-button {
-  background: rgba(255, 255, 255, 0.2) !important;
+  // background: rgba(255, 255, 255, 0.2) !important;
+  background: var(--el-color-primary);
   border: none !important;
   color: white !important;
   width: 32px;
@@ -5178,7 +5260,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 }
 
 .toggle-nav-button:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  // background: rgba(255, 255, 255, 0.3) !important;
 }
 
 .toggle-nav-button :deep(.el-icon) {
@@ -5188,7 +5270,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 
 .el-aside {
   width: auto;
-  background: var(--el-color-primary);
   position: relative;
   transition: width 0.3s ease;
 }
@@ -5203,22 +5284,45 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: -10px;
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.85);
   }
   .main-content {
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
+    margin: 0px 5px;
   }
 }
 :deep(.el-card__header) {
   // padding: 10px 20px!important;
   .el-row {
     align-items: center;
+    color: rgba(0,0,0,0.85);
+    font-size: 16px;
     &:first-child {
       font-size: 16px;
       font-weight: 500;
     }
+    .el-col-20 {
+      display: flex;
+      justify-content: right;
+      align-items: center;
+    }
+  }
+}
+
+.main-header2 {
+  background: var(--rt-bg-color);
+  border: var(--rt-border);
+  border-radius: 5px;
+  padding: 6px;
+  font-size: 10px;
+
+  .tp, .btm {
+    color: var(--el-text-color);
   }
 }
 
@@ -5226,70 +5330,148 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   padding: 5px 10px;
 }
 
-.right-sidebar-trigger {
-  position: fixed;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
-}
-.btns-content {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  .flex-center {
+// .right-sidebar-trigger {
+//   position: fixed;
+//   right: 0;
+//   top: 50%;
+//   transform: translateY(-50%);
+//   z-index: 1000;
+// }
+// .btns-content {
+//   display: flex;
+//   align-items: center;
+//   flex-direction: column;
+//   gap: 8px;
+//   padding: 12px;
+//   .flex-center {
+//     display: flex;
+//     align-items: center;
+//   }
+// }
+
+// .menu-trigger {
+//   background-color: #fff;
+//   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+//   transition: all 0.3s;
+// }
+
+// .menu-trigger:hover {
+//   transform: scale(1.1);
+// }
+
+// .action-menu-popper {
+//   margin-right: 10px !important;
+//   border-radius: 8px;
+//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+// }
+
+// .action-menu-popper .el-button {
+//   justify-content: flex-start;
+//   padding: 10px 12px;
+//   border-radius: 6px;
+//   transition: all 0.3s;
+//   border: none;
+// }
+
+// .action-menu-popper .el-button:hover {
+//   background-color: #f5f7fa;
+//   transform: translateX(4px);
+// }
+
+// .action-menu-popper .el-button.text {
+//   color: #606266;
+// }
+
+// .action-menu-popper .el-button.text:hover {
+//   color: #409eff;
+// }
+
+// .action-menu-popper .el-button .svg-icon,
+// .action-menu-popper .el-button .el-icon {
+//   transition: all 0.3s;
+// }
+
+// .action-menu-popper .el-button:hover .svg-icon,
+// .action-menu-popper .el-button:hover .el-icon {
+//   transform: scale(1.1);
+// }
+
+.right-btns {
+  // padding: 0 3rem;
+  margin: 5px 5px 0 0;
+  // min-width: calc(150px + 6rem);
+  .btns-content {
+    margin-top: 5px;
+    background: var(--rt-bg-color);
+    border: var(--rt-border);
+    padding: 10px;
+    border-radius: 5px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: start;
+    // width: 150px;
+    :deep(.el-button) {
+      margin: 0 0 12px 0;
+      border: none;
+      background-color: transparent!important;
+      color: var(--el-text-color);
+      padding: 0;
+      .el-icon {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        border-radius: 2px;
+        margin-right: 10px!important;
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &:nth-child(5n + 1) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-1;
+          svg {
+            color: $btn-icon-color-1;
+          }
+        }
+      }
+      &:nth-child(5n + 2) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-2;
+          svg {
+            color: $btn-icon-color-2;
+          }
+        }
+      }
+      &:nth-child(5n + 3) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-3;
+          svg {
+            color: $btn-icon-color-3;
+          }
+        }
+      }
+      &:nth-child(5n + 4) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-4;
+          svg {
+            color: $btn-icon-color-4;
+          }
+        }
+      }
+      &:nth-child(5n + 5) {
+        .el-icon {
+          background-color: $btn-icon-bg-color-5;
+          svg {
+            color: $btn-icon-color-5;
+          }
+        }
+      }
+    }
   }
-}
-
-.menu-trigger {
-  background-color: #fff;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
-}
-
-.menu-trigger:hover {
-  transform: scale(1.1);
-}
-
-.action-menu-popper {
-  margin-right: 10px !important;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.action-menu-popper .el-button {
-  justify-content: flex-start;
-  padding: 10px 12px;
-  border-radius: 6px;
-  transition: all 0.3s;
-  border: none;
-}
-
-.action-menu-popper .el-button:hover {
-  background-color: #f5f7fa;
-  transform: translateX(4px);
-}
-
-.action-menu-popper .el-button.text {
-  color: #606266;
-}
-
-.action-menu-popper .el-button.text:hover {
-  color: #409eff;
-}
-
-.action-menu-popper .el-button .svg-icon,
-.action-menu-popper .el-button .el-icon {
-  transition: all 0.3s;
-}
-
-.action-menu-popper .el-button:hover .svg-icon,
-.action-menu-popper .el-button:hover .el-icon {
-  transform: scale(1.1);
 }
 </style>
 <style>

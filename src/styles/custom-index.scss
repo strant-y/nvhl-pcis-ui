@@ -33,7 +33,6 @@
     }
     .el-select {
       .el-select__wrapper {
-        // height: map-get($form-config, item-height) !important;
         min-height: map-get($form-config, item-height) !important;
         font-family: map-get($form-config, font-family);
       }
@@ -99,7 +98,7 @@
         font-weight: map-get($form-config, label-font-weight);
         color: map-get($form-config, label-color);
         padding: map-get($form-config, label-padding);
-        //font-family: map-get($form-config, font-family);
+        font-family: map-get($form-config, font-family);
       }
     }
 
@@ -143,7 +142,6 @@
       // 下拉选择器样式
       .el-select {
         .el-select__wrapper {
-          height: map-get($form-config, item-height) !important;
           min-height: map-get($form-config, item-height) !important;
           font-family: map-get($form-config, font-family);
         }
