@@ -223,7 +223,6 @@ onMounted(() => {
           setTimeout(() => {
             const tabData = tableRef.value?.getFromValue();
             Object.keys(tabData).forEach((key) => {
-              console.log(tabData[key]);
               const sdata = tabData[key];
               const params = {
                 cComponentTab: sdata.cComponentTab,
@@ -245,7 +244,6 @@ onMounted(() => {
           setTimeout(() => {
             const tabData = tableRef.value?.getFromValue();
             Object.keys(tabData).forEach((key) => {
-              console.log(tabData[key]);
               const sdata = tabData[key];
               const params = {
                 cComponentTab: sdata.cComponentTab,
