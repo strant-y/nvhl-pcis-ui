@@ -129,7 +129,9 @@
         <span v-html="row.nEdrPrjNo || ''"></span>
       </template>
       <template #column-cProdNmeCn="{ row }">
-        <span v-html="row.cProdNmeCn || ''"></span>
+        <el-tooltip :content="row.cInsuredNme" placement="top">
+            <span v-html="row.cProdNmeCn || ''" class="twoLine"></span>
+        </el-tooltip>
       </template>
       <template #column-nAmt="{ row }">
         <span v-html="row.nAmt.toLocaleString() || ''"></span>
@@ -949,7 +951,7 @@ const normalQueryColumns = [
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
-        width: 165,
+        width: 136,
         fixed: "left",
         slotName: "policyInfo"
     },
@@ -957,7 +959,7 @@ const normalQueryColumns = [
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批改申请单号/批单号",
-        width: 165,
+        width: 136,
         fixed: "left",
         slotName: "cEdrNo"
     },
@@ -965,8 +967,7 @@ const normalQueryColumns = [
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
         title: "分公司",
-        width: 48,
-        align: 'left',
+        width: 44,
         formatter:(val:any)=>{
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -995,7 +996,6 @@ const normalQueryColumns = [
         prop: "cInsuredNme",
         inputtype: "rtinput",
         title: "被保人名称",
-        maxWidth: 110,
         slotName: "cInsuredNme",
         align: 'left',
         width: 112,
@@ -1004,7 +1004,7 @@ const normalQueryColumns = [
         prop: "cProdNmeCn",
         inputtype: "rtinput",
         title: "产品名称",
-        minWidth: 160,
+        width: 160,
         slotName: "cProdNmeCn",
         align: 'left',
     },
@@ -1012,16 +1012,15 @@ const normalQueryColumns = [
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
-        maxWidth: 140,
         slotName: "cTermNme",
         align: 'left',
-        width: 112,
+        width: 157,
     },
     {
         prop: "nAmt",
         inputtype: "rtinput",
         title: "保额",
-        width: 106,
+        width: 83,
         slotName: "nAmt",
         align: 'left',
     },
@@ -1029,7 +1028,7 @@ const normalQueryColumns = [
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
-        width: 98,
+        width: 77,
         prefix: "¥ ",
         slotName: "nPrm",
         align: 'left'
@@ -1038,7 +1037,7 @@ const normalQueryColumns = [
         prop: "tIssueTm",
         inputtype: "rtinput",
         title: "签单日期",
-        width: 144,
+        width: 112,
         sortable: true,
         slotName: "tIssueTm"
     },
@@ -1046,7 +1045,7 @@ const normalQueryColumns = [
         prop: "InsurancePeriod",
         inputtype: "rtinput",
         title: "保险期间",
-        width: 144,
+        width: 112,
         slotName: "InsurancePeriod",
         align: 'left'
     },
@@ -1054,8 +1053,7 @@ const normalQueryColumns = [
         prop: "cAppStatus",
         inputtype: "rtinput",
         title: "任务状态",
-        minWidth: 120,
-        width: 105,
+        width: 81,
         align: "left",
         loadData: [
             { label: "暂存", value: "1" },
@@ -1091,33 +1089,32 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "批改序号",
         maxWidth: 120,
-        width: 70,
+        width: 55,
         slotName: "nEdrPrjNo"
     },
     {
         prop: "cRsnCde",
         inputtype: "rtselect",
         title: " 批改原因",
-        minWidth: 180,
         typeCode: "EDR_RSN_LIST_KIND",
         align: 'left',
-        width: 120,
+        width: 100,
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
 const extendColumns = [
-  { prop: 'cCiMrk', inputtype: "rtinput", title: '共保类型', minWidth: 180, optional: true, align: 'left', width: 170, },
-  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 140, optional: true, sortable: true},
-  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 140, optional: true, sortable: true, slotName: "tUdrTm" },
+  { prop: 'cCiMrk', inputtype: "rtselect", title: '共保类型', optional: true, align: 'left', width: 139, typeCode: "joint_insurance_business" },
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', width: 112, optional: true, sortable: true},
+  { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', width: 112, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', width: 140, optional: true, align: 'left', },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', width: 140, optional: true, align: 'left', },
   { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', width: 140, optional: true, align: 'left', },
-  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
-  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 100, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
-  { prop: 'CSlsNme', inputtype: "rtinput", title: '录单员', minWidth: 100, optional: true, align: 'left',width: 61, },
-  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', minWidth: 100, optional: true, slotName: "cUdrNme", align: 'left',width: 61,},
-  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', minWidth: 180, optional: true,width:90},
-  { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', minWidth: 180, optional: true },
+  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', width: 83, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
+  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', width: 77, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
+  { prop: 'CSlsNme', inputtype: "rtinput", title: '录单员', optional: true, align: 'left',width: 55, },
+  { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', optional: true, slotName: "cUdrNme", align: 'left',width: 55,},
+  { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', optional: true,width:90},
+  { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', optional: true },
 ];
 
 const tableObj = {
