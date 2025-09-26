@@ -18,6 +18,7 @@ import {copyDist} from "@/api/prod";
 import {encryptRouterParam} from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import {checkAppBase} from "@/api/prod";
+import { cloneDeep } from "lodash-es";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
@@ -471,6 +472,10 @@ const submitEdrToUndrFun = async () => {
     filter.push(...['AgreementCiTcp', 'AgreementCiShare', 'AgreementCi'
       ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
+  }else{
+    ilter.push(...[
+        'AgreementAcctinfo' // 临时关闭账号校验
+    ]);
   }
   const validateAll = await formPage.value?.validateAll(filter);
   if(!validateAll.flag) {
@@ -614,9 +619,10 @@ const saveEdrPlyInfo = async () => {
     res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
         res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
   }
-  console.log('参数',res)
+  const resToSave = cloneDeep(res);
+  resToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
   const edrInfo: any = await cargoApi.saveEdrEcargo({
-    ...res,
+    ...resToSave,
     AgreementDistGoods:null,
     AgreementTgtSummary:null,
     AgreementDistInsured:null,
@@ -766,8 +772,7 @@ function query() {
         //协议费用
         // const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
         // AgreementFeeWarn.setItemShow()
-        if (props.type === 'EDR_APP_NEW_SCENE') {
-         
+        if (props.type === 'EDR_APP_NEW_SCENE') {        
           if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
@@ -782,10 +787,14 @@ function query() {
           }
           if (props.param?.cEdrType == "1") {
             sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
+            const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
+            const newcEdrRsnDetail = JSON.parse(res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail']);
             if (props.param["cRsnCde"] != "FZ") {
-              mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
-                props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
-              ]);
+            //   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
+            //     props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+            //   ]);
+              mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", newcEdrRsnDetail);
+              mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrCtnt", newcEdrCtnt);
             }
           }
           formPage.value?.setPageReadOnly(true, [], {
@@ -890,7 +899,6 @@ const premiumCalculation = ()=>{
   let isBer = false
   let isBef = false
   let isSuccess = false
-  debugger
   try {
     const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
     //协议费用
@@ -994,7 +1002,8 @@ const premiumCalculation = ()=>{
         }
       }
       const agreementCi =formPage.value?.getComponentRefById('AgreementCi');
-      if(agreementCi){
+      const cCiMrk = agreementBaseRef.value?.getValue('EdrECargoBase.cCiMrk');
+      if(agreementCi && cCiMrk !='0'){
         const formValue = agreementCi.getFormValue();
         if (formValue && formValue.length > 0) {
           // 触发第一行数据的 nCiShareChange 方法
@@ -1014,10 +1023,8 @@ const premiumCalculation = ()=>{
 }
 async function save() {
   let isOk = false
-  // const allFromData = formPage.value?.getAllFormData();
   let processedData = { ...formPage.value?.getAllFormData() }; 
   const user = JSON.parse(sessionStorage.getItem("user"));
-  // console.log('allFromData',allFromData)
   const base = processedData['AgreementBase'];
   if(!(processedData['AgreementBase'] && processedData['AgreementBase']['ECargoBase.cDptCde'])){
      return ElMessage.warning("请选择出单机构")
@@ -1033,9 +1040,10 @@ async function save() {
     const { AgreementAcctinfo, ...rest } = processedData;
     processedData = rest;
   }
-
- const res = await cargoApi.save({
-    ...processedData,
+  const dataToSave = cloneDeep(processedData);
+  dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
+  const res = await cargoApi.save({
+    ...dataToSave,
     AgreementDistGoods:null,
    AgreementTgtSummary:null,
    AgreementDistInsured:null,

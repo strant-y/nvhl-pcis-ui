@@ -324,7 +324,7 @@ function selectmainMethod(a: any, b: any, c: any) {
       });
     });
   }
-  if(mc && mutualExclusionClause.value.includes(mc.cUniqueTermNo) && param.type !== 'ECargo'){  //对应主条款存在互斥条款
+  if(mc && mc.cPrimaryMrk === '1' && param.type !== 'ECargo'){  //对应主条款存在互斥条款
     let addkey: any[] = [];
     // 先全量获取已选中数据
     const tree = mainRef.value?.getCheckedNodes(false, true);

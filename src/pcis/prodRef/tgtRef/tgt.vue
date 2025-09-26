@@ -746,6 +746,13 @@ const method = {
     productStore.setCIsSingle(val)
   },
   funcInsuranceChange: (val) => {
+    
+    // 投保方式选择按工程造价投保、按建筑面积投保、按劳务合同价投保，短期费率类型默认按日，短期费率系数固定为1
+    const baseRef = opertaor.getTableRefByKey('base'); 
+    const disableValue = ['613002', '613003', '613004'].includes(val);
+    baseRef.setValue('Base.cRatioTyp', '2'); 
+    baseRef.setFormItem("Base.cRatioTyp", { disabled: disableValue });
+
     groupCheck();
     //根据投保方式得选择对应控制必填项
     if (val == '613002') {

@@ -73,7 +73,6 @@ onMounted(() => {
         { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
       ],
     });
-    console.log("ciAgreementECargo",formPage.getAllFormData())
   })
 });
 
@@ -254,20 +253,24 @@ const method = {
     if(val == "0" || val == "3" || val =="4"){
       idxParam.ciJiMrk = val;
       const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
-      console.log("ciAgreementECargo",formPage.getAllFormData())
-      // formPage.getAllFormData()
-    
       if(ciAgreementECargo) {
         ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
       }
       const cargoCiRef = formPage.getComponentRefById('AgreementCi');
-      if (!!cargoCiRef) {
+      if (!!cargoCiRef && !initFlag.value) {
         cargoCiRef.initCiInfo({
           cCiMrk: val
         });
       }
+      // 当val为'0'时隐藏ECargoBase.nCiOwnRmbPrm和ECargoBase.nCiOwnRmbAmt，否则显示
+      if (val === '0') {
+        formPage.getComponentRefById("AgreementFeeWarn").setFormItem('ECargoBase.nCiOwnRmbPrm', { hidden: true });
+        formPage.getComponentRefById("AgreementFeeWarn").setFormItem('ECargoBase.nCiOwnRmbAmt', { hidden: true });
+      } else {
+        formPage.getComponentRefById("AgreementFeeWarn").setFormItem('ECargoBase.nCiOwnRmbPrm', { hidden: false });
+        formPage.getComponentRefById("AgreementFeeWarn").setFormItem('ECargoBase.nCiOwnRmbAmt', { hidden: false });
+      }
     }else{
-      // ElMessage.warning("所选联共保类型暂时不支持出单业务");
       ElMessage.error("所选联共保类型暂时不支持出单业务");
       setValue("ECargoBase.cCiMrk","")
       return false;
@@ -811,6 +814,7 @@ function getCheckCdeptByCdptCde() {
   }
 }
 
+
 function getFormValue() {
   return baseEditRef?.value?.getFromValue();
 }
@@ -846,21 +850,61 @@ function setDisabledAll(isDisabled: boolean) {
   }
 }
 //给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
+// function setFormItem(key: any, obj: any) {
+//   if (obj && Object.keys(obj).length) {
+//     formconfig1.fromSchema?.forEach((item) => {
+//       if (item.prop === key) {
+//         //控制尾部按钮的
+//         if (item.btnItems && obj.btnItems) {
+//           for (let key in obj.btnItems) {
+//             item.btnItems[key] = obj.btnItems[key];
+//           }
+//         } else {
+//           Object.assign(item, obj);
+//         }
+//       }
+//     });
+//   }
+// }
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
           }
-        } else {
-          Object.assign(item, obj);
-        }
+        });
       }
-    });
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
+
+
+function setFormItem(key: string, obj: Record<string, any>): void {
+  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
 }
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   baseEditRef?.value?.addProvide(key, value);

@@ -67,6 +67,14 @@ onMounted(() => {
          hidden: true,
        });
      })
+     if(param.cEdrFlag =='AY'){
+       setFormItem('ECargoBase.nLowPrm', {hidden: true});
+       setFormItem('ECargoBase.nReceivedPrmEx', {hidden: true});
+     }
+     else{
+       setFormItem('ECargoBase.nLowPrm', {hidden: false});
+       setFormItem('ECargoBase.nReceivedPrmEx', {hidden: false});
+     }
   });
 });
 

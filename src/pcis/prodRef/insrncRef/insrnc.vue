@@ -48,6 +48,18 @@ onMounted(() => {
 // 根据时间更改 短期费率系数 接口
 const nRatioCoefFunc = () => {
   const tabref = opertaor.getTableRefs();
+  if(tabref["tgt"]){
+    // 当投保方式为按工程造价投保、按建筑面积投保、按劳务合同价投保 短期费率系数固定为1
+    const tgtObj = tabref["tgt"]?.getFromValue();
+    const InsureMethod = tgtObj["Tgt.cInsuranceMethod"];
+    const specialMethod = ['613002', '613003', '613004']; 
+
+    if(specialMethod.includes(InsureMethod)){
+        opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(1).toFixed(6));
+        return;
+    }
+  }
+
   const baseBefore = tabref["insrnc"]?.getFromValue();
   const baseBefore2 = tabref["base"]?.getFromValue();
   let prodNo = route.params.param?.cProdNo;

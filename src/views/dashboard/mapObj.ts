@@ -456,7 +456,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 180,
+        width: 238,
       },
       {
         prop: "cTermNme",
@@ -531,7 +531,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 180,
+        width: 238,
       },
       {
         prop: "cTermNme",
@@ -605,7 +605,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 180,
+        width: 238,
       },
       {
         prop: "cTermNme",
@@ -686,7 +686,7 @@ export const tableObj = {
         inputtype: "rtinput",
         title: "承保机构",
         align: "left",
-        width: 180,
+        width: 238,
       },
       {
         prop: "cTermNme",

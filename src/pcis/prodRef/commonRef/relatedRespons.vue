@@ -221,7 +221,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cIsCommon",
         title: "公共信息",
         inputtype: "rtswitch",
-        width:25,
+        width:40,
         keymap:{
           y:'1',
           n:'0'

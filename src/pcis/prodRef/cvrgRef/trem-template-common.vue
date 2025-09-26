@@ -985,6 +985,8 @@ function getUseData(data: any){
       }
       if(checkKey === '1'){  // 清除,校验内容
         item.rules = null;
+        item.cPorpRequired = null;
+        item.required = null;
       }
       return true;
     });
@@ -1305,10 +1307,10 @@ function setDisabledAll() {
 
 function isrequired(i: any) {
 
-  if(i.cPropRequired === "1" || i.cPropRequired === 1 || i.cPropRequired === true){
+  if(i.cPorpRequired === "1" || i.cPorpRequired === 1 || i.cPorpRequired === true){
     return true;
   }
-  if(i.cPropRequired === "0" || i.cPropRequired === 0 || i.cPropRequired === false ){
+  if(i.cPorpRequired === "0" || i.cPorpRequired === 0 || i.cPorpRequired === false ){
     return false;
   }
 

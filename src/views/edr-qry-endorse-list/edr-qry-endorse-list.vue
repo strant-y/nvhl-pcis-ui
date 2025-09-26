@@ -1293,13 +1293,7 @@ const ciCoopCorrect = (cAppNo, cPlyNo) => {
     console.log(3333);
 
     dialog.value?.open('changeCiPolicynoComponent',
-        { cAppNo, cPlyNo }, {}, { title: "变更联共保保单编号", width: "95" })
-    // dzmodal
-    //     .open(changeCiPolicynoComponent, { cAppNo,cPlyNo})
-    //     .then((res) => {
-    //         if (res.type === "ok") {
-    //         }
-    //     });
+    { cAppNo, cPlyNo }, {}, { title: "变更联共保保单编号", width: "95" })
 };
 const transferRsnDetail = (rsnDetail) => {
     let str = "";

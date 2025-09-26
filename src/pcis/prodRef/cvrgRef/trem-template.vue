@@ -565,6 +565,11 @@ function getDatas(){
   if( !newData ){
     newData = termdata.value;
   }
+  if( extermConf.value && extermConf.value.length > 0 ){
+    extermConf.value.forEach((v: any) => {
+      newData[v.prop] = termdata.value[v.prop];
+    });
+  }
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle === "1"
   );
@@ -1083,6 +1088,8 @@ function getUseData(data: any){
       }
       if(checkKey === '1'){  // 清除,校验内容
         item.rules = null;
+        item.cPorpRequired = null;
+        item.required = null;
       }
       return true;
     });
@@ -1316,7 +1323,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  if(pageparam.cEdrType && !props.modelValue['Term.cRowId']){
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
   }
@@ -1400,10 +1407,10 @@ function setDisabledAll() {
 
 function isrequired(i: any) {
 
-  if(i.cPropRequired === "1" || i.cPropRequired === 1 || i.cPropRequired === true){
+  if(i.cPorpRequired === "1" || i.cPorpRequired === 1 || i.cPorpRequired === true){
     return true;
   }
-  if(i.cPropRequired === "0" || i.cPropRequired === 0 || i.cPropRequired === false ){
+  if(i.cPorpRequired === "0" || i.cPorpRequired === 0 || i.cPorpRequired === false ){
     return false;
   }
 
@@ -1472,6 +1479,12 @@ function setData(params: any,data:any){
 }
 
 const methodMap = {
+  excludeLimitChang:(val:any,row:any,item:any) => {
+    if (pageparam.cProdNo === "040015") {
+      termdata.value['Term.nInsuranceAmount'] = val;
+    }
+    update();
+  },
   unifiedPremiumChange: (val: any) => {
     if (pageparam.cProdNo === "040006") {
       termFactormap.value.forEach((item: any) => {
