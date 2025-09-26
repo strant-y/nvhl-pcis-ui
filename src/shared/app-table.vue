@@ -7,11 +7,10 @@
       <template
           #header
           v-if="(tableConfig.title && tableConfig.title.length > 0 ) ||
-              (tableConfig.editFlag && tableConfig?.formconfig?.titleBtns?.length > 0) ||
-              (tableConfig.editFlag &&tableConfig?.titleBtns?.length > 0)
+              (tableConfig?.formconfig?.titleBtns?.filter(f => !f.hidden).length > 0) ||
+              (tableConfig?.titleBtns?.filter(f => !f.hidden).length > 0)
           "
       >
-
         <el-row justify="space-between" v-if="tableConfig.showEdit && tableConfig.formconfig.fromSchema && tableConfig.formconfig.fromSchema.length > 0">
           <el-col :span="24">
             <dynamic-forms

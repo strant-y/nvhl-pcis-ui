@@ -119,12 +119,13 @@
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="openShortcutEdit"> <el-icon><Menu /></el-icon>
-            <span>快捷菜单</span></el-dropdown-item>
+            <span style="font-size: var(--menu-text-size);">快捷菜单</span></el-dropdown-item>
           <el-dropdown-item @click="openDialog" v-if="userStore.user.src == null"> <el-icon><Lock /></el-icon>
-            <span>修改密码</span></el-dropdown-item>
+            <span style="font-size: var(--menu-text-size);">修改密码</span></el-dropdown-item>
           <el-dropdown-item @click="clearRedisCache" v-if="showRedisCache">清除redis缓存</el-dropdown-item>
-          <el-dropdown-item @click="logout"> <el-icon><SwitchButton /></el-icon>
-            <span>退出登录</span></el-dropdown-item>
+          <el-dropdown-item @click="logout">
+            <el-icon><SwitchButton /></el-icon>
+            <span style="font-size: var(--menu-text-size);">退出登录</span></el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -514,7 +515,7 @@ function openShortcutEdit() {
   color: var(--el-text-color);
   text-align: center;
   cursor: pointer;
-
+  font-size: var(--menu-text-size);
   &:hover {
     background: rgb(0 0 0 / 10%);
   }
@@ -547,6 +548,7 @@ function openShortcutEdit() {
   .setting-item,
   .el-icon {
     color: var(--el-text-color);
+    font-size: var(--menu-text-size);
   }
 }
 
@@ -558,6 +560,7 @@ function openShortcutEdit() {
   width: 150px;
   margin: auto;
   .el-select__wrapper {
+    font-size: var(--menu-text-size) !important;
     text-align: end;
     background-color: transparent;
     box-shadow: none;

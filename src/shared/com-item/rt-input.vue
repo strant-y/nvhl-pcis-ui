@@ -36,7 +36,7 @@
         :style="
           item.type === 'color' ?
             { width: 'calc(100% - 32px)' } :
-              (item.type === 'icon' ? { width: 'calc(100% - 48px)' } : { width: '100%', minWidth: item.minWidth || '70px', maxWidth: item.maxWidth || '' })
+              (item.type === 'icon' ? { width: 'calc(100% - 48px)' } : { width: '100%', minWidth: item.minWidth || '50px', maxWidth: item.maxWidth || '' })
         "
         :maxlength="item.maxlength"
         :minlength="item.minlength"

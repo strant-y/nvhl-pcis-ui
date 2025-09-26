@@ -134,6 +134,9 @@ function getShortMenuList() {
   justify-content: center;
   align-items: center;
   color: var(--el-menu-text-color);
+  span{
+    font-size: var(--menu-text-size);
+  }
   &:hover {
     background: var(--el-color-primary);
     color: #ffffff;
