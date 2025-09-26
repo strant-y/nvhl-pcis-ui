@@ -5110,6 +5110,8 @@ const queryTermRateLimitFun = (calcFun: any) => {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/styles/custom-index";
+
 $btn-icon-color-1: #ff3e00;
 $btn-icon-color-2: #0060ff;
 $btn-icon-color-3: #4500ff;
@@ -5138,7 +5140,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   display: inline-block; /* 设置为行内块元素 */
   vertical-align: middle; /* 垂直居中 */
   position: relative;
-  z-index: 9999;
+  z-index: 998;
 }
 .card_ {
   margin-bottom: 10px;
@@ -5151,7 +5153,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  z-index: 9999;
 }
 :deep(.el-main) {
   // padding: 10px 10px 10px 10px;
@@ -5188,12 +5189,21 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
     margin-top: 5px;
     padding-left: 16px;
     padding-right: 22px;
-    &.isActive,&:hover {
-      background: var(--el-color-primary);
+    &.isActive{
+      background: var(--menu-active-bg-color);
       :deep(a) {
-        color: #ffffff;
+        color: var(--menu-active-text);
         .iconfont {
-          color: #ffffff;
+          color: var(--menu-active-text);
+        }
+      }
+    }
+    &:hover {
+      background: var(--menu-hover);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
         }
       }
     }
@@ -5246,6 +5256,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   left: 80px;
   transform: translateX(-50%);
   margin-bottom: 0 !important;
+  z-index: 999;
 }
 
 .toggle-nav-button {

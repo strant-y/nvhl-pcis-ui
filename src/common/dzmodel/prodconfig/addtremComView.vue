@@ -2,23 +2,21 @@
   <div>
     <el-row>
       <el-col :span="12">
-        <div style="background-color: var(--cvrg-sub-header-bg-color);; line-height: 43px">
-          <span style="font-size: 18px; margin-left: 15px">
+        <div style="background-color: var(--cvrg-sub-header-bg-color);line-height: 32px;margin: 0px 0 3px 0;">
+          <span style="font-size: 14px; margin-left: 12px">
             必须选择至少一项条款
           </span>
         </div>
       </el-col>
       <el-col :span="12">
-        <div class="search-btn" style="line-height: 45px">
-          <div style="float: right">
-            <div class="inline-block-div" style="width: 75%">
-              <rtinput
+        <div class="search-btn" style="margin: 0px 0 3px 0;">
+          <div class="search-btn-item">
+            <rtinput
                 v-model="query.main"
                 :item="{ placeholder: '请输入主条款名称或编码' }"
-              />
-            </div>
+            />
             <rtButton
-              :item="{
+                :item="{
                 icon: 'Search',
                 func: () => {
                   mainRef.filter(query.main);
@@ -29,7 +27,7 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="height: 250px; border: 1px solid #f3f3f3; overflow-y: auto">
+        <div style="height: 250px; border: var(--rt-border); overflow-y: auto">
           <el-tree
             ref="mainRef"
             style="max-width: 600px"
@@ -45,12 +43,12 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="background-color: var(--cvrg-sub-header-bg-color);">
-          <span style="font-size: 18px; margin-left: 15px">已选择的条款</span>
+        <div style="background-color: var(--cvrg-sub-header-bg-color);line-height: 32px;margin: 8px 0 3px 0;">
+          <span style="font-size: 14px; margin-left: 12px">已选择的条款</span>
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="overflow-y: auto; max-height: 250px">
+        <div style="overflow-y: auto; max-height: 250px;border: var(--rt-border);margin-bottom: 10px">
           <el-tree
             style="max-width: 600px"
             :props="dataprops"
@@ -74,7 +72,7 @@
         </div>
       </el-col>
       <el-col :span="24">
-        <div style="float: right; margin-right: 20px">
+        <div style="float: right;">
           <rtButton
             :item="{
               icon: 'RefreshLeft',
@@ -369,14 +367,18 @@ function fail() {
 }
 </script>
 
-<style scoped>
-.inline-block-div {
-  display: inline-block;
-}
-.search-btn {
-  width: 100%;
-  height: 45px;
-  background-color: var(--cvrg-sub-header-bg-color);;
+<style lang="scss" scoped>
+@import "src/styles/custom-index";
+
+:deep(.search-btn) {
+  background: var(--cvrg-sub-header-bg-color);
+  .search-btn-item {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    @extend .rt-input__btn;
+    @extend .rt-custom-input;
+  }
 }
 .custom-tree-node {
   display: flex;

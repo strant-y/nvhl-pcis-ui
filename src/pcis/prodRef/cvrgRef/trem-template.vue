@@ -8,8 +8,8 @@
               <el-col :span="16">
                 <div style="display: flex; align-items: center;">
                   <a style="margin-right: 5px" @click="showData = !showData">
-                    <el-icon v-if="!showData"><ArrowUpBold /></el-icon>
-                    <el-icon v-if="showData"><ArrowDownBold /></el-icon>
+                    <el-icon v-if="!showData" color="var(--el-text-color)"><ArrowUpBold /></el-icon>
+                    <el-icon v-if="showData" color="var(--el-text-color)"><ArrowDownBold /></el-icon>
                   </a>
                   <!-- <el-tag :type="term.cRdrTyp === '0' ? 'danger' : 'success'">{{
                     term.cRdrTyp === "0" ? "主" : "附加"
@@ -78,7 +78,6 @@
             </el-row>
           </div>
         </template>
-
         <div class="cvrg-body__" v-show="showData">
           <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
@@ -1622,6 +1621,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index";
 .cvrg-info {
   //background: #FAFAFA;
   box-shadow: none;
@@ -1648,25 +1648,10 @@ defineExpose({
         line-height: 12px;
         font-weight: 450 !important;
         font-size: 11px;
-        color: map-get($form-config, font-color);
+        color: var(--el-text-color);
       }
       .el-form-item__content {
-        .el-select {
-          width: 50%;
-          .el-select__wrapper {
-            font-weight: 450 !important;
-            font-size: map-get($form-config, font-size);
-            color: map-get($form-config, font-color);
-            box-shadow: none;
-          }
-          .el-select__input {
-            font-family: map-get($form-config, font-family);
-            font-size: map-get($form-config, font-size);
-            color: map-get($form-config, font-color);
-            line-height: 100%;
-            height: 100%;
-          }
-        }
+        @extend .rt-custom-select;
       }
     }
   }
@@ -1700,42 +1685,21 @@ defineExpose({
     .el-form-item__content {
       line-height: 25px;
       height: 25px;
-      .el-select {
-        .el-select__wrapper {
-          min-height: map-get($form-config, item-height) !important;
-          font-family: map-get($form-config, font-family);
-        }
-        .el-select__input {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-          color: map-get($form-config, font-color);
-          line-height: 100%;
-          height: 100%;
-        }
-        .el-select__placeholder {
-          font-family: map-get($form-config, font-family);
-          font-size: map-get($form-config, font-size);
-        }
-        .el-select__selection.is-near {
-          margin-left: 0px;
-        }
-        .el-select__selection .el-tag {
-          height: 100%;
-        }
-      }
+      @extend .rt-custom-input;
+      @extend .rt-custom-select;
     }
   }
 }
 .table-title {
   th {
     text-align: center;
-    background: rgba(0,0,0,0.04);
+    background: var(--cvrg-group-header-bg-color);
     white-space: wrap;
     max-width: 150px;
     min-width: 80px;
-    font-family: var(--font-family);
-    font-size: 12px;
+    font-size: var(--rt-form-content-font-size);
     font-weight: 450;
+    color: var(--el-text-color);
   }
 }
 table {
@@ -1764,9 +1728,9 @@ td {
   border: 1px solid var(--el-border-color-lighter); /* 设置边框样式 */
   padding: 2px;
   text-align: left;
-  font-family: var(--font-family);
-  font-size: 11.5px;
-  font-weight: 450;
+  font-size: var(--rt-form-content-font-size);
+  font-weight: var(--rt-form-content-font-weight);
+  color: var(--el-text-color)
 }
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */

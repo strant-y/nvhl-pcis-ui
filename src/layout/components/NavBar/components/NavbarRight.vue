@@ -561,13 +561,11 @@ function openShortcutEdit() {
     text-align: end;
     background-color: transparent;
     box-shadow: none;
-    height: map-get($form-config, item-height) !important;
-    min-height: map-get($form-config, item-height) !important;
-    font-family: map-get($form-config, font-family);
+    height: var(--rt-form-content-height) !important;
+    min-height: var(--rt-form-content-height) !important;
   }
   .el-select__input {
-    font-family: map-get($form-config, font-family);
-    color: map-get($form-config, font-color);
+    color: var(--el-text-color);
   }
 }
 

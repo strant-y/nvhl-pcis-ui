@@ -926,7 +926,7 @@ function isrequired(i: any) {
 }
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }

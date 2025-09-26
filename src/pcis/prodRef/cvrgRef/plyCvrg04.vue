@@ -8,8 +8,8 @@
               <el-row :gutter="16">
                 <el-col :span="4">
                   <a style="margin-right: 5px" @click="changeHidden(k)">
-                    <el-icon v-if="!isHidden(k)"><ArrowRightBold /></el-icon>
-                    <el-icon v-if="isHidden(k)"><ArrowDownBold /></el-icon>
+                    <el-icon v-if="!isHidden(k)" color="var(--el-text-color)"><ArrowRightBold /></el-icon>
+                    <el-icon v-if="isHidden(k)" color="var(--el-text-color)"><ArrowDownBold /></el-icon>
                   </a>
                   {{ k }}方案</el-col
                 >
@@ -917,7 +917,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important;
   height: auto;
