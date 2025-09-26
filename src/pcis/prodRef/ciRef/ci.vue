@@ -957,7 +957,7 @@ const onChiefMrkChange = () => {
     switch (ciMrkValue) {
       case "2":
       case "4":
-        // cChiefMrkVal = '1'; // 主共方（注释掉的代码表示不需要设置）
+        // cChiefMrkVal = '1'; // 主共方（）
         break;
       default:
         cChiefMrkVal = '0'; // 从共方
@@ -1290,9 +1290,10 @@ const intiAgentBroker = (row: any) => {
   if (rowData.length > 0) {
     const rowId = rowData[0]._dataId;
     setValueByRowKey('Ci.cBrkrCde', rowId, row.CChaCde);
+    setValueByRowKey('Ci.CChaNme', rowId, row.CChaNme)
     freeEditRef.value?.addCodeListMap({
       code: 'Ci.cBrkrCde' + rowId,
-      list: rowData.loadData,
+      list: row.loadData,
     })
   }
 };
