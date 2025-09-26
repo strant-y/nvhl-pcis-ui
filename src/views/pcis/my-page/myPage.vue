@@ -12,7 +12,7 @@
           >
             <el-anchor :bound="120" :offset="80">
               <el-anchor-link
-                v-if="edrbaseFlag && (props.param.cRsnCde !== '99'|| props.param.cTransMrk !== '1')"
+                v-if="edrbaseFlag"
                 @click="handleAnchorClick($event, `#edrbase`)"
                 :class="activeAnchor === 'edrbase' ? 'isActive' : ''"
               >
@@ -32,7 +32,7 @@
                 >
               </el-anchor-link>
               <el-anchor-link
-                v-if="edritemFlag && (props.param.cRsnCde !== '99'|| props.param.cTransMrk == '1')"
+                v-if="edritemFlag"
                 @click="handleAnchorClick($event, `#edritem`)"
                 :class="activeAnchor === 'edritem' ? 'isActive' : ''"
               >
@@ -1364,10 +1364,10 @@ const initPage = async () => {
     //退保不显示产品组件信息
     acctinfoFlag.value = false;
   }
-  if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
-    edrbaseFlag.value = true
-    edritemFlag.value = true;
-  }
+  // if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+  //   edrbaseFlag.value = true
+  //   edritemFlag.value = true;
+  // }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
   oldProductResData.value = JSON.parse(getProductRes.data);
@@ -1829,7 +1829,7 @@ async function loadAfter() {
     }
   } else if (props.param.pageType === "readonly") {
     // 查询数据
-    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
+    const cAppNo = props.param.taskTyp === "I" ? props.param?.cInquiryNo : props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
@@ -2602,12 +2602,10 @@ const loadAppPlyInfo = async (CAppNo) => {
     scene: props.param.pageType,
     cTransMrk:props.param.cTransMrk,
   };
-  if ("EDR_APP_NEW_SCENE" === props.param.pageType && props.param.cTransMrk != '1') {
+  if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
     param["CPlyNo"] = CAppNo;
   } else if (props.param.pageName === "priceInquiry") {
     param["cInquiryNo"] = CAppNo;
-  } else if(props.param.cTransMrk === '1'){
-    param['CPlyNo'] = props.param.cAppNo;
   } else{
      param["cAppNo"] = CAppNo;
   }
@@ -2699,7 +2697,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       });
     }
   } else {
-    const res = await getAppPolicy(param);
+    const res = await getAppPolicy(param, "getAppPolicy");
 
     console.log("投保单明细", res);
     if (res["code"] == "200") {
