@@ -13,19 +13,29 @@
 			<template #column-policyInfo="{ row, column, index }">
 				<div class="policy-info-cell">
 					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
-						<span>{{ row.cEcAgrAppNo }}</span>
+						<span style="width: 119px;">{{ row.cEcAgrAppNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
 							<DocumentCopy />
 						</el-icon>
 					</div>
 					<div v-if="row.cEcAgrNo" class="policy-number-row">
-						<span>{{ row.cEcAgrNo }}</span>
+						<span style="width: 119px;">{{ row.cEcAgrNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
 							<DocumentCopy />
 						</el-icon>
 					</div>
 				</div>
 			</template>
+      <template #column-cAppNme="{ row, column, index }">
+        <el-tooltip :content="row.cAppNme" placement="top">
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
 		</app-table>
   </div>
 </template>
@@ -294,7 +304,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
         }),
       ],
-      tableBtnWidth: 120,
+      tableBtnWidth: 95,
       tableBtnPosition: "right",
       tableBtnType: "btn",
       fromSchema: [
@@ -302,7 +312,7 @@ const tableconfig = reactive<AppTableConfig>(
 					prop: "policyInfo",
 					inputtype: "rtinput",
 					title: "协议号",
-					minWidth: 180,
+					width: 142,
 					slotName: "policyInfo"
 				},
         {
@@ -323,25 +333,29 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "cAppId",
           inputtype: "rtinput",
           title: "客户编号",
-          minWidth: 180,
+          width: 76,
         },
         {
           prop: "cAppNme",
           inputtype: "rtinput",
           title: "客户名称",
-          minWidth: 180,
+          slotName: "cAppNme",
+          align: 'left',
+          minWidth: 112,
         },
         {
           prop: "cDptCnm",
           inputtype: "rtinput",
           title: "出单机构",
-          minWidth: 120,
+          slotName: "cDptCnm",
+          align: 'left',
+          minWidth: 145,
         },
 				{
 					prop: "InsurancePeriod",
 					inputtype: "rtinput",
 					title: "协议期间",
-					minWidth: 120,
+          width: 220,
 				},
         // {
         //   prop: "tInsrncBgnTm",
@@ -359,7 +373,8 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "cAppStatus",
           inputtype: "rtselect",
           title: "协议状态",
-          minWidth: 120,
+          width: 82,
+          align: "left",
           loadData: appStatusOptions.value
         },
         // {

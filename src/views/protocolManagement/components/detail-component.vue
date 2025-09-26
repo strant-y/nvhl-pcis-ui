@@ -390,8 +390,23 @@ defineExpose({
     margin-bottom: 20px;
     padding-left: 0;
     opacity: .6;
-    &.isActive,&:hover {
-      opacity: 1;
+    &.isActive{
+      background: var(--menu-active-bg-color);
+      :deep(a) {
+        color: var(--menu-active-text);
+        .iconfont {
+          color: var(--menu-active-text);
+        }
+      }
+    }
+    &:hover {
+      background: var(--menu-hover);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
+        }
+      }
     }
     :deep(a) {
       display: flex;

@@ -5694,7 +5694,7 @@ const shouldCheckYunnanPaymentRules = () => {
 };
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 
 $btn-icon-color-1: #ff3e00;
 $btn-icon-color-2: #0060ff;
@@ -5724,7 +5724,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   display: inline-block; /* 设置为行内块元素 */
   vertical-align: middle; /* 垂直居中 */
   position: relative;
-  z-index: 9999;
+  z-index: 998;
 }
 
 /* 用于包含行内块元素的容器 */
@@ -5734,7 +5734,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  z-index: 9999;
 }
 :deep(.el-main) {
   // padding: 10px 10px 10px 10px;
@@ -5761,18 +5760,28 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   // width: 130px;
   :deep(.el-anchor__list) {
     padding: 0;
-  } 
+    margin-top: 15px;
+  }
   .el-anchor__item {
-    margin-top: 5px;
+    height: 32px;
+    margin-top: 2px;
     padding-left: 16px;
     padding-right: 22px;
-    &.isActive,&:hover {
-      // background: linear-gradient( 180deg, rgba(58, 118, 198, .3) 0%, rgba(57, 117, 198, .3) 100%);
-      background: var(--el-color-primary);
+    &.isActive{
+      background: var(--menu-active-bg-color);
       :deep(a) {
-        color: #ffffff;
+        color: var(--menu-active-text);
         .iconfont {
-          color: #ffffff;
+          color: var(--menu-active-text);
+        }
+      }
+    }
+    &:hover {
+      background: var(--menu-hover);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
         }
       }
     }
@@ -5825,6 +5834,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   left: 80px;
   transform: translateX(-50%);
   margin-bottom: 0 !important;
+  z-index: 999;
 }
 
 .toggle-nav-button {

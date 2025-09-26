@@ -16,8 +16,8 @@
             {{ k + 1 }}
           </td>
           <td v-for="(it, kk) in formcof" :key="kk">
-            <template v-if = "it['inputtype'] === 'rttag'">
-              <el-badge value="退" class="term_badge" :hidden="item['Term.cCancelMrk'] !== '1'" >
+            <template v-if = "it['inputtype'] === 'rttag'">zhutiao
+              <el-badge value="退" class="term_badge rt-custom-input rt-custom-select" :hidden="item['Term.cCancelMrk'] !== '1'" >
                 <from-item
                 v-model="item['Term.'+kk]"
                 :item="getterm(it,item)"
@@ -25,10 +25,12 @@
               </el-badge>
             </template>
             <template v-else>
-              <from-item
-                v-model="item['Term.'+kk]"
-                :item="getterm(it,item)"
-              />
+              <div class="rt-custom-input rt-custom-select">
+                <from-item
+                    v-model="item['Term.'+kk]"
+                    :item="getterm(it,item)"
+                />
+              </div>
             </template>
             
           </td>
@@ -154,6 +156,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index";
 table {
   border-collapse: collapse; /* 合并边框 */
   width: 100%;

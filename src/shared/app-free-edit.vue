@@ -91,7 +91,7 @@
                 />
               </el-card>
               <div
-                style="margin-top: 3px; margin-bottom: -5px;"
+                style="margin-top: 10px; margin-right: 3.4%"
                 :style="{ textAlign: freeEditConfig.endBtnsPosition }"
                 v-if="
                   freeEditConfig.endBtns && freeEditConfig.endBtns.length > 0

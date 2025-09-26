@@ -7,31 +7,17 @@ export enum ThemeEnum {
    */
   DEFAULT = "default",
   /**
+   * 经典
+   */
+  Orange = "orange",
+  /**
+   * 草绿
+   */
+  Green = "green",
+  /**
    * 暗黑主题
    */
   DARK = "dark",
-
-  /**
-   * 青春
-   */
-  SENTIMENTAL = "sentimental",
-
-  /**
-   * 简约
-   */
-  SIMPLE = "simple",
-  /**
-   * 藏青
-   */
-  LINEN = "linen",
-  /**
-   * 淡雅
-   */
-  GRACEFUL = "graceful",
-  /**
-   * 夏天
-   */
-  SUMMER = "summer",
 }
 
 /**

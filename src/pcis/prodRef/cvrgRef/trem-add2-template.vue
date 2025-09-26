@@ -35,12 +35,14 @@
             >
             
             <template v-if = "it['inputtype'] === 'rttag'">
-              <el-badge value="退" class="term_badge" :hidden="item['Term.cCancelMrk'] !== '1'">
+              <el-badge value="退" class="term_badge rt-custom-input rt-custom-select" :hidden="item['Term.cCancelMrk'] !== '1'">
                 <from-item v-model="item['Term.' + kk]" :item="getterm(it,item,kk)" />
               </el-badge>
             </template>
             <template v-else>
-              <from-item v-model="item['Term.' + kk]" :item="getterm(it,item,kk)" />
+              <div class="rt-custom-input rt-custom-select">
+                <from-item v-model="item['Term.' + kk]" :item="getterm(it,item,kk)" />
+              </div>
             </template>
             
             </el-form-item>
@@ -265,6 +267,7 @@ defineOptions({
 });
 </script>
 <style lang="scss" scoped>
+@import "src/styles/custom-index";
 table {
   border-collapse: collapse; /* 合并边框 */
   width: 100%;
