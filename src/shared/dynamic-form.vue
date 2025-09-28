@@ -507,7 +507,7 @@ function setRuleType(irules: any ,schema: any) {
       }
     }
   }
-  if (schema.inputtype === "rtSelectV2" || schema.inputtype === "rtSelect") {
+  if (schema.inputtype === "rtSelectV2" || schema.inputtype === "rtselect") {
     if(schema.multiple === 1 || schema.multiple === true || schema.multiple === '1' ){
       if (rules && rules.length > 0) {
         rules.forEach((item: any) => {
