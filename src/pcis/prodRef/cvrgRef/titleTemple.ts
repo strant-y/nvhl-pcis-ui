@@ -27,7 +27,7 @@ const deductibleKey = ref<{ [key: string] : string }>(
         '040172':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
         '040176':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
 
-        'defrisk':{amt:'TermRisktgt.nPersonDeduct',rate:'TermRisktgt.nPersonDeductrate',deduct:'TermRisktgt.cDeductibleNote'},
+        'defrisk':{amt:'TermRisktgt.nDeductibleAmount',rate:'TermRisktgt.nDeductibleRate',deduct:'TermRisktgt.cDeductibleNote'},
     }
 );
 
