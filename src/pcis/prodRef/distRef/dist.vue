@@ -378,7 +378,11 @@ const method = {
         {
           fromSchema: tableconfig.value.fromSchema,
           title: "编辑",
-          rowData: {...row},
+          rowData: {
+            ...row, 
+            cProdNo: route.params.param?.cProdNo, 
+            cRsnCde: route.params.param?.cRsnCde
+          },
           tab: formconfig1.value.title,
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
