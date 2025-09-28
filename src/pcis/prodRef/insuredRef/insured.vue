@@ -96,6 +96,7 @@ onMounted(() => {
     //   disabled: true,
     // });
   });
+  setValue("Insured.cNation", "CHN"); // 国籍默认中国
   //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
   const cProdNo = opertaor.getParam()?.cProdNo;
   if (
@@ -480,17 +481,45 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-      //办理人 4要素  
-      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
-      setFormItem("Insured.tOperaterCertfEndTm", {
-        rules: [getRules("required", {})],
+      // 被保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      setFormItem("Insured.tBirthday", {
+        hidden: true,
       });
-      setFormItem("Insured.cOperaterCertfTyp", {
-        rules: [getRules("required", {})],
+      setFormItem("Insured.nAge", {
+        hidden: true,
       });
-      setFormItem("Insured.cOperaterCertfCde", {
-        rules: [getRules("required", {})],
+      setFormItem("Insured.cSex", {
+        hidden: true,
       });
+      setFormItem("Insured.cNation", {
+        hidden: true,
+      });
+      setFormItem("Insured.cOccupTyp", {
+        hidden: true,
+      });
+      setFormItem("Insured.cBusinessScope", {
+        hidden: true,
+      });
+      setFormItem("Insured.cMrgCde", {
+        hidden: true,
+      });
+      setFormItem("Insured.cIsBranch", {
+        hidden: false,
+      });
+      setFormItem("Insured.cStkMrk", {
+        hidden: false,
+      });
+      //办理人 4要素  (0928需求法人时办理人人员姓名、证件类型、证件号码必填、有效止期非必填)
+      // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("Insured.tOperaterCertfEndTm", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Insured.cOperaterCertfTyp", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Insured.cOperaterCertfCde", {
+      //   rules: [getRules("required", {})],
+      // });
       setFormItem("Insured.cEnterpriseTel", {
         rules: [getRules("required", {})],
       });
@@ -655,6 +684,34 @@ const method = {
       //   hidden: true,
       // });
     } else {
+      setFormItem("Insured.tBirthday", {
+        hidden: false,
+      });
+      setFormItem("Insured.nAge", {
+        hidden: false,
+      });
+      setFormItem("Insured.cSex", {
+        hidden: false,
+      });
+      setFormItem("Insured.cNation", {
+        hidden: false,
+      });
+      setFormItem("Insured.cOccupTyp", {
+        hidden: false,
+      });
+      setFormItem("Insured.cBusinessScope", {
+        hidden: false,
+      });
+      setFormItem("Insured.cMrgCde", {
+        hidden: false,
+      });
+      // 被保人是个人，是否分支机构、 股东客户隐藏
+      setFormItem("Insured.cIsBranch", {
+        hidden: true,
+      });
+      setFormItem("Insured.cStkMrk", {
+        hidden: true,
+      });
       setFormItem("Insured.tBirthday", {
         rules: [getRules("required", {})],
       });
