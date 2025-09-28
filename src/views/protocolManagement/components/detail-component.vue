@@ -1,7 +1,7 @@
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
-      <el-aside :width="(NavigaShow ? 200 : 100) + 'px'">
+      <el-aside :width="NavigaShow  ? '140px' : '60px'" class="custom-anchor-bg">
         <!-- <el-affix :offset="100"> -->
           <div class="navi_container">
             <div
@@ -9,7 +9,7 @@
                 :key="v"
                 class="NavigaList_card"
             >
-              <el-anchor :bound="120" :offset="80">
+              <el-anchor :bound="120" :offset="60">
                 <el-anchor-link
                     v-if="edrbaseFlag"
                     @click="handleAnchorClick($event, `#edrbase`)"
@@ -79,6 +79,23 @@
                   >
                 </el-anchor-link>
               </el-anchor>
+              <div class="toggle-button">
+                <el-tooltip
+                    effect="dark"
+                    :content="NavigaShow ? '收起导航' : '展开导航'"
+                    placement="right"
+                >
+                  <el-button
+                      circle
+                      @click="NavigaShow = !NavigaShow"
+                      class="toggle-nav-button"
+                  >
+                    <rt-icon
+                        :item="{ icon: NavigaShow ? 'DArrowLeft' : 'DArrowRight' }"
+                    />
+                  </el-button>
+                </el-tooltip>
+              </div>
             </div>
             <!-- <div class="NavigaList_card" style="margin-left: 5px">
               <rt-icon
@@ -155,33 +172,33 @@
           />
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
-        <el-affix position="bottom" :offset="10">
-        <div class="bottom-items">
-<!--          新增的申请单号显示和复制按钮-->
-          <div style="margin-right: 5px; width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-            <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
-              预约协议申请单号:
-              <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">
-              {{ getNo }}
-              </span>
-              <el-tooltip :content="`点击复制预约协议申请单号`" placement="top">
-                <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
-                  <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                </el-button>
-              </el-tooltip>
+        <el-affix position="bottom">
+          <div class="bottom-items">
+            <!--          新增的申请单号显示和复制按钮-->
+            <div style="margin-right: 5px; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+              <div style="padding-left: 10px;display: flex; align-items: center; background: var(--rt-bg-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+                预约协议申请单号:
+                <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;color: var(--el-color-primary);">
+                {{ getNo }}
+                </span>
+                <el-tooltip :content="`点击复制预约协议申请单号`" placement="top">
+                  <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
+                    <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+                  </el-button>
+                </el-tooltip>
+              </div>
             </div>
+            <rt-button
+                v-for="(bth, idx) in props.bthList"
+                :item="bth"
+                :key="idx"
+                :loading="bth.loading"
+                :ref="(res: any) => {
+                  formPage.setButtonRef(bth?.id as string, res);
+                }"
+            />
           </div>
-          <rt-button
-              v-for="(bth, idx) in props.bthList"
-              :item="bth"
-              :key="idx"
-              :loading="bth.loading"
-              :ref="(res: any) => {
-                formPage.setButtonRef(bth?.id as string, res);
-              }"
-          />
-        </div>
-      </el-affix>
+        </el-affix>
       </el-main>
     </el-container>
   </div>
@@ -340,26 +357,18 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
+@import "@/styles/custom-index";
+
 .bottom-items {
   height: 45px;
-  background-color: #fff;
+  background-color: var(--rt-bg-color);
   display: flex;
   justify-content: end;
   align-items: center;
-  padding-right: 20px;
-}
-.NavigaList_card {
-  display: inline-block; /* 设置为行内块元素 */
-  vertical-align: middle; /* 垂直居中 */
-}
-.card_ {
-  margin-bottom: 10px;
+  padding-right: 10px;
+  border-top: 1px var(--el-mypage-right-menu-border-color) solid;
 }
 
-/* 用于包含行内块元素的容器 */
-.navi_container {
-  line-height: 50px; /* 与容器的高度相同，实现垂直居中 */
-}
 :deep(.el-main) {
   padding: 10px 10px 10px 10px;
 }
@@ -377,61 +386,4 @@ defineExpose({
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
 }
-
-.mypage-aside {
-  background: var(--el-color-primary);
-}
-.el-anchor {
-  background: transparent;
-  :deep(.el-anchor__list) {
-    padding: 20px 10px;
-  }
-  .el-anchor__item {
-    margin-bottom: 20px;
-    padding-left: 0;
-    opacity: .6;
-    &.isActive{
-      background: var(--menu-active-bg-color);
-      :deep(a) {
-        color: var(--menu-active-text);
-        .iconfont {
-          color: var(--menu-active-text);
-        }
-      }
-    }
-    &:hover {
-      background: var(--menu-hover);
-      :deep(a) {
-        color: var(--el-color-primary);
-        .iconfont {
-          color: var(--el-color-primary);
-        }
-      }
-    }
-    :deep(a) {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      color: #FFFFFF;
-      padding: 0;
-      .el-icon {
-        font-size: 3rem!important;
-        margin: 0 0 10px 0;
-      }
-      .iconfont {
-        font-size: 1.2rem;
-        color: #FFF;
-        margin-right: 5px;
-      }
-      .icon-title {
-        // font-size: 14px;
-      }
-    }
-  }
-}
-.el-aside {
-  width: auto;
-  background: var(--el-color-primary);
-}
-
 </style>
