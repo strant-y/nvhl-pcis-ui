@@ -1900,16 +1900,20 @@ async function loadAfter() {
             "YYYY-MM-DD HH:mm:ss"
         )
         // ops['insrnc']['Base.tInsrncBgnTm'] = addOneYear(ops['insrnc']['Base.tInsrncBgnTm'])
-        ops['insrnc']['Base.tInsrncBgnTm'] = dayjs(ops['insrnc']['Base.tInsrncBgnTm'])
-            .add(1, "year")
-            .format("YYYY-MM-DD HH:mm:ss");
-        ops['insrnc']['Base.tInsrncEndTm'] = dayjs(ops['insrnc']['Base.tInsrncBgnTm'])
-            .add(1, "year")
-            .format("YYYY-MM-DD HH:mm:ss");
+        // ops['insrnc']['Base.tInsrncBgnTm'] = dayjs(ops['insrnc']['Base.tInsrncBgnTm'])
+        //     .add(1, "year")
+        //     .format("YYYY-MM-DD HH:mm:ss");
+        // ops['insrnc']['Base.tInsrncEndTm'] = dayjs(ops['insrnc']['Base.tInsrncBgnTm'])
+        //     .add(1, "year")
+        //     .format("YYYY-MM-DD HH:mm:ss");
         ops['insrnc']['Base.cTmSysCde']= moment(ops['insrnc']['Base.tInsrncEndTm']).diff(
             moment(ops['insrnc']['Base.tInsrncBgnTm']),
             "days"
         );
+        if(ops.insrnc) {
+          let productCode = route.params.param?.cProdNo;
+          setInsuranceTerm(ops,productCode);
+        }
         // if(ops['ci'] && ops['ci'].length>0){
         //   ops['ci'].forEach((item:any)=>{
         //     if(item['Ci.nCiShare']){
