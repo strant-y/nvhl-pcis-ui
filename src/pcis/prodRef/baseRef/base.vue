@@ -84,13 +84,13 @@ onMounted(async () => {
     }
     if(item.prop === "Base.groupAmtExch") {
       item.labelLength = 13
-      item.groupList[1].minWidth = "88px"
+      // item.groupList[1].minWidth = "88px"
     }
     if(item.prop === "Base.nRmbAmt") {
       item.labelLength = 15
     }
     if(item.prop === "Base.groupPrmExch") {
-      item.groupList[1].minWidth = "88px"
+      // item.groupList[1].minWidth = "88px"
     }
   })
 });

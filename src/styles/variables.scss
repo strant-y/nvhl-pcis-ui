@@ -1,8 +1,9 @@
 /** 全局SCSS变量 */
 :root {
-   --menu-background: #f0f5f9;
-   --menu-active-text: #FFF;
-   --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
+  --menu-background: #f0f5f9;
+  --menu-active-text: #FFF;
+  --menu-text-size: 14px;
+  --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
 
   // 只读状态字体颜色调整
   --el-disabled-text-color: #777;
@@ -18,18 +19,20 @@
   --el-text-color-regular: #000;
 
   --card-group-header-bg-color: #f2f2f2;
+  --card-group-header-title-size: 14px;
+  --card-header-title-size: 15px;
+
   --cvrg-sub-header-bg-color: rgba(214, 254, 255, 0.6);
   --cvrg-group-header-bg-color: rgba(0,0,0,0.04);
 
-  --rt-form-content-font-size: 11.5px; // 表单content字体大小
+  --rt-form-content-font-size: 12px; // 表单content字体大小
   --rt-form-content-font-weight: 450;
-  --rt-form-content-height: 25px; // 表单content高
-  --rt-form-content-line-height: 1.4;
-  --rt-form-label-font-size: 11.5px; // 表单label字体大小
+  --rt-form-content-height: 24px; // 表单content高
+  --rt-form-content-line-height: 24px;
+  --rt-form-label-font-size: 12px; // 表单label字体大小
   --rt-form-label-font-weight: 400;
   --rt-form-label-font-color: #000000;
   --rt-form-label-padding: 0 5px 0 0, // 标签内边距
-
 }
 
 
@@ -82,7 +85,6 @@ html.dark {
   .el-menu-item.is-active {
     background-color: rgb(0 0 0 / 20%) !important;
   }
-  --card-header-title-size: 15px;
   --card-header-title-color: #ccc !important;
   --cvrg-sub-header-bg-color: rgb(0 0 0 / 80%);
   --card-group-header-bg-color: rgb(0 0 0 / 80%);
@@ -119,5 +121,6 @@ $sidebar-logo-background: var(--sidebar-logo-background); // 侧边栏 Logo 背�
 
 $sidebar-width: 210px; // 侧边栏宽度
 $sidebar-width-collapsed: 54px; // 侧边栏收缩宽度
-$navbar-height: 45px; // 导航栏高度
-$tags-view-height: 34px; // TagsView 高度
+$navbar-height: 38px; // 导航栏高度
+$tags-view-height: 35px; // TagsView 高度
+$menu-text-size: var(--menu-text-size);

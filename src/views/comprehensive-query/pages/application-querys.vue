@@ -1,7 +1,7 @@
 <!-- 配置 -->
 <template>
   <div class="app-container">
-    <el-tabs @tab-click="handleTabClick" v-model="activeName">
+    <el-tabs @tab-click="handleTabClick" v-model="activeName" class="custom-tabs">
       <el-tab-pane
         v-for="tab in tabs"
         :key="tab.key"
@@ -297,11 +297,28 @@ const method = {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .app-container {
   padding: 1px 5px;
 }
-:deep(.el-tabs__header) {
-  padding: 0px 12px;
+:deep(.custom-tabs) {
+  // 标签页标题（导航栏中的文字）
+  .el-tabs__item {
+    font-size: var(--card-group-header-title-size) !important; /* 标题字体大小 */
+    font-weight: 520;
+  }
+
+  // 激活状态的标签标题
+  .el-tabs__item.is-active {
+    font-size: var(--card-group-header-title-size) !important; /* 可单独设置激活状态的字体大小 */
+  }
+
+  // 标签页内容区域的字体大小
+  .el-tabs__content {
+    font-size: var(--card-group-header-title-size) !important; /* 内容区域字体大小 */
+  }
+  .el-tabs__header {
+    padding: 2px 12px;
+  }
 }
 </style>

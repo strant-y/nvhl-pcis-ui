@@ -239,29 +239,27 @@
 
 // 输入框块样式
 .rt-custom-input {
-  .el-input {
-    .el-input__wrapper{
-      min-height: var(--rt-form-content-height) !important;
-      height: var(--rt-form-content-height) !important;
-    }
-    .el-input__inner {
+  .el-input__wrapper{
+    min-height: var(--rt-form-content-height) !important;
+    height: var(--rt-form-content-height) !important;
+  }
+  .el-input__inner {
+    font-size: var(--rt-form-content-font-size);
+    color: var(--el-text-color);
+    line-height: 100%;
+    height: 100%;
+  }
+  .el-input__placeholder {
+    font-size: var(--rt-form-content-font-size);
+  }
+  .el-input__prefix {
+    .el-input__prefix-inner {
       font-size: var(--rt-form-content-font-size);
-      color: var(--el-text-color);
-      line-height: 100%;
-      height: 100%;
     }
-    .el-input__placeholder {
+  }
+  .el-input__suffix {
+    .el-input__suffix-inner {
       font-size: var(--rt-form-content-font-size);
-    }
-    .el-input__prefix {
-      .el-input__prefix-inner {
-        font-size: var(--rt-form-content-font-size);
-      }
-    }
-    .el-input__suffix {
-      .el-input__suffix-inner {
-        font-size: var(--rt-form-content-font-size);
-      }
     }
   }
 }
@@ -303,6 +301,7 @@
 .rt-custom-picker {
   .el-input__wrapper {
     height: var(--rt-form-content-height);
+    min-height: var(--rt-form-content-height);
   }
   .el-date-picker__input {
     height: var(--rt-form-content-height) !important;

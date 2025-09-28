@@ -11,7 +11,7 @@
         class="custom-form"
         :label-width="formUi.labelWidth && formUi.labelWidth !== 'auto' ? (formUi.labelWidth + 'px') : maxLabelWidth"
     >
-      <el-row :gutter="10" style="margin-right: 3%;">
+      <el-row :gutter="10" style="margin-right: 1%;">
         <template v-for="(item, index) in props.fromSchema" :key="index">
           <template v-if="!item.hidden">
             <el-col
@@ -174,7 +174,7 @@
               </a>
             </template>
           </div>
-          <el-row :gutter="10" style="margin-bottom: 10px;margin-right: 3%;">
+          <el-row :gutter="10" style="margin-bottom: 10px;margin-right: 1%;">
             <template v-for="(item, index) in props.fromSchema" :key="index">
               <template v-if="!item.hidden">
                 <el-col
@@ -302,28 +302,25 @@ const maxLabelWidth = ref('150px'); // 默认值
 const updateLabelWidth = () => {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-
   const scaleRatio = window.devicePixelRatio;
   const displayPercentage = Math.round(scaleRatio * 100);
   let px;
-
   // 不同缩放比率适配
   if(displayPercentage <= 110) {
-    px = 220;
-  }else if(displayPercentage <= 150) {
     px = 200;
+  }else if(displayPercentage <= 150) {
+    px = 180;
   }else if(displayPercentage <= 175)  {
-    px = 180
-  }else {
     px = 160
+  }else {
+    px = 140
   }
-
   // 不同分辨率适配
   if(viewportWidth < 1280) {
     maxLabelWidth.value = px - 50 + 'px';
-  } else if(viewportWidth < 1920) {
+  } else if(viewportWidth < 1700) {
     maxLabelWidth.value = px - 30 + 'px';
-  } else if (viewportWidth === 1920) {
+  } else if (viewportWidth <= 1920) {
     maxLabelWidth.value = px + 'px';
   } else if(viewportWidth >= 1920 && viewportWidth <= 3840) {
     maxLabelWidth.value = px + 80 + 'px';
@@ -890,8 +887,8 @@ defineExpose({
   padding: 0px 12px;
 }
 .rt_group_title {
-  font-weight: 500;
-  font-size: 14px;
+  font-weight: 450;
+  font-size: var(--card-group-header-title-size);
   color: var(--el-text-color);
   line-height: 24px;
 }
