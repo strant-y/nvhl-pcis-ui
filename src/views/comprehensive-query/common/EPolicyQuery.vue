@@ -68,6 +68,7 @@ import { DocumentCopy } from "@element-plus/icons-vue";
 import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
 import moment from 'moment'
+import { getProdEnableList } from "@/api/prod";
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
 const user: any = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
@@ -155,6 +156,14 @@ function extractCode(str:string) {
   const pattern = /^(P\d+|\d+)/;
   return str.match(pattern)?.[0] || "";
 }
+const kindData: any = computed(() => {
+  return prodTotalDatas.value.map((item: any) => ({
+    label: item.code + " " + item.value,
+    value: item.code,
+    list: item.list,
+  }));
+});
+const cProdData = ref([]);
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
         endBtnsPosition: 'right',
@@ -207,12 +216,69 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
             },
             {
-                prop: 'CProdNo',
+                prop: "cKindNo",
+                inputtype: "rtselect",
+                title: "产品大类",
+                itemWidth: 1,
+                rules: [{ type: "required" }],
+                typeCode: "KIND_LIST_GRT",
+                child: "cProdNo",
+                filterable: true,
+                clearable: true,
+                codeParam: {
+                    cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+                    cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+                },
+                loadData: kindData,
+                func: (val:any) => {
+                    setValue("cProdNo","")
+                    cTermNo = "";      // 重置条款编码
+                    cPard.value = val;
+                    formconfig1.fromSchema?.forEach((item) => {
+                        if (
+                            item.prop === "CEmployeeName" ||
+                            item.prop === "CIdentificationNumber" ||
+                            item.prop === "CPlateNo" ||
+                            item.prop === "CEngineNo" ||
+                            item.prop === "CIndustryType" ||
+                            item.prop === "CProjectName" ||
+                            item.prop === "CDetailedAddress" ||
+                            item.prop === "CProjectType" ||
+                            item.prop === "cPrjCtgTyp" ||
+                            item.prop === "cPrjCtgMidTyp" ||
+                            item.prop === "cPrjCtgSubTyp"
+                        ) {
+                            item.hidden = true;
+                        }
+                    });
+                    if (val && val.length > 0) {
+                        let options: any = [];
+                        kindData.value.forEach((item: any) => {
+                            if (val.includes(item.value)) {
+                                const list = item.list.map((item: any) => ({
+                                label: item.code + " " + item.value,
+                                value: item.code,
+                                list: item.list,
+                                }));
+                                options = options.concat(list);
+                            }
+                        });
+                        cProdData.value = options;
+                        setFormItem("cProdNo", { loadData: options });
+                        freeEditRef.value?.setValue("cProdNo", null);
+                    } else {
+                        setFormItem("cProdNo", { loadData: [] });
+                        freeEditRef.value?.setValue("cProdNo", null);
+                    }
+              },
+            },
+            {
+                prop: 'cProdNo',
                 inputtype: 'rtselect',
                 title: '产品名称',
                 itemWidth: 1,
                 rules: [getRules('required', {})],
-                typeCode: 'EPolicy_List',
+                // typeCode: 'EPolicy_List',
                 filterable: true,
                 clearable: true,
                 func: (val: any) => {
@@ -222,62 +288,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     } else {
                         setFormItem('CTyp', { disabled: true })
                     }
+                    if (val && val.length > 0) {
+                        let options: any = [];
+                        cProdData.value.forEach((item: any) => {
+                        if (val.includes(item.value)) {
+                            const list = item.list.map((item: any) => ({
+                            label: item.code + " " + item.value,
+                            value: item.code,
+                            list: item.list,
+                            }));
+                            options = options.concat(list);
+                        }
+                        });
+                        setFormItem("cTermNo", { loadData: options });
+                        freeEditRef.value?.setValue("cTermNo", null);
+                    } else {
+                        setFormItem("cTermNo", { loadData: [] });
+                        freeEditRef.value?.setValue("cTermNo", null);
+                    }
                 }
             },
             {
-              prop: "cKindNo",
-              inputtype: "rtselect",
-              title: "产品大类",
-              itemWidth: 1,
-              rules: [{ type: "required" }],
-              typeCode: "KIND_LIST_GRT",
-              child: "cProdNo",
-              filterable: true,
-              clearable: true,
-              codeParam: {
-                  cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                  cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-              },
-              func: (val) => {
-                  setValue("cProdNo","")
-                  cTermNo = "";      // 重置条款编码
-                  cPard.value = val;
-                  formconfig1.fromSchema?.forEach((item) => {
-                      if (
-                          item.prop === "CEmployeeName" ||
-                          item.prop === "CIdentificationNumber" ||
-                          item.prop === "CPlateNo" ||
-                          item.prop === "CEngineNo" ||
-                          item.prop === "CIndustryType" ||
-                          item.prop === "CProjectName" ||
-                          item.prop === "CDetailedAddress" ||
-                          item.prop === "CProjectType" ||
-                          item.prop === "cPrjCtgTyp" ||
-                          item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
-                      ) {
-                          item.hidden = true;
-                      }
-                  });
-                  codeListStore
-                    .queryCodeList({
-                        codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
-                        codeListParam:{
-                        cParCde: cPard.value,
-                        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                    },
-                    })
-                    .then((res) => {
-                        cTermNoList.value = res;
-                        setFormItem("cProdNo", {
-                            loadData: res,
-                        });
-                    });
-              },
-            },
-            {
-              prop: "cProdNo",
+              prop: "cTermNo",
               inputtype: "rtselect",
               title: "条款",
               itemWidth: 1,
@@ -533,6 +565,15 @@ const tableconfig = reactive<AppTableConfig>(
         ]
     })
 )
+
+const prodTotalDatas = ref([]);
+onBeforeMount(() => {
+  getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
+    if (res.data && res.data.length > 0) {
+      prodTotalDatas.value = res.data;
+    }
+  });
+});
 
 onMounted(async () => {
     nextTick(() => {
