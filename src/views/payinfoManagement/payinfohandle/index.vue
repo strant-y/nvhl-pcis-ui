@@ -23,7 +23,7 @@
             </template>
             <template #column-cAppNmeInvest="{ row, column, index }">
                 <el-tooltip :content="row.cAppNmeInvest" placement="top">
-                <span v-html="row.cAppNmeInvest || ''" class="twoLine"></span>
+                    <span v-html="row.cAppNmeInvest || ''" class="twoLine"></span>
                 </el-tooltip>
             </template>
 		</app-table>
@@ -900,7 +900,7 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cAppNo",
 				inputtype: "rtinput",
 				title: "申请单号/保单号",
-                width: 165,
+                width: 136,
                 slotName: "cAppNo",
                 fixed: "left",
 			},
@@ -916,7 +916,7 @@ const tableconfig = reactive<AppTableConfig>(
 				title: "投保人名称",
                 slotName: "cAppNmeInvest",
                 align: "left",
-                width: 150,
+                width: 112,
 			},
 			{
 				prop: "cPayTyp",
@@ -940,21 +940,21 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "nPrm",
 				inputtype: "rtinput",
 				title: "保费金额",
-                width: 115,
+                width: 77,
                 align: "left"
 			},
 			{
 				prop: "nPayAmt",
 				inputtype: "rtinput",
 				title: "应缴金额",
-                width: 115,
+                width: 77,
                 align: "left"
 			},
 			{
 				prop: "cCheckSts",
 				inputtype: "rtselect",
 				title: "处理状态",
-                width: 132,
+                width: 112,
                 align: "left",
 				loadData:cCheckStsList,
 				formatter: (val)=>{
@@ -966,25 +966,25 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tBgnTm",
 				inputtype: "rtinput",
 				title: "起保日期",
-                width: 136,
+                width: 112,
 			},
 			{
 				prop: "cUniqueNo",
 				inputtype: "rtinput",
 				title: "收据流水号",
-                width: 165,
+                width: 132,
 			},
 			{
 				prop: "cBatchNo",
 				inputtype: "rtinput",
 				title: "批号",
-                width: 165,
+                width: 132,
 			},
 			{
 				prop: "cPayStatus",
 				inputtype: "rtselect",
 				title: "缴费状态",
-                width: 62,
+                width: 55,
                 align: "left",
                 typeCode: "WEB_BAS_CODELIST",
                 codeParam: {'cParCde': 'DY1'},
@@ -997,13 +997,13 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tUdrTm",
 				inputtype: "rtinput",
 				title: "核保日期",
-                width: 136,
+                width: 112,
 			},
 			{
 				prop: "cChargeCde",
 				inputtype: "rtinput",
 				title: "操作员",
-                width: 62,
+                width: 55,
                 align: "left",
 			}
 		],

@@ -17,6 +17,16 @@
           </div>
         </div>
       </template>
+      <template #column-cDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cDptCnm" placement="top">
+          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-cInsuredNme="{ row, column, index }">
+        <el-tooltip :content="row.cInsuredNme" placement="top">
+          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
     </app-table>
   </div>
 </template>
@@ -144,27 +154,31 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPlyNo",
         inputtype: 'rtinput',
         title: "保单号",
-        width: 165,
+        width: 136,
         fixed: "left",
         slotName: "cPlyNoInfo"
       },
       {
-        prop: "cAppNo",
+        prop: "cDptCnm",
         inputtype: 'rtinput',
         title: "出单机构",
+        slotName: "cDptCnm",
         align: 'left',
+        width: 145,
       },
       {
-        prop: "cPlyNo",
+        prop: "cInsuredNme",
         inputtype: 'rtinput',
         title: "被保险人",
+        slotName: "cInsuredNme",
         align: 'left',
+        width: 112,
       },
       {
         prop: "cProdNmeCn",
         inputtype: 'rtinput',
         title: "起运日期",
-        width: 140,
+        width: 112,
       },
       {
         prop: "nPrm",
@@ -193,19 +207,19 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppNme",
         inputtype: 'rtinput',
         title: "起保时间",
-        width: 140,
+        width: 112,
       },
       {
         prop: "tAppTm",
         inputtype: 'rtinput',
         title: "终保时间",
-        width: 140,
+        width: 112,
       },
       {
-        prop: "cAppStatus",
+        prop: "nAmt",
         inputtype: 'rtinput',
         title: "保额/赔偿限额",
-        width: 105,
+        width: 83,
         align: "left",
         formatter:(val:any) => {
           return val.toLocaleString()
@@ -312,5 +326,12 @@ onMounted(() => {
   }
   ::v-deep(.el-form){
     padding: 5px 30px;
+  }
+  .twoLine {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-all;
+    overflow: hidden;
   }
 </style>

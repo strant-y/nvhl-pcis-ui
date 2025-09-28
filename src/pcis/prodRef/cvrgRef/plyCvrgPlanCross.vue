@@ -282,7 +282,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 
 ::v-deep .planInfo .el-card__header {
   padding: 2px 15px !important; 

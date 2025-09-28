@@ -140,7 +140,7 @@
     font-weight: 550;
   }
   .right-arrow_text {
-    font-size: map-get($form-config, font-size);
+    font-size: var(--rt-form-content-font-size);
     color: var(--el-text-color);
   }
   margin-bottom: 5px;

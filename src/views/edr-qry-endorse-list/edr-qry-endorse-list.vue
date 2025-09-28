@@ -371,8 +371,9 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "policyInfo",
                 inputtype: "rtinput",
                 title: "申请单号/保单号",
-                width: 220,
-                slotName: "policyInfo"
+                width: 136,
+                slotName: "policyInfo",
+                fixed: true
             },
             // {
             //     prop: "cPlyNo",
@@ -390,18 +391,22 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "cAppNme",
                 inputtype: "rtinput",
                 title: "投保人",
+                align: 'left',
+                minWidth: 112,
             },
             {
                 prop: "tAppTm",
                 inputtype: "rtinput",
                 title: "投保日期",
                 sortable: "custom",
-                width: 160
+                width: 112
             },
             {
                 prop: "cProdNmeCn",
                 inputtype: "rtinput",
                 title: "产品",
+                minWidth: 160,
+                align: 'left',
             },
             {
                 prop: "cGrpMrk",
@@ -411,6 +416,7 @@ const tableconfig = reactive<AppTableConfig>(
                     { label: "是", value: "1" },
                     { label: "否", value: "0" },
                 ],
+                width: 55,
             },
             {
                 prop: "id",

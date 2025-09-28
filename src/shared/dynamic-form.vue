@@ -11,7 +11,7 @@
         class="custom-form"
         :label-width="formUi.labelWidth && formUi.labelWidth !== 'auto' ? (formUi.labelWidth + 'px') : maxLabelWidth"
     >
-      <el-row :gutter="10">
+      <el-row :gutter="10" style="margin-right: 3%;">
         <template v-for="(item, index) in props.fromSchema" :key="index">
           <template v-if="!item.hidden">
             <el-col
@@ -174,7 +174,7 @@
               </a>
             </template>
           </div>
-          <el-row :gutter="10" style="margin-bottom: 10px;">
+          <el-row :gutter="10" style="margin-bottom: 10px;margin-right: 3%;">
             <template v-for="(item, index) in props.fromSchema" :key="index">
               <template v-if="!item.hidden">
                 <el-col
@@ -879,7 +879,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 </style>
 <style lang="css" scoped>
 .rt_group {

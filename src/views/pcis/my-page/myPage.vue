@@ -12,7 +12,7 @@
           >
             <el-anchor :bound="120" :offset="80">
               <el-anchor-link
-                v-if="edrbaseFlag && (props.param.cRsnCde !== '99'|| props.param.cTransMrk !== '1')"
+                v-if="edrbaseFlag"
                 @click="handleAnchorClick($event, `#edrbase`)"
                 :class="activeAnchor === 'edrbase' ? 'isActive' : ''"
               >
@@ -32,7 +32,7 @@
                 >
               </el-anchor-link>
               <el-anchor-link
-                v-if="edritemFlag && (props.param.cRsnCde !== '99'|| props.param.cTransMrk == '1')"
+                v-if="edritemFlag"
                 @click="handleAnchorClick($event, `#edritem`)"
                 :class="activeAnchor === 'edritem' ? 'isActive' : ''"
               >
@@ -1364,10 +1364,10 @@ const initPage = async () => {
     //退保不显示产品组件信息
     acctinfoFlag.value = false;
   }
-  if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
-    edrbaseFlag.value = true
-    edritemFlag.value = true;
-  }
+  // if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+  //   edrbaseFlag.value = true
+  //   edritemFlag.value = true;
+  // }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
   oldProductResData.value = JSON.parse(getProductRes.data);
@@ -1829,7 +1829,7 @@ async function loadAfter() {
     }
   } else if (props.param.pageType === "readonly") {
     // 查询数据
-    const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
+    const cAppNo = props.param.taskTyp === "I" ? props.param?.cInquiryNo : props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
@@ -2602,12 +2602,10 @@ const loadAppPlyInfo = async (CAppNo) => {
     scene: props.param.pageType,
     cTransMrk:props.param.cTransMrk,
   };
-  if ("EDR_APP_NEW_SCENE" === props.param.pageType && props.param.cTransMrk != '1') {
+  if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
     param["CPlyNo"] = CAppNo;
   } else if (props.param.pageName === "priceInquiry") {
     param["cInquiryNo"] = CAppNo;
-  } else if(props.param.cTransMrk === '1'){
-    param['CPlyNo'] = props.param.cAppNo;
   } else{
      param["cAppNo"] = CAppNo;
   }
@@ -2699,7 +2697,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       });
     }
   } else {
-    const res = await getAppPolicy(param);
+    const res = await getAppPolicy(param, "getAppPolicy");
 
     console.log("投保单明细", res);
     if (res["code"] == "200") {
@@ -5694,7 +5692,7 @@ const shouldCheckYunnanPaymentRules = () => {
 };
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index.scss";
+@import "@/styles/custom-index";
 
 $btn-icon-color-1: #ff3e00;
 $btn-icon-color-2: #0060ff;
@@ -5724,7 +5722,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   display: inline-block; /* 设置为行内块元素 */
   vertical-align: middle; /* 垂直居中 */
   position: relative;
-  z-index: 9999;
+  z-index: 998;
 }
 
 /* 用于包含行内块元素的容器 */
@@ -5734,7 +5732,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  z-index: 9999;
 }
 :deep(.el-main) {
   // padding: 10px 10px 10px 10px;
@@ -5761,18 +5758,28 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   // width: 130px;
   :deep(.el-anchor__list) {
     padding: 0;
-  } 
+    margin-top: 15px;
+  }
   .el-anchor__item {
-    margin-top: 5px;
+    height: 32px;
+    margin-top: 2px;
     padding-left: 16px;
     padding-right: 22px;
-    &.isActive,&:hover {
-      // background: linear-gradient( 180deg, rgba(58, 118, 198, .3) 0%, rgba(57, 117, 198, .3) 100%);
-      background: var(--el-color-primary);
+    &.isActive{
+      background: var(--menu-active-bg-color);
       :deep(a) {
-        color: #ffffff;
+        color: var(--menu-active-text);
         .iconfont {
-          color: #ffffff;
+          color: var(--menu-active-text);
+        }
+      }
+    }
+    &:hover {
+      background: var(--menu-hover);
+      :deep(a) {
+        color: var(--el-color-primary);
+        .iconfont {
+          color: var(--el-color-primary);
         }
       }
     }
@@ -5825,6 +5832,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   left: 80px;
   transform: translateX(-50%);
   margin-bottom: 0 !important;
+  z-index: 999;
 }
 
 .toggle-nav-button {

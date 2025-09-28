@@ -40,12 +40,10 @@ export const useSettingsStore = defineStore("setting", () => {
     ([newTheme, newThemeColor], [oldTheme, oldThemeColor]) => {
       if (newTheme !== oldTheme) {
         if (newTheme === ThemeEnum.DARK ||
-          newTheme === ThemeEnum.SENTIMENTAL ||
-          newTheme === ThemeEnum.SIMPLE ||
-          newTheme === ThemeEnum.DEFAULT ||
-          newTheme === ThemeEnum.GRACEFUL ||
-          newTheme === ThemeEnum.SUMMER ||
-          newTheme === ThemeEnum.LINEN) {
+          newTheme === ThemeEnum.Orange ||
+          newTheme === ThemeEnum.Green ||
+          newTheme === ThemeEnum.DEFAULT
+        ) {
           document.documentElement.classList.remove(oldTheme);
           document.documentElement.classList.add(newTheme);
         }

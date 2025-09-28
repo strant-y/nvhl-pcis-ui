@@ -619,7 +619,6 @@ const method = {
   //开户行市改变
   cCityChange: (val, row) => {
     if (val) {
-      debugger;
       setValueByRowKey("Ci.cBankCounty", row._dataId, "")
       setOptions('Ci.cBankCounty', row._dataId, 'CBankCountyList', { "areaname": val })
     }

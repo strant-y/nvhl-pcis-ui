@@ -449,7 +449,7 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "policyInfo",
                 inputtype: "rtinput",
                 title: "申请单号\n保单号",
-                width: 165,
+                width: 136,
                 slotName: "policyInfo"
             },
             {
@@ -457,20 +457,20 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: 'rtinput',
                 title: '申请单号',
                 isShow: false,
-                width: 165,
+                width: 136,
             },
             {
                 prop: 'cPlyNo',
                 inputtype: 'rtinput',
                 title: '保单号',
                 isShow: false,
-                width: 165,
+                width: 136,
             },
             {
                 prop: 'cEdrNo',
                 inputtype: 'rtinput',
                 title: '批单号',
-                width: 165,
+                width: 136,
             },
             {
                 prop: 'cAppNme',
@@ -478,13 +478,13 @@ const tableconfig = reactive<AppTableConfig>(
                 title: '投保人名称',
                 slotName: "cAppNme",
                 align: 'left',
-                width: 112,
+                minWidth: 112,
             },
             {
                 prop: 'nPrm',
                 inputtype: 'rtinput',
                 title: '保险费',
-                width: 95,
+                width: 77,
                 align: "left",
                 formatter: (val:any) => {
                     return val.toLocaleString()
@@ -502,14 +502,14 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: 'cSlsNme',
                 inputtype: 'rtinput',
                 title: '业务员名称',
-                width: 80,
+                width: 67,
                 align: 'left',
             },
             {
                 prop: 'tAppTm',
                 inputtype: 'rtinput',
                 title: '投保申请日期',
-                width: 135,
+                width: 112,
                 formatter:(val:any) => {
                     return val?.replace(/T/g,' ')
                 }
@@ -518,14 +518,14 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "InsurancePeriod",
                 inputtype: "rtinput",
                 title: "保险期间",
-                width: 135,
+                width: 112,
                 slotName: "InsurancePeriod"
             },
             {
                 prop: 'tUdrTm',
                 inputtype: 'rtinput',
                 title: '核保日期',
-                width: 135,
+                width: 112,
                 formatter:(val:any) => {
                     return val?.replace(/T/g,' ')
                 }

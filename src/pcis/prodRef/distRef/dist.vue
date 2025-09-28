@@ -63,7 +63,6 @@ const dialog = ref<DialogMethod | null>(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam(); 
-const queryLoading = ref(false);         // 控制按钮 loading 图标
 
 const props = defineProps({
   pageSchema: {
@@ -893,10 +892,13 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
+    tableconfig.value.formconfig.titleBtns[2].loading = true;
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
     input.onchange = () => {
+      ElMessage.warning('正在导入中，请稍候…')
       if (input.files?.length) {
         const file = input.files[0];
         const reader = new FileReader();
@@ -921,18 +923,22 @@ const method = {
           }
 
           policyService.importDistIncrement(params).then((res) => {
+            
             if (res.code === 200) {
               titleInfo.value = {
                 successes: res.data.successes,
                 fails: res.data.fails,
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
+              tableconfig.value.formconfig.titleBtns[2].loading = false;
               method.handleQuery();
             } else {
               ElMessage.error(res.msg || "增量导入失败");
+              tableconfig.value.formconfig.titleBtns[2].loading = false;
             }
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
+            tableconfig.value.formconfig.titleBtns[2].loading = false;
             console.error("导入错误：", error);
             
           });
@@ -940,6 +946,7 @@ const method = {
 
         reader.onerror = (e) => {
           ElMessage.error("文件读取失败");
+          tableconfig.value.formconfig.titleBtns[2].loading = false;
         };
 
         reader.readAsDataURL(file); // 启动读取

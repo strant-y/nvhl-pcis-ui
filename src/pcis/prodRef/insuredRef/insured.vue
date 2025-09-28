@@ -441,6 +441,22 @@ const method = {
       }
     });
   },
+  //证件有效期止期时间事件改变
+  tCertfEndDateChange: (val) => {
+    const tableData = opertaor.getTableRefs();
+    const tcertfEndDate = tableData["insured"].getFromValue()["Insured.TcertfEndDate"]  //证件有效止期
+    const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
+    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.TInsrncBgnTm"] //保险起期
+    if (val && tIssueTm && tinsrncBgnTm) {
+      if (val < tinsrncBgnTm) {
+        ElMessage.error("被保人证件有效期小于保单签单时间，请关注!");
+        setValue("Insured.TcertfEndDate", tinsrncBgnTm);
+      }
+      if (val < tIssueTm) {
+        ElMessage.error("被保人证件有效期小于保单起保时间，请关注!");
+      }
+    }
+  },
 
   //被保人性质change事件
   cClntMrkFunc: (val) => {
@@ -517,6 +533,18 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Insured.cRegisterSuffixAddr", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cIsMicroEntpris", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.nRegisteredCapital", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cFirmscaleTyp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cLegalRepresentative", {
         rules: [getRules("required", {})],
       });
 
@@ -696,7 +724,18 @@ const method = {
 
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.cCntrCertfCde", { rules: null });
-
+      setFormItem("Insured.cIsMicroEntpris", {
+        rules: [],
+      });
+      setFormItem("Insured.nRegisteredCapital", {
+        rules: [],
+      });
+      setFormItem("Insured.cFirmscaleTyp", {
+        rules: [],
+      });
+      setFormItem("Insured.cLegalRepresentative", {
+        rules: [],
+      });
       // 为法人 国民经济行业必填
       const cProdNo = param?.cProdNo;
       if (
@@ -1252,7 +1291,21 @@ const method = {
     setFormItem("Insured.tEstablishingDate", {
       rules: isSpecialCase ? requiredRule : []
     });
-
+    if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
+      setFormItem("Insured.nRegisteredCapital", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cFirmscaleTyp", {
+        rules: [getRules("required", {})],
+      });
+    }else{
+      setFormItem("Insured.nRegisteredCapital", {
+        rules: []
+      });
+      setFormItem("Insured.cFirmscaleTyp", {
+        rules: []
+      });
+    }
 
     const leiCodeRule = [getRules("leiCode", {})];
     if (val === '350') {

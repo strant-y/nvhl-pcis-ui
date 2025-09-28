@@ -416,7 +416,9 @@ function getAgencyBusinessList(param?: any) {
 // }
 
 onMounted(() => {
-  if (sessionStorage.getItem("toMyPageData")) {
+  debugger;
+  console.log("props", props);
+  // if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //业务来源大类下拉数据
     const params = {
@@ -470,7 +472,7 @@ onMounted(() => {
         }
       }
     });
-  }
+  // }
   nextTick(() => {
     setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
   });
