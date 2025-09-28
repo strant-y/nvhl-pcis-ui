@@ -309,7 +309,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
             },
             {
-<<<<<<< HEAD
                 prop: "cKindNo",
                 inputtype: "rtselect",
                 title: "产品大类",
@@ -369,17 +368,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 rules: [{ type: "required" }],
                 filterable: true,
                 clearable: true,
-=======
-              prop: "cTermNo",
-              inputtype: "rtselect",
-              title: "条款",
-              itemWidth: 1,
-              rules: [{ type: "required" }],
-              filterable: true,
-              clearable: true,
-    
-              func: (val:any) => {
->>>>>>> fddf5cbc628fcf48d8319f8ba5ebe84f1d284896
 
                 func: (val: any) => {
 
