@@ -48,7 +48,11 @@
           </el-table-column> -->
           <el-table-column property="cSpecialContent" label="特别约定内容">
             <template #default="scope">
-              <el-input v-model="scope.row['cSpecialContent']"></el-input>
+              <!-- 历史数据补全带过来的特约信息不可编辑 -->
+              <el-tooltip :content="scope.row['cSpecialContent']" placement="top" v-if="scope.row['cTransMrk'] === '1'">
+                <div style="white-space: nowrap">{{ scope.row['cSpecialContent'] }}</div>
+              </el-tooltip>
+              <el-input v-model="scope.row['cSpecialContent']" v-else></el-input>
             </template>
           </el-table-column>
         </el-table>
