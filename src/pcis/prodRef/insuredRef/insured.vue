@@ -448,11 +448,11 @@ const method = {
     const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
     const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.TInsrncBgnTm"] //保险起期
     if (val && tIssueTm && tinsrncBgnTm) {
-      if (val < tinsrncBgnTm) {
-        ElMessage.error("被保人证件有效期小于保单签单时间，请关注!");
-        setValue("Insured.TcertfEndDate", tinsrncBgnTm);
-      }
       if (val < tIssueTm) {
+        ElMessage.error("被保人证件有效期小于保单签单时间，请关注!");
+        setValue("Insured.tIssueTm", tIssueTm);
+      }
+      if (val < tinsrncBgnTm) {
         ElMessage.error("被保人证件有效期小于保单起保时间，请关注!");
       }
     }
