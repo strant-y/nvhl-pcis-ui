@@ -1310,6 +1310,7 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
+  // 投保页功能合并,仅使用投保页配置,要素域控制生效
   let exParams = {};
   if(props.param.cTermNo === "0421070701"){
     exParams = { exp:'3' }
@@ -1325,7 +1326,7 @@ const initPage = async () => {
   if(exParams && Object.keys(exParams).length > 0){
     pageparams.cExParams = JSON.stringify(exParams);
   }
-  let getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage(pageparams) : await getProductPage(pageparams);
+  let getProductRes = await getProductPage(pageparams);
 
   // const getRenewalAppPolicyres = await getRenewalAppPolicy({
   //   cPlyNo: props.param.cPlyNo,
