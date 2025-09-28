@@ -1229,18 +1229,23 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
-  const getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage({
-    CProdNo: props.param.cProdNo,
-    CGrpMrk: props.param.cGrpMrk,
-  }) : await getProductPage({
-    CProdNo: props.param.cProdNo,
-    CGrpMrk: props.param.cGrpMrk,
-  });
-
-  // const getRenewalAppPolicyres = await getRenewalAppPolicy({
-  //   cPlyNo: props.param.cPlyNo,
-  //   queryTyp: props.param.queryTyp,
-  // });
+  // 投保页功能合并,仅使用投保页配置,要素域控制生效
+  let exParams = {};
+    if(props.param.cTermNo === "0421070701"){
+      exParams = { exp:'3' }
+    }
+    if(props.param.cTermNo === "0420092701"){
+      exParams = { exp:'1' }
+    }
+    let pageparams = {
+      CProdNo: props.param.cProdNo,
+      CGrpMrk: props.param.cGrpMrk,
+    };
+    
+    if(exParams && Object.keys(exParams).length > 0){
+      pageparams.cExParams = JSON.stringify(exParams);
+    }
+    let getProductRes = await getProductPage(pageparams);
 
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;

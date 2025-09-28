@@ -457,7 +457,20 @@ const method = {
       }
     }
   },
-
+  //企业成立时间事件改变
+  tEstablishingDateChange: (val) => {
+    const tableParam = opertaor.getTableRefs();
+    const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
+    const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
+    if (val && tAppTm && tIssueTm) {
+      if (val < tIssueTm) {
+        ElMessage.error("企业成立时间小于保单签单时间，请关注!");
+      }
+      if (val < tAppTm) {
+        ElMessage.error("企业成立时间小于投保日期，请关注!");
+      }
+    }
+  },
   //被保人性质change事件
   cClntMrkFunc: (val) => {
     console.log(val)
@@ -974,7 +987,7 @@ const method = {
     if (val == "1") {
       setValue(
         "Insured.tCertfEndDate",
-        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+        moment(new Date("9999-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
       // if (!param.initFlag) {
       setFormItem("Insured.tCertfEndDate", { disabled: true });

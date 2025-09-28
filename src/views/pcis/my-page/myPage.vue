@@ -1310,6 +1310,7 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
+  // 投保页功能合并,仅使用投保页配置,要素域控制生效
   let exParams = {};
   if(props.param.cTermNo === "0421070701"){
     exParams = { exp:'3' }
@@ -1325,7 +1326,7 @@ const initPage = async () => {
   if(exParams && Object.keys(exParams).length > 0){
     pageparams.cExParams = JSON.stringify(exParams);
   }
-  let getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage(pageparams) : await getProductPage(pageparams);
+  let getProductRes = await getProductPage(pageparams);
 
   // const getRenewalAppPolicyres = await getRenewalAppPolicy({
   //   cPlyNo: props.param.cPlyNo,
@@ -2702,10 +2703,12 @@ const loadAppPlyInfo = async (CAppNo) => {
     console.log("投保单明细", res);
     if (res["code"] == "200") {
       const ops = opertaor.convertData(res);
-      // 新增逻辑：如果是历史数据补全单，将Base.cAppNo设置为空
-      // if (props.param.cTransMrk === '1' && ops.plyBase && props.param.pageType !=="readonly") {
-      //   ops.plyBase['Base.cAppNo'] = '';
-      // }
+      // 新增逻辑：如果是历史数据补全单，特约信息中带过来的特约信息中加cTransMrk标识表示是历史数据
+      if (props.param.cTransMrk === '1' && ops.SpecialAgreement[0]) {
+        ops.SpecialAgreement[0]['SpecialAgreement.cIfFix'] = "0"
+        ops.SpecialAgreement[0]['SpecialAgreement.cTransMrk'] = "1"
+        ops.SpecialAgreement[0]['SpecialAgreement.cIfMust'] = "1"
+      }
     console.log("转换的数据", ops);
     if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];

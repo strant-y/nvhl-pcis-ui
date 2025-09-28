@@ -498,6 +498,10 @@ const method = {
     // 出单费用保留2位小数
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
   },
+  //联共保保费事件
+  nCiPrmChange: (val, row) => {
+    
+  },
   //保单编号change事件
   cPolicyNoChange: (val, row) => {
     // 校验保单编号只能包含数字和大写字母
@@ -877,6 +881,7 @@ const method = {
   }
 };
 const updateMasterAgreementValues = () => {
+  const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
   let totalPrm = 0;
@@ -911,6 +916,7 @@ const updateMasterAgreementValues = () => {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
     }
   });
+  updateCiPrmEditable();
   // 设置到对应组件字段（仅使用永安保险的总和）
   allRows.forEach((row) => {
     if (row['Ci.cCoinsurerCde']) {
@@ -921,6 +927,7 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
+
 };
 /**
  * 主共保标识、主联保标识、我司标识变化
@@ -1202,6 +1209,16 @@ const valideRequired = () => {
       }
     }, 300)
   });
+}
+const updateCiPrmEditable = () => {
+  const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+  if (cCiMrkFlag == "2" || cCiMrkFlag == "4") {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop == "Ci.nCiPrm") {
+        item.disabled = false;
+      }
+    });
+  }
 }
 /**
  * 处理EDR_APP_NEW_SCENE页面类型的特殊规则
