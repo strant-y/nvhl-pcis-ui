@@ -56,6 +56,7 @@
           @change="handleChange"
           @blur="blur"
           :style="{width: '100%'}"
+          :unlink-panels="true"
       />
     </el-tooltip>
   </template>
