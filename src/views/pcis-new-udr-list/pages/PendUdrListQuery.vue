@@ -119,7 +119,6 @@ const kindEdit = defineAsyncComponent(
   () => import("../../pcis-new-udr-list/pages/kindEdit.vue")
 );
 const tableRef = ref<AppTableMethod | null>(null);
-const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const departmentTree = defineAsyncComponent(
   () => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue")
 );
@@ -1034,6 +1033,20 @@ function refreshData(flag?: boolean) {
         ElMessage.success({ message: "查询完毕！", duration: 3000 });
         pageresult.list = res.data || [];
         pageresult.total = res.total || 0;
+        if(flag) {
+          selectData.value = []
+        } else {
+          if(pageresult.list.length > 0 && selectData.value?.length > 0) {
+            nextTick(() => {
+              tableRef.value?.clearSelection();
+              pageresult.list.forEach((row:any) => {
+                if (selectData.value?.find((item:any) => item.curtTask === row.curtTask)) {
+                  tableRef.value?.toggleRowSelection(row, true);
+                }
+              });
+            })
+          }
+        }
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
       }
@@ -1350,8 +1363,7 @@ function handle_hasReceived(row: any) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  selectData.value = selection;
-  removeIds.value = selection.map((item: any) => item.cPkId);
+  selectData.value = Array.from(new Set(selectData.value.concat(selection)));
 }
 
 // 详情 核保通过任务
