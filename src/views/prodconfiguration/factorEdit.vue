@@ -1308,7 +1308,6 @@ onMounted(async () => {
           edit[key] = props.data[k];
         }
       });
-      console.log(edit);
       freeEditRef.value?.setFormValue(edit);
       setTimeout(() => {
         if (inputType === "rtinputgroup") {
@@ -1341,7 +1340,6 @@ function getSuperSchema(data: string) {
 }
 
 function showFactorList() {
-  console.log(props.data);
   if (appTableShow.value && freeEditRef.value?.getValue("tab")) {
     getInputGroupList({
       factorTab: freeEditRef.value?.getValue("tab"),
@@ -1403,7 +1401,6 @@ function getFrom() {
   } else {
     s["showExBtn"] = "0";
   }
-  console.log(s);
   if (s) {
     const param = Object.assign(s);
     if (props.type === "edit") {

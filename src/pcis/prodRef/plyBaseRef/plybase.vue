@@ -67,6 +67,14 @@ onMounted(async () => {
     method,
     exRules
   );
+  const p = opertaor.getParam();
+  if(p.sysDist === 'PRICE'){
+    formconfig11.fromSchema.forEach((item:any) => {
+      if( item.prop === "Base.cRemark" ) {
+        item.group = 'group_3';
+      }
+    })
+  }
   // 隐藏保单来源、是否互联网、手工出单标志
   formconfig11.fromSchema.forEach((item:any) => {
     if( item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
