@@ -216,7 +216,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
             },
             {
-                prop: "cKindNo",
+                prop: "CKindNo",
                 inputtype: "rtselect",
                 title: "产品大类",
                 itemWidth: 1,
@@ -264,16 +264,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             }
                         });
                         cProdData.value = options;
-                        setFormItem("cProdNo", { loadData: options });
-                        freeEditRef.value?.setValue("cProdNo", null);
+                        setFormItem("CProdNo", { loadData: options });
+                        freeEditRef.value?.setValue("CProdNo", null);
                     } else {
-                        setFormItem("cProdNo", { loadData: [] });
-                        freeEditRef.value?.setValue("cProdNo", null);
+                        setFormItem("CProdNo", { loadData: [] });
+                        freeEditRef.value?.setValue("CProdNo", null);
                     }
               },
             },
             {
-                prop: 'cProdNo',
+                prop: 'CProdNo',
                 inputtype: 'rtselect',
                 title: '产品名称',
                 itemWidth: 1,
@@ -300,68 +300,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             options = options.concat(list);
                         }
                         });
-                        setFormItem("cTermNo", { loadData: options });
-                        freeEditRef.value?.setValue("cTermNo", null);
+                        setFormItem("CTermNo", { loadData: options });
+                        freeEditRef.value?.setValue("CTermNo", null);
                     } else {
-                        setFormItem("cTermNo", { loadData: [] });
-                        freeEditRef.value?.setValue("cTermNo", null);
+                        setFormItem("CTermNo", { loadData: [] });
+                        freeEditRef.value?.setValue("CTermNo", null);
                     }
                 }
             },
             {
-                prop: "cKindNo",
-                inputtype: "rtselect",
-                title: "产品大类",
-                itemWidth: 1,
-                rules: [{ type: "required" }],
-                typeCode: "KIND_LIST_GRT",
-                child: "cProdNo",
-                filterable: true,
-                clearable: true,
-                codeParam: {
-                    cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                    cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                },
-                func: (val) => {
-                    setValue("cProdNo", "")
-                    cTermNo = "";      // 重置条款编码
-                    cPard.value = val;
-                    formconfig1.fromSchema?.forEach((item) => {
-                        if (
-                            item.prop === "CEmployeeName" ||
-                            item.prop === "CIdentificationNumber" ||
-                            item.prop === "CPlateNo" ||
-                            item.prop === "CEngineNo" ||
-                            item.prop === "CIndustryType" ||
-                            item.prop === "CProjectName" ||
-                            item.prop === "CDetailedAddress" ||
-                            item.prop === "CProjectType" ||
-                            item.prop === "cPrjCtgTyp" ||
-                            item.prop === "cPrjCtgMidTyp" ||
-                            item.prop === "cPrjCtgSubTyp"
-                        ) {
-                            item.hidden = true;
-                        }
-                    });
-                    codeListStore
-                        .queryCodeList({
-                            codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
-                            codeListParam: {
-                                cParCde: cPard.value,
-                                cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-                                cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                            },
-                        })
-                        .then((res) => {
-                            cTermNoList.value = res;
-                            setFormItem("cProdNo", {
-                                loadData: res,
-                            });
-                        });
-                },
-            },
-            {
-                prop: "cProdNo",
+                prop: "CTermNo",
                 inputtype: "rtselect",
                 title: "条款",
                 itemWidth: 1,
