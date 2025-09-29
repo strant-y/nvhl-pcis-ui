@@ -250,7 +250,7 @@ import { Sunny, Moon } from "@element-plus/icons-vue";
 import { LocationQuery, LocationQueryValue, useRoute } from "vue-router";
 import router from "@/router";
 import defaultSettings from "@/settings";
-import { ThemeEnum } from "@/enums/ThemeEnum";
+import {ThemeEnum, ThemeSuitedColorEnum} from "@/enums/ThemeEnum";
 import thirdPartyDialog from "./components/thirdPartyDialog.vue";
 import imagCaptcha from "./components/ImagCaptcha.vue";
 
@@ -553,6 +553,15 @@ onMounted(() => {
     showLoginCard.value = false;
     userStore.verifyCode(code)
   }
+
+  // 登录页 清除深色模式 根据当前的主题颜色匹配主题
+  const settingsStore = useSettingsStore();
+  Object.keys(ThemeSuitedColorEnum).forEach((key: any) => {
+    if(ThemeSuitedColorEnum[key] === settingsStore.themeColor) {
+      settingsStore.changeTheme(key);
+    }
+  });
+
 });
 
 function handleLoginChange() {
