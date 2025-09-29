@@ -26,6 +26,7 @@
   --cvrg-group-header-bg-color: rgba(0,0,0,0.04);
   --el-mypage-right-menu-border-color: rgb(50 50 50 / 10%);
 
+  --rt-form-item-radius: 2px;
   --rt-form-content-font-size: 12px; // 表单content字体大小
   --rt-form-content-font-weight: 450;
   --rt-form-content-height: 24px; // 表单content高
@@ -33,7 +34,7 @@
   --rt-form-label-font-size: 12px; // 表单label字体大小
   --rt-form-label-font-weight: 400;
   --rt-form-label-font-color: #000000;
-  --rt-form-label-padding: 0 5px 0 0, // 标签内边距
+  --rt-form-label-padding: 0 3px 0 0, // 标签内边距
 }
 
 
@@ -46,8 +47,9 @@ html.default {
   --menu-text: #000000;
   --el-text-color: #000 !important;
 
-  --cvrg-sub-header-bg-color: rgba(165, 204, 255, 0.3);
-  --rt-select-row-bg-color: rgba(165, 204, 255, 0.1);
+  --cvrg-sub-header-bg-color: rgba(165, 204, 255, 0.35);
+  --cvrg-select-row-bg-color: rgba(165, 204, 255, 0.25);
+  --rt-select-row-bg-color: rgba(165, 204, 255, 0.15);
 }
 html.orange {
   --menu-background: #f0f5f9;;
@@ -57,8 +59,9 @@ html.orange {
   --menu-text: #000000;
   --el-text-color: #000 !important;
 
-  --cvrg-sub-header-bg-color: rgba(255, 211, 169, 0.3);
-  --rt-select-row-bg-color: rgba(255, 211, 169, 0.1);
+  --cvrg-sub-header-bg-color: rgba(255, 211, 169, 0.35);
+  --cvrg-select-row-bg-color: rgba(255, 211, 169, 0.25);
+  --rt-select-row-bg-color: rgba(255, 211, 169, 0.15);
 }
 html.green {
   --menu-background: #f0f5f9;
@@ -68,8 +71,9 @@ html.green {
   --menu-text: #fff;
   --el-text-color: #000 !important;
 
-  --cvrg-sub-header-bg-color: rgba(168, 251, 207, 0.3);
-  --rt-select-row-bg-color: rgba(168, 251, 207, 0.1);
+  --cvrg-sub-header-bg-color: rgba(168, 251, 207, 0.35);
+  --cvrg-select-row-bg-color: rgba(168, 251, 207, 0.25);
+  --rt-select-row-bg-color: rgba(168, 251, 207, 0.15);
 }
 
 
@@ -88,6 +92,7 @@ html.dark {
   }
   --card-header-title-color: #ccc !important;
   --cvrg-sub-header-bg-color: rgb(0 0 0 / 80%);
+  --cvrg-select-row-bg-color: rgba(155 155 155 / 10%);
   --card-group-header-bg-color: rgb(0 0 0 / 80%);
   --cvrg-group-header-bg-color: rgb(0 0 0 / 60%);
 
