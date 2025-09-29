@@ -451,7 +451,7 @@ const method = {
           method.handleQuery(queryParams, true);
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           try {
-            if (cvrgRef) {
+            if(cvrgRef) {
               cvrgRef.refushCvrgInfo();
             }
           } catch (ignore) {
