@@ -141,8 +141,8 @@
         </template>
       </el-row>
       <!------- 折叠筐内 表单 需要单独来显示  上面是未分组公共部分内容,下面为折叠筐内内容 -------->
-      <div v-for="(v, k) in groupByList" :key="k">
-        <template v-if="!v.hidden">
+      <template v-for="(v, k) in groupByList" :key="k">
+        <div v-if="!v.hidden && props.fromSchema.filter(item => item.group === v.id && !item.hidden).length > 0">
           <div class="rt_group">
             <span class="rt_group_title">{{ v.title }} </span>
             <template v-if="checkNeadGroup(v)">
@@ -285,8 +285,8 @@
               </template>
             </template>
           </el-row>
-        </template>
-      </div>
+        </div>
+      </template>
     </el-form>
   </div>
 </template>
