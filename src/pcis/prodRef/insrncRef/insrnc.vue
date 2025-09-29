@@ -170,7 +170,6 @@ const freeDelay = async (obj: any): Promise<boolean> => {
         }
       }
     }
-    debugger;
     // 所有规则通过：更新状态并放行
     const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
     const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
