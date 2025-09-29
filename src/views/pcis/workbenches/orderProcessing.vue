@@ -753,7 +753,7 @@ const tableconfig = reactive<AppTableConfig>(
         width: 54,
       },
       {
-        prop: "taskStatus",
+        prop: "cAppStatus",
         inputtype: "rtselect",
         title: "任务状态",
         loadData: taskStatusOptions,
