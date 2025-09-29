@@ -622,7 +622,6 @@ const idxParam: IdxParamProps = {
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
-
 const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
@@ -644,11 +643,13 @@ const props:any = defineProps({
     type: Object,
   },
 });
+opertaor.setParam({sysDist:'PRICE',...props.param});
+
+console.log(opertaor.getParam());
 
 onBeforeMount(() => {
   // onMounted() 之前
   console.log(props.param);
-  opertaor.setParam({sysDist:'PRICE',...props.param});
 });
 
 // 当前加载的组件索引
