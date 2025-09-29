@@ -611,7 +611,7 @@ function next() {
                 path: "/pcisapp/myPage",
                 query: {
                   param: JSON.stringify({ ...handleArray(res.res.composition.plyBase[0]), ...{ pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
-                      cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], } }),
+                      cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res } }),
                 },
               });
             } else {
