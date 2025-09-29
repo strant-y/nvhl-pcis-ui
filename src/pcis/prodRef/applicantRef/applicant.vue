@@ -505,21 +505,20 @@ const method = {
   },
   //证件有效期止期时间事件改变
   tCertfEndDateChange: (val) => {
+    debugger
     const tableData = opertaor.getTableRefs();
     const tcertfEndDate = tableData["applicant"].getFromValue()["Applicant.tCertfEndDate"]  //证件有效止期
     const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
     const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.tInsrncBgnTm"] //保险起期
     if (val && tIssueTm && tinsrncBgnTm) {
-      // 统一转换为日期对象进行比较
-      const certfEndDate = new Date(val);
-      const issueTm = new Date(tIssueTm);
-      const insrncBgnTm = new Date(tinsrncBgnTm);
-      if (certfEndDate < tIssueTm) {
+      const certfEndDate = new Date(val).getTime();
+      const issueTm = new Date(tIssueTm).getTime();
+      const insrncBgnTm = new Date(tinsrncBgnTm).getTime();
+      if (certfEndDate < issueTm) {
         ElMessage.error("投保人证件有效期小于保单签单时间，请关注!");
-        setValue("Applicant.tCertfEndDate", '');
-        // setValue("Applicant.tIssueTm", tIssueTm);
+        setValue("Insured.tCertfEndDate", '');
       }
-      if (certfEndDate < tinsrncBgnTm) {
+      if (certfEndDate < insrncBgnTm) {
         ElMessage.error("投保人证件有效期小于保单起保时间，请关注!");
       }
     }
