@@ -309,6 +309,25 @@
   }
 }
 
+// 分页组件自定义样式
+:deep(.el-pagination) {
+  margin-top: 10px;
+  .el-pagination__total {
+    font-size: var(--rt-form-content-font-size);
+  }
+  .el-pagination__jump {
+    .el-pagination__goto {
+      font-size: var(--rt-form-content-font-size);
+    }
+    .el-pagination__classifier {
+      font-size: var(--rt-form-content-font-size);
+    }
+    .el-input {
+      @extend .rt-custom-input;
+    }
+  }
+}
+
 :deep(.sub-header-search-btn) {
   background: var(--cvrg-sub-header-bg-color);
   .search-btn-item {
