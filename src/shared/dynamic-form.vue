@@ -899,4 +899,7 @@ defineExpose({
   display: flex;
   align-items: center;
 }
+:deep(.group-input__items .el-form-item__content) {
+  line-height: normal;
+}
 </style>
