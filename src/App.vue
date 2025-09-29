@@ -88,11 +88,34 @@ watchEffect(() => {
 ::-webkit-scrollbar-thumb:hover {
   background: #636363; /* 滑块悬停颜色 */
 }
-.el-message { 
-  margin-top: calc(50vh - 15vh ) !important;
+
+* {
+  font-family: var(--font-family),serif !important;
 }
+
+// 这些组件通常挂载在body下，需要单独指定
+.el-select-dropdown,
+.el-date-picker,
+.el-dialog,
+.el-tooltip__popper,
+.el-message,
+.el-message-box,
+.el-notification {
+  font-family: var(--font-family),serif !important;
+}
+
+::placeholder {
+  font-family: var(--font-family),serif !important;
+}
+
+// 全局修改ElMessage样式
+.el-message {
+  margin-top: calc(35vh) !important; // 显示位置
+  border: var(--rt-border) !important;
+}
+// 消息内容样式
 .el-message__content,.el-message__icon {
-  font-size: 16px!important;
+  font-size: calc(var(--rt-form-content-font-size) + 1.25px) !important; /* 确保内容字体大小同步 */
 }
 // 成功提示消息背景色和字体颜色
 .el-message--success {
@@ -105,23 +128,6 @@ watchEffect(() => {
   }
 }
 
-* {
-  font-family: var(--font-family),serif !important;
-}
-
-// 这些组件通常挂载在body下，需要单独指定
-.el-select-dropdown,
-.el-date-picker,
-.el-dialog,
-.el-tooltip__popper,
-.el-message-box,
-.el-notification {
-  font-family: var(--font-family),serif !important;
-}
-
-::placeholder {
-  font-family: var(--font-family),serif !important;
-}
 </style>
 <style>
 .el-popper .el-menu--horizontal.el-menu--popup-container {

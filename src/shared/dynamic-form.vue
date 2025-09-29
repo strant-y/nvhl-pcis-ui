@@ -295,41 +295,8 @@
 import { FormInstance } from "element-plus";
 import Validator from "async-validator";
 import { AppGridEditMethod } from "./app-grid-edit-config";
-import {checkIfTruncated} from "@/utils/common";
-const maxLabelWidth = ref('150px'); // 默认值
-
-
-const updateLabelWidth = () => {
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const scaleRatio = window.devicePixelRatio;
-  const displayPercentage = Math.round(scaleRatio * 100);
-  let px;
-  // 不同缩放比率适配
-  if(displayPercentage <= 110) {
-    px = 200;
-  }else if(displayPercentage <= 150) {
-    px = 180;
-  }else if(displayPercentage <= 175)  {
-    px = 160
-  }else {
-    px = 140
-  }
-  // 不同分辨率适配
-  if(viewportWidth < 1280) {
-    maxLabelWidth.value = px - 50 + 'px';
-  } else if(viewportWidth < 1700) {
-    maxLabelWidth.value = px - 30 + 'px';
-  } else if (viewportWidth <= 1920) {
-    maxLabelWidth.value = px + 'px';
-  } else if(viewportWidth >= 1920 && viewportWidth <= 3840) {
-    maxLabelWidth.value = px + 80 + 'px';
-  } else if(viewportWidth > 3840 && viewportWidth <= 5120 ) {
-    maxLabelWidth.value = px + 160 + 'px';
-  }else {
-    maxLabelWidth.value = px + 240 + 'px';
-  }
-};
+import {checkIfTruncated, updateLabelWidth} from "@/utils/common";
+const maxLabelWidth = computed(() => updateLabelWidth()); // 默认值
 
 // 计算label宽度
 const calculatedLabelWidth = () => {
