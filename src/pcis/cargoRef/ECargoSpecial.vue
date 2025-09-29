@@ -209,7 +209,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "index",
         inputtype: "rtinput",
         title: "序号",
-        width: 100,
+        width: 35,
       },
       // {
       //   prop: "cIfEdit",
@@ -231,7 +231,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cIfMust",
         inputtype: "rttag",
         title: "Tag",
-        width: 110,
+        width: 45,
         loadData: [
           {
             label: "可选",
