@@ -21,7 +21,7 @@
       padding-left: 20px;
       padding-right: 15px;
       &.isActive{
-        background: var(--menu-active-bg-color);
+        background: var(--el-color-primary);
         :deep(a) {
           color: var(--menu-active-text);
           .iconfont {
