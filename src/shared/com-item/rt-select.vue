@@ -24,7 +24,7 @@
         :max-collapse-tags="isMultiple() ? 3 : null"
         @visible-change="showOptions"
         @change="handleChange"
-        :style="{'min-width': item.minWidth || '70px'}"
+        :style="{'min-width': item.minWidth || '50px'}"
         :fit-input-width="false"
       >
         <template

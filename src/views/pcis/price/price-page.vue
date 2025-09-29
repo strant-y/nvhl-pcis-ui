@@ -2,7 +2,7 @@
 <template>
   <div class="mypage-app">
     <el-container class="dynamic-container" ref="scrollContainer">
-      <el-aside :width="NavigaShow ? '200px' : '70px'" class="mypage-aside custom-anchor">
+      <el-aside :width="NavigaShow ? '200px' : '70px'" class="custom-anchor-bg">
         <!-- <el-affix :offset="100"> -->
         <div class="navi_container">
           <div
@@ -10,7 +10,7 @@
             :key="v"
             class="NavigaList_card"
           >
-            <el-anchor :bound="120" :offset="80">
+            <el-anchor :bound="120" :offset="60">
               <el-anchor-link
                 v-if="edrbaseFlag"
                 @click="handleAnchorClick($event, `#edrbase`)"
@@ -170,23 +170,23 @@
                 >
               </el-anchor-link>
             </el-anchor>
-          </div>
-          <div class="NavigaList_card toggle-button">
-            <el-tooltip
-              effect="dark"
-              :content="NavigaShow ? '收起导航' : '展开导航'"
-              placement="right"
-            >
-              <el-button 
-                circle 
-                @click="NavigaShow = !NavigaShow" 
-                class="toggle-nav-button"
+            <div class="toggle-button">
+              <el-tooltip
+                  effect="dark"
+                  :content="NavigaShow ? '收起导航' : '展开导航'"
+                  placement="right"
               >
-                <rt-icon 
-                  :item="{ icon: NavigaShow ? 'DArrowLeft' : 'DArrowRight' }" 
-                />
-              </el-button>
-            </el-tooltip>
+                <el-button
+                    circle
+                    @click="NavigaShow = !NavigaShow"
+                    class="toggle-nav-button"
+                >
+                  <rt-icon
+                      :item="{ icon: NavigaShow ? 'DArrowLeft' : 'DArrowRight' }"
+                  />
+                </el-button>
+              </el-tooltip>
+            </div>
           </div>
         </div>
         <!-- </el-affix> -->
@@ -5181,112 +5181,6 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .dynamic-container {
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
-}
-
-.mypage-aside {
-  // background: var(--el-color-primary);
-}
-
-.el-anchor {
-  background: transparent;
-  flex: 1;
-  // width: 130px;
-  :deep(.el-anchor__list) {
-    // padding: 20px 10px;
-    padding: 0;
-  } 
-  .el-anchor__item {
-    margin-top: 5px;
-    padding-left: 16px;
-    padding-right: 22px;
-    &.isActive{
-      background: var(--menu-active-bg-color);
-      :deep(a) {
-        color: var(--menu-active-text);
-        .iconfont {
-          color: var(--menu-active-text);
-        }
-      }
-    }
-    &:hover {
-      background: var(--menu-hover);
-      :deep(a) {
-        color: var(--el-color-primary);
-        .iconfont {
-          color: var(--el-color-primary);
-        }
-      }
-    }
-    :deep(a) {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      color: #595959;
-      padding: 0;
-      height: 40px;
-      .el-icon {
-        font-size: 3rem!important;
-        margin: 0 0 10px 0;
-      }
-      .iconfont {
-        font-size: 1rem;
-        color: #595959;
-        margin-right: 8px;
-        text-align: center;
-      }
-      .icon-title {
-        // font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-}
-
-// 高亮图标和标题文字
-// :deep(.el-anchor__item.is-active) ,
-// :deep(.el-anchor__item.isActive) {
-//   opacity: 1 !important;
-// }
-
-// :deep(.el-anchor__item.is-active a .iconfont),
-// :deep(.el-anchor__item.isActive a .iconfont) {
-//   color: #ffa940 !important; /* 橙色 */
-// }
-
-// :deep(.el-anchor__item.is-active a .icon-title),
-// :deep(.el-anchor__item.isActive a .icon-title) {
-//   color: #ffa940 !important; /* 橙色 */
-// }
-
-.toggle-button {
-  position: fixed;
-  bottom: 60px;
-  left: 80px;
-  transform: translateX(-50%);
-  margin-bottom: 0 !important;
-  z-index: 999;
-}
-
-.toggle-nav-button {
-  // background: rgba(255, 255, 255, 0.2) !important;
-  background: var(--el-color-primary);
-  border: none !important;
-  color: white !important;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  padding: 0;
-}
-
-.toggle-nav-button:hover {
-  // background: rgba(255, 255, 255, 0.3) !important;
-}
-
-.toggle-nav-button :deep(.el-icon) {
-  color: white !important;
-  font-weight: bold;
 }
 
 .el-aside {

@@ -378,7 +378,11 @@ const method = {
         {
           fromSchema: tableconfig.value.fromSchema,
           title: "编辑",
-          rowData: {...row},
+          rowData: {
+            ...row, 
+            cProdNo: route.params.param?.cProdNo, 
+            cRsnCde: route.params.param?.cRsnCde
+          },
           tab: formconfig1.value.title,
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
@@ -446,8 +450,11 @@ const method = {
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
-          if(cvrgRef) {
-            cvrgRef.refushCvrgInfo();
+          try {
+            if(cvrgRef) {
+              cvrgRef.refushCvrgInfo();
+            }
+          } catch (ignore) {
           }
         } else {
           ElMessage.error(res.msg);

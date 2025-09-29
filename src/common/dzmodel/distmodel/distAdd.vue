@@ -251,16 +251,12 @@ const isObjectValid = (obj: any) => {
   return !allEmpty;
 };
 onMounted(() => {
-  // console.log(333)   distAdd
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value.plyBase["Base.cAppNo"];
   cGrpMrk.value = route.params.param.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
-
-
-    // console.log('Dist.cPlateNumber',props.data.fromSchema)
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
     if(['Dist.AllOccup'].includes(item.prop)) {
       item["func"] = getDistoccupType;
@@ -464,6 +460,28 @@ onMounted(() => {
         } catch {
             props.data.rowData[salesKey] = props.data.rowData[salesKey];               
         }
+    }
+    // 02开头的产品，货物明细，批改原因是增加保额，减少保额，编辑弹窗只有发票金额和保险金额可编辑，其它置灰
+    if(cComponentTable.value == "CargoDist" && props.data.rowData.cProdNo.startsWith('02') && (props.data.rowData.cRsnCde == '增加保额'|| props.data.rowData.cRsnCde == '减少保额')){
+        setFormItem("Dist.cBillNum", { disabled: true });
+        setFormItem("Dist.cCodeNo", { disabled: true });
+        setFormItem("Dist.cGoodsNo", { disabled: true });
+        setFormItem("Dist.cGoodsType", { disabled: true });
+        setFormItem("Dist.cInvoiceCur", { disabled: true });
+        setFormItem("Dist.cInvoiceNum", { disabled: true });
+        setFormItem("Dist.cMarkLabel", { disabled: true });
+        setFormItem("Dist.cNumUnit", { disabled: true });
+        setFormItem("Dist.cPackageMethod", { disabled: true });
+        setFormItem("Dist.cPrmCur", { disabled: true });
+        setFormItem("Dist.cTradeNum", { disabled: true });
+        setFormItem("Dist.nEdrPrjNo", { disabled: true });
+        setFormItem("Dist.nInsuranceAmount", { disabled: true });
+        setFormItem("Dist.nAmtExch", { disabled: true });
+        setFormItem("Dist.nInvoiceExch", { disabled: true });
+        setFormItem("Dist.nNum", { disabled: true });
+        setFormItem("Dist.nRmbAmount", { disabled: true });
+        setFormItem("Dist.nRmbLimit", { disabled: true });
+        setFormItem("Dist.cRemarks", { disabled: true });
     }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);

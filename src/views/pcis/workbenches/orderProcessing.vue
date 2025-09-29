@@ -459,8 +459,8 @@ const tableconfig = reactive<AppTableConfig>(
             cancelButtonText: "取消",
             type: "warning",
           }).then(async function () {
-            // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断
-            if (row.cAppStatus !== "1") {
+            // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断(排除历史数据补全单)
+            if (row.cAppStatus !== "1" && row.cRsnCde != "99") {
               const param = {
                 cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
                 cAppNo: row.cAppNo, // 申请单号
