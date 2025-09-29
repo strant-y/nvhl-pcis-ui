@@ -90,6 +90,7 @@ onMounted(() => {
     //   rules: null,
     //   disabled: true,
     // });
+    
     setValue("Applicant.cNation", "CHN"); // 国籍默认中国
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
     const cProdNo = param.cProdNo;
@@ -101,7 +102,6 @@ onMounted(() => {
       cProdNo === "043011"
     ) {
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
-
     }
     if (cProdNo === '130003') {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -542,7 +542,12 @@ const method = {
   },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
-    const param = opertaor.getParam(); ``
+    // if (val == "1") {
+    //     setFormItem("Applicant.cIsMicroEntpris", { disabled: true }); // 是否小微企业
+    //     setFormItem("Applicant.cGreenIndustryCustomers", { disabled: true }); // 是否绿色产业客户
+    //     setFormItem("Applicant.cGreenIndustryList", { disabled: true }); // 是否绿色产业客户
+    // }
+    const param = opertaor.getParam(); 
     if (val === "0") {
       // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
       setFormItem("Applicant.tBirthday", {
@@ -620,12 +625,11 @@ const method = {
         });
 
         // 绿色客户 如果为时就放开
-        if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
-          setFormItem("Applicant.cGreenIndustryList", {
+        // if (getValue('Applicant.cGreenIndustryCustomers') == '1') {}
+        setFormItem("Applicant.cGreenIndustryList", {
             rules: [getRules("required", {})],
             disabled: false,
-          });
-        }
+        });
 
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
@@ -719,6 +723,7 @@ const method = {
         rules: [],
       });
     } else {
+      
       setFormItem("Applicant.tBirthday", {
         hidden: false,
       });
@@ -783,6 +788,11 @@ const method = {
       });
       // 是否绿色详情
       setFormItem("Applicant.cGreenIndustryList", {
+        rules: null,
+        disabled: true,
+      });
+      // 是否小微企业
+      setFormItem("Applicant.cIsMicroEntpris", {
         rules: null,
         disabled: true,
       });
@@ -919,7 +929,6 @@ const method = {
     }
 
     checkUser();
-
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
