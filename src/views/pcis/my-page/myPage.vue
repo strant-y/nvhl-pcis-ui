@@ -3417,6 +3417,7 @@ const submitToUndrFn = async () => {
           const oldPrm = calcData.base["Base.nPrm"];
           const newAmt = newOp.base["Base.nAmt"];
           const oldAmt = calcData.base["Base.nAmt"];
+          validateciPrm()
           if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
@@ -4852,6 +4853,25 @@ const adjustCiPremiumDifference = () => {
       lastCiItem['Ci.nCiPrm'] = parseFloat(lastCiItem['Ci.nCiPrm'] || 0) + premiumDifference;
       // 更新联共保信息
       opertaor.getTableRefByKey("ci").setValueByRowKey("Ci.nCiPrm", lastCiItem._dataId, lastCiItem['Ci.nCiPrm']);
+    }
+  }
+};
+const validateciPrm =() =>{
+  const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
+  if (ciData && ciData.length > 0) {
+    // 计算联共保总保费
+    let totalCiPremium = 0;
+    ciData.forEach((item: any) => {
+      totalCiPremium += parseFloat(item['Ci.nCiPrm'] || 0);
+    });
+
+    // 获取总保费
+    const totalPremium = parseFloat(opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'] || 0);
+    
+    // 计算差值
+    const diffpremium = totalPremium - totalCiPremium;
+    if(diffpremium > 1){
+      ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
     }
   }
 };

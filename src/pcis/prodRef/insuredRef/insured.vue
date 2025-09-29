@@ -444,7 +444,6 @@ const method = {
   },
   //证件有效期止期时间事件改变
   tCertfEndDateChange: (val) => {
-    debugger;
     const tableData = opertaor.getTableRefs();
     const tcertfEndDate = tableData["insured"].getFromValue()["Insured.TcertfEndDate"]  //证件有效止期
     const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
@@ -465,7 +464,6 @@ const method = {
   },
   //企业成立时间事件改变
   tEstablishingDateChange: (val) => {
-    debugger
     const tableParam = opertaor.getTableRefs();
     const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
     const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期

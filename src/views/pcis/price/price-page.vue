@@ -346,14 +346,22 @@
             <span>出单方式:</span><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;
             <br/>
             <span>联共保类型:
-              <span class="publicStyle">{{
+              <span class="publicStyle">
+                <!-- {{
                   (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
                       : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'
                           : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'
                               : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'
                                   : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'
                                       : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'
-                                          : '联保单' }}
+                                          : '联保单' }} -->
+                                          {{productStore.priceCiMrk === '0' ? '非共保业务' 
+              : productStore.priceCiMrk == '1' ? '外部共保我方主共_主联'
+              : productStore.priceCiMrk == '2' ? '外部共保我方从共_主联'
+              : productStore.priceCiMrk == '3' ? '外部共保我方主共_无联保'
+              : productStore.priceCiMrk == '4' ? '外部共保我方从共_无联保'
+              : productStore.priceCiMrk == '5' ? '司内联保_主联'
+              : '联保单' }}
               </span>
             </span>
              <br/>
