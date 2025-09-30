@@ -1050,7 +1050,7 @@ function updateUdrDetail(row: any) {
           cPolicySource: row.cPolicySource,
         });
         router.push({
-          path: "/pcisapp/myPage",
+          path: "/pcisapp/pricePage",
           query: {
             param: en,
           },
@@ -1082,7 +1082,7 @@ function updateUdrDetail(row: any) {
           cPolicySource: row.cPolicySource,
         });
         router.push({
-          path: "/pcisapp/myPage",
+          path: "/pcisapp/pricePage",
           query: {
             param: en,
           },
@@ -1125,7 +1125,7 @@ function handleWorkFlow(row: any, type: any) {
                 cPolicySource: row.cPolicySource,
               });
               router.push({
-                path: "/pcisapp/myPage",
+                path: "/pcisapp/pricePage",
                 query: {
                   param: en,
                 },
@@ -1214,7 +1214,7 @@ function handle_hasReceived(row: any) {
           };
           const en = JSON.stringify(data);
           router.push({
-            path: "/pcisapp/myPage",
+            path: "/pcisapp/pricePage",
             query: {
               param: en,
             },
@@ -1312,7 +1312,7 @@ function showDetails(row: any) {
             cPolicySource: row.cPolicySource,
           });
           router.push({
-            path: "/pcisapp/myPage",
+            path: "/pcisapp/pricePage",
             query: {
               param: en,
             },
@@ -1337,7 +1337,7 @@ function showDetails(row: any) {
             cPolicySource: row.cPolicySource,
           });
           router.push({
-            path: "/pcisapp/myPage",
+            path: "/pcisapp/pricePage",
             query: {
               param: en,
             },
@@ -1377,7 +1377,7 @@ function handleEdit(row: any) {
     cPolicySource: row.cPolicySource,
   });
   router.push({
-    path: "/pcisapp/myPage",
+    path: "/pcisapp/pricePage",
     query: {
       param: en,
     },
