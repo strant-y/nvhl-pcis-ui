@@ -346,14 +346,22 @@
             <span>出单方式:</span><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;
             <br/>
             <span>联共保类型:
-              <span class="publicStyle">{{
+              <span class="publicStyle">
+                <!-- {{
                   (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '0' ? '非共保业务'
                       : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '1' ? '外部共保我方主共_主联'
                           : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '2' ? '外部共保我方从共_主联'
                               : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '3' ? '外部共保我方主共_无联保'
                                   : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '4' ? '外部共保我方从共_无联保'
                                       : (!props.param?.cInquiryNo ?productStore.cCiMrk:productStore.priceCiMrk) == '5' ? '司内联保_主联'
-                                          : '联保单' }}
+                                          : '联保单' }} -->
+                                          {{productStore.priceCiMrk === '0' ? '非共保业务' 
+              : productStore.priceCiMrk == '1' ? '外部共保我方主共_主联'
+              : productStore.priceCiMrk == '2' ? '外部共保我方从共_主联'
+              : productStore.priceCiMrk == '3' ? '外部共保我方主共_无联保'
+              : productStore.priceCiMrk == '4' ? '外部共保我方从共_无联保'
+              : productStore.priceCiMrk == '5' ? '司内联保_主联'
+              : '联保单' }}
               </span>
             </span>
              <br/>
@@ -622,7 +630,6 @@ const idxParam: IdxParamProps = {
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
-
 const underwrite = ref(null);
 const edrbase = ref(null);
 const edritem = ref(null);
@@ -644,11 +651,13 @@ const props:any = defineProps({
     type: Object,
   },
 });
+opertaor.setParam({sysDist:'PRICE',...props.param});
+
+console.log(opertaor.getParam());
 
 onBeforeMount(() => {
   // onMounted() 之前
   console.log(props.param);
-  opertaor.setParam({sysDist:'PRICE',...props.param});
 });
 
 // 当前加载的组件索引
@@ -1229,18 +1238,23 @@ const uwBtn = [
  * @param data
  */
 const initPage = async () => {
-  const getProductRes = props.param?.pageName === "priceInquiry" ? await getReleaseInquiryPage({
-    CProdNo: props.param.cProdNo,
-    CGrpMrk: props.param.cGrpMrk,
-  }) : await getProductPage({
-    CProdNo: props.param.cProdNo,
-    CGrpMrk: props.param.cGrpMrk,
-  });
-
-  // const getRenewalAppPolicyres = await getRenewalAppPolicy({
-  //   cPlyNo: props.param.cPlyNo,
-  //   queryTyp: props.param.queryTyp,
-  // });
+  // 投保页功能合并,仅使用投保页配置,要素域控制生效
+  let exParams = {};
+    if(props.param.cTermNo === "0421070701"){
+      exParams = { exp:'3' }
+    }
+    if(props.param.cTermNo === "0420092701"){
+      exParams = { exp:'1' }
+    }
+    let pageparams = {
+      CProdNo: props.param.cProdNo,
+      CGrpMrk: props.param.cGrpMrk,
+    };
+    
+    if(exParams && Object.keys(exParams).length > 0){
+      pageparams.cExParams = JSON.stringify(exParams);
+    }
+    let getProductRes = await getProductPage(pageparams);
 
   if (props.param.pageType === "PLY_UW_PROCESS_SCENE") {
     underwriteFlag.value = true;

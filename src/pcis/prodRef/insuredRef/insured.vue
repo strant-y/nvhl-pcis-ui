@@ -96,6 +96,7 @@ onMounted(() => {
     //   disabled: true,
     // });
   });
+  setValue("Insured.cNation", "CHN"); // 国籍默认中国
   //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
   const cProdNo = opertaor.getParam()?.cProdNo;
   if (
@@ -446,18 +447,38 @@ const method = {
     const tableData = opertaor.getTableRefs();
     const tcertfEndDate = tableData["insured"].getFromValue()["Insured.TcertfEndDate"]  //证件有效止期
     const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
-    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.TInsrncBgnTm"] //保险起期
+    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.tInsrncBgnTm"] //保险起期
     if (val && tIssueTm && tinsrncBgnTm) {
-      if (val < tinsrncBgnTm) {
+      // 统一转换为日期对象进行比较
+      const certfEndDate = new Date(val).getTime();
+      const issueTm = new Date(tIssueTm).getTime();
+      const insrncBgnTm = new Date(tinsrncBgnTm).getTime();
+      if (certfEndDate < issueTm) {
         ElMessage.error("被保人证件有效期小于保单签单时间，请关注!");
-        setValue("Insured.TcertfEndDate", tinsrncBgnTm);
+        setValue("Insured.tCertfEndDate", '');
       }
-      if (val < tIssueTm) {
+      if (certfEndDate < insrncBgnTm) {
         ElMessage.error("被保人证件有效期小于保单起保时间，请关注!");
       }
     }
   },
-
+  //企业成立时间事件改变
+  tEstablishingDateChange: (val) => {
+    const tableParam = opertaor.getTableRefs();
+    const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
+    const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
+    if (val && tAppTm && tIssueTm) {
+      const establishingDate = new Date(val).getTime();
+      const appTm = new Date(tAppTm).getTime();
+      const issueTm = new Date(tIssueTm).getTime();
+      if (establishingDate > issueTm) {
+        ElMessage.error("企业成立时间小于保单签单时间，请关注!");
+      }
+      if (establishingDate > appTm) {
+        ElMessage.error("企业成立时间小于投保日期，请关注!");
+      }
+    }
+  },
   //被保人性质change事件
   cClntMrkFunc: (val) => {
     console.log(val)
@@ -467,17 +488,45 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-      //办理人 4要素  
-      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
-      setFormItem("Insured.tOperaterCertfEndTm", {
-        rules: [getRules("required", {})],
+      // 被保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      setFormItem("Insured.tBirthday", {
+        hidden: true,
       });
-      setFormItem("Insured.cOperaterCertfTyp", {
-        rules: [getRules("required", {})],
+      setFormItem("Insured.nAge", {
+        hidden: true,
       });
-      setFormItem("Insured.cOperaterCertfCde", {
-        rules: [getRules("required", {})],
+      setFormItem("Insured.cSex", {
+        hidden: true,
       });
+      setFormItem("Insured.cNation", {
+        hidden: true,
+      });
+      setFormItem("Insured.cOccupTyp", {
+        hidden: true,
+      });
+      setFormItem("Insured.cBusinessScope", {
+        hidden: true,
+      });
+      setFormItem("Insured.cMrgCde", {
+        hidden: true,
+      });
+      setFormItem("Insured.cIsBranch", {
+        hidden: false,
+      });
+      setFormItem("Insured.cStkMrk", {
+        hidden: false,
+      });
+      //办理人 4要素  (0928需求法人时办理人人员姓名、证件类型、证件号码必填、有效止期非必填)
+      // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("Insured.tOperaterCertfEndTm", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Insured.cOperaterCertfTyp", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Insured.cOperaterCertfCde", {
+      //   rules: [getRules("required", {})],
+      // });
       setFormItem("Insured.cEnterpriseTel", {
         rules: [getRules("required", {})],
       });
@@ -642,6 +691,34 @@ const method = {
       //   hidden: true,
       // });
     } else {
+      setFormItem("Insured.tBirthday", {
+        hidden: false,
+      });
+      setFormItem("Insured.nAge", {
+        hidden: false,
+      });
+      setFormItem("Insured.cSex", {
+        hidden: false,
+      });
+      setFormItem("Insured.cNation", {
+        hidden: false,
+      });
+      setFormItem("Insured.cOccupTyp", {
+        hidden: false,
+      });
+      setFormItem("Insured.cBusinessScope", {
+        hidden: false,
+      });
+      setFormItem("Insured.cMrgCde", {
+        hidden: false,
+      });
+      // 被保人是个人，是否分支机构、 股东客户隐藏
+      setFormItem("Insured.cIsBranch", {
+        hidden: true,
+      });
+      setFormItem("Insured.cStkMrk", {
+        hidden: true,
+      });
       setFormItem("Insured.tBirthday", {
         rules: [getRules("required", {})],
       });
@@ -974,7 +1051,7 @@ const method = {
     if (val == "1") {
       setValue(
         "Insured.tCertfEndDate",
-        moment(new Date("2099-12-31")).format("YYYY-MM-DD HH:mm:ss")
+        moment(new Date("9999-12-31")).format("YYYY-MM-DD HH:mm:ss")
       );
       // if (!param.initFlag) {
       setFormItem("Insured.tCertfEndDate", { disabled: true });

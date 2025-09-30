@@ -498,6 +498,38 @@ const method = {
     // 出单费用保留2位小数
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
   },
+  //联共保保费事件
+  nCiPrmChange: (val, row) => {
+    if (val === "" || val === null || val === undefined) {
+      return;
+    }
+    const floatValue = parseFloat(val);
+    // 校验是否为有效数字
+    if (isNaN(floatValue)) {
+      ElMessage.warning("请输入有效的数字");
+      return;
+    }
+    // 获取所有行数据
+    const allRows = getFromValue();
+    const res = opertaor.getDataAll();
+    const nPrm = res["base"]["Base.nPrm"];
+    // 计算所有联共保保费的总和
+    const totalCiPrm = allRows.reduce((sum, rowData) => {
+      // 排除当前行，使用更新后的值
+      if (rowData._dataId === row._dataId) {
+        return sum + floatValue;
+      }
+      return sum + (parseFloat(rowData["Ci.nCiPrm"]) || 0);
+    }, 0);
+    const diff = Math.abs(totalCiPrm - nPrm);
+    // 如果差值大于1，则提示并恢复当前行的保费
+    // if (diff > 1) {
+    //   ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
+    //   // 恢复当前行的联共保保费为原来的值
+    //   freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
+    //   return;
+    // }
+  },
   //保单编号change事件
   cPolicyNoChange: (val, row) => {
     // 校验保单编号只能包含数字和大写字母
@@ -877,6 +909,7 @@ const method = {
   }
 };
 const updateMasterAgreementValues = () => {
+  const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
   let totalPrm = 0;
@@ -911,6 +944,7 @@ const updateMasterAgreementValues = () => {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
     }
   });
+  updateCiPrmEditable();
   // 设置到对应组件字段（仅使用永安保险的总和）
   allRows.forEach((row) => {
     if (row['Ci.cCoinsurerCde']) {
@@ -921,6 +955,7 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
+
 };
 /**
  * 主共保标识、主联保标识、我司标识变化
@@ -983,6 +1018,7 @@ const onChiefMrkChange = () => {
 const initCiInfo = (data: any) => {
   const { cCiMrk } = data;
   const cChiefMrk = ['1', '3', '5'].includes(cCiMrk) ? '1' : '0';
+  const cIssueMrk = ['1', '2','3', '5'].includes(cCiMrk) ? '1' : '0';
   const dataList = getFromValue();
   if (dataList.length > 0) {
     setFormValue([]);
@@ -1007,7 +1043,7 @@ const initCiInfo = (data: any) => {
       'Ci.nPlyFee': '0.00',
       'Ci.nComm': '0.00',
       'Ci.cChiefMrk': cChiefMrk,
-      'Ci.cIssueMrk': '1',
+      'Ci.cIssueMrk': cIssueMrk,
       'Ci.cCoinsurerCde': '327001',
       "Ci.cCiSubComp": param.dptCde,
       'Ci.cDptCde': param.cDptCde,
@@ -1198,10 +1234,32 @@ const valideRequired = () => {
             item.disabled = true;
           });
         }
+        if(rowData['Ci.cDptCde'] == param.cDptCde){
+          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+          freeEditRef.value?.setRowFieldProp(
+              rowData._dataId, "Ci.cSlsId", "disabled", true
+            );
+          if (rowItem) {
+            rowItem['Ci.cSlsId']['btnItems'].disabled = true;
+            rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+          }
+        }
+
         handleEdrAppNewSceneRules()
       }
     }, 300)
   });
+}
+const updateCiPrmEditable = () => {
+  const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+  if (cCiMrkFlag == "2" || cCiMrkFlag == "4") {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop == "Ci.nCiPrm") {
+        item.disabled = false;
+      }
+    });
+  }
 }
 /**
  * 处理EDR_APP_NEW_SCENE页面类型的特殊规则

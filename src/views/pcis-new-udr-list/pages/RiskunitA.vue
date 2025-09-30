@@ -1558,8 +1558,10 @@ function saveDatas() {
     );
   } else {
     const param = opertaor.getFatherPage().getSaveDataParams();
-    param[0].plyRiskUnitCvrgObjList = pageresult1.list;
-
+    param[0].plyRiskUnitCvrgObjList = pageresult1.list.map((item:any) => {
+      delete item.CProportion
+      return item;
+    });
     saveRiskData({ param })
       .then((result: any) => {
         if (result.code == "0") {

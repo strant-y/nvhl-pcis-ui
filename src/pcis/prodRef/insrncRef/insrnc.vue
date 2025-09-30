@@ -170,7 +170,6 @@ const freeDelay = async (obj: any): Promise<boolean> => {
         }
       }
     }
-    debugger;
     // 所有规则通过：更新状态并放行
     const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
     const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
@@ -412,16 +411,7 @@ const method = {
     const start = getValue("Base.tRunBgnTm");
     const end = getValue("Base.tRunEndTm");
     const tInsrncBgnTm = getValue('Base.tInsrncBgnTm');  // 保险起期
-    if (!start || !v) {
-      return;
-    }
-    const tm = moment(v).diff(moment(start), "days");
-    const startTime = moment(v).diff(moment(start), "days");
-    if (startTime < 0) {
-      ElMessage.warning("追溯/日落止期不能小于追溯起期");
-      setFormValue({
-        "Base.tRunEndTm": null,
-      });
+    if (!v) {
       return;
     }
     const traceTime = moment(tInsrncBgnTm).diff(moment(v), "seconds")
@@ -434,11 +424,22 @@ const method = {
       });
       return;
     }
-    const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
-    setFormValue({
-      "Base.nTracingDays": moment(formattedDate).add(1, 'second').diff(moment(start), "days"),
-      "Base.tRunEndTm": formattedDate, // 更新日期字段
-    });
+    if(start) {
+      const tm = moment(v).diff(moment(start), "days");
+      const startTime = moment(v).diff(moment(start), "days");
+      if (startTime < 0) {
+        ElMessage.warning("追溯/日落止期不能小于追溯起期");
+        setFormValue({
+          "Base.tRunEndTm": null,
+        });
+        return;
+      }
+      const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
+      setFormValue({
+        "Base.nTracingDays": moment(formattedDate).add(1, 'second').diff(moment(start), "days"),
+        "Base.tRunEndTm": formattedDate, // 更新日期字段
+      });
+    }
   },
   // 报告期起始日期处理
   reportBgnTmFn: (v: any) => {
