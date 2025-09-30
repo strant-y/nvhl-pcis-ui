@@ -75,6 +75,10 @@ onMounted(() => {
        setFormItem('ECargoBase.nLowPrm', {hidden: false});
        setFormItem('ECargoBase.nReceivedPrmEx', {hidden: false});
      }
+    //  付费约定设置默认一次结清且不可编辑
+    setFormItem('ECargoBase.cInstMrk', {disabled: true});
+    //  缴费期数默认1且不可编辑
+    setFormItem('ECargoBase.nPayNum', {btnItems: {disabled: true}})
   });
 });
 

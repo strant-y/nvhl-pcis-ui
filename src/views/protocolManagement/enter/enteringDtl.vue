@@ -19,6 +19,7 @@ import {encryptRouterParam} from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import {checkAppBase} from "@/api/prod";
 import { cloneDeep } from "lodash-es";
+import moment from "moment";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
@@ -1010,6 +1011,12 @@ const premiumCalculation = ()=>{
           agreementCi.setValueByRowKey('ECargoCi.nCiShare', formValue[0]._dataId, formValue[0]['ECargoCi.nCiShare']);
         }
       }
+      // 生成缴费计划
+      const base = agreementBaseRef?.getFormValue();
+      const applicant = formPage.value?.getComponentRefById('AgreementApplicant')?.getFormValue();
+      const insrnc = AgreementFeeWarn?.getFormValue();
+      const payInfo = setPayInfo(base, applicant, insrnc);
+      formPage.value?.getComponentRefById('AgreementPay')?.setFormValue(payInfo);
       ElMessage.success('保费计算成功')
     }else {
       ElMessage.error('保费计算失败,请先添加条款!')
@@ -1021,6 +1028,41 @@ const premiumCalculation = ()=>{
   }
   return isSuccess
 }
+// 生成缴费计划内容
+const setPayInfo = (base: any, applicant: any, insrnc: any) => {
+  const payList: any[] = [];
+  const pay: any = {};
+  pay["ECargoPay.nTms"] = 1;
+  if (applicant) {
+    pay["ECargoPay.cPayorCde"] = applicant["ECargoApplicant.cAppCde"];
+    pay["ECargoPay.cPayorNme"] = applicant["ECargoApplicant.cAppNme"];
+  } else {
+    pay["ECargoPay.cPayorCde"] = "";
+    pay["ECargoPay.cPayorNme"] = "";
+  }
+  if(props.payWay == '01') {// 预付
+    // 应收保费: 折人名币预收保费
+    pay["ECargoPay.nPayablePrm"] = base["ECargoBase.nRmbReceivedPrm"] ? base["ECargoBase.nRmbReceivedPrm"] : 0;
+    // 我司保费: 折人民币我司协议剩余预收保费
+    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.nCiOwnRmbReceivedPrm"] ? base["ECargoBase.nCiOwnRmbReceivedPrm"] : 0;
+  } else {// 非预付
+    // 应收保费: 折人名币预估保费
+    pay["ECargoPay.nPayablePrm"] = base["ECargoBase.nRmbPrm"] ? base["ECargoBase.nRmbPrm"] : 0;
+    // 我司保费: 折人民币我司预估保费
+    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.nCiOwnRmbPrm"] ? base["ECargoBase.nCiOwnRmbPrm"] : 0;
+  }
+
+  pay["ECargoPay.tPayBgnTm"] = moment(insrnc["ECargoBase.tAppTm"]).format(
+    "YYYY-MM-DD HH:mm:ss"
+  );
+  pay["ECargoPay.tPayEndTm"] = moment(insrnc["ECargoBase.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
+    "YYYY-MM-DD HH:mm:ss"
+  );
+  pay["ECargoPay.cProdNo"] = base["ECargoBase.cProdNo"];
+  pay["ECargoPay.nPrmVar"] = !!base["ECargoBase.nPrm"] ? base["ECargoBase.nPrm"] : 0;
+  payList.push(pay);
+  return payList;
+};
 async function save() {
   let isOk = false
   let processedData = { ...formPage.value?.getAllFormData() }; 
