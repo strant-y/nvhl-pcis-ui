@@ -1878,12 +1878,13 @@ async function loadAfter() {
       opertaor.setDisabledAll();
     });
   } else if (props.param.pageType === "orig") {
+    const res = props.param.res
     // 续保复制
-    getAppPolicy({
-      cAppNo: props.param.cAppNo,
-      queryTyp: props.param.pageType,
+    // getAppPolicy({
+    //   cAppNo: props.param.cAppNo,
+    //   queryTyp: props.param.pageType,
      
-    }).then((res) => {
+    // }).then((res) => {
       if (res) {
         const cPlyNo = res.res.composition.plyBase[0]['Base.cPlyNo']
         const ops = clearCAppNo(opertaor.convertData(res));
@@ -1932,7 +1933,7 @@ async function loadAfter() {
         //获取单号
         // getCAppNoFun();
       }
-    });
+    // });
     bthList.value.push(
       createFreeButtonBase({
         label: "保存模板",
