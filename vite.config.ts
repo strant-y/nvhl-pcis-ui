@@ -29,7 +29,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     case 'pre':
       return 'http://10.12.18.114:9079/' // pre发布
     case 'prod':
-      return 'http://10.12.18.165:9080/' // prod发布
+      return 'http://10.4.18.95:9080/' // prod发布
     default:
       return 'http://10.12.18.165:9080/' // 默认DEV
   }
