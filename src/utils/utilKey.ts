@@ -16,6 +16,18 @@ const typeMap = reactive<Record<string, Array<any>>>({
       label: "color",
       value: "color",
     },
+    {
+      label: "number",
+      value: "number",
+    },
+    {
+      label: "%",
+      value: "percent",
+    },
+    {
+      label: "‰",
+      value: "permill",
+    },
   ],
   rtradio: [
     {
@@ -89,6 +101,24 @@ const yesOrNo = [
     value: "0",
   },
 ];
+const showLocation = [
+  {
+    label: "表格中",
+    value: "1",
+  },
+  {
+    label: "表单中",
+    value: "0",
+  },
+  {
+    label: "隐藏",
+    value: "2",
+  },
+  {
+    label: "折叠栏",
+    value: "3",
+  },
+];
 const position = [
   {
     label: "left",
@@ -133,16 +163,6 @@ const freeCol = [
     value: 12,
   },
 ];
-const componentType = [
-  {
-    label: "表单",
-    value: "free",
-  },
-  {
-    label: "表格",
-    value: "grid",
-  },
-];
 const size = [
   {
     label: "large",
@@ -157,6 +177,34 @@ const size = [
     value: "small",
   },
 ];
+const componentType = [
+  {
+    label: "表单",
+    value: "free",
+  },
+  {
+    label: "表格",
+    value: "grid",
+  },
+  {
+    label: "自定义",
+    value: "custom",
+  },
+];
+const showtype = [
+  {
+    label: "合并整列",
+    value: "rowspan",
+  },
+  {
+    label: "显示要素名",
+    value: "text",
+  },
+  {
+    label: "显示组件",
+    value: "prop",
+  },
+]
 const inputtype = [
   {
     label: "input",
@@ -169,6 +217,10 @@ const inputtype = [
   {
     label: "selectV2",
     value: "rtSelectV2",
+  },
+  {
+    label: "cascader",
+    value: "rtcascader",
   },
   {
     label: "number",
@@ -225,6 +277,53 @@ const dateType = [
     value: "month",
   },
 ];
+
+const JBPMState = [
+{
+  value: "0",
+  label: "未接收",
+},
+{
+  value: "1",
+  label: "已接收",
+},
+{
+  value: "2",
+  label: "暂存",
+},
+{
+  value: "3",
+  label: "已完成",
+},
+{
+  value: "4",
+  label: "已撤回",
+},
+{
+  value: "5",
+  label: "已解除接收",
+},
+{
+  value: "6",
+  label: "已退回",
+},
+{
+  value: "7",
+  label: "已申请改派",
+},
+{
+  value: "8",
+  label: "已委托",
+},
+{
+  value: "10",
+  label: "已重做",
+},
+{
+  value: "11",
+  label: "已上报",
+},
+];
 export {
   yesOrNo,
   size,
@@ -234,4 +333,7 @@ export {
   freeCol,
   dateType,
   position,
+  showtype,
+  showLocation,
+  JBPMState,
 };

@@ -24,7 +24,7 @@ export const useSettingsStore = defineStore("setting", () => {
   const layout = useStorage<string>("layout", defaultSettings.layout);
   // 主题颜色
   const themeColor = useStorage<string>(
-    "themeColor",
+    "theme-color",
     defaultSettings.themeColor
   );
   // 主题：light-亮色(默认) dark-暗色
@@ -40,12 +40,10 @@ export const useSettingsStore = defineStore("setting", () => {
     ([newTheme, newThemeColor], [oldTheme, oldThemeColor]) => {
       if (newTheme !== oldTheme) {
         if (newTheme === ThemeEnum.DARK ||
-          newTheme === ThemeEnum.SENTIMENTAL ||
-          newTheme === ThemeEnum.SIMPLE ||
-          newTheme === ThemeEnum.DEFAULT ||
-          newTheme === ThemeEnum.GRACEFUL ||
-          newTheme === ThemeEnum.SUMMER ||
-          newTheme === ThemeEnum.LINEN) {
+          newTheme === ThemeEnum.Orange ||
+          newTheme === ThemeEnum.Green ||
+          newTheme === ThemeEnum.DEFAULT
+        ) {
           document.documentElement.classList.remove(oldTheme);
           document.documentElement.classList.add(newTheme);
         }

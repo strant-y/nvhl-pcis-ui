@@ -13,14 +13,17 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveCommodityBase, getCommodityBase } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRoute } from "vue-router";
 import { cp } from "fs";
 const route = useRoute();
 const router = useRouter();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 const selectedKindNo = ref<string | null>(null);
@@ -53,11 +56,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (r) {
             const data = freeEditRef.value?.getFromValue();
             router.push({
-              path: "/pcis/my-page",
+              path: "/pcisapp/myPage",
               query: {
                 param: JSON.stringify({ ...data, ...{ pageType: "app" } }),
               },
             });
+            sessionStorage.setItem('toMyPageData', JSON.stringify({ ...data, ...{ pageType: "app" } }))
           } else {
             ElMessage.warning("请检查表单！");
           }
@@ -80,7 +84,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         loadData: [
           {
             label: "营总销售团队1",
-            value: "0251010013000",
+            value: "0200000000010",
           },
         ],
       },
@@ -92,7 +96,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [{ type: "required" }],
         typeCode: "KIND_LIST_GRT",
         child: "cProdNo",
-        params: {
+        codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
@@ -121,8 +125,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //     value: "040002",
         //   },
         // ],
+        filterable:true,
         typeCode: "PROD_LIST_IN_GUIDE",
-        params: {
+        codeParam: {
           cParCde: cPard.value,
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,

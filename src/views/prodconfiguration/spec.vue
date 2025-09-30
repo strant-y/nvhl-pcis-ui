@@ -25,7 +25,7 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -35,6 +35,8 @@ import {
   deleteFactorBykey,
   getFactorList,
   qryProdFixSpecList,
+  changeSpecStatus,
+  savePrdFixSpecInfo,
 } from "@/api/prod";
 const dzmodal = useDzModal();
 
@@ -55,7 +57,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.setFormValue({
+            cSpecNo: "",
+            cNmeEn: "",
+            cNmeCn: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -179,8 +188,12 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          const res = await savePrdFixSpecInfo(row);
+          if (res.code == 200) {
+            ElMessage.success("修改成功");
+          }
+          hendleQuery();
         },
       },
     ],

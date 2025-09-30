@@ -24,17 +24,10 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
-import {
-  getButtonByFacKey,
-  getFactorList,
-  getInputGroupList,
-  saveFactor,
-  savePrdFixSpecInfo,
-  saveUndrClsInfo,
-} from "@/api/prod";
+import { getButtonByFacKey, saveUndrClsInfo, getUndrClsInfo } from "@/api/prod";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -50,7 +43,7 @@ const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 
 const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/views/dzmodel/jsonArrayEdit.vue")
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 
 const showBtnConfig = ref(false);
@@ -83,6 +76,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrClsCde",
         inputtype: "rtinput",
         title: "核保级别代码",
+        maxlength: 6,
         rules: [getRules("required", {})],
       },
       {
@@ -100,11 +94,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "nLevel",
         inputtype: "rtinput",
         title: "级别",
+        maxlength: 4,
       },
       {
         prop: "cChiefFlg",
         inputtype: "rtinput",
         title: "首席标识",
+        defaultValue: "0",
+        maxlength: 1,
       },
     ],
     showSuperior: true,
@@ -115,42 +112,20 @@ onMounted(async () => {
   if (props.type === "edit") {
     const inputType = props.data.cFactorInputtype;
     const showExBtn = props.data.cFactorShowExBtn;
-    // const com = getSuperSchema(inputType);
-    if (showExBtn && showExBtn === "1") {
-      showBtnConfig.value = true;
-      getButtonByFacKey({ cFactorKey: props.data.cPkId })
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code && data.data?.length > 0) {
-            const dataObj = data.data[0];
-            const edit = {};
-            Object.keys(dataObj).forEach((k) => {
-              if (k.startsWith("cButton")) {
-                let key = k.replace("cButton", "");
-                key = key.charAt(0).toLowerCase() + key.slice(1);
-                edit[key] = dataObj[k];
-              }
-            });
-            freeEditRefBtn.value?.setFormValue(edit);
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
-    }
-    formconfig1.superFromSchema = com;
-    setTimeout(() => {
-      const edit = {};
-      Object.keys(props.data).forEach((k) => {
-        if (k.startsWith("cFactor")) {
-          let key = k.replace("cFactor", "");
-          key = key.charAt(0).toLowerCase() + key.slice(1);
-          edit[key] = props.data[k];
+    getUndrClsInfo({ cUndrClsCde: props.data.cUndrClsCde })
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          freeEditRef.value?.setFormValue(data);
+        } else {
+          ElMessage.error(msg);
         }
-      });
-      console.log(edit);
-      freeEditRef.value?.setFormValue(edit);
-    }, 50);
+      })
+      .finally(() => {});
+  } else {
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue({ cChiefFlg: "0" });
+    }, 100);
   }
 });
 
@@ -195,13 +170,13 @@ function save() {
       if (200 === code) {
         emits("ok", {});
         ElMessage.success("保存成功");
+        this.dialogVisible = false;
       } else {
         ElMessage.error(msg);
       }
     })
     .finally(() => {});
 }
-
 /* 获取全量表单数据 */
 function getFrom() {
   let s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -223,11 +198,6 @@ function getFrom() {
       btnjson.initid = uuidv4().replace(/-/g, "");
       param["btn"] = btnjson;
     }
-    // if (tableRef.value) {
-    //   const tabjson = tableRef.value?.getFromValue();
-    //   let selectList = tabjson.filter((item: any) => item.isChecked === "1");
-    //   param["tabjson"] = selectList;
-    // }
     return param;
   }
 }

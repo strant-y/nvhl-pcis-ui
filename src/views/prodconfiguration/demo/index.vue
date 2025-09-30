@@ -173,6 +173,32 @@ const formconfig = reactive<AppFreeEditConfig>(
         ],
       },
       {
+        prop: "cascaderarea",
+        inputtype: "rtcascader",
+        title: "这是cascader",
+        // rules: [required()],
+        typeCode:'getarealist',
+        // codeParam:{cParCde:'0',value:'1'},
+        loadData:[{"label":"中国","value":"1"},{"label":"日本","value":"2"}],
+        cascaderprops:['Contry','Prod','City','Town'],
+        showExBtn: true,
+        maxlevel:3,
+        btnWidth: 30, 
+        btnItems: createFreeButtonBase({
+          label: "测试塞值",
+          func: function () {
+            freeEditRef.value?.setFormValue({
+              'Contry':'1',
+              'Prod':'120000',
+              'City':'120102',
+              'Town':'120102'
+            });
+            const t = freeEditRef.value?.getFromValue();
+            console.log(t);
+          },
+        }),
+      },
+      {
         prop: "tableName",
         inputtype: "rttable",
         title: "这是一个可编辑的表格",

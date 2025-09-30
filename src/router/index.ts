@@ -1,4 +1,7 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import {createRouter, createWebHashHistory, RouteLocationRaw, RouteRecordRaw} from "vue-router";
+import {base64encoder, encryptParameter} from "@/utils/encipher";
+import {useTagsViewStore} from "@/store";
+import {CommonConstants} from "@/constants/CommonConstants";
 
 export const Layout = () => import("@/layout/index.vue");
 
@@ -37,7 +40,7 @@ export const constantRoutes: RouteRecordRaw[] = [
           title: "dashboard",
           icon: "homepage",
           affix: true,
-          keepAlive: true,
+          keepAlive: false,
           alwaysShow: false,
         },
       },
@@ -65,6 +68,66 @@ const router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 
+// 保存push replace原始方法
+const originalPush = router.push;
+const originalReplace = router.replace;
+// 扩展 push 方法
+router.push = async function (location: RouteLocationRaw) {
+  if(!location || Object.keys(location).length == 0 || location === '') {
+    return Promise.reject(new Error('Invalid route location'));
+  }
+  sessionStorage.setItem('switchType', 'push');
+  const routeParams = formatLocation(location);
+  routeParams.query = {
+    ...routeParams.query,
+    ...{componentKey: base64encoder(`page-key-${new Date().getTime()}`),}
+  };
+  encryptRouterParam(routeParams);
+  return originalPush(routeParams);
+};
+// 扩展 replace 方法
+router.replace = function (location: RouteLocationRaw) {
+  sessionStorage.setItem('switchType', 'replace');
+  const routeParams: any = formatLocation(location);
+  const tagsViewStore = useTagsViewStore();
+  const {visitedViews} = toRefs(tagsViewStore);
+  const view = visitedViews.value.find((item: TagView) => item.path === routeParams.path);
+  if(view && view.query) {
+    routeParams.query = {
+      ...routeParams.query,
+      ...{componentKey: view.query.componentKey}
+    };
+  }
+  encryptRouterParam(routeParams);
+  return originalReplace(routeParams);
+};
+
+const formatLocation = (param: any) => {
+  const location: RouteLocationRaw = {};
+  if(typeof param === CommonConstants.TYPE_OF_STRING) {
+    location.path = param;
+  }else {
+    Object.assign(location, param);
+  }
+  return location;
+};
+
+// 路由参数加密
+export function encryptRouterParam(location: RouteLocationRaw) {
+  if(!location.query) {
+    return;
+  }
+  if(!location.query.encrypted) {
+    location.query.encrypted = true;
+    for (const key in location.query) {
+      if (Object.prototype.hasOwnProperty.call(location.query, key)) {
+        if (!['encrypted', 'componentKey'].includes(key) && location.query[key]) {
+          location.query[key] = encryptParameter(location.query[key]);
+        }
+      }
+    }
+  }
+}
 
 /**
  * 重置路由

@@ -1,17 +1,20 @@
 <template>
-  <div v-if="freeEditConfig" class="freeedit">
+  <div v-if="freeEditConfig" class="freeedit free_container">
     <div class="searchbar">
       <el-row :gutter="16">
         <el-col :md="24">
-          <el-card>
-            <template #header>
+          <el-card shadow="hover" class="card_container">
+            <template
+              #header
+              v-if=" freeEditConfig.fromUi.showTitleBar && freeEditConfig.title && freeEditConfig.title.length > 0"
+            >
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!freeEditConfig.production">
-                  {{ freeEditConfig.title }}
+                  <span class="card-title-style">{{ freeEditConfig.title }}</span>
                 </el-col>
                 <el-col :span="4" v-if="freeEditConfig.production">
                   <el-tooltip :content="freeEditConfig.productionTitle">
-                    {{ freeEditConfig.title }}
+                    <span class="card-title-style">{{ freeEditConfig.title }}</span>
                   </el-tooltip>
                 </el-col>
                 <el-col
@@ -30,7 +33,9 @@
                       v-for="(item, index) in freeEditConfig.titleBtns"
                       :key="index"
                     >
-                      <rt-button :item="item" />
+                      <template v-if="!item.hidden">
+                        <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
+                      </template>
                     </template>
                   </el-button-group>
                   <a
@@ -42,14 +47,14 @@
                         : false
                     "
                   >
-                    <el-icon v-if="!showMyfrom"><ArrowUpBold /></el-icon>
-                    <el-icon v-if="showMyfrom"><ArrowDownBold /></el-icon>
-                    {{ showMyfrom ? "点击折叠" : "点击展开" }}
+                    <el-icon v-if="!showMyfrom" color="var(--el-text-color)"><ArrowUpBold/></el-icon>
+                    <el-icon v-if="showMyfrom" color="var(--el-text-color)"><ArrowDownBold/></el-icon>
+                    <span class="right-arrow_text">{{ showMyfrom ? "点击折叠" : "点击展开" }}</span>
                   </a>
                 </el-col>
               </el-row>
             </template>
-            <div class="form-inner" v-if="showMyfrom">
+            <div class="form-inner" v-show="showMyfrom">
               <dynamic-forms
                 :fromSchema="freeEditConfig.fromSchema"
                 :fromUi="freeEditConfig.fromUi"
@@ -86,18 +91,22 @@
                 />
               </el-card>
               <div
-                style="margin-top: 20px"
+                style="margin-top: 10px; margin-right: 1.4%"
                 :style="{ textAlign: freeEditConfig.endBtnsPosition }"
                 v-if="
                   freeEditConfig.endBtns && freeEditConfig.endBtns.length > 0
                 "
               >
-                <template
-                  v-for="(item, index) in freeEditConfig.endBtns"
-                  :key="index"
-                >
-                  <rt-button :item="item" />
-                </template>
+                <el-button-group >
+                  <template
+                    v-for="(item, index) in freeEditConfig.endBtns"
+                    :key="index"
+                  >
+                    <template v-if="!item.hidden">
+                      <rt-button :item="item" :ref="(res: any) => {btnMap[item?.id] = item}"/>
+                    </template>
+                  </template>
+                </el-button-group>
               </div>
             </div>
           </el-card>
@@ -109,6 +118,9 @@
 
 <script setup lang="ts">
 import { AppFreeEditConfig, AppFreeEditMethod } from "./app-free-edit-config";
+import {ref} from "vue";
+import {useScrollDetection} from "@/utils/common";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 defineOptions({
   name: "AppFreeEdit",
   inheritAttrs: false,
@@ -120,25 +132,39 @@ const props = defineProps({
     required: true,
   },
 });
-
+const codeListMap = ref<any>({});
+const customMap = ref<any>({});
+provide('codeListMap', codeListMap.value);
+provide('customMap', customMap.value);
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const btnMap = ref({});
 const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
 
+const formData = ref({});   // 临时存储数据,用于折叠式,数据回显
 function updateDatas(newDatas: any) {
+  formData.value = newDatas;
   emits("updateDatas", newDatas);
 }
-const showMyfrom = ref(true);
+
+const showMyfrom = ref(false);
 showMyfrom.value = props.freeEditConfig?.showMyfrom
   ? props.freeEditConfig?.showMyfrom
-  : true;
+  : false;
 
 interface dynamicFormMethod {
   getFromValue: () => any;
-  setFormValue: (data: any) => void;
+  setFormValue: (data: any, noupdate?: boolean) => void;
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
   checkKey: (key: any) => boolean;
+  clearValidate: (key: string | null ) => any;
+  resetFields: () => any;
+  setDisabledAll: (isDisabled: boolean) => void;
+  getFormBtn: () => any;
+  validateField: (fields: string | string[]) => any
+  // getFormBtn: () => any;
 }
 const dynamicForm = ref<dynamicFormMethod | null>(null);
 const superDynamicForm = ref<dynamicFormMethod | null>(null);
@@ -150,6 +176,23 @@ superFromState.value = props.freeEditConfig?.showSuperior
 
 function getFromValue() {
   const d = dynamicForm.value?.getFromValue();
+  // 级联地址 表格显示问题处理
+  freeEditConfig.value?.fromSchema?.forEach((item: any) => {
+    if(item?.inputtype === "rtinputgroup") {
+      const groupList = item.groupList
+      const comp = getFromSchemaItem(groupList[0].prop);
+      if(groupList && comp) {
+        if(comp.itemRef && 'getTextValue' in comp.itemRef) {
+          let text = comp.itemRef.getTextValue()?.replaceAll(' / ', '')
+          if(groupList[1]?.prop) {
+             text += d[groupList[1]?.prop]
+          }
+          d[item.prop] = text
+        }
+      }
+    }
+  });
+
   if (superDynamicForm.value) {
     return {
       ...d,
@@ -160,8 +203,7 @@ function getFromValue() {
   }
 }
 
-function setFormValue(data: any) {
-  console.log(data, "=========================");
+function setFormValue(data: any, noupdate = false) {
   if (data === undefined) {
     data = {};
   }
@@ -169,37 +211,132 @@ function setFormValue(data: any) {
     let dy: Record<string, any> = {};
     let sp: Record<string, any> = {};
     Object.keys(data).forEach((k) => {
-      if (dynamicForm.value?.checkKey(k)) {
+      if (superDynamicForm.value?.checkKey(k)) {
+        sp[k] = data[k];
+      }else{
         dy[k] = data[k];
-      } else {
-        if (superDynamicForm.value?.checkKey(k)) {
-          sp[k] = data[k];
-        }
       }
     });
-    dynamicForm.value?.setFormValue(dy);
-    superDynamicForm.value?.setFormValue(sp);
+    dynamicForm.value?.setFormValue(dy, noupdate);
+    superDynamicForm.value?.setFormValue(sp, noupdate);
   } else {
-    dynamicForm.value?.setFormValue(data);
+    dynamicForm.value?.setFormValue(data, noupdate);
   }
 }
 function validate() {
-  return dynamicForm.value?.validate();
+  return new Promise((resolve) => {
+    dynamicForm.value?.validate().then((valid: any) => {
+      if(!valid) {
+        const isScroll = useScrollDetection();
+        if(idxParam && idxParam.handleAnchorClick && customMap.value?.domId && !isScroll) {
+          idxParam.handleAnchorClick(undefined,`#${customMap.value?.domId}`)
+        }
+      }
+      resolve(valid);
+    });
+  });
 }
+
+// 根据参数 选择需要校验内容
+function validateField(fields:any) {
+  return new Promise((resolve) => {
+    dynamicForm.value?.validateField(fields).then((valid) => {
+      // 校验失败时的处理（与原有validate逻辑保持一致）
+      // if (!valid) {
+      //   const isScroll = useScrollDetection();
+      //   // 滚动到第一个错误字段位置（复用原有逻辑）
+      //   if (idxParam && idxParam.handleAnchorClick && customMap.value?.domId && !isScroll) {
+      //     idxParam.handleAnchorClick(undefined, `#${customMap.value?.domId}`);
+      //   }
+      // }
+      // 返回校验结果
+      resolve(valid);
+    });
+  });
+}
+
+//只清空报错信息
+function clearValidate(key = null) {
+  dynamicForm.value?.clearValidate(key);
+}
+// 初始化值和清空报错信息
+function resetFields() {
+  dynamicForm.value?.resetFields();
+}
+
 function getValue(key: any) {
-  if (dynamicForm.value?.checkKey(key)) {
-    return dynamicForm.value?.getValue(key);
-  }
   if (superDynamicForm.value?.checkKey(key)) {
     return superDynamicForm.value?.getValue(key);
+  }else{
+    return dynamicForm.value?.getValue(key);
   }
 }
 function setValue(key: any, value: any) {
-  if (dynamicForm.value?.checkKey(key)) {
-    dynamicForm.value?.setValue(key, value);
-  }
   if (superDynamicForm.value?.checkKey(key)) {
     superDynamicForm.value?.setValue(key, value);
+  }else {
+    dynamicForm.value?.setValue(key, value);
+  }
+}
+function setDisabledAll(isDisabled: boolean = true) {
+  if (
+    props.freeEditConfig.titleBtns &&
+    props.freeEditConfig.titleBtns.length > 0
+  ) {
+    props.freeEditConfig.titleBtns.forEach((item) => {
+      item.hidden = isDisabled;
+    });
+  }
+  if (props.freeEditConfig.endBtns && props.freeEditConfig.endBtns.length > 0) {
+    props.freeEditConfig.endBtns.forEach((item) => {
+      item.hidden = isDisabled;
+    });
+  }
+  dynamicForm.value?.setDisabledAll(isDisabled);
+}
+
+/**
+ * 获取指定表单项
+ * {id} 要素key
+ */
+function getFromSchemaItem(id: string) {
+  const fromListRef = dynamicForm.value?.fromListRef;
+  if(!!fromListRef) {
+    return fromListRef.find( (item: any) => item.key === id)
+  }else {
+    return undefined;
+  }
+}
+
+const addProvide = <T>(key: InjectionKey<T> | string, value: T) => {
+  customMap.value[key] = value;
+}
+
+watch(
+  () => freeEditConfig,
+  (newVal) => {
+    if (newVal) {
+    }
+  },
+  {
+    deep: true,
+  }
+);
+
+
+function getFormBtn() {
+  return btnMap.value
+}
+function getCodeListMap() {
+  return codeListMap.value;
+}
+function addCodeListMap(data: any) {
+  const {code, list} = data;
+  codeListMap.value[code] = list;
+}
+function setCodeListMap(map: any) {
+  if(map) {
+    Object.assign(codeListMap.value, map);
   }
 }
 
@@ -209,17 +346,59 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  clearValidate,
+  resetFields,
+  setDisabledAll,
+  getFromSchemaItem,
+  getFormBtn,
+  getCodeListMap,
+  setCodeListMap,
+  addCodeListMap,
+  addProvide,
+  validateField
 });
 </script>
 
 <style scoped>
 :deep(.el-card__header) {
-  background-color: #e5f3fa;
-  padding: 15px 20px;
+  height: 32px;
+  padding: 4px 0 4px 12px;
 }
 
 .searchbar {
-  border: 1px solid #ddd;
-  box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+
+
+}
+
+:deep(.el-form-item) {
+  margin-bottom: 5px;
+}
+:deep(.el-form-item__label-wrap) {
+  margin-left: 0px;
+}
+.el-card__header .el-row {
+  align-items: center;
+}
+:deep(.el-select__wrapper) {
+  /* height: 28px; */
+  min-height: 28px;
+  line-height: 28px;
+  padding: 4px 6px;
+}
+:deep(.el-select__input) {
+  height: 20px;
+}
+:deep(.el-input__wrapper) {
+  height: 28px;
+  padding: 1px 5px;
+}
+:deep(.el-form-item__content .el-row) {
+  align-items: baseline;
+}
+:deep(.el-form-item__content .el-button) {
+  height: 28px;
+}
+:deep(.el-input-number.is-without-controls .el-input__wrapper) {
+  padding: 1px 5px;
 }
 </style>

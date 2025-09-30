@@ -49,6 +49,10 @@ declare global {
     keepAlive?: boolean;
     /** 路由查询参数 */
     query?: any;
+    /** 是否显示*/
+    hidden?: boolean;
+    /** 缓存组件的名称*/
+    cachedKey?: string;
   }
 
   /**

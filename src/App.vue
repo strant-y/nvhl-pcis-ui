@@ -70,4 +70,68 @@ watchEffect(() => {
 #nprogress .bar {
   background: var(--el-color-primary) !important; // 跟主题色切换
 }
+::-webkit-scrollbar {
+  width: 4px; /* 垂直滚动条宽度 */
+  height: 4px; /* 水平滚动条高度 */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 轨道背景色 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8b8b8b; /* 滑块颜色 */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #636363; /* 滑块悬停颜色 */
+}
+
+* {
+  font-family: var(--font-family),serif !important;
+}
+
+// 这些组件通常挂载在body下，需要单独指定
+.el-select-dropdown,
+.el-date-picker,
+.el-dialog,
+.el-tooltip__popper,
+.el-message,
+.el-message-box,
+.el-notification {
+  font-family: var(--font-family),serif !important;
+}
+
+::placeholder {
+  font-family: var(--font-family),serif !important;
+}
+
+// 全局修改ElMessage样式
+.el-message {
+  margin-top: calc(35vh) !important; // 显示位置
+  border: var(--rt-border) !important;
+}
+// 消息内容样式
+.el-message__content,.el-message__icon {
+  font-size: calc(var(--rt-form-content-font-size) + 1.25px) !important; /* 确保内容字体大小同步 */
+}
+// 成功提示消息背景色和字体颜色
+.el-message--success {
+  background: var(--el-color-primary-light-9);
+  .el-message__content {
+    color: var(--el-color-primary);
+  }
+  .el-message-icon--success {
+    color: var(--el-color-primary);
+  }
+}
+
+</style>
+<style>
+.el-popper .el-menu--horizontal.el-menu--popup-container {
+  max-height: 60vh;
+  overflow-y: auto;
+}
 </style>

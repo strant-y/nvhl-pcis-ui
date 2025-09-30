@@ -8,6 +8,7 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     />
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -26,14 +27,20 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getProdList, getCvrgList } from "@/api/prod";
+import {
+  getProdList,
+  qryProdTermList,
+  changeTermStatus,
+  savePrdTermInfo,
+} from "@/api/prod";
 import { clear } from "console";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+const dialog = ref<DialogMethod | null>(null);
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -44,18 +51,18 @@ const pageresult = reactive<Pageresult>({
 });
 const formData = ref({
   cKindNo: "",
-  cCvrgNo: "",
+  cTermNo: "",
   cNmeCn: "",
   cRdrTyp: "",
-  cStatus: "",
+  cEnableFlag: "",
 });
 function resetFields() {
   formData.value = {
     cKindNo: "",
-    cCvrgNo: "",
+    cTermNo: "",
     cNmeCn: "",
     cRdrTyp: "",
-    cStatus: "",
+    cEnableFlag: "",
   };
 }
 defineExpose({
@@ -78,7 +85,16 @@ const formconfig = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cKindNo: "",
+            cNmeCn: "",
+            cTermNo: "",
+            cRdrTyp: "",
+            cEnableFlag: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -87,39 +103,39 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         placeholder: "大类代码",
         title: "大类代码",
-        typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
         clearable: true,
       },
       {
-        prop: "cCvrgNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
         itemWidth: 1,
-        title: "险别代码",
+        title: "条款代码",
         clearable: true,
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         itemWidth: 1,
-        title: "险别名称",
+        title: "条款名称",
         clearable: true,
       },
       {
         prop: "cRdrTyp",
         inputtype: "rtselect",
-        placeholder: "险别标志",
-        title: "险别标志",
-        typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "RdrTyp" },
+        placeholder: "条款标志",
+        title: "条款标志",
+        typeCode: "WEB_SYS_RdrTyp",
+        codeParam: { cParCde: "RdrTyp" },
         clearable: true,
       },
       {
-        prop: "cStatus",
+        prop: "cEnableFlag",
         inputtype: "rtselect",
         title: "启用标识",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         clearable: true,
       },
     ],
@@ -128,11 +144,11 @@ const formconfig = reactive<AppFreeEditConfig>(
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    editList: ["cStatus"],
+    editList: ["cEnableFlag"],
     titleBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "新增",
+        label: "增加条款",
         type: "success",
         icon: "Plus",
         func: () => {
@@ -144,6 +160,25 @@ const tableconfig = reactive<AppTableConfig>(
               }),
             },
           });
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "标题绑定",
+        icon:"table",
+        func: async () => {
+          const cTermNo = freeEditRef.value?.getValue("cTermNo");
+
+          dialog.value?.open(
+            "termGroupConfig",
+            {
+              type: "show"
+            },
+            {
+              isOk: (selectdata: any) => {},
+            },
+            { title: "群组编辑", width: 85 }
+          );
         },
       }),
     ],
@@ -163,7 +198,7 @@ const tableconfig = reactive<AppTableConfig>(
             query: {
               param: JSON.stringify({
                 type: "edit",
-                cCvrgNo: row.cCvrgNo,
+                row: row,
               }),
             },
           });
@@ -180,35 +215,67 @@ const tableconfig = reactive<AppTableConfig>(
     ],
     fromSchema: [
       {
-        prop: "cCvrgNo",
-        inputtype: "rtinput",
-        width: 200,
-        title: "险别代码",
+        prop: "cKindNo",
+        inputtype: "rtselect",
+        title: "险类代码",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
       },
       {
-        prop: "cKindNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
-        width: 200,
-        title: "大类代码",
+        title: "条款编码",
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        width: 200,
-        title: "中文名称",
+        title: "条款名称",
+        align: "left",
+
+      },
+      {
+        prop: "cRegisteredNo",
+        inputtype: "rtinput",
+        title: "注册号",
+      },
+      {
+        prop: "cIsInternet",
+        inputtype: "rtselect",
+        title: "是否互联网",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
+      },
+      {
+        prop: "cIsGroup",
+        inputtype: "rtselect",
+        title: "是否团单",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
+      },
+      {
+        prop: "isDutyfree",
+        inputtype: "rtselect",
+        title: "是否免税",
+        loadData: [
+          { label: "是", value: "1" },
+          { label: "否", value: "0" },
+        ],
       },
       {
         prop: "cRdrTyp",
-        inputtype: "rtinput",
-        title: "主险/附加险",
-      },
+        inputtype: "rttag",
+        title: "条款标志",
+        loadData: [
+          { label: "附加条款", value: "1" ,color: "#67C23A",},
+          { label: "主条款", value: "0", color: "##409EFF",}
+        ],
+       },
       {
-        prop: "cDispCde",
-        inputtype: "rtinput",
-        title: "险别显示码",
-      },
-      {
-        prop: "cStatus",
+        prop: "cEnableFlag",
         inputtype: "rtswitch",
         title: "启用标识",
         keymap: {
@@ -218,13 +285,25 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: (val) => {
-          const names = formconfig.fromSchema.map((obj) => obj.cCvrgNo);
+        func: async (val, row) => {
+          await savePrdTermInfo(row).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success(res.msg);
+              handleQuery();
+            }
+          });
         },
       },
     ],
   })
 );
+function setDisa() {
+  formconfig.fromSchema?.forEach((e) => {
+    if (e.prop === "cTermNo") {
+      e.disabled = true;
+    }
+  });
+}
 onMounted(() => {});
 
 // 绑定方法
@@ -251,7 +330,7 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getCvrgList(param)
+  qryProdTermList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {

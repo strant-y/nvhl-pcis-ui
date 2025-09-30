@@ -74,11 +74,12 @@
         <el-col :xs="7" :sm="7" :lg="7">
           <el-row class="header-right">
             <el-col :span="8" :xs="8"></el-col>
-            <el-col :span="8" :xs="8" class="msg-title" @click="msgHandle('msg','消息中心')">
-              <span class="span_text__">消息</span>
+            <el-col :span="8" :xs="8" >
+              <!-- class="msg-title" @click="msgHandle('msg','消息中心')" -->
+              <!-- <span class="span_text__">消息</span>
               <el-badge :value="msgSum" color="#f43053">
                 <svg-icon icon-class="message" size="28px" />
-              </el-badge>
+              </el-badge> -->
             </el-col>
             <!--v-hasRole="['ROLE_00000000','ROLE_00000003','ROLE_00000004']"-->
             <el-col
@@ -92,7 +93,9 @@
               </el-badge>
             </el-col>
           </el-row>
+
         </el-col>
+        
       </el-row>
     </el-card>
     <!-- 表单弹窗 -->
@@ -369,7 +372,7 @@ defineExpose({
   }
   .header-user-text{
     font-size: 15px;
-    color: var(--menu-active-text);
+    color: var(--el-color-primary);
     padding-right: 5px;
   }
 }

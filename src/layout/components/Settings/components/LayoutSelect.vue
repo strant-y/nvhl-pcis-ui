@@ -55,7 +55,7 @@ function updateValue(layout: string) {
   flex-wrap: wrap;
   justify-content: space-around;
   width: 100%;
-  height: 50px;
+  height: 45px;
 }
 
 .layout-item {

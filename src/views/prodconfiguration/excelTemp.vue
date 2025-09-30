@@ -1,11 +1,13 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-    @page-change="handleQuery(false)"
-  />
+  <div class="app-container">
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @page-change="handleQuery(false)"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -19,8 +21,9 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { excelList, exceldelete } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const excelTempEdit = defineAsyncComponent(() => import("./excelTempEdit.vue"));
 import {
@@ -31,10 +34,10 @@ import {
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import { inputtype } from "@/utils/utilKey";
-
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const { getRules } = useValidator();
 
@@ -66,14 +69,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "产品代码",
+        typeCode: "NVHL_PROD_LIST_CACHE",
+        // codeParam: { cParCde: "" },
       },
       {
-        prop: "CTermNo",
+        prop: "cTermNo",
         inputtype: "rtinput",
         title: "列代码",
       },
       {
-        prop: "CNmeCn",
+        prop: "cNmeCn",
         inputtype: "rtinput",
         title: "列标题",
       },
@@ -245,12 +250,13 @@ function handleQuery(flag?: boolean) {
   const param = Object.assign(s, r);
   excelList(param)
     .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
+      // const { code, data, msg } = res;
+      if (res.code == "200") {
+        // debugger;
+        pageresult.list = res.data.result;
+        pageresult.total = res.data.total;
       } else {
-        ElMessage.error(msg);
+        ElMessage.error(res.data.msg);
       }
     })
     .finally(() => {});

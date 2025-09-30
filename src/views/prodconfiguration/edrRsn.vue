@@ -1,11 +1,13 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-    @page-change="handleQuery(false)"
-  />
+  <div class="app-container">
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @page-change="handleQuery(false)"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,9 +20,7 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { qryProdEdrRsnList } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const edrRsnEdit = defineAsyncComponent(() => import("./edrRsnEdit.vue"));
 import {
@@ -30,14 +30,11 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { qryProdTermList } from "@/api/prod";
-import { inputtype } from "@/utils/utilKey";
-
+import { changeProdEdrRsnStatus } from "@/api/prod";
+import { descryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
-const { getRules } = useValidator();
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
@@ -66,14 +63,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        // typeCode: "KIND_LIST_GRT",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
         title: "产品大类",
+        clearable: true,
       },
       {
         prop: "cRsnCde",
         inputtype: "rtinput",
         title: "批改原因编号",
+        clearable: true,
       },
       {
         prop: "cRsnTyp",
@@ -86,20 +89,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "4", label: "变更保险期限" },
           { value: "5", label: "批改分期" },
         ],
+        clearable: true,
       },
       {
         prop: "cRsnNme",
         inputtype: "rtinput",
         title: "批改原因名称",
+        clearable: true,
       },
       {
         prop: "cIsValid",
         inputtype: "rtselect",
         title: "启用标志",
-        loadData: [
-          { label: "启用", value: "1" },
-          { label: "未启用", value: "2" },
-        ],
+        typeCode: "WEB_SYS_STA_DICT",
+        codeParam: { cParCde: "use_mrk" },
+        clearable: true,
       },
     ],
     fromUi: createFromUiConfig({
@@ -130,6 +134,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
     ],
+    editList: ["cIsValid"],
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
@@ -155,7 +160,9 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cKindNo",
         title: "险类",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
       },
       {
         prop: "cRsnCde",
@@ -170,12 +177,36 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cRsnTyp",
         title: "批改原因类别",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        loadData: [
+          { value: "1", label: "一般批改" },
+          { value: "2", label: "注销批改" },
+          { value: "3", label: "退保批改" },
+          { value: "4", label: "变更保险期限" },
+          { value: "5", label: "批改分期" },
+        ],
       },
       {
         prop: "cIsValid",
         title: "启用标志",
-        inputtype: "rtselect",
+        inputtype: "rtswitch",
+        keymap: {
+          y: "1",
+          n: "0",
+        },
+        activeText: "启用",
+        inactiveText: "禁用",
+        inlinePrompt: true,
+        func: async (val, row) => {
+          const res = await changeProdEdrRsnStatus({
+            cIsValid: val,
+            cPkId: row.cPkId,
+          });
+          if (res.code === 200) {
+            ElMessage.success(res.msg);
+            handleQuery();
+          }
+        },
       },
     ],
   })
@@ -258,7 +289,13 @@ onMounted(() => {
     setDisa();
   }
 });
-
+const rsnTypMap = {
+  "1": "一般批改",
+  "2": "注销批改",
+  "3": "退保批改",
+  "4": "变更保险期限",
+  "5": "批改分期",
+};
 defineExpose({
   getFromValue,
   setFormValue,

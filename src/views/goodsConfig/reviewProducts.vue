@@ -25,7 +25,7 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -50,21 +50,33 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
       }),
     ],
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "险种大类",
         clearable: true,
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
         clearable: true,
+        typeCode: "PROD_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "cCommodityNo",
@@ -85,6 +97,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "状态",
         clearable: true,
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: { "cParCde": "commodity_status"}
       },
     ],
   })
@@ -107,17 +121,56 @@ const tableconfig = reactive<AppTableConfig>(
       createFreeButtonBase({
         id: "score",
         link: true,
-        tooltip: "查看",
+        tooltip: "处理",
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if ( row.cStatus === '1' || row.cStatus === '4') {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {  //cStatus
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "handle",
+                cCommodityNo:row.cCommodityNo,
+                cPkId: row.cPkId
+                // prodNo: row.cProdNo,
+              }),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "success",
+        size: "large",
+        icon: "View",
+        hideBtns: (row: any) => {
+            // &&    param.editType !== "edit" 
+          if ( row.cStatus !== '1' && row.cStatus !== '4') {
+            return false;
+          } else {
+            return true;
+          }
+        },
         tableClick: (row) => {
           router.push({
             path: "/goodsConfig/commodityEdit",
             query: {
               param: JSON.stringify({
-                editType: "view",
-                prodNo: row.cProdNo,
+                editType: "review",
+                cCommodityNo:row.cCommodityNo,
+                cPkId: row.cPkId
+                // prodNo: row.cProdNo,
               }),
             },
           });
@@ -136,13 +189,23 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "险种大类",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
         title: "险种名称",
+        typeCode: "PROD_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
       },
       {
         prop: "cCommodityNo",
@@ -151,19 +214,24 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cCommodityCn",
-        inputtype: "rtselect",
+        inputtype: "rtinput",
         title: "商品名称",
       },
       {
         prop: "cStatus",
-        inputtype: "rtswitch",
+        inputtype: "rtselect",
         title: "状态",
+        typeCode: "BAS_COMM_CODE_OUT_CDE",
+        codeParam: { "cParCde": "commodity_status"},
+        
       },
     ],
   })
 );
 
-onMounted(async () => {});
+onMounted(() => {
+  handleQuery();
+});
 
 /** 查询 */
 function handleQuery(flag?: boolean) {

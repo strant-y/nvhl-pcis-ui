@@ -30,8 +30,13 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import {
+  deleteFactorBykey,
+  getBasicKindList,
+  changeKindStatus,
+  saveKindInfo,
+} from "@/api/prod";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
@@ -51,7 +56,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetForm();
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cNmeCn: "",
+            cNmeEn: "",
+          });
+          handleQuery();
+          // freeEditRef.value?.resetForm();
         },
       }),
     ],
@@ -154,8 +165,12 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          await saveKindInfo(row).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
         },
       },
     ],

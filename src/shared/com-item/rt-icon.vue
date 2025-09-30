@@ -32,13 +32,18 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
 const emits = defineEmits(["click"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange() {
   emits("click");
   if (!props.item.isBtn) {
     //如果是从btn透传上来的,则只执行btn上的方法,防止重复触发
-    props.item.func ? props.item.func() : null;
+    (props.item.func && typeof props.item.func === 'function' ) ? props.item.func() : null;
   }
 }
 const renderIcon = (iconName: string) => {

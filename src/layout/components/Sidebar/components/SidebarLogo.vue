@@ -2,12 +2,12 @@
   <div class="logo-container">
     <transition enter-active-class="animate__animated animate__fadeInLeft">
       <router-link v-if="collapse" class="wh-full flex-center" to="/">
-        <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
+        <!-- <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" /> -->
       </router-link>
 
-      <router-link v-else class="wh-full flex-center" to="/">
+      <router-link v-else class="wh-full logo-title-box" to="/">
         <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
-        <span class="logo-title"> {{ defaultSettings.title }}</span>
+        <!-- <span class="logo-title"> {{ defaultSettings.title }}</span> -->
       </router-link>
     </transition>
   </div>
@@ -26,40 +26,59 @@ defineProps({
   },
 });
 
-const logo = ref(new URL(`../../../../assets/logo.png`, import.meta.url).href);
+const logo = ref(new URL(`../../../../assets/logo2.png`, import.meta.url).href);
 </script>
 
 <style lang="scss" scoped>
 .logo-container {
-  width: 100%;
+  // width: 100%;
   height: $navbar-height;
   background-color: $sidebar-logo-background;
+  padding: 0 20px;
 
   .logo-image {
-    margin-bottom: 5px;
-    width: 35px;
-    height: 32px;
+    // margin-bottom: 5px;
+    // width: 35px;
+    // height: 32px;
+    height: 24px;
   }
 
   .logo-title {
-    flex-shrink: 0; /* 防止容器在空间不足时缩小 */
-    margin-left: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--menu-text);
+    // flex-shrink: 0; /* 防止容器在空间不足时缩小 */
+    // margin-left: 10px;
+    // font-size: 14px;
+    // // font-weight: bold;
+    // color: var(--menu-text);
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    height: 100%;
+    &::before {
+      content: "";
+      width: 1px;
+      height: 60%;
+      background-color: rgb(255, 255, 255);
+      margin: 0px 10px;
+    }
   }
 }
 
 .layout-top,
 .layout-mix {
   .logo-container {
-    width: $sidebar-width;
+    // width: $sidebar-width;
   }
 
   &.hideSidebar {
     .logo-container {
-      width: $sidebar-width-collapsed;
+      // width: $sidebar-width-collapsed;
     }
   }
+}
+
+.logo-title-box {
+  display: flex;
+  align-items: center;
 }
 </style>

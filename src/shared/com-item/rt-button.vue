@@ -1,58 +1,157 @@
 <template>
-  <template v-if="item.popover">
-    <el-popover
-      :visible="visible"
-      :width="item.popoverWidth ? item.popoverWidth : 200"
-      :placement="item.position ? item.position : 'bottom'"
-    >
-      <template #reference>
-        <el-button
-          ref="buttonRef"
-          :type="item.type"
-          :size="item.size"
-          :disabled="item.disabled"
-          :placeholder="item.placeholder"
-          :link="item.link ? item.link : false"
-          :circle="item.circle ? item.circle : false"
-          :style="{
+  <template v-if="item">
+    <template v-if="item.popover">
+      <el-popover
+          :visible="visible"
+          :width="item.popoverWidth ? item.popoverWidth : 200"
+          :placement="item.position ? item.position : 'bottom'"
+      >
+        <template #reference>
+          <el-button
+              ref="buttonRef"
+              :type="item.type"
+              :size="item.size"
+              :placeholder="item.placeholder"
+              :loading="item.loading"
+              :link="
+            item.link
+              ? typeof item.link === 'boolean'
+                ? item.link
+              : item.link === 1 || item.link === '1'
+                  ? true
+                : false
+              : false
+          "
+              :circle="
+            item.circle
+              ? typeof item.circle === 'boolean'
+                ? item.circle
+              : item.circle === 1 || item.circle === '1'
+                  ? true
+                : false
+              : false
+          "
+              :style="{
             backgroundColor: item.buttonColor,
             borderColor: item.buttonColor,
             ...style,
+            ...item.btnStyle,
           }"
-          @click="visible = !visible"
+              @click="visible = !visible"
+          >
+            <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+            <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
+            {{ item.label }}</el-button
+          >
+        </template>
+        <component
+            :is="item.popover"
+            :param="item"
+            @closepopover="closepopover"
+        />
+      </el-popover>
+    </template>
+    <template v-else>
+      <!-- 使用el-tooltip包装el-button以支持tooltip功能 -->
+      <el-tooltip
+          v-if="item.tooltip"
+          :content="item.tooltip"
+          :placement="item.tooltipPosition || 'top'"
+          effect="light"
+      >
+        <el-button
+            ref="buttonRef"
+            :type="item.type"
+            :size="item.size"
+            :loading="item.loading"
+            :disabled="
+          item.disabled ||
+          (typeof item.disabled === 'function' ? item.disabled(row) : false)
+        "
+            :placeholder="item.placeholder"
+            :link="
+          item.link
+            ? typeof item.link === 'boolean'
+              ? item.link
+            : item.link === 1 || item.link === '1'
+                ? true
+              : false
+            : false
+        "
+            :circle="
+          item.circle
+            ? typeof item.circle === 'boolean'
+              ? item.circle
+            : item.circle === 1 || item.circle === '1'
+                ? true
+              : false
+            : false
+        "
+            :style="{
+          backgroundColor: item.buttonColor,
+          borderColor: item.buttonColor,
+          ...style,
+          ...item.btnStyle,
+        }"
+            @click="handleChange"
         >
           <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-          <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
+          <rt-icon
+              :style="{ marginRight: item.label ? '5px' : null }"
+              v-if="item.icon"
+              :item="{ ...item, isBtn: true }"
+          />
           {{ item.label }}</el-button
         >
-      </template>
-      <component
-        :is="item.popover"
-        :param="item"
-        @closepopover="closepopover"
-      />
-    </el-popover>
-  </template>
-  <template v-else>
-    <el-button
-      ref="buttonRef"
-      :type="item.type"
-      :size="item.size"
-      :disabled="item.disabled"
-      :placeholder="item.placeholder"
-      :link="item.link ? item.link : false"
-      :circle="item.circle ? item.circle : false"
-      :style="{
+      </el-tooltip>
+
+      <!-- 原有的不带tooltip的按钮 -->
+      <el-button
+          v-else
+          ref="buttonRef"
+          :type="item.type"
+          :size="item.size"
+          :disabled="
+        item.disabled ||
+        (typeof item.disabled === 'function' ? item.disabled(row) : false)
+      "
+          :placeholder="item.placeholder"
+          :link="
+        item.link
+          ? typeof item.link === 'boolean'
+            ? item.link
+          : item.link === 1 || item.link === '1'
+              ? true
+            : false
+          : false
+      "
+          :circle="
+        item.circle
+          ? typeof item.circle === 'boolean'
+            ? item.circle
+          : item.circle === 1 || item.circle === '1'
+              ? true
+            : false
+          : false
+      "
+          :style="{
         backgroundColor: item.buttonColor,
         borderColor: item.buttonColor,
         ...style,
+        ...item.btnStyle,
       }"
-      @click="handleChange"
-    >
-      <!-- 将isBtn透传,防止出现icon方法重复执行  -->
-      <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
-      {{ item.label }}</el-button
-    >
+          :loading="item.loading"
+          @click="handleChange"
+      >
+        <!-- 将isBtn透传,防止出现icon方法重复执行  -->
+        <rt-icon
+            :style="{ marginRight: item.label ? '5px' : null }"
+            v-if="item.icon"
+            :item="{ ...item, isBtn: true }"
+        />
+        {{ item.label }}</el-button
+      >
+    </template>
   </template>
 </template>
 
@@ -70,8 +169,14 @@ const props = defineProps({
     type: Object,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
-
+// console.log(props.row, "props.row");
+const disabled = ref(false);
 const visible = ref(false);
 function closepopover(value: any) {
   visible.value = false;
@@ -85,4 +190,16 @@ function handleChange() {
   emits("click");
   props.item.func ? props.item.func() : null;
 }
+
+function getConfig() {
+  return props.item
+}
+onBeforeMount(() => {
+  if(!props.item) {
+    console.warn('!!! props.item is undefined');
+  }
+})
+defineExpose({
+  getConfig
+})
 </script>

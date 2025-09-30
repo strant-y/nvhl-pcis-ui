@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
@@ -69,7 +69,7 @@ const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 
 const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/views/dzmodel/jsonArrayEdit.vue")
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 
 const showBtnConfig = ref(false);
@@ -106,8 +106,10 @@ function fromUpdata(newData: any) {
     ) {
       return;
     }
+    if (!!jsonObj.codeParam && typeof jsonObj.codeParam === "string") {
+      jsonObj.codeParam = JSON.parse(jsonObj.codeParam);
+    }
     jsonObj.func = null; // 方法去掉,不让预览触发事件
-    console.log(jsonObj);
     formconfiglook.fromSchema = [jsonObj];
   }
 }
@@ -124,6 +126,18 @@ const schemaMap = reactive<Record<string, any>>({
       inputtype: "rtselect",
       title: "type类型",
       loadData: typeMap.rtinput,
+      func:(val: any)=>{
+        let f = "0";
+        if(val=== "number"){
+          f = "1";
+        }
+
+        formconfig1.superFromSchema?.forEach((item: any) => {
+          if (item.prop === "max" || item.prop === "min" || item.prop === "precision") {
+            item.hidden = f === "1" ? false : true;
+          }
+        });
+      }
     },
     {
       prop: "placeholder",
@@ -140,6 +154,34 @@ const schemaMap = reactive<Record<string, any>>({
       inputtype: "rtselect",
       title: "是否显示清除按钮",
       loadData: yesOrNo,
+    },
+    {
+      prop: "prefix",
+      inputtype: "rtinput",
+      title: "前缀符号",
+    },
+    {
+      prop: "suffix",
+      inputtype: "rtinput",
+      title: "后缀符号",
+    },
+    {
+      prop: "min",
+      inputtype: "rtnumber",
+      title: "最小值",
+      hidden: true,
+    },
+    {
+      prop: "max",
+      inputtype: "rtnumber",
+      title: "最大值",
+      hidden: true,
+    },
+    {
+      prop: "precision",
+      inputtype: "rtnumber",
+      title: "数值精度",
+      hidden: true,
     },
     {
       prop: "required",
@@ -172,6 +214,17 @@ const schemaMap = reactive<Record<string, any>>({
         }
       },
     },
+    {
+      prop: "showWordLimit",
+      inputtype: "rtselect",
+      title: "是否显示剩余字段",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "maxlength",
+      inputtype: "rtnumber",
+      title: "文本最大长度",
+    },
   ],
   rtselect: [
     {
@@ -202,6 +255,12 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "multiple",
+      inputtype: "rtselect",
+      title: "是否可以多选",
+      loadData: yesOrNo,
+    },
+    {
       prop: "required",
       inputtype: "rtselect",
       title: "是否必填",
@@ -218,6 +277,19 @@ const schemaMap = reactive<Record<string, any>>({
       inputtype: "rtselect",
       title: "初始化disabled",
       loadData: yesOrNo,
+    },
+    {
+      prop: "showExBtn",
+      inputtype: "rtselect",
+      title: "是否显示扩展按钮",
+      loadData: yesOrNo,
+      func: (v) => {
+        if (v === "1") {
+          showBtnConfig.value = true;
+        } else {
+          showBtnConfig.value = false;
+        }
+      },
     },
     {
       prop: "loadData",
@@ -246,17 +318,20 @@ const schemaMap = reactive<Record<string, any>>({
       }),
     },
     {
-      prop: "showExBtn",
-      inputtype: "rtselect",
-      title: "是否显示扩展按钮",
-      loadData: yesOrNo,
-      func: (v) => {
-        if (v === "1") {
-          showBtnConfig.value = true;
-        } else {
-          showBtnConfig.value = false;
-        }
-      },
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
+      }),
     },
   ],
   rtSelectV2: [
@@ -288,6 +363,12 @@ const schemaMap = reactive<Record<string, any>>({
       loadData: yesOrNo,
     },
     {
+      prop: "multiple",
+      inputtype: "rtselect",
+      title: "是否可以多选",
+      loadData: yesOrNo,
+    },
+    {
       prop: "required",
       inputtype: "rtselect",
       title: "是否必填",
@@ -304,6 +385,19 @@ const schemaMap = reactive<Record<string, any>>({
       inputtype: "rtselect",
       title: "初始化disabled",
       loadData: yesOrNo,
+    },
+    {
+      prop: "showExBtn",
+      inputtype: "rtselect",
+      title: "是否显示扩展按钮",
+      loadData: yesOrNo,
+      func: (v) => {
+        if (v === "1") {
+          showBtnConfig.value = true;
+        } else {
+          showBtnConfig.value = false;
+        }
+      },
     },
     {
       prop: "loadData",
@@ -332,6 +426,75 @@ const schemaMap = reactive<Record<string, any>>({
       }),
     },
     {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
+      }),
+    },
+  ],
+  rtcascader: [
+    {
+      prop: "size",
+      inputtype: "rtselect",
+      title: "要素尺寸",
+      loadData: size,
+    },
+    {
+      prop: "placeholder",
+      inputtype: "rtinput",
+      title: "输入框占位文本",
+    },
+    {
+      prop: "func",
+      inputtype: "rtinput",
+      title: "绑定方法名",
+    },
+    {
+      prop: "typeCode",
+      inputtype: "rtinput",
+      title: "codeKey",
+    },
+    {
+      prop: "clearable",
+      inputtype: "rtselect",
+      title: "是否显示清除按钮",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "checkStrictly",
+      inputtype: "rtselect",
+      title: "任意一级可选",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "required",
+      inputtype: "rtselect",
+      title: "是否必填",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "tag",
+      inputtype: "rtselect",
+      title: "是否tag模式",
+      loadData: yesOrNo,
+    },
+    {
+      prop: "disabled",
+      inputtype: "rtselect",
+      title: "初始化disabled",
+      loadData: yesOrNo,
+    },
+    {
       prop: "showExBtn",
       inputtype: "rtselect",
       title: "是否显示扩展按钮",
@@ -343,6 +506,95 @@ const schemaMap = reactive<Record<string, any>>({
           showBtnConfig.value = false;
         }
       },
+    },
+    {
+      prop: "loadData",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "初始化数据",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          const ck = freeEditRef.value?.getValue("loadData");
+          dzmodal
+            .open(jsonArrayEdit, {
+              data: ck,
+              inititle: ["label", "value"],
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+                freeEditRef.value?.setValue("loadData", res.body);
+              }
+            });
+        },
+      }),
+    },
+    {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
+      }),
+    },
+    {
+      prop: "cascaderprops",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "参数映射",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          const ck = JSON.parse(freeEditRef.value?.getValue("cascaderprops"));
+          let newData: any = [];
+          if (ck && ck.length > 0) {
+            ck.forEach((e: any) => {
+              newData.push({
+                label: e,
+              });
+            });
+          }
+          dzmodal
+            .open(jsonArrayEdit, {
+              data:
+                newData && newData.length > 0
+                  ? JSON.stringify(newData)
+                  : undefined,
+              inititle: ["label"],
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+                let bodys: any[] = [];
+                const list = JSON.parse(res.body);
+                if (list && list.length > 0) {
+                  list.forEach((e: any) => {
+                    bodys.push(e.label);
+                  });
+                }
+                freeEditRef.value?.setValue(
+                  "cascaderprops",
+                  JSON.stringify(bodys)
+                );
+              }
+            });
+        },
+      }),
     },
   ],
   rtnumber: [
@@ -641,6 +893,22 @@ const schemaMap = reactive<Record<string, any>>({
         }
       },
     },
+    {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
+        },
+      }),
+    },
   ],
   rttag: [
     {
@@ -695,6 +963,7 @@ const schemaMap = reactive<Record<string, any>>({
           dzmodal
             .open(jsonArrayEdit, {
               data: ck,
+              inititle: ["label", "value", "color"],
             })
             .then((res) => {
               if (res.type === "ok") {
@@ -822,6 +1091,22 @@ const schemaMap = reactive<Record<string, any>>({
                 freeEditRef.value?.setValue("loadData", res.body);
               }
             });
+        },
+      }),
+    },
+    {
+      prop: "codeParam",
+      inputtype: "rtinput",
+      type: "textarea",
+      itemWidth: 2,
+      title: "code参数",
+      showExBtn: true,
+      btnWidth: 10,
+      readonly: true,
+      btnItems: createFreeButtonBase({
+        icon: "Edit",
+        func: () => {
+          setCodeParam();
         },
       }),
     },
@@ -974,6 +1259,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtnumber",
         title: "占据列",
       },
+      {
+        prop: "notes",
+        inputtype: "rtinput",
+        title: "注释方法",
+      },
     ],
     superFromShow: "要素详情",
     superFromClose: "要素详情",
@@ -991,8 +1281,8 @@ onMounted(async () => {
       getButtonByFacKey({ cFactorKey: props.data.cPkId })
         .then((res) => {
           const { code, data, msg } = res;
-          if (200 === code && data.data?.length > 0) {
-            const dataObj = data.data[0];
+          if (200 === code && data.length > 0) {
+            const dataObj = data[0];
             const edit = {};
             Object.keys(dataObj).forEach((k) => {
               if (k.startsWith("cButton")) {
@@ -1018,10 +1308,8 @@ onMounted(async () => {
           edit[key] = props.data[k];
         }
       });
-      console.log(edit);
       freeEditRef.value?.setFormValue(edit);
       setTimeout(() => {
-        console.log(inputType);
         if (inputType === "rtinputgroup") {
           appTableShow.value = true;
           showFactorList();
@@ -1052,7 +1340,6 @@ function getSuperSchema(data: string) {
 }
 
 function showFactorList() {
-  console.log(props.data);
   if (appTableShow.value && freeEditRef.value?.getValue("tab")) {
     getInputGroupList({
       factorTab: freeEditRef.value?.getValue("tab"),
@@ -1061,13 +1348,13 @@ function showFactorList() {
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {
-          if (data.data) {
-            Object.keys(data.data).forEach((i) => {
-              if (data.data[i].cFactorParentKey) {
-                data.data[i].isChecked = "1";
+          if (data) {
+            Object.keys(data).forEach((i) => {
+              if (data[i].cFactorParentKey) {
+                data[i].isChecked = "1";
               }
             });
-            tableRef.value?.setFormValue(data.data);
+            tableRef.value?.setFormValue(data);
           }
         } else {
           ElMessage.error(msg);
@@ -1114,7 +1401,6 @@ function getFrom() {
   } else {
     s["showExBtn"] = "0";
   }
-  console.log(s);
   if (s) {
     const param = Object.assign(s);
     if (props.type === "edit") {
@@ -1183,6 +1469,44 @@ const tableconfig = reactive<AppTableConfig>(
     ],
   })
 );
+
+function setCodeParam() {
+  const convertObjectToArray = (obj: { [key: string]: any }) => {
+    const result: { key: string; value: any }[] = [];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        result.push({ key: key, value: obj[key] });
+      }
+    }
+    return result.length === 0 ? undefined : result;
+  };
+  const ppp = convertObjectToArray(
+    JSON.parse(freeEditRef.value?.getValue("codeParam"))
+  );
+  dzmodal
+    .open(jsonArrayEdit, {
+      data: !ppp || ppp.length === 0 ? undefined : JSON.stringify(ppp),
+      inititle: ["key", "value"],
+    })
+    .then((res) => {
+      if (res.type === "ok") {
+        let s = undefined;
+        const list = JSON.parse(res.body);
+        if (!!list && list.length > 0) {
+          s = list
+            .map((m) => {
+              const r = {};
+              r[m.key] = m.value;
+              return r;
+            })
+            .reduce((acc, obj) => {
+              return { ...acc, ...obj };
+            });
+        }
+        freeEditRef.value?.setValue("codeParam", JSON.stringify(s));
+      }
+    });
+}
 </script>
 
 <style scoped></style>

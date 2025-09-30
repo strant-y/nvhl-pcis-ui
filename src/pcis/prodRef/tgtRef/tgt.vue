@@ -1,0 +1,1831 @@
+<!-- 标的信息 -->
+<template>
+  <app-free-edit :freeEditConfig="formconfig1" ref="tgtEditRef" />
+  <comDialog ref="dialog"></comDialog>
+</template>
+
+<script setup lang="ts">
+import {
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+} from "@/shared/app-free-edit-config";
+import { formInit } from "@/shared/from-init";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { useProductStore } from "@/store/modules/prod";
+import { rule } from "postcss";
+import { useValidator } from "@/typings/useValidator";
+import { syncDist, selectDist, checkAppBase } from "@/api/prod";
+import { productListA, productListB, productListC } from "./productList";
+const wagesInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
+);
+const surveyInfo = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
+);
+
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import moment from "moment";
+
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { useRouter, useRoute } from 'vue-router';
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import dayjs from "dayjs";
+import { getAddressStr } from "@/api/query";
+import { codeListViewStore } from "@/store";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+
+const codeListStore = codeListViewStore();
+import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
+import { eventBus } from "@/utils/event-bus";
+const route = useRoute();
+const query = ref(route.query);
+const router = useRouter();
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+
+
+const dzmodal = useDzModal();
+const { getRules } = useValidator();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+const params = opertaor.getParam();
+const productStore = useProductStore()
+const dialog = ref<DialogMethod | null>(null);
+
+const props = defineProps({
+  pageSchema: {
+    type: [Object],
+    required: true,
+  },
+  compKey: {
+    type: String,
+    required: false,
+  },
+});
+const whichType = ref('')
+const tgtEditRef = ref<AppFreeEditMethod | null>(null);
+
+const formconfig1 = reactive(createAppFreeEditConfig({}));
+
+const distContactList: Array<string> = ['Tgt.DispatchProp', 'Tgt.cDispatchAddress', "Tgt.DepartureAirportProp", "Tgt.cDepartureAirportAddress",
+  "Tgt.TransitProp", "Tgt.cTransitAddress", "Tgt.DestinationAirportProp", "Tgt.cDestAirportAddr",
+  "Tgt.DestinationProp", "Tgt.cDestinationAddress"]
+
+onMounted(async () => {
+  const formconfig11 = formInit(
+    JSON.stringify(props.pageSchema),
+    method,
+    exRules
+  );
+
+
+  for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+        if (distContactList.includes(data.prop)) {
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
+          }
+        }
+      })
+    }
+  }
+  Object.assign(formconfig1, formconfig11);
+  if (params.cProdNo === '045001') {
+    setFormItem("Tgt.cInsuranceMethod", { typeCode: 'InsuranceMethod045001' });
+  }
+  // Tgt.cShippingType
+  // 运输方式  020011  020013 这两种产品 非必填
+  if (params.cProdNo === '020011' || params.cProdNo === '020013') {
+    setFormItem("Tgt.cShippingType", { rules: [] });
+  } else {
+    setFormItem("Tgt.cShippingType", { rules: [getRules("required", { 'trigger': 'blur' })] });
+  }
+
+  //  020001 起运港 目的港 必填其他非必填
+  if (params.cProdNo === '020001') {
+    setFormItem("Tgt.cDeparturePort", { rules: [getRules("required", { 'trigger': 'blur' })] });
+    setFormItem("Tgt.cDestinationPort", { rules: [getRules("required", { 'trigger': 'blur' })] });
+  }
+
+  // 040005 办学许可证号
+  if (params.cProdNo === '040005') {
+    setFormItem("Tgt.cLicenseNumber", { rules: [] });
+  } else if (params.cProdNo === '020013') {
+    setFormItem("Tgt.cLicenseNumber", {
+      rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
+    });
+  } else {
+    setFormItem("Tgt.cLicenseNumber", {
+      rules: [getRules("vehiclePlate", {})],
+    });
+  }
+
+  //040008  040011  呼号必填
+  if (params.cProdNo === '040011' || params.cProdNo === '040008') {
+    setFormItem("Tgt.cCallSign", { rules: [getRules("required", { 'trigger': 'blur' })] });
+  }
+
+  // 主机功率(单位:千瓦(KW)) 非必填
+  const nHostPowers = ['110004', '110003', '040011', '040008'];
+  const iscHostRequired = nHostPowers.includes(params.cProdNo);
+  setFormItem("Tgt.nHostPower", {
+    rules: iscHostRequired ? [] : [getRules("required", { trigger: 'blur' })]
+  });
+
+  // 询价出单 核定座位总数 非必填
+  console.log('询价查询---', params)
+  if (params.cProdNo === '043002' && params.pageName === "priceInquiry") {
+    setFormItem("Tgt.nSeatsNumber", {
+      rules: []
+    });
+  }
+
+  //  运输工具名称
+  const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
+  const isNonRequired = cTransportationNames.includes(params.cProdNo);
+
+  setFormItem("Tgt.cTransportationName", {
+    rules: isNonRequired ? [] : [getRules("required", { trigger: 'blur' })]
+  });
+
+  // 车牌号校验
+  setFormItem("Tgt.cTransportLicenseNumber", {
+    rules: [getRules("vehiclePlate", {})],
+  });
+  // 约定保期内服务次数正整数
+  setFormItem("Tgt.nAgreeFrequency", {
+    rules: [getRules("signlessInt", {})],
+  });
+  setFormItem("Tgt.nCarsNumber", {
+    rules: [getRules("required", { 'trigger': 'blur' }), getRules("positiveNumber", {})],
+  });
+
+  setFormItem("Tgt.cContactNumber", {
+    rules: [getRules("phoneNo", {})],
+  });
+  selectType()
+  nextTick(() => {
+    eventBus.on('goodsMxChange', handelGoodsMx);
+    if (!getValue('Tgt.cDispatchDetail')) {
+      setFormItem('Tgt.cDispatchDetail', { disabled: true })
+    } else {
+      setFormItem('Tgt.cDispatchDetail', { disabled: false })
+    }
+    if (!getValue('Tgt.cDeparturePort')) {
+      setFormItem('Tgt.cDeparturePort', { disabled: true })
+    } else {
+      setFormItem('Tgt.cDeparturePort', { disabled: false })
+    }
+    if (!getValue('Tgt.cDestinationDetail')) {
+      setFormItem('Tgt.cDestinationDetail', { disabled: true })
+    } else {
+      setFormItem('Tgt.cDestinationDetail', { disabled: false })
+    }
+    if (!getValue('Tgt.cDestinationPort')) {
+      setFormItem('Tgt.cDestinationPort', { disabled: true })
+    } else {
+      setFormItem('Tgt.cDestinationPort', { disabled: false })
+    }
+  })
+});
+function hasEnglish(str: any) {
+  return /[a-zA-Z]/.test(str);
+}
+const handelGoodsMx = (val: any) => {
+  console.log(val)
+  if (val.length > 0) {
+    setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
+    setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
+    setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
+    setValue('Tgt.cInvoiceNum',val[0]['Dist.cInvoiceNum'])
+    setValue('Tgt.cWaybillNumber',val[0]['Dist.cBillNum'])
+    setValue('Tgt.nAdditiveCoefficient', val[0]['Dist.nAdditiveCoefficient'])
+    setValue('Tgt.cTradeNum', val[0]['Dist.cTradeNum'])
+    setValue('Tgt.cLadingNum', val[0]['Dist.cBillNum'])
+    setValue('Tgt.cCreditNum', val[0]['Dist.cLetterNum'])
+  } else {
+    setValue('Tgt.nAdditiveCoefficient', '')
+    setValue('Tgt.cTradeNum', '')
+    setValue('Tgt.cLadingNum', '')
+    setValue('Tgt.cCreditNum', '')
+    setValue('Tgt.cGoodsNo','')
+    setValue('Tgt.nGoodsNum','')
+    setValue('Tgt.nInvoicceValue','')
+    setValue('Tgt.cInvoiceNum','')
+    setValue('Tgt.cWaybillNumber','')
+  }
+}
+const selectType = () => {
+  if (productListA.value.includes(params.cProdNo)) {
+    whichType.value = 'A'
+  } else if (productListB.value.includes(params.cProdNo)) {
+    whichType.value = 'B'
+  } else if (productListC.value.includes(params.cProdNo)) {
+    whichType.value = 'C'
+  }
+}
+const wagesInfoModel = () => {
+  let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
+  let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
+  let cInquiryNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo'];
+  dzmodal.open(wagesInfo, { type: "edit", data: { cAppNo: cAppNo, cRegisteredLogo: cRegisteredLogo, cInquiryNo: cInquiryNo, pageName: route.params.param?.pageName } }).then((res: any) => {
+    if (res.type === "ok") {
+      // setFormItem('Tgt.nTotalSalary',
+      setValue("Tgt.nTotalSalary", res.body)
+    }
+  });
+}
+//水运规则    "Tgt.cTransportationName",
+const tgtWaterMatterList: Array<string> = ["Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.tConstructionYear", "Tgt.nTransTotalTon", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
+//水运外其他规则
+const tgtOtherMatterList: Array<string> = ["Tgt.cLicenseNumber", "Tgt.cFrameNumber", "Tgt.cTransitMode"]
+//非水运隐藏
+const tgtIsWaterMatterList: Array<string> = ["Tgt.cTowing", "Tgt.cWholeShip", "Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.nTotalTonnage", "Tgt.nShipAge", "Tgt.cTransportationName", "Tgt.tConstructionYear", "Tgt.nTransTotalTon", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
+const setIsRule = () => {
+  if (getValue("Tgt.cTowing") === '1') {
+    codeListStore
+      .queryCodeList(
+        {
+          codeListName: "Ship_Type",
+          codeListParam: {
+            remark: "1"
+          },
+        },
+      )
+      .then((res) => {
+        console.log(123123, res)
+        tgtEditRef.value?.addCodeListMap({
+          code: "Tgt.cShipType",
+          list: [
+
+            { label: '半潜驳', value: '7', codeKind: 'codeKind' },
+            { label: '拖船', value: '8', codeKind: 'codeKind' }
+          ]
+        })
+      });
+  } else {
+    codeListStore
+      .queryCodeList(
+        {
+          codeListName: "Ship_Type",
+          codeListParam: {},
+        },
+      )
+      .then((res) => {
+
+        tgtEditRef.value?.addCodeListMap({
+          code: "Tgt.cShipType",
+          list: res
+        })
+      });
+
+  }
+  if (getValue("Tgt.cTowing") === '1' || getValue("Tgt.cWholeShip") === '1') {
+    tgtWaterMatterList.forEach(item => {
+      setFormItem(item, {
+        rules: [getRules("required", {})],
+      });
+    })
+  } else if (getValue("Tgt.cTowing") === '0' || getValue("Tgt.cWholeShip") === '0') {
+    tgtWaterMatterList.forEach(item => {
+      setFormItem(item, {
+        rules: null,
+      });
+    })
+  }
+}
+
+const funcdistadd = () => {
+
+};
+function calculateCarAge(initialDateStr: any) {
+  const initialDate = new Date(initialDateStr);
+  const currentDate = new Date();
+
+  // 计算时间差（毫秒）
+  const diffTime = currentDate - initialDate;
+
+  // 获取初登年份
+  const year = initialDate.getFullYear();
+
+  // 判断是否为闰年
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+  const daysInYear = isLeapYear ? 366 : 365;
+
+  // 计算车龄（年）
+  const carAge = diffTime / (1000 * 60 * 60 * 24) / daysInYear;
+
+  // 四舍五入保留一位小数
+  const roundedAge = Number(carAge.toFixed(1));
+
+  // 如果小于0.5，返回0.5，否则返回原值
+  return roundedAge < 0.5 ? 0.5 : roundedAge;
+}
+//计算两个日期年份差
+function calAgeDif(val1: any, val2: any) {
+  const date1 = new Date(val1);
+  const date2 = new Date(val2);
+
+  const diffInMilliseconds = Math.abs(date1 - date2);
+  const millisecondsInYear = 1000 * 60 * 60 * 24 * 365.25; // 考虑闰年平均一年365.25天
+
+  const diffInYears = diffInMilliseconds / millisecondsInYear;
+
+  return Math.round(diffInYears)
+}
+const guaranteeMethodList = ['Tgt.cCollateralName', 'Tgt.cPledgeNumber', 'Tgt.cPledgeAddress', 'Tgt.cItemNumber', 'Tgt.nFaceValue', 'Tgt.cApplicationLine', 'Tgt.cBankApply', 'Tgt.cAcceptor', 'Tgt.cMaturityWeek', 'Tgt.cDueWeek', 'Tgt.tTicketStartingandending', 'Tgt.cConfirmingBank']
+const cMortgageList = ['Tgt.cMortgageName', 'Tgt.cMortgageNumber', 'Tgt.cCollateralAddress']
+const setcDetailedAddress = (prop: any, aftProp: any) => {
+  const ads = getValue(prop[0].prop);
+  const a = getValue(prop[1].prop) || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue(aftProp.prop, b);
+      }
+    });
+  } else {
+    setValue(aftProp.prop, a);
+  }
+};
+// 绑定方法
+const method = {
+  cDestCountryChange: (val: any) => {
+    const getFormconfig = opertaor.getTableRefs()['AgentTgt'].getFormconfig()
+    getFormconfig.fromSchema?.forEach((item: any) => {
+      if (item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')) {
+        item.disabled = false;
+      } else if (item.prop == "Tgt.cPayCur") {
+        item.disabled = true;
+      }
+    });
+  },
+  getcNavigationAreaChange: () => {
+    dialog.value?.open('navigationAreaTips', null,
+      null, { width: 50, title: '航行区域提示' });
+  },
+
+  getcIsExcludingChange: () => {
+    dialog.value?.open('reinsuranceTips', null,
+      null, { width: 45, title: '水险再保提示' });
+  },
+  getcSanctionAreasChange: () => {
+    dialog.value?.open('detailsKnows', null,
+      null, { width: 45, title: '战争及罢工险核保限制和运输地国家限制' });
+  },
+  gettCompletionYearChange: (val: string) => {
+    const currentYear = new Date().getFullYear();
+    setValue('Tgt.nShipAge', currentYear - Number(val))
+  },
+  gettCompletionDateChange: (val: string) => {
+    const insrnc = opertaor.getTableRefByKey("insrnc").getFromValue()
+    setValue('Tgt.nServiceLife', calAgeDif(insrnc['Base.tAppTm'], val))
+  },
+  getcGuaranteeMethodChange: (val: string) => {
+    //担保方式选择"质押贷款"时带出
+    if (val === 'B05Assure004') {
+      guaranteeMethodList.forEach(item => {
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    } else {
+      guaranteeMethodList.forEach(item => {
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }
+    // 担保方式选择"抵押贷款"时带出
+    if (val === 'B05Assure003') {
+      cMortgageList.forEach(item => {
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    } else {
+      cMortgageList.forEach(item => {
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    }
+    // 担保方式选择"保证贷款 "时带出
+    if (val === 'B05Assure002') {
+      setFormItem('Tgt.cTypeName', {
+        hidden: false,
+      });
+    } else {
+      setFormItem('Tgt.cTypeName', {
+        hidden: true,
+      });
+    }
+  },
+  // 是否单项工程 
+  getcIsSingleChange: (val: string) => {
+    if (val === '1') {
+      // 工程总造价 （元）
+      setFormItem('Tgt.nTotalCost', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.nSurveyPrice', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.Prop', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.cSuffixAddr', {
+        rules: [getRules("required", {})],
+      });
+
+      if (params.cProdNo === '042001') {
+        formconfig1.fromUi.groupBy[1].hidden = false
+        setFormItem('Tgt.cProjectName', {
+          hidden: false,
+          rules: [getRules("required", {})],
+        });
+
+        setFormItem('Tgt.nTotalCost', {
+          hidden: false,
+          rules: [getRules("required", {})],
+        });
+
+        setFormItem('Tgt.nTotalDesign', {
+          hidden: false,
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.ProjectAddress', {
+          hidden: false,
+          rules: [getRules("required", {})],
+        });
+      }
+
+    } else {
+      setFormItem('Tgt.nTotalCost', {
+        rules: null
+      });
+      setFormItem('Tgt.nSurveyPrice', {
+        rules: null
+      });
+      setFormItem('Tgt.Prop', {
+        rules: null
+      });
+      setFormItem('Tgt.cSuffixAddr', {
+        rules: null
+      });
+
+      if (params.cProdNo === '042001' && val === '0') {
+        formconfig1.fromUi.groupBy[1].hidden = true
+        setFormItem('Tgt.cProjectName', {
+          hidden: true,
+          rules: null
+        });
+
+        setFormItem('Tgt.nTotalCost', {
+          hidden: true,
+          rules: null
+        });
+
+        setFormItem('Tgt.nTotalDesign', {
+          hidden: true,
+          rules: null
+        });
+        setFormItem('Tgt.ProjectAddress', {
+          hidden: true,
+          rules: null
+        });
+      }
+
+    }
+
+  },
+  getcTransportationToolsChange: (val: string) => {
+    if (val === '02') {
+      setFormItem('Tgt.cPlateNumber', {
+        rules: [getRules("required", {})],
+      });
+    } else {
+      setFormItem('Tgt.cPlateNumber', {
+        rules: null
+      });
+    }
+  },
+
+  getcMemberLogoChange: (val: string) => {
+    if (val === '1') {
+      // setFormItem('Tgt.cBareboatLessee', {
+      //   rules: [getRules("required", {})],
+      // });
+      setFormItem('Tgt.P&I_CLUB', { rules: [getRules("required", {})] })
+    } else {
+      // setFormItem('Tgt.cBareboatLessee', {
+      //   rules: null
+      // });
+      setFormItem('Tgt.P&I_CLUB', { rules: [] })
+    }
+  },
+  getcRentalLogoChange: (val: string) => {
+    if (val === '1') {
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.nHostPower', {
+        rules: [],
+      });
+    } else {
+      setFormItem('Tgt.cBareboatLessee', {
+        rules: null
+      });
+      const nHostPowers = ['110004', '110003', '040011', '040008'];
+      const iscHostRequired = nHostPowers.includes(params.cProdNo);
+      setFormItem("Tgt.nHostPower", {
+        rules: iscHostRequired ? [] : [getRules("required", { trigger: 'blur' })]
+      });
+      // setFormItem('Tgt.nHostPower', {
+      //   rules: [getRules("required", {})],
+      // });
+    }
+  },
+  getcMortgageMarkChange: (val: string) => {
+    if (val === '1') {
+      setFormItem('Tgt.cShipMortgagee', {
+        rules: [getRules("required", {})],
+      });
+      setFormItem('Tgt.nMortgageAmount', {
+        rules: [getRules("required", {})],
+      });
+    } else {
+      setFormItem('Tgt.cShipMortgagee', {
+        rules: null
+      });
+      setFormItem('Tgt.nMortgageAmount', {
+        rules: null
+      });
+    }
+  },
+  gettInitialDateChange: (val: string) => {
+    setValue("Tgt.cVehicleAge", calculateCarAge(val))
+  },
+  getcShippingMethodChange: (val: string) => {
+    console.log('val', val)
+    // if(val === 'NV591001'){
+    if (val === '11') {
+      tgtIsWaterMatterList.forEach(item => {
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+      tgtOtherMatterList.forEach(item => {
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+    } else {
+      tgtIsWaterMatterList.forEach(item => {
+        setFormItem(item, {
+          hidden: true,
+        });
+      })
+      tgtOtherMatterList.forEach(item => {
+        setFormItem(item, {
+          hidden: false,
+        });
+      })
+    }
+    // if(val === 'NV591003'){
+    if (val === '12') {
+      tgtOtherMatterList.forEach(item => {
+        setFormItem(item, {
+          rules: [getRules("required", {})],
+        });
+      })
+    } else {
+      tgtOtherMatterList.forEach(item => {
+        setFormItem(item, {
+          rules: null,
+        });
+      })
+    }
+  },
+
+  getcShippingTypeChange: (val: string) => {
+    console.log(val);
+    if (val === '04') {
+      setFormItem("Tgt.cRailwayMode", {
+        rules: [getRules("required", {})],
+      });
+    } else {
+      setFormItem("Tgt.cRailwayMode", {
+        rules: [],
+      });
+    }
+  },
+  getcTransportChange: (val: string) => {
+    console.log(val)
+    const requiredRule = [getRules("required", {})];
+    const vehiclePlate = [getRules("vehiclePlate", {})];
+    setFormItem("Tgt.cTransportTools", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    if (val !== '1') {
+      clearValidate('Tgt.cTransportTools')
+    }
+    setFormItem("Tgt.cTransportLicenseNumber", {
+      rules: val === '1' ? [...requiredRule, ...vehiclePlate] : [...vehiclePlate],
+    });
+    setFormItem("Tgt.cTransBrandModel", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportEngineNumber", {
+      rules: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportFrameNumber", {
+      rules: val === '1' ? requiredRule : [],
+    });
+
+    setFormItem("Tgt.cTransportTools", {
+      disabled: val === '1' ? requiredRule : [],
+    });
+    setFormItem("Tgt.cTransportTools", {
+      disabled: val === '1' ? false : true,
+    });
+    setFormItem("Tgt.cTransitAirportName", {
+      rules: val === '1' ? requiredRule : [],
+    });
+
+    setFormItem("Tgt.cTransportVoyageNumber", {
+      rules: val === '1' ? requiredRule : [],
+    });
+  },
+  getcTowingChange: (val: string) => {
+    setIsRule()
+  },
+  getcWholeShipChange: (val: string) => {
+    setIsRule()
+  },
+  func1: () => {
+  },
+  //投保乘客座位总数改变事件
+  changenTotalInsured: (val: any) => {
+    console.log('触发11')
+    if (val || val == 0) {
+      setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+
+      const termref = opertaor.getTableRefByKey("cvrg");
+      const termrefList = termref.getFromValue();
+
+      interface Item {
+        nInsuredHeadcount?: number | null | string;
+      }
+      if (termrefList.length) {
+        termref?.setTermData({
+          termNo: termrefList[0]?.['Term.cUniqueTermNo'],  // 这个不是条款 需要 去方法里面打印看具体数据ID
+          planNo: termrefList[0]?.['Term.cPlanNo'],
+          factorProp: 'Term.nSeatTotal',
+        }, val);
+      }
+    }
+  },
+
+  //投保司乘人员座位总数改变事件
+  changenInsuredcompanySeats: (val: any) => {
+    console.log('触发12')
+
+    if (val || val == 0) {
+      setValue("Tgt.nSeatCapacity", Number(getValue("Tgt.nTotalInsured")) + Number(getValue("Tgt.nInsuredcompanySeats")))
+      const termref = opertaor.getTableRefByKey("cvrg");
+      const terms = termref.getFromValue();
+      console.log('terms', terms);
+
+
+      for (let i = 0; i < terms.length; i++) {
+        const term = terms[i];
+        console.log(term)
+        if (term['Term.cRdrTyp'] == '1' && term['Term.cClauseCategory'] == '1') { // 判断是附加条款
+          termref?.setTermData({
+            termNo: term['Term.cUniqueTermNo'],
+            planNo: term['Term.cPlanNo'],
+            factorProp: 'Term.nInsuredcompanySeats',
+          }, val);
+        }
+      }
+
+
+      // termref?.setTermData({
+      //   termNo:"00425000085",
+      //   planNo:'P1',
+      //   factorProp: 'Term.nSeatTotal',
+      // },123);   
+    }
+  },
+
+  // 投保座位总数
+  nSeatCapacityChange: (val: any) => {
+
+  },
+
+  //是否单项工程change事件
+  cIsSingleFunc: (val) => {
+    if (val == '1') {
+      let obj = {
+        rules: [getRules("required", {})],
+        hidden: false
+      }
+      singChange(obj)
+    } else {
+      let obj = {
+        rules: null,
+        hidden: true
+      }
+      singChange(obj)
+    }
+    //把数据存在store，清单信息组件的是否必填根据这个来
+    productStore.setCIsSingle(val)
+  },
+  funcInsuranceChange: (val) => {
+    
+    // 投保方式选择按工程造价投保、按建筑面积投保、按劳务合同价投保，短期费率类型默认按日，短期费率系数固定为1
+    const baseRef = opertaor.getTableRefByKey('base'); 
+    const disableValue = ['613002', '613003', '613004'].includes(val);
+    baseRef.setValue('Base.cRatioTyp', '2'); 
+    baseRef.setFormItem("Base.cRatioTyp", { disabled: disableValue });
+
+    groupCheck();
+    //根据投保方式得选择对应控制必填项
+    if (val == '613002') {
+      setFormItem("Tgt.nEngineeringCost", {
+        rules: [getRules("required", { blur: true })],
+      });
+      setFormItem("Tgt.nProjectArea", { rules: null });
+      setFormItem("Tgt.nLaborPrice", { rules: null });
+    } else if (val == '613003') {
+      setFormItem("Tgt.nEngineeringCost", { rules: null });
+      setFormItem("Tgt.nProjectArea", {
+        rules: [getRules("required", { blur: true })],
+      });
+      setFormItem("Tgt.nLaborPrice", { rules: null });
+    } else if (val == '613004') {
+      setFormItem("Tgt.nEngineeringCost", { rules: null });
+      setFormItem("Tgt.nProjectArea", { rules: null });
+      setFormItem("Tgt.nLaborPrice", {
+        rules: [getRules("required", { blur: true })],
+      });
+    }
+    const cvrgref = opertaor.getTableRefByKey("cvrg");
+    if (cvrgref.showFlush) {
+      cvrgref.showFlush();
+    }
+  },
+  cDeterminingChange: (val: any) => {
+    const cvrgref = opertaor.getTableRefByKey("cvrg");
+    if (cvrgref.showFlush) {
+      cvrgref.showFlush();
+    }
+    // 直接限额制 投保雇员年工资总额非必填
+    if (val === "0") {
+      setFormItem("Tgt.nTotalSalary", {
+        rules: [],
+      });
+    } else {
+      setFormItem("Tgt.nTotalSalary", {
+        rules: [getRules("required", { blur: true })],
+      });
+    }
+  },
+  industryTypeChange: (val: any) => {
+    groupCheck();
+  },
+  wagesInfoBtn: () => {
+
+    let cRegisteredLogo = opertaor.getDataAll()['tgt']['Tgt.cRegisteredLogo'];  // 记名投保标志 是 获取清单汇总   否可以自己修改添加
+    // let cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];   //申请单号
+    let cAppNo = "";
+    if (route.params.param?.pageName === "priceInquiry") {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cInquiryNo']
+    } else if (opertaor.getDataAll()['applicant'] && opertaor.getDataAll()['applicant']['Applicant.cAppNo']) {
+      cAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo']
+    } else {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
+    }
+
+    if (cRegisteredLogo !== "1" && cRegisteredLogo !== "0") {
+      ElMessage.error('请选择“记名投保标志”！')
+      return false;
+    }
+
+    if (!cAppNo) {
+      ElMessage.error("请先保存申请单!")
+      return false;
+    }
+
+    // 获取总额方式  没有数据给进行提示
+    if (cRegisteredLogo == 1) {
+      const param = {
+        cComponentTable: "EmployeeDist",
+      }
+      if (route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      if (route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+        param['voType'] = "ply"
+      }
+      selectDist(param).then((res: any) => {
+        const { code, data, msg } = res;
+        if (code == 200) {
+          if (data['data'].length > 0) {
+            wagesInfoModel();
+
+          } else {
+            ElMessage.error('雇员清单不能为空！');
+          }
+        }
+
+      });
+    } else {
+      // wagesInfoModel();
+      funcdistadd();
+      const param = {};
+      if (route.params.param?.pageName === "priceInquiry") {
+        param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      } else {
+        param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      }
+      checkAppBase(param).then((res: any) => {
+        if (res.code === 200) {
+          wagesInfoModel();
+        } else {
+          ElMessage.error("请先保存申请单!");
+        }
+      });
+    }
+  },
+  // 工程造价
+  nEngineeringCostChange: (val) => {
+    if (val) {
+      setFormItem('Tgt.nLaborPrice', {
+        rules: null
+      })
+
+      setFormItem('Tgt.nProjectArea', {
+        rules: null,
+      })
+      setFormItem('Tgt.nEngineeringCost', {
+        rules: [getRules("required", {})],
+      })
+    }
+  },
+  // 工程面积(㎡)
+  nProjectAreaChange: (val) => {
+    if (val) {
+
+      setFormItem('Tgt.nLaborPrice', {
+        rules: null
+      })
+
+      setFormItem('Tgt.nProjectArea', {
+        rules: [getRules("required", {})],
+      })
+      setFormItem('Tgt.nEngineeringCost', {
+        rules: null,
+      })
+    }
+  },
+  // 劳务分包合同价格（元）
+  nLaborPriceChange: (val) => {
+    if (val) {
+
+      setFormItem('Tgt.nLaborPrice', {
+        rules: [getRules("required", {})],
+      })
+
+      setFormItem('Tgt.nProjectArea', {
+        rules: null,
+      })
+      setFormItem('Tgt.nEngineeringCost', {
+        rules: null,
+      })
+    }
+
+
+  },
+  // 是否含隧道
+  cIncludeBridgesChange: (val) => {
+    if (val == 1) {
+      setFormItem('Tgt.nBridgeProportion', {
+        rules: [getRules("required", {})],
+      })
+      setFormItem('Tgt.nTunnelProportion', {
+        rules: [getRules("required", {})],
+      })
+    } else {
+      setFormItem('Tgt.nBridgeProportion', {
+        rules: null,
+      })
+      setFormItem('Tgt.nTunnelProportion', {
+        rules: null,
+      })
+    }
+  },
+  // 计划开工日期
+  tPlannedDateChange: (v) => {
+    const start = getValue("Tgt.tPlannedDate");
+    const end = getValue("Tgt.tPlannedCompletion");
+    const tm = moment(end).diff(moment(v), "days");
+    if (!end || !v) {
+      return;
+    }
+    if (tm < 0) {
+      ElMessage.warning("竣工日期不能小于开工日期");
+      setValue("Tgt.tPlannedDate", null);
+      return;
+    }
+    setValue("Tgt.nContractDuration", tm);
+
+  },
+  // 计划竣工日期 
+  tPlannedCompletionChange: (v) => {
+    const start = getValue("Tgt.tPlannedDate");
+    const end = getValue("Tgt.tPlannedCompletion");
+    if (!start || !v) {
+      return;
+    }
+    const tm = moment(v).diff(moment(start), "days");
+    if (tm < 0) {
+      ElMessage.warning("竣工日期不能小于开工日期");
+      setValue("Tgt.tPlannedCompletion", null);
+      return;
+    }
+    setValue("Tgt.nContractDuration", tm);
+  },
+
+  ShipClassOneChange: (val: any) => {
+    console.log('船111', val)
+    clearValidate('Tgt.cShipClassThree');
+    const param = opertaor.getParam();
+    if (!param.initFlag) {
+      if (val == '01') {
+        setValue("Tgt.cShipClassTwo", null);
+        setValue("Tgt.cShipClassThree", null);
+      }
+    }
+    if (val == '01') { //rules: [getRules("required", {})]
+      setFormItem('Tgt.cShipClassTwo', { disabled: true, rules: null });
+      setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
+
+    } else {
+      if (val) {
+        setFormItem('Tgt.cShipClassTwo', { disabled: false, rules: [getRules("required", {})] });
+      }
+    }
+    if (val == '02' || val == '03') {
+      setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+      let cShipClassTwo = getValue('Tgt.cShipClassTwo');
+      setValue("Tgt.cShipClassThree", null);
+      codeListStore
+        .queryCodeList(
+          {
+            codeListName: "Ship_Class_Level2",
+            codeListParam: {
+              classone: val == '02' ? 'level1' : 'level2'
+            },
+          },
+        )
+        .then((res) => {
+          tgtEditRef.value?.addCodeListMap({
+            code: "Tgt.cShipClassTwo",
+            list: res
+          })
+          if (res.length > 0) {
+            let delData = true;
+            res.forEach((item: any) => {
+              if (item['value'] == cShipClassTwo) {
+                delData = false;
+              }
+            })
+
+            // 判断是否有可以清空的数据
+            if (delData) {
+              setValue('Tgt.cShipClassTwo', null)
+            }
+          }
+        });
+    }
+  },
+  cShipClassTwoChange: (val: any) => {
+    clearValidate('Tgt.cShipClassThree');
+    if (val === '15') {
+      setFormItem('Tgt.cShipClassThree', { disabled: false, rules: [getRules("required", {})] })
+
+    } else if (val) {
+      setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+      setValue("Tgt.cShipClassThree", null);
+    }
+  },
+  // 核定座位总数
+  nSeatsNumberChange: (v) => {
+    const nSeatCapacity = getValue("Tgt.nSeatCapacity");
+    if (v !== nSeatCapacity) {
+      ElMessage.warning("核定座位总数和投保座位数总数不一致！");
+    }
+  },
+
+  // 起运港国家 弹框
+  countryFun: () => {
+    let isYW = false
+    if (getValue("Tgt.cDeparturePortCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cDeparturePortCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          setFormItem('Tgt.cDeparturePort', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                setValue("Tgt.cDeparturePortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDeparturePort", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                setValue("Tgt.cDeparturePortProvince", res.cCityCn);
+                setValue("Tgt.cDeparturePort", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                setValue("Tgt.cDeparturePortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDeparturePort", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                setValue("Tgt.cDeparturePortProvince", res.cCityEn);
+                setValue("Tgt.cDeparturePort", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                setValue("Tgt.cDeparturePortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDeparturePort", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryCn);
+                setValue("Tgt.cDeparturePortProvince", res.cAirportCity);
+                setValue("Tgt.cDeparturePort", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                setValue("Tgt.cDeparturePortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDeparturePort", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDeparturePortCountry", res.cCountryEn);
+                setValue("Tgt.cDeparturePortProvince", res.cAirportEn);
+                setValue("Tgt.cDeparturePort", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+  // 中转地国家 按钮
+  cTransitCountryFun: () => {
+    let isYW = false
+    if (getValue("Tgt.cTransitCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cTransitCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          setFormItem('Tgt.cTransitDetail', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cTransitCountry", res.cCountryCn);
+                setValue("Tgt.cTransitProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cTransitDetail", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cTransitCountry", res.cCountryCn);
+                setValue("Tgt.cTransitProvince", res.cCityCn);
+                setValue("Tgt.cTransitDetail", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cTransitCountry", res.cCountryEn);
+                setValue("Tgt.cTransitProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cTransitDetail", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cTransitCountry", res.cCountryEn);
+                setValue("Tgt.cTransitProvince", res.cCityEn);
+                setValue("Tgt.cTransitDetail", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cTransitCountry", res.cCountryCn);
+                setValue("Tgt.cTransitProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cTransitDetail", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cTransitCountry", res.cCountryCn);
+                setValue("Tgt.cTransitProvince", res.cAirportCity);
+                setValue("Tgt.cTransitDetail", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cTransitCountry", res.cCountryEn);
+                setValue("Tgt.cTransitProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cTransitDetail", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cTransitCountry", res.cCountryEn);
+                setValue("Tgt.cTransitProvince", res.cAirportEn);
+                setValue("Tgt.cTransitDetail", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+  // 目的港国家 按钮
+  cDestinationPortCountryFun: () => {
+    let isYW = false
+    if (getValue("Tgt.cDestinationPortCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cDestinationPortCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          setFormItem('Tgt.cDestinationPort', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationPortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDestinationPort", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationPortProvince", res.cCityCn);
+                setValue("Tgt.cDestinationPort", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationPortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDestinationPort", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationPortProvince", res.cCityEn);
+                setValue("Tgt.cDestinationPort", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationPortProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDestinationPort", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationPortProvince", res.cAirportCity);
+                setValue("Tgt.cDestinationPort", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationPortProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDestinationPort", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDestinationPortCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationPortProvince", res.cAirportEn);
+                setValue("Tgt.cDestinationPort", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+  // // 起运港国家 按钮
+  cDestinationCountryFunc: () => {
+    let isYW = false
+    if (getValue("Tgt.cDestinationCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cDestinationCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          if (getValue('Tgt.cDestAirportCountry') && getValue('Tgt.cDestAirportCountry') != res.cCountryCn) {
+            ElMessage.error('目的地国家和目的地机场国家要求一致')
+            return
+          }
+          setFormItem('Tgt.cDestinationDetail', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDestinationDetail", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationProvince", res.cCityCn);
+                setValue("Tgt.cDestinationDetail", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDestinationDetail", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationProvince", res.cCityEn);
+                setValue("Tgt.cDestinationDetail", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDestinationDetail", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDestinationCountry", res.cCountryCn);
+                setValue("Tgt.cDestinationProvince", res.cAirportCity);
+                setValue("Tgt.cDestinationDetail", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDestinationDetail", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDestinationCountry", res.cCountryEn);
+                setValue("Tgt.cDestinationProvince", res.cAirportEn);
+                setValue("Tgt.cDestinationDetail", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+  // 起运地国家 按钮
+  cDispatchCountryFunc: () => {
+    let isYW = false
+    if (getValue("Tgt.cDispatchCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cDispatchCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          if (getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn) {
+            ElMessage.error('起运地国家和起运机场国家要求一致')
+            return
+          }
+          setFormItem('Tgt.cDispatchDetail', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                setValue("Tgt.cDispatchProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDispatchDetail", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                setValue("Tgt.cDispatchProvince", res.cCityCn);
+                setValue("Tgt.cDispatchDetail", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                setValue("Tgt.cDispatchProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDispatchDetail", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                setValue("Tgt.cDispatchProvince", res.cCityEn);
+                setValue("Tgt.cDispatchDetail", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                setValue("Tgt.cDispatchProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDispatchDetail", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDispatchCountry", res.cCountryCn);
+                setValue("Tgt.cDispatchProvince", res.cAirportCity);
+                setValue("Tgt.cDispatchDetail", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                setValue("Tgt.cDispatchProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDispatchDetail", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryCnEn);
+              } else {
+                setValue("Tgt.cDispatchCountry", res.cCountryEn);
+                setValue("Tgt.cDispatchProvince", res.cAirportEn);
+                setValue("Tgt.cDispatchDetail", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+            // setValue("Tgt.cDispatchCountry", res.cCountryEn);
+            // setValue("Tgt.cDispatchProvince", res.cAirportEn);
+            // setValue("Tgt.cDispatchDetail", res.cAirportEn +','+ res.cCountryEn );
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+  // 起运机场国家
+  cDepartureAirportCountryFunc: () => {
+    let isYW = false
+    if (getValue("Tgt.cDepartureAirportCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cDepartureAirportCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          if (getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn) {
+            ElMessage.error('起运地国家和起运机场国家要求一致')
+            return
+          }
+          setFormItem('Tgt.cDepartureAirport', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDepartureAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDepartureAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDepartureAirportProvince", res.cCityCn);
+                setValue("Tgt.cDepartureAirport", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDepartureAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDepartureAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDepartureAirportProvince", res.cCityEn);
+                setValue("Tgt.cDepartureAirport", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDepartureAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDepartureAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
+                setValue("Tgt.cDepartureAirport", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDepartureAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDepartureAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDepartureAirportProvince", res.cAirportEn);
+                setValue("Tgt.cDepartureAirport", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+
+  // 目的地机场国家
+  cDestinationAirportCountryFunc: () => {
+    let isYW = false
+    if (getValue("Tgt.cDestAirportCountry")) {
+      isYW = hasEnglish(getValue("Tgt.cDestAirportCountry"))
+    }
+    dialog.value?.open(
+      "countryInfoModal",
+      { type: "departure", data: { whichType: whichType.value, isYW } },
+      {
+        isOk: (res: any) => {
+          if (getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn) {
+            ElMessage.error('目的地国家和目的地机场国家要求一致')
+            return
+          }
+          setFormItem('Tgt.cDestinationDetail', { disabled: false })
+          if (res.cType === '1') {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDestAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDestinationAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDestAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDestAirportProvince", res.cCityCn);
+                setValue("Tgt.cDestinationAirport", res.cCityCn + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDestAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDestinationAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDestAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDestAirportProvince", res.cCityEn);
+                setValue("Tgt.cDestinationAirport", res.cCityEn + ',' + res.cCountryEn);
+              }
+            }
+          } else {
+            if (res.isCN) {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDestAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
+                setValue("Tgt.cDestinationAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
+              } else {
+                setValue("Tgt.cDestAirportCountry", res.cCountryCn);
+                setValue("Tgt.cDestAirportProvince", res.cAirportCity);
+                setValue("Tgt.cDestinationAirport", res.cAirportCity + ',' + res.cCountryCn);
+              }
+            } else {
+              if (res.cCountryEn == 'CHINA') {
+                setValue("Tgt.cDestAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDestAirportProvince", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn);
+                setValue("Tgt.cDestinationAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
+              } else {
+                setValue("Tgt.cDestAirportCountry", res.cCountryEn);
+                setValue("Tgt.cDestAirportProvince", res.cAirportEn);
+                setValue("Tgt.cDestinationAirport", res.cAirportEn + ',' + res.cCountryEn);
+              }
+            }
+          }
+        },
+      },
+      { width: "80" }
+    );
+  },
+
+  //  检验代理人  按钮
+  cCheckerCdeFunc: () => {
+    dzmodal.open(surveyInfo, { type: "departure", data: {} }).then((res: any) => {
+      if (res.type === "ok") {
+
+        setValue("Tgt.cCheckerCde", res.body.cSryDoc);   // 代理人
+        setValue("Tgt.cAddr", res.body.cAddr);   // 大洲
+        // setValue("Tgt.cCountry",res.body.id);  // ?国家
+        setValue("Tgt.cAraCde", res.body.cAraCde); // ?国家
+        setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
+        setValue("Tgt.cCode", res.body.cSrvyCde);  // 城市
+      };
+    });
+  },
+  // 建造完成年份
+  tCompletionYearChange: (val: any) => {
+    if (val) {
+      const currentYear = new Date().getFullYear();
+      const targetYear = new Date(val).getFullYear();
+      setValue('Tgt.nShipAge', currentYear - targetYear)
+    }
+  },
+  // 标的信息--证件类型
+  cCertificateTypeChange: (val: any) => {
+    // 道路运输
+    // if (val === '1') {
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
+    // } else if (val === '2') {
+    //   //  网络预约出租汽车经营许可证
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiLicense", {})] })  //证件号
+    // } else if (val === '3') {
+    //   //  网络预约出租汽车运输证
+    //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
+    // }
+    if (val) {
+      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
+    }
+
+  },
+  // 证件有效起期
+  tStartDateDisable: (date: any) => {
+    const fs = tgtEditRef?.value?.getFromValue();
+    if (fs && JSON.stringify(fs) !== '{}') {
+      const endDate = new Date(fs["Tgt.tEndDate"] || '')   // 结束时间 
+      let minDate = dayjs(endDate).valueOf();
+      return date.getTime() > minDate
+    } else {
+      return true;
+    }
+  },
+  // 证件有效止期
+  tEndDateDisable: (date: any) => {
+    const fs = tgtEditRef?.value?.getFromValue();
+    if (fs && JSON.stringify(fs) !== '{}') {
+      const startDate = new Date(fs["Tgt.tStartDate"] || '')   // 开始时间   
+      let maxDate = dayjs(startDate).valueOf();
+      return date.getTime() < maxDate
+    } else {
+      return true;
+    }
+  },
+
+  // 是否记名投保
+  cIsinsuranceRegisteredChange: (val: any) => {
+    if (val == '0') {
+      setFormItem('Tgt.cPracticeType', {
+        rules: [getRules("required", {})]
+      })
+    } else {
+      setFormItem('Tgt.cPracticeType', {
+        rules: []
+      })
+    }
+  },
+  // 投保行业
+  getcInsuranceIndustryChange: (val: any) => {
+    if (val === '8') {
+      setFormItem('Tgt.cIndustryRemarks', {
+        rules: [getRules("required", {})]
+      })
+    } else {
+      setFormItem('Tgt.cIndustryRemarks', {
+        rules: []
+      })
+    }
+  },
+  // 工程地址级联change
+  getPropChange: (val: any) => {
+    setregistAdd()
+  },
+  // 工程地址输入框change
+  getcSuffixAddrChange: (val: any) => {
+    setregistAdd()
+  },
+
+
+  getAddressstr: (val: any, row: any, pitem: any) => {
+    let getv1 = '';  //集联地址
+    let getv2 = '';  //字符串地址
+    let setv = '';  //需要设置的目标地址
+
+    let r = false;
+    formconfig1.fromSchema?.forEach((item: any) => {
+      if (r) {
+        setv = item;
+        r = false;
+      }
+      if (item.inputtype === 'rtinputgroup') {
+        for (let i = 0; i < item.groupList.length; i++) {
+          if (pitem.prop === item.groupList[i].prop) {
+            r = true;
+          }
+        }
+        if (r) {
+          getv1 = item.groupList.filter((it: any) => it.inputtype === 'rtcascader');
+          getv2 = item.groupList.filter((it: any) => it.inputtype === 'rtinput');
+        }
+      }
+    })
+    setAddressBykey(getv1, getv2, setv);
+  },
+  // 工程起期
+  tProjectStartChange: (v: any) => {
+    console.log(1112, v)
+    const start = getValue("Tgt.tProjectStart");
+    const end = getValue("Tgt.tProjectEnd");
+    if (!end || !v) {
+      return;
+    }
+    // const tmDay = moment(end).diff(moment(start), "days");
+    const tm = moment(end).diff(moment(start), "seconds")
+    if (tm < 0) {
+      ElMessage.warning("“工程起期”不能小于“工程止期”");
+      setFormValue({
+        "Tgt.tProjectStart": null,
+      });
+      return;
+    }
+    setFormValue({
+      "Tgt.nContractDuration": moment(end).add(1, 'second').diff(moment(start), "days"),
+    });
+  },
+  // 工程止期
+  tProjectEndChange: (v: any) => {
+    const start = getValue("Tgt.tProjectStart");
+    if (!start || !v) {
+      return;
+    }
+    const startTime = moment(v).diff(moment(start), "days");
+    if (startTime < 0) {
+      ElMessage.warning("“工程止期”不能小于“工程起期”");
+      setFormValue({
+        "Tgt.tProjectEnd": null,
+      });
+      return;
+    }
+    const formattedDate = moment(v).format('YYYY-MM-DD') + ' 23:59:59';
+    setFormValue({
+      "Tgt.nContractDuration": moment(formattedDate).add(1, 'second').diff(moment(start), "days"),
+      "Tgt.tProjectEnd": formattedDate, // 更新日期字段
+    });
+  },
+
+  // // 工程起期禁用
+  // tProjectStartDis:(val:any)=>{
+  // //  console.log('工程1',val)
+  // },
+
+  // 工程止期禁用
+  tProjectEndDis: (date: any) => {
+    const fs = tgtEditRef?.value?.getFromValue();
+    if (fs) {
+      const startDate = new Date(fs["Tgt.tProjectStart"])   // 开始时间   1
+      return date.getTime() < startDate.getTime()
+    } else {
+      return true;
+    }
+  },
+  // 是否铁路联运
+  cRailwayIntermodalChange: (val: any) => {
+    console.log('是否联运', val)
+    if (val === '1') {
+      setValue('Tgt.cRailwayMode', '02')
+    }
+
+  }
+
+};
+
+function setAddressBykey(getv1: any, getv2: any, setv: any) {
+  const a = tgtEditRef?.value?.getValue(getv1[0].prop);
+  const b = tgtEditRef?.value?.getValue(getv2[0].prop);
+
+  const setS = setv.prop;
+  if (a) {
+    getAddressStr({ address: a }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const c = (data ? data["addStr"] : "") + (b ? b : "");
+        setValue(setS, c);
+      }
+    });
+  } else {
+    setValue(setS, b);
+  }
+};
+
+function setregistAdd() {
+  const ads = tgtEditRef?.value?.getValue("Tgt.Prop");
+  const a = tgtEditRef?.value?.getValue("Tgt.cSuffixAddr") || "";
+  if (ads) {
+    getAddressStr({ address: ads }).then((res: any) => {
+      const { code, data, msg } = res;
+      if (code === 200) {
+        const b = (data ? data["addStr"] : "") + a;
+        setValue("Tgt.cProjectAddress", b);
+      }
+    });
+  } else {
+    setValue("Tgt.cProjectAddress", a);
+  }
+}
+
+function singChange(obj) {
+  setFormItem("Tgt.cProjectName", obj) //工程名称
+  setFormItem("Tgt.nTotalCost", obj) //工程总造价 （元）
+  setFormItem("Tgt.nTotalDesign", obj) //设计总价（元）
+  setFormItem("Tgt.cProjectAddress", obj) //工程地址
+  setValue('Tgt.cProjectName', '')
+  setValue('Tgt.nTotalCost', '')
+  setValue('Tgt.nTotalDesign', '')
+  setValue('Tgt.cProjectAddress', '')
+}
+
+function groupCheck() {
+  if (params.cProdNo === '043009' || params.cProdNo === '045001'
+    || params.cProdNo === '049035' || params.cProdNo === '049036'
+    || params.cProdNo === '049037' || params.cProdNo === '049040'
+    || params.cProdNo === '049041'
+  ) {
+    const cInsuranceMethod = getValue("Tgt.cInsuranceMethod");
+    const cIndustryType = getValue("Tgt.cIndustryType");
+    const plyBase = opertaor.getTableRefByKey('plyBase');
+    let subSidiary = null;
+    if (plyBase) {
+      subSidiary = plyBase.getValue('Base.cDptCde');
+      subSidiary = subSidiary?.substring(0, 6);
+    }
+
+    let h = true;
+    if (cIndustryType === '15' && (subSidiary === '024101' || subSidiary === '026201' || subSidiary === '024201'
+      || subSidiary === '023702' || subSidiary === '026401')) {
+      h = false;
+    } else {
+      if (cInsuranceMethod !== '613001') {
+        h = false;
+      }
+    }
+
+    formconfig1.fromUi.groupBy.forEach(item => {
+      if (item.id == 'group2') {
+        item.hidden = h;
+      }
+    });
+  }
+}
+
+// 绑定特殊验证器
+const exRules = {};
+function getFromValue() {
+  return tgtEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  tgtEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return tgtEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  tgtEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return tgtEditRef?.value?.getValue(key);
+}
+function clearValidate(key = null) {
+  tgtEditRef?.value?.clearValidate(key);
+}
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        } else {
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
+const terms1 = ['00425000277', '00425000278', '00425000279', '00425000282', '00425000283'];
+const terms2 = ['00425000281', '00425000280'];
+function change403009(v) {
+  if (terms1.includes(v)) {
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod", { disabled: true });
+  }
+  if (terms2.includes(v)) {
+    setValue("Tgt.cInsuranceMethod", "613001");
+    setFormItem("Tgt.cInsuranceMethod", { disabled: true });
+  }
+}
+
+function getFormconfig() {
+  return formconfig1;
+}
+
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+  getFormconfig,
+  change403009,
+  clearValidate,
+});
+</script>
+
+<style scoped></style>

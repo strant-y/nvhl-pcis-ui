@@ -89,6 +89,12 @@ function queryOnce(typeList: string[] = undefined){
   function queryCodeList(param: any, unAuthor: boolean = false, cache: boolean = false): Promise<OptionType[]>{
     return new Promise<OptionType[]> (async (resolve, reject) => {
       const result = ref<OptionType[]>([]);
+      const k = param.codeListName + ((param.codeListParam && Object.keys(param.codeListParam).length > 0) ? JSON.stringify(param.codeListParam):'');
+      const v = codeListMap.value[k];
+      if(codeListMap.value[k]){
+        resolve(codeListMap.value[k]);
+        return ;
+      }
       const cacheData = codeListMap.value[param.codeListName];
       if (!!cacheData) {
         // 缓存有数据就返回
@@ -117,6 +123,7 @@ function queryOnce(typeList: string[] = undefined){
       if (!!result.value && cache) {
         // setOptionsToCacheMap(param.codeListName, result.value);
       }
+      codeListMap.value[k] = result.value;  // 将数据加入缓存,方便下次直接缓存获取不需要再数据库交互
       resolve(result.value);
     });
   }
@@ -176,7 +183,7 @@ function queryOnce(typeList: string[] = undefined){
       if(res.code == 200){
         const options = res.data.list.map(item => ({
           value: item.cDptCde,
-          label: item.cDptCnm,
+          label: item.cDptCde+item.cDptCnm,
           children: [], // 初始时，所有项都没有子项
         }));
         setOptionsToCacheMap('QueryFormDeptType', options);
@@ -187,8 +194,10 @@ function queryOnce(typeList: string[] = undefined){
 
     // 产品列表
     getProdInfoList({}).then(res => {
-      setOptionsToCacheMap('CProdMap', res.data.groupMap);
-      setOptionsToCacheMap('CProdList', res.data.list);
+        if(res.data){
+        setOptionsToCacheMap('CProdMap', res.data.groupMap);
+        setOptionsToCacheMap('CProdList', res.data.list);
+      }
     })
   }
 

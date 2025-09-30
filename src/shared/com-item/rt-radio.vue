@@ -75,6 +75,11 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
 
 const options: Ref<OptionType[]> = ref([]); // 字典下拉数据源
@@ -90,6 +95,9 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
     return;
   }
   selectedValue.value = newModelValue;
+  if (props.item.typeCode && options.value.length === 0) {
+    uploadOption();
+  }
   // }
 });
 
@@ -97,25 +105,13 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
  * 页面数据监听
  */
 watch(
-  () => props.item,
-  (newValue, oldValue) => {
-    if (props.item.loadData) {
-      options.value = newValue.loadData;
+  [() => props.item.loadData, () => props.item.typeCode],
+  ([newloadData, newtypeCode]) => {
+    if (newloadData) {
+      options.value = newloadData;
     }
-    if (props.item.typeCode) {
-      codeListStore.queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: props.item.params
-          },
-          false,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+    if (newtypeCode) {
+      uploadOption();
     }
   }
 );
@@ -124,19 +120,41 @@ function handleChange(val?: string | number | boolean | undefined) {
   emits("valueChange", val, option);
   emits("update:modelValue", val, option);
   emits("update:item", val, option);
-  props.item.func ? props.item.func(val, option) : null;
+  // props.item.func ? props.item.func(val, option) : null;
 }
 
 const codeListStore = codeListViewStore();
+
+function uploadOption() {
+  codeListStore
+    .queryCodeList(
+      {
+        codeListName: props.item.typeCode,
+        codeListParam: getParam(),
+      },
+      false,
+      props.item.cache ? props.item.cache : true
+    )
+    .then((res) => {
+      if (res) {
+        options.value = res;
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      options.value = [];
+    });
+}
 
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
     if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore.queryCodeList(
+      codeListStore
+        .queryCodeList(
           {
             codeListName: props.item.typeCode,
-            codeListParam: props.item.params
+            codeListParam: props.item.codeParam,
           },
           false,
           props.item.cache ? props.item.cache : true
@@ -151,4 +169,22 @@ onMounted(() => {
     }
   }
 });
+
+function getParam() {
+  let p: any = {};
+  if (props.item.codeParam && typeof props.item.codeParam === "string") {
+    p = JSON.parse(props.item.codeParam);
+  } else {
+    p = props.item.codeParam;
+  }
+
+  if (props.item.disabled) {
+    if (!p) {
+      p = { value: selectedValue.value };
+    } else {
+      p.value = selectedValue.value;
+    }
+  }
+  return p;
+}
 </script>

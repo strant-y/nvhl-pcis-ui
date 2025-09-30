@@ -4,11 +4,10 @@
       <template #default="{ Component, route }">
         <transition
           enter-active-class="animate__animated animate__fadeIn"
-          mode="out-in"
           name="expand"
         >
-          <keep-alive :include="cachedViews">
-            <component :is="Component" :key="route.path" />
+          <keep-alive :max="8" :include="cachedViews">
+            <component :is="Component" :key="route.query.componentKey"/>
           </keep-alive>
         </transition>
       </template>
@@ -18,15 +17,17 @@
 
 <script setup lang="ts">
 import { useTagsViewStore } from "@/store";
-
-const cachedViews = computed(() => useTagsViewStore().cachedViews); // 缓存页面集合
+const tagsViewStore = useTagsViewStore();
+const {
+  cachedViews, // 缓存页面集合
+} = storeToRefs(tagsViewStore);
 </script>
 
 <style lang="scss" scoped>
 .app-main {
   position: relative;
   width: 100%;
-  min-height: calc(100vh - $navbar-height);
+  min-height: calc(100vh - $navbar-height - 55px);
   overflow: hidden;
   background-color: var(--el-bg-color-page);
 }
@@ -60,17 +61,17 @@ const cachedViews = computed(() => useTagsViewStore().cachedViews); // 缓存页
   }
 
   .hasTagsView .app-main {
-    height: calc(100vh - $navbar-height - $tags-view-height);
-    min-height: calc(100vh - $navbar-height - $tags-view-height);
+    height: calc(100vh - $navbar-height - $tags-view-height - 55px);
+    min-height: calc(100vh - $navbar-height - $tags-view-height - 55px);
   }
 
   .fixed-header + .app-main {
-    min-height: calc(100vh - $navbar-height);
+    min-height: calc(100vh - $navbar-height - 55px);
   }
 
   .hasTagsView .fixed-header + .app-main {
-    height: calc(100vh - $navbar-height);
-    min-height: calc(100vh - $navbar-height);
+    height: calc(100vh - $navbar-height - 55px);
+    min-height: calc(100vh - $navbar-height - 55px);
     padding-top: $tags-view-height;
   }
 }

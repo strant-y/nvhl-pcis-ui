@@ -57,6 +57,11 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
 
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
@@ -82,9 +87,11 @@ function handleChange(val?: string | number | boolean) {
       res = props.item.keymap["n"];
     }
   }
-  emits("valueChange", res);
+  emits("valueChange", res, props.parentFromUi);
   emits("update:modelValue", res);
-  props.item.func ? props.item.func(res) : null;
+  console.log("rt-switch", res, props);
+  // props.item.func ? props.item.func(res) : null;
+  // props.item.func ? props.item.func(res, props.row) : null; // 传递当前行的数据
 }
 
 onMounted(() => {});

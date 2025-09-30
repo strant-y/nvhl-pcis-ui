@@ -1,45 +1,41 @@
 <template>
-  <el-input-number
-    v-if="!showLabel"
-    ref="inputNumberRef"
-    v-model="vInput"
-    :readonly="
-      item.readonly
-        ? typeof item.readonly === 'boolean'
-          ? item.readonly
-          : item.readonly === 1 || item.readonly === '1'
-            ? true
-            : false
-        : false
-    "
-    :placeholder="item.placeholder"
-    :disabled="
-      item.disabled
-        ? typeof item.disabled === 'boolean'
-          ? item.disabled
-          : item.disabled === 1 || item.disabled === '1'
-            ? true
-            : false
-        : false
-    "
-    :min="item.min"
-    :max="item.max"
-    :step="item.step"
-    :step-strictly="item.stepStrictly"
-    :size="item.size"
-    :precision="item.precision"
-    :controls="item.controls ? item.controls : false"
-    controls-position="right"
-    @change="handleChange"
-  >
-    <template #prefix v-if="item.prefix">
-      <span>{{ item.prefix }}</span>
-    </template>
-    <template #suffix v-if="item.suffix">
-      <span>{{ item.suffix }}</span>
-    </template>
-  </el-input-number>
-  <span v-else>
+  <template v-if="!showLabel">
+    <el-tooltip
+        :content="changeContent"
+        :disabled="!changeContent"
+        placement="top"
+    >
+      <el-input-number
+          ref="inputNumberRef"
+          v-model="vInput"
+          :class="[
+          ...customClass,
+          ...[isReQuired() ? 're-quired-flag' : '']
+      ]"
+          :readonly="isReadonly()"
+          :placeholder="item.placeholder"
+          :disabled="isDisabled()"
+          :min="item.min!=null && item.min !=undefined ?  item.min : 0"
+          :max="item.max!=null && item.max !=undefined ?  item.max : 99999999999999999999"
+          :step="item.step"
+          :step-strictly="item.stepStrictly"
+          :size="item.size"
+          :precision="item.precision"
+          :controls="item.controls ? item.controls : false"
+          controls-position="right"
+          @change="handleChange"
+          :style="{maxWidth: item.maxWidth || ''}"
+      >
+        <template #prefix v-if="item.prefix">
+          <span>{{ item.prefix }}</span>
+        </template>
+        <template #suffix v-if="item.suffix">
+          <span>{{ item.suffix }}</span>
+        </template>
+      </el-input-number>
+    </el-tooltip>
+  </template>
+  <span v-else style="width: 100%;">
     {{
       (item.prefix ? item.prefix : "") +
       (vInput ? vInput : "") +
@@ -67,24 +63,86 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
-
+const customClass = ref<string[]>([]);
+const changeContent = ref<string | undefined>();
 const vInput = ref<number | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
-  vInput.value = newModelValue ? Number(newModelValue) : undefined;
+  vInput.value = newModelValue !== null && newModelValue != undefined ? Number(newModelValue) : undefined;
 });
 
 function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
   emits("valueChange", val);
-  props.item.func ? props.item.func(val) : null;
+  // props.item.func ? props.item.func(val) : null;
+}
+function isReQuired() {
+  // 如果是禁用状态,默认带底色
+  if(props.item.disabled === true || props.item.disabled === '1' || props.item.disabled === 1){
+    return false;
+  }
+  if(props.item.required === '1' || props.item.required === 1 || props.item.required === true){
+    return true;
+  }
+  const rule = props.item.rules;
+  let r = false;
+  if (rule && rule.length > 0) {
+    for (const key in rule) {
+      if (rule[key].required) {
+        r = true;
+      }
+    }
+  }
+  return r;
+}
+
+
+function isReadonly(){
+  if(props.item.readonly === true || props.item.readonly === 1 || props.item.readonly === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function isClearable(){
+  if(props.item.clearable === true || props.item.clearable === 1 || props.item.clearable === '1'){
+    return true;
+  }else{
+    return false;
+  }
+}
+function isDisabled(){
+  if(props.item.disabled === true || props.item.disabled === 1 || props.item.disabled === '1'){
+    return true;
+  }else{
+    return false;
+  }
 }
 
 onMounted(() => {
   vInput.value = props.modelValue ? Number(props.modelValue) : undefined;
 });
 
-onMounted(() => {});
+function setCustomClass(classs: string[]) {
+  customClass.value = classs;
+}
+function setChangeInfo(content: any) {
+  if(content) {
+    changeContent.value = (content.text ? content.text : '') + ' 变更为 ' + vInput.value;
+  }else {
+    changeContent.value = undefined;
+  }
+}
+defineExpose({
+  setCustomClass,
+  setChangeInfo
+});
 </script>
 
 <style scoped>
@@ -93,5 +151,8 @@ onMounted(() => {});
 }
 ::v-deep .el-input__inner {
   text-align: left !important;
+}
+:deep(.el-input__wrapper) {
+  padding: 1px 5px!important;
 }
 </style>

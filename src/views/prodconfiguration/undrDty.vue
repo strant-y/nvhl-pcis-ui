@@ -7,6 +7,7 @@
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
+      @selection-change="handleSelectionChange"
     />
   </div>
 </template>
@@ -25,17 +26,26 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { qryBatchUndrDtyList, delBatchUndrDtyInfo } from "@/api/prod";
+import {
+  qryBatchUndrDtyList,
+  delBatchUndrDtyInfo,
+  delSelectedUndrDtyInfo,
+  expExcelUndrDty,
+} from "@/api/prod";
 import { template } from "lodash";
 const dzmodal = useDzModal();
+import { useUserStore } from "@/store";
+const userStore = useUserStore();
+const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 
-const undrEdit = defineAsyncComponent(() => import("./undrEdit.vue"));
+const undrDtyEdit = defineAsyncComponent(() => import("./undrDtyEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -52,19 +62,76 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
+      }),
+      createFreeButtonBase({
+        type: "primary",
+        label: "批量作废",
+        func: () => {
+          if (!selectedRows.value.length) {
+            ElMessage.error("请选择要作废的数据");
+          } else {
+            const param = selectedRows.value
+              .map((item) => item.cPkId)
+              .join(",");
+            let arrData = param.split(",");
+            delSelectedUndrDtyInfo({
+              undrDtyPkIds: arrData,
+              flag: "cancellation",
+            })
+              .then((res) => {
+                const { code, data, msg } = res;
+                if (200 === code) {
+                  ElMessage.success(msg);
+                  handleQuery();
+                } else {
+                  ElMessage.error(msg);
+                }
+              })
+              .finally(() => {});
+          }
+        },
       }),
       createFreeButtonBase({
         type: "primary",
         label: "删除所有",
-        func: () => {},
+        func: () => {
+          delSelectedUndrty();
+        },
       }),
     ],
     fromSchema: [
       {
         prop: "cDptCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "核保任职机构",
+        disabled: true,
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            dzmodal.open(DepartmentTree, {}).then((res) => {
+              if (res.body) {
+                const selectObj = res.body;
+								freeEditRef.value?.setValue(
+									"cDptCde",
+									selectObj.id
+								);
+								setFormItem("cDptCde", {
+									loadData: [
+										{
+											label: `${selectObj.id}${selectObj.name}`,
+											value: selectObj.id,
+										},
+									],
+								});
+              }
+            });
+          },
+        },
         clearable: true,
       },
       {
@@ -77,24 +144,45 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrClsCde",
         inputtype: "rtselect",
         title: "核保人级别",
+        typeCode: "UNDR_CLS_CDE",
+        codeParam: {},
         clearable: true,
       },
       {
-        prop: "cProdNo",
+        prop: "CKindNo",
         inputtype: "rtselect",
         title: "产品大类",
+        // typeCode: "WEB_SYS_STA_DICT",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: {
+          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+        },
         clearable: true,
       },
       {
-        prop: "cProdNo",
+        prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
+        typeCode: "PROD_LIST_GRT",
+        params: {
+          cParCde: "",
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
+        },
+        // loadData: [],
         clearable: true,
       },
       {
-        prop: "cUndrClsCnm",
-        inputtype: "rtdatetime",
-        title: "任职起止期",
+        prop: "tDutyStrtTm",
+        inputtype: "rtdatepicker",
+        title: "任职起期",
+        clearable: true,
+      },
+      {
+        prop: "tDutyEndTm",
+        inputtype: "rtdatepicker",
+        title: "任职止期",
         clearable: true,
       },
     ],
@@ -108,9 +196,11 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+const selectedRows = ref<any[]>([]);
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    showSelection: true,
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -118,11 +208,32 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         // icon: "Plus",
         func: function () {
-          dzmodal.open(undrEdit, { type: "add", data: {} }).then((res) => {
+          dzmodal.open(undrDtyEdit, { type: "add", data: {} }).then((res) => {
             if (res.type === "ok") {
               handleQuery();
             }
           });
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "导出",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "Excel导入",
+        type: "primary",
+        func: () => {},
+      }),
+      createFreeButtonBase({
+        id: "score",
+        label: "模板下载",
+        type: "primary",
+        func: () => {
+          const params = freeEditRef.value?.getFromValue();
+          expExcelUndrDty(params).then((res) => {});
         },
       }),
     ],
@@ -134,7 +245,7 @@ const tableconfig = reactive<AppTableConfig>(
         id: "score",
         link: true,
         tooltip: "删除",
-        type: "success",
+        type: "danger",
         size: "large",
         icon: "Delete",
         tableClick: (row) => {
@@ -142,7 +253,7 @@ const tableconfig = reactive<AppTableConfig>(
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
-                ElMessage.success("删除成功");
+                ElMessage.success(msg);
                 handleQuery();
               } else {
                 ElMessage.error(msg);
@@ -162,25 +273,38 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cDptCde",
         inputtype: "rtinput",
         title: "核保任职机构",
+        // typeCode: "KIND_LIST_CACHE",
+        // codeParam: { codeListParam: "" },
       },
       {
         prop: "cProdNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "产品",
+        typeCode: "PROD_LIST_GRT",
+        // typeCode: "KIND_LIST_CACHE",
+        codeParam: {
+          cParCde: "",
+          cOperId: user.value.opCde,
+          cDptCde: user.value.companyId,
+        },
       },
       {
         prop: "cUndrClsCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "核保人级别",
+        typeCode: "UNDR_CLS_CDE",
+        codeParam: {},
+        // typeCode: "KIND_LIST_CACHE",
+        // codeParam: { codeListParam: "" },
       },
       {
         prop: "tDutyStrtTm",
-        inputtype: "rtdatetime",
+        inputtype: "rtdatepicker",
         title: "任职起期",
       },
       {
         prop: "tDutyEndTm",
-        inputtype: "rtdatetime",
+        inputtype: "rtdatepicker",
         title: "任职止期",
       },
     ],
@@ -207,7 +331,28 @@ const exRules = {
     }
   },
 };
-
+function handleSelectionChange(rows: any[]) {
+  selectedRows.value = rows;
+}
+function delSelectedUndrty(params: type) {
+  if (!selectedRows.value.length) {
+    ElMessage.error("请选择要删除的数据");
+  } else {
+    const param = selectedRows.value.map((item) => item.cPkId).join(",");
+    let arrData = param.split(",");
+    delSelectedUndrDtyInfo({ undrDtyPkIds: arrData })
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          ElMessage.success("删除成功");
+          handleQuery();
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
+  }
+}
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
@@ -225,6 +370,24 @@ function handleQuery(flag?: boolean) {
       }
     })
     .finally(() => {});
+}
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
 }
 </script>
 

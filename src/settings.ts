@@ -1,5 +1,5 @@
 const defaultSettings: AppSettings = {
-  title: "财险承保系统",
+  title: "财产险承保系统",
   version: "v1.0.1",
   showSettings: true,
   tagsView: true,
@@ -9,7 +9,7 @@ const defaultSettings: AppSettings = {
   theme: "light",
   size: "default",
   language: "zh-cn",
-  themeColor: "#FF8C00",
+  themeColor: "#3a76c6",
   watermarkEnabled: true,
   watermarkContent: "vue3-element-admin",
 };

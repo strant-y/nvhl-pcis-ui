@@ -2,7 +2,7 @@
 
 .app-container {
   padding: 6px;
-  margin-bottom: 80px
+  // margin-bottom: 80px
 }
 
 .app-button-margin5 {
@@ -11,14 +11,18 @@
 
 .table-container > .el-card__header {
   padding: calc(var(--el-card-padding) - 12px) var(--el-card-padding);
-  background-color: var(--el-card-header-bg-color);
 }
 
 .table-container{
   margin-bottom: 6px;
   margin-top: 6px;
 }
-
+// 文字过多省略
+.text-ellipsis {
+  text-align: center; /* 文本居中 */
+  overflow: hidden; /* 防止内容溢出 */
+  text-overflow: ellipsis; /* 超出部分用省略号表示 */
+}
 
 // 查询组件样式
 .search-container {
@@ -98,4 +102,61 @@
 .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner:after{
   border-color: #555 !important;
 }
+
+.re-quired-flag .el-input__wrapper{
+  background-color: var(--wrapper-required-bg-color);
+}
+
+.re-quired-flag .el-select__wrapper{
+  background-color: var(--wrapper-required-bg-color);
+}
+.el-form-item__error{
+  position: initial !important;
+}
+
+.form-item-change .el-input__wrapper{
+  border: 1px solid #e32828 !important;
+}
+.form-item-change .el-select__wrapper{
+  border: 1px solid #e32828 !important;
+}
+.form-item-unchange .el-input__wrapper{
+  border: 1px solid transparent !important;
+}
+.form-item-unchange .el-select__wrapper{
+  border: 1px solid transparent !important;
+}
+
+
+.width-100 {
+  width: 100%;
+}
+
+// 全局卡片样式
+.card_container{
+  .card-title-style {
+    font-size: var(--card-header-title-size);
+    color: var(--card-header-title-color);
+    font-weight: 550;
+  }
+  .right-arrow_text {
+    font-size: var(--rt-form-content-font-size);
+    color: var(--el-text-color);
+  }
+  margin-bottom: 5px;
+}
+
+.free_container{
+
+}
+
+.grid_container{
+
+}
+
+.table_container{
+
+}
+
+
 

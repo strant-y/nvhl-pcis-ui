@@ -1,45 +1,43 @@
 <!--核保人批量配置-业务员-员工信息--->
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
-    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
-    <app-table
-      :tableConfig="tableconfig"
-      v-model:pageresult="pageresult"
-      ref="tableRef"
-      @page-change="handleQuery(false)"
-      @selection-change="handleSelectionChange"
-    />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="handleSave">保存</el-button>
-      </span>
-    </template>
-  </el-dialog>
+  <div>
+    <el-dialog v-model="dialogVisible" title="" width="80%">
+      <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+      <app-table
+        :tableConfig="tableconfig"
+        v-model:pageresult="pageresult"
+        ref="tableRef"
+        @page-change="handleQuery(false)"
+      />
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
+const dialog = ref<DialogMethod | null>(null);
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 import { useRoute } from "vue-router";
 import { createFreeButtonBase } from "@/shared/button-config";
-// const publicProblem = defineAsyncComponent(() => import("./PublicProblem.vue"));
+import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -50,13 +48,12 @@ import { ref, reactive } from "vue";
 import { saveRiskInfo } from "@/api/prod";
 
 const props = defineProps<{
-  visible: boolean;
+  data: {
+    type: Object;
+    default: () => {};
+  };
 }>();
-
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-  (e: "save"): void;
-}>();
+const emit = defineEmits(["row-click"]);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
@@ -64,51 +61,63 @@ const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "业务员-员工信息",
     endBtnsPosition: "right",
-    // endBtns: [
-    //   createFreeButtonBase({
-    //     type: "primary",
-    //     label: "选择产品",
-    //     func: () => {
-    //       save();
-    //     },
-    //   }),
-    // ],
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "查询",
+        func: async () => {
+          const isValid = await freeEditRef.value?.validate();
+          if (!isValid) return false;
+          handleQuery();
+        },
+      }),
+      createFreeButtonBase({
+        label: "重置",
+        func: () => {
+          freeEditRef.value?.resetFields();
+        },
+      }),
+    ],
     fromSchema: [
       {
-        prop: "CDptCde",
-        inputtype: "rtselect",
+        prop: "cEmpCde",
+        inputtype: "rtinput",
         title: "员工代码",
       },
       {
-        prop: "cPlanCn",
-        inputtype: "rtselect",
+        prop: "cEmpCnm",
+        inputtype: "rtinput",
         title: "员工名称",
+        // rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cPlanCn",
+        prop: "dptCde",
         inputtype: "rtselect",
         title: "员工所属机构",
+        // rules: [getRules("required", { change: true })],
+        showExBtn: true,
+        btnItems: {
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            dzmodal.open(DepartmentTree, {}).then((res) => {
+              if (res.body) {
+                const selectObj = res.body;
+                let obj = {
+                  loadData: [
+                    {
+                      label: selectObj.name,
+                      value: selectObj.id,
+                    },
+                  ],
+                };
+                freeEditRef.value?.setValue("dptCde", selectObj.id);
+              }
+            });
+          },
+        },
+        clearable: true,
       },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtselect",
-      //   title: "核保任职级别",
-      // },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtdatetimepicker",
-      //   title: "任职起期",
-      // },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtdatetimepicker",
-      //   title: "任职止期",
-      // },
-      // {
-      //   prop: "cPlanCn",
-      //   inputtype: "rtcheckbox",
-      //   title: "核保提醒",
-      // },
     ],
     fromUi: createFromUiConfig({
       cols: 3,
@@ -132,10 +141,6 @@ const handleSave = async () => {
 
 const handleCancel = () => {
   dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 
 const tableRef = ref<AppTableMethod | null>(null);
@@ -174,27 +179,32 @@ const tableconfig = reactive<AppTableConfig>(
     //   }),
     // ],
     fromSchema: [
+      // {
+      //   prop: "cBsnsTyp",
+      //   title: "编号",
+      //   inputtype: "rtinput",
+      // },
       {
-        prop: "cBsnsTyp",
-        title: "编号",
-        inputtype: "rtinput",
-      },
-      {
-        prop: "cChaType",
+        prop: "cEmpCde",
         title: "员工代码",
         inputtype: "rtinput",
       },
       {
-        prop: "cChaSubtype",
+        prop: "cEmpCnm",
         title: "员工名称",
         inputtype: "rtinput",
       },
       {
-        prop: "cChaCde",
+        prop: "cDptCde",
         title: "所属机构",
         inputtype: "rtselect",
       },
     ],
+    rowDbClickFun(rowData) {
+      emit("ok", rowData);
+      dialogVisible.value = false;
+      // props.data.method?.getdbClickData(rowData);
+    },
   })
 );
 /** 查询 */
@@ -202,17 +212,16 @@ function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getCvrgRiskRelList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
+  codeListStore
+    .queryCodeList({
+      codeListName: "Sales_Emp_Qry_List",
+      codeListParam: param,
     })
-    .finally(() => {});
+    .then((res) => {
+      if (res.length) {
+        pageresult.list = res;
+      }
+    });
 }
 </script>
 

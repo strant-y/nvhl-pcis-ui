@@ -2,16 +2,18 @@ import router from "@/router";
 import { useUserStore } from "@/store/modules/user";
 import { usePermissionStore } from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
-import {codeListViewStore} from "@/store";
+import {clearDataOpertaorByPageKey, codeListViewStore, useTagsViewStore} from "@/store";
+import { descryptParameterToQuery } from '@/utils/common'
 
 export function setupPermission() {
   // 白名单路由
   const whiteList = ["/login"];
-  // 加密标志位
-  const isEncrypted = ref<Boolean>(false);
 
   router.beforeEach(async (to, from, next) => {
     NProgress.start();
+       // 设置页面标题
+    // setPageTitle(to);
+
     const hasToken = sessionStorage.getItem("token");
     if (hasToken) {
       if (to.path === "/login") {
@@ -24,40 +26,20 @@ export function setupPermission() {
         if (hasRoles) {
           // 未匹配到任何路由，跳转404
           if (to.matched.length === 0) {
-            if(to.href){
+            if (to.href) {
               next(from);
-            }else if(from.name) {
+            } else if (from.name) {
               ElMessage.error('无权限访问！');
-              next({name: from.name})
-            }else {
+              next({ name: from.name })
+            } else {
               next("/404");
             }
           } else {
-            // Encrypt route parameters 路由参数加密
-            const query = to.query;
-            if (!isEncrypted.value && to.query && Object.keys(to.query).length > 0) {
-              isEncrypted.value = true;
-              if(!!query.encrypted && query.encrypted === '1'){ // 页面刷新
-                nextTick(() => {
-                  router.push({ path: to.fullPath, query: query});
-                });
-              }else {
-                for (const key in query) {
-                  if (Object.prototype.hasOwnProperty.call(query, key)) {
-                    if(!!query[key] && key !== 'encrypted') {
-                      to.query[key] = encodeURI(query[key]);
-                    }
-                  }
-                }
-                if(Object.keys(query).length > 0) {
-                  query['encrypted'] = '1';
-                  next({path: to.path , query: query});
-                }
-              }
-            }else {
-              isEncrypted.value = false;
-              next();
+            const switchType = sessionStorage.getItem('switchType');
+            if(!switchType || switchType === 'push') {
+              clearDataOpertaorByPageKey(to.name);
             }
+            next();
           }
         } else {
           const permissionStore = usePermissionStore();
@@ -78,9 +60,20 @@ export function setupPermission() {
           }
         }
       }
-    } else {  
+    } else {
+      const query = to.query;
+
+      if (!!query['token']) {
+        sessionStorage.setItem("token", "Bearer " + query['token']); // Bearer eyJhbGciOiJIUzI1NiJ9.xxx.xxx
+
+        const userStore = useUserStore();
+        const getCaptchaParam = ref({});
+        Object.assign(getCaptchaParam.value, { token: query['token'] });
+        await userStore.resolveToken(getCaptchaParam.value);
+        next({ ...to, replace: true });
+      }
       // 未登录可以访问白名单页面
-      if (whiteList.indexOf(to.path) !== -1) {
+      else if (whiteList.indexOf(to.path) !== -1) {
         next();
       } else {
         next(`/login`);
@@ -89,19 +82,42 @@ export function setupPermission() {
     }
   });
 
+  // 独立的标题设置函数
+  const setPageTitle = (to) => {
+    let title = "";
+    // 1. 优先从query参数中获取动态标题
+    if (to.query && to.query.title) {
+      title = to.query.title;
+    }
+    // 2. 其次使用路由配置中的meta.title
+    else if (to.meta && to.meta.title) {
+      title = to.meta.title;
+    }
+    // 3. 使用默认标题
+    else {
+      title = "默认标题";
+    }
+
+    // 设置浏览器标题
+    // document.title = title;
+
+    // 如果需要更新标签页标题，在这里处理
+    const tagsViewStore = useTagsViewStore();
+    if (to.meta.title && tagsViewStore.currentTag && tagsViewStore.currentTag.path === to.path) {
+      tagsViewStore.updateTagTitle(to.path, title);
+    }
+  };
+
+
   router.afterEach((to) => {
     // Decrypt route parameters 路由参数解密
     if (to.query) {
-      for (const key in to.query) {
-        if (Object.prototype.hasOwnProperty.call(to.query, key)) {
-          const keyData = decodeURI(to.query[key]);
-          to.query[key] = keyData;
-          if(!!keyData && key !== 'encrypted') {
-            to.params[key] = JSON.parse(keyData);
-          }
-        }
-      }
+      const {JMquery, ParseParams} = descryptParameterToQuery(to.query);
+      to.query = JMquery
+      to.params = ParseParams
     }
+    sessionStorage.removeItem('switchType');
     NProgress.done();
   });
+
 }

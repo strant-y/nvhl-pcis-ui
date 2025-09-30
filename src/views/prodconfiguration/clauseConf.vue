@@ -20,11 +20,12 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const clauseConfAdd = defineAsyncComponent(
-  () => import("../pcis/prodRef/clauseConfRef/ClauseConfAdd.vue")
+  () => import("@/pcis/prodRef/clauseConfRef/ClauseConfAdd.vue")
 );
 import {
   AppTableConfig,
@@ -35,9 +36,11 @@ import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import { qryProdTermList, delTermById } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
+import { descryptParameter, encryptParameter } from "@/utils/encipher";
+
 const route = useRoute();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
@@ -67,8 +70,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "险类代码",
-        typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
       },
       {
         prop: "cTermNo",
@@ -85,7 +88,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "启用标识",
         codeType: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
       },
     ],
     fromUi: createFromUiConfig({
@@ -147,7 +150,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           delTermById(row)
-            .then((res) => {
+            .then((res: any) => {
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success("删除成功");

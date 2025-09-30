@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title=""
-    width="80%"
-    @update:model-value="handleVisibleUpdate"
-  >
+  <el-dialog v-model="dialogVisible" title="" width="80%">
     <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
     <template #footer>
       <span class="dialog-footer">
@@ -24,8 +19,9 @@ import {
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-import { saveProdEdrRsnInfo } from "@/api/prod"; // api接口
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+import { saveProdEdrRsnInfo, getProdEdrRsnInfo } from "@/api/prod"; // api接口
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const props = defineProps<{
@@ -43,10 +39,10 @@ const formconfig = reactive<AppFreeEditConfig>(
     endBtnsPosition: "right",
     fromSchema: [
       {
-        prop: "CKindNo",
+        prop: "cKindNo",
         inputtype: "rtselect",
-        typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
         title: "产品大类",
         rules: [getRules("required", { change: true })],
       },
@@ -74,14 +70,14 @@ const formconfig = reactive<AppFreeEditConfig>(
           { value: "4", label: "变更保险期限" },
           { value: "5", label: "批改分期" },
         ],
-        defaultValue: "1",
+        defaultValue: "2",
       },
       {
         prop: "cNmeEn",
         inputtype: "rtselect",
         title: "是否计算保费",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -89,7 +85,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否团单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -97,7 +93,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "是否个单",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "yes_no" },
+        codeParam: { cParCde: "yes_no" },
         rules: [getRules("required", { change: true })],
       },
       {
@@ -105,11 +101,11 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "启用标志",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cDesc",
+        prop: "cRsnTxt",
         inputtype: "rtinput",
         type: "textarea",
         btnWidth: 20,
@@ -141,18 +137,21 @@ const handleSave = async () => {
   }
 };
 onMounted(async () => {
-  if (props.type === "edit" && props.data) {
-    setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data);
-    }, 50);
+  if (props.type === "edit") {
+    getProdEdrRsnInfo({ cPkId: props.data.cPkId })
+      .then((res) => {
+        const { code, data, msg } = res;
+        if (200 === code) {
+          freeEditRef.value?.setFormValue(data);
+        } else {
+          ElMessage.error(msg);
+        }
+      })
+      .finally(() => {});
   }
 });
 const handleCancel = () => {
   dialogVisible.value = false;
-};
-
-const handleVisibleUpdate = (value: boolean) => {
-  emit("update:visible", value);
 };
 </script>
 

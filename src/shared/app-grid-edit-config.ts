@@ -1,6 +1,7 @@
 import { FreeButtonBase } from "./button-config";
 
 export interface AppGridEditConfig {
+  fromType?: "grid" | "free" | "custom" | null | undefined;
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
   production?: boolean; //标题是否显示tooltip
@@ -25,6 +26,7 @@ export interface AppGridEditConfig {
   showSelection?: boolean; //是否显示多选列
 
   dragFlag?: boolean; // mytable模式下,是否可以拖动
+  rowDbClickFun?: (rowData) => void;
 }
 
 export interface AppGridEditMethod {
@@ -33,14 +35,30 @@ export interface AppGridEditMethod {
   validate: () => any;
   getTableValue: () => any;
   addRow: () => any;
+  delRow: (editIndex) => any;
+  addRowByData: (rowData) => any;
   getSelectRow: () => any;
   tableExvalidate: () => any;
+  setDisabledAll: (isDisabled: boolean) => void;
+  setFormSchema: (rowId: string, props: any, schama: any, value: any) => void;
+  setValueByRowKey:(props:string ,rowId: any, value:any) => void;
+  getRowById:(rowId: string) => void;
+  setRowFieldProp: (rowId: string, field: string, prop: string, value: any) => void,
+  getFormBtn: () => any;
+  getTableBtn: () => any;
+  getCodeListMap: () => any;
+  setCodeListMap: (map: any) => void;
+  addCodeListMap: (data: any) => void;
+  getRowAllItemRefById: (rowId: string) => any;
+  spliceTableData: (index: number, delCount: number, list: any[]) => any[];
+  addProvide: <T> (key: InjectionKey<T> | string, value: T) => void;
 }
 
 export function createAppGridEditConfig(
   config: AppGridEditConfig = {}
 ): AppGridEditConfig {
   return {
+    fromType: 'grid',
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
     showBtn: config.showBtn || true,
@@ -64,6 +82,7 @@ export function createAppGridEditConfig(
     showSelection: config.showSelection || false,
     fromUi: createGridFromUiConfig(config.fromUi),
     dragFlag: config.dragFlag || false,
+    rowDbClickFun: config.rowDbClickFun || null,
   };
 }
 

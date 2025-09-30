@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ref, defineProps } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
@@ -55,7 +55,7 @@ import { v4 as uuidv4 } from "uuid";
 import { max } from "lodash";
 
 const jsonArrayEdit = defineAsyncComponent(
-  () => import("@/views/dzmodel/jsonArrayEdit.vue")
+  () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 
 const showBtnConfig = ref(false);
@@ -107,8 +107,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "大类代码",
-        typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
         clearable: true,
         rules: [getRules("required", {})],
       },
@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "启用标志",
         rules: [getRules("required", {})],
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
       },
     ],
   })
@@ -185,7 +185,7 @@ function save() {
           const { code, data, msg } = res;
           if (200 === code) {
             emits("ok", {});
-            ElMessage.success("保存成功");
+            ElMessage.success(msg);
             dialogVisible.value = false;
           } else {
             ElMessage.error(msg);

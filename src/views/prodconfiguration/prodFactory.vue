@@ -33,9 +33,9 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { getProFactoryList, changeStatus } from "@/api/prod";
+import { getProFactoryList, changeStatus, auditSubmit, releaseAllPage } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { DialogMethod } from "../dzmodel/ComDialogConf";
+import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -61,9 +61,25 @@ const formconfig = reactive<AppFreeEditConfig>(
         label: "重置",
         icon: "RefreshRight",
         func: () => {
-          freeEditRef.value?.setFormValue({});
-          console.log("After reset:", freeEditRef.value.getFromValue());
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cProdNo: "",
+            cNmeCn: "",
+            cStatus: "",
+            cAuditStatus: "",
+          });
           handleQuery();
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "全产品组件更新",
+        func: async () => {
+          releaseAllPage({}).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success('全量发布成功');
+            }
+          })
         },
       }),
     ],
@@ -73,8 +89,8 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         placeholder: "产品大类",
         title: "产品大类",
-        typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
         clearable: true,
       },
       {
@@ -98,7 +114,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         placeholder: "启用标识",
         title: "启用标识",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         clearable: true,
       },
       {
@@ -106,7 +122,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "审核状态",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "PROD_AUDIT_STATUS" },
+        codeParam: { cParCde: "PROD_AUDIT_STATUS" },
         clearable: true,
       },
     ],
@@ -139,7 +155,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
-        id: "score",
+        id: "edit",
         tooltip: "编辑",
         link: true,
         type: "success",
@@ -158,7 +174,28 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
       createFreeButtonBase({
-        id: "score",
+        id: "check",
+        tooltip: "提交审核",
+        link: true,
+        type: "primary",
+        icon: "Check",
+        disabled: (row) =>
+          row.cAuditStatus === "audit" || row.cAuditStatus === "submit",
+        tableClick: async (row) => {
+          await auditSubmit({
+            cProdNo: row.cProdNo,
+            cStatus: row.cStatus,
+            cAuditStatus: "submit",
+          }).then((res) => {
+            if (res.code === 200) {
+              ElMessage.success(res.data.message);
+              handleQuery();
+            }
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "copy",
         iconColor: "#02D05F",
         tooltip: "复制",
         icon: "DocumentCopy",
@@ -172,8 +209,10 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "大类编号",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
       },
       {
         prop: "cKindNme",
@@ -206,6 +245,16 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
+        func: async (val, row) => {
+          await changeStatus({
+            cProdNo: row.cProdNo,
+            cStatus: val,
+          }).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
+        },
       },
       {
         prop: "cAuditStatus",
@@ -213,14 +262,19 @@ const tableconfig = reactive<AppTableConfig>(
         title: "审核状态",
         loadData: [
           {
-            label: "审核通过",
+            label: "已提交",
             value: "submit",
-            color: "#FF6600",
+            color: "#67C23A",
           },
           {
-            label: "未审核",
+            label: "未提交",
             value: "unsubmit",
             color: "#14CCCC",
+          },
+          {
+            label: "已审核",
+            value: "audit",
+            color: "##409EFF",
           },
         ],
       },
@@ -257,7 +311,6 @@ function copy(cProdNo: string) {
     { title: "产品复制确认" }
   );
 }
-
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据

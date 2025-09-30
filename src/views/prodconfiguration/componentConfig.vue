@@ -2,36 +2,51 @@
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    
-    <el-affix style="right: 25px; position: fixed;z-index: 1000;" v-if="compareList?.length > 0">
-      <div style="border: 2px dashed var(--el-border-color);width: 150px;background-color: var(--el-border-color-extra-light);">
+
+    <el-affix
+      style="right: 25px; position: fixed; z-index: 1000"
+      v-if="compareList?.length > 0"
+    >
+      <div
+        style="
+          border: 2px dashed var(--el-border-color);
+          width: 150px;
+          background-color: var(--el-border-color-extra-light);
+        "
+      >
         <el-row style="margin: 5px">
           <template v-for="item in compareList" :key="item.cComponentKey">
-              <el-col :span="21">
-                <el-text type="primary">{{item.cComponentName}}</el-text>
-              </el-col>
-              <el-col :span="2" style="align-items: center;">
-                <rtIcon style="margin-top: 4px;" 
-                    :item="{
-                      icon: 'CloseBold',
-                      iconColor: '#8b8b8b',
-                      func: () => {
-                        // 从compareList中删除该元素
-                        compareList = compareList.filter(t => t.cComponentKey !== item.cComponentKey);
-                      }
-                    }"
-                />
-              </el-col>
+            <el-col :span="21">
+              <el-text type="primary">{{ item.cComponentName }}</el-text>
+            </el-col>
+            <el-col :span="2" style="align-items: center">
+              <rtIcon
+                style="margin-top: 4px"
+                :item="{
+                  icon: 'CloseBold',
+                  iconColor: '#8b8b8b',
+                  func: () => {
+                    // 从compareList中删除该元素
+                    compareList = compareList.filter(
+                      (t) => t.cComponentKey !== item.cComponentKey
+                    );
+                  },
+                }"
+              />
+            </el-col>
           </template>
-          <el-col :span="2">
-          </el-col>
+          <el-col :span="2"> </el-col>
           <el-col :span="13">
-            <el-button type="info" size="small" @click=" compareList = [] ">清空</el-button>
+            <el-button type="info" size="small" @click="compareList = []"
+              >清空</el-button
+            >
           </el-col>
           <el-col :span="9">
-            <el-button type="primary" size="small" @click="showCompare">比较</el-button>
+            <el-button type="primary" size="small" @click="showCompare"
+              >比较</el-button
+            >
           </el-col>
-          </el-row>
+        </el-row>
       </div>
     </el-affix>
     <app-table
@@ -42,7 +57,6 @@
     />
 
     <comDialog ref="dialog"></comDialog>
-
   </div>
 </template>
 
@@ -59,8 +73,8 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
-import { DialogMethod } from "../dzmodel/ComDialogConf";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 import {
   AppTableConfig,
   AppTableMethod,
@@ -70,17 +84,15 @@ import {
   getComponentViewByKey,
   getComponentList,
   querySelectorList,
+  releaseByComptype,
 } from "@/api/prod";
-const dzmodal = useDzModal();
 
-const componentEdit = defineAsyncComponent(() => import("./componentEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
 const dialog = ref<DialogMethod | null>(null);
 const compareList = ref<any>([]);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "组件配置",
-    production: true,
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -94,17 +106,53 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {},
       }),
+      createFreeButtonBase({
+        label: "根据tab全量更新组件",
+        type:'success',
+        func: () => {
+          const k = freeEditRef.value?.getValue('cComponentTab');
+          if(!k){
+            ElMessage.error('请选择要更新的组件tab!');
+            return ;
+          }
+          
+
+          ElMessageBox.confirm(
+            '确认是否执行组件'+k+'的全量更新吗?',
+            '提示',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'info',
+            }
+          ).then(() => {
+            releaseByComptype({
+              cComponentCode: k,
+            }).then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("更新成功");
+              }else{
+                console.log(res);
+                ElMessage.error("更新失败");
+              }
+            });
+          })
+        },
+      }),
     ],
     fromSchema: [
       {
         prop: "componentId",
         inputtype: "rtinput",
         title: "组件主键",
+        clearable: true,
       },
       {
         prop: "componentName",
         inputtype: "rtinput",
         title: "组件名称",
+        clearable: true,
       },
       {
         prop: "cComponentTab",
@@ -134,17 +182,24 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         icon: "Plus",
         func: function () {
-          dzmodal.open(componentEdit, { type: "add", data: {} }).then((res) => {
-            console.log(res);
-            if (res.type === "ok") {
-              handleQuery();
-            }
-          });
+          dialog.value?.open(
+            "componentEdit",
+            { type: "add", data: {} },
+            {
+              isOk: (res: any) => {
+                console.log(res);
+                if (res.type === "ok") {
+                  handleQuery();
+                }
+              },
+            },
+            { title: "新增组件",draggable :false }
+          );
         },
       }),
     ],
     tableBtnType: "btn",
-    tableBtnWidth: 220,
+    tableBtnWidth: 250,
     tableBtnPosition: "right",
     tableBtn: [
       createFreeButtonBase({
@@ -155,16 +210,23 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Edit",
         tableClick: (row) => {
-          dzmodal
-            .open(componentEdit, {
+
+          dialog.value?.open(
+            "componentEdit",
+            {
               type: "edit",
               data: { componentKey: row.cComponentKey },
-            })
-            .then((res) => {
-              if (res.type === "ok") {
-                handleQuery();
-              }
-            });
+            },
+            {
+              isOk: (res: any) => {
+                console.log(res);
+                if (res.type === "ok") {
+                  handleQuery();
+                }
+              },
+            },
+            { title: "编辑组件",draggable :false }
+          );
         },
       }),
       createFreeButtonBase({
@@ -201,17 +263,50 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "menu",
         link: true,
         tableClick: (row: any) => {
-          if(compareList.value.length < 2){
-            const com = compareList.value.find((item: any) => item.cComponentKey === row.cComponentKey);
-            if(!com){
+          if (compareList.value.length < 2) {
+            const com = compareList.value.find(
+              (item: any) => item.cComponentKey === row.cComponentKey
+            );
+            if (!com) {
               compareList.value.push(row);
             }
-          }else{
+          } else {
             ElMessage({
-              message: '仅支持同时两个组件的对比',
-              type: 'warning',
-            })
+              message: "仅支持同时两个组件的对比",
+              type: "warning",
+            });
           }
+        },
+      }),
+      createFreeButtonBase({
+        id: "refresh",
+        tooltip: "组件刷新",
+        icon: "Refresh",
+        link: true,
+        tableClick: (row: any) => {
+          console.log(row);
+          ElMessageBox.confirm(
+            '确认是否执行组件'+row.cComponentName+'的更新操作吗?',
+            '提示',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'info',
+            }
+          ).then(() => {
+            releaseByComptype({
+              cComponentCode: row.cComponentTab,
+              cComponentKey: row.cComponentKey,
+            }).then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("更新成功");
+              }else{
+                console.log(res);
+                ElMessage.error("更新失败");
+              }
+            });
+          })
         },
       }),
     ],
@@ -245,7 +340,7 @@ function showView(type: string, cComponentKey: any) {
     if (200 === code) {
       dialog.value?.open(
         "componentView",
-        { type: type, data: data?.data, conKey: cComponentKey },
+        { type: type, data: data, conKey: cComponentKey },
         {
           isOk: () => {
             handleQuery();
@@ -258,34 +353,33 @@ function showView(type: string, cComponentKey: any) {
 }
 
 async function showCompare() {
-  if(compareList.value.length != 2){
+  if (compareList.value.length != 2) {
     ElMessage({
-      message: '2个组件才能进行对比',
-      type: 'warning',
-    })
-    return ;
+      message: "2个组件才能进行对比",
+      type: "warning",
+    });
+    return;
   }
   const comList = compareList.value.map((item: any) => {
     return item.cComponentKey;
   });
   getComponentViewByKey({
     componentKeys: comList,
-  }).then((res) => {
+  }).then((res: any) => {
     const { code, data, msg } = res;
     if (200 === code) {
       dialog.value?.open(
         "componentCompare",
-        { type: 'compare', data: data?.data },
+        { type: "compare", data: data },
         {
           isOk: () => {
             handleQuery();
           },
         },
-        { title: '组件对比', width:'95' }
+        { title: "组件对比", width: "95" }
       );
     }
   });
-  
 }
 
 // 绑定方法
@@ -313,11 +407,11 @@ function handleQuery(type?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
   getComponentList(param)
-    .then((res) => {
+    .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.data;
-        pageresult.total = data.total;
+        pageresult.list = data;
+        pageresult.total = res.total;
       } else {
         ElMessage.error(msg);
       }

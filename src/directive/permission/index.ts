@@ -37,7 +37,6 @@ export const hasPerm: Directive = {
 export const hasRole: Directive = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
     const { value } = binding;
-
     if (value) {
       const requiredRoles = value; // DOM绑定需要的角色编码
       const { roles } = useUserStoreHook().user;

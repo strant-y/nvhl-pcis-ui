@@ -41,7 +41,7 @@
       <Settings v-if="defaultSettings.showSettings" />
     </div>
     <div>
-      <CopyRight />
+    <!-- <CopyRight v-if="route.name === 'Dashboard'" /> -->
     </div>
   </div>
 </template>
@@ -49,6 +49,8 @@
 <script setup lang="ts">
 import { useAppStore, useSettingsStore, usePermissionStore } from "@/store";
 import defaultSettings from "@/settings";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const appStore = useAppStore();
 const settingsStore = useSettingsStore();
@@ -119,16 +121,81 @@ const handleScroll = () => {
   }
 };
 
+
+// 设备像素比和缩放比例
+const pixelRatio = ref(window.devicePixelRatio || 1);
+const scaleRatio = ref(pixelRatio.value);
+
+// 原始基准值（与CSS变量初始值对应）
+const baseStyles = {
+  menuTextSize: 13,
+  cardTitleSize: 15,
+  cardGroupHeaderTitleSize: 14,
+  contentFontSize: 12,
+  contentFontWeight: 450,
+  contentHeight: 24,
+  contentLineHeight: 24,
+  labelFontSize: 12,
+  labelFontWeight: 400
+};
+
+// 根据设备像素比更新CSS变量
+const updateStylesByPixelRatio = (ratio: number) => {
+  const root = document.documentElement;
+  if(ratio <= 1.4) ratio = 0;
+  // 计算缩放后的值（可根据需求调整计算逻辑）
+  const scaled = {
+    menuTextSize: baseStyles.menuTextSize - ratio * 0.2,
+    cardTitleSize: baseStyles.cardTitleSize - ratio * 1.1,
+    cardGroupHeaderTitleSize: baseStyles.cardGroupHeaderTitleSize - ratio * 1.1,
+
+    contentFontSize: baseStyles.contentFontSize - ratio,
+    contentHeight: baseStyles.contentHeight - ratio * 1.1,
+    contentLineHeight: baseStyles.contentLineHeight - ratio * 1.1,
+    labelFontSize: baseStyles.labelFontSize - ratio  * 1.1,
+  };
+
+  root.style.setProperty('--menu-text-size', `${scaled.menuTextSize}px`);
+  root.style.setProperty('--card-header-title-size', `${scaled.cardTitleSize}px`);
+  root.style.setProperty('--card-group-header-title-size', `${scaled.cardGroupHeaderTitleSize}px`);
+
+  root.style.setProperty('--rt-form-content-font-size', `${scaled.contentFontSize}px`);
+  root.style.setProperty('--rt-form-content-font-weight', baseStyles.contentFontWeight + "");
+  root.style.setProperty('--rt-form-content-height', `${scaled.contentHeight}px`);
+  root.style.setProperty('--rt-form-content-line-height', scaled.contentLineHeight + "px");
+  root.style.setProperty('--rt-form-label-font-size', `${scaled.labelFontSize}px`);
+  root.style.setProperty('--rt-form-label-font-weight', baseStyles.labelFontWeight + "");
+};
+
+// 处理窗口大小变化
+const handleResize = () => {
+  // 延迟更新，避免频繁触发
+  const timer = setTimeout(() => {
+    const newRatio = window.devicePixelRatio || 1;
+    if (newRatio !== pixelRatio.value) {
+      pixelRatio.value = newRatio;
+      scaleRatio.value = newRatio;
+      updateStylesByPixelRatio(newRatio);
+    }
+    clearTimeout(timer);
+  }, 300);
+};
+
 onMounted(() => {
   if (showTagsView.value) {
     window.addEventListener("scroll", handleScroll);
   }
+  // 初始设置
+  updateStylesByPixelRatio(pixelRatio.value);
+  // 监听窗口大小变化（可能影响像素比）
+  window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
   if (showTagsView.value) {
     window.removeEventListener("scroll", handleScroll);
   }
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 
@@ -160,10 +227,14 @@ onUnmounted(() => {
 }
 
 .main-container {
-  position: relative;
-  min-height: 100%;
+  // position: relative;
+  // min-height: 100%;
   margin-left: $sidebar-width;
   transition: margin-left 0.28s;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .layout-top {
@@ -188,6 +259,7 @@ onUnmounted(() => {
     :deep(.el-menu--horizontal) {
       height: $navbar-height;
       line-height: $navbar-height;
+      font-size: $menu-text-size;
     }
 
     :deep(.el-menu--collapse) {
@@ -196,7 +268,7 @@ onUnmounted(() => {
   }
 
   .main-container {
-    min-height: calc(100vh - $navbar-height);
+    // min-height: calc(100vh - $navbar-height - 60px );
     padding-top: $navbar-height;
     margin-left: 0;
   }
@@ -217,6 +289,10 @@ onUnmounted(() => {
     :deep(.el-menu--horizontal) {
       height: $navbar-height;
       line-height: $navbar-height;
+
+      span {
+        font-size: 10px !important;
+      }
     }
 
     :deep(.el-menu--horizontal.el-menu) {
@@ -247,8 +323,8 @@ onUnmounted(() => {
         align-items: center;
         justify-content: center;
         width: 99%;
-        height: 50px;
-        line-height: 50px;
+        height: 45px;
+        line-height: 45px;
         box-shadow: 0 0 6px -2px var(--el-color-primary);
 
         div:hover {

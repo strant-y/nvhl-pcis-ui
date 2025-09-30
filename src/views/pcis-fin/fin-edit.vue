@@ -1,0 +1,484 @@
+<template>
+  <el-dialog v-model="dialogVisible" width="90%" title="账户信息修改">
+    <div>
+      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+      <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+        @page-change="handleQuery(false)" />
+      <!-- <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
+        <rt-button :item="{
+          type: 'primary',
+          label: '保存',
+          func: () => {
+            save();
+          },
+        }" />
+      </div> -->
+    </div>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { useValidator } from "@/typings/useValidator";
+import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
+import { ref, defineProps, defineEmits, onMounted } from "vue";
+import { createFreeButtonBase } from "@/shared/button-config";
+import {
+  AppFreeEditConfig,
+  AppFreeEditMethod,
+  createAppFreeEditConfig,
+} from "@/shared/app-free-edit-config";
+import {
+  AppTableConfig,
+  createTableEditConfig,
+  MyTableMethod,
+} from "@/shared/app-table-config";
+import { FinService } from './service/fin.service';
+import { useUserStore } from "@/store/modules/user";
+import { cloneDeep } from "lodash-es";
+const userStore = useUserStore();
+const user = ref(userStore.user);
+const finService = new FinService();
+const props = defineProps({
+  data: Object,
+  type: String,
+});
+const { getRules } = useValidator();
+const emits = defineEmits(["ok", "cancel"]);
+import { v4 as uuidv4 } from "uuid";
+const showBtnConfig = ref(false);
+const dialogVisible = ref(true);
+const showView = ref(false);
+
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const freeLookRef = ref<AppFreeEditMethod | null>(null);
+const freeEditRefBtn = ref<AppFreeEditMethod | null>(null);
+const tableRef = ref<MyTableMethod | null>(null);
+const appTableShow = ref(false);
+let para = []; //银行大类 list
+
+const schemaMap = reactive<Record<string, any>>({
+  rtinputgroup: [],
+});
+// 绑定方法
+const method = {
+  func1: () => {
+  },
+};
+const formconfig1 = reactive<AppFreeEditConfig>(
+  createAppFreeEditConfig({
+    title: '账户信息修改',
+    endBtnsPosition: "right",
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "读取银行卡",
+        position: 'btn-left',
+        func: async () => {
+        },
+      }),
+      createFreeButtonBase({
+        type: "primary",
+        label: "提交审核",
+        func: async () => {
+          saveSubmit('commit');
+        },
+      })
+    ],
+    fromSchema: [
+      {
+        prop: "cAcctNme",
+        inputtype: "rtinput",
+        // typeCode: "",
+        title: "收款人姓名",
+        rules: [getRules("required", {})],
+      },
+      {
+        prop: 'cAcctNo',
+        title: '收款人账号',
+        inputtype: "rtinput",
+        rules: [getRules("required", {})],
+      },
+        {
+        prop: "cBankRelTyp",
+        inputtype: "rtselect",
+        typeCode: 'CBankRelTypList',
+        clearable: true,
+        title: "收款银行大类",
+        rules: [getRules("required", {})],
+        func: (val: any) => {
+
+          if (!val) {
+            return false
+          }
+          para = val.split('_');
+          const bankname = para[1];  	// 银行名称
+          const isdefault = para[2]; 	// 是否默认值
+          const banktype = para[3];  	// 银行大类
+
+          if (val == null || val == undefined) {
+            return
+          }
+          setValue('cBankCde','');
+          // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
+            if (isdefault === '1') {
+            setFormItem("cBankPro", {
+              disabled: false,
+              rules: [getRules("required", {})],
+            });
+            setFormItem("cBankAreaList", {
+              disabled: true,
+              rules: [getRules("required", {})],
+            });
+
+            setFormItem("cBankCounty", {
+              disabled: true,
+              rules: null,
+            });
+
+
+            setValue('cBankCnaps',null)
+            setValue('cBankAddr',bankname)
+            
+          } else {
+            setFormItem("cBankPro", {
+              rules: [getRules("required", {})],
+            });
+            setFormItem("cBankAreaList", {
+              disabled: true,
+              rules: [getRules("required", {})],
+            });
+
+            setFormItem("cBankCounty", {
+              disabled: true,
+              rules: [getRules("required", {})],
+            });
+
+            // 不为1  清空开户地址和  
+     
+            setValue('cBankAddr',null)
+            
+  
+          }
+        },
+
+      },
+      {
+        prop: "cBankPro",
+        inputtype: "rtselect",
+        title: "开户行省",
+        typeCode: "CBankProList",
+        // disabled: true,
+        func: (val: any) => {
+          setFormItem("cBankArea", {
+            disabled: false,
+            typeCode: 'CBankAreaList',
+            codeParam: { 'areaprovince': val },
+          });
+ 
+        }
+      },
+      {
+        prop: "cBankArea",
+        inputtype: "rtselect",
+        // typeCode: 'CBankAreaList',
+        title: "开户行市",
+        // disabled: true,
+        func: (val: any) => {
+          if (val) {
+            setFormItem("cBankCounty", {
+              typeCode: 'CBankCountyList',
+              codeParam: { 'areaname': val },
+              disabled: false,
+              // rules: [getRules("required", {})],
+            });
+          }
+
+        }
+      },
+      {
+        prop: "cBankCounty",
+        inputtype: "rtselect",
+        // typeCode: 'CBankCountyList',
+        title: "开户行县",
+        // disabled: true,
+        func: (val: any) => {
+          if (val) {
+            setFormItem("cBankCde", {
+              disabled: false,
+              typeCode: 'CBankCdeList',
+              codeParam: { 'banktypecod': para[3], 'areacode': val },
+              // rules: [getRules("required", {})],
+            });
+          }
+        }
+      },
+      {
+        prop: "cBankCde",
+        inputtype: "rtselect",
+        // disabled: true,
+        title: "开户银行",
+        func: (val:any)=>{
+          let backAddr  = val.split('_');
+            if(val){
+                setValue('cBankCnaps',backAddr[0])
+                setValue('cBankAddr',backAddr[1])
+            }
+        }
+      },
+   
+      {
+        prop: "cBankCnaps",
+        inputtype: "rtnumber",
+
+             disabled: true,
+        title: "CNAPS号",
+      },
+      {
+        prop: "cBankAddr",
+        inputtype: "rtinput",
+        rules: [getRules("required", {})],
+           disabled: true,
+        title: "开户行地址",
+      },
+      {
+        prop: 'cPubPri',
+        title: '对公对私',
+        rules: [getRules("required", {})],
+        inputtype: "rtselect",
+        loadData: [
+          { label: "对公", value: "1" },
+          { label: "对私", value: "2" },
+        ],
+      }
+    ]
+  })
+);
+const pageresult = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
+const tableconfig = reactive<AppTableConfig>(
+  createTableEditConfig({
+    title: "审核修改记录",
+    isPage: false,
+    fromSchema: [
+      {
+        prop: "cCustSeq",
+        inputtype: "rtinput",
+        title: "业务唯一流水号",
+      },
+      {
+        prop: "cPlyNo",
+        inputtype: "rtinput",
+        title: "保单号",
+      },
+      {
+        prop: "cEdrNo",
+        inputtype: "rtinput",
+        title: "批单号",
+      },
+      {
+        prop: "cAcctNme",
+        inputtype: "rtinput",
+        title: "账户名",
+      },
+      {
+        prop: "cAcctNo",
+        inputtype: "rtinput",
+        title: "账户",
+      },
+      {
+        prop: "cCrtCde",
+        inputtype: "rtinput",
+        title: "提交人",
+      },
+      {
+        prop: "tCrtTm",
+        inputtype: "rtinput",
+        title: "提交时间",
+      },
+      {
+        prop: "tOprTyp",
+				inputtype: "rtselect",
+				title: "操作类型",
+				loadData:[
+					{label: '未申请修改',value: "0"},
+					{label: "提交",value :"1"},
+					{label: '已通过',value: "2"},
+					{label: '已退回', value: '3'}
+				]
+      },
+      {
+        prop: "cCheckOpn",
+        inputtype: "rtinput",
+        title: "审批意见",
+      }
+    ],
+  })
+);
+onMounted(async () => {
+  if (props.type === "update" && props.data) {
+    nextTick(() => {
+      freeEditRef.value?.setFormValue(props.data);
+
+      setValue('cAcctNme',props.data.cCustomerNameCn)
+      setValue('cAcctNo',props.data.cCustAccountNo)
+      setValue('cBankRelTyp',props.data.cBankType)
+      setValue('cBankPro',props.data.cBankProvince)
+
+      setValue('cBankArea',props.data.cBankCity)
+      setValue('cBankCounty',props.data.cBankCounty)
+      setValue('cBankCde',props.data.cBankName)
+      setValue('cBankCnaps',props.data.cBankCnaps)
+      setValue('cBankAddr',props.data.cBankAddr)
+      setValue('cPubPri',props.data.cIspayPublic)
+
+      handleQuery(true);
+    });
+  }
+});
+/** 查询 */
+function handleQuery(flag?: boolean) {
+  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+  //const s = freeEditRef.value?.getFromValue(); //获取表单数据
+  const param = Object.assign({}, r, {
+    currentUser: user.value['opCde'],
+    currentUserOrg: user.value['companyId'],
+    cId: props.data['cId'],
+    cCustSeq: props.data['cCustSeq'],
+  });
+  finService.getEditFinReback(param)
+    .then((res) => {
+      const { code, data, msg } = res;
+      if (200 === code) {
+        pageresult.list = [];
+        pageresult.list = data.result;
+        pageresult.total = data.total;
+      } else {
+        ElMessage.error(msg);
+      }
+    })
+    .finally(() => { });
+}
+
+
+/** 提交审核 */
+function saveSubmit(obj) {
+  freeEditRef.value?.validate().then((isValid) => {
+    if (isValid) {
+      const s = cloneDeep(freeEditRef.value?.getFromValue()); //获取表单数据
+      const prm = obj + '|' + props.data['cCustSeq'];
+      if (obj === 'commit') {
+        const saveFormData = Object.assign(s,{ cStatus: '1' });
+        const returnData = finService.saveFinReback({ param: prm, banckTraVOList: [saveFormData] });
+        returnData.then((res: any) => {
+          if (null != res && null != res['code']) {
+            if (res['code'] === 200) {
+              
+              emits("ok", {});
+              ElMessage.success(res['msg']);
+              dialogVisible.value = false;
+            } else {
+              ElMessage.warning(res['msg']);
+            }
+          }
+        }, error => {
+          ElMessage.error('后台服务异常,请联系管理员');
+        });
+      }
+    } else {
+      ElMessage.error("请填写必填项");
+    }
+  })
+}
+/* 获取全量表单数据 */
+function getFrom() {
+  let s = freeEditRef.value?.getFromValue(); //获取表单数据
+  // if (showBtnConfig.value) {
+  //   s["showExBtn"] = "1";
+  // } else {
+  //   s["showExBtn"] = "0";
+  // }
+  if (s) {
+    const param = Object.assign(s);
+    // if (props.type === "edit") {
+    //   param["cPkId"] = props.data.cPkId;
+    // }
+    // if (freeEditRefBtn.value) {
+    //   let btnjson = freeEditRefBtn.value?.getFromValue();
+    //   btnjson.initid = uuidv4().replace(/-/g, "");
+    //   param["btn"] = btnjson;
+    // }
+    // if (tableRef.value) {
+    //   const tabjson = tableRef.value?.getFromValue();
+    //   let selectList = tabjson.filter((item: any) => item.isChecked === "1");
+    //   param["tabjson"] = selectList;
+    // }
+    return param;
+  }
+}
+
+
+
+//给表单下拉项赋值
+const setFormItem = (key, obj) => {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.loadData && obj.loadData) {
+          let newBtnItems = null;
+          if (obj.loadData.length != 0) {
+            for (let key in obj.loadData) {
+              item.loadData[key] = obj.loadData[key];
+            }
+          } else {
+            item.loadData = obj.loadData;
+          }
+          newBtnItems = item.loadData;
+          newBtnItems && (obj.loadData = newBtnItems);
+        }
+        Object.assign(item, obj);
+      }
+    });
+  }
+}
+
+
+function getFromValue() {
+  return freeEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef?.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef?.value?.validate();
+}
+
+function setValue(key: string, value: any) {
+  freeEditRef?.value?.setValue(key, value);
+}
+
+function getValue(key: string) {
+  return freeEditRef?.value?.getValue(key);
+}
+function getFormconfig() {
+  return formconfig1;
+}
+
+defineExpose({
+  getFromValue,
+  setFormValue,
+  validate,
+  setValue,
+  getValue,
+  getFormconfig,
+});
+</script>
+
+<style scoped></style>

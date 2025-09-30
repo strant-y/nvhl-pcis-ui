@@ -49,6 +49,11 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
 
 const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
@@ -75,9 +80,14 @@ function handleChange(val?: string | number | boolean) {
   }
   emits("valueChange", res);
   emits("update:modelValue", res);
-  props.item.func ? props.item.func(res) : null;
+  // props.item.func ? props.item.func(res) : null;
 }
 onMounted(() => {
+  if (props.item.keymap) {
+    selectedValue.value = props.modelValue === props.item.keymap["y"];
+  } else if (typeof props.modelValue === "boolean") {
+    selectedValue.value = props.modelValue;
+  }
   // 初始化组件数据
   if (props.item) {
   }

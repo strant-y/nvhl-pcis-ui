@@ -1,76 +1,111 @@
 <!-- 用户管理 -->
 <template>
-  <el-container>
-    <el-main>
-      <el-container>
-        <el-aside width="150px">
-          <template v-for="(pageConfig, v) in formconfig1" :key="v">
-            <el-affix :offset="150">
-              <el-anchor :bound="120" :offset="80">
-                <el-anchor-link
-                  v-for="(k, i) in pageConfig?.pageInfo"
-                  :key="i"
-                  :href="`#${k.pageKey}`"
-                >
-                  {{ k.pageTtile }}
-                </el-anchor-link>
-              </el-anchor>
-            </el-affix>
-          </template>
-        </el-aside>
+  <div>
+    <el-container>
+      <el-main>
         <el-container>
-          <el-main>
+          <el-aside>
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <div
-                v-for="(k, i, index) in pageConfig?.pageInfo"
-                :key="i"
-                :id="k.pageKey"
-              >
-                <component
-                  v-if="currentIndex >= index"
-                  :ref="
-                    (res) => {
-                      opertaor.addTableRef(k.pageKey, res);
-                    }
-                  "
-                  :is="k.pageRef + '-ref'"
-                />
-              </div>
+              <el-affix :offset="0">
+                <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
+                  <el-anchor-link
+                    v-for="(k, i) in pageConfig?.pageInfo"
+                    :key="i"
+                    :href="`#${k.pageKey}`"
+                  >
+                    <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
+                    <div class="icon-title">
+                      <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                        <el-tooltip
+                          effect="dark"
+                          :content="k.pageTtile"
+                          placement="top-start"
+                        >
+                          {{ k.pageTtile.substring(0, 6) + "..." }}
+                        </el-tooltip>
+                      </template>
+                      <template v-else>
+                        {{ k.pageTtile }}
+                      </template>
+                    </div>
+                  </el-anchor-link>
+                </el-anchor>
+              </el-affix>
             </template>
-          </el-main>
+          </el-aside>
+          <el-container>
+            <el-main id="main-container" style="padding: 10px;">
+              <template v-for="(pageConfig, v) in formconfig1" :key="v">
+                <div
+                  v-for="(k, i, index) in pageConfig?.pageInfo"
+                  :key="i"
+                  :id="k.pageKey"
+                >
+                  <component
+                    v-if="currentIndex >= index"
+                    :ref="
+                      (res) => {
+                        opertaor.addTableRef(k.pageKey, res);
+                      }
+                    "
+                    :is="k.pageRef + '-ref'"
+                  />
+                </div>
+              </template>
+            </el-main>
+          </el-container>
         </el-container>
-      </el-container>
-    </el-main>
-  </el-container>
+      </el-main>
+    </el-container>
+    <el-backtop :right="100" :bottom="100" style="background-color: #dcf9fd" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { getProdInfos } from "@/api/prod";
-import { useRoute } from "vue-router";
+import { getProdInfos, getInquiryPage } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-opertaor.init();
+import { dataParam } from "@/store/modules/dataParam";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
-const router = useRouter();
-const query = ref(route.query);
+const dataparam = dataParam();
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  // handleAnchorClick: handleAnchorClick,
+};
+provide(idxParamKey, idxParam);
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+opertaor.init();
 
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
+const props = defineProps({
+  param: {
+    type: Object,
+  },
+});
+
+const param = props.param;
+dataparam.setParam(param);
+
 const formconfig1 = opertaor.getTableConfig();
 // 当前加载的组件索引
 const currentIndex = ref(0);
+const prodauditConfig = {
+  pageKey: "prodaudit",
+  pageTtile: "产品审核",
+  pageRef: "prodaudit",
+};
 
 opertaor.setTableConfig([
   {
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      // prodaudit: {
-      //   pageKey: "prodaudit",
-      //   pageTtile: "产品审核",
-      //   pageRef: "prodaudit",
-      //   isShow: true,
-      // },
+      prodaudit: {
+        pageKey: "prodaudit",
+        pageTtile: "产品审核",
+        pageRef: "prodaudit",
+      },
       prodInfo: {
         pageKey: "prodInfo",
         pageTtile: "产品基本信息",
@@ -78,29 +113,29 @@ opertaor.setTableConfig([
       },
       relatedMainInsurance: {
         pageKey: "relatedMainInsurance",
-        pageTtile: "关联主险",
+        pageTtile: "关联主条款",
         pageRef: "relatedMainInsurance",
       },
-      factoryrelatedAdditionalIns: {
-        pageKey: "factoryrelatedAdditionalIns",
-        pageTtile: "关联附加险",
-        pageRef: "factoryrelatedAdditionalIns",
-      },
+      // factoryrelatedAdditionalIns: {
+      //   pageKey: "factoryrelatedAdditionalIns",
+      //   pageTtile: "关联附加条款",
+      //   pageRef: "factoryrelatedAdditionalIns",
+      // },
       specialAgreement: {
         pageKey: "specialAgreement",
         pageTtile: "关联特别约定",
         pageRef: "specialAgreement",
       },
-      healthNotice: {
-        pageKey: "healthNotice",
-        pageTtile: "关联健康告知",
-        pageRef: "healthNotice",
-      },
-      relatedInsuranceLiability: {
-        pageKey: "relatedInsuranceLiability",
-        pageTtile: "关联险别责任",
-        pageRef: "relatedInsuranceLiability",
-      },
+      // healthNotice: {
+      //   pageKey: "healthNotice",
+      //   pageTtile: "关联健康告知",
+      //   pageRef: "healthNotice",
+      // },
+      // relatedInsuranceLiability: {
+      //   pageKey: "relatedInsuranceLiability",
+      //   pageTtile: "关联条款责任",
+      //   pageRef: "relatedInsuranceLiability",
+      // },
       relatedBusinessRules: {
         pageKey: "relatedBusinessRules",
         pageTtile: "关联业务规则",
@@ -141,13 +176,31 @@ opertaor.setTableConfig([
         pageTtile: "页面组件绑定",
         pageRef: "prodComponent",
       },
+      priceComponent: {
+        pageKey: "priceComponent",
+        pageTtile: "询价页面配置",
+        pageRef: "priceComponent",
+      },
     },
   },
 ]);
 
 const btns = {};
+const anchorRef = ref(null);
 onMounted(() => {
+  formconfig1.forEach((ele) => {
+    if (param.type !== "approve" || param.editType === "view") {
+      delete ele.pageInfo.prodaudit;
+    } else if (!ele.pageInfo.prodaudit) {
+      ele.pageInfo.prodaudit = { ...prodauditConfig };
+    }
+  });
   renderComponents();
+  nextTick(() => {
+    const keys = Object.keys(formconfig1[0].pageInfo)
+    const href = '#' + formconfig1[0].pageInfo[keys[0]]?.pageKey
+    anchorRef.value[0]?.scrollTo(href);
+  })
 });
 
 function renderComponents() {
@@ -168,7 +221,19 @@ function loadAfter() {
           const { code, data, msg } = res;
           if (200 === code) {
             setTimeout(() => {
-              setData(data.data);
+              setData(data);
+            }, 100);
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+      getInquiryPage(param)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            setTimeout(() => {
+              setData({ priceComponent: data});
             }, 100);
           } else {
             ElMessage.error(msg);
@@ -178,16 +243,87 @@ function loadAfter() {
     });
   }
 }
-watch(route, (to, from) => {
-  router.go(0);
-});
+// function fileterAside(val: string) {
+//   pageconfig.forEach((element) => {
+//     if (element.pageKey === "prodaudit") {
+//     }
+//   });
+// }
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
     const ref = opertaor.getTableRefByKey(k);
-    console.log(ref);
     ref.setFormValue(datas[k]);
   });
 }
+
+const iconMap = {
+  'prodInfo': 'icon-wenjianban1',
+  'relatedMainInsurance': 'icon-zaibaoxinxi',
+  'specialAgreement': 'icon-anjiantiaocha',
+  'relatedBusinessRules': 'icon-lishiyijian',
+  'relatedPremCalcuRules': 'icon-qitafeiyong',
+  'relatedPayOrderConf': 'icon-yufuxinxi',
+  'planConfigration': 'icon-xianbiexinxi',
+  'rateConfiguration': 'icon-jiaonafeiyong',
+  'InstituTaxRateAllocat': 'icon-jinetiaozheng',
+  'assoCorrPreCalculFormula': 'icon-yishoubaodan',
+  'prodComponent': 'icon-tiaoduxinxi',
+  'priceComponent': 'icon-tiaodumingxi',
+}
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.el-main {
+  padding: 0;
+  height: calc(100vh - 45px - 34px);
+  overflow: hidden;
+  overflow-y: auto;
+  .el-aside {
+    width: auto;
+    .el-affix {
+      height: 100%;
+      background: var(--el-color-primary);
+    }
+  }
+}
+:deep(.el-anchor) {
+  background: transparent;
+  .el-anchor__list {
+    padding: 20px 10px;
+    .el-anchor__item {
+      margin-bottom: 20px;
+      .el-anchor__link {
+        font-size: 14px;
+        color: #FFF;
+        text-align: center;
+        padding: 0;
+        opacity: 0.6;
+        display: flex;
+        &.isActive{
+          background: var(--el-color-primary);
+          :deep(a) {
+            color: var(--menu-active-text);
+            .iconfont {
+              color: var(--menu-active-text);
+            }
+          }
+        }
+        &:hover {
+          background: var(--menu-hover);
+          :deep(a) {
+            color: var(--el-color-primary);
+            .iconfont {
+              color: var(--el-color-primary);
+            }
+          }
+        }
+        .iconfont {
+          font-size: 1.2rem;
+          color: #FFF;
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
+</style>

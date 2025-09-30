@@ -1,0 +1,196 @@
+<template>
+  <div>
+    <app-grid-edit v-model:gridEditConfig="gridconfig" ref="gridEditRef" />
+    <comDialog ref="dialog"></comDialog>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { createFreeButtonBase } from "@/shared/button-config";
+import { useValidator } from "@/typings/useValidator";
+import { getPageViewByPage, getProdList, saveInquiryPage } from "@/api/prod";
+import {
+  AppGridEditConfig,
+  AppGridEditMethod,
+  createAppGridEditConfig,
+  createGridFromUiConfig,
+} from "@/shared/app-grid-edit-config";
+import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+const dataparam = dataParam();
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+const dzmodal = useDzModal();
+const prodPageComponent = defineAsyncComponent(
+  () => import("./prodPageComponent.vue")
+);
+
+const prodPageComFactor = defineAsyncComponent(
+  () => import("./prodPageComFactor.vue")
+);
+const dialog = ref<DialogMethod | null>(null);
+const { getRules } = useValidator();
+
+const gridEditRef = ref<AppGridEditMethod | null>(null);
+
+const gridconfig = reactive<AppGridEditConfig>(
+  createAppGridEditConfig({
+    title: "询价页面配置",
+    // showSelection: true,  // 是否显示多选框
+    editFlag: true, //是否可以编辑
+    tableBtnWidth: "200",
+    endBtns: [
+      createFreeButtonBase({
+        type: "primary",
+        label: "新增",
+        func: async function () {
+          const pages = gridEditRef.value?.getTableValue();
+          if(pages.filter((item:any) => !item.cGrpMrk || !item.cPageNme).length > 0) {
+            ElMessage.error("请先完善列表数据");
+            return;
+          }
+          gridEditRef.value?.addRowByData({cGrpMrk:'0'});
+        },
+      }),
+      createFreeButtonBase({
+        label: "保存",
+        type: "primary",
+        func: function () {
+          const prodInfo = opertaor?.getTableRefByKey("prodInfo");
+          const prodInfoData = prodInfo?.getFromValue();
+          const pages = gridEditRef.value?.getTableValue();
+          if(pages.filter((item:any) => !item.cGrpMrk || !item.cPageNme).length > 0) {
+            ElMessage.error("请先完善列表数据");
+            return;
+          }
+          const params = Object.assign(prodInfoData, { pages: pages });
+          saveInquiryPage(params)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("保存成功");
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => {});
+        },
+      }),
+      createFreeButtonBase({
+        label: "组件关联",
+        type: "primary",
+        func: function () {
+          const prodInfo = opertaor?.getTableRefByKey("prodInfo");
+          const prodInfoData = prodInfo?.getFromValue();
+          const r = gridEditRef.value?.getSelectRow();
+          if (!r) {
+            ElMessage.error("请选择一行数据");
+            return;
+          }
+          dzmodal
+            .open(prodPageComponent, {
+              type: "edit",
+              data: { prodInfo: prodInfoData, pageSelect: r },
+              component: "priceComponent",
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        label: "组件要素绑定",
+        type: "primary",
+        func: function () {
+          const prodInfo = opertaor?.getTableRefByKey("prodInfo");
+          const prodInfoData = prodInfo?.getFromValue();
+          const r = gridEditRef.value?.getSelectRow();
+          if (!r) {
+            ElMessage.error("请选择一行数据");
+            return;
+          }
+          dzmodal
+            .open(prodPageComFactor, {
+              type: "edit",
+              data: { prodInfo: prodInfoData, pageSelect: r },
+              component: "priceComponent",
+            })
+            .then((res) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        type: "success",
+        label: "预览",
+        func: () => {
+          const r = gridEditRef.value?.getSelectRow();
+          if (!r) {
+            ElMessage.error("请选择一行数据");
+            return;
+          }
+          dialog.value?.open(
+            "componentPageView",
+            {
+              param: {
+                CprodNo: r.cProdNo,
+                CPageCde: r.cPkId,
+              },
+            },
+            {},
+            { title: "页面预览", width: "95" }
+          );
+        },
+      }),
+    ],
+    fromSchema: [
+      {
+        prop: "cPageNme",
+        inputtype: "rtinput",
+        title: "页面名称",
+      },
+      {
+        prop: "cGrpMrk",
+        inputtype: "rtselect",
+        title: "团个单",
+        loadData: [
+          {
+            label: "是",
+            value: "1",
+          },
+          {
+            label: "否",
+            value: "0",
+          },
+        ],
+      },
+    ],
+    fromUi: createGridFromUiConfig({
+      cols: 3,
+    }),
+  })
+);
+
+function copyInitProdNo(v: any) {
+  gridconfig.endBtns = [];
+  gridEditRef?.value?.setFormValue(v);
+}
+
+function setFormValue(value: any) {
+  gridEditRef?.value?.setFormValue(value);
+}
+function getFromValue() {
+  return gridEditRef?.value?.getFromValue();
+}
+defineExpose({
+  setFormValue,
+  getFromValue,
+  copyInitProdNo,
+});
+</script>

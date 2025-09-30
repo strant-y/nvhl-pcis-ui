@@ -1,10 +1,10 @@
-import {loginApi, logoutApi, verifyCodeApi} from "@/api/auth";
-import { getUserInfoApi } from "@/api/user";
-import router, { resetRouter } from "@/router";
-import { store } from "@/store";
+import {loginApi, logoutApi, resolveTokenApi, verifyCodeApi} from "@/api/auth";
+import {getUserInfoApi} from "@/api/user";
+import router, {resetRouter} from "@/router";
+import {store} from "@/store";
 
-import { LoginData } from "@/api/auth/types";
-import { UserInfo } from "@/api/user/types";
+import {LoginData} from "@/api/auth/types";
+import {UserInfo} from "@/api/user/types";
 import {LocationQuery, LocationQueryValue, useRoute} from "vue-router";
 
 export const useUserStore = defineStore("user", () => {
@@ -45,8 +45,9 @@ export const useUserStore = defineStore("user", () => {
               sessionStorage.setItem("opOrg", userData.companyId);
               sessionStorage.setItem("user", JSON.stringify(userData));
               sessionStorage.setItem("returntime", res.returntime);
-              
+
               const query: LocationQuery = route.query;
+
               const redirect = (query.redirect as LocationQueryValue) ?? "/";
               const otherQueryParams = Object.keys(query).reduce(
                 (acc: any, cur: string) => {
@@ -70,6 +71,29 @@ export const useUserStore = defineStore("user", () => {
       });
     });
   }
+
+    function resolveToken(params: any) {
+        return new Promise<void>((resolve, reject) => {
+            resolveTokenApi(params)
+                .then((res) => {
+                    if (200 === res.code) {
+                        if (res.data) {
+                            const userData = res.data;
+                            // sessionStorage.setItem("token", "Bearer " + params); // Bearer eyJhbGciOiJIUzI1NiJ9.xxx.xxx
+                            sessionStorage.setItem("user", JSON.stringify(userData));
+                        } else {
+                            ElMessage.error("token校验失败");
+                        }
+                    } else {
+                        ElMessage.error(res.msg);
+                    }
+                    resolve(res);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    }
 
   // 获取信息(用户昵称、头像、角色集合、权限集合)
   function getUserInfo() {
@@ -108,6 +132,12 @@ export const useUserStore = defineStore("user", () => {
           resolve();
         })
         .catch((error) => {
+          sessionStorage.removeItem("token");
+          sessionStorage.removeItem("returntime");
+          location.reload(); // 清空路由
+          localStorage.clear();
+          sessionStorage.clear();
+          document.cookie = '';
           reject(error);
         });
     });
@@ -129,7 +159,8 @@ export const useUserStore = defineStore("user", () => {
     getUserInfo,
     logout,
     resetToken,
-    verifyCode
+      verifyCode,
+      resolveToken
   };
 });
 

@@ -1,6 +1,6 @@
 import {JSEncrypt} from 'jsencrypt';
 import {Md5} from 'ts-md5/dist/md5';
-import { fromByteArray } from 'base64-js';
+import { fromByteArray, toByteArray } from 'base64-js';
 
 //公钥
 const PUBLIC_KEY = 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKrSOXubY9bA9kRMmH8Yo3Bk1SxY52l/jkf8yDc8btyN0qUwErinFO8eESfBplpV+EUGNwZWGrDUZbMg+gVnm8kCAwEAAQ==';
@@ -9,11 +9,18 @@ const encryptByMD5 = (data: string): string => {
   const res = Md5.hashStr(data);
   return res.toString();
 };
-const base64encoder = (Context): any => {
+export const base64encoder = (Context): any => {
   return fromByteArray(new TextEncoder().encode(Context));
 };
-const encryptParameter = (Context) => {
+export const base64decoder = (Context): any => {
+  return new TextDecoder().decode(toByteArray(Context));
+};
+export const encryptParameter = (Context) => {
   return base64encoder(Context);
+};
+
+export const descryptParameter = (Context) => {
+  return base64decoder(Context);
 };
 export const rsaEncoder = (Context): any => {
   const encrypt = new JSEncrypt();
@@ -47,7 +54,7 @@ export const reqParamsEncrypt = (params: any) => {
       for (const i in keys) {
         parameterNew[keys[i]] = params[keys[i]];
       }
-      console.log('请求参数',parameterNew);
+      // console.log('请求参数',parameterNew);
       const encoder = encryptParameter(JSON.stringify(parameterNew));
       reqParams = {
         sourceParameter: encoder,

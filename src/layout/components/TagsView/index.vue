@@ -9,8 +9,9 @@
         ref="tagRef"
         v-for="tag in visitedViews"
         :key="tag.fullPath"
+        :to="{}"
         :class="'tags-item ' + (isActive(tag) ? 'active' : '')"
-        :to="{ path: tag.path, query: tag.query }"
+        @click.prevent="toView(tag)"
         @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
         @contextmenu.prevent="openContentMenu(tag, $event)"
       >
@@ -69,6 +70,7 @@ import {
   useSettingsStore,
   useAppStore,
 } from "@/store";
+import {eventBus} from "@/utils/event-bus";
 
 const { proxy } = getCurrentInstance()!;
 const router = useRouter();
@@ -95,17 +97,6 @@ const affixTags = ref<TagView[]>([]);
 const left = ref(0);
 const top = ref(0);
 
-watch(
-  route,
-  () => {
-    addTags();
-    moveToCurrentTag();
-  },
-  {
-    immediate: true, //初始化立即执行
-  }
-);
-
 const contentMenuVisible = ref(false); // 右键菜单是否显示
 watch(contentMenuVisible, (value) => {
   if (value) {
@@ -114,6 +105,32 @@ watch(contentMenuVisible, (value) => {
     document.body.removeEventListener("click", closeContentMenu);
   }
 });
+
+watch(route, (newRoute) => {
+  tagsViewStore.addTagView(newRoute)
+});
+
+const currentTitle = computed(() => translateRouteTitle(visitedViews.value.find((i)=>isActive(i))?.title))
+const visitedViewsNew = computed(() => {
+  const list:any = []
+  const lastList:any = []
+  visitedViews.value.forEach((item:any) => {
+    if(isActive(item)) {
+      lastList.push(item)
+    } else {
+      list.push(item)
+    }
+  })
+  return list.concat(lastList)
+})
+
+function toView(tag: TagView) {
+  if(tag.keepAlive) {
+    router.replace({ path: tag.path, query: tag.query})
+  }else {
+    router.push({ path: tag.path, query: tag.query})
+  }
+}
 
 /**
  * 过滤出需要固定的标签
@@ -153,43 +170,6 @@ function initTags() {
   }
 }
 
-function addTags() {
-  if (route.meta.title) {
-    tagsViewStore.addView({
-      name: route.name as string,
-      title: route.meta.title,
-      path: route.path,
-      query: route.query,
-      fullPath: route.fullPath,
-      affix: route.meta?.affix,
-      keepAlive: route.meta?.keepAlive,
-      hidden: route.meta.hidden
-    });
-  }
-}
-
-function moveToCurrentTag() {
-  // 使用 nextTick() 的目的是确保在更新 tagsView 组件之前，scrollPaneRef 对象已经滚动到了正确的位置。
-  nextTick(() => {
-    for (const tag of visitedViews.value) {
-      if (tag.path === route.path) {
-        // when query is different then update
-        // route.query = { ...route.query, ...tag.query };
-        if (tag.fullPath !== route.fullPath) {
-          tagsViewStore.updateVisitedView({
-            name: route.name as string,
-            title: route.meta.title || "",
-            path: route.path,
-            query: route.query,
-            fullPath: route.fullPath,
-            affix: route.meta?.affix,
-            keepAlive: route.meta?.keepAlive,
-          });
-        }
-      }
-    }
-  });
-}
 
 function isActive(tag: TagView) {
   return tag.path === route.path;
@@ -222,6 +202,7 @@ function isLastView() {
 }
 
 function refreshSelectedTag(view: TagView) {
+  return;
   tagsViewStore.delCachedView(view);
   const { fullPath } = view;
   nextTick(() => {
@@ -229,10 +210,10 @@ function refreshSelectedTag(view: TagView) {
   });
 }
 
-function toLastView(visitedViews: TagView[], view?: TagView) {
+const toLastView = (visitedViews: TagView[], view?: TagView) => {
   const latestView = visitedViews.slice(-1)[0];
-  if (latestView && latestView.fullPath) {
-    router.push(latestView.fullPath);
+  if(latestView && latestView.path) {
+    toView(latestView);
   } else {
     // now the default is to redirect to the home page if there is no tags-view,
     // you can adjust it according to your needs.
@@ -245,10 +226,10 @@ function toLastView(visitedViews: TagView[], view?: TagView) {
   }
 }
 
-function closeSelectedTag(view: TagView) {
-  tagsViewStore.delView(view).then((res: any) => {
+async function closeSelectedTag(view: TagView) {
+  tagsViewStore.delView(view).then(() => {
     if (isActive(view)) {
-      toLastView(res.visitedViews, view);
+      toLastView(visitedViews.value, view);
     }
   });
 }
@@ -271,7 +252,7 @@ function closeRightTags() {
 function closeOtherTags() {
   router.push(selectedTag.value);
   tagsViewStore.delOtherViews(selectedTag.value).then(() => {
-    moveToCurrentTag();
+    tagsViewStore.moveToCurrentTag(route);
   });
 }
 
@@ -370,27 +351,36 @@ watch(
     deep: true,
   }
 );
+
+eventBus.on('closeSelectedTag', (view: TagView) => {
+  closeSelectedTag(view);
+});
 onMounted(() => {
   initTags();
+  nextTick(() => {
+    tagsViewStore.addTagView(route)
+  })
 });
 </script>
 
 <style lang="scss" scoped>
 .tags-container {
   width: 100%;
-  height: 34px;
   background-color: var(--el-bg-color);
   border: 1px solid var(--el-border-color-light);
   box-shadow: 0 1px 1px var(--el-box-shadow-light);
+  display: flex;
+  flex-direction: column;
 
   .tags-item {
     display: inline-block;
     padding: 3px 8px;
     margin: 4px 0 0 5px;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     border: 1px solid var(--el-border-color-light);
-
+    height: 32px;
+    line-height: 26px;
     &:hover {
       color: var(--el-color-primary);
     }
@@ -465,5 +455,29 @@ onMounted(() => {
   .el-scrollbar__wrap {
     height: 49px;
   }
+}
+
+.current-title {
+  width: 100px;
+  height: 28px;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 20px;
+  color: rgba(0,0,0,0.85);
+  line-height: 28px;
+  text-align: left;
+  font-style: normal;
+  margin: 16px 20px;
+}
+// 面包屑
+.el-breadcrumb {
+  margin: 16px 0 0 20px;
+}
+:deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
+  color: rgba(0,0,0,0.85);
+}
+:deep(.el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner) {
+  color: rgba(0,0,0,0.45);
+  font-weight: 400;
 }
 </style>

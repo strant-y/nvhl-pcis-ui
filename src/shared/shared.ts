@@ -10,6 +10,7 @@ import RtIcon from "./com-item/rt-icon.vue";
 import RtInput from "./com-item/rt-input.vue";
 import RtSelect from "./com-item/rt-select.vue";
 import RtCascader from "./com-item/rt-cascader.vue";
+import RtCascaderArea from "./com-item/rt-cascader-area.vue";
 import RtSelectV2 from "./com-item/rt-select-v2.vue";
 import RtNumber from "./com-item/rt-number.vue";
 import RtDatePicker from "./com-item/rt-datePicker.vue";
@@ -21,6 +22,9 @@ import RtCheckboxGroup from "./com-item/rt-checkbox-group.vue";
 import RtlTable from "./com-item/rt-table.vue";
 import AppTable from "./app-table.vue";
 import RtMytable from "./com-item/rt-mytable.vue";
+
+// 自定义表单声明
+import MyCard from "./mytemplate/card.vue";
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -36,6 +40,7 @@ const componentMap = {
   rtselect: RtSelect,
   rtSelectV2: RtSelectV2,
   rtcascader: RtCascader,
+  rtcascaderarea: RtCascaderArea,
   rtnumber: RtNumber,
   rtdatepicker: RtDatePicker,
   rtswitch: RtSwitch,
@@ -45,6 +50,8 @@ const componentMap = {
   rtcheckboxgroup: RtCheckboxGroup,
   rttable: RtlTable,
   rtMytable: RtMytable,
+  
+  myCard:MyCard
 };
 
 const install = (Vue) => {

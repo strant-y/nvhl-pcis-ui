@@ -1,8 +1,10 @@
 import { FreeButtonBase } from "./button-config";
 
 export interface AppFreeEditConfig {
+  fromType?: "grid" | "free" | "custom" | null | undefined;
   id?: string; // 表单主键
   title?: string | null | undefined; // 功能标题
+  defaultValue?: any | null;
   production?: boolean; //标题是否显示tooltip
   productionTitle?: string; //标题内容
   fromUi?: any | null; // formUi配置
@@ -23,17 +25,28 @@ export interface AppFreeEditConfig {
 
 export interface AppFreeEditMethod {
   getFromValue: () => any;
-  setFormValue: (data: any) => void;
+  setFormValue: (data: any,noupdate?: boolean) => void; // 设置表单值 noupdate:限制不触发update方法
   validate: () => any;
   setValue: (key: any, value: any) => void;
   getValue: (key: any) => any;
+  clearValidate: (key: string | null ) => any;
+  setDisabledAll: (isDisabled: boolean) => void;
+  resetFields: () => void;
+  getFormBtn: () => any;
+  getCodeListMap: () => any;
+  setCodeListMap: (map: any) => void;
+  addCodeListMap: (data: any) => void;
+  addProvide: <T> (key: InjectionKey<T> | string, value: T) => void;
+  validateField: (fields: string | string[]) => Promise<boolean>;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}
 ): AppFreeEditConfig {
   return {
+    fromType:'free',
     id: config.id || `ID${new Date().getTime()}`,
     title: config.title || null,
+    defaultValue: config.defaultValue || {},
     showBtn: config.showBtn || true,
     showSuperior: config.showSuperior || false,
     shadow: config.shadow || true,
@@ -58,15 +71,19 @@ export interface FromUiConfig {
   labelWidth?: string | "auto"; //label长度
   labelPosition?: "left" | "right" | "top"; //label位置
   size?: "large" | "default" | "small"; //表单号
+  showMessage?: "1"| "0"; // 是否显示验证异常信息,默认显示需要显示
   groupBy?: any[];
+  showTitleBar?: boolean;  // 是否显示标题栏
 }
-export function createFromUiConfig(config: FromUiConfig = {}): FromUiConfig {
+export function createFromUiConfig(config: FromUiConfig = {showTitleBar: true}): FromUiConfig {
   return {
     cols: config.cols || 3,
     labelWidth: config.labelWidth || "auto",
     labelPosition: config.labelPosition || "right",
     size: config.size || "default",
+    showMessage: config.showMessage || "1",
     groupBy: config.groupBy || [],
+    showTitleBar: config.showTitleBar ===null || config.showTitleBar === undefined ? true : config.showTitleBar,
   };
 }
 

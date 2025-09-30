@@ -36,6 +36,7 @@
         v-for="option in options"
         :value="option.value"
         :key="option.value"
+        :checked="option.checked"
         :label="option.label"
         :border="
           item.border
@@ -73,6 +74,11 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  row: {
+    // 新增属性，用于接收当前行的数据
+    type: Object as () => Record<string, any>,
+    required: false,
+  },
 });
 
 const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
@@ -81,65 +87,108 @@ const options: Ref<OptionType[]> = ref([]); // 字典下拉数据源
 const selectedValue = ref<string[] | number[] | undefined>();
 
 watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
-  if (newOptions == null || newOptions.length === 0) return; // 下拉数据源加载未完成不回显
   if (newModelValue == undefined) {
     selectedValue.value = undefined;
     return;
   }
   selectedValue.value = newModelValue;
-});
-watch(
-  () => props.item,
-  (newValue, oldValue) => {
-    if (props.item.loadData) {
-      options.value = newValue.loadData;
-    }
-    if (props.item.typeCode) {
-      codeListStore.queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: props.item.params
-          },
-          false,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
-    }
+  if (props.item.typeCode && options.value.length === 0) {
+    uploadOption();
   }
+});
+/**
+ * 页面数据监听
+ */
+watch(
+  [() => props.item.loadData],
+  ([newloadData]) => {
+    if (newloadData) {
+      options.value = newloadData;
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  [() => props.item.typeCode],
+  ([newtypeCode]) => {
+    if (newtypeCode) {
+      uploadOption();
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  [() => props.item.codeParam],
+  ([newCodeParam]) => {
+    if (newCodeParam) {
+      uploadOption();
+    }
+  },
+  { deep: true }
 );
 function handleChange(val?: string | number | Array<any> | undefined) {
   const option = options.value.find((item) => item.value === val);
   emits("valueChange", val, option);
   emits("update:modelValue", val, option);
   emits("update:item", val, option);
-  props.item.func ? props.item.func(val, option) : null;
+  // props.item.func ? props.item.func(val, option) : null;
 }
 const codeListStore = codeListViewStore();
+function uploadOption() {
+  codeListStore
+    .queryCodeList(
+      {
+        codeListName: props.item.typeCode,
+        codeListParam: getParam(),
+      },
+      false,
+      props.item.cache ? props.item.cache : true
+    )
+    .then((res) => {
+      if(res){
+        options.value = res;
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      options.value = [];
+    });
+}
 
 onMounted(() => {
   // 初始化组件数据
   if (props.item) {
-    if (!props.item.loadData && !!props.item.typeCode) {
-      codeListStore.queryCodeList(
-          {
-            codeListName: props.item.typeCode,
-            codeListParam: props.item.params
-          },
-          false,
-          props.item.cache ? props.item.cache : true
-        )
-        .then((res) => (options.value = res))
-        .catch((err) => {
-          console.error(err);
-          options.value = [];
-        });
+    if (!props.item.loadData && !props.item.typeCode) {
+      options.value = [];
+    } else if (!props.item.loadData && !!props.item.typeCode) {
+      if (props.item.disabled) {
+        //如果属性被标记为不可读,则初始化不自动加载下拉选,但是值变更的时候,再额外触发下拉选
+        return;
+      }
+      uploadOption();
     } else {
       options.value = props.item.loadData;
     }
   }
 });
+
+function getParam() {
+  let p: any = {};
+  if (props.item.codeParam && typeof props.item.codeParam === "string") {
+    p = JSON.parse(props.item.codeParam);
+  } else {
+    p = props.item.codeParam;
+  }
+
+  if (props.item.disabled) {
+    if (!p) {
+      p = { value: selectedValue.value };
+    } else {
+      p.value = selectedValue.value;
+    }
+  }
+  return p;
+}
 </script>

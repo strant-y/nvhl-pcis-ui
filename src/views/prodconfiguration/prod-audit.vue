@@ -1,11 +1,13 @@
 <template>
-  <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-  <app-table
-    :tableConfig="tableconfig"
-    v-model:pageresult="pageresult"
-    ref="tableRef"
-    @page-change="handleQuery(false)"
-  />
+  <div class="app-container">
+    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table
+      :tableConfig="tableconfig"
+      v-model:pageresult="pageresult"
+      ref="tableRef"
+      @page-change="handleQuery(false)"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -16,13 +18,6 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
-import { useValidator } from "@/typings/useValidator";
-import { saveProdInfo } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const opertaor = dataOpertaor();
-import { useDzModal } from "@/views/dzmodel/DzModalService";
-const dzmodal = useDzModal();
-// const excelTempEdit = defineAsyncComponent(() => import("./excelTempEdit.vue"));
 import {
   AppTableConfig,
   AppTableMethod,
@@ -30,18 +25,16 @@ import {
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
-import { getProdList } from "@/api/prod";
-import { inputtype } from "@/utils/utilKey";
-
+import { getProFactoryList, changeStatus } from "@/api/prod";
+import { descryptParameter } from "@/utils/encipher";
 const route = useRoute();
 const router = useRouter();
 const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? String(query.value.param) : "{}");
-
-const { getRules } = useValidator();
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
+
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -59,7 +52,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+        func: () => {
+          freeEditRef.value.setFormValue({
+            cKindNo: "",
+            cProdNo: "",
+            cNmeCn: "",
+            cStatus: "",
+            cAuditStatus: "",
+          });
+          handleQuery();
+        },
       }),
     ],
 
@@ -67,8 +69,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        typeCode: "KIND_LIST_CACHE",
-        params: { codeListParam: "" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
         title: "产品大类",
       },
       {
@@ -85,15 +87,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cStatus",
         inputtype: "rtselect",
         typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
+        codeParam: { cParCde: "use_mrk" },
         title: "启用标识",
       },
       {
         prop: "cAuditStatus",
         inputtype: "rtselect",
-        typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "PROD_AUDIT_STATUS" },
         title: "审核状态",
+        typeCode: "WEB_SYS_STA_DICT",
+        codeParam: { cParCde: "PROD_AUDIT_STATUS" },
+        clearable: true,
       },
     ],
     fromUi: createFromUiConfig({
@@ -141,6 +144,7 @@ const tableconfig = reactive<AppTableConfig>(
             path: "/prodconfiguration/prodFactoryInfo",
             query: {
               param: JSON.stringify({
+                type: "approve",
                 editType: "edit",
                 prod: row,
                 prodNo: row.cProdNo,
@@ -150,10 +154,10 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
       createFreeButtonBase({
-        id: "View-edrItem",
+        id: "view",
         link: true,
         tooltip: "查看",
-        type: "success",
+        type: "primary",
         size: "large",
         icon: "View",
         tableClick: (row) => {
@@ -161,7 +165,9 @@ const tableconfig = reactive<AppTableConfig>(
             path: "/prodconfiguration/prodFactoryInfo",
             query: {
               param: JSON.stringify({
+                type: "approve",
                 editType: "view",
+                prod: row,
                 prodNo: row.cProdNo,
               }),
             },
@@ -173,7 +179,9 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cKindNo",
         title: "大类编号",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { codeListParam: "" },
       },
       {
         prop: "cKindNme",
@@ -192,7 +200,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cProdNme",
+        prop: "cNmeCn",
         title: "产品名称",
         inputtype: "rtinput",
       },
@@ -207,14 +215,38 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          await changeStatus({
+            cProdNo: row.cProdNo,
+            cStatus: val,
+          }).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
         },
       },
       {
         prop: "cAuditStatus",
+        inputtype: "rttag",
         title: "审核状态",
-        inputtype: "rtselect",
+        loadData: [
+          {
+            label: "已提交",
+            value: "submit",
+            color: "#67C23A",
+          },
+          {
+            label: "未提交",
+            value: "unsubmit",
+            color: "#14CCCC",
+          },
+          {
+            label: "已审核",
+            value: "audit",
+            color: "##409EFF",
+          },
+        ],
       },
     ],
   })
@@ -281,11 +313,11 @@ function handleQuery() {
   const r = tableRef.value?.getPartnerPage(); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  getProdList(param)
+  getProFactoryList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data.data;
+        pageresult.list = data.result;
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);

@@ -25,13 +25,13 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { qryUndrClsList } from "@/api/prod";
+import { qryUndrClsList, delUndrClsById } from "@/api/prod";
 import { template } from "lodash";
 const dzmodal = useDzModal();
 
@@ -52,7 +52,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.setFormValue({
+            cUndrClsCde: "",
+            cUndrClsCnm: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -117,6 +123,26 @@ const tableconfig = reactive<AppTableConfig>(
           });
         },
       }),
+      createFreeButtonBase({
+        id: "score",
+        type: "danger",
+        tooltip: "删除",
+        icon: "Delete",
+        link: true,
+        tableClick: (row) => {
+          delUndrClsById(row)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (200 === code) {
+                ElMessage.success("删除成功");
+                handleQuery();
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => {});
+        },
+      }),
     ],
     fromSchema: [
       {
@@ -141,11 +167,18 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cChiefFlg",
-        inputtype: "rtswitch",
+        inputtype: "rtinput",
         title: "首席标识",
-        change: (val: any, row: any) => {
-          // console.log(val, row);
-        },
+        // keymap: {
+        //   y: "1",
+        //   n: "0",
+        // },
+        // activeText: "启用",
+        // inactiveText: "禁用",
+        // inlinePrompt: true,
+        // change: (val) => {
+        //   console.log(val);
+        // },
       },
     ],
   })

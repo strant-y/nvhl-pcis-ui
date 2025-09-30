@@ -1,9 +1,7 @@
-import request from "@/utils/request";
-import { AxiosPromise } from "axios";
-import { CaptchaResult, LoginData, LoginResult } from "./types";
-import {post,del} from "@/utils/http";
+import {AxiosPromise} from "axios";
+import {LoginData, LoginResult} from "./types";
+import {post} from "@/utils/http";
 import {rsaEncoder} from "@/utils/encipher";
-import {AppBaseApi,LocalBaseApi} from "@/api/config"
 
 /**
  * 登录API
@@ -28,9 +26,16 @@ export function loginApi(data: LoginData): AxiosPromise<LoginResult> {
  * @returns
  */
 export function verifyCodeApi(data): AxiosPromise<LoginResult> {
-  return post('/verifyCode',
-    {source: data}
-  );
+  const href = window.location.href;
+  if(href.indexOf("code=") > 0) {
+    return post('/unifiedPlatform',
+      {source: {key: 'source', value: data}}
+    );
+  } else {
+    return post('/verifyCode',
+      {source: data}
+    );
+  }
 }
 
 
@@ -39,6 +44,13 @@ export function verifyCodeApi(data): AxiosPromise<LoginResult> {
  */
 export function getCaptchaApi(param) {
   return post(`/getCaptcha`,{source: param});
+}
+
+/**
+ * 根据token获取用户信息
+ */
+export function resolveTokenApi(param) {
+  return post(`/resolveToken`, {source: param});
 }
 
 
@@ -51,7 +63,10 @@ export function getCaptchaApi(param) {
 export function logoutApi() {
   return post('/logout',{source: null});
 }
-
+// 临时测试
+/*export function logoutApi() {
+  return post('http://10.12.18.114:8082/beauty-api/logout', { source: null }); // 指定完整URL
+}*/
 /**
  * 绑定用户
  */

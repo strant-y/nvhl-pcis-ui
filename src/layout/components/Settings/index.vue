@@ -93,7 +93,7 @@ const isDark = ref<boolean>(settingsStore.theme === ThemeEnum.DARK);
 const changeTheme = (val: any) => {
   isDark.value = val;
   settingsStore.changeTheme(isDark.value ? ThemeEnum.DARK : ThemeEnum.DEFAULT);
-  settingsStore.changeThemeColor(ThemeSuitedColorEnum.default);
+  // settingsStore.changeThemeColor(ThemeSuitedColorEnum.default);
 };
 
 /**

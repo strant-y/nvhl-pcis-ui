@@ -1,60 +1,24 @@
 <template>
   <div class="login-container">
     <el-row class="login-container-img">
-      <el-col class="logo-img">
-        <img src="../../assets/images/logo.png" alt="logo" />
-      </el-col>
-      <el-col class="logo-text">
-        <el-row><span class="text-class">财产保险</span>承保系统</el-row>
-        <el-row class="text-en"
-          ><span class="text-class">Property Insurance </span>Underwriting System
-          </el-row
-        >
-      </el-col>
-
-      <el-col class="ewm-img">
-        <el-row>
-          <div
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <img
-              width="100"
-              height="100"
-              src="../../assets/images/m_ui_ewm.png"
-              alt="移动端入口"
-            />
-            <div class="w-200px text-center mt-5">
-              <span>请使用手机扫描二维码进入移动端事故预防平台</span>
-            </div>
-          </div>
-        </el-row>
-      </el-col>
-    </el-row>
-    <div class="login-container-form">
-      <!-- 登录表单 -->
-      <el-card
-        class="!border-none !bg-transparent !rounded-4% w-100 <sm:w-85 card_self"
-      >
-        <div>
-          <h2>你好，欢迎使用平台</h2>
+      <div class="login-left">
+      <!-- Logo -->
+      <div class="logo">
+        <!-- <img src="../../assets/images/logo.png" alt="logo" /> -->
+      </div>
+      <!-- 系统名称 -->
+      <div class="system-name">
+        <div class="name-cn">
+          <span class="text-class">永安财产保险承保系统</span>
         </div>
-        <el-row class="tab-container" justify="center">
-          <el-col
-            class="tab-item"
-            :class="curIndex === index ? 'active' : ''"
-            :span="12"
-            v-for="(item, index) in tabList"
-            :key="item.id"
-            @click="tabHandle(index)"
-          >
-            <el-row justify="center">{{ item.name }}</el-row>
-          </el-col>
-          <!-- <el-col class="tab-item" :span="12">
-        <el-row justify="center">第三方登录</el-row>
-      </el-col> -->
-        </el-row>
-        <!-- <el-tabs v-model="activeName" @tab-click="changeInside">
-        <el-tab-pane label="内部登录" name="inside" bor> -->
+        <div class="name-en">
+          <span class="text-en">Yong'an Property Insurance Underwriting System</span>
+        </div>
+      </div>
+    </div>
+      <div class="login-container-form" >
+        <el-card class="login-card" v-show="showLoginCard">
+            <h2>账号登录</h2>
         <el-form
           v-if="inside"
           ref="loginFormRef"
@@ -65,7 +29,7 @@
         >
           <!-- 用户名 -->
           <el-form-item prop="username">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <svg-icon icon-class="user" class="mx-2" />
               </span>
@@ -75,41 +39,39 @@
                 :placeholder="$t('login.username')"
                 name="username"
                 size="large"
-                class="h-[48px] w-[79%]"
-                :disabled="verifyFlag"
                 @keyup.enter="handleLogin"
+                @change="handleLoginChange"
               />
             </div>
           </el-form-item>
           <!-- 密码 -->
-          <!-- <el-tooltip
-              :visible="isCapslock"
-              content="Caps lock is On"
-              placement="right"
-            > -->
           <el-form-item prop="password">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <el-icon class="mx-2"><Lock /></el-icon>
               </span>
               <el-input
                 v-model="loginData.password"
                 :placeholder="$t('login.password')"
-                type="password"
+                :type="passwordType"
                 name="password"
                 @keyup.enter="handleLogin"
                 size="large"
-                class="h-[48px] pr-3 w-[79%]"
-                show-password
-                :disabled="verifyFlag"
-              />
+                @change="handleLoginChange"
+              >
+                <template #suffix>
+                  <span @mousedown="showPassword" @mouseup="hidePassword" @mouseleave="hidePassword">
+                    <el-icon v-if="passwordType === 'text'"><View /></el-icon>
+                    <el-icon v-else><Hide /></el-icon>
+                  </span>
+                </template>
+              </el-input>
             </div>
           </el-form-item>
-          <!-- </el-tooltip> -->
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
-            <div class="flex-y-center w-full">
-              <span class="icon-box">
+            <div class="input_item__ flex-y-center w-full">
+              <span class="icon-box captcha-icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
               <el-input
@@ -120,24 +82,25 @@
                 :placeholder="$t('login.captCode')"
                 @keyup.enter="verifyCode"
               />
-              <!---->
               <!-- 验证码-->
-              <el-button
-                v-if="verifyTime === 0"
-                class="mr-1 w-72px"
-                :loading="loading"
-                type="primary"
-                size="small"
-                plain
-                @click="getCaptcha"
-                >获取验证码</el-button
-              >
-              <el-tag v-else disabled class="mr-1" type="primary"
-                >{{ verifyTime }}秒</el-tag
-              >
+              <span style="width: 72px;text-align: right;">
+                <el-button
+                  v-if="verifyTime === 0"
+                  class="mr-1 w-72px"
+                  :loading="loading"
+                  type="primary"
+                  size="small"
+                  plain
+                  @click="getCaptcha"
+                  >获取验证码</el-button
+                >
+                <el-tag v-else disabled class="mr-1 " type="primary"
+                  >{{ verifyTime }}秒</el-tag
+                >
+              </span>
             </div>
           </el-form-item>
-
+          <!-- <el-checkbox> 30天内免登录</el-checkbox> -->
           <!-- 登录按钮 -->
           <el-button
             v-if="!verifyFlag"
@@ -159,7 +122,6 @@
             >{{ $t("login.submit") }}
           </el-button>
         </el-form>
-        <!-- </el-tab-pane> -->
         <!-- <el-tab-pane label="第三方登录" name="threePartyLogin"> -->
         <el-form
           v-else
@@ -171,7 +133,7 @@
         >
           <!-- 手机号 -->
           <el-form-item prop="mobile">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <el-icon class="mx-2"><Iphone /></el-icon>
               </span>
@@ -188,7 +150,7 @@
           </el-form-item>
           <!-- 图形验证码-->
           <el-form-item prop="imageCaptchaCode" v-if="!verifyFlag">
-            <div class="flex-y-center w-full justify-between">
+            <div class="input_item__ flex-y-center w-full justify-between">
               <span class="icon-box">
                 <el-icon class="mx-2"><Lock /></el-icon>
               </span>
@@ -211,7 +173,7 @@
           </el-form-item>
           <!-- 验证码 -->
           <el-form-item v-if="verifyFlag" prop="captchaCode">
-            <div class="flex-y-center w-full">
+            <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
@@ -260,17 +222,18 @@
             @click.prevent="verifyCode"
             >{{ $t("login.submit") }}
           </el-button>
+          
         </el-form>
-        <!-- </el-tab-pane> -->
-        <!-- </el-tabs> -->
+        <!-- <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox> -->
       </el-card>
     </div>
-
+  </el-row>
     <!-- <el-button type="primary" @click="test" >测试</el-button> -->
     <!-- ICP备案 -->
     <!-- <div class="absolute bottom-1 text-[10px] text-center" v-show="icpVisible">
       <p>2005-2024 版权所有 软通动力信息技术（集团）股份有限公司 版权所有</p>
     </div> -->
+    <CopyRight style="position: absolute;border: none;background: transparent;bottom: 0;" />
     <third-party-dialog
       v-if="dialogShow"
       v-model:dialogShow="dialogShow"
@@ -287,7 +250,7 @@ import { Sunny, Moon } from "@element-plus/icons-vue";
 import { LocationQuery, LocationQueryValue, useRoute } from "vue-router";
 import router from "@/router";
 import defaultSettings from "@/settings";
-import { ThemeEnum } from "@/enums/ThemeEnum";
+import {ThemeEnum, ThemeSuitedColorEnum} from "@/enums/ThemeEnum";
 import thirdPartyDialog from "./components/thirdPartyDialog.vue";
 import imagCaptcha from "./components/ImagCaptcha.vue";
 
@@ -316,6 +279,19 @@ const isCapslock = ref(false); // 是否大写锁定
 const captchaBase64 = ref(); // 验证码图片Base64字符串
 const loginFormRef = ref(ElForm); // 登录表单ref
 const { height } = useWindowSize();
+const passwordType = ref("password"); // 密码类型
+const isMouseDown = ref(false); // 鼠标按下状态
+const showPassword = () => {
+  passwordType.value = "text";
+  isMouseDown.value = true
+};
+const hidePassword = () => {
+  if(isMouseDown.value) {
+    passwordType.value = "password";
+    isMouseDown.value = false
+  }
+};
+const showLoginCard = ref(true); // 是否显示登录卡片
 
 const loginData = ref<LoginData>({
   username: "",
@@ -569,108 +545,186 @@ watchEffect(() => {
   }
 });
 
-onMounted(() => {});
+onMounted(() => {
+  // 从平台过来的 隐藏登陆卡片
+  const href = window.location.href;
+  const code = href.slice(href.indexOf("?") + 1, href.indexOf("&")).split("=")[1];
+  if(code) {
+    showLoginCard.value = false;
+    userStore.verifyCode(code)
+  }
+
+  // 登录页 清除深色模式 根据当前的主题颜色匹配主题
+  const settingsStore = useSettingsStore();
+  Object.keys(ThemeSuitedColorEnum).forEach((key: any) => {
+    if(ThemeSuitedColorEnum[key] === settingsStore.themeColor) {
+      settingsStore.changeTheme(key);
+    }
+  });
+
+});
+
+function handleLoginChange() {
+  verifyFlag.value = false;
+  if(loginData.value.captchaCode) {
+    loginData.value.captchaCode = "";
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 .login-container {
   width: 100%;
+  height: 100vh;
   display: flex;
+  background: url("@/assets/images/logo1.png") no-repeat center center /cover;
+
   .login-container-img {
-    width: 60%;
-    height: 100vh;
-    background: url("@/assets/images/login-new-bg.png") no-repeat center center /
-      cover;
-    .logo-img {
-      display: flex;
-      margin: 80px 0 0 150px;
+    display: flex; /* 确保 .login-container-img 也是 Flex 容器 */
+    width: 100%;
+    height: 100%;
+  }
+
+  .login-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 20px;
+
+    .logo {
       img {
-        width: 300px;
-        height: 75px;
-        margin-left: -20px;
+        width: 200px; // 根据实际Logo大小调整
+        height: auto;
       }
     }
-    .logo-text {
-      font-size: 38px;
-      font-weight: 500;
-      margin: 100px 0 0 150px;
-      letter-spacing: 2px;
-      .text-en {
-        font-size: 20px;
+
+    .system-name {
+      position: absolute;
+      top: 50%; // 垂直居中
+      left: 50%; // 水平居中
+      transform: translate(-50%, -50%); // 精确垂直居中调整
+      text-align: center;
+      .name-cn, .name-en {
+        display: block; // 确保换行
       }
       .text-class {
-        color: #ff8c00;
+        font-size: 32px;
+        font-weight: bold;
+        color: #3a76c6;
+      }
+      .text-en {
+        font-size: 15px;
+        color: #3a76c6;
       }
     }
-    .ewm-img {
-      margin: 50px 0 0 150px;
-      letter-spacing: 2px;
-    }
   }
+
   .login-container-form {
-    width: 40%;
-    margin: 10% 0 0 10%;
-    h2 {
-      margin-left: 16px;
-      text-align: center;
-    }
-    .el-card.is-always-shadow {
-      box-shadow: none;
-    }
-    .el-card__body {
-      padding-top: 0;
-    }
-    .login-form {
-      margin-top: 20px;
-    }
-  }
-  .el-form-item {
-    border: 1px solid #d0d2d9;
-    border-radius: 8px;
-    .icon-box {
-      border-radius: 8px 0 0 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 21%;
-      height: 48px;
-      font-size: 18px;
-      background-color: #e3e3e3;
-    }
-  }
-  :deep(.el-input) {
-    .el-input__wrapper {
-      padding: 0 0 0 15px;
-      background-color: transparent;
-      box-shadow: none;
-      &.is-focus,
-      &:hover {
-        box-shadow: none !important;
+    width: 400px; // 登录表单宽度
+    margin-left: auto; // 靠右展示
+    display: flex;
+    align-items: center; // 垂直居中
+    height: 100%;
+    position: static; /* 移除 position 干扰 */
+    float: none; /* 移除 float 干扰 */
+    margin-right: 50px; // 在最右侧留有50px的空间
+
+    .login-card {
+      margin: auto; // 垂直居中
+      border-radius: 8px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      border: 1px solid #e4e4e4;
+      h2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #333;
+        font-weight: 600;
+        margin: 25px 0;
       }
 
-      input:-webkit-autofill {
-        /* 通过延时渲染背景色变相去除背景颜色 */
-        transition: background-color 1000s ease-in-out 0s;
+      .login-form {
+        width: 100%;
+        padding: 0 12px 22px;
+        :deep(.el-form-item__content) {
+          flex-direction: column;
+        }
+        :deep(.el-form-item__error) {
+          width: 100%;
+          height: 0;
+          transform: translate(0, 2px);
+          padding: 0;
+          text-align: left;
+        }
+      }
+
+      :deep(.el-card__body) {
+        padding: 10px;
       }
     }
   }
-  .tab-container {
+}
+
+:deep(.el-form-item) {
+  border: 1px solid #d0d2d9;
+  border-radius: 8px;
+  width: 243px;
+
+  .icon-box {
+    border-radius: 8px 0 0 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 21%;
     height: 48px;
-    background-color: #f8f8f8;
+    font-size: 18px;
+    &.captcha-icon-box {
+      width: calc(21% - 10.5px);
+    }
+  }
+}
+
+:deep(.el-input) {
+  .el-input__wrapper {
+    padding: 0 15px 0 0;
+    background-color: transparent;
+    box-shadow: none;
+    &.is-focus,
+    &:hover {
+      box-shadow: none !important;
+    }
+    input:-webkit-autofill {
+      transition: background-color 1000s ease-in-out 0s;
+    }
+    .el-input__inner {
+      color: #333 !important;
+    }
+  }
+  .el-input__suffix {
+    width: 22px;
+  }
+}
+
+.tab-container {
+  height: 48px;
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
+  .tab-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s linear;
+  }
+  .active {
+    background-color: #fff;
+    color: #3a76c6;
     border-radius: 12px;
-    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
-    .tab-item {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.2s linear;
-    }
-    .active {
-      background-color: #fff;
-      color: #ff8c00;
-      border-radius: 12px;
-    }
   }
 }
 

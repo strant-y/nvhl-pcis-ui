@@ -25,13 +25,19 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-import { useDzModal } from "@/views/dzmodel/DzModalService";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
   AppTableConfig,
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getFactorList, getBasicRiskList } from "@/api/prod";
+import {
+  deleteFactorBykey,
+  getFactorList,
+  getBasicRiskList,
+  changeRiskStatus,
+  saveRiskInfo,
+} from "@/api/prod";
 import { template } from "lodash";
 const dzmodal = useDzModal();
 
@@ -52,7 +58,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "重置",
-        func: () => {},
+        func: () => {
+          freeEditRef.value?.setFormValue({
+            cKindNo: "",
+            cRiskNo: "",
+            cNmeCn: "",
+          });
+          handleQuery();
+        },
       }),
     ],
     fromSchema: [
@@ -60,8 +73,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cKindNo",
         inputtype: "rtselect",
         title: "大类代码",
-        typeCode: "KIND_LIST_ALL",
-        params: { cStatus: "1" },
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
         clearable: true,
       },
       {
@@ -73,7 +86,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "中文名称",
+        title: "责任名称",
         clearable: true,
       },
     ],
@@ -131,10 +144,10 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "大类代码",
-        clearable: true,
-        rules: [getRules("required", {})],
+        typeCode: "KIND_LIST_GRT",
+        codeParam: { cStatus: "1" },
       },
       {
         prop: "cRiskNo",
@@ -144,7 +157,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
-        title: "中文名称",
+        title: "责任名称",
       },
       {
         prop: "cNmeEn",
@@ -162,8 +175,12 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
-          console.log(val);
+        func: async (val, row) => {
+          await saveRiskInfo(row).then((res) => {
+            if (res.code === 200) {
+              handleQuery();
+            }
+          });
         },
       },
     ],
