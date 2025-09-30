@@ -214,3 +214,41 @@ export function lowercaseKeys<T extends object>(
   }
   return newObj;
 }
+
+
+/**
+ * 根据分辨率适配form-item的label宽度
+ */
+export function updateLabelWidth(): string {
+  let maxLabelWidth;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const scaleRatio = window.devicePixelRatio;
+  const displayPercentage = Math.round(scaleRatio * 100);
+  let px;
+  // 不同缩放比率适配
+  if(displayPercentage <= 110) {
+    px = 200;
+  }else if(displayPercentage <= 150) {
+    px = 180;
+  }else if(displayPercentage <= 175)  {
+    px = 160
+  }else {
+    px = 140
+  }
+  // 不同分辨率适配
+  if(viewportWidth < 1280) {
+    maxLabelWidth = px - 50 + 'px';
+  } else if(viewportWidth < 1700) {
+    maxLabelWidth = px - 30 + 'px';
+  } else if (viewportWidth <= 1920) {
+    maxLabelWidth = px + 'px';
+  } else if(viewportWidth >= 1920 && viewportWidth <= 3840) {
+    maxLabelWidth = px + 80 + 'px';
+  } else if(viewportWidth > 3840 && viewportWidth <= 5120 ) {
+    maxLabelWidth = px + 160 + 'px';
+  }else {
+    maxLabelWidth = px + 240 + 'px';
+  }
+  return maxLabelWidth;
+}

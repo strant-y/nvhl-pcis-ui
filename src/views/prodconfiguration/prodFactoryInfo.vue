@@ -300,7 +300,7 @@ const iconMap = {
         opacity: 0.6;
         display: flex;
         &.isActive{
-          background: var(--menu-active-bg-color);
+          background: var(--el-color-primary);
           :deep(a) {
             color: var(--menu-active-text);
             .iconfont {

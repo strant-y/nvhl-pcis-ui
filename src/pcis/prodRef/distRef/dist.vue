@@ -959,6 +959,9 @@ const method = {
         reader.readAsDataURL(file); // 启动读取
       }
     };
+    input.oncancel = () => {
+      tableconfig.value.formconfig.titleBtns[2].loading = false;
+    };
     input.click(); // 触发文件选择对话框
   },
   //全量模板下载-模板下载

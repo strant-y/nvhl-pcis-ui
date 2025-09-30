@@ -3,7 +3,6 @@
     ref="tableFormfef"
     :model="tableDatas"
     :inline-message="true"
-    :label-width="formUi.labelWidth"
     :size="formUi.size"
     :label-position="formUi.labelPosition"
   >
@@ -48,14 +47,12 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="props">
-          
-          <div style="margin: -5px 5px -5px 5px;background-color: rgba(228,204,164,0.2);">
-           
-            <el-row :gutter="20">
+          <div style="margin: -5px 5px -5px 5px;background-color: rgba(228,204,164,0.2);padding-right: 2%">
+            <el-row :gutter="10">
               <template v-for="(i, index) in getfromSchema()" :key="index">
                 <el-col
                     :span="i.itemWidth ? i.itemWidth * formUi.span : formUi.span"
-                    style="margin-top: 5px"
+                    style="margin-top: 2px"
                     v-if = 'formItems[props.row._dataId][i.prop].hidden !== true'
                     v-show="formItems[props.row._dataId][i.prop].cShowLocation !== '2'"
                 >
@@ -64,9 +61,9 @@
                       :rules="formItems[props.row._dataId][i.prop].rules ? formItems[props.row._dataId][i.prop].rules : undefined"
                       :label="i.title"
                       :label-position="
-                    i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
-                  "
-                      style="margin-bottom: 18px"
+                        i.inputtype === 'table' ? 'top' : formUi.labelPosition // table 组件,默认标题显示在top上
+                      "
+                      :label-width="calculatedLabelWidth()"
                   >
                     <div style="display: flex; width: 100%;" :class="{'show-right-btn': formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId}">
                       <div
@@ -391,7 +388,7 @@ import { v4 as uuidv4 } from "uuid";
 import Validator from "async-validator";
 import { ref, reactive, watch, onMounted, handleError } from "vue";
 import { ElTable } from "element-plus";
-import {checkIfTruncated} from "@/utils/common";
+import {checkIfTruncated, updateLabelWidth} from "@/utils/common";
 
 // 定义要触发的事件
 const emits = defineEmits<{
@@ -417,6 +414,24 @@ const props = defineProps({
     required: false,
   },
 });
+
+const maxLabelWidth = computed(() => updateLabelWidth()); // 默认值
+
+// 计算label宽度
+const calculatedLabelWidth = () => {
+  let originalWidth;
+  if (formUi.labelWidth && formUi.labelWidth !== 'auto') {
+    originalWidth = formUi.labelWidth.includes('px')
+        ? formUi.labelWidth
+        : `${formUi.labelWidth}px`;
+  } else {
+    originalWidth = maxLabelWidth.value;
+  }
+  const widthValue = parseFloat(originalWidth);
+  const finalValue = Math.max( widthValue, 0);
+  return `${finalValue}px`;
+};
+
 
 /**
  * 单元格样式

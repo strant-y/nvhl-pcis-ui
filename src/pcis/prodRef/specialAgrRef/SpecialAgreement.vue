@@ -99,7 +99,6 @@ const tableconfig = reactive<AppTableConfig>(
           if(originalData.value.length==0){
               originalData.value  =    deepClone(formData.value)
           }
-          debugger;
           let param = {};
           if(row['cIfMust'] !== '9' && row['cIfFix'] !== '0') {
             

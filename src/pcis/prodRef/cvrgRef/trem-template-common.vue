@@ -179,7 +179,6 @@
                                 </template>
                                 <template v-else>
                                   <el-form-item
-                                      class="custom-table-item__"
                                       :error="
                                       showError(
                                         riskdata.rowConfig[colinfo.cColId][
@@ -226,7 +225,6 @@
                             <template v-for="v in extermConf" :key="v.c_pk_id">
                               <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
                                 <el-form-item
-                                    class="custom-table-item__"
                                     :rules="
                                     isrequired(v) ? getRequired() : undefined
                                   "
@@ -277,7 +275,6 @@
                       </td>
                       <td>
                         <el-form-item
-                            class="custom-table-item__"
                           :rules="isrequired(item) ? getRequired() : undefined"
                           :prop="item.prop"
                         >
@@ -327,7 +324,6 @@
                     <template v-for="(item, k) in termFactormap" :key="k">
                       <td v-if="item.cPorpShowtitle !== '1' && item.cPorpExtend !== '1'">
                         <el-form-item
-                            class="custom-table-item__"
                           :rules="isrequired(item) ? getRequired() : undefined"
                           :prop="item.prop"
                         >
@@ -348,7 +344,6 @@
                           <template v-if="item.cPorpExtend === '1'">
                             <el-col style="margin-top: 5px" :span="12">
                               <el-form-item
-                                  class="custom-table-item__"
                                 :rules="isrequired(item) ? getRequired() : undefined"
                                 :prop="item.prop"
                                 :label="item.title" 
@@ -1553,7 +1548,7 @@ td {
 }
 
 .selected {
-  background-color: rgba(146, 209, 232, 0.5) !important;
+  background-color: var(--cvrg-select-row-bg-color) !important;
 }
 :deep(.el-input__inner) {
   text-align: right!important;
@@ -1574,15 +1569,6 @@ td {
       background-color: var( --cvrg-sub-header-bg-color);
       //padding: 2px
       padding: 5px 10px;
-    }
-  }
-
-  :deep(.custom-table-item__){
-    .el-form-item__content {
-      line-height: 25px;
-      height: 25px;
-      @extend .rt-custom-input;
-      @extend .rt-custom-select;
     }
   }
 }

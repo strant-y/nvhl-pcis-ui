@@ -1,20 +1,12 @@
 /** 全局SCSS变量 */
 :root {
-  --menu-background: #f0f5f9;
-  --menu-active-text: #FFF;
-  --menu-text-size: 14px;
-  --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
-
   // 只读状态字体颜色调整
   --el-disabled-text-color: #777;
+  --el-card-header-bg-color: rgba(245, 250, 255, 0.86);
   --font-family: "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
   //--font-family: 'Source code Pro', monospace;
   //--font-family: 'Noto Sans SC', sans-serif;
   --wrapper-required-bg-color:  #FEFAF1 !important;
-  --rt-bg-color: #FFFFFF !important;
-  --rt-border: rgb(100 100 100 / 20%) 1px solid !important;
-  --rt-overlay-color: rgb(20 20 20 / 10%) !important;
-
   --dashboard-bg: url("@/assets/img/home_bg1.png");
   --el-text-color-regular: #000;
 
@@ -22,10 +14,14 @@
   --card-group-header-title-size: 14px;
   --card-header-title-size: 15px;
 
-  --cvrg-sub-header-bg-color: rgba(214, 254, 255, 0.6);
   --cvrg-group-header-bg-color: rgba(0,0,0,0.04);
   --el-mypage-right-menu-border-color: rgb(50 50 50 / 10%);
 
+  --rt-bg-color: #FFFFFF !important;
+  --rt-border: rgb(100 100 100 / 20%) 1px solid !important;
+  --rt-overlay-color: rgb(20 20 20 / 10%) !important;
+
+  --rt-form-item-radius: 2px;
   --rt-form-content-font-size: 12px; // 表单content字体大小
   --rt-form-content-font-weight: 450;
   --rt-form-content-height: 24px; // 表单content高
@@ -33,7 +29,7 @@
   --rt-form-label-font-size: 12px; // 表单label字体大小
   --rt-form-label-font-weight: 400;
   --rt-form-label-font-color: #000000;
-  --rt-form-label-padding: 0 5px 0 0, // 标签内边距
+  --rt-form-label-padding: 0 3px 0 0, // 标签内边距
 }
 
 
@@ -42,34 +38,34 @@ html.default {
   --menu-background: #f0f5f9;;
   --menu-active-text: #FFFFFF;
   --menu-hover: rgba(171, 212, 253, 0.4);
-  --menu-active-bg-color: #3a76c6;
   --menu-text: #000000;
   --el-text-color: #000 !important;
 
-  --cvrg-sub-header-bg-color: rgba(165, 204, 255, 0.3);
-  --rt-select-row-bg-color: rgba(165, 204, 255, 0.1);
+  --cvrg-sub-header-bg-color: rgba(165, 204, 255, 0.35);
+  --cvrg-select-row-bg-color: rgba(165, 204, 255, 0.25);
+  --rt-select-row-bg-color: rgba(165, 204, 255, 0.15);
 }
 html.orange {
   --menu-background: #f0f5f9;;
   --menu-active-text: #FFFFFF;
   --menu-hover: rgba(236, 177, 148, 0.4);
-  --menu-active-bg-color: #FF8C00;
   --menu-text: #000000;
   --el-text-color: #000 !important;
 
-  --cvrg-sub-header-bg-color: rgba(255, 211, 169, 0.3);
-  --rt-select-row-bg-color: rgba(255, 211, 169, 0.1);
+  --cvrg-sub-header-bg-color: rgba(255, 211, 169, 0.35);
+  --cvrg-select-row-bg-color: rgba(255, 211, 169, 0.25);
+  --rt-select-row-bg-color: rgba(255, 211, 169, 0.15);
 }
 html.green {
   --menu-background: #f0f5f9;
   --menu-active-text: #FFFFFF;
   --menu-hover: rgba(184, 248, 218, 0.4);
-  --menu-active-bg-color: #09d067;
-  --menu-text: #fff;
+  --menu-text: #000;
   --el-text-color: #000 !important;
 
-  --cvrg-sub-header-bg-color: rgba(168, 251, 207, 0.3);
-  --rt-select-row-bg-color: rgba(168, 251, 207, 0.1);
+  --cvrg-sub-header-bg-color: rgba(168, 251, 207, 0.35);
+  --cvrg-select-row-bg-color: rgba(168, 251, 207, 0.25);
+  --rt-select-row-bg-color: rgba(168, 251, 207, 0.15);
 }
 
 
@@ -78,7 +74,6 @@ html.dark {
   --menu-background: rgb(0 0 0 / 80%);
   --menu-text: #fff !important;
   --menu-hover: rgb(220 220 220 / 30%);
-  --menu-active-bg-color: #3a76c6;
 
   --sidebar-logo-background: rgba(255, 255, 255, 0.6);
   --el-text-color: #b9b9b9 !important;
@@ -88,6 +83,7 @@ html.dark {
   }
   --card-header-title-color: #ccc !important;
   --cvrg-sub-header-bg-color: rgb(0 0 0 / 80%);
+  --cvrg-select-row-bg-color: rgba(155 155 155 / 10%);
   --card-group-header-bg-color: rgb(0 0 0 / 80%);
   --cvrg-group-header-bg-color: rgb(0 0 0 / 60%);
 

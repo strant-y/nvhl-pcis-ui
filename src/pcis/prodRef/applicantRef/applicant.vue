@@ -90,6 +90,7 @@ onMounted(() => {
     //   rules: null,
     //   disabled: true,
     // });
+    
     setValue("Applicant.cNation", "CHN"); // 国籍默认中国
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
     const cProdNo = param.cProdNo;
@@ -101,7 +102,6 @@ onMounted(() => {
       cProdNo === "043011"
     ) {
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
-
     }
     if (cProdNo === '130003') {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -505,16 +505,20 @@ const method = {
   },
   //证件有效期止期时间事件改变
   tCertfEndDateChange: (val) => {
+    debugger
     const tableData = opertaor.getTableRefs();
-    const tcertfEndDate = tableData["applicant"].getFromValue()["Applicant.TcertfEndDate"]  //证件有效止期
+    const tcertfEndDate = tableData["applicant"].getFromValue()["Applicant.tCertfEndDate"]  //证件有效止期
     const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期
-    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.TInsrncBgnTm"] //保险起期
+    const tinsrncBgnTm = tableData["insrnc"].getFromValue()["Base.tInsrncBgnTm"] //保险起期
     if (val && tIssueTm && tinsrncBgnTm) {
-      if (val < tIssueTm) {
+      const certfEndDate = new Date(val).getTime();
+      const issueTm = new Date(tIssueTm).getTime();
+      const insrncBgnTm = new Date(tinsrncBgnTm).getTime();
+      if (certfEndDate < issueTm) {
         ElMessage.error("投保人证件有效期小于保单签单时间，请关注!");
-        setValue("Applicant.tIssueTm", tIssueTm);
+        setValue("Insured.tCertfEndDate", '');
       }
-      if (val < tinsrncBgnTm) {
+      if (certfEndDate < insrncBgnTm) {
         ElMessage.error("投保人证件有效期小于保单起保时间，请关注!");
       }
     }
@@ -525,17 +529,25 @@ const method = {
     const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
     const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
     if (val && tAppTm && tIssueTm) {
-      if (val < tIssueTm) {
+      const establishingDate = new Date(val).getTime();
+      const appTm = new Date(tAppTm).getTime();
+      const issueTm = new Date(tIssueTm).getTime();
+      if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
-      if (val < tAppTm) {
+      if (establishingDate > appTm) {
         ElMessage.error("企业成立时间小于投保日期，请关注!");
       }
     }
   },
   //投保人性质(0是法人 1是个人)
   InsureChange: (val) => {
-    const param = opertaor.getParam(); ``
+    // if (val == "1") {
+    //     setFormItem("Applicant.cIsMicroEntpris", { disabled: true }); // 是否小微企业
+    //     setFormItem("Applicant.cGreenIndustryCustomers", { disabled: true }); // 是否绿色产业客户
+    //     setFormItem("Applicant.cGreenIndustryList", { disabled: true }); // 是否绿色产业客户
+    // }
+    const param = opertaor.getParam(); 
     if (val === "0") {
       // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
       setFormItem("Applicant.tBirthday", {
@@ -613,12 +625,11 @@ const method = {
         });
 
         // 绿色客户 如果为时就放开
-        if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
-          setFormItem("Applicant.cGreenIndustryList", {
+        // if (getValue('Applicant.cGreenIndustryCustomers') == '1') {}
+        setFormItem("Applicant.cGreenIndustryList", {
             rules: [getRules("required", {})],
             disabled: false,
-          });
-        }
+        });
 
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
@@ -712,6 +723,7 @@ const method = {
         rules: [],
       });
     } else {
+      
       setFormItem("Applicant.tBirthday", {
         hidden: false,
       });
@@ -776,6 +788,11 @@ const method = {
       });
       // 是否绿色详情
       setFormItem("Applicant.cGreenIndustryList", {
+        rules: null,
+        disabled: true,
+      });
+      // 是否小微企业
+      setFormItem("Applicant.cIsMicroEntpris", {
         rules: null,
         disabled: true,
       });
@@ -912,7 +929,6 @@ const method = {
     }
 
     checkUser();
-
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
