@@ -39,6 +39,16 @@
                     </div>
                 </div>
             </template>
+            <template #column-cEdrNo="{ row, column, index }">
+                <div class="policy-info-cell">
+                    <div v-if="row.cEdrNo" class="policy-number-row">
+                        <span>{{ row.cEdrNo }}</span>
+                        <el-icon class="copy-icon" @click="copyText(row.cEdrNo)">
+                            <DocumentCopy />
+                        </el-icon>
+                    </div>
+                </div>
+            </template>
         </app-table>
         <comDialog ref="dialogRef"></comDialog>
     </div>
@@ -482,7 +492,8 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "policyInfo",
                 inputtype: "rtinput",
                 title: "申请单号\n保单号",
-                width: 136,
+                lengthNum: 21,
+                lengthIsNumber: true,
                 slotName: "policyInfo"
             },
             {
@@ -503,7 +514,9 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: 'cEdrNo',
                 inputtype: 'rtinput',
                 title: '批单号',
-                width: 136,
+                lengthNum: 21,
+                lengthIsNumber: true,
+                slotName: "cEdrNo"
             },
             {
                 prop: 'cAppNme',
@@ -511,13 +524,14 @@ const tableconfig = reactive<AppTableConfig>(
                 title: '投保人名称',
                 slotName: "cAppNme",
                 align: 'left',
-                minWidth: 112,
+                lengthNum: 12,
             },
             {
                 prop: 'nPrm',
                 inputtype: 'rtinput',
                 title: '保险费',
-                width: 77,
+                lengthNum: 12,
+                lengthIsNumber: true,
                 align: "left",
                 formatter: (val: any) => {
                     return val.toLocaleString()
@@ -527,7 +541,7 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: 'cProdNmeCn',
                 inputtype: 'rtinput',
                 title: '产品',
-                minWidth: 160,
+                lengthNum: 13,
                 slotName: "cProdNmeCn",
                 align: 'left',
             },
@@ -535,14 +549,15 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: 'cSlsNme',
                 inputtype: 'rtinput',
                 title: '业务员名称',
-                width: 67,
+                lengthNum: 5,
                 align: 'left',
             },
             {
                 prop: 'tAppTm',
                 inputtype: 'rtinput',
                 title: '投保申请日期',
-                width: 112,
+                lengthNum: 17,
+                lengthIsNumber: true,
                 formatter: (val: any) => {
                     return val?.replace(/T/g, ' ')
                 }
@@ -551,14 +566,16 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "InsurancePeriod",
                 inputtype: "rtinput",
                 title: "保险期间",
-                width: 112,
+                lengthNum: 17,
+                lengthIsNumber: true,
                 slotName: "InsurancePeriod"
             },
             {
                 prop: 'tUdrTm',
                 inputtype: 'rtinput',
                 title: '核保日期',
-                width: 112,
+                lengthNum: 17,
+                lengthIsNumber: true,
                 formatter: (val: any) => {
                     return val?.replace(/T/g, ' ')
                 }

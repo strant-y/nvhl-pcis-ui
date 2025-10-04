@@ -616,14 +616,15 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "询价申请单号/询价单号",
         fixed: "left",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
         slotName: "cInquiryNo"
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        width: 45,
+        lengthNum: 3,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -638,7 +639,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         // slotName: "cDptCnm",
         align: 'left',
-        minWidth: 145,
+        lengthNum: 12,
       },
       {
         prop: "cTermNme",
@@ -646,7 +647,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         // slotName: "cTermNme",
         align: 'left',
-        minWidth: 122,
+        lengthNum: 13,
       },
       {
         prop: "cAppNme",
@@ -654,7 +655,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         // slotName: "cAppNme",
         align: 'left',
-        minWidth: 122,
+        lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -662,32 +663,34 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         // slotName: "cInsuredNme",
         align: 'left',
-        minWidth: 122,
+        lengthNum: 12,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        width: 67,
+        lengthNum: 5,
       },
       {
         prop: "bsTm1",
         inputtype: "rtinput",
         title: "询价日期",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "提交时间",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
-        width: 65,
+        lengthNum: 5,
         align: "left",
         loadData: [
           { label: "未接收", value: "0" },

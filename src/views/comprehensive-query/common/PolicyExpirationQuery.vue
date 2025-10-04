@@ -324,7 +324,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保单号",
         slotName: "cPlyNo",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
       },
       {
         prop: "cDptCnm",
@@ -332,7 +333,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "机构",
         slotName: "cDptCnm",
         align: 'left',
-        minWidth: 145,
+        // lengthNum: 12,
       },
       {
         prop: "cTermNme",
@@ -340,13 +341,13 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款",
         slotName: "cTermNme",
         align: 'left',
-        minWidth: 157,
+        // lengthNum: 13,
       },
       {
         prop: "nExpirationDays",
         inputtype: "rtinput",
         title: "保单到期剩余天数",
-        width: 102,
+        lengthNum: 8,
       },
     ],
   })
