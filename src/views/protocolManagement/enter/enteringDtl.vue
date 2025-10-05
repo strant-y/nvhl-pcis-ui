@@ -1042,14 +1042,14 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   }
   if(props.payWay == '01') {// 预付
     // 应收保费: 折人名币预收保费
-    pay["ECargoPay.nPayablePrm"] = base["ECargoBase.nRmbReceivedPrm"] ? base["ECargoBase.nRmbReceivedPrm"] : 0;
+    pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbReceivedPrm"] ? insrnc["ECargoBase.nRmbReceivedPrm"] : 0;
     // 我司保费: 折人民币我司协议剩余预收保费
-    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.nCiOwnRmbReceivedPrm"] ? base["ECargoBase.nCiOwnRmbReceivedPrm"] : 0;
+    pay["ECargoPay.nOwnPrm"] = insrnc["ECargoBase.nCiOwnRmbReceivedPrm"] ? insrnc["ECargoBase.nCiOwnRmbReceivedPrm"] : 0;
   } else {// 非预付
     // 应收保费: 折人名币预估保费
-    pay["ECargoPay.nPayablePrm"] = base["ECargoBase.nRmbPrm"] ? base["ECargoBase.nRmbPrm"] : 0;
+    pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbPrm"] ? insrnc["ECargoBase.nRmbPrm"] : 0;
     // 我司保费: 折人民币我司预估保费
-    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.nCiOwnRmbPrm"] ? base["ECargoBase.nCiOwnRmbPrm"] : 0;
+    pay["ECargoPay.nOwnPrm"] = insrnc["ECargoBase.nCiOwnRmbPrm"] ? insrnc["ECargoBase.nCiOwnRmbPrm"] : 0;
   }
 
   pay["ECargoPay.tPayBgnTm"] = moment(insrnc["ECargoBase.tAppTm"]).format(
@@ -1059,14 +1059,14 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
     "YYYY-MM-DD HH:mm:ss"
   );
   pay["ECargoPay.cProdNo"] = base["ECargoBase.cProdNo"];
-  pay["ECargoPay.nPrmVar"] = !!base["ECargoBase.nPrm"] ? base["ECargoBase.nPrm"] : 0;
+  pay["ECargoPay.nPrmVar"] = !!insrnc["ECargoBase.nPrm"] ? insrnc["ECargoBase.nPrm"] : 0;
   payList.push(pay);
   return payList;
 };
 async function save() {
   let isOk = false
   let processedData = { ...formPage.value?.getAllFormData() }; 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const base = processedData['AgreementBase'];
   if(!(processedData['AgreementBase'] && processedData['AgreementBase']['ECargoBase.cDptCde'])){
      return ElMessage.warning("请选择出单机构")
