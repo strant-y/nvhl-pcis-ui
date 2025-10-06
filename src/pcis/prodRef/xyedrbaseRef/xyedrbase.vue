@@ -143,6 +143,28 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // suffix: "元"
       },
       {
+        prop: "EdrECargoBase.nBefEdrReceivedPrm",
+        inputtype: "rtinput",
+        title: "原预收保费",
+        disabled:true,
+        // suffix: "元"
+      },
+      {
+        prop: "EdrECargoBase.nReceivedPrm",
+        inputtype: "rtinput",
+        title: "现预收保费",
+        disabled:true,
+        // suffix: "元"
+      },
+      {
+        prop: "EdrECargoBase.nReceivedPrmVar",
+        inputtype: "rtinput",
+        min:-999999999999,
+        title: "预收保费变化",
+        disabled:true,
+        // suffix: "元"
+      },
+      {
         prop: "EdrECargoBase.tEdrAppTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
