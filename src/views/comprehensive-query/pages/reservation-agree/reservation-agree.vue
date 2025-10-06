@@ -11,13 +11,13 @@
 			<template #column-policyInfo="{ row, column, index }">
 				<div class="policy-info-cell">
 					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
-						<span style="width: 119px;">{{ row.cEcAgrAppNo }}</span>
+						<span style="width: calc(100% - 1em - 5px)">{{ row.cEcAgrAppNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
 							<DocumentCopy />
 						</el-icon>
 					</div>
 					<div v-if="row.cEcAgrNo" class="policy-number-row">
-						<span style="width: 119px;">{{ row.cEcAgrNo }}</span>
+						<span style="width: calc(100% - 1em - 5px)">{{ row.cEcAgrNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
 							<DocumentCopy />
 						</el-icon>
@@ -205,20 +205,22 @@ const tableconfig = reactive<AppTableConfig>(
         title: "序号",
         showIndex: true,
         fixed: "left",
-        width: 33,
+        lengthNum: 2,
       },
 			{
 				prop: "policyInfo",
 				inputtype: "rtinput",
 				title: "协议号",
         fixed: "left",
-				width: 142,
+        lengthNum: 22,
+        lengthIsNumber: true,
 				slotName: "policyInfo"
 			},
       {
         prop: "cEcAgrEdrNo",
         inputtype: "rtinput",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
         title: "批单号",
         slotName: "cEcAgrEdrNo"
       },
@@ -242,7 +244,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         slotName: "cAppNme",
         align: "left",
-        width: 112,
+        lengthNum: 12,
       },
       {
         prop: "insuredNme",
@@ -250,13 +252,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         slotName: "insuredNme",
         align: "left",
-        width: 112,
+        lengthNum: 12,
       },
 			{
 				prop: "InsurancePeriod",
 				inputtype: "rtinput",
 				title: "协议期间",
-        width: 220,
+        lengthNum: 36,
+        lengthIsNumber: true,
 			},
       // {
       //   prop: "tInsrncBgnTm",
@@ -272,56 +275,64 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nRmbPrm",
         inputtype: "rtinput",
         title: "预估总保费",
-        width: 77,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nRmbAmt",
         inputtype: "rtinput",
         title: "预估总保额",
-        width: 83,
+        lengthNum: 13,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nLowPrm",
         inputtype: "rtinput",
         title: "最低保费",
-        width: 77,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nWhRmbAmt",
         inputtype: "rtinput",
         title: "预扣保额",
-        width: 83,
+        lengthNum: 13,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nRecRemEstAmt",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保额",
-        width: 132,
+        lengthNum: 13,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nRmbReceivedPrm",
         inputtype: "rtinput",
         title: "预收保费",
-        width: 77,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nWhRmbPrm",
         inputtype: "rtinput",
         title: "预扣保费",
-        width: 77,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nRecRemPrm",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保费",
-        width: 132,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left",
       },
       {
@@ -337,7 +348,7 @@ const tableconfig = reactive<AppTableConfig>(
 					{ label: "见费出单退回", value: "8" },
 					{ label: "已拒保", value: "9" },
 				],
-        width: 76,
+        lengthNum: 6,
         align: "left"
       },
     ],

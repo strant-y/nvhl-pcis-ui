@@ -452,6 +452,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "info",
         size: "large",
         icon: "Message",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
             return false;
@@ -471,6 +472,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
             return false;
@@ -489,6 +491,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "info",
         size: "large",
         icon: "Release",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
             return false;
@@ -507,6 +510,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "return",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
             return false;
@@ -551,6 +555,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "primary",
         size: "large",
         icon: "View",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
@@ -569,6 +574,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Refresh",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
@@ -604,7 +610,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
-        width: 57,
+        lengthNum: 4,
         title: "任务类型",
       },
       {
@@ -612,14 +618,15 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "申请单号",
         slotName: "cAppNoInfo",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
         fixed: "left",
       },
       {
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        width: 45,
+        lengthNum: 3,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -634,7 +641,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         slotName: "cDptCnm",
         align: 'left',
-        width: 145,
+        lengthNum: 12,
       },
       {
         prop: "cTermNme",
@@ -642,7 +649,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         slotName: "cTermNme",
         align: 'left',
-        width: 122,
+        lengthNum: 13,
       },
       {
         prop: "cAppNme",
@@ -650,7 +657,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         slotName: "cAppNme",
         align: 'left',
-        width: 122,
+        lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -658,14 +665,15 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         slotName: "cInsuredNme",
         align: 'left',
-        width: 122,
+        lengthNum: 12,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
         align: 'left',
-        width: 79,
+        lengthNum: 12,
+        lengthIsNumber: true,
         formatter:(val:any) => {
           return val.toLocaleString()
         }
@@ -677,36 +685,35 @@ const tableconfig = reactive<AppTableConfig>(
         type: "datetimerange", // 显示日期和时间选择器
         format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        width: 67,
+        lengthNum: 5,
       },
       {
         prop: "udrClsCde",
         inputtype: "rtinput",
         title: "当前核保级别",
-        minWidth: 180,
         align: 'left',
-        width: 112,
+        lengthNum: 12,
       },
       {
         prop: "cMinUndrCls",
         inputtype: "rtinput",
         title: "最终审核级别",
-        minWidth: 180,
         align: 'left',
-        width: 112,
+        lengthNum: 12,
       },
       {
         prop: "state",
         inputtype: "rtselect",
         title: "任务状态",
-        width: 65,
+        lengthNum: 5,
         align: "left",
         loadData: [
           { label: "未接收", value: "0" },
