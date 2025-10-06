@@ -796,7 +796,7 @@ const method = {
 			if(keys && keys.length>0) {
 				const inputGroupKey = keys[0];
 				const addrValueKey = addrInput[inputGroupKey];
-				paramitem.dist[addrValueKey] = paramitem.dist[inputGroupKey];
+				paramitem.dist ? paramitem.dist[addrValueKey] = paramitem.dist?.[inputGroupKey] : '';
 			}
 		}
     policyService

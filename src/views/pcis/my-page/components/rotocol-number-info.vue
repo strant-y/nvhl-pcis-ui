@@ -114,6 +114,11 @@ const tableconfig = reactive<AppTableConfig>(
       }
     ],
 		rowDbClickFun:(row: any)=>{
+      // cPayStatus 在是0的情况下 点击给出提示'该协议有待缴费任务，请先完成缴费'
+      if(row.cPayStatus == '0'){
+        ElMessage.warning("该协议有待缴费任务，请先完成缴费！");
+        return false
+      }
       emits("ok", row);
       maindialogVisible.value = false
     }

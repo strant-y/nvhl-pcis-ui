@@ -546,6 +546,9 @@ import { ElTable, ElTableColumn } from 'element-plus';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { fa } from 'element-plus/es/locale';
+import { numSubp } from '@/utils/Math';
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -1878,12 +1881,13 @@ async function loadAfter() {
       opertaor.setDisabledAll();
     });
   } else if (props.param.pageType === "orig") {
+    const res = props.param.res
     // 续保复制
-    getAppPolicy({
-      cAppNo: props.param.cAppNo,
-      queryTyp: props.param.pageType,
+    // getAppPolicy({
+    //   cAppNo: props.param.cAppNo,
+    //   queryTyp: props.param.pageType,
      
-    }).then((res) => {
+    // }).then((res) => {
       if (res) {
         const cPlyNo = res.res.composition.plyBase[0]['Base.cPlyNo']
         const ops = clearCAppNo(opertaor.convertData(res));
@@ -1932,7 +1936,7 @@ async function loadAfter() {
         //获取单号
         // getCAppNoFun();
       }
-    });
+    // });
     bthList.value.push(
       createFreeButtonBase({
         label: "保存模板",
@@ -3279,7 +3283,11 @@ const submitToUndrFn = async () => {
       return false;
     }
   }
- 
+
+  // 反洗钱校验
+  if (!validateNPrmAmlya()) {
+    return;
+  }
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {
     const btn = getBtn("btn010103");
@@ -3489,6 +3497,93 @@ const submitToUndrFn = async () => {
     });
   }
 };
+
+function amlyaFlag() {
+  const plyBaseData = opertaor.getDataAll()["base"];
+  const NPrm = plyBaseData['Base.nPrm'];// 总保费
+  const NRmbPrm = plyBaseData['Base.nRmbPrm'];// 折人民币保费
+  const CPrmCur = plyBaseData['Base.cPrmCur']; // 保费币种
+  const diff = 0.00.toFixed(2);
+  if (CPrmCur === 'USD') {// 美元大于等于2W
+    if (numSubp(NPrm, 20000, 2) >= diff) {
+      return true;
+    }
+  } else {// 折合人民币大于等于20W
+    if (numSubp(NRmbPrm, 200000, 2) >= diff) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// 校验反洗钱
+const validateNPrmAmlya = () => {
+  if(amlyaFlag()) {
+    const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
+    let msg = `根据反洗钱相关规定，当前保单保费大于等于${CPrmCur === 'USD' ? '2万美元' : '20万'}，请完善客户信息中：<br/>`;
+    let flag = false;
+    
+    // ----------投保人------------
+    const applicantArr = ['Applicant.cNation', 'Applicant.cBusinessScope', 'Applicant.cCntrNme', 'Applicant.cOperaterCertfTyp', 'Applicant.cOperaterCertfCde', 'Applicant.tOperaterCertfEndTm', 'Applicant.cOccupTyp', 'Applicant.cHabitualResidence'];
+    const applicantCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '职业类别', '经常居住地'];
+    let appMsg = '';
+    if(opertaor.getDataAll()["applicant"]) {
+      const applicantData = opertaor.getDataAll()["applicant"];
+      const applicantRef = opertaor.getTableRefByKey('applicant');
+      for (const i in applicantArr) {
+        const objValue = applicantData[applicantArr[i]];
+        if (objValue === null || objValue === '' || objValue === undefined) {
+          appMsg += applicantCnmArr[i] + '、';
+          applicantRef.setFormItem(applicantArr[i], {
+            rules: [getRules("required", {})],
+            hidden: false,
+            disabled: false
+          });
+          flag = true;
+        }
+      }
+      if (appMsg !== '') {
+        msg += `【投保人信息】${appMsg}<br/>`;
+      }
+    }
+    // ----------被保人------------
+    const insuredArr = ['Insured.cNation', 'Insured.cBusinessScope', 'Insured.cCntrNme', 'Insured.cOperaterCertfTyp', 'Insured.cOperaterCertfCde', 'Insured.tOperaterCertfEndTm', 'Insured.cHabitualResidence'];
+    const insuredCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '经常居住地'];
+    if(props.param.cProdNo === '029900' || props.param.cProdNo === '120001' || props.param.cProdNo === '120003') {
+      insuredArr.push('Insured.cOccupCde')
+      insuredCnmArr.push('职业')
+    } else {
+      insuredArr.push('Insured.cOccupTyp')
+      insuredCnmArr.push('职业类别')
+    }
+    let insuredMsg = '';
+    if(opertaor.getDataAll()["insured"]) {
+      const insuredData = opertaor.getDataAll()["insured"];
+      const insuredRef = opertaor.getTableRefByKey('insured');
+      for (const i in insuredArr) {
+        const objValue = insuredData[insuredArr[i]];
+        if (objValue === null || objValue === '' || objValue === undefined) {
+          insuredMsg += insuredCnmArr[i] + '、';
+          insuredRef.setFormItem(insuredArr[i], {
+            rules: [getRules("required", {})],
+            hidden: false,
+            disabled: false
+          });
+          flag = true;
+        }
+      }
+      if (insuredMsg !== '') {
+        msg += `【被保人信息】${insuredMsg}<br/>`;
+      }
+    }
+    if (flag) {
+      msg += '字段！'
+      ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
+      return false;
+    }
+  }
+  return true;
+}
 
 /**
  * 额度明细弹窗
@@ -4527,6 +4622,11 @@ const submitEdrToUndrFun = async () => {
   //     ElMessage.warning("请填写账户信息中的必填项")
   //     return
   //   }
+
+  // 反洗钱校验
+  if (!validateNPrmAmlya()) {
+    return;
+  }
 if(props.param.cTransMrk !== "1"){
     adjustCiPremiumDifference();
     if (!checkNAmt()) return;
