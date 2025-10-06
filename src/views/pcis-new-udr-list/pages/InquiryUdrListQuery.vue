@@ -454,7 +454,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "info",
         size: "large",
         icon: "Message",
-        // iconSize: "25",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "1") {
             return false;
@@ -474,7 +474,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
-        // iconSize: "25",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
             return false;
@@ -493,7 +493,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "info",
         size: "large",
         icon: "Message",
-        // iconSize: "25",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "2") {
             return false;
@@ -512,7 +512,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "return",
-        // iconSize: "25",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3") {
             return false;
@@ -559,7 +559,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "View",
-        // iconSize: "25",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
@@ -578,7 +578,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Refresh",
-        // iconSize: "25",
+        iconSize: "25",
         hideBtns: (row: any) => {
           if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
             return false;
