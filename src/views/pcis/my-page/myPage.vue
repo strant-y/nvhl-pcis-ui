@@ -764,7 +764,12 @@ const detailcodeList = [
 // 用来处理 账户信息 哪些场景显示
 const isDetailCde = () => {
   let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];  // 判断 批改的用批改ID   综合查询的用cEdrRsnBundleCde
-  return detailcodeList.some(item => item.id === cRsnCde);
+  // 查询列表返回的cRsnCde是中文名称，所以这里处理一下
+  if(/^[\u4e00-\u9fa5]+$/.test(cRsnCde)) {
+    return detailcodeList.some(item => item.name === cRsnCde);
+  } else {
+    return detailcodeList.some(item => item.id === cRsnCde);
+  }
 };
 
 const getNo = computed(() => {
@@ -1156,14 +1161,14 @@ const edrAddDataBtn = [
       calcPremiumEdr();
     },
   }),
-  createFreeButtonBase({
-    label: "比较/生成批文",
-    type: "primary",
-    id: "btnCompare",
-    func: async () => {
-      generateEndorse();
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "比较/生成批文",
+  //   type: "primary",
+  //   id: "btnCompare",
+  //   func: async () => {
+  //     generateEndorse();
+  //   },
+  // }),
   createFreeButtonBase({
     label: "保存",
     type: "primary",
@@ -1210,6 +1215,7 @@ const edrBtn = [
     label: "比较/生成批文",
     type: "primary",
     id: "btnCompare",
+    hidden: props.param.cRsnCde === '99' || props.param.cEdrRsnBundle === '99', // 数据不全不展示该按钮
     func: () => {
       generateEndorse();
     },
