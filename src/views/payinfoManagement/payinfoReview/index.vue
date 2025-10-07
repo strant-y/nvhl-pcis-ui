@@ -290,7 +290,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "policyInfo",
         inputtype: "rtinput",
         title: "申请单号",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
         fixed: "left",
         slotName: "policyInfo"
       },
@@ -298,7 +299,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPayTyp",
         inputtype: "rtselect",
         title: "缴费类型",
-        width: 65,
+        lengthNum: 9,
         fixed: "left",
         typeCode: "CHARGE_TYPE_CACHE",
         param: { cCde: ["2", "3", "5", "99"] },
@@ -307,14 +308,16 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cChqueNo",
         inputtype: "rtinput",
         title: "交易号",
-        width: 145,
+        lengthNum: 18,
+        lengthIsNumber: true,
         align: "left",
       },
       {
         prop: "nPrm",
         inputtype: "rtnumber",
         title: "保费",
-        width: 77,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left"
       },
       // {
@@ -327,7 +330,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nPayAmt",
         inputtype: "rtnumber",
         title: "缴费金额",
-        width: 77,
+        lengthNum: 12,
+        lengthIsNumber: true,
         align: "left"
       },
       {
@@ -336,7 +340,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款",
         slotName: "cTermName",
         align: 'left',
-        minWidth: 157,
+        lengthNum: 25,
       },
       // {
       //   prop: "d",

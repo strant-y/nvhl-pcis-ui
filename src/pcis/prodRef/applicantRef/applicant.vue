@@ -76,6 +76,7 @@ const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质
 const maindialogVisible = ref(false) // ocr识别弹框打开
 const resetLogo = ref<any>(false);   // 重置标识
 let isOcrEcho = false;   // OCR识别标志
+let firstRealData = true; 
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -1399,7 +1400,15 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  applicantEditRef?.value?.setFormValue(value);
+  applicantEditRef?.value?.setFormValue(value); 
+  if (firstRealData && value?.["Applicant.cClntMrk"] != null) {
+    firstRealData = false;
+    nextTick(() => {
+      setTimeout(() => {
+        method.InsureChange(value['Applicant.cClntMrk'])
+      }, 10000)
+    })
+  }
 }
 
 function validate() {

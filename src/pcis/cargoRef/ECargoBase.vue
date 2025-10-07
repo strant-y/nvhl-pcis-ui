@@ -256,11 +256,13 @@ const method = {
       if(ciAgreementECargo) {
         ciAgreementECargo.cCiMrkChangeFun({cCiMrk: val})
       }
-      const cargoCiRef = formPage.getComponentRefById('AgreementCi');
-      if (!!cargoCiRef && !initFlag.value) {
-        cargoCiRef.initCiInfo({
-          cCiMrk: val
-        });
+      if (!!val && !initFlag.value) {
+        const cargoCiRef = formPage.getComponentRefById('AgreementCi');
+        if (!!cargoCiRef) {
+          cargoCiRef.initCiInfo({
+            cCiMrk: val
+          });
+        }
       }
       // 当val为'0'时隐藏ECargoBase.nCiOwnRmbPrm和ECargoBase.nCiOwnRmbAmt，否则显示
       if (val === '0') {

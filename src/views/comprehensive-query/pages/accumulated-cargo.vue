@@ -154,7 +154,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cPlyNo",
         inputtype: 'rtinput',
         title: "保单号",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
         fixed: "left",
         slotName: "cPlyNoInfo"
       },
@@ -164,7 +165,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "出单机构",
         slotName: "cDptCnm",
         align: 'left',
-        width: 145,
+        lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -172,13 +173,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保险人",
         slotName: "cInsuredNme",
         align: 'left',
-        width: 112,
+        lengthNum: 12,
       },
       {
         prop: "cProdNmeCn",
         inputtype: 'rtinput',
         title: "起运日期",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "nPrm",
@@ -207,19 +209,22 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppNme",
         inputtype: 'rtinput',
         title: "起保时间",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "tAppTm",
         inputtype: 'rtinput',
         title: "终保时间",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "nAmt",
         inputtype: 'rtinput',
         title: "保额/赔偿限额",
-        width: 83,
+        lengthNum: 13,
+        lengthIsNumber: true,
         align: "left",
         formatter:(val:any) => {
           return val.toLocaleString()
