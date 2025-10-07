@@ -1011,11 +1011,18 @@ const premiumCalculation = ()=>{
           agreementCi.setValueByRowKey('ECargoCi.nCiShare', formValue[0]._dataId, formValue[0]['ECargoCi.nCiShare']);
         }
       }
+      if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
+        const nReceivedPrm = AgreementFeeWarn?.getFormValue()?.['ECargoBase.nRmbReceivedPrm'] || 0;// 折人民币协议预收保费
+        const nBefEdrReceivedPrm = mainRef.value?.getxyedrbaseRefValue()?.['EdrECargoBase.nBefEdrReceivedPrm'] || 0;// 原预收保费
+        mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.nReceivedPrm", nReceivedPrm);// 现预收保费
+        mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.nReceivedPrmVar", Number(nReceivedPrm) - Number(nBefEdrReceivedPrm));// 预收保费变化
+      }
       // 生成缴费计划
       const base = agreementBaseRef?.getFormValue();
       const applicant = formPage.value?.getComponentRefById('AgreementApplicant')?.getFormValue();
       const insrnc = AgreementFeeWarn?.getFormValue();
-      const payInfo = setPayInfo(base, applicant, insrnc);
+      const payList = formPage.value?.getComponentRefById('AgreementPay')?.getFormValue() || [];
+      const payInfo = setPayInfo(base, applicant, insrnc, payList);
       formPage.value?.getComponentRefById('AgreementPay')?.setFormValue(payInfo);
       ElMessage.success('保费计算成功')
     }else {
@@ -1029,10 +1036,13 @@ const premiumCalculation = ()=>{
   return isSuccess
 }
 // 生成缴费计划内容
-const setPayInfo = (base: any, applicant: any, insrnc: any) => {
+const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   const payList: any[] = [];
   const pay: any = {};
-  pay["ECargoPay.nTms"] = 1;
+  if(list.length > 0) {
+    payList.push(list[0]);
+  }
+  pay["ECargoPay.nTms"] = payList.length + 1;
   if (applicant) {
     pay["ECargoPay.cPayorCde"] = applicant["ECargoApplicant.cAppCde"];
     pay["ECargoPay.cPayorNme"] = applicant["ECargoApplicant.cAppNme"];
@@ -1040,16 +1050,35 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
     pay["ECargoPay.cPayorCde"] = "";
     pay["ECargoPay.cPayorNme"] = "";
   }
-  if(props.payWay == '01') {// 预付
-    // 应收保费: 折人名币预收保费
-    pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbReceivedPrm"] ? insrnc["ECargoBase.nRmbReceivedPrm"] : 0;
-    // 我司保费: 折人民币我司协议剩余预收保费
-    pay["ECargoPay.nOwnPrm"] = insrnc["ECargoBase.nCiOwnRmbReceivedPrm"] ? insrnc["ECargoBase.nCiOwnRmbReceivedPrm"] : 0;
-  } else {// 非预付
-    // 应收保费: 折人名币预估保费
-    pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbPrm"] ? insrnc["ECargoBase.nRmbPrm"] : 0;
-    // 我司保费: 折人民币我司预估保费
-    pay["ECargoPay.nOwnPrm"] = insrnc["ECargoBase.nCiOwnRmbPrm"] ? insrnc["ECargoBase.nCiOwnRmbPrm"] : 0;
+  const eCargoCiList = formPage.value?.getComponentRefById('AgreementCi')?.getFormValue() || [];
+  let share = 0;
+  if(eCargoCiList && eCargoCiList.length > 0) {
+    eCargoCiList.forEach((item:any) => {
+      if (item["ECargoCi.cCoinsurerCde"] === "327001") {
+        share += Number(item["ECargoCi.nCiShare"]) || 0;
+      }
+    })
+  }
+  if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
+    const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
+    // 应收保费: 预收保费变化
+    pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'] || 0;
+    // 我司保费: 应收保费 * 我司比例
+    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+    pay["ECargoPay.nPrmVar"] = pay["ECargoPay.nPayablePrm"];
+  } else {
+    if(props.payWay == '01') {// 预付
+      // 应收保费: 折人名币预收保费
+      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbReceivedPrm"] ? insrnc["ECargoBase.nRmbReceivedPrm"] : 0;
+      // 我司保费: 折人民币我司协议剩余预收保费(应收保费 * 我司比例)
+      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+    } else {// 非预付
+      // 应收保费: 折人名币预估保费
+      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbPrm"] ? insrnc["ECargoBase.nRmbPrm"] : 0;
+      // 我司保费: 折人民币我司预估保费(应收保费 * 我司比例)
+      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+    }
+    pay["ECargoPay.nPrmVar"] = !!insrnc["ECargoBase.nPrm"] ? insrnc["ECargoBase.nPrm"] : 0;
   }
 
   pay["ECargoPay.tPayBgnTm"] = moment(insrnc["ECargoBase.tAppTm"]).format(
@@ -1059,7 +1088,6 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
     "YYYY-MM-DD HH:mm:ss"
   );
   pay["ECargoPay.cProdNo"] = base["ECargoBase.cProdNo"];
-  pay["ECargoPay.nPrmVar"] = !!insrnc["ECargoBase.nPrm"] ? insrnc["ECargoBase.nPrm"] : 0;
   payList.push(pay);
   return payList;
 };
