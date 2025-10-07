@@ -1161,14 +1161,14 @@ const edrAddDataBtn = [
       calcPremiumEdr();
     },
   }),
-  createFreeButtonBase({
-    label: "比较/生成批文",
-    type: "primary",
-    id: "btnCompare",
-    func: async () => {
-      generateEndorse();
-    },
-  }),
+  // createFreeButtonBase({
+  //   label: "比较/生成批文",
+  //   type: "primary",
+  //   id: "btnCompare",
+  //   func: async () => {
+  //     generateEndorse();
+  //   },
+  // }),
   createFreeButtonBase({
     label: "保存",
     type: "primary",
@@ -1215,6 +1215,7 @@ const edrBtn = [
     label: "比较/生成批文",
     type: "primary",
     id: "btnCompare",
+    hidden: props.param.cRsnCde === '99' || props.param.cEdrRsnBundle === '99', // 数据不全不展示该按钮
     func: () => {
       generateEndorse();
     },
