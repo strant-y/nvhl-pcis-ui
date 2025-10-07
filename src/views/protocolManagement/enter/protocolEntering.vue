@@ -316,7 +316,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "View",
         tableClick: (row) => {
           console.log(row);
-          toDtl({ ...row, sence:'policy' }, 'view');
+          toDtl({ ...row, sence:'policy' }, 'view', row.cEdrFlag == 'YY' ? '01' : row.cEdrFlag == 'AY' ? '02' : '');
         },
       }),
       createFreeButtonBase({
@@ -328,7 +328,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         tableClick: (row) => {
           console.log('row', { ...row, sence:'app' });
-          toDtl({ ...row, sence:'app' }, 'edit');
+          toDtl({ ...row, sence:'app' }, 'edit', row.cEdrFlag == 'YY' ? '01' : row.cEdrFlag == 'AY' ? '02' : '');
         },
       }),
       createFreeButtonBase({
