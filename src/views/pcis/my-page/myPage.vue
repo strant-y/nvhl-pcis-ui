@@ -764,7 +764,12 @@ const detailcodeList = [
 // 用来处理 账户信息 哪些场景显示
 const isDetailCde = () => {
   let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];  // 判断 批改的用批改ID   综合查询的用cEdrRsnBundleCde
-  return detailcodeList.some(item => item.id === cRsnCde);
+  // 查询列表返回的cRsnCde是中文名称，所以这里处理一下
+  if(/^[\u4e00-\u9fa5]+$/.test(cRsnCde)) {
+    return detailcodeList.some(item => item.name === cRsnCde);
+  } else {
+    return detailcodeList.some(item => item.id === cRsnCde);
+  }
 };
 
 const getNo = computed(() => {
