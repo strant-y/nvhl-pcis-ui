@@ -13,7 +13,7 @@ const EnteringCompList = [
     {sort: 10, tab: 'AgreementCi'},
     // {sort: 11, tab: 'AgreementCiShare'},
     {sort: 12, tab: 'AgreementAcctinfo'},
-    {sort: 13, tab: 'AgreementImagedInformation'},
+    // {sort: 13, tab: 'AgreementImagedInformation'},
     {sort: 14, tab: 'AgreementPay'},
 ];
 
@@ -32,7 +32,7 @@ const CorrectionCompList = [
     {sort: 10, tab: 'AgreementCi'},
     // {sort: 11, tab: 'AgreementCiShare'},
     {sort: 12, tab: 'AgreementAcctinfo'},
-    {sort: 13, tab: 'AgreementImagedInformation'},
+    // {sort: 13, tab: 'AgreementImagedInformation'},
     {sort: 14, tab: 'AgreementPay'},
 ];
 
@@ -51,7 +51,7 @@ const ReviewCompList = [
     {sort: 10, tab: 'AgreementCi'},
     // {sort: 11, tab: 'AgreementCiShare'},
     {sort: 12, tab: 'AgreementAcctinfo'},
-    {sort: 13, tab: 'AgreementImagedInformation'},
+    // {sort: 13, tab: 'AgreementImagedInformation'},
     {sort: 14, tab: 'AgreementReview'},
     {sort: 15, tab: 'AgreementPay'},
 ];
