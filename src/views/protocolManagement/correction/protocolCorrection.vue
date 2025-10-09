@@ -13,13 +13,13 @@
 			<template #column-policyInfo="{ row, column, index }">
 				<div class="policy-info-cell">
 					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
-						<span style="width: 119px;">{{ row.cEcAgrAppNo }}</span>
+						<span style="width: calc(100% - 1em - 5px)">{{ row.cEcAgrAppNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
 							<DocumentCopy />
 						</el-icon>
 					</div>
 					<div v-if="row.cEcAgrNo" class="policy-number-row">
-						<span style="width: 119px;">{{ row.cEcAgrNo }}</span>
+						<span style="width: calc(100% - 1em - 5px)">{{ row.cEcAgrNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
 							<DocumentCopy />
 						</el-icon>
@@ -416,7 +416,8 @@ const tableconfig = reactive<AppTableConfig>(
 					prop: "policyInfo",
 					inputtype: "rtinput",
 					title: "协议号",
-				  width: 142,
+          lengthNum: 22,
+          lengthIsNumber: true,
 					slotName: "policyInfo"
 				},
         {
@@ -437,7 +438,8 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "cAppId",
           inputtype: "rtinput",
           title: "客户编号",
-          width: 76,
+          lengthNum: 12,
+          lengthIsNumber: true,
         },
         {
           prop: "cAppNme",
@@ -445,7 +447,7 @@ const tableconfig = reactive<AppTableConfig>(
           title: "客户名称",
           slotName: "cAppNme",
           align: 'left',
-          minWidth: 112,
+          lengthNum: 9,
         },
         {
           prop: "cDptCnm",
@@ -453,13 +455,14 @@ const tableconfig = reactive<AppTableConfig>(
           title: "出单机构",
           slotName: "cDptCnm",
           align: 'left',
-          minWidth: 145,
+          lengthNum: 12,
         },
 				{
 					prop: "InsurancePeriod",
 					inputtype: "rtinput",
 					title: "协议期间",
-          width: 220,
+          lengthNum: 36,
+          lengthIsNumber: true,
 				},
         // {
         //   prop: "tInsrncBgnTm",
@@ -477,7 +480,7 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "cAppStatus",
           inputtype: "rtselect",
           title: "协议状态",
-          width: 82,
+          lengthNum: 7,
           align: "left",
           loadData: appStatusOptions.value
         },
@@ -485,7 +488,7 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "cPlySts",
           inputtype: "rtselect",
           title: "有效",
-          width: 32,
+          lengthNum: 2,
           loadData: [
             { label: '有效', value: 'I' },
             { label: '无效', value: 'T' }
@@ -495,13 +498,14 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "nPrm",
           inputtype: "rtinput",
           title: "缴费余额",
-          width: 78,
+          lengthNum: 12,
+          lengthIsNumber: true,
         },
         {
           prop: "id",
           inputtype: "rtcascader",
           title: "批改原因",
-          width: 192,
+          lengthNum: 16,
           typeCode: 'EDR_RSN_LIST_NEW',
           checkStrictly: false,
           func: (val, row, codeListMap) => {

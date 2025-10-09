@@ -194,7 +194,7 @@
             :fixed="i.fixed ? i.fixed : null"
             :align="item.align ? item.align : i.align ? i.align : 'center'"
             :min-width="getColumnWidth(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth)"
-            :width="i.width"
+            :width="getColumnWidth1(i.title,i.prop,tableDatas,i.minWidth,i.width, i.maxWidth || item.maxWidth, i)"
             :sortable="i.sortable"
           >
             <template #header="header">
@@ -895,15 +895,48 @@ function getColumnWidth(label: string, prop: any, tableData: any[], itemMinWidth
   return Math.max(minWidth, maxWidth, width)
 }
 
-function getTextWidth(text) {
+function getColumnWidth1(label: string, prop: any, tableData: any[], itemMinWidth: number, itemWidth: number, itemMaxWidth: number, iProp: any) {
+  //label表头名称
+  //prop对应的内容
+  //tableData表格数据
+  const width = itemWidth || 0 // 列表属性宽度
+  const minWidth = itemMinWidth || 0 // 最小宽度
+  const padding = 0 // 列内边距
+  let arr = tableData.map(item => item[prop])
+  arr.push(label)//拼接内容和表头数据
+  const lengthNumArray = [];
+  if(iProp.lengthNum && iProp.lengthNum > 0) {
+    for(let i = 0; i < iProp.lengthNum; i ++) {
+      iProp.lengthIsNumber ? lengthNumArray.push('8') : lengthNumArray.push('汉');
+    }
+  }
+
+  const contentWidths = iProp.lengthNum ? [getTextWidth(lengthNumArray.toString().replaceAll(',',''), label.length === iProp.lengthNum || tableData.length < 1)] : arr.map(item => {
+    const value = item ? String(item) : ''
+    const textWidth = getTextWidth(value)
+    return textWidth + padding
+  })
+  {/* if(itemWidth > 0) {
+    // 如果配置了列宽度且内容长度超出了配置的宽度就用配置的数据
+    const width2 = Math.max(...contentWidths)
+    return width2 > itemWidth ? itemWidth : width2;
+  } */}
+  const maxWidth = Math.max(...contentWidths) > itemMaxWidth ? itemMaxWidth : Math.max(...contentWidths)
+  return !itemMinWidth && !itemWidth && !itemMaxWidth && !iProp.lengthNum ? "auto" : Math.max(minWidth, maxWidth, width)
+}
+
+function getTextWidth(text:string, isFix?: boolean) {
   const span = document.createElement('span')
   span.style.visibility = 'hidden'
   span.style.position = 'absolute'
   span.style.top = '-9999px'
   span.style.whiteSpace = 'nowrap'
+  span.style.fontSize = 'var(--rt-form-content-font-size)'
+  span.style.display = 'inline-block'
   span.innerText = text
   document.body.appendChild(span)
-  const width = span.offsetWidth + 40
+  /* const width = span.offsetWidth + 40 */
+  const width = isFix ? span.offsetWidth + 9 : span.offsetWidth + 7
   document.body.removeChild(span)
   return width
 }
