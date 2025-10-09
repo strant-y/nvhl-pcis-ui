@@ -111,6 +111,9 @@ onMounted(async () => {
     if (e.cShowLocation === '0') {
       e.isShow = false
     }
+    if(e.prop === "ECargoInsuredDist.cCertfCls") {
+      e.typeCode = "TYPE_OF_ID"
+    }
     return e;
   });
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;

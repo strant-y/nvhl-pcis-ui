@@ -341,9 +341,8 @@
 
 // 输入框块样式
 .rt-custom-input {
-  --el-input-inner-height: var(--rt-form-content-height);
   .el-input__wrapper{
-    min-height: var(--rt-form-content-height) !important;
+    min-height: var(--rt-form-content-height);
     border-radius: var(--rt-form-item-radius);
   }
   .el-input__inner {
@@ -357,11 +356,13 @@
   }
   .el-input__prefix {
     .el-input__prefix-inner {
+      height: calc(var(--rt-form-content-height) - 3px);
       font-size: var(--rt-form-content-font-size);
     }
   }
   .el-input__suffix {
     .el-input__suffix-inner {
+      height: calc(var(--rt-form-content-height) - 3px);
       font-size: var(--rt-form-content-font-size);
     }
   }

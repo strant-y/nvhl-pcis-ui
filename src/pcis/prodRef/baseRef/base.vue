@@ -238,9 +238,12 @@ const method = {
   },
 
   //缴费拆分按钮事件
-  splitPayNumber() {
-    nPayNumberFun();
+  splitPayNumber: async () => {
+    // 山东见费出单专项拆分
+    const isSD = await shandongSplit();
+    if (isSD) return;
 
+    nPayNumberFun();
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
@@ -473,6 +476,145 @@ const method = {
     }
   },
 };
+
+/**
+ * 山东见费出单 – 专项缴费拆分
+ * 返回 true  表示已按山东规则拆分完
+ * 返回 false 表示不满足山东条件，继续走原逻辑
+ */
+async function shandongSplit(): Promise<boolean> {
+  const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+  const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const base  = opertaor.getTableRefByKey('base')?.getFromValue();
+  const baseData = opertaor.getDataAll()['base']['needCalc'];
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
+
+  if (!baseData && payinfoRef.length < 1) {
+    ElMessage.error("请先进行保费计算!");
+    return false;
+  }
+  // 机构
+  const cDptCde = plyBase['Base.cDptCde'];
+  if (!cDptCde.startsWith('0237')) return false;
+  // 产品
+  const prod = plyBase['Base.cProdNo'];
+  const okProdPre = ['11','08','09','01','04','05','07','12'];
+  if (!okProdPre.some(item => prod.startsWith(item))) return false;
+  // 剔除特殊产品
+  if (['019904','089031'].includes(prod)) return false;
+  // 投保人性质
+  if ((applicant['Applicant.cClntMrk']) !== '0') return false;   // 0 法人
+  // 签单保费
+  const totalPrm = Number(base['Base.nPrm'] || 0);
+  // const totalPrm = Number(120000 || 0);
+  if (totalPrm <= 100_000){
+    ElMessage.error(
+        `单张保单签单保费不超过10万元，请选择一次性缴费业务！`
+    )
+    return false;
+  };
+  const totalCent = Math.round(totalPrm * 100)  // 总保费→分
+  // 联共保过滤
+  const cCiMrk = plyBase['Base.cCiMrk'];
+  if (['2','4','6'].includes(cCiMrk)) return false;
+  // 必须多次缴清
+  const cInstMrk = base['Base.cInstMrk'] || '0';
+  if (cInstMrk !== '5') return false;
+  // 拆分 添加特约信息
+  if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
+
+  /* ---------- 2. 计算保险期限（自然年） ---------- */
+  const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+  const wholeYears = tmEnd.diff(tmStart, 'year'); 
+  const maxPhase = 4 + Math.max(0, wholeYears - 1);
+
+  /* ---------- 3. 取期数---------- */
+  const nPayNum = Number(base['Base.nPayNum'] || 0)  // "1"  缴费期数
+  if (nPayNum <= 0 || nPayNum > maxPhase) {
+    const remainDays = tmEnd
+        .subtract(wholeYears, 'year')
+        .diff(tmStart, 'day')
+    const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+    const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+    ElMessage.error(
+        `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`
+    )
+    return true
+  }
+  /* ---------- 4. 首期规则 ---------- */
+  const firstCent = Math.max(Math.round(totalCent * 0.25), 5_000_000 ); // 25% 或 5 万取高
+  
+  /* ---------- 5. 生成计划 ---------- */
+  const restCent = totalCent - firstCent;
+  const avgRest = restCent / (nPayNum - 1);    // 理论平均值
+  const floor = Math.round(avgRest * 0.95);    // ±5% 边界
+  const ceil  = Math.round(avgRest * 1.05);
+
+  // 首期
+  const cents = [];
+  cents.push(firstCent);                               
+
+  /* 中间期 */
+  for (let i = 1; i < nPayNum - 1; i++) {
+    cents.push(Math.round(avgRest));
+  }
+
+  /* 末期（剩余）*/
+  let lastRaw = restCent - Math.round(avgRest) * (nPayNum - 2);
+  cents.push(lastRaw);         
+
+  /* 尾差±1 分*/
+  let diff = totalCent - cents.reduce((a, b) => a + b, 0);
+  for (let i = cents.length - 1; diff !== 0; i--) {
+    const delta = diff > 0 ? 1 : -1;
+    const next = cents[i] + delta;
+    if (next >= floor && next <= ceil && next >= 0) {
+        cents[i] = next;
+        diff -= delta;
+    }
+  }
+    
+  /* 再钳位末期（仅末期）,转回元 */
+  const lastIdx = cents.length - 1;
+  cents[lastIdx] = Math.max(floor, Math.min(ceil, cents[lastIdx]));
+  const plans = cents.map(v => v / 100);
+
+  /* ---------- 6. 时间规则 ---------- */
+  const lastPayMaxTm = tmEnd.subtract(30, 'day') ;  // 责任终止前 30 天
+  const phaseDays = tmEnd.diff(tmStart, 'day') / nPayNum
+  
+  let val = {};
+  let payinfoArr = [];
+  for (let i = 0; i < nPayNum; i++) {
+    const payBgn = tmStart.add(i * phaseDays, 'day');
+    const payEnd = i === nPayNum - 1
+      ? lastPayMaxTm
+      : tmStart.add((i + 1) * phaseDays, 'day').subtract(1, 'second');
+
+    if (i === nPayNum - 1 && payEnd.isAfter(lastPayMaxTm)) {
+      ElMessage.error('最后一期缴费时间不得晚于保险责任终止日前 30 个自然日')
+      return true
+    }
+     val = {
+        "_dataId": "",
+        "Pay.nTms": i + 1,
+        "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
+        "Pay.cPayorNme": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
+        "Pay.tPayBgnTm": payBgn.format('YYYY-MM-DD HH:mm:ss'),
+        "Pay.tPayEndTm": payEnd.format('YYYY-MM-DD HH:mm:ss'),
+        "Pay.nOwnPrm":  plans[i],  // 我司
+        "Pay.nPayablePrm": plans[i], // 应收
+        "Pay.nPrmVar": 0     // 差额
+      }
+      payinfoArr.push(val);
+  }
+
+  opertaor.getTableRefByKey('payinfo').setFormValue(payinfoArr);
+  ElMessage.success('已按山东见费出单规则生成缴费计划');
+  return true;
+}
 
 // 绑定特殊验证器
 const exRules = {};

@@ -72,6 +72,40 @@ export function monthBetween(date1, date2) {
 	return monthDiff;
 }
 
+/**
+ * 判断保险期限是否小于 6 个自然月 （日历上月数）
+ * @param {number} date1 起期时间戳（ms）
+ * @param {number} date2 止期时间戳（ms）
+ * @returns {boolean} true=不足6个月
+ */
+export function lessThan6Months(date1, date2) {
+  if (!date1 || !date2) return false;
+
+  const start = new Date(date1);
+  const end   = new Date(date2);
+  if (end <= start) return false;
+
+  // 1. 整月差
+  let months = (end.getFullYear() - start.getFullYear()) * 12 +
+               (end.getMonth() - start.getMonth());
+
+  // 2. 如果止期的“日”小于起期的“日”，则再减 1 个月
+  if (end.getDate() < start.getDate()) months -= 1;
+
+  // 3. 加上剩余天数折算的小数月（按当月总天数折算）
+  const daysRemained = Math.max(0, end.getDate() - start.getDate());
+  if (daysRemained > 0) {
+    // 用起期所在月的总天数做分母，保持自然月定义
+    const totalDaysInMonth = new Date(
+      start.getFullYear(),
+      start.getMonth() + 1,
+      0
+    ).getDate();
+    months += daysRemained / totalDaysInMonth;
+  }
+  return months < 6;
+}
+
 /*
 * 将字符串转换成日期对象
 * 参数1： str 日期字符串（格式为yyyy[[-MM][-dd]] [[[HH][:mm]][:ss]]）

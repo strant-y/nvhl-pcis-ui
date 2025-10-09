@@ -78,8 +78,10 @@ onMounted(() => {
      }
     //  付费约定设置默认一次结清且不可编辑
     setFormItem('ECargoBase.cInstMrk', {disabled: true});
+    setValue('ECargoBase.cInstMrk', "0");
     //  缴费期数默认1且不可编辑
     setFormItem('ECargoBase.nPayNum', {btnItems: {disabled: true}})
+    setValue('ECargoBase.nPayNum', 1);
     // 初始化加载完成标识
     mountedFlag.value = true;
   });
