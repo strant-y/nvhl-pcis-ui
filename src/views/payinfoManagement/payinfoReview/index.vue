@@ -308,8 +308,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cChqueNo",
         inputtype: "rtinput",
         title: "交易号",
-        lengthNum: 18,
-        lengthIsNumber: true,
+        // lengthNum: 18,
+        // lengthIsNumber: true,
         align: "left",
       },
       {
