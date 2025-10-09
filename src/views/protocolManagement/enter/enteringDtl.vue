@@ -1037,10 +1037,19 @@ const premiumCalculation = ()=>{
 }
 // 生成缴费计划内容
 const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
-  const payList: any[] = [];
+  let payList: any[] = [];
   const pay: any = {};
-  if(list.length > 0 && props.type === 'EDR_APP_NEW_SCENE') {
-    payList.push(list[0]);
+  const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
+  if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
+    // 退保和注销直接在原有的条数上新增1条
+    if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
+      payList = list;
+    } else {
+      // 根据批改次数决定缴费计划生成几条（0 总共2条；1 总共3条，以此类推）
+      if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] && list.length > 0) {
+        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo'] + 1);
+      }
+    }
   }
   pay["ECargoPay.nTms"] = payList.length + 1;
   if (applicant) {
@@ -1060,11 +1069,17 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
     })
   }
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
-    const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
-    // 应收保费: 预收保费变化
-    pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'] || 0;
-    // 我司保费: 应收保费 * 我司比例
-    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+    // 退保和注销
+    if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
+      if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY ：应收保费=折人民币预扣保费 - 折人民币预收保费
+        pay["ECargoPay.nPayablePrm"] = (insrnc["ECargoBase.nWhRmbPrm"] * 100 - insrnc["ECargoBase.nRmbReceivedPrm"] * 100)/100;
+      }
+    } else {
+      // 应收保费: 预收保费变化
+      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'] || 0;
+      // 我司保费: 应收保费 * 我司比例
+      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+    }
     pay["ECargoPay.nPrmVar"] = pay["ECargoPay.nPayablePrm"];
   } else {
     if(props.payWay == '01') {// 预付
