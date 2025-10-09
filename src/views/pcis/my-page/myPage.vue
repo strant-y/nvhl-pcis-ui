@@ -3119,8 +3119,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-
-  if (validateShanDong() && getcNeedfeeFlag !== '1') {
+  if (await validateShanDong() && getcNeedfeeFlag !== '1') {
     ElMessageBox.confirm(
     "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
     "提示", 
@@ -4608,7 +4607,7 @@ const submitEdrToUndrFun = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (validateShanDong() && getcNeedfeeFlag !== '1') {
+  if (await validateShanDong() && getcNeedfeeFlag !== '1') {
     ElMessageBox.confirm(
     "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
     "提示", 
@@ -5292,20 +5291,6 @@ const validateShanDong = async () => {
   const tInsrncEndTmA = insrncData["Base.tInsrncEndTm"];  // 1790956799000  止期
   const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
   const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
-  
-  // 接口校验
-  let backEndParam = {};
-  if (props.param?.pageName === 'priceInquiry') {
-    backEndParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
-  } else {
-    backEndParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
-  }
-  const backendRes: any = await validShanDong(backEndParam);
-  if (backendRes.code == 200 && backendRes.data == true) {
-    return false; 
-  } else {
-    return true;
-  }
   // 机构是山东分公司
   if (!String(cDptCdeA).startsWith('0237')) return false;
   // 币种是人民币
@@ -5321,7 +5306,19 @@ const validateShanDong = async () => {
   if (skipProducts.includes(cProdNoA)) return false;
   // 页面上已经是“见费”直接跳过
   if (cNeedfeeFlagA == "1") return false;
-
+  // 接口校验
+  let backEndParam = {};
+  if (props.param?.pageName === 'priceInquiry') {
+    backEndParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
+  } else {
+    backEndParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
+  }
+  const backendRes: any = await validShanDong(backEndParam);
+  if (backendRes.code == 200 && backendRes.data == true) {
+    return false; 
+  } else {
+    return true;
+  }
   // 满足一次性缴费(个人客户|| 法人且保费<=10万 || 保险期限<6个月（按自然月差））即为“见费出单” 
   if (AppcClntMrk == "1") return true;
   if (AppcClntMrk == "0" && Number(basePrmCur) <= 100000 ) {
@@ -5331,6 +5328,7 @@ const validateShanDong = async () => {
   if (!isShortTerm) {
     return true;
   }
+
 };
 
 opertaor.setFatherPage({
