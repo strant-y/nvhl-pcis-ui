@@ -384,3 +384,12 @@ export function getTermDetailByDist(queryParams: any): AxiosPromise<any> {
 export function getTgtDetailByDist(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/getTgtDetailByDist`, queryParams);
 }
+
+/**
+ * 山东非车险“见费出单”制度的业务
+ * @param queryParams
+ */
+export function validShanDong(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/validShanDong`, queryParams);
+}
+

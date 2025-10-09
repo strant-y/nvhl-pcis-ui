@@ -506,7 +506,6 @@ const method = {
   },
   //证件有效期止期时间事件改变
   tCertfEndDateChange: (val) => {
-    debugger
     const tableData = opertaor.getTableRefs();
     const tcertfEndDate = tableData["applicant"].getFromValue()["Applicant.tCertfEndDate"]  //证件有效止期
     const tIssueTm = tableData["insrnc"].getFromValue()["Base.tIssueTm"] //签单日期

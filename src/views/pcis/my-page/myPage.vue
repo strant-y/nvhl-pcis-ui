@@ -506,6 +506,7 @@ import {
   getInquiryPolicy,
 	getisAllDone,
     checkDistTerm,
+    validShanDong,
 	isUndrClsBlackList,
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
@@ -523,6 +524,7 @@ import { iconMap } from './iconMap';
 import { imageMethod } from './imageMethod';
 import { pageMethod } from './pageMethod';
 import { codeListViewStore } from "@/store";
+import { lessThan6Months } from "@/utils/date";
 
 const codeListStore = codeListViewStore();
 
@@ -1236,7 +1238,6 @@ const edrBtn = [
       submitEdrToUndrFun();
     },
   }),
- 
 ];
 /**
  * （退保/注销） 按钮
@@ -3106,6 +3107,22 @@ const checkStudentValidity  =  async() => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
+  const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
+  if (validateShanDong() && getcNeedfeeFlag !== '1') {
+    ElMessageBox.confirm(
+    "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+    })
+    .catch(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+    });
+  }
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -4572,7 +4589,24 @@ const generateEndorse = async () => {
  * 批单申请核保
  */
 const submitEdrToUndrFun = async () => {
-// 协议出单剩余预收保费校验
+   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
+   if (validateShanDong() && getcNeedfeeFlag !== '1') {
+    ElMessageBox.confirm(
+    "根据山东省非车险业务'见费出单'实施方案，该笔业务为'见费出单'业务！系统将更新为'见费出单'！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+    })
+    .catch(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+    });
+  }
+
+  // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
       ElMessage.error("协议剩余预收保费不足");
@@ -5237,7 +5271,65 @@ function getTotalNum(arr: any[]) {
   }, 0);
 }
 
+const validateShanDong = async () => {
+  const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+  const applicantData = opertaor.getTableRefByKey("applicant").getFromValue();
+  const insrncData = opertaor.getTableRefByKey("insrnc").getFromValue();
+  const baseData = opertaor.getTableRefByKey("base").getFromValue();
 
+  // 解构并统一命名
+  const {
+    "Base.cDptCde": cDptCdeA,  // cDptCde
+    "Base.cCiMrk": cCiMrkA,   //cCiMrk
+    "Base.cNeedfeeFlag": cNeedfeeFlagA,  // 是否见费出单  1 是  0否
+  } = plyBaseData;
+
+  const cProdNoA = props.param?.cProdNo;
+  const AppcClntMrk = applicantData["Applicant.cClntMrk"]; // 0 法人 1个人
+  const tInsrncBgnTmA = insrncData["Base.tInsrncBgnTm"];  // 1759420800000  起期
+  const tInsrncEndTmA = insrncData["Base.tInsrncEndTm"];  // 1790956799000  止期
+  const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
+  const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
+  
+  // 接口校验
+  let backEndParam = {};
+  if (props.param?.pageName === 'priceInquiry') {
+    backEndParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
+  } else {
+    backEndParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
+  }
+  const backendRes: any = await validShanDong(backEndParam);
+  if (backendRes.code == 200 && backendRes.data == true) {
+    return false; 
+  } else {
+    return true;
+  }
+  // 机构是山东分公司
+  if (!String(cDptCdeA).startsWith('0237')) return false;
+  // 币种是人民币
+  if (!['人民币', 'CNY'].includes(basePrm)) return false;
+  // 联共保业务类型
+  const skipCiMrk = ['2', '4', '6'];
+  if (skipCiMrk.includes(cCiMrkA)) return false;
+  // 产品号
+  const prodList = ['11', '08', '09', '01', '04', '05', '07', '12'];
+  if (!prodList.includes(cProdNoA.slice(0, 2))) return false;
+  // 特殊产品剔除
+  const skipProducts = ['019904', '089031'];
+  if (skipProducts.includes(cProdNoA)) return false;
+  // 页面上已经是“见费”直接跳过
+  if (cNeedfeeFlagA == "1") return false;
+
+  // 满足一次性缴费(个人客户|| 法人且保费<=10万 || 保险期限<6个月（按自然月差））即为“见费出单” 
+  if (AppcClntMrk == "1") return true;
+  if (AppcClntMrk == "0" && Number(basePrmCur) <= 100000 ) {
+     return true;
+  }
+  const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
+  if (!isShortTerm) {
+    return true;
+  }
+};
 
 opertaor.setFatherPage({
   currentIndex: currentIndex,
