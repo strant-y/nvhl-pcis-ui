@@ -3240,21 +3240,6 @@ const checkStudentValidity  =  async() => {
  */
 const submitToUndrFn = async () => {
  const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
- if (validateShanDong() && getcNeedfeeFlag !== '1') {
-    ElMessageBox.confirm(
-    "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
-    "提示", 
-    {
-      confirmButtonText: "确定",
-      type: "warning",
-    })
-    .then(() => {
-      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-    })
-    .catch(() => {
-      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-    });
-  }
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -3265,6 +3250,22 @@ const submitToUndrFn = async () => {
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
+  }
+  if (validateShanDong() && getcNeedfeeFlag !== '1') {
+      ElMessageBox.confirm(
+      "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
+      "提示", 
+      {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+      .then(() => {
+        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      })
+      .catch(() => {
+        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      });
+      return;
   }
  /**
    * 联共保判断
@@ -4708,21 +4709,6 @@ const generateEndorse = async () => {
  */
 const submitEdrToUndrFun = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
-  if (validateShanDong() && getcNeedfeeFlag !== '1') {
-    ElMessageBox.confirm(
-    "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
-    "提示", 
-    {
-      confirmButtonText: "确定",
-      type: "warning",
-    })
-    .then(() => {
-      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-    })
-    .catch(() => {
-      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-    });
-  }
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -4738,6 +4724,22 @@ const submitEdrToUndrFun = async () => {
   if (needCalc.value && props.param.cTransMrk !== "1") {
     ElMessage.error("请先进行保费计算!");
     return;
+  }
+  if (validateShanDong() && getcNeedfeeFlag !== '1') {
+      ElMessageBox.confirm(
+      "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
+      "提示", 
+      {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+      .then(() => {
+        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      })
+      .catch(() => {
+        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      });
+      return;
   }
   if (!baseValite()) {
     // btn.loading = false;
