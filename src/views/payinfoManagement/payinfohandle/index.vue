@@ -147,6 +147,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 									freeEditRef.value?.setValue('CBillNoStart', params.cAppNo)
 									freeEditRef.value?.setValue('CBillNoEnd', params.cAppNo)
 							}
+							freeEditRef.value?.setValue('isEcargo', '0');
 					  })
 					},
 				}),
@@ -427,7 +428,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CSlsNme",
 				inputtype: "rtinput",
 				title: "业务员名称"
-			}
+			},
+			{
+				prop: "isEcargo",
+				inputtype: "rtcheckbox",
+				title: "是否协议",
+				keymap: {
+				  y: 1,
+				  n: 0,
+				},
+			},
 		],
 	})
 );
@@ -465,7 +475,8 @@ const tableconfig = reactive<AppTableConfig>(
                                 "UserId": user.value['opCde'],
                                 "CompanyId": user.value['companyId'],
                                 "OpRelCde": user.value['opCde'],
-                                "CUniqueNo": CUniqueNos
+                                "CUniqueNo": CUniqueNos,
+                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                             };
                             //这一块儿如果要校验缴费类型的话，请排除云南分公司
                             console.log(param)
@@ -518,7 +529,8 @@ const tableconfig = reactive<AppTableConfig>(
                             });
                             const param = {
                                 "CPaySequence": CPaySequences,
-                                "CUniqueNo": CUniqueNos
+                                "CUniqueNo": CUniqueNos,
+                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                             };
                             console.log(param)
                             pcisQueryService.cancelPaymentNo(param)
@@ -565,7 +577,8 @@ const tableconfig = reactive<AppTableConfig>(
                             "CompanyId":  user.value['companyId'],
                             "OpRelCde": user.value['opCde'],
                             "CUniqueNo": CUniqueNos,
-                            "CPaySequence":CPaySequences
+                            "CPaySequence":CPaySequences,
+                            "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                         };
                         console.log(param)
                         pcisQueryService.queryPaymentNo(param)
@@ -673,6 +686,7 @@ const tableconfig = reactive<AppTableConfig>(
                             const param = {
                                 "CAppNos": CAppNos,
                                 "CUniqueNos": CUniqueNos,
+                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                             };
                             console.log(param)
                             pcisQueryService.needFeeToBack(param)
