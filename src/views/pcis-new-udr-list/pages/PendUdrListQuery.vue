@@ -705,7 +705,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cMinUndrCls",
         inputtype: "rtinput",
-        title: "最终审核级别",
+        title: "最小可核级别",
         align: 'left',
         lengthNum: 12,
       },
