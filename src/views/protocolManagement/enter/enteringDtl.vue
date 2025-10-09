@@ -1039,7 +1039,7 @@ const premiumCalculation = ()=>{
 const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   const payList: any[] = [];
   const pay: any = {};
-  if(list.length > 0) {
+  if(list.length > 0 && props.type === 'EDR_APP_NEW_SCENE') {
     payList.push(list[0]);
   }
   pay["ECargoPay.nTms"] = payList.length + 1;
