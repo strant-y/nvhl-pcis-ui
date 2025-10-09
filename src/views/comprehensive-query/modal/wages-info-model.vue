@@ -287,15 +287,14 @@ const getTableFun = async (isSave=false) => {
 const saveProdDataFun = () => {
     let cAppNo = props.data.cAppNo;  // 申请单号
     let cRegisteredLogo = props.data.cRegisteredLogo;
-    let param = Object.assign({
+    let param:any = Object.assign({
         cRegisteredLogo
 
     }, { data: getFromValue() });
 
+    param.cAppNo = cAppNo
     if(props.data?.pageName === 'priceInquiry'){
         param.cInquiryNo = props.data.cInquiryNo;  // 询价单号
-    } else {
-        param.cAppNo = cAppNo
     }
 
     policyService.saveTotalSalary(param).then((response) => {
