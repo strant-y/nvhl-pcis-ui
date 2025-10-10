@@ -1627,7 +1627,7 @@ async function loadAfter() {
     // 批改单核保退回
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
-    bthList.value = edrBtn;
+    bthList.value = edrBtn.filter(item => !item.hidden);;
     nextTick(() => {
       opertaor.setDisabledAll();
       getEdrRsnItemFun(
@@ -1835,7 +1835,7 @@ async function loadAfter() {
         });
       }
       
-      bthList.value = edrBtn;
+      bthList.value = edrBtn.filter(item => !item.hidden);
     } else {
       bthList.value = edrSurrenderBtn;
     }
