@@ -416,12 +416,15 @@ function getAgencyBusinessList(param?: any) {
 // }
 
 onMounted(() => {
-  if (sessionStorage.getItem("toMyPageData")) {
+  debugger;
+  // if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //业务来源大类下拉数据
     const params = {
-      CDptCde: data["cDptCde"],
-      CKindNo: data["cKindNo"],
+      // CDptCde: data["cDptCde"],
+      // CKindNo: data["cKindNo"],
+      CDptCde: props.data.data.rowData['ECargoCi.cDptCde'],
+      CKindNo: props.data.data.rowData['ECargoCi.cDptCde'],
     };
     //查询大类数据，用于默认回显
     getBsnsTypList(params).then((res) => {
@@ -470,7 +473,7 @@ onMounted(() => {
         }
       }
     });
-  }
+  // }
   nextTick(() => {
     setValue("CDptCde", props.data.data.rowData['ECargoCi.cDptCde']);
   });
