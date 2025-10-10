@@ -479,7 +479,7 @@ const funCheckUser = (val:any)=>{
        rules: [getRules("required", {})],
      });
 
-     setValue("ECargoInsuredDist.cNation", "1"); // 国籍
+     setValue("ECargoInsuredDist.cNation", "CHN"); // 国籍
 
      setFormItem("ECargoInsuredDist.tBirthday", {
        disabled: true,
