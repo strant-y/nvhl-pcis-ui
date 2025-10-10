@@ -474,7 +474,7 @@ const submitEdrToUndrFun = async () => {
       ,'AgreementAcctinfo','AgreementCiTcp'  // 临时关闭体条款校验
     ]);
   }else{
-    ilter.push(...[
+    filter.push(...[
         'AgreementAcctinfo' // 临时关闭账号校验
     ]);
   }
@@ -1046,7 +1046,7 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
       payList = list;
     } else {
       // 根据批改次数决定缴费计划生成几条（0 总共2条；1 总共3条，以此类推）
-      if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] && list.length > 0) {
+      if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
         payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo'] + 1);
       }
     }
