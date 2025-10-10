@@ -371,7 +371,8 @@ const tableconfig = reactive<AppTableConfig>(
                 prop: "policyInfo",
                 inputtype: "rtinput",
                 title: "申请单号/保单号",
-                width: 136,
+                lengthNum: 21,
+                lengthIsNumber: true,
                 slotName: "policyInfo",
                 fixed: true
             },
@@ -392,20 +393,21 @@ const tableconfig = reactive<AppTableConfig>(
                 inputtype: "rtinput",
                 title: "投保人",
                 align: 'left',
-                minWidth: 112,
+                lengthNum: 12,
             },
             {
                 prop: "tAppTm",
                 inputtype: "rtinput",
                 title: "投保日期",
                 sortable: "custom",
-                width: 112
+                lengthNum: 17,
+                lengthIsNumber: true,
             },
             {
                 prop: "cProdNmeCn",
                 inputtype: "rtinput",
                 title: "产品",
-                minWidth: 160,
+                // lengthNum: 13,
                 align: 'left',
             },
             {
@@ -416,13 +418,13 @@ const tableconfig = reactive<AppTableConfig>(
                     { label: "是", value: "1" },
                     { label: "否", value: "0" },
                 ],
-                width: 55,
+                lengthNum: 4,
             },
             {
                 prop: "id",
                 inputtype: "rtcascader",
                 title: "批改原因",
-                minWidth: 140,
+                lengthNum: 17,
                 checkStrictly: false,
                 func: (val, row, codeListMap) => {
                     console.log(row);
