@@ -3298,6 +3298,10 @@ const submitToUndrFn = async () => {
   }
   
   adjustCiPremiumDifference()
+  const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk');
+  if (CiMrk != '0') {
+    await showJointInsuranceInfo(); // 显示联共保信息
+  }
 
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
@@ -4997,6 +5001,105 @@ const adjustCiPremiumDifference = () => {
     }
   }
 };
+/**
+ * 联共保永安保险公司和各分公司保费保额核保时提示信息
+ */
+const showJointInsuranceInfo = async () => {
+  let msg = '联共保';
+  const ciMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
+  if(ciMrk=='1'){
+		msg = "外部共保我方主共_主联";
+	}else if(ciMrk=='2'){
+		msg = "外部共保我方从共_主联";
+	}else if(ciMrk=='3'){
+		msg = "外部共保我方主共_无联保";
+	}else if(ciMrk=='4'){
+		msg = "外部共保我方从共_无联保";
+	}else if(ciMrk=='5'){
+		msg = "司内联保_主联";
+	}
+  const ciData = opertaor.getTableRefByKey("ci")?.getFromValue() || [];
+  const yonganCompanies = ciData.filter(item => item['Ci.cCoinsurerCde'] === '327001');
+
+  // 定义分公司编码到中文名称的映射表
+  const branchCodeToName: { [key: string]: string } = {
+    '0244010000000': '北京分公司',
+    '0261010000000': '山东分公司',
+    '0237020000000': '青岛分公司',
+    '0213010000000': '河北分公司',
+    '0214010000000': '山西分公司',
+    '0215010000000': '内蒙古分公司',
+    '0221010000000': '辽宁分公司',
+    '0221020000000': '大连分公司',
+    '0231010000000': '上海分公司',
+    '0232010000000': '江苏分公司',
+    '0233010000000': '浙江分公司',
+    '0233020000000': '宁波分公司',
+    '0241010000000': '河南分公司',
+    '0242010000000': '湖北分公司',
+    '0244010000000': '广东分公司',
+    '0244030000000': '深圳分公司',
+    '0250010000000': '重庆分公司',
+    '0251010000000': '四川分公司',
+    '0253010000000': '云南分公司',
+    '0261010000000': '陕西分公司',
+    '0262010000000': '甘肃分公司',
+    '0265010000000': '新疆分公司',
+    '0261010260000': '总公司营业部',
+    '0298000000000': '永安保险航保中心',
+    '0252010000000': '贵州分公司',
+    '0236010000000': '江西分公司',
+    '0234010000000': '安徽分公司',
+    '0235010000000': '福建分公司',
+  };
+
+  // 计算总保额、总保费
+  let totalAmount = 0;
+  let totalPremium = 0;
+  let totalShare = 0;
+
+  const companyDetails = yonganCompanies.map(item => {
+    const amount = parseFloat(item['Ci.nCiAmt'] || '0');
+    const premium = parseFloat(item['Ci.nCiPrm'] || '0');
+    const ratio = parseFloat(item['Ci.nCiShare'] || '0') || 0; 
+
+    totalAmount += amount;
+    totalPremium += premium;
+    totalShare += ratio; // 累加比例
+
+    const branchCode = item['Ci.cCiSubComp'] || '';
+    const branchName = branchCodeToName[branchCode] || '未知分公司';
+    const formattedName = `永安${branchName}`;
+
+    return {
+      name: formattedName,
+      ratio: `${ratio*100}%`,
+      amount: `${amount.toLocaleString()}元`,
+      premium: `${premium.toLocaleString()}元`
+    };
+  });
+
+  // 构造提示内容
+  const htmlContent = `
+    <div style="font-size: 14px; line-height: 1.8;">
+      <strong>${msg}信息如下：</strong><br>
+      永安方总保额：<strong>${totalAmount.toLocaleString()}元</strong><br>
+      永安方总比例：<strong>${totalShare*100}%</strong><br>
+      永安方总保费：<strong>${totalPremium.toLocaleString()}元</strong><br>
+      ${companyDetails.map(detail => 
+        `<span style="display: block;">${detail.name}->比例：${detail.ratio}->保额：${detail.amount}->保费：${detail.premium}</span>`
+      ).join('')}
+    </div>
+  `;
+
+  // 弹出提示框（带警告图标）
+  await ElMessageBox.alert(htmlContent, '联共保信息确认', {
+    confirmButtonText: '确定',
+    // type: 'warning',
+    dangerouslyUseHTMLString: true,
+    customClass: 'joint-insurance-dialog'
+  });
+};
 const validateciPrm =() =>{
   const ciData = opertaor.getTableRefByKey("ci")?.getFromValue();
   if (ciData && ciData.length > 0) {
@@ -6186,5 +6289,14 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .el-message-box.my-message-box {
   width: auto !important;
   max-width: 80% !important;
+}
+.joint-insurance-dialog .el-message-box__title {
+  font-weight: bold;
+  color: #f56c6c;
+}
+
+.joint-insurance-dialog .el-message-box__content {
+  padding: 20px;
+  font-family: 'Microsoft YaHei', sans-serif;
 }
 </style>
