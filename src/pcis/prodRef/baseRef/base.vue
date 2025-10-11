@@ -244,7 +244,7 @@ const shanDongFun = () => {
     return true;
   }
   const totalPrm = Number(base['Base.nPrm'] || 0);
-  if (totalPrm < 100_000) 
+  if (totalPrm <= 100_000) 
   return true;
 
   const totalCent = Math.round(totalPrm * 100)  // 总保费→分
@@ -592,6 +592,7 @@ const method = {
 };
 /* ========== 山东校验点拆分提示语（阻断返回 true） ========== */
 const checkShanDong = () => {
+
   const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
   const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
   const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
@@ -601,6 +602,9 @@ const checkShanDong = () => {
   const tInsrncBgnTmA = insrnc["Base.tInsrncBgnTm"];  // 起期
   const tInsrncEndTmA = insrnc["Base.tInsrncEndTm"];  // 止期
   const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
+  const cNeedfeeFlag = plyBase['Base.cNeedfeeFlag'];
+  const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
+
   if (!baseData && payinfoRef.length < 1) {
     ElMessage.error("请先进行保费计算!");
     return true;
@@ -615,23 +619,68 @@ const checkShanDong = () => {
   if ((applicant['Applicant.cClntMrk'] == '') || (applicant['Applicant.cClntMrk'] == undefined) || (applicant['Applicant.cClntMrk'] == null)){
     ElMessage.error("请选择投保人性质！")
     return true;
-  } 
-  if ((applicant['Applicant.cClntMrk']) == '1' && base['Base.cInstMrk'] == '5'){
-    ElMessage.error("根据山东省非车险业务“见费出单”实施方案，投保人性质是个人，请选择一次性缴费！")
-    return true;
-  } 
+  }
   const totalPrm = Number(base['Base.nPrm'] || 0);
-  if (applicant['Applicant.cClntMrk'] !== '1' && totalPrm <= 100_000 && base['Base.cInstMrk'] == '5'){
-    ElMessage.error(
-        `根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），请选择一次性缴费！`
-    )
+  
+  // 小于10万元
+  if (totalPrm <= 100_000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')){ 
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
     return true;
   };
+  // 个人
+  if ((applicant['Applicant.cClntMrk']) == '1' && ( cInstMrk == '5' || cNeedfeeFlag == '0')){
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，投保人是个人, 系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  }
+  
+  // 法人且小于10万元
+  if (applicant['Applicant.cClntMrk'] == "0" && Number(basePrmCur) <= 100000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')) {
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万 元（含），系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  }
   // 短期业务
-  if (isShortTerm && base['Base.cInstMrk'] == '5') {
-    ElMessage.error(
-        "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，请选择一次性缴费！"
-    )
+  if (isShortTerm && ( cInstMrk == '5' || cNeedfeeFlag == '0')) {
+     ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
     return true;
   }
 
@@ -642,7 +691,10 @@ const checkShanDong = () => {
   const maxPhase = 4 + Math.max(0, wholeYears - 1);
 
   const nPayNum = Number(base['Base.nPayNum'] || 0)  // "1"  缴费期数
-  if (nPayNum < 2) return true;   // 只处理分期业务
+  // 只处理分期业务
+  if (nPayNum == 1) {
+    return true;
+  }
   if (nPayNum > maxPhase) {
     const remainDays = tmEnd
         .subtract(wholeYears, 'year')
@@ -706,9 +758,6 @@ const judgeShandongCase = async () => {
   if (backendRes.code == 200 && backendRes.data == true) {
     return false; 
   }
-  if (nPayNum < 2) {return false};
-  if (totalPrm < 100_000){ return false} ;
-
   return true;
 }
 
