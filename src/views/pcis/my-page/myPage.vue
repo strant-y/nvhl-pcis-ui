@@ -5532,7 +5532,7 @@ const validateShanDong = async () => {
   }
   if (AppcClntMrk == "0" && Number(basePrmCur) <= 100000 ) {
     ElMessageBox.alert(
-    "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万 元（含），系统将更新为[见费出单][一次性缴费]！",
+    "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
     "提示", 
     {
       confirmButtonText: "确定",

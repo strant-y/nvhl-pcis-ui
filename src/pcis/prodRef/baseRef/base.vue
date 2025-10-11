@@ -592,7 +592,6 @@ const method = {
 };
 /* ========== 山东校验点拆分提示语（阻断返回 true） ========== */
 const checkShanDong = () => {
-
   const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
   const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
   const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
@@ -603,25 +602,14 @@ const checkShanDong = () => {
   const tInsrncEndTmA = insrnc["Base.tInsrncEndTm"];  // 止期
   const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
   const cNeedfeeFlag = plyBase['Base.cNeedfeeFlag'];
-  const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
 
   if (!baseData && payinfoRef.length < 1) {
     ElMessage.error("请先进行保费计算!");
     return true;
   }
-  // 必须多次缴清
   const cInstMrk = base['Base.cInstMrk'] || '0';
-  if (cInstMrk == '' || cInstMrk == undefined || cInstMrk == null ){
-    ElMessage.error("请选择付费约定！")
-    return true;
-  }
-  // 投保人性质
-  if ((applicant['Applicant.cClntMrk'] == '') || (applicant['Applicant.cClntMrk'] == undefined) || (applicant['Applicant.cClntMrk'] == null)){
-    ElMessage.error("请选择投保人性质！")
-    return true;
-  }
   const totalPrm = Number(base['Base.nPrm'] || 0);
-  
+
   // 小于10万元
   if (totalPrm <= 100_000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')){ 
     ElMessageBox.alert(
@@ -654,7 +642,7 @@ const checkShanDong = () => {
   }
   
   // 法人且小于10万元
-  if (applicant['Applicant.cClntMrk'] == "0" && Number(basePrmCur) <= 100000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')) {
+  if (applicant['Applicant.cClntMrk'] == "0" && Number(totalPrm) <= 100000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')) {
     ElMessageBox.alert(
     "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万 元（含），系统将更新为[见费出单][一次性缴费]！",
     "提示", 
@@ -725,8 +713,7 @@ const judgeShandongCase = async () => {
   const cProdNoA = plyBase['Base.cProdNo'] || route.params.param?.cProdNo;
   const AppcClntMrk = applicantData["Applicant.cClntMrk"]; // 0 法人 1个人
   const tInsrncBgnTmA = insrncData["Base.tInsrncBgnTm"];  // 1759420800000  起期
-  const tInsrncEndTmA = insrncData["Base.tInsrncEndTm"];  // 1790956799000  止期
-  const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
+  const tInsrncEndTmA = insrncData["Base.tInsrncEndTm"];  // 1790956799000  止期 
   const cInstMrk = baseData['Base.cInstMrk'] || '0'; // 缴费次数 
   const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
   const nPayNum = Number(baseData['Base.nPayNum'] || 0)  // "1"  缴费期数
