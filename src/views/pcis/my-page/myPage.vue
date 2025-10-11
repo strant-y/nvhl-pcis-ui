@@ -1217,7 +1217,7 @@ const edrBtn = [
     label: "比较/生成批文",
     type: "primary",
     id: "btnCompare",
-    hidden: props.param.cRsnCde === '99' || props.param.cEdrRsnBundle === '99', // 数据不全不展示该按钮
+    hidden: props.param.cRsnCde === '99' || props.param.cEdrRsnBundle === '99' || props.param.cEdrRsnBundleCde === '99', // 数据不全不展示该按钮
     func: () => {
       generateEndorse();
     },
@@ -4652,7 +4652,7 @@ const submitEdrToUndrFun = async () => {
     }
   }
   // 校验生成批文
-  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt") && props.param.cTransMrk !== "1") {
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt") && props.param.cTransMrk !== "1" && (props.param.cRsnCde !== "99" && props.param.cEdrRsnBundle !== "99" && props.param.cEdrRsnBundleCde !== "99")) {
     ElMessage.warning("请先生成批文!")
     return
   }
