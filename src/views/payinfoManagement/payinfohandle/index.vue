@@ -434,8 +434,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				inputtype: "rtcheckbox",
 				title: "是否协议",
 				keymap: {
-				  y: 1,
-				  n: 0,
+				  y: '1',
+				  n: '0',
 				},
 			},
 		],
@@ -1073,6 +1073,7 @@ onMounted(async () => {
         freeEditRef.value?.setValue('CBillNoEnd', params.cAppNo)
         handleQuery()
     }
+    freeEditRef.value?.setValue('isEcargo', '0')
   })  
   getListByCode('WEB_BAS_CODELIST', {
       'cParCde': 'shoufeifangshi',
