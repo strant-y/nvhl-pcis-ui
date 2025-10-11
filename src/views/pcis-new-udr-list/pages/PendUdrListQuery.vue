@@ -834,36 +834,25 @@ onMounted(async () => {
 
   //首页跳转过来的逻辑 Start
   if (sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)) {
-    //首页 暂存任务跳转过来的,选中投保单
+    //首页点击搜索跳转过来的
     const homeJumpData = JSON.parse(
-      sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)
+      sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)|| '{}'
     );
-    await nextTick();
-    if (homeJumpData.type === "temp") {
-      //暂存任务
-      changeForm("1"); //展示form表单不同的栏位
-    } else if (homeJumpData.type === "edit") {
-      //核保退回任务
-      changeForm("4"); //展示form表单不同的栏位
+    if (homeJumpData.hasOwnProperty("objId")) {
+      //申请单号
+      freeEditRef.value?.setValue("cAppNo", homeJumpData.objId);
+      handleQuery();
     }
-    console.log("123123", homeJumpData);
-    // 投保日期
-    freeEditRef.value.setValue("tm1", [
-      homeJumpData.startCrtTm,
-      homeJumpData.TAppTmEnd,
-    ]);
-    // 提核日期
-    freeEditRef.value.setValue("tm2", [
-      homeJumpData.startBsTm1,
-      homeJumpData.endBsTm1,
-    ]);
-    setTimeout(() => {
-      if (homeJumpData.hasOwnProperty("objId")) {
-        //申请单号
-        freeEditRef.value.setValue("objId", homeJumpData.objId);
-        handleQuery();
-      }
-    }, 500);
+  } else if(sessionStorage.getItem('navToOrderUdrListQuery')) {
+    // 首页点击更多跳转过来的
+    const homeJumpData = JSON.parse(
+      sessionStorage.getItem('navToOrderUdrListQuery') || '{}'
+    );
+    if(homeJumpData.hasOwnProperty("udrType")) {
+      //申请单号
+      freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
+      handleQuery();
+    }
   } else {
     handleQuery();
   }
@@ -1561,6 +1550,44 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+
+// 添加 copyText 方法
+const copyText = (text: any) => {
+  if (!text) {
+    ElMessage.warning('没有可复制的内容');
+    return;
+  }
+
+  // 检查 navigator.clipboard 是否存在
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+          ElMessage.success('复制成功');
+        },
+        () => {
+          ElMessage.error('复制失败');
+        }
+    );
+  } else {
+    // 使用 document.execCommand('copy') 方法作为备选方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const result = document.execCommand('copy');
+      if (result) {
+        ElMessage.success('复制成功');
+      } else {
+        ElMessage.error('复制失败');
+      }
+    } catch (err) {
+      ElMessage.error('复制失败，请稍后再试');
+    } finally {
+      document.body.removeChild(textarea); // 清理创建的 textarea 元素
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

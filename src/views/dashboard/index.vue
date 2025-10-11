@@ -1819,7 +1819,7 @@ function handleSearch(val: any) {
       AppKey.query.pcis_query_newudrlist,
       JSON.stringify(param)
     );
-    router.push({ path: "/pcis-new-udr-list/PendUdrList" });
+    router.push({ path: "/pcis-new-udr-list/PendUdrListQuery" });
   }
 }
 
