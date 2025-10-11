@@ -2890,7 +2890,7 @@ const calcPremium = () => {
                 })
                 return;
             };
-            if (cClntMrk !== '1' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
+            if (cClntMrk == '0' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
                 ElMessageBox.alert(
                 "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
                 "提示", 
