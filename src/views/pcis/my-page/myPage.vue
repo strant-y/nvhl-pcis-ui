@@ -1841,7 +1841,7 @@ async function loadAfter() {
     }
   } else if (props.param.pageType === "readonly") {
     // 查询数据
-    const cAppNo = props.param.taskTyp === "I" ? props.param?.cInquiryNo : props.param?.cAppNo;
+    const cAppNo = (props.param.taskTyp === "I" || props.param.baseType === "询价") ? props.param?.cInquiryNo : props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "E") {
       edritem.value?.handleQuery();
