@@ -595,6 +595,7 @@ const updateMasterAgreementValues = () => {
   // 遍历所有行，只处理 ECargoCi.cCoinsurerCde === "327001" 的行
   const res = formPage.getFormDataById("AgreementFeeWarn");
   const agreementBaseData = formPage.getComponentRefById("AgreementCiTcp")
+  formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.cCiAgtNo", res["ECargoBase.cCiAgtNo"]);
   formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiJntAmt", res["ECargoBase.nAmt"]);  //共保预估总保额
   formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiJntPrm", res["ECargoBase.nPrm"]);
   allRows.forEach(row => {
