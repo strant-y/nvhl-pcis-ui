@@ -348,11 +348,11 @@ const method = {
 
   //缴费拆分按钮事件
   splitPayNumber: async () => {
-    // 山东见费提示语
-    if (checkShanDong()) return;
     // 满足山东条件，按照山东拆分
-    const isShandongCase = judgeShandongCase();  
+    const isShandongCase = await judgeShandongCase();  
     if (isShandongCase) {
+        // 山东见费提示语
+        if (checkShanDong()) return;
         shanDongFun();
         return;
     }
