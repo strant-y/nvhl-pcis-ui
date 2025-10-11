@@ -221,6 +221,7 @@ onMounted(async () => {
           item.children?.forEach((e: any) => {
             riskList.push({
               "TermRisktgt.cLiabCode": e.cRiskNo,
+              "TermRisktgt.cDeductibleMethod": "01",
             });
           });
           let data: { [key: string]: any } = {
@@ -229,6 +230,7 @@ onMounted(async () => {
               "Term.cUniqueTermNo": item.cUniqueTermNo,
               "Term.nSeqNo":1,
               "Term.cPlanNo":'P1',
+              "Term.cDeductibleMethod": "01",
           };
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
