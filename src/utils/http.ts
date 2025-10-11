@@ -7,8 +7,11 @@ export function get<T>(url: string, params?: any): Promise<T> {
 }
 
 // post
-export function post<T>(url: string, data?: any): Promise<T> {
-  return request.post<T>(url, data);
+// export function post<T>(url: string, data?: any): Promise<T> {
+//   return request.post<T>(url, data);
+// }
+export function post<T>(url: string, data?: any, config?: any): Promise<T> {
+  return request.post<T>(url, data, config);
 }
 
 // put
