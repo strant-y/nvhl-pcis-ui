@@ -2959,6 +2959,113 @@ function baseValite(){
  * 投保保费计算
  */
 const calcPremium = () => {
+     let shanDongFlag = false;
+            const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+            const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
+            const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+            const base  = opertaor.getTableRefByKey('base')?.getFromValue();
+            const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
+            // 机构
+            const cDptCde = plyBase['Base.cDptCde'];
+            // 产品
+            const prod = props.param.cProdNo;
+            const okProdPre = ['11','08','09','01','04','05','07','12'];
+            // 联共保
+            const cCiMrk = plyBase['Base.cCiMrk'];
+            // 缴费方式
+            const cInstMrk = base['Base.cInstMrk'] || '0';
+            // 签单保费
+            const totalPrm = Number(base['Base.nPrm'] || 0);
+            // 投保人性质
+            const cClntMrk = applicant['Applicant.cClntMrk'];
+            // 保险期限
+            const tInsrncBgnTmA = insrnc["Base.tInsrncBgnTm"];  // 起期
+            const tInsrncEndTmA = insrnc["Base.tInsrncEndTm"];  // 止期
+            const basePrmCur = parseFloat(base["Base.nPrm"] || 0); //承保基本信息 
+            //承保基本信息 总保费币种   // "CNY"
+            const basePrm = base["Base.cPrmCur"]; 
+            const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
+            const nPayNum = Number(base['Base.nPayNum'] || 0)  // "1"  缴费期数
+            const cNeedfeeFlag = plyBase['Base.cNeedfeeFlag'];
+    
+            // 满足山东见费出单业务
+            if(cDptCde.startsWith('0237') && okProdPre.some(item => prod.startsWith(item)) 
+            && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY")){
+                shanDongFlag = true;
+                if (cClntMrk == '1' && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
+                    ElMessageBox.alert(
+                    "根据山东省非车险业务“见费出单”实施方案，投保人是个人, 系统将更新为[见费出单][一次性缴费]！",
+                    "提示", 
+                    {
+                        confirmButtonText: "确定",
+                        type: "warning",
+                    })
+                    .then(() => {
+                        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+                        opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+                    })
+                    return;
+                };
+                if (cClntMrk !== '1' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
+                    ElMessageBox.alert(
+                    "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
+                    "提示", 
+                    {
+                        confirmButtonText: "确定",
+                        type: "warning",
+                    })
+                    .then(() => {
+                        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+                        opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+                    })
+                    return;
+                };
+                if (isShortTerm && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')) {
+                    ElMessageBox.alert(
+                    "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
+                    "提示", 
+                    {
+                        confirmButtonText: "确定",
+                        type: "warning",
+                    })
+                    .then(() => {
+                        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+                        opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+                    })
+                    return;
+                }
+    
+                // 山东见费只处理保费大于10万元业务
+                if (totalPrm < 100_000){
+                    shanDongFlag = false;
+                } 
+                // 山东见费只处理分期业务, 1期业务走普通拆分
+                if ( nPayNum < 2 ){
+                    shanDongFlag = false;
+                }
+                /* ---------- 计算保险期限（自然年） ---------- */
+                const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+                const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+                const wholeYears = tmEnd.diff(tmStart, 'year'); 
+                const maxPhase = 4 + Math.max(0, wholeYears - 1);
+    
+                /* ---------- 取期数---------- */
+                if (nPayNum > maxPhase) {
+                    const remainDays = tmEnd
+                        .subtract(wholeYears, 'year')
+                        .diff(tmStart, 'day')
+                    const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+                    const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+                    ElMessageBox.alert(
+                        `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`,
+                        "提示", 
+                        {
+                            confirmButtonText: "确定",
+                            type: "warning",
+                        })
+                    return;
+                }
+    }
     const btn = getBtn("btn010101");
   if(btn && props.param.cRsnCde !== '99'){
     // const btn = getBtn("btn010101");
@@ -3239,7 +3346,8 @@ const checkStudentValidity  =  async() => {
  * 投保申请核保
  */
 const submitToUndrFn = async () => {
- const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
+  const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
+  const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -3251,20 +3359,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong() && getcNeedfeeFlag !== '1') {
-      ElMessageBox.confirm(
-      "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
-      "提示", 
-      {
-        confirmButtonText: "确定",
-        type: "warning",
-      })
-      .then(() => {
-        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-      })
-      .catch(() => {
-        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-      });
+  if (await validateShanDong() && (getcNeedfeeFlag !== '1' || getcInstMrk == '5')) {
       return;
   }
  /**
@@ -4725,20 +4820,7 @@ const submitEdrToUndrFun = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong() && getcNeedfeeFlag !== '1') {
-      ElMessageBox.confirm(
-      "根据山东省非车险业务“见费出单”实施方案，该笔业务为“见费出单”业务！系统将更新为“见费出单”！",
-      "提示", 
-      {
-        confirmButtonText: "确定",
-        type: "warning",
-      })
-      .then(() => {
-        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-      })
-      .catch(() => {
-        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-      });
+  if (await validateShanDong() && (getcNeedfeeFlag !== '1' || getcInstMrk == '5')) {
       return;
   }
   if (!baseValite()) {
@@ -5411,7 +5493,9 @@ const validateShanDong = async () => {
   const tInsrncBgnTmA = insrncData["Base.tInsrncBgnTm"];  // 1759420800000  起期
   const tInsrncEndTmA = insrncData["Base.tInsrncEndTm"];  // 1790956799000  止期
   const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
+  const cInstMrk = baseData['Base.cInstMrk'] || '0'; // 缴费次数 
   const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
+
   // 机构是山东分公司
   if (!String(cDptCdeA).startsWith('0237')) return false;
   // 币种是人民币
@@ -5425,28 +5509,63 @@ const validateShanDong = async () => {
   // 特殊产品剔除
   const skipProducts = ['019904', '089031'];
   if (skipProducts.includes(cProdNoA)) return false;
-  // 页面上已经是“见费”直接跳过
-  if (cNeedfeeFlagA == "1") return false;
+  // 页面上已经是“见费”,"一次性缴费"直接跳过
+  if (cNeedfeeFlagA == "1" && cInstMrk == '0') return false;
+
   // 接口校验
   let backEndParam = {};
   if (props.param?.pageName === 'priceInquiry') {
     backEndParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
   } else {
-    backEndParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
+    backEndParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || props.param?.cAppNo;
   }
   const backendRes: any = await validShanDong(backEndParam);
   if (backendRes.code == 200 && backendRes.data == true) {
     return false; 
-  } else {
+  }
+
+  // 满足一次性缴费(个人客户|| 法人且保费<=10万 || 保险期限<6个月（按自然月差））即为“见费出单” 
+  if (AppcClntMrk == "1"){
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，投保人是个人, 系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true
+  }
+  if (AppcClntMrk == "0" && Number(basePrmCur) <= 100000 ) {
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万 元（含），系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
     return true;
   }
-  // 满足一次性缴费(个人客户|| 法人且保费<=10万 || 保险期限<6个月（按自然月差））即为“见费出单” 
-  if (AppcClntMrk == "1") return true;
-  if (AppcClntMrk == "0" && Number(basePrmCur) <= 100000 ) {
-     return true;
-  }
   const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
-  if (!isShortTerm) {
+  if (isShortTerm) {
+     ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
     return true;
   }
 };
