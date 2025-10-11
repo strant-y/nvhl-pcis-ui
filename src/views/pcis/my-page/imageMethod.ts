@@ -10,13 +10,14 @@ export const imageMethod = {
     const params = opertaor.getParam();
     const CEdrType = params.cEdrType;
     let ParamNo = null;
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
     if (params?.pageName === "priceInquiry") {
       ParamNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
       param["cInquiryNo"] = ParamNo;
     } else {
       if (CEdrType === "2" || CEdrType === "3") {
-        const edrBaseTab = opertaor.getTableRefs()["edrBase"].getFromValue();
+        const edrBaseTab = opertaor.getFatherPage().getEdrbaseValue();
         ParamNo = edrBaseTab["EdrBase.cAppNo"];
       } else {
         ParamNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -54,7 +55,7 @@ export const imageMethod = {
           let COprCde;
           if (cEdrType === "2" || cEdrType === "3") {
             // 批改类型 2 注销 3 退保
-            const edrBaseTab = tabref["edrBase"].getFromValue();
+            const edrBaseTab = opertaor.getFatherPage().getEdrbaseValue();
             bussNo = edrBaseTab["EdrBase.cAppNo"];
             plyNo = edrBaseTab["EdrBase.cPlyNo"];
             appTyp = edrBaseTab["EdrBase.cAppTyp"];

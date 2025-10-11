@@ -32,7 +32,6 @@ onMounted(() => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
-  
 });
 
 // 绑定方法

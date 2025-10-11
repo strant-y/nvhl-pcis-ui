@@ -14,7 +14,7 @@ const codeListStore = codeListViewStore();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { formatDate } from "@/utils/date";
-import { policyRatio } from "@/api/query";
+import { policyRatio,validShanDong } from "@/api/query";
 import { useRoute } from "vue-router";
 const route = useRoute();
 import { ratio } from "@/api/prod"
@@ -23,6 +23,7 @@ import { eventBus } from '@/utils/event-bus'
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
+import { lessThan6Months } from "@/utils/date";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -100,7 +101,6 @@ onMounted(async () => {
   })
 });
 
-
 // 获取我司比例
 const getOwnShare = () => {
   let ownShare = 0;
@@ -117,7 +117,6 @@ const getOwnShare = () => {
   }
   return ownShare;
 }
-
 
 // 拆分事件
 const nPayNumberFun = () => {
@@ -232,15 +231,133 @@ const nPayNumberFun = () => {
   }
 }
 
+// 山东拆分事件
+const shanDongFun = () => {
+  const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+  const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const base  = opertaor.getTableRefByKey('base')?.getFromValue();
+  const baseData = opertaor.getDataAll()['base']['needCalc'];
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
+  if (!baseData && payinfoRef.length < 1) {
+    ElMessage.error("请先进行保费计算!");
+    return true;
+  }
+  const totalPrm = Number(base['Base.nPrm'] || 0);
+  if (totalPrm <= 100_000) 
+  return true;
+
+  const totalCent = Math.round(totalPrm * 100)  // 总保费→分
+  // 拆分 添加特约信息
+  if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
+
+  /* ---------- 2. 计算保险期限（自然年） ---------- */
+  const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+  const wholeYears = tmEnd.diff(tmStart, 'year'); 
+  const maxPhase = 4 + Math.max(0, wholeYears - 1);
+
+  /* ---------- 3. 取期数---------- */
+  const nPayNum = Number(base['Base.nPayNum'] || 0)  // "1"  缴费期数
+  if (nPayNum < 2) return true;   // 只处理分期业务
+  if ( nPayNum > maxPhase) {
+    const remainDays = tmEnd
+        .subtract(wholeYears, 'year')
+        .diff(tmStart, 'day')
+    const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+    const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+    ElMessage.error(
+        `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`
+    )
+    return true
+  }
+  /* ---------- 4. 首期规则 ---------- */
+  const firstCent = Math.max(Math.round(totalCent * 0.25), 5_000_000 ); // 25% 或 5 万取高
+  
+  /* ---------- 5. 生成计划 ---------- */
+  const restCent = totalCent - firstCent;
+  const avgRest = restCent / (nPayNum - 1);    // 理论平均值
+  const floor = Math.round(avgRest * 0.95);    // ±5% 边界
+  const ceil  = Math.round(avgRest * 1.05);
+
+  // 首期
+  const cents = [];
+  cents.push(firstCent);                               
+
+  /* 中间期 */
+  for (let i = 1; i < nPayNum - 1; i++) {
+    cents.push(Math.round(avgRest));
+  }
+
+  /* 末期（剩余）*/
+  let lastRaw = restCent - Math.round(avgRest) * (nPayNum - 2);
+  cents.push(lastRaw);         
+
+  /* 尾差±1 分*/
+  let diff = totalCent - cents.reduce((a, b) => a + b, 0);
+  for (let i = cents.length - 1; diff !== 0; i--) {
+    const delta = diff > 0 ? 1 : -1;
+    const next = cents[i] + delta;
+    if (next >= floor && next <= ceil && next >= 0) {
+        cents[i] = next;
+        diff -= delta;
+    }
+  }
+    
+  /* 再钳位末期（仅末期）,转回元 */
+  const lastIdx = cents.length - 1;
+  cents[lastIdx] = Math.max(floor, Math.min(ceil, cents[lastIdx]));
+  const plans = cents.map(v => v / 100);
+
+  /* ---------- 6. 时间规则 ---------- */
+  const lastPayMaxTm = tmEnd.subtract(30, 'day') ;  // 责任终止前 30 天
+  const phaseDays = tmEnd.diff(tmStart, 'day') / nPayNum
+  
+  let val = {};
+  let payinfoArr = [];
+  for (let i = 0; i < nPayNum; i++) {
+    const payBgn = tmStart.add(i * phaseDays, 'day');
+    const payEnd = i === nPayNum - 1
+      ? lastPayMaxTm
+      : tmStart.add((i + 1) * phaseDays, 'day').subtract(1, 'second');
+
+    if (i === nPayNum - 1 && payEnd.isAfter(lastPayMaxTm)) {
+      ElMessage.error('最后一期缴费时间不得晚于保险责任终止日前 30 个自然日')
+      return true
+    }
+     val = {
+        "_dataId": "",
+        "Pay.nTms": i + 1,
+        "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
+        "Pay.cPayorNme": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
+        "Pay.tPayBgnTm": payBgn.format('YYYY-MM-DD HH:mm:ss'),
+        "Pay.tPayEndTm": payEnd.format('YYYY-MM-DD HH:mm:ss'),
+        "Pay.nOwnPrm":  plans[i],  // 我司
+        "Pay.nPayablePrm": plans[i], // 应收
+        "Pay.nPrmVar": 0     // 差额
+      }
+      payinfoArr.push(val);
+  }
+  opertaor.getTableRefByKey('payinfo').setFormValue(payinfoArr);
+}
+
 // 绑定方法
 const method = {
   func1: () => {
   },
 
   //缴费拆分按钮事件
-  splitPayNumber() {
+  splitPayNumber: async () => {
+    // 满足山东条件，按照山东拆分
+    const isShandongCase = await judgeShandongCase();  
+    if (isShandongCase) {
+        // 山东见费提示语
+        if (checkShanDong()) return;
+        shanDongFun();
+        return;
+    }
+    // 普通拆分
     nPayNumberFun();
-
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
@@ -473,6 +590,163 @@ const method = {
     }
   },
 };
+/* ========== 山东校验点拆分提示语（阻断返回 true） ========== */
+const checkShanDong = () => {
+  const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+  const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const base  = opertaor.getTableRefByKey('base')?.getFromValue();
+  const baseData = opertaor.getDataAll()['base']['needCalc'];
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
+  const tInsrncBgnTmA = insrnc["Base.tInsrncBgnTm"];  // 起期
+  const tInsrncEndTmA = insrnc["Base.tInsrncEndTm"];  // 止期
+  const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
+  const cNeedfeeFlag = plyBase['Base.cNeedfeeFlag'];
+
+  if (!baseData && payinfoRef.length < 1) {
+    ElMessage.error("请先进行保费计算!");
+    return true;
+  }
+  const cInstMrk = base['Base.cInstMrk'] || '0';
+  const totalPrm = Number(base['Base.nPrm'] || 0);
+
+  // 小于10万元
+  if (totalPrm <= 100_000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')){ 
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  };
+  // 个人
+  if ((applicant['Applicant.cClntMrk']) == '1' && ( cInstMrk == '5' || cNeedfeeFlag == '0')){
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，投保人是个人, 系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  }
+  
+  // 法人且小于10万元
+  if (applicant['Applicant.cClntMrk'] == "0" && Number(totalPrm) <= 100000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')) {
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万 元（含），系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  }
+  // 短期业务
+  if (isShortTerm && ( cInstMrk == '5' || cNeedfeeFlag == '0')) {
+     ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  }
+
+  // 拆分期数提示
+  const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+  const wholeYears = tmEnd.diff(tmStart, 'year'); 
+  const maxPhase = 4 + Math.max(0, wholeYears - 1);
+
+  const nPayNum = Number(base['Base.nPayNum'] || 0)  // "1"  缴费期数
+  // 只处理分期业务
+  if (nPayNum == 1) {
+    return true;
+  }
+  if (nPayNum > maxPhase) {
+    const remainDays = tmEnd
+        .subtract(wholeYears, 'year')
+        .diff(tmStart, 'day')
+    const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+    const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+    ElMessage.error(
+        `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`
+    )
+    return true
+  }
+
+  return false; // 不阻断
+}
+const judgeShandongCase = async () => {
+  const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+  const applicantData = opertaor.getTableRefByKey("applicant").getFromValue();
+  const insrncData = opertaor.getTableRefByKey("insrnc").getFromValue();
+  const baseData = opertaor.getTableRefByKey("base").getFromValue();
+
+  // 解构并统一命名
+  const {
+    "Base.cDptCde": cDptCdeA,  // cDptCde
+    "Base.cCiMrk": cCiMrkA,   //cCiMrk
+    "Base.cNeedfeeFlag": cNeedfeeFlagA,  // 是否见费出单  1 是  0否
+  } = plyBaseData;
+
+  const cProdNoA = plyBase['Base.cProdNo'] || route.params.param?.cProdNo;
+  const AppcClntMrk = applicantData["Applicant.cClntMrk"]; // 0 法人 1个人
+  const tInsrncBgnTmA = insrncData["Base.tInsrncBgnTm"];  // 1759420800000  起期
+  const tInsrncEndTmA = insrncData["Base.tInsrncEndTm"];  // 1790956799000  止期 
+  const cInstMrk = baseData['Base.cInstMrk'] || '0'; // 缴费次数 
+  const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
+  const nPayNum = Number(baseData['Base.nPayNum'] || 0)  // "1"  缴费期数
+
+  // 机构是山东分公司
+  if (!String(cDptCdeA).startsWith('0237')) return false;
+  // 币种是人民币
+  if (!['人民币', 'CNY'].includes(basePrm)) return false;
+  // 联共保业务类型
+  const skipCiMrk = ['2', '4', '6'];
+  if (skipCiMrk.includes(cCiMrkA)) return false;
+  // 产品号
+  const prodList = ['11', '08', '09', '01', '04', '05', '07', '12'];
+  if (!prodList.includes(cProdNoA.slice(0, 2))) return false;
+  // 特殊产品剔除
+  const skipProducts = ['019904', '089031'];
+  if (skipProducts.includes(cProdNoA)) return false;
+  // 签单保费
+  const totalPrm = Number(baseData['Base.nPrm'] || 0);
+
+  // 接口校验
+  let backEndParam = {};
+  if (props.param?.pageName === 'priceInquiry') {
+    backEndParam['cInquiryNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cInquiryNo');
+  } else {
+    backEndParam['cAppNo'] = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo') || props.param?.cAppNo;
+  }
+  const backendRes: any = await validShanDong(backEndParam);
+  if (backendRes.code == 200 && backendRes.data == true) {
+    return false; 
+  }
+  return true;
+}
 
 // 绑定特殊验证器
 const exRules = {};
@@ -580,6 +854,7 @@ defineExpose({
   getValue,
   getFormconfig,
   nPayNumberFun,
+  shanDongFun,
   addProvide,
   setFormItem
 });

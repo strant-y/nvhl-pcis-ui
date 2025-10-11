@@ -193,7 +193,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保(批)单号",
-        rules: [getRules("required", {})],
+        rules: props.data?.cInquiryNo ? [] : [getRules("required", {})], 
         itemWidth: 3,
         disabled: true,
       },

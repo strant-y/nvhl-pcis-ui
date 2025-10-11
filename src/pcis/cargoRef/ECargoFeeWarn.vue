@@ -43,7 +43,8 @@ const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
 const tCertfDate = ref<any[]>([]);
-const initFlag = computed(() => param?.type ==='add' ? false : formPage.init);
+const initFlag = computed(() => param?.type ==='add' ? false : formPage.init && mountedFlag.value === false);
+const mountedFlag = ref(false);
 onMounted(() => {
   const formconfig11 = formInit(
       JSON.stringify(props.pageSchema),
@@ -75,6 +76,14 @@ onMounted(() => {
        setFormItem('ECargoBase.nLowPrm', {hidden: false});
        setFormItem('ECargoBase.nReceivedPrmEx', {hidden: false});
      }
+    //  付费约定设置默认一次结清且不可编辑
+    setFormItem('ECargoBase.cInstMrk', {disabled: true});
+    setValue('ECargoBase.cInstMrk', "0");
+    //  缴费期数默认1且不可编辑
+    setFormItem('ECargoBase.nPayNum', {btnItems: {disabled: true}})
+    setValue('ECargoBase.nPayNum', 1);
+    // 初始化加载完成标识
+    mountedFlag.value = true;
   });
 });
 
@@ -203,6 +212,8 @@ const method = {
         setValue('ECargoBase.nRecRemPrm',getValue('ECargoBase.nRmbReceivedPrm')- (getValue('ECargoBase.nWhRmbPrm') || 0))
       }
     }
+    // 折人民币协议预收保费
+    setValue('ECargoBase.nRmbReceivedPrm', val * getValue('ECargoBase.nReceivedRate'))
   },
   nWhAmtChange:(val:any)=>{
     if(initFlag.value) return

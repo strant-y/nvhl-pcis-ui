@@ -591,9 +591,11 @@ const updateMasterAgreementValues = () => {
   const allRows = getFormValue(); // 获取所有行数据
   let totalAmt = 0;
   let totalPrm = 0;
+  const nRecRemPrms =ref(0);
   // 遍历所有行，只处理 ECargoCi.cCoinsurerCde === "327001" 的行
   const res = formPage.getFormDataById("AgreementFeeWarn");
   const agreementBaseData = formPage.getComponentRefById("AgreementCiTcp")
+  formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.cCiAgtNo", res["ECargoBase.cCiAgtNo"]);
   formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiJntAmt", res["ECargoBase.nAmt"]);  //共保预估总保额
   formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nCiJntPrm", res["ECargoBase.nPrm"]);
   allRows.forEach(row => {
@@ -611,6 +613,13 @@ const updateMasterAgreementValues = () => {
       totalPrm += ciPrm;
       formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       formPage.getComponentRefById("AgreementCiTcp").setValue("ECargoBase.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
+      // nRecRemPrms = share* Number(res["ECargoBase.nReceivedPrm"] || '0')
+      formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbReceivedPrm",share* Number(res["ECargoBase.nReceivedPrm"] || '0'))
+      // formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbReceivedPrm",ciPrm)  //我司协议预收保费
+      // const diffSub = ciPrm - res["ECargoBase.nWhRmbPrm"]
+      // formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nRecRemPrm",diffSub)
+      // ECargoBase.nWhRmbPrm //折人民币预扣保费
+      // ECargoBase.nRecRemPrm  //协议剩余预收保费（人民币）
     }else{
       // 非永安保险公司：仅更新该行的 ECargoCi.nCiAmt 和 ECargoCi.nCiPrm，不参与总和计算
       const share = Number(row["ECargoCi.nCiShare"]) || 0;
@@ -644,7 +653,13 @@ const updateMasterAgreementValues = () => {
       //折人民币我司预估保额-折人民币预扣保额=协议剩余实收(预估)保额（人民币）
       // if(Number(res["ECargoBase.nRecRemPrm"] || '0') > Number(res["ECargoBase.nCiOwnRmbPrm"] ||'0')){
       const nRecRemEstAmts = Number(res["ECargoBase.nCiOwnRmbAmt"] || '0')- Number(res["ECargoBase.nWhRmbAmt"] || '0')
-      formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nRecRemEstAmt",nRecRemEstAmts)
+      formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nRecRemEstAmt",nRecRemEstAmts);
+      // formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nCiOwnRmbReceivedPrm",nRecRemPrms)  //我司协议预收保费
+      const nRecRemPrms = formPage.getComponentRefById("AgreementFeeWarn").getValue("ECargoBase.nCiOwnRmbReceivedPrm")
+      if(nRecRemPrms !=''|| nRecRemPrms != null || nRecRemPrms != undefined || nRecRemPrms != 0){
+        const diffSub = nRecRemPrms -Number((res["ECargoBase.nWhRmbPrm"] || '0'))
+        formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nRecRemPrm",diffSub)
+      }
       // }
     }else{
       //主共保：

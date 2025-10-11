@@ -107,7 +107,9 @@ const vInputShow = ()=> {
   }
 };
 watch([() => props.modelValue], ([newModelValue]) => {
-  if(typeof newModelValue === "number") {
+  if(props.item.type === 'year') {
+    vInput.value = newModelValue?.toString();
+  } else if(typeof newModelValue === "number") {
     vInput.value = moment(newModelValue).format(getValueFormat());
   } else {
     vInput.value = newModelValue;

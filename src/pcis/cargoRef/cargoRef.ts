@@ -12,7 +12,8 @@ import ECargoSpecial from "@/pcis/cargoRef/ECargoSpecial.vue"; //
 import AgreementDistInsured from "@/pcis/cargoRef/ECargoInsured.vue"; //
 import AgreementDistTransport from "@/pcis/cargoRef/ECargoTransportDist.vue"; //
 import ECargoAcctinfo from "@/pcis/cargoRef/ECargoAcctinfo.vue"; //
-import ECargoImagedInformation from "@/pcis/cargoRef/ECargoImagedInformation.vue"; //
+// import ECargoImagedInformation from "@/pcis/cargoRef/ECargoImagedInformation.vue"; //
+import AgreementPayInfo from '@/pcis/cargoRef/ECargoPayInfo.vue' // 缴费计划
 
 /**用于动态组件的映射生成 */
 const componentMap = {
@@ -29,8 +30,9 @@ const componentMap = {
   AgreementDistGoodsRef: markRaw(ECargoGoodsTgt),
   AgreementTgtSummaryRef: markRaw(ECargoTgtSummary),
   AgreementAcctinfoRef: markRaw(ECargoAcctinfo),
-  AgreementImagedInformationRef: markRaw(ECargoImagedInformation),
+  // AgreementImagedInformationRef: markRaw(ECargoImagedInformation),
   AgreementDistTransportRef:  markRaw(AgreementDistTransport),
+  AgreementPayRef: markRaw(AgreementPayInfo)
 };
 
 const install = (Vue) => {

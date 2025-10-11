@@ -455,7 +455,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 });
 
                 if(!cv){
-                    ElMessage.error('条款信息存在验证失败数据，请确认！');
+                    ElMessage.error('保障信息存在验证失败数据，请确认！');
                 }
             // 5. 返回验证结果和失败详情
             const isValid = failedKeys.length === 0;

@@ -147,6 +147,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 									freeEditRef.value?.setValue('CBillNoStart', params.cAppNo)
 									freeEditRef.value?.setValue('CBillNoEnd', params.cAppNo)
 							}
+							freeEditRef.value?.setValue('isEcargo', '0');
 					  })
 					},
 				}),
@@ -427,7 +428,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				prop: "CSlsNme",
 				inputtype: "rtinput",
 				title: "业务员名称"
-			}
+			},
+			{
+				prop: "isEcargo",
+				inputtype: "rtcheckbox",
+				title: "是否协议",
+				keymap: {
+				  y: '1',
+				  n: '0',
+				},
+			},
 		],
 	})
 );
@@ -465,7 +475,8 @@ const tableconfig = reactive<AppTableConfig>(
                                 "UserId": user.value['opCde'],
                                 "CompanyId": user.value['companyId'],
                                 "OpRelCde": user.value['opCde'],
-                                "CUniqueNo": CUniqueNos
+                                "CUniqueNo": CUniqueNos,
+                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                             };
                             //这一块儿如果要校验缴费类型的话，请排除云南分公司
                             console.log(param)
@@ -518,7 +529,8 @@ const tableconfig = reactive<AppTableConfig>(
                             });
                             const param = {
                                 "CPaySequence": CPaySequences,
-                                "CUniqueNo": CUniqueNos
+                                "CUniqueNo": CUniqueNos,
+                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                             };
                             console.log(param)
                             pcisQueryService.cancelPaymentNo(param)
@@ -565,7 +577,8 @@ const tableconfig = reactive<AppTableConfig>(
                             "CompanyId":  user.value['companyId'],
                             "OpRelCde": user.value['opCde'],
                             "CUniqueNo": CUniqueNos,
-                            "CPaySequence":CPaySequences
+                            "CPaySequence":CPaySequences,
+                            "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                         };
                         console.log(param)
                         pcisQueryService.queryPaymentNo(param)
@@ -673,6 +686,7 @@ const tableconfig = reactive<AppTableConfig>(
                             const param = {
                                 "CAppNos": CAppNos,
                                 "CUniqueNos": CUniqueNos,
+                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
                             };
                             console.log(param)
                             pcisQueryService.needFeeToBack(param)
@@ -900,7 +914,8 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cAppNo",
 				inputtype: "rtinput",
 				title: "申请单号/保单号",
-                width: 136,
+                lengthNum: 21,
+                lengthIsNumber: true,
                 slotName: "cAppNo",
                 fixed: "left",
 			},
@@ -908,7 +923,7 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "nTms",
 				inputtype: "rtinput",
 				title: "期次",
-                width: 35,
+                lengthNum: 2,
 			},
 			{
 				prop: "cAppNmeInvest",
@@ -916,13 +931,13 @@ const tableconfig = reactive<AppTableConfig>(
 				title: "投保人名称",
                 slotName: "cAppNmeInvest",
                 align: "left",
-                width: 112,
+                lengthNum: 12,
 			},
 			{
 				prop: "cPayTyp",
 				inputtype: "rtselect",
 				title: "缴费类型",
-                width: 65,
+                lengthNum: 9,
                 typeCode: "CHARGE_TYPE_CACHE",
                 param: {'cCde': [ '2', '3', '5',  '99']},
 				formatter: (val)=>{
@@ -934,27 +949,30 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "cPaySequence",
 				inputtype: "rtinput",
 				title: "支付号",
-                width: 100,
+                lengthNum: 8,
+                lengthIsNumber: true,
 			},
 			{
 				prop: "nPrm",
 				inputtype: "rtinput",
 				title: "保费金额",
-                width: 77,
+                lengthNum: 12,
+                lengthIsNumber: true,
                 align: "left"
 			},
 			{
 				prop: "nPayAmt",
 				inputtype: "rtinput",
 				title: "应缴金额",
-                width: 77,
+                lengthNum: 12,
+                lengthIsNumber: true,
                 align: "left"
 			},
 			{
 				prop: "cCheckSts",
 				inputtype: "rtselect",
 				title: "处理状态",
-                width: 112,
+                lengthNum: 9,
                 align: "left",
 				loadData:cCheckStsList,
 				formatter: (val)=>{
@@ -966,25 +984,28 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tBgnTm",
 				inputtype: "rtinput",
 				title: "起保日期",
-                width: 112,
+                lengthNum: 17,
+                lengthIsNumber: true,
 			},
 			{
 				prop: "cUniqueNo",
 				inputtype: "rtinput",
 				title: "收据流水号",
-                width: 132,
+                lengthNum: 11,
+                lengthIsNumber: true,
 			},
 			{
 				prop: "cBatchNo",
 				inputtype: "rtinput",
 				title: "批号",
-                width: 132,
+                lengthNum: 11,
+                lengthIsNumber: true,
 			},
 			{
 				prop: "cPayStatus",
 				inputtype: "rtselect",
 				title: "缴费状态",
-                width: 55,
+                lengthNum: 4,
                 align: "left",
                 typeCode: "WEB_BAS_CODELIST",
                 codeParam: {'cParCde': 'DY1'},
@@ -997,13 +1018,14 @@ const tableconfig = reactive<AppTableConfig>(
 				prop: "tUdrTm",
 				inputtype: "rtinput",
 				title: "核保日期",
-                width: 112,
+                lengthNum: 17,
+                lengthIsNumber: true,
 			},
 			{
 				prop: "cChargeCde",
 				inputtype: "rtinput",
 				title: "操作员",
-                width: 55,
+                lengthNum: 4,
                 align: "left",
 			}
 		],
@@ -1051,6 +1073,7 @@ onMounted(async () => {
         freeEditRef.value?.setValue('CBillNoEnd', params.cAppNo)
         handleQuery()
     }
+    freeEditRef.value?.setValue('isEcargo', '0')
   })  
   getListByCode('WEB_BAS_CODELIST', {
       'cParCde': 'shoufeifangshi',

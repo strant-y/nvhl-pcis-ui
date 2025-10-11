@@ -16,10 +16,6 @@ const props = defineProps({
     required: true,
   },
 });
-// ECargoBase.nCiJntAmt  //共保总保额
-// ECargoBase.nCiJntPrm  共保总保费
-// ECargoBase.nJiJntAmt  联保总保额
-// ECargoBase.nJiJntPrm  联保总保费
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));

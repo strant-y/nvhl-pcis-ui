@@ -489,6 +489,10 @@ export function deleteTermRiskRel(queryParams: any): AxiosPromise<any> {
 export function getPrdTermInfo(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/getPrdTermInfo`, queryParams);
 }
+/* 条款预览-条款详情*/
+export function viewPdfProposal(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/viewPdfProposal`, queryParams, { responseType: 'blob' });
+}
 /**
  * 条款配置-关联附加条款列表
  * @param queryParams

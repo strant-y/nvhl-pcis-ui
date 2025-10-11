@@ -460,7 +460,8 @@ const tableconfig = reactive<AppTableConfig>(
             type: "warning",
           }).then(async function () {
             // 删除时除了暂存单，其他要调险位删除接口，如果返回失败要阻断(排除历史数据补全单)
-            if (row.cAppStatus !== "1" && row.cRsnCde != "99") {
+            // 询价单暂时不调用险位删除接口
+            if (row.cAppStatus !== "1" && row.cRsnCde != "99" && row.baseType !== "询价") {
               const param = {
                 cDocTyp: row.cAppTyp, // 单证类型 A 保单 E 批单
                 cAppNo: row.cAppNo, // 申请单号
@@ -650,35 +651,38 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "baseType",
         inputtype: "rtinput",
         title: "任务类型",
-        width: 55,
+        lengthNum: 4,
       },
       {
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
         slotName: "cInquiryNo",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
       },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "申请单号/保单号",
         slotName: "cPlyNo",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
       },
       {
         prop: "cEdrNo",
         inputtype: "rtselect",
         title: "批改申请单号/批单号",
         slotName: "cEdrNo",
-        width: 136,
+        lengthNum: 21,
+        lengthIsNumber: true,
       },
       {
         prop: "cRsnCdeText",
         inputtype: "rtinput",
         title: "批改原因",
         align: "left",
-        width: 99,
+        lengthNum: 8,
       },
       {
         prop: "cTermNme",
@@ -686,20 +690,21 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         slotName: "cTermNme",
         align: "left",
-        width: 122,
+        lengthNum: 13,
       },
       {
         prop: "tAppTm",
         inputtype: "rtinput",
         title: "申请日期",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人名称",
         align: "left",
-        width: 122,
+        lengthNum: 12,
         slotname: "cAppNme",
       },
       {
@@ -707,7 +712,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "被保人名称",
         align: "left",
-        width: 122,
+        lengthNum: 12,
         slotname: "cInsuredNme",
       },
       {
@@ -715,7 +720,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保险期间",
         align: "left",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
         slotName: "InsurancePeriod",
       },
       {
@@ -723,7 +729,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保费",
         align: "left",
-        width: 79,
+        lengthNum: 12,
+        lengthIsNumber: true,
         formatter: (val:any) => {
           return val?.toLocaleString()
         }
@@ -733,7 +740,8 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "保费变化量",
         align: "left",
-        width: 82,
+        lengthNum: 13,
+        lengthIsNumber: true,
         formatter: (val:any) => {
           return val?.toLocaleString()
         }
@@ -743,21 +751,22 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "核保日期",
         align: "left",
-        width: 112,
+        lengthNum: 17,
+        lengthIsNumber: true,
       },
       {
         prop: "cUdrCnm",
         inputtype: "rtinput",
         title: "核保人",
         align: "left",
-        width: 54,
+        lengthNum: 4,
       },
       {
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "任务状态",
         loadData: taskStatusOptions,
-        width: 81,
+        lengthNum: 7,
         align: "left",
       },
     ],
