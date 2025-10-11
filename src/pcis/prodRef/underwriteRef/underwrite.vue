@@ -85,6 +85,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             });
           },
         },
+        hidden: params.pageName === "priceInquiry"
       },
       {
         prop: "riFacMrk",
@@ -179,6 +180,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             }
           },
         },
+        hidden: params.pageName === "priceInquiry"
       },
       {
         prop: "riFacOpn",
@@ -187,6 +189,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "临分意见",
         rows: 3,
         itemWidth: 2,
+        hidden: params.pageName === "priceInquiry"
       },
       {
         prop: "cRiFacFeeOpn",
@@ -196,6 +199,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rows: 3,
         itemWidth: 2,
         disabled: true,
+        hidden: params.pageName === "priceInquiry"
       },
       {
         prop: "cFacObReOpn",
@@ -205,6 +209,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rows: 3,
         itemWidth: 2,
         disabled: true,
+        hidden: params.pageName === "priceInquiry"
       },
       {
         prop: "cIsExcluding",
@@ -258,6 +263,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             }
           },
         },
+        hidden: params.pageName === "priceInquiry"
       },
       {
         prop: "cUndrMrk",
