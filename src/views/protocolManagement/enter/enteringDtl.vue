@@ -1075,8 +1075,12 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
         pay["ECargoPay.nPayablePrm"] = (insrnc["ECargoBase.nWhRmbPrm"] * 100 - insrnc["ECargoBase.nRmbReceivedPrm"] * 100)/100;
       }
     } else {
-      // 应收保费: 预收保费变化
-      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'] || 0;
+      if(props.payWay == '01' || props.param?.cEdrFlag === "YY"){
+        // 应收保费: 预收保费变化
+        pay["ECargoPay.nPayablePrm"] = convertNumber(edrbaseData['EdrECargoBase.nReceivedPrmVar']) || 0;
+      } else {// AY : 应收保费=保费变化 * 汇率 
+        pay["ECargoPay.nPayablePrm"] = (convertNumber(edrbaseData['EdrECargoBase.nPrmVar']) || 0) * convertNumber(insrnc['ECargoBase.nPrmRmbExch']);
+      }
       // 我司保费: 应收保费 * 我司比例
       pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
     }
@@ -1342,6 +1346,14 @@ async function  submit() {
 // 绑定特殊验证器
 const exRules = {};
 
+// 将1,000,000格式的数字转成可以计算的数值
+function convertNumber(val:any) {
+  if (val === null || val === undefined || val === '') {
+    return val;
+  }
+  const num = Number(val.replace(/,/g, ''));
+  return isNaN(num) ? val : num;
+}
 </script>
 <style lang="scss" scoped>
 </style>
