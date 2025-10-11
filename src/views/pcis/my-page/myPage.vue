@@ -5084,7 +5084,7 @@ const showJointInsuranceInfo = async () => {
     <div style="font-size: 14px; line-height: 1.8;">
       <strong>${msg}信息如下：</strong><br>
       永安方总保额：<strong>${totalAmount.toLocaleString()}元</strong><br>
-      永安方总比例：<strong>${totalShare*100}%</strong><br>
+      永安方总比例：<strong>${Math.round(totalShare * 100)}%</strong><br>
       永安方总保费：<strong>${totalPremium.toLocaleString()}元</strong><br>
       ${companyDetails.map(detail => 
         `<span style="display: block;">${detail.name}->比例：${detail.ratio}->保额：${detail.amount}->保费：${detail.premium}</span>`
