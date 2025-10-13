@@ -4443,12 +4443,12 @@ const getSurrenderPrecisFun = () => {
  */
 const submitEdrToUndrSurrender = async () => {
   // 协议出单剩余预收保费校验
-  if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
-      ElMessage.error("协议剩余预收保费不足");
-      return;
-    }
-  }
+  // if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
+  //   if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+  //     ElMessage.error("协议剩余预收保费不足");
+  //     return;
+  //   }
+  // }
   const isAcctValid = await validateAcctinfo();
     // 账户信息校验
   if (!isAcctValid) {
@@ -4698,14 +4698,13 @@ const generateEndorse = async () => {
 const submitEdrToUndrFun = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
   const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
-  
   // 协议出单剩余预收保费校验
-  if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
-      ElMessage.error("协议剩余预收保费不足");
-      return;
-    }
-  }
+  // if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
+  //   if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
+  //     ElMessage.error("协议剩余预收保费不足");
+  //     return;
+  //   }
+  // }
   const isAcctValid = await validateAcctinfo();
     // 账户信息校验
   if (!isAcctValid) {
