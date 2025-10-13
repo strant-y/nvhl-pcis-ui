@@ -4743,7 +4743,7 @@ const submitEdrToUndrFun = async () => {
     }
   }
   // 校验生成批文
-  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt") && props.param.cTransMrk !== "1" && (props.param.cRsnCde !== "99" && props.param.cEdrRsnBundle !== "99" && props.param.cEdrRsnBundleCde !== "99")) {
+  if(!edrbase.value?.getValue("EdrBase.cEdrCtnt") && props.param.cTransMrk !== "1" && (props.param.cRsnCde !== "99" && props.param.cEdrRsnBundle !== "99" && props.param.cEdrRsnBundleCde !== "99" && props.param.cEdrRsnDetail !== "99")) {
     ElMessage.warning("请先生成批文!")
     return
   }
