@@ -1183,7 +1183,7 @@ const tableObj = {
                     if (cleanRow) {
                         const data = cleanRow;
                         router.push({
-                            path: "/pcisapp/pcisappView",
+                            path: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
                             query: {
                                 param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
                             },

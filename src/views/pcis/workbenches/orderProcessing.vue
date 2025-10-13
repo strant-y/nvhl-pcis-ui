@@ -597,7 +597,7 @@ const tableconfig = reactive<AppTableConfig>(
           if (r) {
             const data = row;
             router.push({
-              path: "/pcisapp/pcisappView",
+              path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
               query: {
                 param:
                   row.baseType === "询价"
