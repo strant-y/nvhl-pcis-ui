@@ -28,9 +28,6 @@ import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue
 import { constantRoutes } from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { saveAs } from "file-saver";
-import { fa } from "element-plus/es/locale";
-import { debugPort } from "process";
-import { debug } from "console";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
@@ -75,7 +72,7 @@ onMounted(async () => {
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   setTimeout(() => {
     valideRequired();
-    handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
+    // handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
     if(param.pageType === "inquiryToApp"){
       const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
       // 调用联共保信息初始化方法
