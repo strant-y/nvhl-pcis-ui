@@ -570,6 +570,7 @@ const method = {
       });
       setFormItem("Applicant.cMrgCde", {
         hidden: true,
+        rules: null,
       });
       setFormItem("Applicant.cIsBranch", {
         hidden: false,
@@ -663,10 +664,10 @@ const method = {
       const cWorkDpt = getValue('Applicant.cWorkDpt')
       const isSpecialCase = cWorkDptList.includes(cWorkDpt);
       const requiredRule = [getRules("required", {})];
-      //实名认证方式
-      setFormItem("Applicant.cRealnameAuthType", {
-        rules: isSpecialCase ? requiredRule : []
-      });
+      //实名认证方式-20251013 实名认证方式都是非必填
+      // setFormItem("Applicant.cRealnameAuthType", {
+      //   rules: isSpecialCase ? requiredRule : []
+      // });
       // 法定代表人/责任人
       setFormItem("Applicant.cLegalRepresentative", {
         rules: isSpecialCase ? requiredRule : []
@@ -722,6 +723,10 @@ const method = {
       setFormItem("Applicant.cSex", {
         rules: [],
       });
+      // 法人时 全球法人机构识别编码必填
+      setFormItem("Applicant.cGcidCode", {
+        rules: [getRules("required", {})],
+      });
     } else {
       
       setFormItem("Applicant.tBirthday", {
@@ -744,6 +749,7 @@ const method = {
       });
       setFormItem("Applicant.cMrgCde", {
         hidden: false,
+        rules: [getRules("required", {})],
       });
       // 投保人是个人，是否分支机构、 股东客户隐藏
       setFormItem("Applicant.cIsBranch", {
@@ -871,6 +877,9 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cLegalRepresentative", {
+        rules: [],
+      });
+      setFormItem("Applicant.cGcidCode", {
         rules: [],
       });
 
