@@ -210,19 +210,19 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "大类编号",
+        title: "产品大类编码",
         typeCode: "KIND_LIST_GRT",
         codeParam: { codeListParam: "" },
       },
       {
         prop: "cKindNme",
         inputtype: "rtinput",
-        title: "大类名称",
+        title: "产品大类名称",
       },
       {
         prop: "cProdNo",
         inputtype: "rtinput",
-        title: "产品编号",
+        title: "产品编码",
       },
       {
         prop: "cDispCde",

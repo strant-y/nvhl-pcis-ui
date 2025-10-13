@@ -119,7 +119,7 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "大类名称",
+        title: "产品大类名称",
         inputtype: "rtinput",
       },
       {

@@ -185,13 +185,13 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cKindNme",
-        title: "大类名称",
+        title: "产品大类名称",
         inputtype: "rtinput",
       },
 
       {
         prop: "cProdNo",
-        title: "产品编号",
+        title: "产品编码",
         inputtype: "rtinput",
       },
       {

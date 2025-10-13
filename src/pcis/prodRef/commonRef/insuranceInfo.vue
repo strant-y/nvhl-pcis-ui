@@ -65,7 +65,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "大类代码",
+        title: "产品大类编码",
         rules: [getRules("required", {})],
         loaddata: [
           {
