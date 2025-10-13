@@ -27,19 +27,21 @@ import { ElMessage } from "element-plus";
 import { saveAssociationSpec } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const tabref = opertaor.getTableRefByKey("prodInfo");
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps<{
   data: Object;
   type: string;
+  idxParam: Object;
 }>();
 const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+const tabref = opertaor.getTableRefByKey("prodInfo");
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({

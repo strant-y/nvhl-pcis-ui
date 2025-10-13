@@ -125,7 +125,7 @@ const tableconfig = reactive<AppTableConfig>(
             return;
           } else {
             dzmodal
-              .open(RelatedSpecialAgree, { type: "add", data: {} })
+              .open(RelatedSpecialAgree, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();
@@ -140,7 +140,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         func: function () {
           dzmodal
-            .open(AddSpecialAgreeModal, { type: "add", data: {} })
+            .open(AddSpecialAgreeModal, { type: "add", data: {}, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();

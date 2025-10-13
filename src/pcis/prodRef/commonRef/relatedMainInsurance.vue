@@ -117,7 +117,7 @@ const tableconfig = reactive<AppTableConfig>(
             return;
           } else {
             dzmodal
-              .open(MaininsuranceModal, { type: "add", data: {} })
+              .open(MaininsuranceModal, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();

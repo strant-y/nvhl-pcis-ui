@@ -28,16 +28,17 @@ const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { saveEdrFormulaRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const tabref = opertaor.getTableRefByKey("prodInfo");
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const props = defineProps<{
   data: Object;
   type: string;
+  idxParam: Object;
 }>();
 const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+const tabref = opertaor.getTableRefByKey("prodInfo");
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({

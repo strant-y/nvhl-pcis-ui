@@ -28,15 +28,16 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const emits = defineEmits(["ok", "cancel"]);
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const tabref = opertaor.getTableRefByKey("prodInfo");
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const props = defineProps<{
   data: Object;
   type: String;
+  idxParam: Object;
 }>();
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+const tabref = opertaor.getTableRefByKey("prodInfo");
 const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig = reactive<AppFreeEditConfig>(
