@@ -647,8 +647,14 @@ const method = {
       // });
 
       // 法人时 全球法人机构识别编码必填
-      setFormItem("Applicant.cGcidCode", {
+      setFormItem("Insured.cGcidCode", {
         rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cEdubackgroudTyp", {
+        rules: [],
+      });
+      setFormItem("Insured.nYearincomeNum", {
+        rules: [],
       });
 
       codeListStore
@@ -860,8 +866,16 @@ const method = {
       //   rules: [getRules("required", {})]
       // });
 
-      setFormItem("Applicant.cGcidCode", {
+      setFormItem("Insured.cGcidCode", {
         rules: null,
+      });
+      // 个人 客户学历必填
+      setFormItem("Insured.cEdubackgroudTyp", {
+        rules: [getRules("required", {})],
+      });
+      // 个人 年收入（单位：万元）必填
+      setFormItem("Insured.nYearincomeNum", {
+        rules: [getRules("required", {})],
       });
 
 
