@@ -2163,19 +2163,13 @@ function handleDelete(row: any) {
 }
 // table表格的双击事件
 const handleRowDoubleClick = (row:any) => {
-    if (
-        row.cAppStatus != "1" &&
-        row.cAppStatus != "3" &&
-        row.cAppStatus != "8"
-    ) {
-       const data = row;
-        router.push({
-            path: "/pcisapp/myPage",
-            query: {
-                param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
-            },
-        });
-    }
+    const data = row;
+    router.push({
+        path: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
+        query: {
+            param: JSON.stringify({ ...data, ...{ pageType: "readonly", pageName: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "priceInquiry": "" } }),
+        },
+    });
 };
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {

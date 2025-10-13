@@ -401,6 +401,9 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 80,
     tableBtnPosition: "right",
     fixed: true,
+    rowDbClickFun: (row:any) => {
+      handleDblClick(row);
+    },
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -793,6 +796,22 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+
+// 行双击查看详情
+function handleDblClick(row:any) {
+  router.push({
+    path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
+    query: {
+      param:
+        row.baseType === "询价"
+          ? JSON.stringify({
+              ...row,
+              ...{ pageType: "readonly", pageName: "priceInquiry" },
+            })
+          : JSON.stringify({ ...row, ...{ pageType: "readonly" } }),
+    },
+  });
+}
 
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
