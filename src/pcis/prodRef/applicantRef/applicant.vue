@@ -727,6 +727,12 @@ const method = {
       setFormItem("Applicant.cGcidCode", {
         rules: [getRules("required", {})],
       });
+      setFormItem("Applicant.cEdubackgroudTyp", {
+        rules: [],
+      });
+      setFormItem("Applicant.nYearincomeNum", {
+        rules: [],
+      });
     } else {
       
       setFormItem("Applicant.tBirthday", {
@@ -846,6 +852,14 @@ const method = {
       // 法定代表人/责任人
       setFormItem("Applicant.cLegalRepresentative", {
         rules: []
+      });
+      // 个人 客户学历必填
+      setFormItem("Applicant.cEdubackgroudTyp", {
+        rules: [getRules("required", {})],
+      });
+      // 个人 年收入（单位：万元）必填
+      setFormItem("Applicant.nYearincomeNum", {
+        rules: [getRules("required", {})],
       });
 
       // 个人 移动电话必填  
