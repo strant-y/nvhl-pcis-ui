@@ -127,7 +127,7 @@ const tableconfig = reactive<AppTableConfig>(
             return;
           } else {
             dzmodal
-              .open(AddInstituTaxRateModal, { type: "add", data: {} })
+              .open(AddInstituTaxRateModal, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();

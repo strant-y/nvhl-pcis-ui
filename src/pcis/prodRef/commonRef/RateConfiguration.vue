@@ -132,7 +132,7 @@ const tableconfig = reactive<AppTableConfig>(
             return;
           } else {
             dzmodal
-              .open(AddRateConfModal, { type: "add", data: {} })
+              .open(AddRateConfModal, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();

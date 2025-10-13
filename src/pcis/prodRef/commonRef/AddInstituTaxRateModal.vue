@@ -28,16 +28,17 @@ import { saveProdTaxRateInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 
 const { getRules } = useValidator();
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const emits = defineEmits(["ok", "cancel"]);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const tabref = opertaor.getTableRefByKey("prodInfo");
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const props = defineProps<{
   data: Object;
   type: String;
+  idxParam: Object;
 }>();
 const dialogVisible = ref(true);
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+const tabref = opertaor.getTableRefByKey("prodInfo");
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 

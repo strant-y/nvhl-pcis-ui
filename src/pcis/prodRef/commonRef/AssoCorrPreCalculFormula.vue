@@ -103,6 +103,7 @@ const tableconfig = reactive<AppTableConfig>(
             .open(RelatedAssoCorrPreCalculFormulaModal, {
               type: "related",
               data: {},
+              idxParam: idxParam
             })
             .then((res) => {
               if (res.type === "ok") {
@@ -117,7 +118,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         func: function () {
           dzmodal
-            .open(AddAssoCorrPreCalculFormulaModal, { type: "add", data: {} })
+            .open(AddAssoCorrPreCalculFormulaModal, { type: "add", data: {}, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();

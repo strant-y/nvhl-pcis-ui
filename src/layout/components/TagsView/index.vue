@@ -11,7 +11,7 @@
         :key="tag.fullPath"
         :to="{}"
         :class="'tags-item ' + (isActive(tag) ? 'active' : '')"
-        @click.prevent="toView(tag)"
+        @click.prevent="!isActive(tag) ? toView(tag) : ()=>{}"
         @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
         @contextmenu.prevent="openContentMenu(tag, $event)"
       >

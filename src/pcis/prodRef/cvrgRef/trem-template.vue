@@ -879,6 +879,7 @@ function dataInit() {
         }
       })
     }
+    methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
     if (props.disabledFlag) {
       setDisabledAll();
     }
@@ -915,6 +916,7 @@ function dataInit() {
           }
         })
       }
+      methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
       if (props.disabledFlag) {
         setDisabledAll();
       }
@@ -1422,6 +1424,32 @@ const methodMap = {
     nextTick(()=>{
       checkData(val,item);
     });
+  },
+  // 费率计算方式(0: 按限额 1: 按人)
+  cRateMethodChange:(val:any)=> {
+    // 040020-保险经纪人的条款费率计算方式:按限额，费率必填；按人，每人保费必填、在职保险经纪人人数（标的信息）必填
+    termFactormap.value.forEach((item: any) => {
+      if (item["prop"] === "Term.nRateVal") {
+        if(val === "0") {
+          item.cPorpRequired = true;
+        } else {
+          item.cPorpRequired = false;
+        }
+      }
+      if(item["prop"] === "Term.nPersonPremium") {
+        if(val === "1") {
+          item.cPorpRequired = true;
+        } else {
+          item.cPorpRequired = false;
+        }
+      }
+    });
+    const tgt = opertaor.getTableRefByKey("tgt")
+    if(val === "1") {
+      tgt?.setFormItem('Tgt.nAgentNumber',{ rules: [getRules("required", {})] })
+    } else {
+      tgt?.setFormItem('Tgt.nAgentNumber',{ rules: [] })
+    }
   }
 };
 

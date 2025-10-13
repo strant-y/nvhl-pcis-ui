@@ -108,7 +108,7 @@ const tableconfig = reactive<AppTableConfig>(
             return;
           } else {
             dzmodal
-              .open(AddPremCalcuRulesModal, { type: "add", data: {} })
+              .open(AddPremCalcuRulesModal, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();

@@ -29,15 +29,17 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { saveVersionInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const tabref = opertaor.getTableRefByKey("prodInfo");
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps<{
   data: Object;
   type: string;
+  idxParam: Object;
 }>();
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
+const tabref = opertaor.getTableRefByKey("prodInfo");
 const dialogVisible = ref(true);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
