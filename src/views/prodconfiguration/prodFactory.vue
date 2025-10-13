@@ -179,8 +179,8 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         type: "primary",
         icon: "Check",
-        disabled: (row) =>
-          row.cAuditStatus === "audit" || row.cAuditStatus === "submit",
+        hideBtns: (row) =>
+          row.cAuditStatus == "audit" || row.cAuditStatus == "submit",
         tableClick: async (row) => {
           await auditSubmit({
             cProdNo: row.cProdNo,
