@@ -102,7 +102,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "险种大类",
+        title: "产品大类",
         rules: [getRules("required", { change: true })],
         typeCode: "KIND_LIST_GRT",
         codeParam: {
@@ -111,7 +111,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         func: (val: any) => {
           console.log('大类', val)
-          // 险种大类
+          // 产品大类
           if (!!val) {
             eventBus.emit('cKindNo-change', val)
             setFormItem('cProdNo', {
@@ -130,7 +130,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
         rules: [getRules("required", {})],
         // typeCode: "PROD_LIST_GRT",
         // codeParam: {

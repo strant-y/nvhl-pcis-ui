@@ -1,7 +1,7 @@
 <!-- 协议号-查询 -->
 <template>
   <div>
-    <el-dialog v-model="maindialogVisible" width="70%" title="产品代码查询">
+    <el-dialog v-model="maindialogVisible" width="70%" title="产品编码查询">
         <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" @page-change="handleQuery(false)" />
     </el-dialog>
   </div>
@@ -61,7 +61,7 @@ const tableconfig = reactive<AppTableConfig>(
 			{
         prop: "code",
         inputtype: 'rtinput',
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "value",
@@ -82,7 +82,7 @@ onMounted(() => {
 	})
 });
 
-// 查询产品代码
+// 查询产品编码
 const handleQuery = (flag?: boolean) => {
 	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const params = Object.assign({cEcAgrAppNo:props.data.cEcAgrAppNo},r);

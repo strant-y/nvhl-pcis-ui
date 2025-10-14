@@ -1558,7 +1558,7 @@ async function loadAfter() {
 		if(props.param.cRecordType === 9){
 			let params = {
 				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
-				cProdNo: props.param.cProdNo, // 产品代码
+				cProdNo: props.param.cProdNo, // 产品编码
 				cTermNo: props.param.cTermNo, // 条款代码
 				cInsuredCde: props.param.cInsuredCde, // 被保人代码
 				insuredNme: props.param.cInsuredNme, // 被保人名称
@@ -4995,7 +4995,7 @@ const submitUnderwritingFn = async () => {
             cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
             cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
             cProdNme: props.param?.cTermNme,// 产品名称
-            cProdNo: props.param?.cProdNo,//产品代码
+            cProdNo: props.param?.cProdNo,//产品编码
             cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
             // nAmtChgRate: "1.00",// 保额币种汇率
             nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号

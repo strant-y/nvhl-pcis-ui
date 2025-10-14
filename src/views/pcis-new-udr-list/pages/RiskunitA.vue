@@ -1377,7 +1377,7 @@ async function tryCountInFoRIs(row: any) {
     cDptCde: row.cDptCde,// 机构代码
     cAppNo: params.cAppNo,// 申请单号
     nEdrPrjNo: row.nEdrPrjNo,// 批改序号
-    cProdNo: row.cProdNo,// 产品代码
+    cProdNo: row.cProdNo,// 产品编码
     nSplitSeq: row.nSeqNo,// 拆分序号
     cRiskLvlCde: row.cRiskLvlCde,// 风险等级代码
     cCiMrk: row.cCiMrk,// 共保方式

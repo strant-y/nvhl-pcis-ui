@@ -222,7 +222,7 @@ function handleQuery() {
     prod = tabref.getFromValue().cProdNo;
   }
   if (!prod || prod === '') {
-    ElMessage.error("产品代码为空！请保存后操作");
+    ElMessage.error("产品编码为空！请保存后操作");
     return;
   } else {
     const r = tableRef.value?.getPartnerPage(); //获取分页数据

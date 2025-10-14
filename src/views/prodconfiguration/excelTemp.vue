@@ -68,7 +68,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "产品代码",
+        title: "产品编码",
         typeCode: "NVHL_PROD_LIST_CACHE",
         // codeParam: { cParCde: "" },
       },
@@ -158,7 +158,7 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cProdNo",
-        title: "产品代码",
+        title: "产品编码",
         inputtype: "rtinput",
       },
       {

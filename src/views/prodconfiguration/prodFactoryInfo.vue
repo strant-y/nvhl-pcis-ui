@@ -176,11 +176,11 @@ opertaor.setTableConfig([
         pageTtile: "页面组件绑定",
         pageRef: "prodComponent",
       },
-      priceComponent: {
-        pageKey: "priceComponent",
-        pageTtile: "询价页面配置",
-        pageRef: "priceComponent",
-      },
+      // priceComponent: {
+      //   pageKey: "priceComponent",
+      //   pageTtile: "询价页面配置",
+      //   pageRef: "priceComponent",
+      // },
     },
   },
 ]);

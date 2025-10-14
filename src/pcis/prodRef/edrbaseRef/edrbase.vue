@@ -347,7 +347,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 // 判断是否应该禁用短期费率类型下拉框
 function shouldDisableRatioTyp(params: any) {
-  // 指定产品代码列表
+  // 指定产品编码列表
   const specialProducts = [
     "040016", "059014", "059015", "070002", "043021", 
     "120008", "059018", "059017", "059016", "043020",

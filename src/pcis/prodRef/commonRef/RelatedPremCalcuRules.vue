@@ -104,7 +104,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         func: function () {
           if (tabref.getFromValue().cProdNo == null) {
-            ElMessage.error("产品代码为空！请保存后操作");
+            ElMessage.error("产品编码为空！请保存后操作");
             return;
           } else {
             dzmodal
@@ -177,7 +177,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "cProdNo",
-        title: "产品代码",
+        title: "产品编码",
         inputtype: "rtinput",
       },
       {
@@ -231,7 +231,7 @@ function handleQuery() {
     prod = tabref.getFromValue().cProdNo;
   }
   if (!prod || prod === '') {
-    ElMessage.error("产品代码为空！请保存后操作");
+    ElMessage.error("产品编码为空！请保存后操作");
     return;
   } else {
     const r = tableRef.value?.getPartnerPage(); //获取分页数据

@@ -174,7 +174,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "CContId",
         inputtype: "rtinput",
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "CContId",
@@ -300,7 +300,7 @@ const tableconfig = reactive<AppTableConfig>(
       // {
       //   prop: "CRikindNo",
       //   inputtype: "rtinput",
-      //   title: "险种大类",
+      //   title: "产品大类",
       // },
       // {
       //   prop: "CProdNo",

@@ -679,7 +679,7 @@ export class PcisQueryService {
 			return post(`/ecargo/queryEcargoRelevancePolicy`, ops);
 		}
 		/**
-		 * 产品代码查询
+		 * 产品编码查询
 		 */
 		queryEcargoRelevancePolicyTermProd(ops: any): AxiosPromise<any> {
 			return post(`ecargo/queryEcargoRelevancePolicyTermProd`, ops);
