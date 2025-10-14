@@ -27,7 +27,7 @@
             </div>
           </template>
           <!-- 批改 (保单号)-->
-          <template v-else-if="cAppType == 'E'">
+          <template v-else="cAppType == 'E'">
             <div v-if="row.cPlyNo" class="policy-number-row">
                 <span v-html="row.cPlyNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
@@ -35,8 +35,13 @@
                 </el-icon>
             </div>
           </template>
+        </div>
+       </template>
+
+       <template #column-policyInfoXJ="{ row, column, index }">
+        <div class="policy-info-cell">
           <!-- 询价 -->
-          <template v-else>
+          <template v-if="cAppType == 'I'">
             <div v-if="row.cAppNo" class="policy-number-row">
                 <span v-html="row.cAppNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
@@ -228,13 +233,6 @@ const cAppType = ref("A");
 import { FIELD_MAP } from '@/constants/fieldMaps';
 import {saveAs} from "file-saver";
 const cPard = ref(null);
-
-watch(() => {
-  const freeEditRefs = freeEditRef.value;
-  return freeEditRefs?.getFromValue()?.cAppTyp;
-}, (newVal) => {
-  updatePolicyInfoTitle(newVal);
-}, { immediate: false });
 
 function extractCode(str:string) {
   // 匹配 "P+数字" 或 "纯数字"
@@ -955,6 +953,15 @@ const normalQueryColumns = [
         lengthIsNumber: true,
         fixed: "left",
         slotName: "policyInfo"
+    },
+    {
+        prop: "policyInfoXJ",
+        inputtype: "rtinput",
+        title: "询价申请单号/询价单号",
+        lengthNum: 21,
+        lengthIsNumber: true,
+        fixed: "left",
+        slotName: "policyInfoXJ"
     },
     {
         prop: "cEdrNo",
@@ -2071,22 +2078,6 @@ async function loadUserColumns() {
     return defaultChecked;
 }
 
-// 更新表格第一列标题
-function updatePolicyInfoTitle(cAppTyp: string) {
-  const targetColumn = tableconfig.fromSchema?.find(col => col.prop == 'policyInfo');
-  cAppType.value = cAppTyp;
-
-  if (targetColumn) {
-    if (cAppTyp === 'I') {
-      targetColumn.title = '询价申请单号/询价单号';
-    } else if (cAppTyp === 'E') {
-      targetColumn.title = '保单号';
-    } else {
-      targetColumn.title = '申请单号/保单号';
-    }
-  }
-}
-
 // 多选事件
 function handleSelectionChange(selection: any) {
   removeIds.value = selection.map((item: any) => item.cPkId);
@@ -2239,19 +2230,6 @@ async function applyCheckedColumns(props: string[]) {
         ...normalQueryColumns.filter(col => props.includes(col.prop)),
         ...extendColumns.filter(col => props.includes(col.prop))
     ];
-
-    // 更新第一列标题
-    const policyInfoCol = finalColumns.find(col => col.prop === 'policyInfo');
-    if (policyInfoCol) {
-      const currentAppType = freeEditRef.value?.getFromValue()?.cAppTyp;
-      if (currentAppType === 'I') {
-        policyInfoCol.title = '询价申请单号/询价单号';
-      } else if (currentAppType === 'E') {
-        policyInfoCol.title = '保单号';
-      } else {
-        policyInfoCol.title = '申请单号/保单号';
-      }
-    }
     const newConfig = {
         ...tableObj.notWaitObj,
         fromSchema: finalColumns
