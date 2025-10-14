@@ -142,7 +142,8 @@ onMounted(async () => {
   }
 
   // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
-  if (params.cTermNo === '0421070701') {
+  const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+  if (cvrgData['Term.cUniqueTermNo'] === '00425000144') {
     setFormItem("Tgt.cPracticingLicense", {
       rules: []
     });
