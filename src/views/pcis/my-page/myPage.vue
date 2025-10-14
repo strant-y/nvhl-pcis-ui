@@ -4961,14 +4961,14 @@ const submitUnderwritingFn = async () => {
   // cProdMap中的产品是一期上线的需要走校验，其他的直接走提交
   if(cProdMap.includes(props.param?.cProdNo)) {
     // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)(批单核保不需要走这一步)
-    if(res.cUndrMrk === "A" && props.param.cPolicySource === "6" && props.param?.cAppTyp !== "E") {
-      const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
-      if(checkoutnInfo?.code !== "1") {
-        ElMessage.warning(checkoutnInfo.message);
-        btn.loading = false;
-        return
-      }
-    }
+    // if(res.cUndrMrk === "A" && props.param.cPolicySource === "6" && props.param?.cAppTyp !== "E") {
+    //   const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
+    //   if(checkoutnInfo?.code !== "1") {
+    //     ElMessage.warning(checkoutnInfo.message);
+    //     btn.loading = false;
+    //     return
+    //   }
+    // }
     if(props.param['cEdrRsnBundleCde'] != "99") {// 批改原因为99的核保时不需要调用再保的一系类前端接口
       if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
         const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
