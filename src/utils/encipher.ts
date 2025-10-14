@@ -49,7 +49,7 @@ export const reqParamsEncrypt = (params: any) => {
   let reqParams = {};
   if (!!params) {
     try {
-      const parameterNew = {};
+      const parameterNew = {userSign: sessionStorage.getItem("token")};
       const keys = Object.keys(params);
       for (const i in keys) {
         parameterNew[keys[i]] = params[keys[i]];
