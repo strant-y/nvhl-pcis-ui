@@ -1229,6 +1229,10 @@ const method = {
   },
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
+    setValue("Tgt.cDestinationDetail", null);
+    setValue("Tgt.cDestinationCountry", null);
+    setValue("Tgt.cDestinationProvince", null);
+
     let isYW = false
     if (getValue("Tgt.cDestinationCountry")) {
       isYW = hasEnglish(getValue("Tgt.cDestinationCountry"))
@@ -1437,6 +1441,9 @@ const method = {
 
   // 目的地机场国家
   cDestinationAirportCountryFunc: () => {
+    setValue("Tgt.cDestinationAirport", null);
+    setValue("Tgt.cDestAirportCountry", null);
+    setValue("Tgt.cDestAirportProvince", null);
     let isYW = false
     if (getValue("Tgt.cDestAirportCountry")) {
       isYW = hasEnglish(getValue("Tgt.cDestAirportCountry"))
