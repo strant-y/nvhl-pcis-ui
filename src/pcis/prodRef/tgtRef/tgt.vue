@@ -141,6 +141,13 @@ onMounted(async () => {
     });
   }
 
+  // 040011、040008产品--标的信息--航行区域为非必填
+  if (params.cProdNo === '040011' || params.cProdNo === '040008') {
+    setFormItem("Tgt.cNavigationArea", {
+      rules: []
+    });
+  }
+
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);
