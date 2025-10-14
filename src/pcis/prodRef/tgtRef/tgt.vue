@@ -141,14 +141,6 @@ onMounted(async () => {
     });
   }
 
-  // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
-  const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-  if (cvrgData[0] && cvrgData[0]['Term.cUniqueTermNo'] === '00425000144') {
-    setFormItem("Tgt.cPracticingLicense", {
-      rules: []
-    });
-  }
-
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);

@@ -923,6 +923,13 @@ function dataInit() {
       initMethod();
     });
   }
+  // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
+  if (termdata.value['Term.cUniqueTermNo'] === '00425000144') {
+    const tgt = opertaor.getTableRefByKey("tgt");
+    tgt?.setFormItem("Tgt.cPracticingLicense", {
+      rules: []
+    });
+  }
 }
 
 function getUseData(data: any){
