@@ -75,13 +75,13 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNme",
         inputtype: "rtselect",
-        title: "险种大类",
+        title: "产品大类",
         loadData: [],
       },
       {
         prop: "cProdNme",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
       },
       {
         prop: "cPlanCn",
@@ -174,7 +174,7 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cProdNo",
-        title: "产品代码",
+        title: "产品编码",
         inputtype: "rtinput",
       },
       {

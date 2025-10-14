@@ -225,7 +225,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "险种大类",
+        title: "产品大类",
         typeCode: "KIND_LIST_GRT", //产品大类的接口
         codeParam: {
           cOperId: user.value?.opCde,
@@ -241,7 +241,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
         clearable: true,
         disabled: true,
         typeCode: "PROD_LIST_IN_GUIDE", //条款的接口

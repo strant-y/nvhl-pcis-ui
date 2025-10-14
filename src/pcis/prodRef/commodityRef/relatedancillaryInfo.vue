@@ -73,12 +73,12 @@
         {
           prop: "cPlanNo",
           inputtype: "rtinput",
-          title: "险种大类",
+          title: "产品大类",
         },
         {
           prop: "CPlanCn",
           inputtype: "rtinput",
-          title: "险种名称",
+          title: "产品名称",
         },
       ],
       fromUi: createFromUiConfig({
@@ -104,7 +104,7 @@
   
             console.log(tabref.getFromValue());
             // if(!tabref.getFromValue()['cCommodityNo']){
-            //   ElMessage.error('产品代码为空,请保存后操作!');
+            //   ElMessage.error('产品编码为空,请保存后操作!');
             //   return false;
             // }
             // return false;
@@ -187,12 +187,12 @@
         {
           prop: "CPlanCn",
           inputtype: "rtinput",
-          title: "险种大类",
+          title: "产品大类",
         },
         {
           prop: "CIsMainProdPlan",
           inputtype: "rtinput",
-          title: "险种名称",
+          title: "产品名称",
         },
         {
           prop: "CDispNme",

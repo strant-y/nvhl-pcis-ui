@@ -74,7 +74,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  prodNo: {// 产品代码
+  prodNo: {// 产品编码
     type: String,
     required: true,
   },

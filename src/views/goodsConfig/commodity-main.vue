@@ -60,7 +60,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "险种大类",
+        title: "产品大类",
         typeCode: "KIND_LIST_GRT",
         codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
@@ -71,7 +71,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
         typeCode: "PROD_LIST_GRT",
         codeParam: {
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
@@ -258,12 +258,12 @@ const tableconfig = reactive<AppTableConfig>(
           cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
           cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
         },
-        title: "险种大类",
+        title: "产品大类",
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
         typeCode: "PROD_LIST_GRT",
                 codeParam: {
                     cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,

@@ -65,7 +65,7 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "clauseCode",
         inputtype: "rtinput",
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "clauseName",

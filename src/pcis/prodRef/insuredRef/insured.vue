@@ -509,6 +509,7 @@ const method = {
       });
       setFormItem("Insured.cMrgCde", {
         hidden: true,
+        rules: null
       });
       setFormItem("Insured.cIsBranch", {
         hidden: false,
@@ -645,6 +646,17 @@ const method = {
       //   rules: []
       // });
 
+      // 法人时 全球法人机构识别编码必填
+      setFormItem("Insured.cGcidCode", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cEdubackgroudTyp", {
+        rules: [],
+      });
+      setFormItem("Insured.nYearincomeNum", {
+        rules: [],
+      });
+
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -711,6 +723,7 @@ const method = {
       });
       setFormItem("Insured.cMrgCde", {
         hidden: false,
+        rules: [getRules("required", {})],
       });
       // 被保人是个人，是否分支机构、 股东客户隐藏
       setFormItem("Insured.cIsBranch", {
@@ -853,7 +866,17 @@ const method = {
       //   rules: [getRules("required", {})]
       // });
 
-
+      setFormItem("Insured.cGcidCode", {
+        rules: null,
+      });
+      // 个人 客户学历必填
+      setFormItem("Insured.cEdubackgroudTyp", {
+        rules: [getRules("required", {})],
+      });
+      // 个人 年收入（单位：万元）必填
+      setFormItem("Insured.nYearincomeNum", {
+        rules: [getRules("required", {})],
+      });
 
 
 
@@ -1356,10 +1379,10 @@ const method = {
     const clientNature = getValue('Insured.cClntMrk');
     const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
     const requiredRule = [getRules("required", {})];
-    //实名认证方式
-    setFormItem("Insured.cRealnameAuthType", {
-      rules: isSpecialCase ? requiredRule : []
-    });
+    //实名认证方式-20251013 实名认证方式都是非必填
+    // setFormItem("Insured.cRealnameAuthType", {
+    //   rules: isSpecialCase ? requiredRule : []
+    // });
     // 法定代表人/责任人
     setFormItem("Insured.cLegalRepresentative", {
       rules: isSpecialCase ? requiredRule : []

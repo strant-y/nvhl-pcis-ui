@@ -171,7 +171,7 @@ function handleQuery() {
   const c = tabref.getFromValue().cProdNo;
   const param = Object.assign(s, r, { cProdNo: c });
   if (c == null) {
-    ElMessage.error("产品代码为空,请保存后操作!");
+    ElMessage.error("产品编码为空,请保存后操作!");
     return;
   } else {
     getCvrgRiskRelList(param)

@@ -141,6 +141,13 @@ onMounted(async () => {
     });
   }
 
+  // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
+  if (params.cTermNo === '0421070701') {
+    setFormItem("Tgt.cPracticingLicense", {
+      rules: []
+    });
+  }
+
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);
@@ -1838,6 +1845,7 @@ defineExpose({
   getFormconfig,
   change403009,
   clearValidate,
+  setFormItem,
 });
 </script>
 

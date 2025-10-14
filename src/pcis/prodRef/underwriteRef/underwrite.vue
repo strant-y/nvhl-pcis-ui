@@ -137,7 +137,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               cInsrntNme: props.pageData?.insured["Insured.cInsuredNme"], // 被保人名称
               tInsmcBgnTm: props.pageData?.insrnc["Base.tInsrncBgnTm"], // 保险起期
               tInsmcEndTm: props.pageData?.insrnc["Base.tInsrncEdnTm"], // 保险止期
-              cProdNo: params.cProdNo, // 产品代码
+              cProdNo: params.cProdNo, // 产品编码
               cProdNme: params.cTermNme, // 产品名称
               cDptCde: params.cDptCde, // 机构代码
               // nAmtChgRate: null,// 保额币种汇率

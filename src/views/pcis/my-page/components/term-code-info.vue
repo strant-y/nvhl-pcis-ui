@@ -83,7 +83,7 @@ onMounted(() => {
 	})
 });
 
-// 查询产品代码
+// 查询产品编码
 const handleQuery = () => {
 	props.data.codelist.forEach((item: any, index: number) => {
 		item.nSeqNo = index + 1;
