@@ -1570,6 +1570,9 @@ async function loadAfter() {
 					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
 					// dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
           dataInit.value.SpecialAgreement = res.data.policyApplication?.composition?.SpecialAgreement || {};
+          dataInit.value.base["Base.cFinTyp"] = res.data.policyApplication?.composition?.plyBase[0]["Base.cFinTyp"] || "";
+          dataInit.value.base["Base.cInstMrk"] = res.data.policyApplication?.composition?.plyBase[0]["Base.cInstMrk"] || "0";
+          dataInit.value.base["Base.nPayNum"] = res.data.policyApplication?.composition?.plyBase[0]["Base.nPayNum"] || "1";
           dataInit.value.plyBase = res.data.policyApplication?.composition?.plyBase[0] || {};
 					dataInit.value.plyBase["Base.cNeedfeeFlag"] = props.param.cNeedfeeFlag
 					dataInit.value.plyBase["Base.cEcAgrNo"] = props.param.cEcAgrNo
