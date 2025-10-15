@@ -845,7 +845,7 @@ onMounted(() => {
     )?.taskStatus
   }
   freeEditRef.value?.setFormValue(param);
-  handleQuery()
+  // handleQuery()
 });
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
