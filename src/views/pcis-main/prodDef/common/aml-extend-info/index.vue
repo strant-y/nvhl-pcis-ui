@@ -123,7 +123,7 @@ const save = async () => {
   let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
   let CAppTyp =  props.data?.CAppTyp ?  props.data.CAppTyp: 'A'; // CAppTyp：投保单是A,批单是E
   let opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  let controlFlag = props.controlFlag; 
+  let controlFlag = props.controlFlag;
   let params = {
     CAppNo,
     CAppTyp,
@@ -150,18 +150,73 @@ const save = async () => {
   if ('1' === controlFlag || '3' === controlFlag) {
     appInfo = await appExtendInfoRef?.value?.getFrom()
     params.appInfo = appInfo
-    if(!appInfo){
+    if(!appInfo || appInfo.appGridEdit.items.length >= 1){
+      ElMessage.error('请完善投保人必填项信息');
       return false
+    }
+    
+    // 验证投保人表格中的关键字段
+    if (appInfo.appGridEdit && appInfo.appGridEdit.items) {
+      const requiredFields = [
+        { prop: 'cCusLnme', label: '姓' },
+        { prop: 'cCusFnme', label: '名' },
+        { prop: 'cCerftCls', label: '证件类型' },
+        { prop: 'cCerftCde', label: '证件号码' },
+        { prop: 'tCerftBgnTm', label: '证件有效起期' },
+        { prop: 'tCerftEndTm', label: '证件有效止期' },
+        { prop: 'cCusAddr', label: '地址' }
+      ];
+      
+      for (let i = 0; i < appInfo.appGridEdit.items.length; i++) {
+        const item = appInfo.appGridEdit.items[i];
+        const emptyFields = requiredFields.filter(field => {
+          const value = item[field.prop];
+          return value === undefined || value === null || value === '';
+        });
+        
+        if (emptyFields.length > 0) {
+          const emptyFieldLabels = emptyFields.map(field => field.label).join('、');
+          ElMessage.error(`投保人表格第${i + 1}行中以下字段不能为空: ${emptyFieldLabels}`);
+          return false;
+        }
+      }
     }
   }
 
  // 投保人 被保人
   let insInfo = null
   if(controlFlag  ==='2' ||controlFlag === '3'){
-    insInfo = await inextendRef?.value?.getFrom()  
+    insInfo = await inextendRef?.value?.getFrom()
     params.insInfo = insInfo
     if(!insInfo){
       return false
+    }
+    
+    // 验证被保险人表格中的关键字段
+    if (insInfo.insGridEdit && insInfo.insGridEdit.items) {
+      const requiredFields = [
+        { prop: 'cSurname', label: '姓' },
+        { prop: 'cName', label: '名' },
+        { prop: 'cDocumentType', label: '证件类型' },
+        { prop: 'cIdentificationNumber', label: '证件号码' },
+        { prop: 'tDocumentValidStart', label: '证件有效起期' },
+        { prop: 'tDocumentValidEnd', label: '证件有效止期' },
+        { prop: 'cAddr', label: '地址' }
+      ];
+      
+      for (let i = 0; i < insInfo.insGridEdit.items.length; i++) {
+        const item = insInfo.insGridEdit.items[i];
+        const emptyFields = requiredFields.filter(field => {
+          const value = item[field.prop];
+          return value === undefined || value === null || value === '';
+        });
+        
+        if (emptyFields.length > 0) {
+          const emptyFieldLabels = emptyFields.map(field => field.label).join('、');
+          ElMessage.error(`被保险人表格第${i + 1}行中以下字段不能为空: ${emptyFieldLabels}`);
+          return false;
+        }
+      }
     }
   }
 
