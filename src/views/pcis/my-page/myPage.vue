@@ -6420,6 +6420,9 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   width: auto !important;
   max-width: 80% !important;
 }
+.el-message-box.my-message-box .el-message-box__message {
+  min-width: 0;
+}
 .joint-insurance-dialog .el-message-box__title {
   font-weight: bold;
   color: #f56c6c;
