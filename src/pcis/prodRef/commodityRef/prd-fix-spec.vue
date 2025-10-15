@@ -28,7 +28,11 @@
             label="特约代码"
             width="160"
           /> -->
-          <el-table-column property="cSpecialContent" label="特别约定内容" />
+          <el-table-column property="cSpecialContent" label="特别约定内容">
+            <template #default="scope">
+              <div>{{ checkedLanguage[0] === "en-US" && scope.row["cSpecialContentEn"] ? scope.row["cSpecialContentEn"] : scope.row["cSpecialContent"] }}</div>
+            </template>
+          </el-table-column>
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
@@ -58,6 +62,12 @@
         </el-table>
         <el-button @click="add" class="addSty" :icon="Plus">新增一行</el-button>
       </el-tab-pane>
+      <div class="languageCheckbox">
+        <el-checkbox-group v-model="checkedLanguage" @change="languageChange">
+          <el-checkbox label="中文" value="zh-CN" />
+          <el-checkbox label="英文" value="en-US" />
+        </el-checkbox-group>
+      </div>
     </el-tabs>
     <div class="btnSty">
       <el-button @click="close">取消</el-button>
@@ -94,6 +104,14 @@ const emits = defineEmits(["handleClose"]);
 const multipleTableRef = ref<MyTableMethod | null>(null);
 const multipleTableOtherRef = ref<MyTableMethod | null>(null);
 const selected = ref([]);
+const checkedLanguage = ref(['zh-CN']);
+const languageChange = (val:any) => {
+  if(val.length > 1) {
+    checkedLanguage.value = val.slice(-1)
+  } else if(val.length < 1) {
+    checkedLanguage.value = ['zh-CN']
+  }
+}
 const pageresult = reactive<Pageresult>({
   /** 数据列表 */
   list: [],
@@ -131,6 +149,7 @@ const refreshData = () => {
         pageresult.list.push({
           cSpecialCode: item.cSpecialCode,
           cSpecialContent: item.cSpecialContent,
+          cSpecialContentEn: item.cSpecialContentEn,
           // cNmeEn: item.cNmeEn,
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
@@ -170,9 +189,9 @@ function add() {
 
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
-  let selectedData = props.data.selectedData;
+  let selectedData = props.data.selectedData.map((item:any) => ({...item, cLanguageCode: checkedLanguage.value[0]}));
 
-  let tempData = multipleTableRef.value.getSelectionRows();
+  let tempData = multipleTableRef.value.getSelectionRows().map((item:any) => ({...item, cLanguageCode: checkedLanguage.value[0]}));
   if(addTableData) {
     for (const item of addTableData) {
       tempData.push(item);
@@ -233,6 +252,9 @@ onMounted(() => {
             addTableData.push(item);
         });
     }
+    if(selectedData[0]?.cLanguageCode === "en-US") {
+      checkedLanguage.value = ["en-US"]
+    }
     refreshData();
 });
 </script>
@@ -258,5 +280,13 @@ onMounted(() => {
   border: 1px dashed #ccc;
   width: 100%;
   margin-top: 10px;
+}
+.languageCheckbox {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  .el-checkbox {
+    margin-right: 10px;
+  }
 }
 </style>
