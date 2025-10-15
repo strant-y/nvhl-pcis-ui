@@ -99,6 +99,23 @@ onMounted(async () => {
       // item.groupList[1].minWidth = "88px"
     }
   })
+  nextTick(() => {
+  // 协议出单-收费方式、付费约定、缴费期数设置不可编辑
+  if(params.cRecordType == 9) {
+    setFormItem('Base.cFinTyp',{
+      disabled:  true
+    })
+    setFormItem('Base.cInstMrk',{
+      disabled:  true
+    })
+    setFormItem('Base.nPayNum',{
+      disabled:  true,
+      btnItems: {
+        disabled: true
+      }
+    })
+  }
+  })
 });
 
 // 获取我司比例
