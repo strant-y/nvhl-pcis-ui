@@ -411,10 +411,16 @@ const method = {
       {
         getSelected(selectdata: any) {
             let len = formData.value.length;
-            let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData"))?.['SpecialAgreement'] || [];
+            const selectedData = selectdata.map((item:any) => ({...item, cSpecialContent: item.cLanguageCode === "en-US" ? item.cSpecialContentEn : item.cSpecialContent}))
+            let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData") || "{}")?.['SpecialAgreement'] || [];
+            sessionSpecialAgreement.forEach((item:any) => {
+              if(!item.cLanguageCode) {
+                item.cLanguageCode = "zh-CN"
+              }
+            })
             console.log('缓存问题',sessionSpecialAgreement )
-            console.log('缓存问题2selectdata',selectdata )
-            const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cSpecialCode', ['cSpecialContent']);
+            console.log('缓存问题2selectdata',selectedData )
+            const result = mergeArrays(sessionSpecialAgreement, selectedData, 'cSpecialCode', ['cSpecialContent','cSpecialContentEn','cLanguageCode' ]);
             result.forEach((item: any,index:number) => {
               item.index = index + 1;
               len++;
