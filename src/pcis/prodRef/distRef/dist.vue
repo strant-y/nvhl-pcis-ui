@@ -1245,6 +1245,18 @@ function getFatherPageOldProductResData() {
 function getFormConfig() {
   return tableconfig.value;
 }
+
+function setDisabledAll() {
+  tableconfig.value.formconfig?.endBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  tableconfig.value.formconfig?.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  tableconfig.value.tableBtn?.forEach((item: any) => {
+    item.hidden = true;
+  });
+}
 defineExpose({
   getValue,
   setValue,
@@ -1256,6 +1268,7 @@ defineExpose({
   getTableData,
   setTableData,
   getFormConfig,
+  setDisabledAll,
 });
 </script>
 
