@@ -412,6 +412,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "0", label: "否" },
         ],
         clearable: true,
+        hidden: params.pageName === "priceInquiry" ? true : false,
         func: (val:any) => {
           if(val === "1") {
             setFormItem("cUndrMrk", {
@@ -444,6 +445,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "2", label: "否" },
         ],
         clearable: true,
+        hidden: params.pageName === "priceInquiry" ? true : false,
       },
     ],
     fromUi: createFromUiConfig({
