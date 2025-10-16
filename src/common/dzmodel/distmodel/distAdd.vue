@@ -297,7 +297,7 @@ onMounted(() => {
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
     if(item.prop =='Dist.cVinCode'){
-     item['rules'] = [getRules("vinNumber", {})];
+     item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
     }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
