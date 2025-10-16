@@ -148,6 +148,11 @@ onMounted(async () => {
     });
   }
 
+  // 090003产品 工程名称非必填
+  if (params.cProdNo === '090003') {
+    setFormItem("Tgt.cProjectName", { rules: [] })
+  }
+
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);
