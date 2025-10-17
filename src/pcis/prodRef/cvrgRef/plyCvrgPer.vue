@@ -524,7 +524,8 @@ function getAddrSeqOptions() {
         const addrList = addrRes.data.data || [];
         addrSeqArray.value  = addrList.map(item => ({
             label: String(item['Dist.cCodeNo']),
-            value: String(item['Dist.cPkId'])
+            value: String(item['Dist.cCodeNo']),
+            id: String(item['Dist.cPkId']),
         }));
         sessionStorage.setItem("getAddrSeqData", JSON.stringify(addrSeqArray.value));
     }
