@@ -606,6 +606,15 @@ function initData(data: any) {
         }
       }, 1000)
     }
+    // 041010 非营运客运承运人责任险 标的信息 投保座位总数的值取所有险别信息中的投保座位数（座）的和
+    if(pageparam.cProdNo === "041010") {
+      const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+      let num = 0;
+      cvrgData?.forEach((item:any) => {
+        num += Number(item['Term.nSeatCount'] || 0)
+      })
+      opertaor.getTableRefByKey("tgt")?.setValue("Tgt.nSeatCapacity", num)
+    }
   });
 }
 
