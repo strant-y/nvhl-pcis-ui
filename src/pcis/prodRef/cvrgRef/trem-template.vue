@@ -430,6 +430,10 @@ const props = defineProps({
     type: Object,
     default:() =>({}),
   },
+  addrSeqArray: {
+    type: Array,
+    default: () => []
+  }
 });
 
 const effectiveShowConf = computed(() => {
@@ -861,6 +865,11 @@ function dataInit() {
     groupInfo.value = d.groupInfo;
     term.value = d.term;
     termFactormap.value = getUseData(d.termFactormap);
+    const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+    if (cAddrSeq) {
+        cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+    }
+
     methodLink(termFactormap.value);
     riskMethodLink(factormap.value);
     initshowConfig();
@@ -894,6 +903,11 @@ function dataInit() {
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
         termFactormap.value = getUseData(data.data.termFactormap);
+        // 给 Term.cDistCodeNo地址编码下拉框赋值
+        const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+        if (cAddrSeq) {
+            cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+        }
         methodLink(termFactormap.value);
         riskMethodLink(factormap.value);
         initshowConfig();
