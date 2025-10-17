@@ -141,11 +141,16 @@ onMounted(async () => {
     });
   }
 
-  // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
-  if (params.cTermNo === '0421070701') {
-    setFormItem("Tgt.cPracticingLicense", {
+  // 040011、040008产品--标的信息--航行区域为非必填
+  if (params.cProdNo === '040011' || params.cProdNo === '040008') {
+    setFormItem("Tgt.cNavigationArea", {
       rules: []
     });
+  }
+
+  // 090003产品 工程名称非必填
+  if (params.cProdNo === '090003') {
+    setFormItem("Tgt.cProjectName", { rules: [] })
   }
 
   //  运输工具名称

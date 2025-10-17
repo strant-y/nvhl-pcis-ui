@@ -62,7 +62,8 @@ const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
-const params = opertaor.getParam(); 
+const params = opertaor.getParam();
+const emit = defineEmits(['savePlyInfo']);  
 
 const props = defineProps({
   pageSchema: {
@@ -177,6 +178,7 @@ watch(
         // 02开头的货物明细清单，关联标的信息
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
            method.getTgtDetailFn();
+           emit('savePlyInfo');
         }
       }
     }
