@@ -62,7 +62,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //     {value: '2', label: '按日'},
         //     {value: '3', label: '不计'},
         // ],
-        typeCode: "CRATIO_TYPE_CACHE",
+        // typeCode: "CRATIO_TYPE_CACHE",
         rules: [getRules("required", {})],
         clearable: true,
         defaultValue: "2",
@@ -93,7 +93,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
-        disabled:true
+        disabled:true,
+        func: (val:any) => {
+          if(val?.length === 23) {// 历史数据补全的保单号是23位
+            setFormItem("EdrBase.cRatioTyp", { 
+              loadData: [
+                { label: "按月", value: "1" },
+                { label: "按日", value: "2" },
+                { label: "不计", value: "3" },
+              ],
+            });
+          } else {
+            setFormItem("EdrBase.cRatioTyp", {
+              typeCode: "CRATIO_TYPE_CACHE",
+            })
+          }
+        }
       },
       {
         prop: "EdrBase.cAppNo",

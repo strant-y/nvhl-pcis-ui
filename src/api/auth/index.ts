@@ -61,7 +61,7 @@ export function resolveTokenApi(param) {
  * 注销API
  */
 export function logoutApi() {
-  return post('/logout',{source: null});
+  return post('/logOut',{source: null});
 }
 // 临时测试
 /*export function logoutApi() {
