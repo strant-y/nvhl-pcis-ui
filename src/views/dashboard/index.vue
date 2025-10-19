@@ -200,7 +200,7 @@
           </div>
         </div>
       </div>
-      <div class="center-box">
+      <div class="center-box" style="display: none;">
         <div class="center-content1">
           <div class="title-box">
             <div class="title-line">
@@ -1036,7 +1036,7 @@ function init() {
     ecahrtsRefInstance = echarts.init(ecahrtsRef.value);
     ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value);
   }
-  getOrderInfo();
+  // getOrderInfo();
 }
 
 function getOrderInfo() {
