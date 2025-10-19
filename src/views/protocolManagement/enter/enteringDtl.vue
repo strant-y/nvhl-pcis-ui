@@ -906,6 +906,12 @@ const premiumCalculation = ()=>{
     //协议费用
     const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
     const allFromData = formPage.value?.getAllFormData();
+    const pgxx = mainRef.value?.getxyedrbaseRefValue()
+    // 一般退保 修改后的预收保费不能大于原预收保费
+    if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] > pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
+      ElMessage.error('一般退保预收保费不能大于原预收保费！')
+      return
+    }
     // 条款
     const AgreementCvrg = allFromData['AgreementCvrg']
     if(AgreementCvrg.length > 0){
