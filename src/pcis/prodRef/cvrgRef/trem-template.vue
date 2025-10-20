@@ -430,6 +430,10 @@ const props = defineProps({
     type: Object,
     default:() =>({}),
   },
+  addrSeqArray: {
+    type: Array,
+    default: () => []
+  }
 });
 
 const effectiveShowConf = computed(() => {
@@ -861,6 +865,11 @@ function dataInit() {
     groupInfo.value = d.groupInfo;
     term.value = d.term;
     termFactormap.value = getUseData(d.termFactormap);
+    const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+    if (cAddrSeq) {
+        cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+    }
+
     methodLink(termFactormap.value);
     riskMethodLink(factormap.value);
     initshowConfig();
@@ -879,6 +888,7 @@ function dataInit() {
         }
       })
     }
+    methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
     if (props.disabledFlag) {
       setDisabledAll();
     }
@@ -894,6 +904,11 @@ function dataInit() {
         groupInfo.value = data.data.groupInfo;
         term.value = data.data.term;
         termFactormap.value = getUseData(data.data.termFactormap);
+        // 给 Term.cDistCodeNo地址编码下拉框赋值
+        const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+        if (cAddrSeq) {
+            cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+        }
         methodLink(termFactormap.value);
         riskMethodLink(factormap.value);
         initshowConfig();
@@ -915,10 +930,18 @@ function dataInit() {
           }
         })
       }
+      methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
       if (props.disabledFlag) {
         setDisabledAll();
       }
       initMethod();
+    });
+  }
+  // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
+  if (termdata.value['Term.cUniqueTermNo'] === '00425000144') {
+    const tgt = opertaor.getTableRefByKey("tgt");
+    tgt?.setFormItem("Tgt.cPracticingLicense", {
+      rules: []
     });
   }
 }
@@ -1422,6 +1445,33 @@ const methodMap = {
     nextTick(()=>{
       checkData(val,item);
     });
+  },
+  // 费率计算方式(0: 按限额 1: 按人)
+  cRateMethodChange:(val:any)=> {
+    // 040020-保险经纪人的条款费率计算方式:按限额，费率必填；按人，每人保费必填、在职保险经纪人人数（标的信息）必填
+    if(termdata.value["Term.cUniqueTermNo"] !== "00425000144") return;
+    termFactormap.value.forEach((item: any) => {
+      if (item["prop"] === "Term.nRateVal") {
+        if(val === "0") {
+          item.cPorpRequired = true;
+        } else {
+          item.cPorpRequired = false;
+        }
+      }
+      if(item["prop"] === "Term.nPersonPremium") {
+        if(val === "1") {
+          item.cPorpRequired = true;
+        } else {
+          item.cPorpRequired = false;
+        }
+      }
+    });
+    const tgt = opertaor.getTableRefByKey("tgt")
+    if(val === "1") {
+      tgt?.setFormItem('Tgt.nAgentNumber',{ rules: [getRules("required", {})] })
+    } else {
+      tgt?.setFormItem('Tgt.nAgentNumber',{ rules: [] })
+    }
   }
 };
 

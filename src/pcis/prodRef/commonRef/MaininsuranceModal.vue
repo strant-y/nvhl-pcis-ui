@@ -44,15 +44,17 @@ import {
 } from "@/shared/app-table-config";
 import { ref, reactive, defineEmits, defineProps } from "vue";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const emits = defineEmits(["ok", "cancel"]);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
 const dialogVisible = ref(true);
 const props = defineProps<{
   data: Object;
   type: string;
+  idxParam: Object;
 }>();
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
 
 const selectedRows = ref<any[]>([]);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -117,7 +119,7 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "大类名称",
+        title: "产品大类名称",
         inputtype: "rtinput",
       },
       {

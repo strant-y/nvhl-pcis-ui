@@ -82,7 +82,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "CProdNo",
         inputtype: "rtinput",
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "CGrpMrk",
@@ -193,7 +193,7 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "productCode",
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "effectiveStartDate",

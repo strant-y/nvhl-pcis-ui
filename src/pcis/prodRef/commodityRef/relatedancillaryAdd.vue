@@ -77,7 +77,7 @@ const formconfig = reactive<AppFreeEditConfig>(
             {
                 prop: "CKindNo",
                 inputtype: "rtselect",
-                title: "险种大类",
+                title: "产品大类",
                 clearable: true,
                 typeCode: "KIND_LIST_GRT",
                 itemWidth: 1.5,
@@ -90,7 +90,7 @@ const formconfig = reactive<AppFreeEditConfig>(
             {
                 prop: "CProdNo",
                 inputtype: "rtselect",
-                title: "险种名称",
+                title: "产品名称",
                 itemWidth: 1.5,
                 typeCode: "PROD_LIST_GRT",
                 codeParam: {

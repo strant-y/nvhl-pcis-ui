@@ -16,7 +16,7 @@
             {{ k + 1 }}
           </td>
           <td v-for="(it, kk) in formcof" :key="kk">
-            <template v-if = "it['inputtype'] === 'rttag'">zhutiao
+            <template v-if = "it['inputtype'] === 'rttag'">
               <el-badge value="退" class="term_badge rt-custom-input rt-custom-select" :hidden="item['Term.cCancelMrk'] !== '1'" >
                 <from-item
                 v-model="item['Term.'+kk]"

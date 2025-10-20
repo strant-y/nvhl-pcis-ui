@@ -330,7 +330,7 @@ export function isUndrClsBlackList(queryParams: any): AxiosPromise<any> {
 }
 
 /**
- * 协议/录单-根据协议号、产品代码、条款代码、被保人id查询被保人信息和条款信息
+ * 协议/录单-根据协议号、产品编码、条款代码、被保人id查询被保人信息和条款信息
  * @param queryParams
  */
 export function queryEcargoRelevancePolicyDetails(queryParams: any): AxiosPromise<any> {

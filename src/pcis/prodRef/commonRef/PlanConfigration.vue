@@ -144,12 +144,12 @@ const tableconfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNme",
-        title: "险种大类",
+        title: "产品大类",
         inputtype: "rtinput",
       },
       {
         prop: "cProdNme",
-        title: "险种名称",
+        title: "产品名称",
         inputtype: "rtinput",
       },
       {
@@ -203,7 +203,7 @@ function handleQuery(flag?: boolean) {
     prod = tabref.getFromValue().cProdNo;
   }
   if (!prod || prod === '') {
-    ElMessage.error("产品代码为空！请保存后操作");
+    ElMessage.error("产品编码为空！请保存后操作");
     return;
   } else {
     const r = tableRef.value?.getPartnerPage(flag); //获取分页数据

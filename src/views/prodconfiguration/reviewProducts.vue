@@ -57,13 +57,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtinput",
-        title: "险种大类",
+        title: "产品大类",
         clearable: true,
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
         clearable: true,
       },
       {
@@ -137,12 +137,12 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtinput",
-        title: "险种大类",
+        title: "产品大类",
       },
       {
         prop: "cProdNo",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
       },
       {
         prop: "cCommodityNo",

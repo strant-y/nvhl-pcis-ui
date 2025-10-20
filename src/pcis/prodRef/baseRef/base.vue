@@ -99,6 +99,23 @@ onMounted(async () => {
       // item.groupList[1].minWidth = "88px"
     }
   })
+  nextTick(() => {
+  // 协议出单-收费方式、付费约定、缴费期数设置不可编辑
+  if(params.cRecordType == 9) {
+    setFormItem('Base.cFinTyp',{
+      disabled:  true
+    })
+    setFormItem('Base.cInstMrk',{
+      disabled:  true
+    })
+    setFormItem('Base.nPayNum',{
+      disabled:  true,
+      btnItems: {
+        disabled: true
+      }
+    })
+  }
+  })
 });
 
 // 获取我司比例
@@ -250,10 +267,13 @@ const shanDongFun = () => {
   const totalCent = Math.round(totalPrm * 100)  // 总保费→分
   // 拆分 添加特约信息
   if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
-
+  
+ 
   /* ---------- 2. 计算保险期限（自然年） ---------- */
   const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
-  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+  const tmEndRaw  = dayjs(insrnc['Base.tInsrncEndTm']);     // 页面值
+  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
+
   const wholeYears = tmEnd.diff(tmStart, 'year'); 
   const maxPhase = 4 + Math.max(0, wholeYears - 1);
 
@@ -269,6 +289,8 @@ const shanDongFun = () => {
     ElMessage.error(
         `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`
     )
+    // 设置值
+    opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
     return true
   }
   /* ---------- 4. 首期规则 ---------- */
@@ -310,7 +332,8 @@ const shanDongFun = () => {
   const plans = cents.map(v => v / 100);
 
   /* ---------- 6. 时间规则 ---------- */
-  const lastPayMaxTm = tmEnd.subtract(30, 'day') ;  // 责任终止前 30 天
+  const lastPayMaxTm = tmEndRaw.subtract(31, 'day');   // 责任终止前 30 天
+
   const phaseDays = tmEnd.diff(tmStart, 'day') / nPayNum
   
   let val = {};
@@ -610,21 +633,6 @@ const checkShanDong = () => {
   const cInstMrk = base['Base.cInstMrk'] || '0';
   const totalPrm = Number(base['Base.nPrm'] || 0);
 
-  // 小于10万元
-  if (totalPrm <= 100_000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')){ 
-    ElMessageBox.alert(
-    "根据山东省非车险业务“见费出单”实施方案，单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
-    "提示", 
-    {
-      confirmButtonText: "确定",
-      type: "warning",
-    })
-    .then(() => {
-      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
-    })
-    return true;
-  };
   // 个人
   if ((applicant['Applicant.cClntMrk']) == '1' && ( cInstMrk == '5' || cNeedfeeFlag == '0')){
     ElMessageBox.alert(
@@ -671,10 +679,25 @@ const checkShanDong = () => {
     })
     return true;
   }
+  // 小于10万元
+  if (totalPrm <= 100_000 && ( cInstMrk == '5' || cNeedfeeFlag == '0')){ 
+    ElMessageBox.alert(
+    "根据山东省非车险业务“见费出单”实施方案，单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
+    "提示", 
+    {
+      confirmButtonText: "确定",
+      type: "warning",
+    })
+    .then(() => {
+      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+    })
+    return true;
+  };
 
   // 拆分期数提示
   const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
-  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+  const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
   const wholeYears = tmEnd.diff(tmStart, 'year'); 
   const maxPhase = 4 + Math.max(0, wholeYears - 1);
 
@@ -692,9 +715,10 @@ const checkShanDong = () => {
     ElMessage.error(
         `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`
     )
+    // 设置值
+    opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
     return true
   }
-
   return false; // 不阻断
 }
 const judgeShandongCase = async () => {
@@ -731,6 +755,11 @@ const judgeShandongCase = async () => {
   // 特殊产品剔除
   const skipProducts = ['019904', '089031'];
   if (skipProducts.includes(cProdNoA)) return false;
+  // 投保人性质不明确，剔除
+  if (!['0', '1'].includes(AppcClntMrk)) {
+    return false;
+  }
+
   // 签单保费
   const totalPrm = Number(baseData['Base.nPrm'] || 0);
 

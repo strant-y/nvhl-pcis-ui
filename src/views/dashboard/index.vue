@@ -3,9 +3,11 @@
     <div class="home">
       <div class="code-box" style="position: absolute;right: 3px;">
         <div class="code-inner-box">
+          <span>移动端二维码：</span>
           <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
         </div>
         <div class="code-inner-box">
+          <span>在线缺陷平台：</span>
           <div>
             <a :href="platformUrl" target="_blank" class="link">缺陷平台</a>
           </div>
@@ -2300,7 +2302,7 @@ window.addEventListener("resize", () => {
     background-image: var(--dashboard-bg);
     background-size: 100% 24.06667rem;
     background-position: top;
-    padding: 0.8rem 4rem;
+    padding: 0.8rem 6.5rem 0.8rem 4rem;
     overflow-y: auto;
 
     .top-box {
@@ -2773,8 +2775,10 @@ window.addEventListener("resize", () => {
     display: flex;
     align-items: center; /* 垂直居中 */
     justify-content: flex-start; /* 左对齐 */
-    gap: 16px; /*间距*/
+    // gap: 16px; /*间距*/
     // padding: 16px 14px;
+    flex-direction: column;
+    margin-bottom: 10px;
     .code-img {
       width: 64px;
     }

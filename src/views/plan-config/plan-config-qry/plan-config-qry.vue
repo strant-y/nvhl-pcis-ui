@@ -83,7 +83,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
           prop: "cProdNo",
           inputtype: "rtselect",
-          title: "产品",
+          title: "产品名称",
           itemWidth: 1,
           rules: [getRules("required", {})],
           filterable: true,

@@ -44,15 +44,17 @@ import {
 } from "@/api/prod";
 import {ref, reactive, defineEmits, defineProps, onMounted} from "vue";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const emits = defineEmits(["ok", "cancel"]);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps<{
   data: Object;
   type: String;
+  idxParam: Object;
 }>();
 const dialogVisible = ref(true);
+const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);

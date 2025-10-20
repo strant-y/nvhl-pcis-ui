@@ -96,9 +96,9 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "cProdNo",
         inputtype: "rtinput",
-        placeholder: "产品代码",
+        placeholder: "产品编码",
         itemWidth: 1,
-        title: "产品代码",
+        title: "产品编码",
         clearable: true,
       },
       {
@@ -179,8 +179,8 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         type: "primary",
         icon: "Check",
-        disabled: (row) =>
-          row.cAuditStatus === "audit" || row.cAuditStatus === "submit",
+        hideBtns: (row) =>
+          row.cAuditStatus == "audit" || row.cAuditStatus == "submit",
         tableClick: async (row) => {
           await auditSubmit({
             cProdNo: row.cProdNo,
@@ -210,19 +210,19 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "大类编号",
+        title: "产品大类",
         typeCode: "KIND_LIST_GRT",
         codeParam: { codeListParam: "" },
       },
       {
         prop: "cKindNme",
         inputtype: "rtinput",
-        title: "大类名称",
+        title: "产品大类名称",
       },
       {
         prop: "cProdNo",
         inputtype: "rtinput",
-        title: "产品编号",
+        title: "产品编码",
       },
       {
         prop: "cDispCde",

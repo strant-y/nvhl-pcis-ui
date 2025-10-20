@@ -360,7 +360,7 @@ const tableconfig1 = reactive<AppTableConfig>(
       {
         prop: "cProdNo",
         inputtype: 'rtinput',
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "cProdCnm",
@@ -430,7 +430,7 @@ const tableconfig2 = reactive<AppTableConfig>(
       {
         prop: "cProdNo",
         inputtype: 'rtinput',
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "cProdCnm",

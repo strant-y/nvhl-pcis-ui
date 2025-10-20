@@ -96,7 +96,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         {
             prop: "cProdNo",
             inputtype: "rtselect",
-            title: "产品",
+            title: "产品名称",
             itemWidth: 1,
             filterable: true,
             clearable: true,
@@ -218,7 +218,7 @@ const tableconfig = reactive<AppTableConfig>(
         {
             prop: "cProdNme",
             inputtype: 'rtinput',
-            title: "条款",
+            title: "产品名称",
         },
         {
             prop: "cPlanNo",

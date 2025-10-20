@@ -52,12 +52,12 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cFactorProp",
         inputtype: "rtinput",
-        title: "险种大类",
+        title: "产品大类",
       },
       {
         prop: "cFactorInputtype",
         inputtype: "rtselect",
-        title: "险种名称",
+        title: "产品名称",
       },
       {
         prop: "cFactorTitle",

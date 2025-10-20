@@ -75,7 +75,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cKindNo",
         inputtype: "rtselect",
-        title: "大类代码",
+        title: "产品大类编码",
         typeCode: "KIND_LIST_GRT",
         codeParam: { cStatus: "1" },
       },
@@ -109,7 +109,7 @@ const tableConfig = reactive<AppTableConfig>(
     fromSchema: [
       {
         prop: "cKindNo",
-        title: "大类代码",
+        title: "产品大类编码",
         inputtype: "rtinput",
       },
       {

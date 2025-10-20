@@ -268,7 +268,7 @@ const handleQuery = async () => {
 
   if (!formModel.value.CProdNo && !formModel.value.CTermNo &&
       !formModel.value.CCvrgNo && !formModel.value.CRiskNo) {
-    ElMessage.warning('产品代码、条款代码、险别代码、责任代码不能都为空')
+    ElMessage.warning('产品编码、条款代码、险别代码、责任代码不能都为空')
     return
   }
 

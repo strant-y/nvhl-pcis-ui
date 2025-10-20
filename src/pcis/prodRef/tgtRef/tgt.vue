@@ -141,6 +141,18 @@ onMounted(async () => {
     });
   }
 
+  // 040011、040008产品--标的信息--航行区域为非必填
+  if (params.cProdNo === '040011' || params.cProdNo === '040008') {
+    setFormItem("Tgt.cNavigationArea", {
+      rules: []
+    });
+  }
+
+  // 090003产品 工程名称非必填
+  if (params.cProdNo === '090003') {
+    setFormItem("Tgt.cProjectName", { rules: [] })
+  }
+
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
   const isNonRequired = cTransportationNames.includes(params.cProdNo);
@@ -1222,6 +1234,10 @@ const method = {
   },
   // // 起运港国家 按钮
   cDestinationCountryFunc: () => {
+    setValue("Tgt.cDestinationDetail", null);
+    setValue("Tgt.cDestinationCountry", null);
+    setValue("Tgt.cDestinationProvince", null);
+
     let isYW = false
     if (getValue("Tgt.cDestinationCountry")) {
       isYW = hasEnglish(getValue("Tgt.cDestinationCountry"))
@@ -1430,6 +1446,9 @@ const method = {
 
   // 目的地机场国家
   cDestinationAirportCountryFunc: () => {
+    setValue("Tgt.cDestinationAirport", null);
+    setValue("Tgt.cDestAirportCountry", null);
+    setValue("Tgt.cDestAirportProvince", null);
     let isYW = false
     if (getValue("Tgt.cDestAirportCountry")) {
       isYW = hasEnglish(getValue("Tgt.cDestAirportCountry"))
@@ -1831,6 +1850,7 @@ defineExpose({
   getFormconfig,
   change403009,
   clearValidate,
+  setFormItem,
 });
 </script>
 

@@ -249,7 +249,7 @@ const tableconfig1 = reactive<AppTableConfig>(
       {
         prop: "totalClaimAmount",
         inputtype: 'rtinput',
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "outstandingAmount",
@@ -342,7 +342,7 @@ const tableconfig2 = reactive<AppTableConfig>(
       {
         prop: "totalClaimAmount",
         inputtype: 'rtinput',
-        title: "产品代码",
+        title: "产品编码",
       },
       {
         prop: "outstandingAmount",

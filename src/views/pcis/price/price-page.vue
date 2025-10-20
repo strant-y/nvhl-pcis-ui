@@ -1615,7 +1615,7 @@ async function loadAfter() {
 		if(props.param.cRecordType === 9){
 			let params = {
 				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
-				cProdNo: props.param.cProdNo, // 产品代码
+				cProdNo: props.param.cProdNo, // 产品编码
 				cTermNo: props.param.cTermNo, // 条款代码
 				cInsuredCde: props.param.cInsuredCde, // 被保人代码
 				insuredNme: props.param.cInsuredNme, // 被保人名称
@@ -2942,9 +2942,9 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
-  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018'].includes(props.param.cProdNo)){
+  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018','020015'].includes(props.param.cProdNo)){
     const term = opertaor.getTableRefByKey("cvrg").getFromValue();
-    term.forEach(item => {
+    term.forEach((item:any) => {
       if(item["Term.cRdrTyp"] === '0'){
         if( !item["Term.riskList"] || item["Term.riskList"].length === 0 ){
           ElMessage.error("至少需要一条责任信息!");
@@ -2959,7 +2959,7 @@ function baseValite(){
  * 投保保费计算
  */
 const calcPremium = () => {
-     let shanDongFlag = false;
+            let shanDongFlag = false;
             const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
             const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
             const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
@@ -2990,7 +2990,7 @@ const calcPremium = () => {
     
             // 满足山东见费出单业务
             if(cDptCde.startsWith('0237') && okProdPre.some(item => prod.startsWith(item)) 
-            && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY")){
+            && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY") && (['0', '1'].includes(cClntMrk))){
                 shanDongFlag = true;
                 if (cClntMrk == '1' && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
                     ElMessageBox.alert(
@@ -3035,17 +3035,17 @@ const calcPremium = () => {
                     return;
                 }
     
-                // 山东见费只处理保费大于10万元业务
+                // 山东拆分只处理保费大于10万元业务，小于等于10万是一次性缴费
                 if (totalPrm < 100_000){
                     shanDongFlag = false;
                 } 
-                // 山东见费只处理分期业务, 1期业务走普通拆分
+                // 山东拆分只处理分期业务, 1期走普通拆分
                 if ( nPayNum < 2 ){
                     shanDongFlag = false;
                 }
                 /* ---------- 计算保险期限（自然年） ---------- */
                 const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
-                const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']);
+                const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
                 const wholeYears = tmEnd.diff(tmStart, 'year'); 
                 const maxPhase = 4 + Math.max(0, wholeYears - 1);
     
@@ -3062,6 +3062,11 @@ const calcPremium = () => {
                         {
                             confirmButtonText: "确定",
                             type: "warning",
+                        })
+                        .then(() => {
+                            opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
+                            shanDongFlag = true;
+                            opertaor.getTableRefByKey("base").shanDongFun(); 
                         })
                     return;
                 }
@@ -3185,11 +3190,12 @@ const calcPremium = () => {
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
-      opertaor.getTableRefByKey("base").nPayNumberFun();
-
-
-
-
+      const baseRef = opertaor.getTableRefByKey("base");
+      if(shanDongFlag){
+         baseRef.shanDongFun();
+      } else{
+         baseRef.nPayNumberFun();
+      }
     } else {
       ElMessage.error(res.msg);
     }
@@ -3359,7 +3365,7 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong() && (getcNeedfeeFlag !== '1' || getcInstMrk == '5')) {
+  if (await validateShanDong()) {
       return;
   }
  /**
@@ -3943,7 +3949,7 @@ const savePlyInfo = async () => {
             sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
-              path: "/pcis/my-page",
+              path: "/pcis/price-page",
               query: {
                 param: JSON.stringify({
                   ...data,
@@ -4804,6 +4810,7 @@ const generateEndorse = async () => {
  */
 const submitEdrToUndrFun = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
+  const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
   // 协议出单剩余预收保费校验
   if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
     if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
@@ -4820,7 +4827,7 @@ const submitEdrToUndrFun = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong() && (getcNeedfeeFlag !== '1' || getcInstMrk == '5')) {
+  if (await validateShanDong()) {
       return;
   }
   if (!baseValite()) {
@@ -5101,7 +5108,7 @@ const submitUnderwritingFn = async () => {
   //         cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
   //         cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
   //         cProdNme: props.param?.cTermNme,// 产品名称
-  //         cProdNo: props.param?.cProdNo,//产品代码
+  //         cProdNo: props.param?.cProdNo,//产品编码
   //         cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
   //         // nAmtChgRate: "1.00",// 保额币种汇率
   //         nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
@@ -5510,6 +5517,10 @@ const validateShanDong = async () => {
   // 特殊产品剔除
   const skipProducts = ['019904', '089031'];
   if (skipProducts.includes(cProdNoA)) return false;
+  // 投保人性质不明确，剔除
+  if (!['0', '1'].includes(AppcClntMrk)) {
+    return false;
+  }
   // 页面上已经是“见费”,"一次性缴费"直接跳过
   if (cNeedfeeFlagA == "1" && cInstMrk == '0') return false;
 

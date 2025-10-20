@@ -127,7 +127,7 @@ const tableconfig = reactive<AppTableConfig>(
 
           console.log(tabref.getFromValue());
           if (!tabref.getFromValue()['cCommodityNo']) {
-            ElMessage.error('产品代码为空,请保存后操作!');
+            ElMessage.error('产品编码为空,请保存后操作!');
             return false;
           }
           dzmodal

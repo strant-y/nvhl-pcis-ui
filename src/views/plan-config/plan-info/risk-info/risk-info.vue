@@ -110,7 +110,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "code",
         inputtype: 'rtinput',
-        title: "产品代码",
+        title: "产品编码",
         disabled: props.isAdd,
       },
       {

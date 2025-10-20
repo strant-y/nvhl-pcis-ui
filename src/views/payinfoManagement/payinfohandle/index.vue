@@ -887,25 +887,30 @@ const tableconfig = reactive<AppTableConfig>(
 				size: "large",
 				icon: "Document",
 				tableClick: (row) => {
-                    const en = JSON.stringify({
-                        cAppNo: row['cAppNo'],
-                        cAppTyp: row['cAppTyp'],
-                        cCiMrk: row['cCiMrk'],
-                        cEdrRsnBundleCde: row['cEdrRsnBundleCde'],
-                        cProdNo: row['cProdNo'],
-                        cGrpMrk: row['cGrpMrk'],
-                        cDptCde: row['cDptCde'],
-                        pageType: "readonly",
-                        cTermNo:row['cTermNo'],
-                        cTermNme:row['cTermNme'],
-                        cPolicySource:row['cPolicySource'],
-                    });
-                    router.push({
-                        path: "/pcisapp/myPage",
-                        query: {
-                            param: en,
-                        },
-                    });
+                    if(row.cPlyNo && (row.cPlyNo.slice(0,2) === "YY" || row.cPlyNo.slice(0,2) === "AY")) {
+                        const en = { ...row, sence:'policy', cEcAgrAppNo: row.cEcAgrAppNo || row.cAppNo }
+                        router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(en), type: 'view'}});
+                    } else {
+                        const en = JSON.stringify({
+                            cAppNo: row['cAppNo'],
+                            cAppTyp: row['cAppTyp'],
+                            cCiMrk: row['cCiMrk'],
+                            cEdrRsnBundleCde: row['cEdrRsnBundleCde'],
+                            cProdNo: row['cProdNo'],
+                            cGrpMrk: row['cGrpMrk'],
+                            cDptCde: row['cDptCde'],
+                            pageType: "readonly",
+                            cTermNo:row['cTermNo'],
+                            cTermNme:row['cTermNme'],
+                            cPolicySource:row['cPolicySource'],
+                        });
+                        router.push({
+                            path: "/pcisapp/myPage",
+                            query: {
+                                param: en,
+                            },
+                        });
+                    }
 				},
 			}),
 		],

@@ -148,6 +148,12 @@ const taskStatusOptions = [
   // { label: "已提交未接收", value: "7" },
   { label: "见费出单退回", value: "8" },
 ];
+const inquiryTaskStatusOptions = [
+  { label: "暂存", value: "1" },
+  { label: "已提交", value: "2" },
+  { label: "询价退回/撤回", value: "3" },
+  { label: "询价通过", value: "5" },
+]
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "出单任务处理",
@@ -179,7 +185,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             ],
           });
           freeEditRef.value?.setFormValue({
-            baseType: null,
+            baseType: "询价",
             cAppNme: "",
             cDptCde: user.companyId,
             cLoadSub: 1,
@@ -253,12 +259,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "任务类型",
         clearable: true,
-        multiple: true,
         loadData: [
           { label: "询价", value: "询价" },
           { label: "投保", value: "投保" },
           { label: "批改", value: "批改" },
         ],
+        func: (val: any) => {
+          if (val === "询价") {
+            setFormItem("taskStatus", { loadData: inquiryTaskStatusOptions });
+          } else {
+            setFormItem("taskStatus", { loadData: taskStatusOptions });
+          }
+          freeEditRef.value?.setValue("taskStatus", null);
+        },
+        rules: [getRules("required", {})],
       },
       {
         prop: "taskStatus",
@@ -388,6 +402,9 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 80,
     tableBtnPosition: "right",
     fixed: true,
+    rowDbClickFun: (row:any) => {
+      handleDblClick(row);
+    },
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -584,7 +601,7 @@ const tableconfig = reactive<AppTableConfig>(
           if (r) {
             const data = row;
             router.push({
-              path: "/pcisapp/pcisappView",
+              path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
               query: {
                 param:
                   row.baseType === "询价"
@@ -781,6 +798,22 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
+// 行双击查看详情
+function handleDblClick(row:any) {
+  router.push({
+    path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
+    query: {
+      param:
+        row.baseType === "询价"
+          ? JSON.stringify({
+              ...row,
+              ...{ pageType: "readonly", pageName: "priceInquiry" },
+            })
+          : JSON.stringify({ ...row, ...{ pageType: "readonly" } }),
+    },
+  });
+}
+
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
   getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
@@ -806,6 +839,7 @@ onMounted(() => {
       dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       dayjs().format("YYYY-MM-DD 23:59:59"),
     ],
+    baseType: "询价"
   }
   if (sessionStorage.getItem("navToOrderProcessing")) {
     param['taskStatus'] = JSON.parse(
@@ -813,7 +847,7 @@ onMounted(() => {
     )?.taskStatus
   }
   freeEditRef.value?.setFormValue(param);
-  handleQuery()
+  // handleQuery()
 });
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
@@ -845,6 +879,9 @@ function refreshData(flag?: boolean) {
   }
   if(param.tIssueTm && param.tIssueTm[1]) {
     param.tIssueTm[1] = dayjs(param.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
+  }
+  if(param.baseType) {
+    param.baseType = [param.baseType];
   }
   selectTask(param)
     .then((res: any) => {

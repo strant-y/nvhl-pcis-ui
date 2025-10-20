@@ -67,14 +67,15 @@ onMounted(async () => {
     method,
     exRules
   );
-  const p = opertaor.getParam();
-  if(p.sysDist === 'PRICE'){
-    formconfig11.fromSchema.forEach((item:any) => {
-      if( item.prop === "Base.cRemark" ) {
-        item.group = 'group_3';
-      }
-    })
-  }
+  // 20251013 这块代码先注释
+  // const p = opertaor.getParam();
+  // if(p.sysDist === 'PRICE'){
+  //   formconfig11.fromSchema.forEach((item:any) => {
+  //     if( item.prop === "Base.cRemark" ) {
+  //       item.group = 'group_3';
+  //     }
+  //   })
+  // }
   // 隐藏保单来源、是否互联网、手工出单标志
   formconfig11.fromSchema.forEach((item:any) => {
     if( item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
@@ -790,6 +791,18 @@ const method = {
     } else {
       setFormItem("Base.cCanclfeersnCde", { hidden: false });
       setFormItem("Base.cCanclfeeFlg", { hidden: false });
+    }
+  },
+  // 保单号
+  cPlyNoChange:(val:any)=>{
+    if(val?.length === 23) {
+      opertaor.getTableRefs().base?.setFormItem("Base.cRatioTyp", {
+        loadData: [
+          { label: "按月", value: "1" },
+          { label: "按日", value: "2" },
+          { label: "不计", value: "3" },
+        ],
+      })
     }
   }
 };
