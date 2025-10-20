@@ -185,7 +185,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             ],
           });
           freeEditRef.value?.setFormValue({
-            baseType: null,
+            baseType: "询价",
             cAppNme: "",
             cDptCde: user.companyId,
             cLoadSub: 1,
@@ -272,6 +272,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
           freeEditRef.value?.setValue("taskStatus", null);
         },
+        rules: [getRules("required", {})],
       },
       {
         prop: "taskStatus",
@@ -838,6 +839,7 @@ onMounted(() => {
       dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
       dayjs().format("YYYY-MM-DD 23:59:59"),
     ],
+    baseType: "询价"
   }
   if (sessionStorage.getItem("navToOrderProcessing")) {
     param['taskStatus'] = JSON.parse(
@@ -845,7 +847,7 @@ onMounted(() => {
     )?.taskStatus
   }
   freeEditRef.value?.setFormValue(param);
-  handleQuery()
+  // handleQuery()
 });
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据

@@ -20,6 +20,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import {checkAppBase} from "@/api/prod";
 import { cloneDeep } from "lodash-es";
 import moment from "moment";
+import Decimal from "decimal.js";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
@@ -905,6 +906,7 @@ const premiumCalculation = ()=>{
     //协议费用
     const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
     const allFromData = formPage.value?.getAllFormData();
+    const pgxx = mainRef.value?.getxyedrbaseRefValue()
     // 条款
     const AgreementCvrg = allFromData['AgreementCvrg']
     if(AgreementCvrg.length > 0){
@@ -1012,10 +1014,33 @@ const premiumCalculation = ()=>{
         }
       }
       if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
-        const nReceivedPrm = AgreementFeeWarn?.getFormValue()?.['ECargoBase.nRmbReceivedPrm'] || 0;// 折人民币协议预收保费
-        const nBefEdrReceivedPrm = mainRef.value?.getxyedrbaseRefValue()?.['EdrECargoBase.nBefEdrReceivedPrm'] || 0;// 原预收保费
+        const nReceivedPrm = new Decimal(AgreementFeeWarn?.getFormValue()?.['ECargoBase.nReceivedPrm'] || 0);// 预收保费
+        const nBefEdrReceivedPrm = new Decimal(mainRef.value?.getxyedrbaseRefValue()?.['EdrECargoBase.nBefEdrReceivedPrm'] || 0);// 原预收保费
         mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.nReceivedPrm", nReceivedPrm);// 现预收保费
-        mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.nReceivedPrmVar", Number(nReceivedPrm) - Number(nBefEdrReceivedPrm));// 预收保费变化
+        mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.nReceivedPrmVar", nReceivedPrm.minus(nBefEdrReceivedPrm));// 预收保费变化
+      }
+      if(props.param?.cEdrType == '3') {
+        // 一般退保 修改后的预收保费不能大于原预收保费 YY
+        if(props.param?.cRsnCde === 's2') {
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] <= 0) {
+            ElMessage.error('一般退保预收保费必须大于0！')
+            return
+          }
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] >= pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
+            ElMessage.error('一般退保预收保费不能大于原预收保费！')
+            return
+          }
+        } else {// 全单退保 预收保费设置为0 YY
+          AgreementFeeWarn.setValue('ECargoBase.nReceivedPrm',0)
+        }
+      }
+      // 全单注销（YY:预收保费设置0  AY:预估保费设置0）
+      if(props.param?.cEdrType == '2') {
+        if(props.param?.cEdrFlag === "YY") {
+          AgreementFeeWarn.setValue('ECargoBase.nReceivedPrm',0)
+        } else {
+          AgreementFeeWarn.setValue('ECargoBase.nPrm',0)
+        }
       }
       // 生成缴费计划
       const base = agreementBaseRef?.getFormValue();
@@ -1069,35 +1094,27 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
     })
   }
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
-    // 退保和注销
-    if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
-      if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY ：应收保费=折人民币预扣保费 - 折人民币预收保费
-        pay["ECargoPay.nPayablePrm"] = (insrnc["ECargoBase.nWhRmbPrm"] * 100 - insrnc["ECargoBase.nRmbReceivedPrm"] * 100)/100;
-      }
-    } else {
-      if(props.payWay == '01' || props.param?.cEdrFlag === "YY"){
-        // 应收保费: 预收保费变化
-        pay["ECargoPay.nPayablePrm"] = convertNumber(edrbaseData['EdrECargoBase.nReceivedPrmVar']) || 0;
-      } else {// AY : 应收保费=保费变化 * 汇率 
-        pay["ECargoPay.nPayablePrm"] = (convertNumber(edrbaseData['EdrECargoBase.nPrmVar']) || 0) * convertNumber(insrnc['ECargoBase.nPrmRmbExch']);
-      }
-      // 我司保费: 应收保费 * 我司比例
-      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+    if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY：应收保费= 预收保费变化 * 预收保费汇率
+      pay["ECargoPay.nPayablePrm"] = new Decimal(edrbaseData['EdrECargoBase.nReceivedPrmVar']).times(new Decimal(insrnc["ECargoBase.nReceivedRate"]));
+    } else {// AY: 预估保费变化 * 预估保费汇率
+      pay["ECargoPay.nPayablePrm"] = new Decimal(edrbaseData['EdrECargoBase.nPrmVar']).times(new Decimal(insrnc["ECargoBase.nPrmRmbExch"]));
     }
+    // 我司保费: 应收保费 * 我司比例
+    pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : new Decimal(share).times(new Decimal(pay["ECargoPay.nPayablePrm"]));
     pay["ECargoPay.nPrmVar"] = pay["ECargoPay.nPayablePrm"];
   } else {
     if(props.payWay == '01') {// 预付
       // 应收保费: 折人名币预收保费
       pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbReceivedPrm"] ? insrnc["ECargoBase.nRmbReceivedPrm"] : 0;
       // 我司保费: 折人民币我司协议剩余预收保费(应收保费 * 我司比例)
-      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : new Decimal(share).times(new Decimal(pay["ECargoPay.nPayablePrm"]));
     } else {// 非预付
       // 应收保费: 折人名币预估保费
       pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbPrm"] ? insrnc["ECargoBase.nRmbPrm"] : 0;
       // 我司保费: 折人民币我司预估保费(应收保费 * 我司比例)
-      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : share* Number(pay["ECargoPay.nPayablePrm"]);
+      pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : new Decimal(share).times(new Decimal(pay["ECargoPay.nPayablePrm"]));
     }
-    pay["ECargoPay.nPrmVar"] = !!insrnc["ECargoBase.nPrm"] ? insrnc["ECargoBase.nPrm"] : 0;
+    pay["ECargoPay.nPrmVar"] = pay["ECargoPay.nPayablePrm"];
   }
 
   pay["ECargoPay.tPayBgnTm"] = moment(insrnc["ECargoBase.tAppTm"]).format(
@@ -1348,7 +1365,7 @@ const exRules = {};
 
 // 将1,000,000格式的数字转成可以计算的数值
 function convertNumber(val:any) {
-  if (val === null || val === undefined || val === '') {
+  if (val === null || val === undefined || val === '' || val === 0) {
     return val;
   }
   const num = Number(val.replace(/,/g, ''));
