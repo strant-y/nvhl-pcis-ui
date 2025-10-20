@@ -888,7 +888,7 @@ const tableconfig = reactive<AppTableConfig>(
 				icon: "Document",
 				tableClick: (row) => {
                     if(row.cPlyNo && (row.cPlyNo.slice(0,2) === "YY" || row.cPlyNo.slice(0,2) === "AY")) {
-                        const en = { ...row, sence:'policy' }
+                        const en = { ...row, sence:'policy', cEcAgrAppNo: row.cEcAgrAppNo || row.cAppNo }
                         router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(en), type: 'view'}});
                     } else {
                         const en = JSON.stringify({

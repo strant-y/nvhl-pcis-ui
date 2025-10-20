@@ -2066,23 +2066,11 @@ async function queryAE( flag?: boolean, isEs = false) {
     if(s.tEdrAppTm && s.tEdrAppTm[1]) {
         s.tEdrAppTm[1] = dayjs(s.tEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
     }
-    let expandFlag = 0;
-    let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    // 09 工程险
-    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
-    }
-
-    // 08 家庭财产险
-    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
-    }
-
+    // 使用公共方法处理展开列传参
+    const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
     // 清空多余参数
     delete s.cProdNo;
@@ -2271,22 +2259,10 @@ async function queryI(flag?: boolean, isEs = false) {
     if(s.tInquiryTm && s.tInquiryTm[1]) {
         s.tInquiryTm[1] = dayjs(s.tInquiryTm[1]).format("YYYY-MM-DD 23:59:59")
     }
-    let expandFlag = 0;
-    let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    // 09 工程险
-    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
-    }
-
-    // 08 家庭财产险
-    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
-    }
+    const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
     // 清空其他日期参数
     s.tAppTm = null;
@@ -2416,22 +2392,10 @@ async function exportAE( flag?: boolean, isEs) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
-    let expandFlag = 0;
-    let expandVal = {};
-
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    // 09 工程险
-    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
-    }
-    // 08 家庭财产险
-    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
-    }
+    const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
     // 清空多余参数
     delete s.cProdNo;
@@ -2532,22 +2496,10 @@ async function exportI(flag?: boolean, isEs = false) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
-    let expandFlag = 0;
-    let expandVal = {};
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
-    // 09 工程险
-    if (s["cKindNo"] == "09" && (s["cProjectName"] || s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cProjectName":s["cProjectName"], "cDetailedAddress":s["cDetailedAddress"]}
-    }
-
-    // 08 家庭财产险
-    if (s["cKindNo"] == "08" && (s["cDetailedAddress"])) {
-       expandFlag = 1;
-       expandVal = {"cDetailedAddress":s["cDetailedAddress"]}
-    }
+    const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
     // 清空其他日期参数
     s.tAppTm = null;
@@ -2859,6 +2811,331 @@ async function applyCheckedColumns(props: string[]) {
 
     Object.assign(tableconfig, newConfig); 
 }
+
+// 提取公共方法：处理展开列传参逻辑
+function processExpandParams(formData) {
+    let expandFlag = 0;
+    let expandVal = {};
+    const s = formData;
+    // 01的逻辑
+    if (s["cKindNo"] == "01") {
+        if (s["prodCNmeCn"] == "010006" && s["cEngineNumber"]) {
+            expandFlag = 1;
+            expandVal = { "cEngineNumber": s["cEngineNumber"] };
+        } else if (s["prodCNmeCn"] == "010009" && s["cLicenseNumber"]) {
+            expandFlag = 1;
+            expandVal = { "cLicenseNumber": s["cLicenseNumber"] };
+        } else if (s["prodCNmeCn"] == "010022" && (s["cIdentificationNumber"] || s["cCustomerName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cCustomerName": s["cCustomerName"]
+            };
+        } else if (s["prodCNmeCn"] == "019003" && s["cEngineNumber"]) {
+            expandFlag = 1;
+            expandVal = { "cEngineNumber": s["cEngineNumber"] };
+        }
+    }
+    // 04的逻辑
+    if (s["cKindNo"] == "04") {
+        if (s["prodCNmeCn"] == "040001" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "040002" && (s["cIdentificationNumber"] || s["cEmployeeName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cEmployeeName": s["cEmployeeName"]
+            };
+        } else if (s["prodCNmeCn"] == "040005" && (s["cIdentificationNumber"] || s["cWardName"] || s["cDetailedAddress"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cWardName": s["cWardName"],
+                "cDetailedAddress": s["cDetailedAddress"]
+            };
+        } else if (s["prodCNmeCn"] == "040006" && (s["cIdentificationNumber"] || s["cFullName"] || s["cLicenseNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"],
+                "cLicenseNumber": s["cLicenseNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "040007" && (s["cIdentificationNumber"] || s["cDetailedAddress"] || s["cEmployeeName"] || s["cLicenseNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cDetailedAddress": s["cDetailedAddress"],
+                "cEmployeeName": s["cEmployeeName"],
+                "cLicenseNumber": s["cLicenseNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "040013" && (s["cEngineeringCategory"] || s["cProjectAddress"] || s["cBuildingAddress"] || s["cCreditCode"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cEngineeringCategory": s["cEngineeringCategory"],
+                "cProjectAddress": s["cProjectAddress"],
+                "cBuildingAddress": s["cBuildingAddress"],
+                "cCreditCode": s["cCreditCode"]
+            };
+        } else if (s["prodCNmeCn"] == "040016" && (s["cIdentificationNumber"] || s["cFullName"] || s["cDetailedAddress"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"],
+                "cDetailedAddress": s["cDetailedAddress"]
+            };
+        } else if (s["prodCNmeCn"] == "040019" && s["cOrganizationName"]) {
+            expandFlag = 1;
+            expandVal = { "cOrganizationName": s["cOrganizationName"] };
+        } else if (s["prodCNmeCn"] == "040020" && (s["cIdentificationNumber"] || s["cFullName"] || s["cLicenseNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"],
+                "cLicenseNumber": s["cLicenseNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "040021" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "041001" && (s["cFullName"] || s["cIdentificationNumber"] || s["cLicenseNumber"] || s["cDetailedAddress"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cFullName": s["cFullName"],
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cLicenseNumber": s["cLicenseNumber"],
+                "cDetailedAddress": s["cDetailedAddress"]
+            };
+        } else if (s["prodCNmeCn"] == "041007" && (s["cIdentificationNumber"] || s["cWardName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cWardName": s["cWardName"]
+            };
+        } else if (s["prodCNmeCn"] == "041015" && (s["cDetailedAddress"] || s["cCoachStaff"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cDetailedAddress": s["cDetailedAddress"],
+                "cCoachStaff": s["cCoachStaff"]
+            };
+        } else if (s["prodCNmeCn"] == "042002" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "042003" && (s["cSchoolAddress"] || s["cIdentificationNumber"] || s["cWardName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cSchoolAddress": s["cSchoolAddress"],
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cWardName": s["cWardName"]
+            };
+        } else if (s["prodCNmeCn"] == "043001" && s["cLicenseNumber"]) {
+            expandFlag = 1;
+            expandVal = { "cLicenseNumber": s["cLicenseNumber"] };
+        } else if ((s["prodCNmeCn"] == "043004" || s["prodCNmeCn"] == "043005") && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "043009" && (s["cIdentificationNumber"] || s["cEmployeeName"] || s["cDetailedAddress"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cEmployeeName": s["cEmployeeName"],
+                "cDetailedAddress": s["cDetailedAddress"]
+            };
+        } else if (s["prodCNmeCn"] == "043010" && (s["cIdentificationNumber"] || s["cWardName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cWardName": s["cWardName"]
+            };
+        } else if (s["prodCNmeCn"] == "043011" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "043013" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "043020" && (s["cIdentificationNumber"] || s["cDetailedAddress"] || s["cFullName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cDetailedAddress": s["cDetailedAddress"],
+                "cFullName": s["cFullName"]
+            };
+        } else if (s["prodCNmeCn"] == "045001" && (s["cEmployeeName"] || s["cIdentificationNumber"] || s["cDetailedAddress"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cEmployeeName": s["cEmployeeName"],
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cDetailedAddress": s["cDetailedAddress"]
+            };
+        } else if (s["prodCNmeCn"] == "047001" && (s["cDriverName"] || s["cIdentificationNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cDriverName": s["cDriverName"],
+                "cIdentificationNumber": s["cIdentificationNumber"]
+            };
+        } else if ((s["prodCNmeCn"] == "047002" || s["prodCNmeCn"] == "049001") && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "049020" && (s["cWardName"] || s["cIdentificationNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cWardName": s["cWardName"],
+                "cIdentificationNumber": s["cIdentificationNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "049021" && s["cProvince"]) {
+            expandFlag = 1;
+            expandVal = { "cProvince": s["cProvince"] };
+        } else if (s["prodCNmeCn"] == "049024" && (s["cIdentificationNumber"] || s["cFullName"] || s["cDetailedAddress"] || s["cLicenseNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"],
+                "cDetailedAddress": s["cDetailedAddress"],
+                "cLicenseNumber": s["cLicenseNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "049026" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "049027" && (s["cFullName"] || s["cIdentificationNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cFullName": s["cFullName"],
+                "cIdentificationNumber": s["cIdentificationNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "049028" && s["cProvince"]) {
+            expandFlag = 1;
+            expandVal = { "cProvince": s["cProvince"] };
+        } else if (s["prodCNmeCn"] == "049029" && (s["cLicenseNumber"] || s["cEmployeeName"] || s["cIdentificationNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cLicenseNumber": s["cLicenseNumber"],
+                "cEmployeeName": s["cEmployeeName"],
+                "cIdentificationNumber": s["cIdentificationNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "049030" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "049031" && (s["cFullName"] || s["cIdentificationNumber"] || s["cLicenseNumber"] || s["cDetailedAddress"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cFullName": s["cFullName"],
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cLicenseNumber": s["cLicenseNumber"],
+                "cDetailedAddress": s["cDetailedAddress"]
+            };
+        } else if (s["prodCNmeCn"] == "049033" && (s["cDetailedAddress"] || s["cIdentificationNumber"] || s["cFullName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cDetailedAddress": s["cDetailedAddress"],
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"]
+            };
+        }
+    }
+    // 05的逻辑
+    if (s["cKindNo"] == "05") {
+        if (s["prodCNmeCn"] == "059003" && (s["cIdentificationNumber"] || s["cEmployeeName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cEmployeeName": s["cEmployeeName"]
+            };
+        } else if (
+            ["059902", "059903", "059904", "059906", "059907", "059908", "059910", "059912", "059913", "059914", "059915"].includes(s["prodCNmeCn"]) &&
+            (s["cIdentificationNumber"] || s["cBorrowerName"])
+        ) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cBorrowerName": s["cBorrowerName"]
+            };
+        }
+    }
+    // 07的逻辑
+    if (s["cKindNo"] == "07") {
+        if ((s["prodCNmeCn"] == "070001" || s["prodCNmeCn"] == "070005") && (s["cCustomerName"] || s["cLicenseNumber"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cCustomerName": s["cCustomerName"],
+                "cLicenseNumber": s["cLicenseNumber"]
+            };
+        } else if (s["prodCNmeCn"] == "070002" && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        }
+    }
+    // 08的逻辑
+    if (s["cKindNo"] == "08") {
+        if (s["prodCNmeCn"] == "080002" && s["cMembersNames"]) {
+            expandFlag = 1;
+            expandVal = { "cMembersNames": s["cMembersNames"] };
+        } else if (s["prodCNmeCn"] == "080003" && (s["cIdentificationNumber"] || s["cFullName"] || s["cMembersNames"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"],
+                "cMembersNames": s["cMembersNames"]
+            };
+        } else if (["080007", "080008", "089005"].includes(s["prodCNmeCn"]) && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        } else if (s["prodCNmeCn"] == "080011" && (s["cIdentificationNumber"] || s["cFullName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"]
+            };
+        } else if (s["prodCNmeCn"] == "089030" && s["cDetailAddr"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailAddr": s["cDetailAddr"] };
+        } else if (s["prodCNmeCn"] == "089031" && s["cMembersNames"]) {
+            expandFlag = 1;
+            expandVal = { "cMembersNames": s["cMembersNames"] };
+        }
+    }
+    // 09的逻辑
+    if (s["cKindNo"] == "09") {
+        if (["090001", "090002", "090003"].includes(s["prodCNmeCn"]) && s["cDetailedAddress"]) {
+            expandFlag = 1;
+            expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
+        }
+    }
+    // 12的逻辑
+    if (s["cKindNo"] == "12") {
+        if (s["prodCNmeCn"] == "120001" && (s["cHolderName"] || s["cCarrierName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cHolderName": s["cHolderName"],
+                "cCarrierName": s["cCarrierName"]
+            };
+        }
+    }
+    // 13的逻辑
+    if (s["cKindNo"] == "13") {
+        if (["130001", "130002", "130003"].includes(s["prodCNmeCn"]) && (s["cIdNumber"] || s["cBorrowerName"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdNumber": s["cIdNumber"],
+                "cBorrowerName": s["cBorrowerName"]
+            };
+        }
+    }
+    // 16的逻辑
+    if (s["cKindNo"] == "16") {
+        if (s["prodCNmeCn"] == "169001" && s["cEngineNumber"]) {
+            expandFlag = 1;
+            expandVal = { "cEngineNumber": s["cEngineNumber"] };
+        } else if (s["prodCNmeCn"] == "169002" && (s["cIdentificationNumber"] || s["cFullName"] || s["cMembersNames"])) {
+            expandFlag = 1;
+            expandVal = {
+                "cIdentificationNumber": s["cIdentificationNumber"],
+                "cFullName": s["cFullName"],
+                "cMembersNames": s["cMembersNames"]
+            };
+        }
+    }
+    return { expandFlag, expandVal };
+}
+
 
 function formatTwoLine(text, num=7) {
   if (!text) return '';

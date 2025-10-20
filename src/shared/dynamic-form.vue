@@ -128,7 +128,7 @@
                       >
                         <rt-button
                             :item="item.btnItems"
-                            :style="{ width: item.btnItems.label ? '100%' : '32px' }"
+                            :style="{ width: item.btnItems?.label ? '100%' : '32px' }"
                             @closepopover="(rev) => setPopover(rev, item)"
                         />
                       </div>
@@ -505,8 +505,7 @@ async function validate() {
           }
         }
       })
-    }else if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
-      // 如果当前列有验证规则，则将其添加到规则对象中
+    } else if (props.fromSchema[schama].hidden !== true && props.fromSchema[schama].rules) {
       let rul = props.fromSchema[schama].rules;
       const nrul = setRuleType(rul,props.fromSchema[schama]);
       if(nrul){
@@ -538,7 +537,7 @@ async function validate() {
       freeValidate();
     })
   }else{
-    freeValidate();
+    return await freeValidate();
   }
   if(r && r.length > 0){
     // console.log(form);
@@ -551,21 +550,26 @@ async function validate() {
 }
 
 async function freeValidate(){
-  const promise = await fromRef.value?.validate((valid, fields) => {
-  if (valid) {
-  } else {
-  }
-  });
-  let fromListbl = promise;
-  if (fromListRef.value) {
-    for (const ref in fromListRef.value) {
-      const exvali = await fromListRef.value[ref].tableExvalidate();
-      if (exvali != null) {
-        fromListbl = fromListbl && exvali;
+  return new Promise((resolve) => {
+    fromRef.value?.validate((valid, fields) => {
+      if (valid) {
+        resolve(true);
+      } else {
+        resolve(false);
       }
-    }
-  }
-  return fromListbl;
+    }).then(async (formValid: any) => {
+      let fromListbl = formValid;
+      if (fromListRef.value) {
+        for (const ref in fromListRef.value) {
+          const exvali = await fromListRef.value[ref].tableExvalidate();
+          if (exvali != null) {
+            fromListbl = fromListbl && exvali;
+          }
+        }
+      }
+      resolve(fromListbl === undefined ? true : fromListbl);
+    });
+  });
 }
 
 function dovalidate(validator: any) { 

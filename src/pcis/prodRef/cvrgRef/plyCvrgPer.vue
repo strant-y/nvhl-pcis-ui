@@ -27,6 +27,7 @@
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
               :faters="faters"
+              :addr-seq-array="addrSeqArray"
               @delete="
                 (r) => {
                   if(formData['m'].length === 1 && parparam.cTransMrk !== '1'){
@@ -167,6 +168,7 @@ const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
 const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
 const pageName = computed(() => opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
+const addrSeqArray = ref([]);
 
 const props = defineProps({
   pageSchema: {
@@ -504,6 +506,32 @@ function refushCvrgInfo() {
   });
 }
 
+function getAddrSeqOptions() {
+  const selData: any = {
+    pageNum: 1,
+    pageSize: 9999,
+    cProdNo: parparam.cProdNo,
+    cClauseCode: parparam.cTermNo,
+    cComponentTable: "PropertyaddressDist",
+  };
+  if(pageName.value === "priceInquiry") {
+    selData['cInquiryNo'] = cInquiryNo.value;
+  }else {
+    selData['cAppNo'] = cAppNo.value;
+  }
+  selectDist(selData).then((addrRes: any) => {
+    if (addrRes.code === 200) {
+        const addrList = addrRes.data.data || [];
+        addrSeqArray.value  = addrList.map(item => ({
+            label: String(item['Dist.cCodeNo']),
+            value: String(item['Dist.cCodeNo']),
+            id: String(item['Dist.cPkId']),
+        }));
+        sessionStorage.setItem("getAddrSeqData", JSON.stringify(addrSeqArray.value));
+    }
+  });
+}
+
 function refushData(datas: any) {
   let pd: { [key: string]: any } = {};
   datas?.forEach((item: any) => {
@@ -719,6 +747,9 @@ onActivated(() => {
 onDeactivated(() => {
   console.log('keep-alive -> onDeactivated')
 });
+onUnmounted(() => {
+  sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');
+});
 
 defineExpose({
   getFromValue,
@@ -732,6 +763,7 @@ defineExpose({
   calcCheck,
   setTermData,
   refushCvrgInfo,
+  getAddrSeqOptions,
   getPlanNo,
 });
 </script>
