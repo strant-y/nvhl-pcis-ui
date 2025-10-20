@@ -2829,7 +2829,7 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
-  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018','020015'].includes(props.param.cProdNo)){
+  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018','020015','020019','020020','020021'].includes(props.param.cProdNo)){
     const term = opertaor.getTableRefByKey("cvrg").getFromValue();
     term.forEach((item:any) => {
       if(item["Term.cRdrTyp"] === '0'){

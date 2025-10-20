@@ -334,13 +334,32 @@ onMounted(() => {
     //         { value: params.cDptCde, label: `${params.cDptCde} ${params.cDptCnm}` },
     //     ],
     // });
+    if(params.cEdrFlag === 'AY') {
+      setFormItem("EdrECargoBase.nBefEdrReceivedPrm",{hidden:true})
+      setFormItem("EdrECargoBase.nReceivedPrm",{hidden:true})
+      setFormItem("EdrECargoBase.nReceivedPrmVar",{hidden:true})
+      if(params["cEdrType"] == '2') {// 全单注销
+        setFormItem("EdrECargoBase.nBefEdrAmt",{hidden:true})
+        setFormItem("EdrECargoBase.nAmt",{hidden:true})
+        setFormItem("EdrECargoBase.nAmtVar",{hidden:true})
+      }
+    } else if(params.cEdrFlag === 'YY') {
+      if(params["cEdrType"] !== '1') {// 退保和注销隐藏原保费和原保额两行
+        setFormItem("EdrECargoBase.nBefEdrPrm",{hidden:true})
+        setFormItem("EdrECargoBase.nPrm",{hidden:true})
+        setFormItem("EdrECargoBase.nPrmVar",{hidden:true})
+        setFormItem("EdrECargoBase.nBefEdrAmt",{hidden:true})
+        setFormItem("EdrECargoBase.nAmt",{hidden:true})
+        setFormItem("EdrECargoBase.nAmtVar",{hidden:true})
+      }
+    }
     if(params["cEdrType"]!='1'){
-      setFormItem("EdrECargoBase.nBefEdrPrm",{hidden:true})
-      setFormItem("EdrECargoBase.nPrm",{hidden:true})
-      setFormItem("EdrECargoBase.nPrmVar",{hidden:true})
-      setFormItem("EdrECargoBase.nBefEdrAmt",{hidden:true})
-      setFormItem("EdrECargoBase.nAmt",{hidden:true})
-      setFormItem("EdrECargoBase.nAmtVar",{hidden:true})
+      // setFormItem("EdrECargoBase.nBefEdrPrm",{hidden:true})
+      // setFormItem("EdrECargoBase.nPrm",{hidden:true})
+      // setFormItem("EdrECargoBase.nPrmVar",{hidden:true})
+      // setFormItem("EdrECargoBase.nBefEdrAmt",{hidden:true})
+      // setFormItem("EdrECargoBase.nAmt",{hidden:true})
+      // setFormItem("EdrECargoBase.nAmtVar",{hidden:true})
       if(params["cEdrType"]=='3'){
             setFormItem("EdrECargoBase.cEdrRsnDetail", { loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'}] });
         }else if(params["cEdrType"]=='2'){
@@ -348,12 +367,12 @@ onMounted(() => {
         }
         setFormItem("EdrECargoBase.cEdrRsnBundleCde", {typeCode:'', codeParam:'',loadData: [{value:'s1',label:'全单退保'},{value:'s2',label:'一般退保'},{value:'c1',label:'全单注销'}] });
     }else{
-      setFormItem("EdrECargoBase.nBefEdrPrm",{hidden:false})
-      setFormItem("EdrECargoBase.nPrm",{hidden:false})
-      setFormItem("EdrECargoBase.nPrmVar",{hidden:false})
-      setFormItem("EdrECargoBase.nBefEdrAmt",{hidden:false})
-      setFormItem("EdrECargoBase.nAmt",{hidden:false})
-      setFormItem("EdrECargoBase.nAmtVar",{hidden:false})
+      // setFormItem("EdrECargoBase.nBefEdrPrm",{hidden:false})
+      // setFormItem("EdrECargoBase.nPrm",{hidden:false})
+      // setFormItem("EdrECargoBase.nPrmVar",{hidden:false})
+      // setFormItem("EdrECargoBase.nBefEdrAmt",{hidden:false})
+      // setFormItem("EdrECargoBase.nAmt",{hidden:false})
+      // setFormItem("EdrECargoBase.nAmtVar",{hidden:false})
         const isGrp = params["cGrpMrk"] === "1" ? "1" : null;
         const isPer = params["CGrpMrk"] === "1" ? "1" : null;
         const param = {

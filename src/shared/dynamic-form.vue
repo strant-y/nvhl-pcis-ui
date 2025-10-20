@@ -128,7 +128,7 @@
                       >
                         <rt-button
                             :item="item.btnItems"
-                            :style="{ width: item.btnItems.label ? '100%' : '32px' }"
+                            :style="{ width: item.btnItems?.label ? '100%' : '32px' }"
                             @closepopover="(rev) => setPopover(rev, item)"
                         />
                       </div>
