@@ -730,6 +730,17 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
   emit('savePlyInfo');
 };
 
+function getPlanNo() {
+  let plans:any = [];
+  if (formData.value["m"] && formData.value["m"].length > 0) {
+    formData.value["m"].forEach((e) => {
+      let d = { label: e["Term.cPlanNo"], value: e["Term.cPlanNo"] };
+      plans.push(d);
+    });
+  }
+  return plans;
+}
+
 onActivated(() => {
   console.log('keep-alive -> onActivated')
 });
@@ -752,7 +763,8 @@ defineExpose({
   calcCheck,
   setTermData,
   refushCvrgInfo,
-  getAddrSeqOptions
+  getAddrSeqOptions,
+  getPlanNo,
 });
 </script>
 
