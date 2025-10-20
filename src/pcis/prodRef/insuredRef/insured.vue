@@ -646,10 +646,6 @@ const method = {
       //   rules: []
       // });
 
-      // 法人时 全球法人机构识别编码必填
-      setFormItem("Insured.cGcidCode", {
-        rules: [getRules("required", {})],
-      });
       setFormItem("Insured.cEdubackgroudTyp", {
         rules: [],
       });
@@ -865,10 +861,7 @@ const method = {
       // setFormItem("Insured.cSex", {
       //   rules: [getRules("required", {})]
       // });
-
-      setFormItem("Insured.cGcidCode", {
-        rules: null,
-      });
+      
       // 个人 客户学历必填
       setFormItem("Insured.cEdubackgroudTyp", {
         rules: [getRules("required", {})],

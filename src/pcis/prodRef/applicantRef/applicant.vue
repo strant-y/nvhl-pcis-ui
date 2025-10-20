@@ -723,10 +723,6 @@ const method = {
       setFormItem("Applicant.cSex", {
         rules: [],
       });
-      // 法人时 全球法人机构识别编码必填
-      setFormItem("Applicant.cGcidCode", {
-        rules: [getRules("required", {})],
-      });
       setFormItem("Applicant.cEdubackgroudTyp", {
         rules: [],
       });
@@ -891,9 +887,6 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cLegalRepresentative", {
-        rules: [],
-      });
-      setFormItem("Applicant.cGcidCode", {
         rules: [],
       });
 
