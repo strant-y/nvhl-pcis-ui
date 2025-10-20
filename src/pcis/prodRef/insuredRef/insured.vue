@@ -570,6 +570,12 @@ const method = {
         setFormItem("Insured.cGreenIndustryCustomers", {
           disabled: false,
         });
+        if (getValue('Insured.cGreenIndustryCustomers') == '1') {
+          setFormItem("Insured.cGreenIndustryList", {
+            rules: [getRules("required", {})],
+            disabled: false,
+          });
+        }
       }
       // 参加社会统筹标志
       setFormItem("Insured.cParticiinsocTyp", {

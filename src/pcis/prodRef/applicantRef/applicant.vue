@@ -626,11 +626,12 @@ const method = {
         });
 
         // 绿色客户 如果为时就放开
-        // if (getValue('Applicant.cGreenIndustryCustomers') == '1') {}
-        setFormItem("Applicant.cGreenIndustryList", {
+        if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
+          setFormItem("Applicant.cGreenIndustryList", {
             rules: [getRules("required", {})],
             disabled: false,
-        });
+          });
+        }
 
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
