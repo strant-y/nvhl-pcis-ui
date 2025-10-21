@@ -1043,7 +1043,7 @@ function init() {
 function getOrderInfo() {
   (async () => {
     try {
-      const res: any = await getAnalysis({type: "ply_total"});
+      const res: any = await getAnalysis({ type: "ply_total" });
       if (res.code === 200) {
         tabDataMap.value = res.dataMap;
         const keys = Object.keys(res.dataMap).filter(
@@ -1068,8 +1068,11 @@ function getOrderInfo() {
 
 function handleStatisticTabClick(tab: any) {
   currentTab.value = tab.props.label;
-  handleRefreshEcharts();
+  (async () => {
+    await handleRefreshEcharts();
+  })();
 }
+
 const echartsOptionsData = ref([]);
 const echartsOptionsData1 = ref([]);
 async function handleRefreshEcharts() {
@@ -1101,9 +1104,9 @@ async function handleRefreshEcharts() {
         echartsOptionsPie.legend.data = data.map((item: any) => item.item);
         ecahrtsRefInstance?.clear();
         ecahrtsRefInstance?.setOption(
-            ecahrtsOptionsType.value === "0"
-                ? echartsOptions
-                : echartsOptionsPie
+          ecahrtsOptionsType.value === "0"
+            ? echartsOptions
+            : echartsOptionsPie
         );
       } else {
         ElMessage.error(res.msg);
@@ -1156,9 +1159,9 @@ async function handleRefreshEcharts() {
         echartsOptions1Pie.legend.data = data.map((item: any) => item.item);
         ecahrtsRefInstance1?.clear();
         ecahrtsRefInstance1?.setOption(
-            ecahrtsOptions1Type.value === "0"
-                ? echartsOptions1
-                : echartsOptions1Pie
+          ecahrtsOptions1Type.value === "0"
+            ? echartsOptions1
+            : echartsOptions1Pie
         );
       } else {
         ElMessage.error(res.msg);
