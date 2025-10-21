@@ -1007,8 +1007,8 @@ const echartsOptions1Pie = reactive({
 });
 const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
-const tabDataMap = ref({});
-const currentTab = ref("");
+const tabDataMap:any = ref({});
+const currentTab = ref("核心出单");
 // 今日总录单
 const dayTotalRecords = computed(() => {
   const currentItem = tabDataMap.value[currentTab.value] || [];
@@ -1037,6 +1037,7 @@ function init() {
     ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value);
   }
   getOrderInfo();
+  handleRefreshEcharts();
 }
 
 function getOrderInfo() {
@@ -1046,17 +1047,16 @@ function getOrderInfo() {
       if (res.code === 200) {
         tabDataMap.value = res.dataMap;
         const keys = Object.keys(res.dataMap).filter(
-          (item: any) =>
-            item === "核心出单" ||
-            item === "复制出单" ||
-            item === "模板出单" ||
-            item === "方案出单" ||
-            item === "询价转投保"
+            (item: any) =>
+                item === "核心出单" ||
+                item === "复制出单" ||
+                item === "模板出单" ||
+                item === "方案出单" ||
+                item === "询价转投保"
         );
         keys.splice(0, 0, keys.splice(keys.indexOf("核心出单"), 1)[0]);
         currentTab.value = keys[0];
         statisticTabList.value = keys;
-        handleRefreshEcharts();
       } else {
         ElMessage.error(res.msg);
       }
@@ -1116,27 +1116,27 @@ async function handleRefreshEcharts() {
     }
   } else {
     echartsOptions.xAxis[0].data = echartsOptionsData.value[
-      currentTab.value
-    ].map((item: any) => item.item);
+        currentTab.value
+        ].map((item: any) => item.item);
     echartsOptions.series[0].data = echartsOptionsData.value[
-      currentTab.value
-    ].map((item: any) => item.value);
+        currentTab.value
+        ].map((item: any) => item.value);
     echartsOptions.series[1].data = echartsOptionsData.value[
-      currentTab.value
-    ].map((item: any) => item.rate);
+        currentTab.value
+        ].map((item: any) => item.rate);
     // 饼状图
     echartsOptionsPie.series[0].data = echartsOptionsData.value[
-      currentTab.value
-    ].map((item: any) => ({
+        currentTab.value
+        ].map((item: any) => ({
       name: item.item,
       value: item.value,
     }));
     echartsOptionsPie.legend.data = echartsOptionsData.value[
-      currentTab.value
-    ].map((item: any) => item.item);
+        currentTab.value
+        ].map((item: any) => item.item);
     ecahrtsRefInstance?.clear();
     ecahrtsRefInstance?.setOption(
-      ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie
+        ecahrtsOptionsType.value === "0" ? echartsOptions : echartsOptionsPie
     );
   }
   if (echartsOptionsData1.value.length < 1) {
@@ -1171,27 +1171,27 @@ async function handleRefreshEcharts() {
     }
   } else {
     echartsOptions1.xAxis[0].data = echartsOptionsData1.value[
-      currentTab.value
-    ].map((item: any) => item.item);
+        currentTab.value
+        ].map((item: any) => item.item);
     echartsOptions1.series[0].data = echartsOptionsData1.value[
-      currentTab.value
-    ].map((item: any) => item.value);
+        currentTab.value
+        ].map((item: any) => item.value);
     echartsOptions1.series[1].data = echartsOptionsData1.value[
-      currentTab.value
-    ].map((item: any) => item.rate);
+        currentTab.value
+        ].map((item: any) => item.rate);
     // 饼状图
     echartsOptions1Pie.series[0].data = echartsOptionsData1.value[
-      currentTab.value
-    ].map((item: any) => ({
+        currentTab.value
+        ].map((item: any) => ({
       name: item.item,
       value: item.value,
     }));
     echartsOptions1Pie.legend.data = echartsOptionsData1.value[
-      currentTab.value
-    ].map((item: any) => item.item);
+        currentTab.value
+        ].map((item: any) => item.item);
     ecahrtsRefInstance1?.clear();
     ecahrtsRefInstance1?.setOption(
-      ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie
+        ecahrtsOptions1Type.value === "0" ? echartsOptions1 : echartsOptions1Pie
     );
   }
 }
