@@ -173,6 +173,10 @@ watch(
     (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
+        // 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
+        if(route.params.param?.cProdNo === '043003') {
+          opertaor.getTableRefByKey('tgt')?.setValue('Tgt.nInsuredCars', pageresult.list.length)
+        }
         if(isQuery.value) return
         eventBus.emit('goodsMxChange', newVal);
         // 02开头的货物明细清单，关联标的信息
