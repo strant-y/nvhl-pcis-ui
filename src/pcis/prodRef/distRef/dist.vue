@@ -173,12 +173,22 @@ watch(
     (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
+        // 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
+        if(route.params.param?.cProdNo === '043003') {
+          opertaor.getTableRefByKey('tgt')?.setValue('Tgt.nInsuredCars', pageresult.list.length)
+        }
         if(isQuery.value) return
         eventBus.emit('goodsMxChange', newVal);
         // 02开头的货物明细清单，关联标的信息
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
            method.getTgtDetailFn();
            emit('savePlyInfo');
+        }
+        // 010001, 010002, 010003产品地址编码根据清单内容下拉框展示
+        const targetProducts = ['010001', '010002', '010003'];
+         if( route.params.param?.cProdNo.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
+            const cvrgRef = opertaor.getTableRefs()['cvrg'];
+            cvrgRef?.getAddrSeqOptions();
         }
       }
     }
@@ -501,6 +511,10 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
+                const cvrgRef = opertaor.getTableRefs()['cvrg'];
+                try {
+                    cvrgRef?.refushCvrgInfo();
+                } catch (ignore) {}
               },
             },
             { width: "60" }
@@ -1256,6 +1270,18 @@ function getFatherPageOldProductResData() {
 function getFormConfig() {
   return tableconfig.value;
 }
+
+function setDisabledAll() {
+  tableconfig.value.formconfig?.endBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  tableconfig.value.formconfig?.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  tableconfig.value.tableBtn?.forEach((item: any) => {
+    item.hidden = true;
+  });
+}
 defineExpose({
   getValue,
   setValue,
@@ -1267,6 +1293,7 @@ defineExpose({
   getTableData,
   setTableData,
   getFormConfig,
+  setDisabledAll,
 });
 </script>
 

@@ -185,7 +185,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             ],
           });
           freeEditRef.value?.setFormValue({
-            baseType: null,
+            baseType: "询价",
             cAppNme: "",
             cDptCde: user.companyId,
             cLoadSub: 1,
@@ -194,7 +194,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cPlyNo: "",
             cInsuredNme: "",
             tAppTm: [
-              dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+              dayjs().subtract(7, "day").format("YYYY-MM-DD 00:00:00"),
               dayjs().format("YYYY-MM-DD 23:59:59"),
             ],
             tIssueTm: [],
@@ -272,6 +272,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
           freeEditRef.value?.setValue("taskStatus", null);
         },
+        rules: [getRules("required", {})],
       },
       {
         prop: "taskStatus",
@@ -381,6 +382,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "datetimerange",
+        rules: [getRules("required", {})],
       },
       {
         prop: "tIssueTm",
@@ -835,9 +837,10 @@ onMounted(() => {
     cLoadSub: 1,
     cDptCde: user.companyId,
     tAppTm: [
-      dayjs().subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+      dayjs().subtract(7, "day").format("YYYY-MM-DD 00:00:00"),
       dayjs().format("YYYY-MM-DD 23:59:59"),
     ],
+    baseType: "询价"
   }
   if (sessionStorage.getItem("navToOrderProcessing")) {
     param['taskStatus'] = JSON.parse(
@@ -845,7 +848,7 @@ onMounted(() => {
     )?.taskStatus
   }
   freeEditRef.value?.setFormValue(param);
-  handleQuery()
+  // handleQuery()
 });
 onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
@@ -857,6 +860,11 @@ onUnmounted(() => {
 function handleQuery(flag = true) {
   freeEditRef.value?.validate().then((isValid: boolean) => {
     if (isValid) {
+      const tAppTm = freeEditRef.value?.getValue("tAppTm")
+      if(dayjs(tAppTm[1]).diff(dayjs(tAppTm[0]),'day') > 7) {
+        ElMessage.error("申请日期查询范围不能超过7天！");
+        return
+      }
       refreshData(flag);
     } else {
       ElMessage.error("请填写必填项");

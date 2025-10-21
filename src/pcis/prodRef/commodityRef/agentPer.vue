@@ -73,12 +73,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "业务来源大类",
         loadData: [],
         rules: [getRules("required", {})],
-        func: (val) => {
+        func: (val:any) => {
           console.log(3232, val)
-          // setValue("CChaType", "");
-          // setValue("CChaSubtype", "");
+          setValue("CChaType", "");
+          setValue("CChaSubtype", "");
           getChaTypeList({ BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }).then(
-            (res) => {
+            (res:any) => {
               if (null != res && null != res["code"]) {
                 if (res["code"] === 200) {
                   const obj = {
@@ -97,23 +97,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "业务来源中类",
         loadData: [],
         rules: [getRules("required", {})],
-        func: (val) => {
+        func: (val:any) => {
           setValue("CChaSubtype", "");
           const params = {
             CChaType: val,
             flag: 1,
             scene: "PLY_APP_NEW_SCENE",
           };
-          getChaSubtypList(params).then((res) => {
+          getChaSubtypList(params).then((res:any) => {
             if (null != res && null != res["code"]) {
               if (res["code"] === 200) {
                 const obj = {
                   loadData: res.data,
                 };
                 setFormItem("CChaSubtype", obj);
-                nextTick(()=>{
-                  setValue("CChaSubtype", props.data.data.cChaSubtype);
-                })
               }
             }
           });
@@ -444,7 +441,7 @@ onMounted(() => {
       // CKindNo: data["cKindNo"] || prData['cDptCde'],
     };
     //查询大类数据，用于默认回显
-    getBsnsTypList(params).then((res) => {
+    getBsnsTypList(params).then((res:any) => {
       if (null != res && null != res["code"]) {
         if (res["code"] === 200) {
           const obj = {
@@ -453,76 +450,15 @@ onMounted(() => {
           console.log("大类数据", obj);
           setFormItem("CBsnsTyp", obj);
           setValue("CBsnsTyp", props.data.data.cBsnsTyp);
-          // setValue("cChaType", props.data.data.cChaType);
-          // setValue("cChaSubtype", props.data.data.cChaSubtype);
+          nextTick(() => {
+            setValue("CChaType", props.data.data.cChaType);
+            nextTick(() => {
+              setValue("CChaSubtype", props.data.data.cChaSubtype);
+            })
+          })
         }
       }
     });
-    //查询中类数据，用于默认回显  { BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }
-    getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp, scene: "PLY_APP_NEW_SCENE" }).then((res) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          const obj = {
-            loadData: res.data,
-          };
-          console.log("中类数据", obj);
-          setFormItem("CChaType", obj);
-          setValue("CChaType", props.data.data.cChaType);
-        }
-      }
-    });
-    //查询子类数据，用于默认回显
-    const paramSub = {
-      CChaType: props.data.data.cChaType,
-      flag: 1,
-
-      scene: "PLY_APP_NEW_SCENE",
-    };
-    getChaSubtypList(paramSub).then((res) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          const obj = {
-            loadData: res.data,
-          };
-          console.log("子类数据", res.data);
-          setFormItem("CChaSubtype", obj);
-          setValue("CChaSubtype", props.data.data.cChaSubtype);
-        }
-      }
-    });
-  // }
-
-
-    // 回显大类       
-  // if (props.data.data.cBsnsTyp) {
-  //   let timer1 = setInterval(() => {
-  //     setValue('Base.cBsnsTyp', props.data.data.cBsnsTyp)
-  //     let cChaType = getValue('Base.cBsnsTyp')
-  //     if (cChaType) {
-  //       clearInterval(timer1); //清除定时器
-  //     }
-  //   }, 1000)
-  // }
-
-  // // 回显中类
-  // if (props.data.data.cChaType) {
-  //   let timer2 = setInterval(() => {
-  //     setValue('Base.cChaType', props.data.data.cChaType)
-  //     let cChaType = getValue('Base.cChaType')
-  //     if (cChaType) {
-  //       clearInterval(timer2); //清除定时器
-  //     }
-  //   }, 1000)
-  // }
-  // // 回显子类
-  // if (props.data.data.cChaSubtype) {
-  //   let timer3 = setInterval(() => {
-  //     setValue('Base.cChaSubtype', props.data.data.cChaSubtype)
-  //     let cChaSubtype = getValue('Base.cChaSubtype')
-  //     if (cChaSubtype) {
-  //       clearInterval(timer3); //清除定时器
-  //     }
-  //   }, 1000)
   // }
 
   nextTick(() => {

@@ -792,6 +792,18 @@ const method = {
       setFormItem("Base.cCanclfeersnCde", { hidden: false });
       setFormItem("Base.cCanclfeeFlg", { hidden: false });
     }
+  },
+  // 保单号
+  cPlyNoChange:(val:any)=>{
+    if(val?.length === 23) {
+      opertaor.getTableRefs().base?.setFormItem("Base.cRatioTyp", {
+        loadData: [
+          { label: "按月", value: "1" },
+          { label: "按日", value: "2" },
+          { label: "不计", value: "3" },
+        ],
+      })
+    }
   }
 };
 

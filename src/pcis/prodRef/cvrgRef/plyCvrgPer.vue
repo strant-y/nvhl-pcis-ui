@@ -27,6 +27,7 @@
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
               :faters="faters"
+              :addr-seq-array="addrSeqArray"
               @delete="
                 (r) => {
                   if(formData['m'].length === 1 && parparam.cTransMrk !== '1'){
@@ -167,6 +168,7 @@ const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
 const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
 const pageName = computed(() => opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
+const addrSeqArray = ref([]);
 
 const props = defineProps({
   pageSchema: {
@@ -504,6 +506,32 @@ function refushCvrgInfo() {
   });
 }
 
+function getAddrSeqOptions() {
+  const selData: any = {
+    pageNum: 1,
+    pageSize: 9999,
+    cProdNo: parparam.cProdNo,
+    cClauseCode: parparam.cTermNo,
+    cComponentTable: "PropertyaddressDist",
+  };
+  if(pageName.value === "priceInquiry") {
+    selData['cInquiryNo'] = cInquiryNo.value;
+  }else {
+    selData['cAppNo'] = cAppNo.value;
+  }
+  selectDist(selData).then((addrRes: any) => {
+    if (addrRes.code === 200) {
+        const addrList = addrRes.data.data || [];
+        addrSeqArray.value  = addrList.map(item => ({
+            label: String(item['Dist.cCodeNo']),
+            value: String(item['Dist.cCodeNo']),
+            id: String(item['Dist.cPkId']),
+        }));
+        sessionStorage.setItem("getAddrSeqData", JSON.stringify(addrSeqArray.value));
+    }
+  });
+}
+
 function refushData(datas: any) {
   let pd: { [key: string]: any } = {};
   datas?.forEach((item: any) => {
@@ -702,11 +730,25 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
   emit('savePlyInfo');
 };
 
+function getPlanNo() {
+  let plans:any = [];
+  if (formData.value["m"] && formData.value["m"].length > 0) {
+    formData.value["m"].forEach((e) => {
+      let d = { label: e["Term.cPlanNo"], value: e["Term.cPlanNo"] };
+      plans.push(d);
+    });
+  }
+  return plans;
+}
+
 onActivated(() => {
   console.log('keep-alive -> onActivated')
 });
 onDeactivated(() => {
   console.log('keep-alive -> onDeactivated')
+});
+onUnmounted(() => {
+  sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');
 });
 
 defineExpose({
@@ -720,7 +762,9 @@ defineExpose({
   setUnDisabledByKeyList,
   calcCheck,
   setTermData,
-  refushCvrgInfo
+  refushCvrgInfo,
+  getAddrSeqOptions,
+  getPlanNo,
 });
 </script>
 

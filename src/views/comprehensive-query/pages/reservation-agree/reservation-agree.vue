@@ -24,6 +24,16 @@
 					</div>
 				</div>
 			</template>
+      <template #column-cAppNme="{ row, column, index }">
+        <el-tooltip :content="row.cAppNme" placement="top">
+          <span v-html="row.cAppNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
+      <template #column-insuredNme="{ row, column, index }">
+        <el-tooltip :content="row.insuredNme" placement="top">
+          <span v-html="row.insuredNme || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
 		</app-table>
   </div>
 </template>
@@ -582,5 +592,13 @@ const copyText = (text: any) => {
 
 :deep(.el-table td.el-table__cell div.cell) {
     white-space: pre-line;
+}
+
+.twoLine {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+  overflow: hidden;
 }
 </style>

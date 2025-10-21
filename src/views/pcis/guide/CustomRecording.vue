@@ -142,7 +142,7 @@
 						<el-col :span="24">
 							<el-form-item
                 id="cProdNme"
-								label="产品代码"
+								label="产品编码"
 								prop="cProdNme"
 								:rules="[getRules('required', {})]"
 							>
@@ -904,14 +904,14 @@ function getProtocolNumber (){
 }
 
 /**
- * 产品代码
+ * 产品编码
  */
-// 协议出单-产品代码查询弹窗页面引入
+// 协议出单-产品编码查询弹窗页面引入
 const productCodeInfo = defineAsyncComponent(
   () => import("@/views/pcis/my-page/components/product-code-info.vue")
 );
 
-// 协议出单-产品代码查询弹窗打开
+// 协议出单-产品编码查询弹窗打开
 function getBeToOrgan (){
 	if(!formconfig1.value.cEcAgrNo && !formconfig1.value.cEcAgrAppNo){
 		ElMessage.warning("请先选择协议号！");
@@ -945,7 +945,7 @@ function getTermNme (){
 		return false
 	}
 	if(!formconfig1.value.cProdNo && !formconfig1.value.cProdNme){
-		ElMessage.warning("请先选择产品代码！");
+		ElMessage.warning("请先选择产品编码！");
 		return false
 	}
 	dzmodal

@@ -1124,6 +1124,7 @@ const basicRightBtn = [
     // svgIcon: "template2",
     // iconSize: "20",
     icon: "Memo",
+    hidden: props.param.cRecordType == 9,
     func: () => {
       handleSaveTemplate()
     },
@@ -1135,6 +1136,7 @@ const basicRightBtn = [
     // svgIcon: "copy2",
     // iconSize: "25", // 设置图标大小为25px
     icon: "CopyDocument",
+    hidden: props.param.cRecordType == 9,
     func: () => {
       copyPolicyFun();
     },
@@ -1552,7 +1554,7 @@ async function loadAfter() {
       );
     } else {
       bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
+      rightBtnList.value = basicRightBtn.filter(item => !item.hidden)
     }
 		// 协议出单请求被保人信息和条款信息,见费出单跟协议号返回的走并且不可修改，展示剩余预收保费字段
 		if(props.param.cRecordType === 9){
@@ -1602,7 +1604,7 @@ async function loadAfter() {
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "A") {
       bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
+      rightBtnList.value = basicRightBtn.filter(item => !item.hidden);
 			if(props.param?.pageName === "priceInquiry") {
 				bthList.value.push(
 					createFreeButtonBase({
@@ -1625,12 +1627,12 @@ async function loadAfter() {
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     bthList.value = basicBtn;
-    rightBtnList.value = basicRightBtn;
+    rightBtnList.value = basicRightBtn.filter(item => !item.hidden);
   } else if (props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE") {
     // 批改单核保退回
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
-    bthList.value = edrBtn.filter(item => !item.hidden);;
+    bthList.value = edrBtn.filter(item => !item.hidden);
     nextTick(() => {
       opertaor.setDisabledAll();
       getEdrRsnItemFun(
@@ -2442,7 +2444,7 @@ async function loadAfter() {
       }
     })
     bthList.value = basicBtn;
-    rightBtnList.value = basicRightBtn;
+    rightBtnList.value = basicRightBtn.filter(item => !item.hidden);
   } 
   let imageStr = '影像管理';
   if(pageMethod.isReadOnlyScene(opertaor)){
@@ -2829,7 +2831,7 @@ function baseValite(){
     ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
     r = false;
   }
-  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018','020015'].includes(props.param.cProdNo)){
+  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018','020015','020019','020020','020021'].includes(props.param.cProdNo)){
     const term = opertaor.getTableRefByKey("cvrg").getFromValue();
     term.forEach((item:any) => {
       if(item["Term.cRdrTyp"] === '0'){
@@ -5174,7 +5176,7 @@ const showJointInsuranceInfo = async () => {
 
     return {
       name: formattedName,
-      ratio: `${ratio*100}%`,
+      ratio: `${Math.round(ratio*100)}%`,
       amount: `${amount.toLocaleString()}元`,
       premium: `${premium.toLocaleString()}元`
     };
@@ -5188,7 +5190,7 @@ const showJointInsuranceInfo = async () => {
       永安方总比例：<strong>${Math.round(totalShare * 100)}%</strong><br>
       永安方总保费：<strong>${totalPremium.toLocaleString()}元</strong><br>
       ${companyDetails.map(detail => 
-        `<span style="display: block;">${detail.name}->比例：${detail.ratio}->保额：${detail.amount}->保费：${detail.premium}</span>`
+        `<span style="display: block;">${detail.name}->比例：${Math.round(detail.ratio)}->保额：${detail.amount}->保费：${detail.premium}</span>`
       ).join('')}
     </div>
   `;
