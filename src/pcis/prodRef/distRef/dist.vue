@@ -1107,6 +1107,15 @@ watch(
     if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
+    // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
+    if(route.params.param?.cProdNo === '043011') {
+      const num = pageresult.list.length || 0;
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nAddressCount',
+      },num); 
+    }
   }
 )
 const getSummary = async () => {
