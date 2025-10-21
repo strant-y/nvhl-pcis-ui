@@ -1007,8 +1007,8 @@ const echartsOptions1Pie = reactive({
 });
 const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
-const tabDataMap = ref({});
-const currentTab = ref("");
+const tabDataMap:any = ref({});
+const currentTab = ref("核心出单");
 // 今日总录单
 const dayTotalRecords = computed(() => {
   const currentItem = tabDataMap.value[currentTab.value] || [];
@@ -1037,6 +1037,7 @@ function init() {
     ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value);
   }
   getOrderInfo();
+  handleRefreshEcharts();
 }
 
 function getOrderInfo() {
@@ -1056,7 +1057,6 @@ function getOrderInfo() {
         keys.splice(0, 0, keys.splice(keys.indexOf("核心出单"), 1)[0]);
         currentTab.value = keys[0];
         statisticTabList.value = keys;
-        handleRefreshEcharts();
       } else {
         ElMessage.error(res.msg);
       }
