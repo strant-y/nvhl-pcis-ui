@@ -1010,6 +1010,14 @@ watch(
     formconfig1.value.cInsuredNme = '';
   }
 );
+watch(
+  () => formconfig1.value.cProdNo,
+  () => {
+    // 产品编码变化，立即清空条款代码
+    formconfig1.value.cTermNo   = '';
+    formconfig1.value.cTermNme  = '';
+  }
+);
 </script>
 
 <style scoped>
