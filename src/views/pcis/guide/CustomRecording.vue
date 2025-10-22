@@ -1013,9 +1013,11 @@ watch(
 watch(
   () => formconfig1.value.cProdNo,
   () => {
-    // 产品编码变化，立即清空条款代码
-    formconfig1.value.cTermNo   = '';
-    formconfig1.value.cTermNme  = '';
+    if(formconfig1.value.cRecordType == '9') {
+      // 协议出单 产品编码变化，立即清空条款代码
+      formconfig1.value.cTermNo   = '';
+      formconfig1.value.cTermNme  = '';
+    }
   }
 );
 </script>
