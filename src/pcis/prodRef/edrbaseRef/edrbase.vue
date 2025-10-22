@@ -167,7 +167,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // suffix: "元"
       },
       {
-        prop: "EdrBase.tEdrAppTm",
+        prop: "EdrBase.tNextEdrUdrTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
@@ -175,7 +175,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled:true
       },
       {
-        prop: "EdrBase.tEdrBgnTm",
+        prop: "EdrBase.tNextEdrBgnTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
@@ -197,6 +197,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             return false;
           }
         },
+        rules: [getRules("required", {})],
+        disabled: params["cEdrType"]=='2'
       },
       {
         prop: "EdrBase.nDelayNum",
@@ -490,6 +492,14 @@ onMounted(() => {
               setFormItem("EdrBase.cEdrRsnDetail", { loadData: res });
           });
       }
+    }
+    // 批改申请日期
+    if(!getValue("EdrBase.tNextEdrUdrTm")) {
+      setValue("EdrBase.tNextEdrUdrTm", dayjs().format("YYYY-MM-DD HH:mm:ss"))
+    }
+    // 批单生效起期
+    if(!getValue("EdrBase.tNextEdrBgnTm")) {
+      setValue("EdrBase.tNextEdrBgnTm", dayjs().add(1,"day").format("YYYY-MM-DD 00:00:00"))
     }
   });
 });
