@@ -1699,8 +1699,47 @@ const method = {
       setValue('Tgt.cRailwayMode', '02')
     }
 
-  }
-
+  },
+  // 特种设备种类
+  cEquipmentTypesFunc: () => {
+    dialog.value?.open(
+      "specialCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("Tgt.cEquipmentCategory", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Tgt.cEquipmentCategory", `${data.cde}${data.cnm}`);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      {  width: 85 }
+    );
+  },
+  // 行业性质(弹框与国民经济行业分类一样)
+  funcNdustryCate: () => {
+    dialog.value?.open(
+      "ndustryCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("Tgt.cIndustryNature", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Tgt.cIndustryNature", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      { title: "行业性质", width: "70" }
+    );
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

@@ -150,6 +150,16 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 return; // 阻止后续保存逻辑
                 }
             }
+            // 047003、043003清单新增 车架号和车牌号码二选一
+            const productsNoMap = ['047003','043003'];
+            const cVinCode = getValue('Dist.cVinCode');
+            const cPlateNumber = getValue('Dist.cPlateNumber')
+            if (productsNoMap.includes(productNo)) {
+              if (!cVinCode && !cPlateNumber) {
+                ElMessage.error('车牌号码和车架号需至少填写一项');
+                return; // 阻止后续保存逻辑
+              }
+            }
             const isValid = await freeEditRef.value?.validate();
             if(isValid){
             const s = freeEditRef.value?.getFromValue();
@@ -296,9 +306,9 @@ onMounted(() => {
 
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
-    if(item.prop =='Dist.cVinCode'){
-     item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
-    }
+    // if(item.prop =='Dist.cVinCode'){
+    //  item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
+    // }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
       if(cGrpMrk.value === '1') {
