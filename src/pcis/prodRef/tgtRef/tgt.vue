@@ -109,16 +109,18 @@ onMounted(async () => {
   }
 
   // 040005 办学许可证号
-  if (params.cProdNo === '040005') {
-    setFormItem("Tgt.cLicenseNumber", { rules: [] });
-  } else if (params.cProdNo === '020013') {
+  const requiredRulesNo = ['020018','020013'];// 必填加号码校验的产品
+  const rulesNo = ['020002','020006','020009','020014'];// 号码校验的产品
+  if (requiredRulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
     });
-  } else {
+  } else if(rulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("vehiclePlate", {})],
     });
+  } else {
+    setFormItem("Tgt.cLicenseNumber", { rules: [] });
   }
 
   //040008  040011  呼号必填
@@ -1699,8 +1701,47 @@ const method = {
       setValue('Tgt.cRailwayMode', '02')
     }
 
-  }
-
+  },
+  // 特种设备种类
+  cEquipmentTypesFunc: () => {
+    dialog.value?.open(
+      "specialCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("Tgt.cEquipmentCategory", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Tgt.cEquipmentCategory", `${data.cde}${data.cnm}`);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      {  width: 85 }
+    );
+  },
+  // 行业性质(弹框与国民经济行业分类一样)
+  funcNdustryCate: () => {
+    dialog.value?.open(
+      "ndustryCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("Tgt.cIndustryNature", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Tgt.cIndustryNature", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      { title: "行业性质", width: "70" }
+    );
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

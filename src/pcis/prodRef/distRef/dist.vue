@@ -1121,6 +1121,31 @@ watch(
     if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
+    // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
+    if(route.params.param?.cProdNo === '043011') {
+      const num = pageresult.list.length || 0;
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nAddressCount',
+      },num);
+    }
+    // 043022 特种设备第三者责任保险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总
+    if(route.params.param?.cProdNo === '043022') {
+      const num = pageresult.list.length || 0;
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nEquipmentCount',
+      },num);
+    }
+    // 047003 非机动车第三者责任保险 标的信息中：“投保总座位数（座）”要素，由清单中“投保座位数”汇总；“投保总车辆数（个）”要素，由清单中总车辆汇总；
+    if(route.params.param?.cProdNo === '047003') {
+      const carNum = pageresult.list.length || 0;
+      const seatNum = pageresult.list.map(item => Number(item['Dist.nInsuredSeats']) || 0).reduce((total, value) => total + value, 0)
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalSeats',seatNum)
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalCars',carNum)
+    }
   }
 )
 const getSummary = async () => {
