@@ -109,16 +109,18 @@ onMounted(async () => {
   }
 
   // 040005 办学许可证号
-  if (params.cProdNo === '040005') {
-    setFormItem("Tgt.cLicenseNumber", { rules: [] });
-  } else if (params.cProdNo === '020013') {
+  const requiredRulesNo = ['020018','020013'];// 必填加号码校验的产品
+  const rulesNo = ['020002','020006','020009','020014'];// 号码校验的产品
+  if (requiredRulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
     });
-  } else {
+  } else if(rulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("vehiclePlate", {})],
     });
+  } else {
+    setFormItem("Tgt.cLicenseNumber", { rules: [] });
   }
 
   //040008  040011  呼号必填
