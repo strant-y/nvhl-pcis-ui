@@ -1160,6 +1160,8 @@ function updateUdrDetail(row: any) {
           cPolicySource: row.cPolicySource,
           cRelateBusi: row.cRelateBusi,
           cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+          nRecRemPrm: row.nRecRemPrm,
+          nRecRemEstAmt: row.nRecRemEstAmt,
         });
         router.push({
           path: "/pcisapp/myPage",
@@ -1192,6 +1194,8 @@ function updateUdrDetail(row: any) {
           cPolicySource: row.cPolicySource,
           cRelateBusi: row.cRelateBusi,
           cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+          nRecRemPrm: row.nRecRemPrm,
+          nRecRemEstAmt: row.nRecRemEstAmt,
         });
         router.push({
           path: "/pcisapp/myPage",
@@ -1415,6 +1419,8 @@ function showDetails(row: any) {
               cTermNo: row.cTermNo,
               cProdNmeCn: row.cProdNmeCn,
               cPolicySource: row.cPolicySource,
+              nRecRemPrm: row.nRecRemPrm,
+              nRecRemEstAmt: row.nRecRemEstAmt,
             });
             router.push({
               path: "/pcisapp/myPage",
@@ -1439,6 +1445,8 @@ function showDetails(row: any) {
               cTermNo: row.cTermNo,
               cProdNmeCn: row.cProdNmeCn,
               cPolicySource: row.cPolicySource,
+              nRecRemPrm: row.nRecRemPrm,
+              nRecRemEstAmt: row.nRecRemEstAmt,
             });
             router.push({
               path: "/pcisapp/myPage",
