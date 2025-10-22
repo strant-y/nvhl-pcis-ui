@@ -447,7 +447,7 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-    } else if (val == "110007") {
+    } else if (val == "01") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -940,7 +940,7 @@ const method = {
             list: res
           })
           if (val === '0') {
-            setValue('Applicant.cCertfCls', '110007');  // 法人默认机构代码
+            setValue('Applicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
     }
@@ -1081,7 +1081,7 @@ const method = {
       );
       setFormItem("Applicant.tCertfEndDate", { disabled: true });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   01  111
       // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {  rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [getRules("required", {})],});
@@ -1097,7 +1097,7 @@ const method = {
       }
       setFormItem("Applicant.tCertfEndDate", { disabled: false });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   01  111
       // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
@@ -1332,7 +1332,7 @@ const method = {
     type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
     const ruleMap: Record<string, RuleType> = {
       "110001": "orgCode",
-      "110007": "socialCode",
+      "01": "socialCode",
       "111": "idCard",
       "07": "passPort",
       "553": "ariCard",
@@ -1572,7 +1572,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Applicant.cCertfCls", "110007"); // 证件类型
+            setValue("Applicant.cCertfCls", "01"); // 证件类型
             setValue("Applicant.cClntMrk", "0"); // 投保人性质
           }
           checkUser();

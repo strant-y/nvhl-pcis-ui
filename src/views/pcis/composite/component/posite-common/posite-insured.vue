@@ -221,7 +221,7 @@ function setFormItem(key: string, obj: Record<string, any>): void {
 const idAnalysis = (id:string)=>{
     const tabref = opertaor.getTableRefs();
     const insuredValue = tabref["insured"].getFromValue();
-      if ( !validateIdCard(id) || (insuredValue["Insured.cCertfCls"] !=='111' && insuredValue["Insured.cCertfCls"] !=='19')) {
+      if ( !validateIdCard(id) || (insuredValue["Insured.cCertfCls"] !=='111' && insuredValue["Insured.cCertfCls"] !=='553')) {
         return false
       }
  
@@ -557,7 +557,7 @@ const method = {
               code: "Insured.cCertfCls",
               list: res
             })
-          setValue('Insured.cCertfCls','110007')
+          setValue('Insured.cCertfCls','01')
           // setFormItem("Insured.cCertfCls", {
           //   loadData: [],
           // });
@@ -1020,7 +1020,7 @@ const method = {
         rules: [getRules("required", {}),getRules("passPort", {})],
       });
     
-    } else if (val == "110007") {
+    } else if (val == "01") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -1059,7 +1059,7 @@ const method = {
         rules: [getRules("required", {}),getRules("passPort", {})],
       });
 
-    } else if(val == "19"){
+    } else if(val == "553"){
       // 外国人证件号
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}),getRules("ariCard", {})],
@@ -1096,7 +1096,7 @@ const method = {
             }
           })
       }
-    }else if(cCertfCls =='110007'){
+    }else if(cCertfCls =='01'){
       // setValue('Insured.cTaxRegistrationNo',val)
       // setValue('Insured.cOrganizationCode',val)
     }
@@ -1257,10 +1257,10 @@ const method = {
    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
     const ruleMap: Record<string, RuleType> = {
       "110001": "orgCode",
-      "110007": "socialCode",
+      "01": "socialCode",
       "111": "idCard",
       "07": "passPort",
-      "19": "ariCard",
+      "553": "ariCard",
     };
      baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
     if (cClntMrk == '0') {
@@ -1459,7 +1459,7 @@ function handleFileChange(event: Event) {
                 cardInfo["period_of_validity"]["value"].split("-")[1]?.replaceAll(".", "-") || null
               );
             }
-            setValue("Insured.cCertfCls", "19");
+            setValue("Insured.cCertfCls", "553");
             setValue("Insured.cClntMrk", "1");
             const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
             const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
@@ -1496,7 +1496,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Insured.cCertfCls", "110007");
+            setValue("Insured.cCertfCls", "01");
             setValue("Insured.cClntMrk", "0");
 					}
           checkUser();
