@@ -640,7 +640,7 @@ const cIsIndvduBizChange = (val:any)=>{
       });
       clearValidate('ECargoInsuredDist.cSex')
 
-      setFormItem("ECargoInsuredDist.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("ECargoInsuredDist.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("ECargoInsuredDist.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });

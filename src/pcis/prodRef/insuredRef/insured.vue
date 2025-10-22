@@ -139,7 +139,7 @@ onMounted(() => {
   // 传真校验
   setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
   // 法人身份证
-  setFormItem("Insured.cLegalCertfCde", { rules: [getRules("idCard", {})] });
+  // setFormItem("Insured.cLegalCertfCde", { rules: [getRules("idCard", {})] });
   setFormItem("Insured.cGcidCode", {
     rules: [getRules("leiCode", {})],
   });
@@ -147,7 +147,7 @@ onMounted(() => {
   setFormItem("Insured.cRelateNo", { rules: [getRules("txnApprovalNo", {})] });
 
   // 营业执照号码
-  setFormItem("Insured.cBuslicenceNo", { rules: [getRules("businessLicense", {})] });
+  // setFormItem("Insured.cBuslicenceNo", { rules: [getRules("businessLicense", {})] });
 
   // 组织机构代码
   // setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
@@ -547,7 +547,7 @@ const method = {
       clearValidate('Insured.cSex')
 
       // setValue("Insured.cCertfCls", "");
-      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
@@ -1191,13 +1191,13 @@ const method = {
 
 
       // 税务登记证号
-      setFormItem("Insured.cTaxRegistrationNo", {
-        disabled: true,
-      });
+      // setFormItem("Insured.cTaxRegistrationNo", {
+      //   disabled: true,
+      // });
       // 组织机构代码
-      setFormItem("Insured.cOrganizationCode", {
-        disabled: true,
-      });
+      // setFormItem("Insured.cOrganizationCode", {
+      //   disabled: true,
+      // });
 
     } else if (val === '07') {
       // 护照
@@ -1251,8 +1251,8 @@ const method = {
           })
         }
       } else if (cCertfCls == '110007') {
-        setValue('Insured.cTaxRegistrationNo', val)
-        setValue('Insured.cOrganizationCode', val)
+        // setValue('Insured.cTaxRegistrationNo', val)
+        // setValue('Insured.cOrganizationCode', val)
       }
 
     }, 10)

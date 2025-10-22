@@ -420,7 +420,7 @@ const method = {
       // ECargoApplicant.cWorkDpt
       productStore.setcClntMrk(val);
       // 办理人
-      setFormItem("ECargoApplicant.cCntrNme", { hidden:false,rules: [getRules("required", {})] });
+      // setFormItem("ECargoApplicant.cCntrNme", { hidden:false,rules: [getRules("required", {})] });
       setFormItem("ECargoApplicant.tOperaterCertfEndTm", {
         hidden:false,
         rules: [getRules("required", {})],

@@ -517,7 +517,7 @@ const method = {
  
       productStore.setcClntMrk(val);
       // 办理人
-      setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Applicant.tOperaterCertfEndTm", {
         rules: [getRules("required", {})],
       });

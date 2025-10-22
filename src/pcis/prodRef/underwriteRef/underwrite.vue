@@ -648,7 +648,7 @@ function loadUwTabData() {
 }
 
 async function queryRiskCodelistFn() {
-  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cProdNo: params.cProdNo })
+  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
   if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "200") {
     contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
   }
