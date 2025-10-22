@@ -676,7 +676,7 @@ const method = {
             code: "Insured.cCertfCls",
             list: res
           })
-          setValue('Insured.cCertfCls', '110007')
+          setValue('Insured.cCertfCls', '01')
           // setFormItem("Insured.cCertfCls", {
           //   loadData: [],
           // });
@@ -1177,7 +1177,7 @@ const method = {
         rules: [getRules("required", {}), getRules("passPort", {})],
       });
 
-    } else if (val == "110007") {
+    } else if (val == "01") {
       setFormItem("Insured.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -1250,7 +1250,7 @@ const method = {
             }
           })
         }
-      } else if (cCertfCls == '110007') {
+      } else if (cCertfCls == '01') {
         // setValue('Insured.cTaxRegistrationNo', val)
         // setValue('Insured.cOrganizationCode', val)
       }
@@ -1427,7 +1427,7 @@ const method = {
     type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
     const ruleMap: Record<string, RuleType> = {
       "110001": "orgCode",
-      "110007": "socialCode",
+      "01": "socialCode",
       "111": "idCard",
       "07": "passPort",
       "553": "ariCard",
@@ -1672,7 +1672,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Insured.cCertfCls", "110007");
+            setValue("Insured.cCertfCls", "01");
             setValue("Insured.cClntMrk", "0");
           }
           checkUser();

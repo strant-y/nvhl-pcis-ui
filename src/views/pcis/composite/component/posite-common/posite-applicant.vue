@@ -226,7 +226,7 @@ const idAnalysis = (id:string)=>{
       const tabref = opertaor.getTableRefs();
       const applicantValue = tabref["applicant"].getFromValue();
 
-      if (  !validateIdCard(id)  || (applicantValue["Applicant.cCertfCls"] !=='111' && applicantValue["Applicant.cCertfCls"] !=='19')) {
+      if (  !validateIdCard(id)  || (applicantValue["Applicant.cCertfCls"] !=='111' && applicantValue["Applicant.cCertfCls"] !=='553')) {
         return false
       }
           const birthYear = parseInt(id.substring(6, 10), 10);
@@ -466,7 +466,7 @@ const method = {
         //   rules: [getRules("required", {})],
         // });
         
-    } else if ( val == "110007") {   
+    } else if ( val == "01") {   
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -483,7 +483,7 @@ const method = {
       setFormItem("Applicant.tEstablishingDate", {
         rules: [getRules("required", {})],
       });
-    } else if(val == "19"){
+    } else if(val == "553"){
       // 外国人证件号
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}),getRules("ariCard", {})],
@@ -643,7 +643,7 @@ const method = {
               code: "Applicant.cCertfCls",
               list: res
             })
-          setValue('Applicant.cCertfCls','110007')
+          setValue('Applicant.cCertfCls','01')
         });
     } else {
       setFormItem("Applicant.tBirthday", {
@@ -911,7 +911,7 @@ const method = {
       );
         setFormItem("Applicant.tCertfEndDate", { disabled: true });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   01  111
       // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {  rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [getRules("required", {})],});
@@ -927,7 +927,7 @@ const method = {
       }
         setFormItem("Applicant.tCertfEndDate", { disabled: false });
       
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   01  111
       // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
@@ -1146,10 +1146,10 @@ const method = {
     type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
       const ruleMap: Record<string, RuleType> = {
         "110001": "orgCode",
-        "110007": "socialCode",
+        "01": "socialCode",
         "111": "idCard",
         "07": "passPort",
-        "19": "ariCard",
+        "553": "ariCard",
       };
       baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
       if (cClntMrk == '0') {
@@ -1337,7 +1337,7 @@ function handleFileChange(event: Event) {
                 cardInfo["period_of_validity"]["value"].split("-")[1]?.replaceAll(".", "-") || null
               );
             }
-            setValue("Applicant.cCertfCls", "19");
+            setValue("Applicant.cCertfCls", "553");
             setValue("Applicant.cClntMrk", "1");
             const getCacheCodeLis = codeListStore.getCacheCodeListByCode('AREA_COUNTRY_CACHE{"cType":"0"}');
             const countryNm = cardInfo["nationality"].value?.split("/")[0] || null;
@@ -1372,7 +1372,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Applicant.cCertfCls", "110007"); // 证件类型
+            setValue("Applicant.cCertfCls", "01"); // 证件类型
             setValue("Applicant.cClntMrk", "0"); // 投保人性质
 					}
            checkUser();

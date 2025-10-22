@@ -441,7 +441,7 @@ const checkUser = () => {
 // 解析身份证
 const idAnalysis = (id:string)=>{
   const applicantValue = freeEditRef.value?.getFromValue() //tabref["AgreementApplicant"].getFormValue();
-  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
+  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='553')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
@@ -511,7 +511,7 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.cNation", {
        disabled: false,
      });
-   } else if ( val == "110007") {
+   } else if ( val == "01") {
      setFormItem("ECargoInsuredDist.tCertfBgnDate", {
        rules: [getRules("required", {})],
      });
@@ -541,7 +541,7 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.cNation", {
        disabled: false,
      });
-   } else if(val == "19"){
+   } else if(val == "553"){
      // 外国人证件号
      setFormItem("ECargoInsuredDist.cCertfCde", {
        rules: [getRules("required", {}),getRules("ariCard", {})],
@@ -717,7 +717,7 @@ const cIsIndvduBizChange = (val:any)=>{
             code: "ECargoInsuredDist.cCertfCls",
             list: res
           })
-          setValue('ECargoInsuredDist.cCertfCls', '110007')
+          setValue('ECargoInsuredDist.cCertfCls', '01')
         });
     }else{
 
