@@ -547,7 +547,7 @@ const method = {
       clearValidate('Insured.cSex')
 
       // setValue("Insured.cCertfCls", "");
-      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });

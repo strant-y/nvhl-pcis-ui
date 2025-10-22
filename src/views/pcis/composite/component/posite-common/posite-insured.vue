@@ -456,7 +456,7 @@ const method = {
         rules: null
       });
       // setValue("Insured.cCertfCls", "");
-      setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
