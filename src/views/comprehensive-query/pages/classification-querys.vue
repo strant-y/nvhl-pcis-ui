@@ -273,7 +273,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               label: "查询",
               func: async () => {
                   const freeEditRefs = freeEditRef.value;
-                  freeEditRefs.validate().then((isValid) => {
+                  freeEditRefs?.validate().then((isValid:boolean) => {
                       if (isValid) {
                           handleQuery(false);
                       }
@@ -297,7 +297,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     tAppTm: [
-                        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                        dayjs(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     cDataTyp:"app",
@@ -1173,15 +1173,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "批改", value: "E" },
                   { label: "询价", value: "I" },
               ],
-              func: (val) => {
+              func: (val:any) => {
                   if (val === "A") {
                       // 投保
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
-                              // 设置默认值为最近3个月
+                              // 设置默认值为最近7天
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                              const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                              const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
@@ -1202,9 +1202,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
-                            // 设置默认值为最近3个月
+                            // 设置默认值为最近7天
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
@@ -1220,9 +1220,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tInquiryTm") {
                               item.hidden = false; // 显示询价日期，询价单号
-                            // 设置默认值为最近3个月
+                            // 设置默认值为最近7天
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
@@ -1284,6 +1284,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
+              rules: [getRules("required", {})],
           },
           {
               prop: "tEdrAppTm",
@@ -1293,6 +1294,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
+              rules: [getRules("required", {})],
           },
           {
               prop: "tInquiryTm",
@@ -1303,6 +1305,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
               hidden: true,
+              rules: [getRules("required", {})],
           },
           {
               prop: "tIssueTm",
@@ -1730,7 +1733,7 @@ const extendColumns = [
         { label: "联保单", value: "6" },
     ] 
   },
-  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', lengthNum: 17, lengthIsNumber: true, optional: true, sortable: true},
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', lengthNum: 17, lengthIsNumber: true, optional: true, sortable: true, rules: [getRules("required", {})]},
   { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', lengthNum: 17, lengthIsNumber: true, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', lengthNum: 12, optional: true, align: 'left', },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', lengthNum: 12, optional: true, align: 'left', },
@@ -1966,7 +1969,7 @@ onMounted(async () => {
          item.prop === "tEdrAppTm"
         ) {
             item.hidden = true; // 隐藏批改申请日期，询价投保日期，默认投保日期
-            item.rules = []; // 清除必填规则
+            // item.rules = []; // 清除必填规则
         }
     });
     freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
@@ -1987,7 +1990,7 @@ onMounted(async () => {
     ]);
     // 申请日期默认展示投保日期
     freeEditRef.value.setValue("tAppTm", [
-        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+        dayjs(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
 
@@ -2117,8 +2120,8 @@ async function queryAE( flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2146,8 +2149,8 @@ async function queryAE( flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2294,8 +2297,8 @@ async function queryI(flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2531,8 +2534,8 @@ async function exportI(flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }

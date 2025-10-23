@@ -398,6 +398,7 @@ function getPrnTypeOptions() {
       CProdNo: props.data?.cProdNo,
       CPrnType: "W",
       CAppNo: props.data?.cAppNo,
+      CTypeCode: props.data?.taskTyp
     })
     .then((res: any) => {
       if (res.code === 200) {

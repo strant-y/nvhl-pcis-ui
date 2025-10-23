@@ -282,7 +282,7 @@
         @extend .rt-custom-picker;
       }
 
-      .el-text {
+      .el-text, span {
         margin-top: 3px;
         font-size: var(--rt-form-content-font-size);
         color: var(--el-text-color);

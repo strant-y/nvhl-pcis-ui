@@ -412,6 +412,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         valueFormat: "YYYY-MM-DD HH:mm:ss",
         clearable: true,
         type: "datetimerange",
+        rules: [getRules("required", {})],
       },
       {
         prop: "tm2",
@@ -984,9 +985,9 @@ function refreshData(flag?: boolean) {
     date1 &&
     date1.length == 2 &&
     new Date(date1[1]).getTime() - new Date(date1[0]).getTime() >=
-      31 * 1000 * 60 * 60 * 24
+      7 * 1000 * 60 * 60 * 24
   ) {
-    ElMessage.warning("申请日期范围请控制在30天以内");
+    ElMessage.warning("申请日期范围请控制在7天以内");
     return;
   }
   if (
@@ -1159,6 +1160,8 @@ function updateUdrDetail(row: any) {
           cPolicySource: row.cPolicySource,
           cRelateBusi: row.cRelateBusi,
           cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+          nRecRemPrm: row.nRecRemPrm,
+          nRecRemEstAmt: row.nRecRemEstAmt,
         });
         router.push({
           path: "/pcisapp/myPage",
@@ -1191,6 +1194,8 @@ function updateUdrDetail(row: any) {
           cPolicySource: row.cPolicySource,
           cRelateBusi: row.cRelateBusi,
           cEdrRsnBundleCde: row.cEdrRsnBundleCde,
+          nRecRemPrm: row.nRecRemPrm,
+          nRecRemEstAmt: row.nRecRemEstAmt,
         });
         router.push({
           path: "/pcisapp/myPage",
@@ -1414,6 +1419,8 @@ function showDetails(row: any) {
               cTermNo: row.cTermNo,
               cProdNmeCn: row.cProdNmeCn,
               cPolicySource: row.cPolicySource,
+              nRecRemPrm: row.nRecRemPrm,
+              nRecRemEstAmt: row.nRecRemEstAmt,
             });
             router.push({
               path: "/pcisapp/myPage",
@@ -1438,6 +1445,8 @@ function showDetails(row: any) {
               cTermNo: row.cTermNo,
               cProdNmeCn: row.cProdNmeCn,
               cPolicySource: row.cPolicySource,
+              nRecRemPrm: row.nRecRemPrm,
+              nRecRemEstAmt: row.nRecRemEstAmt,
             });
             router.push({
               path: "/pcisapp/myPage",

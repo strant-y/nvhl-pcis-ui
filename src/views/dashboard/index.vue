@@ -1007,8 +1007,8 @@ const echartsOptions1Pie = reactive({
 });
 const tabs = ref<Array<any>>([]); //tabs数组
 const statisticTabList = ref<Array<any>>([]);
-const tabDataMap = ref({});
-const currentTab = ref("");
+const tabDataMap:any = ref({});
+const currentTab = ref("核心出单");
 // 今日总录单
 const dayTotalRecords = computed(() => {
   const currentItem = tabDataMap.value[currentTab.value] || [];
@@ -1037,12 +1037,13 @@ function init() {
     ecahrtsRefInstance1 = echarts.init(ecahrtsRef1.value);
   }
   getOrderInfo();
+  handleRefreshEcharts();
 }
 
 function getOrderInfo() {
   (async () => {
     try {
-      const res: any = await getAnalysis({type: "ply_total"});
+      const res: any = await getAnalysis({ type: "ply_total" });
       if (res.code === 200) {
         tabDataMap.value = res.dataMap;
         const keys = Object.keys(res.dataMap).filter(
@@ -1056,7 +1057,6 @@ function getOrderInfo() {
         keys.splice(0, 0, keys.splice(keys.indexOf("核心出单"), 1)[0]);
         currentTab.value = keys[0];
         statisticTabList.value = keys;
-        handleRefreshEcharts();
       } else {
         ElMessage.error(res.msg);
       }
@@ -1068,8 +1068,11 @@ function getOrderInfo() {
 
 function handleStatisticTabClick(tab: any) {
   currentTab.value = tab.props.label;
-  handleRefreshEcharts();
+  (async () => {
+    await handleRefreshEcharts();
+  })();
 }
+
 const echartsOptionsData = ref([]);
 const echartsOptionsData1 = ref([]);
 async function handleRefreshEcharts() {
@@ -1101,9 +1104,9 @@ async function handleRefreshEcharts() {
         echartsOptionsPie.legend.data = data.map((item: any) => item.item);
         ecahrtsRefInstance?.clear();
         ecahrtsRefInstance?.setOption(
-            ecahrtsOptionsType.value === "0"
-                ? echartsOptions
-                : echartsOptionsPie
+          ecahrtsOptionsType.value === "0"
+            ? echartsOptions
+            : echartsOptionsPie
         );
       } else {
         ElMessage.error(res.msg);
@@ -1156,9 +1159,9 @@ async function handleRefreshEcharts() {
         echartsOptions1Pie.legend.data = data.map((item: any) => item.item);
         ecahrtsRefInstance1?.clear();
         ecahrtsRefInstance1?.setOption(
-            ecahrtsOptions1Type.value === "0"
-                ? echartsOptions1
-                : echartsOptions1Pie
+          ecahrtsOptions1Type.value === "0"
+            ? echartsOptions1
+            : echartsOptions1Pie
         );
       } else {
         ElMessage.error(res.msg);

@@ -336,13 +336,13 @@ const handleCertificateChange = (value: string) => {
   freeEditRef.value.clearValidate('customerName')
   if (value == '111') { // 身份证号
     CCertfCdeRules.value = [getRules("idCard", {})]
-  } else if (value == '110007') { // 统一社会信用代码
+  } else if (value == '01') { // 统一社会信用代码
     CCertfCdeRules.value = [getRules("socialCode", {})]
   } else if (value == '110001') { // 组织机构
     CCertfCdeRules.value = [getRules("orgCode", {})]
   } else if(value == '07') { // 护照
     CCertfCdeRules.value = [getRules("passPort", {})]
-  } else if(value == '19') { //外国人永久居留身份证
+  } else if(value == '553') { //外国人永久居留身份证
     CCertfCdeRules.value = [getRules("ariCard", {})]
   } else if ('110002' === value) {  // 营业执照
     CCertfCdeRules.value = [getRules("businessLicense", {})]
@@ -359,13 +359,13 @@ const handleCertificateChange2 = (value: string) => {
   freeEditRef.value?.clearValidate('shareholderName')
   if (value == '111') { // 身份证号
     CCertfCdeRules2.value = [getRules("idCard", {})]
-  } else if (value == '110007') { // 统一社会信用代码
+  } else if (value == '01') { // 统一社会信用代码
     CCertfCdeRules2.value = [getRules("socialCode", {})]
   } else if (value == '110001') { // 组织机构
     CCertfCdeRules2.value = [getRules("orgCode", {})]
   } else if(value == '07') { // 护照
     CCertfCdeRules2.value = [getRules("passPort", {})]
-  } else if(value == '19') { //外国人永久居留身份证
+  } else if(value == '553') { //外国人永久居留身份证
     CCertfCdeRules2.value = [getRules("ariCard", {})]
   } else if ('110002' === value) {  // 营业执照
     CCertfCdeRules2.value = [getRules("businessLicense", {})]

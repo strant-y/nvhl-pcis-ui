@@ -630,8 +630,8 @@ const cDocumentTypeChange = (val: any) => {
 
   const baseRuleMap: Record<string, any[]> = {
     "111": [getRules("idCard", {})], // 身份证
-    "110007": [getRules("socialCode", {})], // 统一社会信用代码
-    "19": [getRules("ariCard", {})], // 外国人证件号
+    "01": [getRules("socialCode", {})], // 统一社会信用代码
+    "553": [getRules("ariCard", {})], // 外国人证件号
     "110001": [getRules("orgCode", {})], // 组织机构编码
     default: [] // 默认无规则
   };
