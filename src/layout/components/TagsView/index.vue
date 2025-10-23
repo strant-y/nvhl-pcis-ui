@@ -157,7 +157,7 @@ function filterAffixTags(routes: RouteRecordRaw[], basePath = "/") {
       }
     }
   });
-  if(user.roles && user.roles[0]?.cOpgrpCde === "ROLE_00000173") {// 外部系统查看保单详情
+  if(user.roles?.length > 0 && user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {// 外部系统查看保单详情
     tags = tags.filter(item => item.path !== "/dashboard")
   }
   return tags;

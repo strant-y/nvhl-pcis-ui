@@ -76,7 +76,7 @@ const shorMenuList = ref([])
 
 onMounted(() => {
   const roles = JSON.parse(sessionStorage.getItem("user") || "{}").roles;
-  if(roles && roles[0]?.cOpgrpCde === "ROLE_00000173") {// 外部系统查看保单详情
+  if(roles?.length > 0 && roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {// 外部系统查看保单详情
     return;
   }
   dropdowmList.value = permissionStore.routes.filter((item:any) => {
