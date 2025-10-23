@@ -840,7 +840,8 @@ const tableconfig = reactive<AppTableConfig>(
                         }
 
                          cPaySequences = multipleSelection.value[0]['cPaySequence'];
-        				window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
+        				// window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
+                        window.open('https://pay.yaic.com.cn/02/'+cPaySequences)
 					},
 				}),
 			// createFreeButtonBase({
