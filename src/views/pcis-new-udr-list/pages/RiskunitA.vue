@@ -114,6 +114,7 @@ const cInwdMrk = ref(""); // 临分标识
 const addressOptions = ref([]); // 标的地址下拉选项
 let nAmtVarInit = ref(null); // 我司保额变化初始值
 let nPrmVarInit = ref(null); // 我司保费变化初始值
+const tryCountDisabled = ref(false);
 
 const props = defineProps({
   param: {
@@ -655,6 +656,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         func: () => {
           if (!selectRow1.value.cPkId)
             return ElMessage.warning("请选择一条风险单位");
+          if(tryCountDisabled.value) return;
           tryCountInFoRIs(selectRow1.value);
         },
       }),
@@ -1370,6 +1372,7 @@ async function tryCountInFoRIs(row: any) {
     ElMessage.error("备注不能为空")
     return
   }
+  tryCountDisabled.value = true;
   pageresult2.list = [];
   const res = opertaor.getDataAll();
   const param = {
@@ -1414,6 +1417,7 @@ async function tryCountInFoRIs(row: any) {
   } else {
     ElMessage.error({ message: tryCountInfo.message, duration: 3000 });
   }
+  tryCountDisabled.value = false;
 }
 
 // 查看比例合约
