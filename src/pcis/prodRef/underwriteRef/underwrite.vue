@@ -124,9 +124,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
           func: async () => {
+            setFormItem("riFacMrk", {
+              btnItems: {disabled: true}
+            });
             const riskDataIsMultiple = await getRiskDataIsMultiple();
             if(riskDataIsMultiple) {
               ElMessage.warning("多险位不可以自主临分，请检查险位信息。");
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: false}
+              });
               return;
             }
             const param = {
@@ -177,6 +183,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               setValue("cUndrMrk", "")
             } else {
               ElMessage.error(checkLibertyInfo.message);
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: false}
+              });
             }
           },
         },
