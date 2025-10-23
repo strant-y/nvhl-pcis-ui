@@ -2460,17 +2460,19 @@ async function loadAfter() {
       },
     }),
   )
-
-  bthList.value.push(
-    // {isdivider: true},  //间隔符
-    createFreeButtonBase({
-      label: "返回",
-      func: () => {
-        tagsViewStore.back();
-        // history.back();
-      },
-    }),
-  );
+  
+  if(user.roles?.length > 0 && !user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {
+    bthList.value.push(
+      // {isdivider: true},  //间隔符
+      createFreeButtonBase({
+        label: "返回",
+        func: () => {
+          tagsViewStore.back();
+          // history.back();
+        },
+      }),
+    );
+  }
   rightBtnList.value.push(
     createFreeButtonBase({
       label: "历史赔案",

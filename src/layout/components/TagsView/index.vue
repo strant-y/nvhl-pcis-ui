@@ -19,7 +19,7 @@
         <i-ep-close
           class="close-icon"
           size="12px"
-          v-if="!isAffix(tag)"
+          v-if="!isAffix(tag) && !isRole173"
           @click.prevent.stop="closeSelectedTag(tag)"
         />
       </router-link>
@@ -84,6 +84,7 @@ const { visitedViews } = storeToRefs(tagsViewStore);
 const settingsStore = useSettingsStore();
 const layout = computed(() => settingsStore.layout);
 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+const isRole173 = user.roles?.length > 0 && user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173");
 
 const selectedTag = ref<TagView>({
   path: "",
