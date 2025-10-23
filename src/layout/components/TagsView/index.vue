@@ -83,6 +83,7 @@ const appStore = useAppStore();
 const { visitedViews } = storeToRefs(tagsViewStore);
 const settingsStore = useSettingsStore();
 const layout = computed(() => settingsStore.layout);
+const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
 const selectedTag = ref<TagView>({
   path: "",
@@ -156,6 +157,9 @@ function filterAffixTags(routes: RouteRecordRaw[], basePath = "/") {
       }
     }
   });
+  if(user.roles && user.roles[0]?.cOpgrpCde === "ROLE_00000173") {// 外部系统查看保单详情
+    tags = tags.filter(item => item.path !== "/dashboard")
+  }
   return tags;
 }
 
