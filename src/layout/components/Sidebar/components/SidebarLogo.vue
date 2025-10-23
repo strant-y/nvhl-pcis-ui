@@ -1,11 +1,11 @@
 <template>
   <div class="logo-container">
     <transition enter-active-class="animate__animated animate__fadeInLeft">
-      <router-link v-if="collapse" class="wh-full flex-center" to="/">
+      <router-link v-if="collapse" class="wh-full flex-center" :to="!isRole173 ? '/' : ''">
         <!-- <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" /> -->
       </router-link>
 
-      <router-link v-else class="wh-full logo-title-box" to="/">
+      <router-link v-else class="wh-full logo-title-box" :to="!isRole173 ? '/' : ''">
         <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
         <!-- <span class="logo-title"> {{ defaultSettings.title }}</span> -->
       </router-link>
@@ -27,6 +27,8 @@ defineProps({
 });
 
 const logo = ref(new URL(`../../../../assets/logo2.png`, import.meta.url).href);
+const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+const isRole173 = user.roles?.length > 0 && user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173");
 </script>
 
 <style lang="scss" scoped>
