@@ -1139,9 +1139,7 @@ watch(
         planNo:'P1',
         factorProp: 'Term.nEquipmentCount',
       },num);
-      if(route.params.param?.cProdNo === '041014') {
-        opertaor.getTableRefs()['tgt']?.setValue('Tgt.nDevicesNumber',num);
-      }
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nDevicesNumber',num);
     }
     // 047003 非机动车第三者责任保险 标的信息中：“投保总座位数（座）”要素，由清单中“投保座位数”汇总；“投保总车辆数（个）”要素，由清单中总车辆汇总；
     if(route.params.param?.cProdNo === '047003') {
