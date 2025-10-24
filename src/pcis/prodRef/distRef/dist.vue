@@ -1148,6 +1148,15 @@ watch(
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalSeats',seatNum)
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalCars',carNum)
     }
+    // 049001 食品卫生责任险 条款中的关联地址数量根据清单进行汇总
+    if(route.params.param?.cProdNo === '049001') {
+      const num = pageresult.list.length || 0;
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nAddressCount',
+      },num);
+    }
   }
 )
 const getSummary = async () => {

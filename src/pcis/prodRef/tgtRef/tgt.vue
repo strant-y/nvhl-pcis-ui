@@ -1762,6 +1762,14 @@ const method = {
       setFormItem("Tgt.cSpecificYears", { rules: [] })
     }
   },
+  // 企业类别
+  cEnterpriseCategoryChange: (val:any) => {
+    if(val === "NV04900104") {// 选其他 所属行业必填
+      setFormItem("Tgt.cIndustryAffiliation", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cIndustryAffiliation", { rules: [] })
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
