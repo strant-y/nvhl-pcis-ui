@@ -1816,19 +1816,21 @@ async function loadAfter() {
       }
       if (props.param["cRsnCde"] !== "99") {
         nextTick(() => {
-        opertaor.setDisabledAll();
-        getEdrRsnItemFun(
-          props.param["cProdNo"],
-          props.param["cDptCde"],
-          props.param["cRsnCde"],
-          props.param["cRsnCde"],
-          props.param["cEdrType"],
-          props.param["cGrpMrk"]
-        );
+          opertaor.setDisabledAll();
+        })
+        nextTick(() => {
+          getEdrRsnItemFun(
+            props.param["cProdNo"],
+            props.param["cDptCde"],
+            props.param["cRsnCde"],
+            props.param["cRsnCde"],
+            props.param["cEdrType"],
+            props.param["cGrpMrk"]
+          );
 
-        // 用于处理 账户信息
-        let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-        if(acctinfoInfo){
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          if(acctinfoInfo){
             acctinfoInfo.setDisabledAll(false);  
             acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
               disabled: true
@@ -1836,7 +1838,7 @@ async function loadAfter() {
             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
               disabled: true
             })
-        }
+          }
         });
       }
       
