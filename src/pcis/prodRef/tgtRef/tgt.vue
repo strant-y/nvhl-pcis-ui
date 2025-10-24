@@ -1742,6 +1742,26 @@ const method = {
       { title: "行业性质", width: "70" }
     );
   },
+  // 是否为上市公司
+  cIsListedChange: (val:any) => {
+    if(val === "1") {// 选是 上市时间 上市地点 股票代码必填
+      setFormItem("Tgt.tListingTime", { rules: [getRules("required", {})] })
+      setFormItem("Tgt.cListingLocation", { rules: [getRules("required", {})] })
+      setFormItem("Tgt.cStockCode", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.tListingTime", { rules: [] })
+      setFormItem("Tgt.cListingLocation", { rules: [] })
+      setFormItem("Tgt.cStockCode", { rules: [] })
+    }
+  },
+  // 是否包含退市后责任（run-off）
+  cIncludeDelistingChange: (val:any) => {
+    if(val === "1") {// 选是 ___年必填
+      setFormItem("Tgt.cSpecificYears", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cSpecificYears", { rules: [] })
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
