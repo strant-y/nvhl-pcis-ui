@@ -658,8 +658,10 @@ function loadUwTabData() {
 
 async function queryRiskCodelistFn() {
   const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
-  if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "200") {
+  if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "1") {
     contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
+    setFormItem("cIsExcluding", { disabled: queryRiskCodelistInfo.data?.cReadOnly === "1" ? false : true })
+    setValue("cIsExcluding", queryRiskCodelistInfo.data?.cExc || '')
   }
 }
 
