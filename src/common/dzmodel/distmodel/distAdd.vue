@@ -407,9 +407,9 @@ onMounted(() => {
         })
       }
     }
-    if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cDetailedAddress' ){
-        item.disabled = true;
-    }
+    // if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cDetailedAddress' ){
+    //     item.disabled = true;
+    // }
     // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址/营业场所地址清单043013 标的坐落地址
     // if(item.prop === 'Dist.JingYingAddress043009' || item.prop === 'Dist.HouseAreaProp' || item.prop === 'Dist.PropertyLocationProp'){
     //   item.groupList.forEach((data:any) => {
