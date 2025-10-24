@@ -3344,6 +3344,10 @@ const submitToUndrFn = async () => {
       }
     }
 
+    if(!validateTgt()) {
+      return;
+    }
+
     //040005 校验 地址清单总数 和 学生人数（人）
     //    if(props.param.cProdNo ==='040005'){
     //         const isUnEqual = await checkStudentValidity();
@@ -4730,6 +4734,9 @@ const submitEdrToUndrFun = async () => {
     // btn.loading = false;
     return;
   }
+  if(!validateTgt()) {
+    return;
+  }
     if(props.param.cTransMrk !== "1" ){
     const edrBaseValidate = await edrbase.value?.validate();
      if(!edrBaseValidate) {
@@ -5576,6 +5583,18 @@ const validateShanDong = async () => {
     return true;
   }
 };
+
+// 047001 校验标的信息中的预估代驾人员数量(人)、预估代驾订单数量(单)二选一必填
+const validateTgt = () => {
+  const tgtData = opertaor.getTableRefByKey("tgt").getFromValue();
+  if(props.param?.cProdNo === "047001") {
+    if(!tgtData['Tgt.nProxyDrivers'] && !tgtData['Tgt.nOrderQuantity']) {
+      ElMessage.error("标的信息预估代驾人员数量(人)、预估代驾订单数量(单)不能全部为空！")
+      return false;
+    }
+  }
+  return true;
+}
 
 opertaor.setFatherPage({
   currentIndex: currentIndex,
