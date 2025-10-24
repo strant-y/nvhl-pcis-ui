@@ -953,6 +953,10 @@ function dataInit() {
       rules: []
     });
   }
+  // 041014 团单展示 关联被保险人要素
+  if(pageparam.cProdNo === "041014" && pageparam.cGrpMrk == "0") {
+    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
+  }
 }
 
 function getUseData(data: any){

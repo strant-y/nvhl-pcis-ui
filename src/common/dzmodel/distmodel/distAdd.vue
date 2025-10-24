@@ -453,6 +453,10 @@ onMounted(() => {
             disabled: idx > nextIdx     // 未开始
         }));
     }
+    // 解决特种设备清单信息新增数据后点击编辑或新增，表单中特种设备种类的按钮无法点击
+    if(route.params.param.cProdNo == '041014' && item.prop =='Dist.cEquipmentTypes') {
+      item.btnItems.disabled = false;
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
