@@ -940,6 +940,12 @@ const updateMasterAgreementValues = () => {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", row._dataId, ciAmt.toFixed(2));
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
     }
+    
+    // 更新出单费用：根据联共保保费和出单费比例重新计算
+    const nPlyFeeRate = Number(row["Ci.nPlyFeeRate"]) || 0;
+    const nCiPrm = Number(row["Ci.nCiPrm"]) || 0;
+    const nPlyFee = nPlyFeeRate * nCiPrm;
+    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
   });
   updateCiPrmEditable();
   // 设置到对应组件字段（仅使用永安保险的总和）
