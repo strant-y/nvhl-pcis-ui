@@ -1485,7 +1485,26 @@ const methodMap = {
     } else {
       tgt?.setFormItem('Tgt.nAgentNumber',{ rules: [] })
     }
-  }
+  },
+  // 被保险人名称：被保险人名称输入后，被保险人证件类型、被保险人证件号码必填
+  cInsuredNameChange: (val:any) => {
+    termFactormap.value.forEach((item: any) => {
+      if (item["prop"] === "Term.cIdentityType") {
+        if(val) {
+          item.cPorpRequired = true;
+        } else {
+          item.cPorpRequired = false;
+        }
+      }
+      if(item["prop"] === "Term.cIdentityNumber") {
+        if(val) {
+          item.cPorpRequired = true;
+        } else {
+          item.cPorpRequired = false;
+        }
+      }
+    });
+  },
 };
 
 const checkData = (v :any,item:any) => {

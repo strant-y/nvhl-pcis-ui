@@ -1150,7 +1150,9 @@ watch(
     }
     // 049001 食品卫生责任险 条款中的关联地址数量根据清单进行汇总
     // 043005 机动车停车场责任险 条款信息中：关联地址数量、关联地址车位总数根据清单进行汇总
-    if(route.params.param?.cProdNo === '049001' || route.params.param?.cProdNo === '043005') {
+    // 043004 火灾公众责任险 条款中的关联地址数量根据清单进行汇总
+    const nAddressCountProdNoMap = ['049001','043005','043004'];
+    if(nAddressCountProdNoMap.includes(route.params.param?.cProdNo)) {
       const num = pageresult.list.length || 0;
       opertaor.getTableRefs()['cvrg']?.setTermData({
         termNo:route.params.param?.cTermNo,
