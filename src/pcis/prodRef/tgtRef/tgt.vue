@@ -111,6 +111,7 @@ onMounted(async () => {
   // 040005 办学许可证号
   const requiredRulesNo = ['020018','020013'];// 必填加号码校验的产品
   const rulesNo = ['020002','020006','020009','020014'];// 号码校验的产品
+  const requiredNo = ['041011','049001']// 必填校验的产品
   if (requiredRulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
@@ -119,7 +120,11 @@ onMounted(async () => {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("vehiclePlate", {})],
     });
-  } else if(!getFormItem("Tgt.cLicenseNumber")?.rules) {
+  } else if(requiredNo.includes(params.cProdNo)) {
+    setFormItem("Tgt.cLicenseNumber", {
+      rules: [getRules("required", {})],
+    });
+  } else {
     setFormItem("Tgt.cLicenseNumber", { rules: [] });
   }
 
@@ -1948,10 +1953,6 @@ function change403009(v) {
 
 function getFormconfig() {
   return formconfig1;
-}
-
-function getFormItem(key: any) {
-  return formconfig1.fromSchema?.find(item => item.prop === key);
 }
 
 
