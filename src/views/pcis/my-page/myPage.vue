@@ -5593,6 +5593,15 @@ const validateTgt = () => {
       return false;
     }
   }
+  //  041012  是否单项工程逻辑
+  if(props.param?.cProdNo==='041012'){
+    let tableLenght = opertaor.getTableRefByKey("SurveyDist041012").getTableData().length;  // 清单条数
+    let cIsSingle =  opertaor.getTableRefByKey("tgt").getValue('Tgt.cIsSingle');      // 是否单项工程
+    if(tableLenght ==0 && cIsSingle==0){
+      ElMessage.warning("“是否单项工程”为否时，勘察工程项目清单不能为空！");  
+      return false;
+    }
+  }
   return true;
 }
 
