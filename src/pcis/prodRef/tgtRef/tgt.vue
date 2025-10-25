@@ -119,7 +119,7 @@ onMounted(async () => {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("vehiclePlate", {})],
     });
-  } else {
+  } else if(!getFormItem("Tgt.cLicenseNumber")?.rules) {
     setFormItem("Tgt.cLicenseNumber", { rules: [] });
   }
 
@@ -1948,6 +1948,10 @@ function change403009(v) {
 
 function getFormconfig() {
   return formconfig1;
+}
+
+function getFormItem(key: any) {
+  return formconfig1.fromSchema?.find(item => item.prop === key);
 }
 
 

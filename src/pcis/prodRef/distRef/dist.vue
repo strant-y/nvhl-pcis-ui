@@ -1121,15 +1121,6 @@ watch(
     if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
-    // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
-    if(route.params.param?.cProdNo === '043011') {
-      const num = pageresult.list.length || 0;
-      opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
-        planNo:'P1',
-        factorProp: 'Term.nAddressCount',
-      },num);
-    }
     // 043022 特种设备第三者责任保险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总
     // 041014 特种设备责任险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总 标的信息中：特种设备数量与清单数量一致
     if(route.params.param?.cProdNo === '043022' || route.params.param?.cProdNo === '041014') {
@@ -1151,7 +1142,9 @@ watch(
     // 049001 食品卫生责任险 条款中的关联地址数量根据清单进行汇总
     // 043005 机动车停车场责任险 条款信息中：关联地址数量、关联地址车位总数根据清单进行汇总
     // 043004 火灾公众责任险 条款中的关联地址数量根据清单进行汇总
-    const nAddressCountProdNoMap = ['049001','043005','043004'];
+    // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
+    // 041011 食品安全责任险 条款中的关联地址数量根据清单进行汇总
+    const nAddressCountProdNoMap = ['049001','043005','043004','043011','041011'];
     if(nAddressCountProdNoMap.includes(route.params.param?.cProdNo)) {
       const num = pageresult.list.length || 0;
       opertaor.getTableRefs()['cvrg']?.setTermData({
