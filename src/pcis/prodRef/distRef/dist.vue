@@ -1149,13 +1149,22 @@ watch(
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalCars',carNum)
     }
     // 049001 食品卫生责任险 条款中的关联地址数量根据清单进行汇总
-    if(route.params.param?.cProdNo === '049001') {
+    // 043005 机动车停车场责任险 条款信息中：关联地址数量、关联地址车位总数根据清单进行汇总
+    if(route.params.param?.cProdNo === '049001' || route.params.param?.cProdNo === '043005') {
       const num = pageresult.list.length || 0;
       opertaor.getTableRefs()['cvrg']?.setTermData({
         termNo:route.params.param?.cTermNo,
         planNo:'P1',
         factorProp: 'Term.nAddressCount',
       },num);
+      if(route.params.param?.cProdNo === '043005') {
+        const parkingNum = pageresult.list?.map(item => Number(item["Dist.nParkingNumber"]) || 0).reduce((total, value) => total + value, 0)
+        opertaor.getTableRefs()['cvrg']?.setTermData({
+          termNo:route.params.param?.cTermNo,
+          planNo:'P1',
+          factorProp: 'Term.nParkingTotal',
+        },parkingNum);
+      }
     }
   }
 )
