@@ -286,6 +286,14 @@ onMounted(async () => {
         }
       })
     }
+    // 关联项目地址列表展示
+    if(r['prop'] === 'Dist.cProjectAddress'){
+      eventBus.on('setMap-ProjectDist045001', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
+    }
   });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
@@ -641,6 +649,19 @@ const method = {
           }
           eventBus.emit('setMap-EmployeeDist043009', {
             code: 'Dist.cEmploymentAddress',
+            list: pageresult.list.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          });
+        }
+
+        // 045001 set 关联项目地址 下拉值
+        if(props.compKey === 'ProjectDist045001'){
+          eventBus.emit('setMap-ProjectDist045001', {
+            code: 'Dist.cProjectAddress',
             list: pageresult.list.map((m: any) => {
               return {
                 label: m['Dist.cDetailedAddress'],
