@@ -476,6 +476,21 @@ const method = {
           rules: [getRules("required", {})],
         });
       }
+      // 工程名称、工程总造价、勘察造价、勘察项目地址必填
+      if (params.cProdNo === '041012') {
+        setFormItem('Tgt.cProjectName', {
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.nTotalCost', {
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.nSurveyPrice', {
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.SurveyProjectProp', {
+          rules: [getRules("required", {})],
+        });
+      }
 
     } else {
       setFormItem('Tgt.nTotalCost', {
@@ -513,6 +528,20 @@ const method = {
         });
       }
 
+      if (params.cProdNo === '041012') {
+        setFormItem('Tgt.cProjectName', {
+          rules: null,
+        });
+        setFormItem('Tgt.nTotalCost', {
+          rules: null,
+        });
+        setFormItem('Tgt.nSurveyPrice', {
+          rules: null,
+        });
+        setFormItem('Tgt.SurveyProjectProp', {
+          rules: null,
+        });
+      }
     }
 
   },
@@ -1768,6 +1797,14 @@ const method = {
       setFormItem("Tgt.cIndustryAffiliation", { rules: [getRules("required", {})] })
     } else {
       setFormItem("Tgt.cIndustryAffiliation", { rules: [] })
+    }
+  },
+  // 工程勘察资质
+  cSurveyQualificationChange: (val:any) => {
+    if(val === "2" || val === "3" || val === "4") {// 选专业XX资质 工程勘察专业类型必填
+      setFormItem("Tgt.cEngineeringType", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cEngineeringType", { rules: [] })
     }
   },
 };
