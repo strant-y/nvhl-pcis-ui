@@ -115,6 +115,15 @@ export const dataOpertaor = (props: OpertaorProps) => {
                         if(readTab.includes(info.pageKey)){
                             setread(fsch);
                         }
+                        if(info.pageKey === 'base'){
+                            fsch.editFlag = true;
+                            fsch.fromSchema.forEach(item => {
+                                if(item.prop === 'Base.nAccidentLimit'){  //单独放开,每次事故赔偿限额字段
+                                    item.disabled = false;
+                                }
+                            })
+                            console.log(fsch);
+                        }
                         if(info.pageKey === 'applicant' || info.pageKey === 'insured' || info.pageKey === 'insrnc'){
                             fsch.fromSchema.forEach(item => {
                                 if(readAppProp.includes(item.prop)){
