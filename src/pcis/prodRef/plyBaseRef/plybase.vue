@@ -735,7 +735,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "2",
           },
@@ -763,7 +763,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "3",
           },
