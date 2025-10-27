@@ -445,7 +445,7 @@ const vehiclePlate = (options = {}) => {
       // 验证逻辑
       if (normalPattern.test(formattedValue)) {
         callback();
-      } else if (newEnergyPattern.test(formattedValue)) {
+      } else if (formattedValue.length === 7 || formattedValue.length === 8) {// 临时修改车牌号校验规则
         callback();
       } else {
         callback(new Error(message));

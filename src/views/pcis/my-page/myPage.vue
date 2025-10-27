@@ -2734,6 +2734,10 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.SpecialAgreement[0]['SpecialAgreement.cTransMrk'] = "1"
         ops.SpecialAgreement[0]['SpecialAgreement.cIfMust'] = "1"
       }
+      if (props.param.cTransMrk === '1') {
+        ops.applicant['Applicant.cCertfCls'] = ops.applicant['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant['Applicant.cCertfCls'];
+        ops.insured['Insured.cCertfCls'] = ops.insured['Insured.cCertfCls'] === '110007' ? '01' : ops.insured['Insured.cCertfCls'];
+      }
     console.log("转换的数据", ops);
     if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];

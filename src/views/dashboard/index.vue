@@ -4,7 +4,8 @@
       <div class="code-box" style="position: absolute;right: 3px;">
         <div class="code-inner-box">
           <span>移动端二维码：</span>
-          <img class="code-img" src="@/assets/img/dashbord/prod-QRCode.png" alt="">
+          <img class="code-img" src="@/assets/img/dashbord/prod-QRCode.png" alt="" v-if="env.MODE === 'prod'">
+          <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="" v-else>
         </div>
         <div class="code-inner-box">
           <span>在线缺陷平台：</span>
