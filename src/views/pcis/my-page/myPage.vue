@@ -2266,13 +2266,17 @@ async function loadAfter() {
           ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
           ops.plyBase['Base.cRemark'] = "" // 出单员备注
         }
-        // if(ops['ci'] && ops['ci'].length>0){
-        //   ops['ci'].forEach((item:any)=>{
-        //     if(item['Ci.nCiShare']){
-        //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-        //     }
-        //   })
-        // }
+        
+        if(ops['ci'] && ops['ci'].length>0){
+          ops['ci'].forEach((item:any)=>{
+            item['Ci.cBrkrCde'] = "" // 代理经纪人
+            item['Ci.cBrkSlsCde'] = "" // 代理代理业务员
+            item['Ci.cCoinsurerCde'] = "" // 共保公司
+            item['Ci.cDptCde'] = "" // 出单机构
+            item['Ci.cSlsId'] = ""
+            item['Ci.cSlsNme'] = ""
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
         // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -5805,7 +5809,7 @@ function replacecInquiryNo(res:any) {
 }
 
 // 复制出单和模板出单清空原有的申请单号
-const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo"]
+const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo","cCrtCde","cUpdCde"]
 function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   if(res instanceof Array) {
     res.forEach((item:any) => {
