@@ -1390,10 +1390,12 @@ function setregistAdd() {
       if (code === 200) {
         const b = (data ? data["addStr"] : "") + a;
         setAddressStr("Applicant.cClntAddr", b);
+        setAddressStr("Applicant.cHabitualResidence", b);
       }
     });
   } else {
     setAddressStr("Applicant.cClntAddr", a);
+    setAddressStr("Applicant.cHabitualResidence", a);
   }
 }
 

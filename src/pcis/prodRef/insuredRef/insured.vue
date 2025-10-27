@@ -1488,10 +1488,12 @@ function setregistAdd() {
       if (code === 200) {
         const b = (data ? data["addStr"] : "") + a;
         setAddressStr("Insured.cClntAddr", b);
+        setAddressStr("Insured.cHabitualResidence", b);
       }
     });
   } else {
     setAddressStr("Insured.cClntAddr", a);
+    setAddressStr("Insured.cHabitualResidence", a);
   }
 }
 
