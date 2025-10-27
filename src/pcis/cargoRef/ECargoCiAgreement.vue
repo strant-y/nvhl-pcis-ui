@@ -40,9 +40,9 @@ const method = {
   func1: () => {},
   cCiAgtNoChange: (val) => {
     const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
-    const isValidLength = val.length <= 20;      
+    const isValidLength = val.length <= 25;      
     if (!isPositiveInteger || !isValidLength) {
-      ElMessage.error("请输入不超过20位的正整数和英文字母");
+      ElMessage.error("请输入不超过25位的正整数和英文字母");
       tgtobjEditRef.value?.setValue("ECargoBase.cCiAgtNo", "");
     }
   },
