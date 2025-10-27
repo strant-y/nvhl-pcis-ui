@@ -322,10 +322,10 @@ const method = {
             disabled: true,
           },
         };
-        if (!p.initFlag) {
-          setFormItem("Base.cSlsId", obj); //业务员工号
-        }
-        setFormItem("Base.cSlsId", { rules: null }); //业务员工号
+        // if (!p.initFlag) {
+        //   setFormItem("Base.cSlsId", obj); //业务员工号
+        // }
+        // setFormItem("Base.cSlsId", { rules: null }); //业务员工号
         setValue("Base.cSlsId", "");
         setValue("Base.cSlsNme", "");
       } else {
@@ -735,7 +735,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "2",
           },
@@ -763,7 +763,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "3",
           },
