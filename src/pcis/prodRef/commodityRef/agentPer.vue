@@ -454,6 +454,7 @@ onMounted(() => {
             setValue("CChaType", props.data.data.cChaType);
             nextTick(() => {
               setValue("CChaSubtype", props.data.data.cChaSubtype);
+              handleQuery();
             })
           })
         }
