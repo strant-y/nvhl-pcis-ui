@@ -194,7 +194,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
             const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
             const currentTm = new Date().getTime();
-            return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
+            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
+            return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
           } else {
             return false;
           }

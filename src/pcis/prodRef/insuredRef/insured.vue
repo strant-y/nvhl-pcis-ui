@@ -80,6 +80,7 @@ const tCertfDate = ref<any[]>([]);
 const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
 const resetLogo = ref<any>(false);   // 重置标识
+const param = opertaor.getParam();
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -157,6 +158,10 @@ onMounted(() => {
   // setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
   // 证件号码
   // setFormItem("Insured.cCertfCde", { minWidth: '165px' });
+  if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT") && (param.cTransMrk == '1' || param.cRsnCde === '99' || param.cEdrRsnBundle === '99' || param.cEdrRsnBundleCde === '99')) {
+    setFormItem("Insured.cCertfCls", { disabled: false });
+    setFormItem("Insured.cCertfCde", { disabled: false });
+  }
 });
 // function setFormItem(key: any, obj: any) {
 //   if (obj && Object.keys(obj).length) {
