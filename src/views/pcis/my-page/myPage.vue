@@ -3675,8 +3675,8 @@ const validateNPrmAmlya = () => {
     let flag = false;
     
     // ----------投保人------------
-    const applicantArr = ['Applicant.cNation', 'Applicant.cBusinessScope', 'Applicant.cCntrNme', 'Applicant.cOperaterCertfTyp', 'Applicant.cOperaterCertfCde', 'Applicant.tOperaterCertfEndTm', 'Applicant.cOccupTyp'];
-    const applicantCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '职业类别'];
+    const applicantArr = ['Applicant.cNation', 'Applicant.cBusinessScope', 'Applicant.cCntrNme', 'Applicant.cOperaterCertfTyp', 'Applicant.cOperaterCertfCde', 'Applicant.tOperaterCertfEndTm', 'Applicant.cOccupTyp', 'Applicant.cHabitualResidence'];
+    const applicantCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '职业类别', '经常居住地'];
     let appMsg = '';
     if(opertaor.getDataAll()["applicant"]) {
       const applicantData = opertaor.getDataAll()["applicant"];
@@ -3698,8 +3698,8 @@ const validateNPrmAmlya = () => {
       }
     }
     // ----------被保人------------
-    const insuredArr = ['Insured.cNation', 'Insured.cBusinessScope', 'Insured.cCntrNme', 'Insured.cOperaterCertfTyp', 'Insured.cOperaterCertfCde', 'Insured.tOperaterCertfEndTm'];
-    const insuredCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期'];
+    const insuredArr = ['Insured.cNation', 'Insured.cBusinessScope', 'Insured.cCntrNme', 'Insured.cOperaterCertfTyp', 'Insured.cOperaterCertfCde', 'Insured.tOperaterCertfEndTm', 'Insured.cHabitualResidence'];
+    const insuredCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '经常居住地'];
     if(props.param.cProdNo === '029900' || props.param.cProdNo === '120001' || props.param.cProdNo === '120003') {
       insuredArr.push('Insured.cOccupCde')
       insuredCnmArr.push('职业')
