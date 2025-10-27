@@ -159,6 +159,10 @@ onMounted(() => {
     setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
     // 证件号码
     // setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
+    if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT") && (param.cTransMrk == '1' || param.cRsnCde === '99' || param.cEdrRsnBundle === '99' || param.cEdrRsnBundleCde === '99')) {
+      setFormItem("Applicant.cCertfCls", { disabled: false });
+      setFormItem("Applicant.cCertfCde", { disabled: false });
+    }
   });
 });
 // //给表单下拉项赋值
