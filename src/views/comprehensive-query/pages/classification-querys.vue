@@ -1816,7 +1816,7 @@ const tableObj = {
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
                     // 联保单6不显示复制按钮;询价单没有复制;核保岗隐藏复制按钮
-                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value) {
+                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value || row.cPlyNo?.length > 18 ) {
                         return true;
                     } else {
                         return false;
