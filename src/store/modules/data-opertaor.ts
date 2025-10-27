@@ -115,6 +115,14 @@ export const dataOpertaor = (props: OpertaorProps) => {
                         if(readTab.includes(info.pageKey)){
                             setread(fsch);
                         }
+                        if(info.pageKey === 'base') {
+                            fsch.editFlag = true;
+                            fsch.fromSchema.forEach(item => {
+                                if(item.prop === 'Base.nAccidentLimit'){
+                                    item.disabled = false;
+                                }
+                            })
+                        }
                         if(info.pageKey === 'applicant' || info.pageKey === 'insured' || info.pageKey === 'insrnc'){
                             fsch.fromSchema.forEach(item => {
                                 if(readAppProp.includes(item.prop)){
