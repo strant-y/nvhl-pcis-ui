@@ -84,6 +84,10 @@ onMounted(async () => {
   if(params.cProdNo?.slice(0,2) === "02" && !hidenRatioCoefProdNoMap.includes(params.cProdNo)){
     setFormItem('Base.nRatioCoef', { hidden: true })
   }
+  // 历史数据补全-短期费率类型可编辑
+  if((params?.pageType === 'EDR_APP_NEW_SCENE' || params?.pageType === 'TEMPORARY_DEPOSIT') && (params.cTransMrk == '1' || params.cRsnCde === '99' || params.cEdrRsnBundle === '99' || params.cEdrRsnBundleCde === '99')) {
+    setFormItem('Base.cRatioTyp', { disabled: false })
+  }
   formconfig11.fromSchema?.forEach((item:any) => {
     if(item.prop === "Base.groupAmtCur") {
       item.labelLength = 11
