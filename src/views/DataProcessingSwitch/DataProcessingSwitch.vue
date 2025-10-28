@@ -246,7 +246,7 @@ function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-  qryTerminationDataList(param)
+  getBasicKindList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
