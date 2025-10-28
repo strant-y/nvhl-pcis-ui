@@ -113,7 +113,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     page.pageInfo.forEach(info => {
                         const fsch = info.pageSchema;
                         if(readTab.includes(info.pageKey)){
-                            setread(fsch);
+                            setread(info.pageSchema);
                         }
                         if(info.pageKey === 'base'){
                             fsch.editFlag = true;
@@ -122,7 +122,14 @@ export const dataOpertaor = (props: OpertaorProps) => {
                                     item.disabled = false;
                                 }
                             })
-                            console.log(fsch);
+                        }
+                        if(info.pageKey === 'plyBase'){
+                            fsch.editFlag = true;
+                            fsch.fromSchema.forEach(item => {
+                                if(item.prop === 'Base.cSlsId'){          //单独放开,业务员编号
+                                    item.disabled = false;
+                                }
+                            })
                         }
                         if(info.pageKey === 'applicant' || info.pageKey === 'insured' || info.pageKey === 'insrnc'){
                             fsch.fromSchema.forEach(item => {
