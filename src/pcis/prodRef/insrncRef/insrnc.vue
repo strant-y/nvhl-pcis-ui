@@ -517,12 +517,16 @@ const method = {
 
   // 起运日期控制
   tDepartureDateDis: (date: any) => {
+    const cProdMap = ['020001', '020002', '020003', '020009', '020013'];
     const fs = insrncEditRef?.value?.getFromValue();
     if (fs) {
-      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间    
+      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   
+      const before30Tm = dayjs(startDate).subtract(30, 'day').toDate().getTime();
       let cProdNo = route.params.param?.cProdNo
       if (cProdNo === "020014" || cProdNo === "020018") {
         return false;
+      } else if(cProdMap.includes(cProdNo)) {// 这5个产品起运日期不能早于保险起期前30天(暂定)
+        return date.getTime() < before30Tm
       } else {
         return date.getTime() < startDate.getTime()
       }
