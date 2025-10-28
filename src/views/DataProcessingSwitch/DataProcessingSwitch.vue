@@ -42,6 +42,9 @@ const departmentTree = defineAsyncComponent(
 );
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
+    fromUi:{
+      cols:2,
+    },
     title: "数据处理开关",
     endBtnsPosition: "right",
     endBtns: [
@@ -66,40 +69,38 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "cKindNo",
-        inputtype: "rtselect",
-        title: "申请单号",
-        labelWidth: 200,
+        prop: "CPlyNo",
+        inputtype: "rtinput",
+        title: "保单号",
         clearable: true,
+      },
+      {
+        prop: "CAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
+        clearable: true,
+      },
+      {
+        prop: "COperType",
+        inputtype: "rtselect",
+        title: "业务申请类型",
+        clearable: true,
+        rules: [getRules("required", {})],
         loadData: [
-          { value: '1', label: '终保后批改' },
-          { value: '2', label: '一般退保倒签' },
-          { value: '3', label: '注销倒签' },
-          { value: '4', label: '一般退保手动修改退保总保费' },
-          { value: '5', label: '投保手动修改保费' },
-          { value: '6', label: '一般批改手动修改险别保费' },
-          { value: '7', label: '取消免费延期校验' },
+          {value: 'TerEdr', label: '终保后批改'},
+          {value: 'SurBck', label: '一般退保倒签'},
+          {value: 'CanBck', label: '注销倒签'},
+          {value: 'EdrUpdPrm', label: '批改时手动修改保费'},
+          {value: 'EdrBckBgn', label: '批改时允许倒签批改生效时间'},
+          {value: 'SurUpdPrm', label: '一般退保手动修改退保费'},
+          {value: 'EdrUpdRate', label: '修改批减手续费比例'}
         ],
       },
       {
-        prop: "cKindNo",
-        inputtype: "rtinput",
-        title: "保单号",
-        labelWidth: 200,
-        clearable: true,
-      },
-      {
-        prop: "cStatus",
-        inputtype: "rtselect",
-        title: "业务申请类型",
-        typeCode: "WEB_SYS_STA_DICT",
-        params: { cParCde: "use_mrk" },
-        clearable: true,
-      },
-      {
-        prop: "cKindNo",
+        prop: "CTitleOa",
         inputtype: "rtinput",
         title: "OA标题",
+        rules: [getRules("required", {})],
         clearable: true,
       },
       {
@@ -132,7 +133,8 @@ const tableconfig = reactive<AppTableConfig>(
     editFlag: true,
     editList: ["cStatus"],
     showSelection:true,
-    titleBtns: [
+    tableBtnPosition:'center',
+    endBtns: [
       createFreeButtonBase({
         id: "score",
         label: "打开开关",

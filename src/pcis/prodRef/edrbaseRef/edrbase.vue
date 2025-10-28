@@ -194,8 +194,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
             const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
             const currentTm = new Date().getTime();
+            const before30Tm = dayjs().subtract(30, 'day').toDate().getTime(); // 当前日期前30天
+            const before61Tm = dayjs().subtract(61, 'day').toDate().getTime(); // 当前日期前61天
+            if(["040011","040015"].includes(params["cProdNo"])) {// 这俩产品 批改生效起期允许往前选61天
+              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before61Tm ? new Date(beginTm).getTime() : before61Tm)
+            } else {
+              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before30Tm ? new Date(beginTm).getTime() : before30Tm)
+            }
             // return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
-            return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
+            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
           } else {
             return false;
           }

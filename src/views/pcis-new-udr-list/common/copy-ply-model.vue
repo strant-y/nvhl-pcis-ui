@@ -38,6 +38,7 @@ import dayjs from "dayjs";
 import { useAppStore } from "@/store";
 const appStore = useAppStore();
 const locale = computed(() => appStore.locale);
+import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 
 const props = defineProps({
   data: {
@@ -264,7 +265,7 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-const selected = ref([]);
+const selected:any = ref([]);
 const displayData = ref("");
 const selectedGrpMrk = ref("");
 const selectedCiMrk = ref("");
@@ -457,6 +458,10 @@ const confirm = async () => {
     }
     if (selected.value[0].cPlyNo.length > 18) {
       ElMessage.error("历史数据的保单, 不允许复制");
+      return;
+    }
+    if (cannotCopy(selected.value[0].cPlyNo)) {
+      ElMessage.error("该保单不允许复制");
       return;
     }
     // 点击下一步前校验，如果data为true则继续，否则阻断并提示

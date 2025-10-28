@@ -123,6 +123,7 @@ import { min } from "lodash";
 const { withdraw } = NewUdrListService();
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
+import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
@@ -627,7 +628,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "DocumentCopy",
         hideBtns: (row: any) => {
           // 联保单不显示复制按钮
-          if ((row.baseType !== "询价" && row.cCiMrk !== "6") && row.cPlyNo?.length <= 18) {
+          if ((row.baseType !== "询价" && row.cCiMrk !== "6") && row.cPlyNo?.length <= 18 && !cannotCopy(row.cPlyNo)) {
             return false;
           } else {
             return true;
