@@ -25,6 +25,11 @@ import {
   getPageList,
 } from "@/api/code-list-service";
 const { getRules } = useValidator();
+// import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+// import { dataOpertaor } from "@/store";
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
+
 const props = defineProps({
   data: {
     type: Object,
@@ -87,21 +92,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         loadData: [],
         rules: [getRules("required", {})],
         func: (val) => {
-          console.log(3232, val)
-          // setValue("CChaType", "");
-          // setValue("CChaSubtype", "");
-          getChaTypeList({ BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }).then(
-            (res) => {
-              if (null != res && null != res["code"]) {
-                if (res["code"] === 200) {
-                  const obj = {
-                    loadData: res.data,
-                  };
-                  setFormItem("CChaType", obj);
+          if(val){
+            getChaTypeList({ BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }).then(
+              (res) => {
+                if (null != res && null != res["code"]) {
+                  if (res["code"] === 200) {
+                    const obj = {
+                      loadData: res.data,
+                    };
+                    setFormItem("CChaType", obj);
+                  }
                 }
               }
-            }
-          );
+            );
+          }
         },
       },
       {
@@ -417,11 +421,9 @@ function getAgencyBusinessList(param?: any) {
 
 onMounted(() => {
     if(props.cTransMrk !== '1'){
-      const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
       //业务来源大类下拉数据
       const params = {
-        CDptCde: data["cDptCde"],
-        CKindNo: data["cKindNo"],
+        CDptCde: props.data.data.rowData['Ci.cDptCde'],
       };
       //查询大类数据，用于默认回显
       getBsnsTypList(params).then((res) => {
@@ -435,40 +437,11 @@ onMounted(() => {
           }
         }
       });
-      //查询中类数据，用于默认回显  { BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }
-      getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp, scene: "PLY_APP_NEW_SCENE" }).then((res) => {
-        if (null != res && null != res["code"]) {
-          if (res["code"] === 200) {
-            const obj = {
-              loadData: res.data,
-            };
-            setFormItem("CChaType", obj);
-            setValue("CChaType", props.data.data.cChaType);
-          }
-        }
-      });
-      //查询子类数据，用于默认回显
-      const paramSub = {
-        CChaType: props.data.data.cChaType,
-        flag: 1,
-
-        scene: "PLY_APP_NEW_SCENE",
-      };
-      getChaSubtypList(paramSub).then((res) => {
-        if (null != res && null != res["code"]) {
-          if (res["code"] === 200) {
-            const obj = {
-              loadData: res.data,
-            };
-            setFormItem("CChaSubtype", obj);
-            setValue("CChaSubtype", props.data.data.cChaSubtype);
-          }
-        }
-      });
-      nextTick(() => {
-        setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
-      });
     }
+    
+    nextTick(() => {
+      setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
+    });
 });
 
 defineExpose({
