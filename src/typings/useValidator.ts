@@ -615,9 +615,9 @@ const valiAddress = (options = {}) => {
         return callback(new Error(`地址长度不能超过${maxLength}个字符`));
       }
       
-      if (!basicPattern.test(trimmedValue)) {
-        return callback(new Error('地址包含不支持的特殊字符'));
-      }
+      // if (!basicPattern.test(trimmedValue)) {
+      //   return callback(new Error('地址包含不支持的特殊字符'));
+      // }
       
       // 增强模式校验（修复后可通过"北京市海淀区..."这类地址）
       if (enhanced && !enhancedPattern.test(trimmedValue)) {

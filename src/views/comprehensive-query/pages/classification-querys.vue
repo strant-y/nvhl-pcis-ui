@@ -233,6 +233,7 @@ const cAppType = ref("A");
 import { FIELD_MAP } from '@/constants/fieldMaps';
 import {saveAs} from "file-saver";
 const cPard = ref(null);
+import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 
 watch(() => {
   const freeEditRefs = freeEditRef.value;
@@ -1816,7 +1817,7 @@ const tableObj = {
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
                     // 联保单6不显示复制按钮;询价单没有复制;核保岗隐藏复制按钮
-                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value || row.cPlyNo?.length > 18 ) {
+                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value || row.cPlyNo?.length > 18 || cannotCopy(row.cPlyNo)) {
                         return true;
                     } else {
                         return false;
