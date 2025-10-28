@@ -3792,7 +3792,9 @@ const savePlyInfo = async () => {
   // if(props.param.cTransMrk !== '1'){
     let saveFlag = false;
     const btn = getBtn("btn010102");
-    btn.loading = true;
+    if(btn) {
+      btn.loading = true;
+    }
   // }
   const res = opertaor.getDataAll();
   // 点击保存之前的申请单号 

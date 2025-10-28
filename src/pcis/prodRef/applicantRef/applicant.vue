@@ -108,7 +108,7 @@ onMounted(() => {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
       setFormItem("Applicant.cGreenIndustryList", { hidden: true, rules: null });
     }
-    if (!cProdNo.startsWith("05")) {
+    if (!cProdNo?.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderNature", {
