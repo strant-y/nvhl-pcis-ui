@@ -235,8 +235,15 @@ const method = {
           }
         }
       );
-      nextTick(() => {
-        const ciRef = opertaor.getTableRefs()['ci'];
+      
+      const obj = {
+        rules: [],
+        disabled: true,
+        btnItems: {
+          disabled: true,
+        },
+      };
+      if(p.cTransMrk !== '1'){
         //代理业务 服务机构不可选
         if (val === "19002"){
           setFormItem("Base.cIntroDptcde", {btnItems: {
@@ -247,6 +254,28 @@ const method = {
               disabled: false,
             }});
         }
+        if (val === "19002" || val === "19003" ) {
+            setFormItem("Base.cBrkrCde", {...obj,disabled:false}); //代理(经纪)人
+            setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+            setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
+
+        } else {
+            setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
+            setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+
+            setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
+            if (!p.initFlag) {
+              setValue("Base.cBrkrCde", "");
+              setValue("Base.cBrkSlsCde", "");
+              setValue("Base.cAgtAgrNo", "");
+            }
+            nextTick(() => {
+              plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
+            });
+        }
+      }
+      nextTick(() => {
+        const ciRef = opertaor.getTableRefs()['ci'];
         if (val === "19002" || val === "19003") {
           // 非直销业务：清空业务员
           if (ciRef) {
@@ -263,9 +292,6 @@ const method = {
               disabled: false,
             },
           };
-          setFormItem("Base.cBrkrCde", {...obj,disabled:0}); //代理(经纪)人
-          setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-          setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
         } else {
           // 直销业务：清空代理业务员和代理经纪人
           if (ciRef) {
@@ -275,25 +301,6 @@ const method = {
               ciRef.setValueByRowKey("Ci.cBrkSlsCde", row._dataId, "");
             });
           }
-          const obj = {
-            rules: [],
-            disabled: true,
-            btnItems: {
-              disabled: true,
-            },
-          };
-          setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
-          setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-
-          setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
-          if (!p.initFlag) {
-            setValue("Base.cBrkrCde", "");
-            setValue("Base.cBrkSlsCde", "");
-            setValue("Base.cAgtAgrNo", "");
-          }
-          nextTick(() => {
-            plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
-          });
         }
         if (!!ciRef) {
           ciRef.valideRequired();
