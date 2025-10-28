@@ -678,9 +678,9 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            setFormValue({
-              "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
-            });
+            // setFormValue({
+            //   "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
+            // });
             codeListStore
               .queryCodeList(
                 {
@@ -694,8 +694,8 @@ const method = {
               )
               .then((res) => {
                 console.log("业务员=-==", res);
-                if (res && res.code == 200) {
-                  const codeValData = res.data;
+                if (res && res.length > 0) {
+                  const codeValData = res;
                   if (codeValData) {
                     // 服务机构业务员下拉和显示的值
                     setFormItem("Base.cIntroSalecde", {

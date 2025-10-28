@@ -108,7 +108,7 @@ onMounted(() => {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
       setFormItem("Applicant.cGreenIndustryList", { hidden: true, rules: null });
     }
-    if (!cProdNo.startsWith("05")) {
+    if (!cProdNo?.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderNature", {
@@ -1568,7 +1568,7 @@ function handleFileChange(event: Event) {
                 "Applicant.tCertfBgnDate",
                 cardInfo["BizLicenseOperatingPeriod"].split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效起期
               );
-              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("期限")) { // 证件有效期长期标识
+              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("期限") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "年月日") { // 证件有效期长期标识
                 setValue("Applicant.cLongendTyp", "1");
               } else {
                 setValue("Applicant.cLongendTyp", "0");

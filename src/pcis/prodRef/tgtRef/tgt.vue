@@ -1247,7 +1247,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDestAirportCountry') && getValue('Tgt.cDestAirportCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDestAirportCountry') && getValue('Tgt.cDestAirportCountry') != res.cCountryCn && getValue('Tgt.cDestAirportCountry') != res.cCountryEn) {
             ElMessage.error('目的地国家和目的地机场国家要求一致')
             return
           }
@@ -1316,7 +1316,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn && getValue('Tgt.cDepartureAirportCountry') != res.cCountryEn) {
             ElMessage.error('起运地国家和起运机场国家要求一致')
             return
           }
@@ -1388,7 +1388,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn && getValue('Tgt.cDispatchCountry') != res.cCountryEn) {
             ElMessage.error('起运地国家和起运机场国家要求一致')
             return
           }
@@ -1458,7 +1458,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn && getValue('Tgt.cDestinationCountry') != res.cCountryEn) {
             ElMessage.error('目的地国家和目的地机场国家要求一致')
             return
           }
