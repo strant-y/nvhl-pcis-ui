@@ -1237,17 +1237,17 @@ const valideRequired = () => {
             item.disabled = true;
           });
         }
-        if(rowData['Ci.cDptCde'] == param.cDptCde){
-          const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
-          freeEditRef.value?.setRowFieldProp(
-              rowData._dataId, "Ci.cSlsId", "disabled", true
-            );
-          if (rowItem) {
-          //  rowItem['Ci.cSlsId']['btnItems'].disabled = true;
-            rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
-            rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
-          }
-        }
+        // if(rowData['Ci.cDptCde'] == param.cDptCde){
+        //   const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
+        //   freeEditRef.value?.setRowFieldProp(
+        //       rowData._dataId, "Ci.cSlsId", "disabled", true
+        //     );
+        //   if (rowItem) {
+        //     rowItem['Ci.cSlsId']['btnItems'].disabled = true;
+        //     rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
+        //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
+        //   }
+        // }
 
         handleEdrAppNewSceneRules()
       }
