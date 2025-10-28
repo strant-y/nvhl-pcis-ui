@@ -236,13 +236,6 @@ const method = {
         }
       );
       
-      const obj = {
-        rules: [],
-        disabled: true,
-        btnItems: {
-          disabled: true,
-        },
-      };
       if(p.cTransMrk !== '1'){
         //代理业务 服务机构不可选
         if (val === "19002"){
@@ -255,23 +248,36 @@ const method = {
             }});
         }
         if (val === "19002" || val === "19003" ) {
-            setFormItem("Base.cBrkrCde", {...obj,disabled:false}); //代理(经纪)人
-            setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-            setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
+          const obj = {
+            rules: [getRules("required", {})],
+            btnItems: {
+              disabled: false,
+            },
+          };
+          setFormItem("Base.cBrkrCde", {...obj,disabled:false}); //代理(经纪)人
+          setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+          setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
 
         } else {
-            setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
-            setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+          const obj = {
+            rules: [],
+            disabled: true,
+            btnItems: {
+              disabled: true,
+            },
+          };
+          setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
+          setFormItem("Base.cBrkSlsCde", obj); //代理业务员
 
-            setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
-            if (!p.initFlag) {
-              setValue("Base.cBrkrCde", "");
-              setValue("Base.cBrkSlsCde", "");
-              setValue("Base.cAgtAgrNo", "");
-            }
-            nextTick(() => {
-              plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
-            });
+          setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
+          if (!p.initFlag) {
+            setValue("Base.cBrkrCde", "");
+            setValue("Base.cBrkSlsCde", "");
+            setValue("Base.cAgtAgrNo", "");
+          }
+          nextTick(() => {
+            plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
+          });
         }
       }
       nextTick(() => {
