@@ -416,66 +416,59 @@ function getAgencyBusinessList(param?: any) {
 // }
 
 onMounted(() => {
-  debugger;
-  console.log("props", props);
-  // if (sessionStorage.getItem("toMyPageData")) {
-    const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
-    //业务来源大类下拉数据
-    const params = {
-      CDptCde: data["cDptCde"],
-      CKindNo: data["cKindNo"],
-    };
-    //查询大类数据，用于默认回显
-    getBsnsTypList(params).then((res) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          const obj = {
-            loadData: res.data,
-          };
-          console.log("大类数据", obj);
-          setFormItem("CBsnsTyp", obj);
-          setValue("CBsnsTyp", props.data.data.cBsnsTyp);
-          // setValue("cChaType", props.data.data.cChaType);
-          // setValue("cChaSubtype", props.data.data.cChaSubtype);
+    if(props.cTransMrk !== '1'){
+      const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
+      //业务来源大类下拉数据
+      const params = {
+        CDptCde: data["cDptCde"],
+        CKindNo: data["cKindNo"],
+      };
+      //查询大类数据，用于默认回显
+      getBsnsTypList(params).then((res) => {
+        if (null != res && null != res["code"]) {
+          if (res["code"] === 200) {
+            const obj = {
+              loadData: res.data,
+            };
+            setFormItem("CBsnsTyp", obj);
+            setValue("CBsnsTyp", props.data.data.cBsnsTyp);
+          }
         }
-      }
-    });
-    //查询中类数据，用于默认回显  { BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }
-    getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp, scene: "PLY_APP_NEW_SCENE" }).then((res) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          const obj = {
-            loadData: res.data,
-          };
-          console.log("中类数据", obj);
-          setFormItem("CChaType", obj);
-          setValue("CChaType", props.data.data.cChaType);
+      });
+      //查询中类数据，用于默认回显  { BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }
+      getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp, scene: "PLY_APP_NEW_SCENE" }).then((res) => {
+        if (null != res && null != res["code"]) {
+          if (res["code"] === 200) {
+            const obj = {
+              loadData: res.data,
+            };
+            setFormItem("CChaType", obj);
+            setValue("CChaType", props.data.data.cChaType);
+          }
         }
-      }
-    });
-    //查询子类数据，用于默认回显
-    const paramSub = {
-      CChaType: props.data.data.cChaType,
-      flag: 1,
+      });
+      //查询子类数据，用于默认回显
+      const paramSub = {
+        CChaType: props.data.data.cChaType,
+        flag: 1,
 
-      scene: "PLY_APP_NEW_SCENE",
-    };
-    getChaSubtypList(paramSub).then((res) => {
-      if (null != res && null != res["code"]) {
-        if (res["code"] === 200) {
-          const obj = {
-            loadData: res.data,
-          };
-          console.log("子类数据", res.data);
-          setFormItem("CChaSubtype", obj);
-          setValue("CChaSubtype", props.data.data.cChaSubtype);
+        scene: "PLY_APP_NEW_SCENE",
+      };
+      getChaSubtypList(paramSub).then((res) => {
+        if (null != res && null != res["code"]) {
+          if (res["code"] === 200) {
+            const obj = {
+              loadData: res.data,
+            };
+            setFormItem("CChaSubtype", obj);
+            setValue("CChaSubtype", props.data.data.cChaSubtype);
+          }
         }
-      }
-    });
-  // }
-  nextTick(() => {
-    setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
-  });
+      });
+      nextTick(() => {
+        setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
+      });
+    }
 });
 
 defineExpose({
