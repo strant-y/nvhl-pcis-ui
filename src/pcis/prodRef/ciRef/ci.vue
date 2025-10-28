@@ -766,28 +766,33 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     console.log("rowData", rowData);
-    dialogRef.value?.open(
-      "ciagentPer",
-      {
-        type: "show",
-        data: {
-          rowData: rowData,
-        },
-        method: {
-          getSelected: (params) => {
-            freeEditRef.value?.setRowFieldProp(rowId, "Ci.cBrkrCde", "loadData", [{ label: `${params.CChaCde}${params.CChaNme}`, value: params.CChaCde }])
-            setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde)
-            dialogRef.value?.handleClose();
+    if(rowData['Ci.cDptCde']){
+      dialogRef.value?.open(
+        "ciagentPer",
+        {
+          type: "show",
+          data: {
+            rowData: rowData,
+          },
+          method: {
+            getSelected: (params) => {
+              freeEditRef.value?.setRowFieldProp(rowId, "Ci.cBrkrCde", "loadData", [{ label: `${params.CChaCde}${params.CChaNme}`, value: params.CChaCde }])
+              setValueByRowKey("Ci.cBrkrCde", rowId, params.CChaCde)
+              dialogRef.value?.handleClose();
+            },
           },
         },
-      },
-      {
-        isOk: (selectdata: any) => {
-          console.log("a", selectdata);
+        {
+          isOk: (selectdata: any) => {
+            console.log("a", selectdata);
+          },
         },
-      },
-      { title: "代理查询", width: 85 }
-    );
+        { title: "代理查询", width: 85 }
+      );
+    }else{
+      ElMessage.warning('请先选择出单机构'); // 提示用户选择出单机构
+    }
+    
   },
   //代理业务员
   cBrkSlsCdeChange: () => {
