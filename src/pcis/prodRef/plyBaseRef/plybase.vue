@@ -728,7 +728,6 @@ const method = {
       setValue("Base.cPrjCtgMidTyp", "");
       setValue("Base.cPrjCtgSubTyp", "");
     }
-
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });
@@ -736,7 +735,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "2",
           },
@@ -764,7 +763,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "3",
           },
@@ -826,8 +825,9 @@ function getCheckCdeptByCdptCde() {
                 {
                   codeListName: "CPrjCtgTyp_List",
                   codeListParam: {
-                    CRangeCde: subDptCde.value,
-                    // CParCde: "",
+                    // CRangeCde: subDptCde.value,
+                    CRangeCde: ['0200000000000', subDptCde.value],
+                    CParCde: '-1',
                     cLev: "1",
                   },
                 },
