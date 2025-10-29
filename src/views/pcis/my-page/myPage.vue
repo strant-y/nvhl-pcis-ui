@@ -1808,6 +1808,7 @@ async function loadAfter() {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
+    edritem.value?.handleQuery();
     if (props.param.cEdrType === "1") {
       if (props.param["cRsnCde"] !== "FZ") {
         edrbase.value?.setValue("EdrBase.cEdrRsnDetail", [
