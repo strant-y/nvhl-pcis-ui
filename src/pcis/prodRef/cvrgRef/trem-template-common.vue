@@ -40,7 +40,7 @@
                   </template>
                 </div>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-row :gutter="20">
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
@@ -61,6 +61,17 @@
                 </el-row>
               </el-col>
               <el-col :span="2">
+                <rtButton
+                  v-if="!btnItem.edit.hidden"
+                  @click="
+                    () => {
+                      emit('editPlan', termdata);
+                    }
+                  "
+                  :item="btnItem.edit"
+                />
+              </el-col>
+              <el-col :span="1">
                 <rtButton
                   v-if="!btnItem.delete.hidden"
                   @click="
@@ -424,7 +435,7 @@ const effectiveShowConf = computed(() => {
   };
 });
 
-const emit = defineEmits(["update:modelValue", "delete"]);
+const emit = defineEmits(["update:modelValue", "delete", "editPlan"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
@@ -433,6 +444,11 @@ const riskList = ref<{ [key: string]: any }>({});
 
 const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  edit: {
+    type: "primary",
+    label: "条款编辑",
+    size: "small"
+  },
   delete: {
     label: "删除",
     size: "small"
