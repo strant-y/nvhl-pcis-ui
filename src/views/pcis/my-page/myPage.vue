@@ -2744,6 +2744,13 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.insured['Insured.cCertfCls'] = ops.insured['Insured.cCertfCls'] === '110007' ? '01' : ops.insured['Insured.cCertfCls'];
       }
     console.log("转换的数据", ops);
+    if(ops["payinfo"] && ops["payinfo"].length > 0){
+      ops["payinfo"].forEach((item:any, index:number)=>{
+        if(item["Pay.nTms"] != index + 1){
+          item["Pay.nTms"] = index + 1;
+        }
+      })
+    }
     if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
