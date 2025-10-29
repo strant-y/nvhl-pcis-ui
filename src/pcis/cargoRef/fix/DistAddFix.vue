@@ -452,7 +452,7 @@ const idAnalysis = (id:string)=>{
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   const age = new Date().getFullYear() - birthYear;
 
-  setValue("ECargoInsuredDist.cNation", "1"); // 国籍
+  setValue("ECargoInsuredDist.cNation", "CHN"); // 国籍
   setValue("ECargoInsuredDist.tBirthday", birthday);
   setValue("ECargoInsuredDist.nAge", age);
   setValue("ECargoInsuredDist.cSex", sex);

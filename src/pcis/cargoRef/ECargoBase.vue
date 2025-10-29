@@ -198,22 +198,23 @@ const method = {
         return
       }else{
         const startDate = dayjs(getValue('ECargoBase.tInsrncBgnTm')); // 新的开始时间（v是用户选择的开始时间）
-        let endDate = getValue('ECargoBase.tInsrncEndTm')  // 结束时间
-        let days = Number(getValue('ECargoBase.cTmSysCde')); // 天数
-        const isDaysEmpty = isNaN(days) || days <= 0;
+        let endDate = dayjs(getValue('ECargoBase.tInsrncEndTm')).format("YYYY-MM-DD 23:59:59")  // 结束时间
+        // let days = Number(getValue('ECargoBase.cTmSysCde')); // 天数
+        // const isDaysEmpty = isNaN(days) || days <= 0;
         // 计算新的结束时间
-        let newEndDate;
-        if (!isDaysEmpty) {
-          newEndDate = startDate.add(days, 'day').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
-          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
-        } else if (!endDate) {
-          newEndDate = startDate.add(1, 'year').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
-          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
-        } else {
-          newEndDate = dayjs(endDate).subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
-          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
-        }
-        setValue('ECargoBase.tInsrncEndTm',newEndDate)
+        // let newEndDate;
+        // if (!isDaysEmpty) {
+        //   newEndDate = startDate.add(days, 'day').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+        //   days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        // } else if (!endDate) {
+        //   newEndDate = startDate.add(1, 'year').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+        //   days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        // } else {
+        //   newEndDate = dayjs(endDate).subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+        //   days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        // }
+        // setValue('ECargoBase.tInsrncEndTm',newEndDate)
+        const days = dayjs(endDate).add(1, 'second').diff(startDate, 'day');
         setValue( 'ECargoBase.cTmSysCde' ,days)
       }
     }
@@ -226,22 +227,23 @@ const method = {
         return
       }else {
         const startDate = dayjs(getValue('ECargoBase.tInsrncBgnTm')); // 新的开始时间（v是用户选择的开始时间）
-        let endDate = getValue('ECargoBase.tInsrncEndTm')  // 结束时间
-        let days = Number(getValue('ECargoBase.cTmSysCde')); // 天数
-        const isDaysEmpty = isNaN(days) || days <= 0;
+        let endDate = dayjs(getValue('ECargoBase.tInsrncEndTm')).format("YYYY-MM-DD 23:59:59") // 结束时间
+        // let days = Number(getValue('ECargoBase.cTmSysCde')); // 天数
+        // const isDaysEmpty = isNaN(days) || days <= 0;
         // 计算新的结束时间
-        let newEndDate;
-        if (!isDaysEmpty) {
-          newEndDate = startDate.add(days, 'day').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
-          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
-        } else if (!endDate) {
-          newEndDate = startDate.add(1, 'year').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
-          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
-        } else {
-          newEndDate = dayjs(endDate).subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
-          days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
-        }
-        setValue('ECargoBase.tInsrncEndTm',newEndDate)
+        // let newEndDate;
+        // if (!isDaysEmpty) {
+        //   newEndDate = startDate.add(days, 'day').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+        //   days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        // } else if (!endDate) {
+        //   newEndDate = startDate.add(1, 'year').subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+        //   days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        // } else {
+        //   newEndDate = dayjs(endDate).subtract(1, 'second').format("YYYY-MM-DD HH:mm:ss");
+        //   days = dayjs(newEndDate).add(1, 'second').diff(startDate, 'day');
+        // }
+        const days = dayjs(endDate).add(1, 'second').diff(startDate, 'day');
+        setValue('ECargoBase.tInsrncEndTm',endDate)
         setValue( 'ECargoBase.cTmSysCde' ,days)
       }
     }
