@@ -734,7 +734,7 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      setValue("ECargoApplicant.cNation", "1"); // 国籍
+      setValue("ECargoApplicant.cNation", "CHN"); // 国籍
       // setValue("ECargoApplicant.tBirthday", null);
       // setValue("ECargoApplicant.nAge", null);
       // setValue("ECargoApplicant.cSex", null);
@@ -881,7 +881,7 @@ const idAnalysis = (id:string)=>{
           const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           const age = calculateAgeFromIdCard(id);
 
-          setValue("ECargoApplicant.cNation", "1"); // 国籍
+          setValue("ECargoApplicant.cNation", "CHN"); // 国籍
           setValue("ECargoApplicant.tBirthday", birthday);
           setValue("ECargoApplicant.nAge", age);
           setValue("ECargoApplicant.cSex", sex);
