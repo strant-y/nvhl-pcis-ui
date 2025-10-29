@@ -420,6 +420,7 @@ import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service'
 import {scrollByDomId} from "@/utils/common";
 import {POSITE_PAGE_TYPE_APP} from "@/views/pcis/support/composite.types";
 const policyService = new PolicyService();
+import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -588,6 +589,14 @@ function next() {
       // 点击下一步前校验，如果data为true则继续，否则阻断并提示
       const queryProdDptCdeParam:any = { cDptCde:  formconfig1.value.cDptCde }
       if(formconfig1.value.cRenewMrk === "1") {
+        if(formconfig1.value.cPlyNo?.length > 18) {
+          ElMessage.error("历史数据的保单, 不允许续保");
+          return;
+        }
+        if (cannotCopy(formconfig1.value.cPlyNo)) {
+          ElMessage.error("该保单不允许续保");
+          return;
+        }
         queryProdDptCdeParam['cPlyNo'] = formconfig1.value.cPlyNo
       } else {
         queryProdDptCdeParam['cProdNo'] = formconfig1.value.cProdNo
@@ -605,6 +614,10 @@ function next() {
               // 续保保单的承保机构必须与选择的承保机构一致
               if(res.res.composition.plyBase[0]?.['Base.cDptCde'] !== formconfig1.value.cDptCde) {
                 ElMessage.warning("续保保单的承保机构编码【"+ res.res.composition.plyBase[0]?.['Base.cDptCde'] +"】与当前选择的承保机构不符，请重新选择！");
+                return
+              }
+              if(res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
+                ElMessage.warning("该保单不允许续保，请重新选择！");
                 return
               }
               router.push({
