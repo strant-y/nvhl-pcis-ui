@@ -384,6 +384,7 @@
 </template>
 
 <script setup lang="ts">
+import { getCurrentInstance } from 'vue'
 import { getTRFactorJson,getPrdTermInfo,viewPdfProposal } from "@/api/prod";
 import {
   AppFreeEditMethod,
@@ -405,6 +406,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const pageparam = opertaor.getParam();
 const terconfig = terConfig();
+const instance = getCurrentInstance();
 const { getRules } = useValidator();
 const props = defineProps({
   modelValue: {
@@ -490,6 +492,7 @@ function initData(data: any) {
   // 缓存条款数据
   const termData = JSON.parse(JSON.stringify(data));
   termData.riskList = null;
+  instance.proxy.$forceUpdate();
   termdata.value = termData;
   if(termdata.value['Term.nSeatTotal']){
     const tgt = opertaor.getTableRefByKey("tgt");
