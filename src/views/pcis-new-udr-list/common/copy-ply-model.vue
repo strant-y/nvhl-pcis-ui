@@ -456,7 +456,7 @@ const confirm = async () => {
       ElMessage.error("源保单和新单的共保方式不同, 不允许复制");
       return;
     }
-    if (selected.value[0].cPlyNo.length > 18) {
+    if (selected.value[0].cPlyNo?.length > 18) {
       ElMessage.error("历史数据的保单, 不允许复制");
       return;
     }
