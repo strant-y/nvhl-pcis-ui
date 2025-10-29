@@ -6,7 +6,6 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
-      @selection-change="handleSelectionChange"
       @page-change="handleQuery(false)"
     />
   </div>
@@ -31,7 +30,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import { deleteFactorBykey, getBasicKindList } from "@/api/prod";
+import { dealTerminationData, deleteFactorBykey, getBasicKindList, qryTerminationDataList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
@@ -69,19 +68,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CPlyNo",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         clearable: true,
       },
       {
-        prop: "CAppNo",
+        prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
         clearable: true,
       },
       {
-        prop: "COperType",
+        prop: "cOperType",
         inputtype: "rtselect",
         title: "业务申请类型",
         clearable: true,
@@ -97,21 +96,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
       },
       {
-        prop: "CTitleOa",
+        prop: "cTitleOa",
         inputtype: "rtinput",
         title: "OA标题",
         rules: [getRules("required", {})],
         clearable: true,
       },
+      // {
+      //   prop: "tOperTm",
+      //   inputtype: "rtdatepicker",
+      //   title: "业务申请时间",
+      //   clearable: true,
+      //   type: "daterange",
+      // },
       {
-        prop: "tm",
-        inputtype: "rtdatepicker",
-        title: "业务申请时间",
-        clearable: true,
-        type: "daterange",
-      },
-      {
-        prop: "appCde",
+        prop: "cOperCde",
         inputtype: "rtinput",
         title: "业务申请人",
         clearable: true,
@@ -131,89 +130,91 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     editFlag: true,
-    editList: ["cStatus"],
+    editList: ["cAppTyp"],
     showSelection:true,
     tableBtnPosition:'center',
     endBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "打开开关",
+        label: "选择全部打开",
         type: "primary",
         func: function () {
-           
+           openAll();
         },
       }),
       createFreeButtonBase({
         id: "score",
-        label: "关闭开关",
+        label: "选择全部关闭",
         type: "primary",
         func: function () {
-           
-        },
-      }),
-    ],
-    tableBtnType: "btn",
-    tableBtnWidth: 220,
-    tableBtnPosition: "right",
-    tableBtnFixed: "right",
-    tableBtn: [
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "编辑",
-        type: "success",
-        size: "large",
-        icon: "Edit",
-        tableClick: (row) => {
-          console.log(row);
-          dzmodal.open(kindEdit, { type: "edit", data: row }).then((res) => {
-            if (res.type === "ok") {
-              handleQuery();
-            }
-          });
+           closeAll();
         },
       }),
     ],
 
     fromSchema: [
       {
-        prop: "a",
+        prop: "cAppNo",
         inputtype: "rtinput",
-        title: "单据单号",
+        title: "申请单号",
         minWidth: 180,
         fixed: 'left',
       },
       {
-        prop: "b",
+        prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
         minWidth: 180,
       },
       {
-        prop: "c",
+        prop: "tInsrncBgnTm",
         inputtype: "rtinput",
         title: "保险日期",
         minWidth: 180,
       },
       {
-        prop: "d",
+        prop: "tInsrncEndTm",
         inputtype: "rtinput",
         title: "保险止期",
         minWidth: 180,
       },
       {
-        prop: "cStatus",
+        prop: "cAppTyp",
         inputtype: "rtswitch",
         title: "开关状态",
         keymap: {
-          y: "1",
-          n: "0",
+          y: "on",
+          n: "off",
         },
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        change: (val) => {
+        func: (val,row) => {
           console.log(val);
+          console.log(row);
+
+          let saveType = null;
+          const s = freeEditRef.value?.getFromValue(); //获取表单数据
+          if(val === 'on'){
+            freeEditRef.value?.validate().then((res) => {
+              if(!res){
+                tableRef.value?.setValueByRowKey("cAppTyp", row._dataId, val === 'off');  //如果验证不通过,则不修改状态
+                return ;
+              }
+            });
+          }
+          const params = {
+            forms: Object.assign(s,{cAppTyp:val}),
+            list: [row]
+          }
+
+          dealTerminationData(params).then((res) => {
+            if(res.code === 200){
+              handleQuery();
+            }else{
+              ElMessage.error(res.msg);
+            }
+          });
         },
       },
     ],
@@ -224,46 +225,89 @@ onMounted(async () => {});
 
 // 绑定方法
 const method = {
-  func1: () => {
-    console.log(getRules);
-  },
+  func1: () => {},
 };
+
+function openAll(){ 
+  const all = tableRef.value?.getselectionData();
+  if(!all || all.length === 0){ 
+    ElMessage.error('请选择至少一条数据!');
+    return ;
+  }
+
+  freeEditRef.value?.validate().then((res) => {
+    if(res){
+      const s = freeEditRef.value?.getFromValue(); //获取表单数据
+      const params = {
+        forms: Object.assign(s,{cAppTyp:'on'}),
+        list: all
+      }
+      dealTerminationData(params).then((res) => {
+        if(res.code === 200){
+          handleQuery();
+        }else{
+          ElMessage.error(res.msg);
+        }
+      });
+    }
+  });
+}
+
+
+function closeAll(){
+  
+  const all = tableRef.value?.getselectionData();
+  if(!all || all.length === 0){ 
+    ElMessage.error('请选择至少一条数据!');
+    return ;
+  }
+
+  freeEditRef.value?.validate().then((res) => {
+    if(res){
+      const s = freeEditRef.value?.getFromValue(); //获取表单数据
+      const params = {
+        forms: Object.assign(s,{cAppTyp:'off'}),
+        list: all
+      }
+      dealTerminationData(params).then((res) => {
+        if(res.code === 200){
+          handleQuery();
+        }else{
+          ElMessage.error(res.msg);
+        }
+      });
+    }
+  });
+
+}
 
 // 绑定特殊验证器
 const exRules = {
-  byrtInput: (rule: any, value: any, callback: any) => {
-    const r = freeEditRef.value?.getFromValue();
-    if (r["name"]) {
-      callback();
-    } else {
-      callback("姓名");
-    }
-  },
+  byrtInput: (rule: any, value: any, callback: any) => {},
 };
 
 /** 查询 */
-function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+async function handleQuery(flag?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        pageresult.list = [];
-        pageresult.list = data.result;
-        pageresult.total = data.total;
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-    .finally(() => {});
-}
-
-// 多选事件
-function handleSelectionChange(selection: any) {
-  console.log('selection',selection)
-  removeIds.value = selection.map((item: any) => item.cPkId);
+  if(s.cPlyNo || s.cAppNo) {
+    const r = await freeEditRef.value?.validateField("cOperType");
+    if(r){
+      const param = Object.assign(s);
+      qryTerminationDataList(param)
+        .then((res) => {
+          const { code, data, msg } = res;
+          if (200 === code) {
+            pageresult.list = [];
+            pageresult.list = data;
+          } else {
+            ElMessage.error(msg);
+          }
+        })
+        .finally(() => {});
+    }
+  }else{
+    ElMessage.error('保单号/申请单号至少录入一个');
+  }
 }
 
 </script>

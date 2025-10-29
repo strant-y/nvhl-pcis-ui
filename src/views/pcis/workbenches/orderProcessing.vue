@@ -155,6 +155,14 @@ const inquiryTaskStatusOptions = [
   { label: "询价退回/撤回", value: "3" },
   { label: "询价通过", value: "5" },
 ]
+const baseTypeStatus = ref("询价");
+const cAppStatusOptions = computed(() => {
+  if (baseTypeStatus.value === "询价") {
+    return inquiryTaskStatusOptions;
+  } else {
+    return taskStatusOptions;
+  }
+});
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "出单任务处理",
@@ -628,7 +636,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "DocumentCopy",
         hideBtns: (row: any) => {
           // 联保单不显示复制按钮
-          if ((row.baseType !== "询价" && row.cCiMrk !== "6") && row.cPlyNo?.length <= 18 && !cannotCopy(row.cPlyNo)) {
+          if ((row.baseType !== "询价" && row.cCiMrk !== "6") && row.cPlyNo?.length <= 18 && !cannotCopy(row.cPlyNo) && row.canCopy == 1) {
             return false;
           } else {
             return true;
@@ -784,7 +792,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "任务状态",
-        loadData: taskStatusOptions,
+        loadData: cAppStatusOptions,
         lengthNum: 7,
         align: "left",
       },
@@ -887,6 +895,7 @@ function refreshData(flag?: boolean) {
   if(param.tIssueTm && param.tIssueTm[1]) {
     param.tIssueTm[1] = dayjs(param.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
   }
+  baseTypeStatus.value = param.baseType;
   if(param.baseType) {
     param.baseType = [param.baseType];
   }

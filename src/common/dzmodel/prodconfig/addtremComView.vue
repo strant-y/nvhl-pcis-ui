@@ -188,17 +188,25 @@ onMounted(async () => {
   }
   const { code, data, msg } = res;
   if (200 === code) {
-    data1.value = data;
+    if(param.showMethod === 'edit'){
+      const rr = data?.forEach((item: any) => {
+        let nch = [];
+        item.children?.forEach((it: any) => {
+          const r = param.commonconf.termRisk?.filter((rt: any) => {
+            return it.cRiskNo === rt.cRiskNo && rt.cIsCommon !=='1';
+          });
+          if(r.length > 0){
+            nch.push(it);
+          }
+        });
+        item.children = nch;
+      });
+      data1.value = data;
+    }else{
+      data1.value = data;
+    }
     expandedKeys.value = data.map((item) => item.id);
     data1.value.forEach((item: any) => {
-      // if (tremMap.value[item.cUniqueTermNo]) {
-      //   const risks = tremMap.value[item.cUniqueTermNo];
-      //   item.children?.forEach((i: any) => {
-      //     if (risks.includes(i.cRiskNo)) {
-      //       i.disabled = param.type !== "ECargo";
-      //     }
-      //   });
-      // } 将前端写死的配置,修改为后端配置
         item.children?.forEach((i: any) => {
           i.disabled = param.type !== "ECargo" && i.cIsDissel === '1';
         });
@@ -227,22 +235,23 @@ function setNode() {
   } else {
     if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
       selectAdditionNodes.value.forEach((item: any) => {
-        if (item["cRdrTyp"] === "0") {
-          if (item["riskList"] && item["riskList"].length > 0) {
-            item["riskList"].forEach((risk: any) => {
-              const k = item["cTermNo"] + risk["cRiskNo"];
-              addMainKey.push(k);
-            });
-          }
-          addMainKey.push(item["cTermNo"]);
+        if (item["riskList"] && item["riskList"].length > 0) {
+          item["riskList"].forEach((risk: any) => {
+            const k = item["cTermNo"] + risk["cRiskNo"];
+            addMainKey.push(k);
+          });
         }
       });
     }
   }
-
+  ignoreCheckChange = true;
   mainRef.value?.setCheckedKeys(addMainKey, false);
+  nextTick(() => {
+    ignoreCheckChange = false;
+  });
 }
 
+let ignoreCheckChange = false;
 function selectmainMethod(a: any, b: any, c: any) {
   const param = props.data.data;
   let mc = null;
@@ -294,7 +303,9 @@ function selectmainMethod(a: any, b: any, c: any) {
           addMainKey = addMainKey.filter((node: any) => node !== child.id);
         }
       });
-      mainRef.value?.setCheckedKeys(addMainKey, false);
+      if(!(ignoreCheckChange && param.showMethod === "edit")){
+        mainRef.value?.setCheckedKeys(addMainKey, false);
+      }
     } else {
       if (b) {
         data1.value.forEach((d: any) => {

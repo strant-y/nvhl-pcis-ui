@@ -332,7 +332,7 @@ const method = {
         const obj = {
           rules: null,
           btnItems: {
-            disabled: true,
+            disabled: false,
           },
         };
         if (!p.initFlag) {
