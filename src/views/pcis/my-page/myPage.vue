@@ -3479,7 +3479,9 @@ const submitToUndrFn = async () => {
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
-      btn.loading = true;
+      if(btn) {
+        btn.loading = true;
+      }
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
   
@@ -3500,14 +3502,18 @@ const submitToUndrFn = async () => {
       const baseValue = opertaor.getTableRefByKey("base").getFromValue();
       if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
         ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
-        btn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
         return;
       }
       // 校验标的信息中核定座位总数和投保座位数总数不一致！
       const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
       if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
         ElMessage.error("核定座位总数和投保座位数总数不一致！");
-        btn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
         return;
       }
 
@@ -3529,19 +3535,25 @@ const submitToUndrFn = async () => {
                     dangerouslyUseHTMLString: true,
                     type: 'warning'
                 });
-                btn.loading = false;
+                if(btn) {
+                  btn.loading = false;
+                }
                 return false;
             }
         } else {
             ElMessage.error({ message: blackRes.msg, duration: 3000 });
-            btn.loading = false;
+            if(btn) {
+              btn.loading = false;
+            }
             return false;
         }
 
       // 校验清单与条款方案是否一致
       const DistOK = await validateDistConsistency();
       if (!DistOK) { // 未通过阻断
-        btn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
         return;
       };   
       //校验联共保信息
@@ -3551,7 +3563,9 @@ const submitToUndrFn = async () => {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
         if (!isCiValid) {
-          btn.loading = false;
+          if(btn) {
+            btn.loading = false;
+          }
           return;
         }
       }
@@ -3569,7 +3583,9 @@ const submitToUndrFn = async () => {
       // 重新进行保费计算
       const calBtn = getBtn("btn010101");
       try {
-        calBtn.loading = true;
+        if(calBtn) {
+          calBtn.loading = true;
+        }
         const calcres: any = props.param?.pageName === "priceInquiry" ? await calculatePremium(calcData) : await appCalc(calcData);
         if (calcres.code === 200) {
           const newOp: any = opertaor.convertData(calcres);
@@ -3580,7 +3596,9 @@ const submitToUndrFn = async () => {
           validateciPrm()
           if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
-            btn.loading = false;
+            if(btn) {
+              btn.loading = false;
+            }
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
                 ElMessage({
@@ -3643,8 +3661,12 @@ const submitToUndrFn = async () => {
       } catch (err) {
         console.log("保费计算失败!" + err);
       } finally {
-        btn.loading = false;
-        calBtn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
+        if(calBtn) {
+          calBtn.loading = false;
+        }
       }
     });
   }
@@ -3819,7 +3841,9 @@ const savePlyInfo = async () => {
       const basePrmCent = toCent(res['base']['Base.nPrm']);
        if(totalCent !== basePrmCent){
          ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-         btn.loading = false;
+          if(btn) {
+            btn.loading = false;
+          }
         return false;
       }
   }
@@ -3851,7 +3875,9 @@ const savePlyInfo = async () => {
 
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     return false;
   }
   // 判断是否为历史补全保单 (cTransMrk === '1')
@@ -3862,7 +3888,9 @@ const savePlyInfo = async () => {
   console.log('res保存参数',res)
   const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(res) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
-  btn.loading = false;
+  if(btn) {
+    btn.loading = false;
+  }
   if (resInfo["code"] == "200") {
     const ops: any = opertaor.convertData(resInfo);
     console.log("转换的数据", ops);
@@ -4132,7 +4160,9 @@ const calcPremiumEdr = async () => {
   }
 
   const btn = getBtn("btnCalEdr");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
 
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
@@ -4155,7 +4185,9 @@ const calcPremiumEdr = async () => {
   // }
 
   calcEdr(res).then((res) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     console.log("批改计算", res);
     if (res["code"] == "200") {
       let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
@@ -4297,7 +4329,9 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
  */
 const calcPremiumEdrSurrender = () => {
   const btn = getBtn("btn010101");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
@@ -4311,7 +4345,9 @@ const calcPremiumEdrSurrender = () => {
   }
 
   calcSurrenEdr(res).then((res: any) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     console.log("批改计算", res);
     if (res["code"] == "200") {
       ElMessage.success(
@@ -4359,7 +4395,9 @@ const calcPremiumEdrSurrender = () => {
 const saveApplicationEdr = async () => {
   let saveFlag = false;
   const btn = getBtn("btn010102");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4376,7 +4414,9 @@ const saveApplicationEdr = async () => {
   // 点击保存之前的申请单号
   const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
   const resInfo = await saveSurrenEdr(res)
-  btn.loading = false;
+  if(btn) {
+    btn.loading = false;
+  }
   console.log("退保保存", resInfo);
   if (resInfo["code"] == "200") {
     const ops = opertaor.convertData(resInfo);
@@ -4444,14 +4484,18 @@ const saveApplicationEdr = async () => {
  * **/
 const getSurrenderPrecisFun = () => {
   const btn = getBtn("btnCompare");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   getSurrenderPrecis(res).then((res) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     if (res["code"] == "200") {
       const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
       edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
@@ -4498,7 +4542,9 @@ const submitEdrToUndrSurrender = async () => {
   const f = await saveApplicationEdr();// 提交核保,需要默认执行一次保存操作
   if(f === false) return;
   const btn = getBtn("btn010103");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4512,7 +4558,9 @@ const submitEdrToUndrSurrender = async () => {
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   
   submitEdrSurrender(res).then((result) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     console.log("申请核保(退保、注销)", result);
     if (result["code"] == "200") {
       ElMessage.success(result.msg);
@@ -4538,7 +4586,9 @@ const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
   const btn = getBtn("saveEdr");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = opertaor.getDataAll();
   const dataALl = opertaor.getDataAll();
   res["user"] = user;
@@ -4558,7 +4608,9 @@ const saveEdrPlyInfo = async () => {
   
   const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
-  btn.loading = false;
+  if(btn) {
+    btn.loading = false;
+  }
   if(edrInfo["code"] == "200") {
     const ops = opertaor.convertData(edrInfo);
     console.log("转换的数据", ops);
@@ -4636,7 +4688,9 @@ const generateEndorse = async () => {
     return
   }
   const btn = getBtn("btnCompare");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -4657,7 +4711,9 @@ const generateEndorse = async () => {
   //   })
   // }
   getEndorseChange(res).then((res) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     if (res["code"] == "200") {
       const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
       const edrRsn = res["data"]["data"]["edrRsn"]; //批文
@@ -4796,13 +4852,17 @@ if(props.param.cTransMrk !== "1"){
     // 校验清单与条款方案是否一致
     const DistOK = await validateDistConsistency();
     if (!DistOK) {
+      if(btn) {
         btn.loading = false;
+      }
         return;
     };  
     // const s = await saveDataInfo()
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
-    btn.loading = true;
+    if(btn) {
+      btn.loading = true;
+    }
     const res = {};
     const base = opertaor.getTableRefByKey("plyBase").getFromValue();
     res["user"] = user;
@@ -4811,7 +4871,9 @@ if(props.param.cTransMrk !== "1"){
     res["taskId"] = props.param.taskId ? props.param.taskId : null;
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
     const calBtn = getBtn("btnCalEdr");
-    calBtn.loading = true;
+    if(calBtn) {
+      calBtn.loading = true;
+    }
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
@@ -4891,7 +4953,9 @@ if(props.param.cTransMrk !== "1"){
           const oldPrm = calcData.base["Base.nPrm"];
           if (newPrm === oldPrm) {
             submitEdrToUndr(res).then((result) => {
-              btn.loading = false;
+              if(btn) {
+                btn.loading = false;
+              }
               console.log("批改申请核保", result);
               // ElMessage.success(res.msg);
               // history.back();
@@ -4918,8 +4982,12 @@ if(props.param.cTransMrk !== "1"){
       } catch (err) {
         console.log("保费计算失败!" + err);
       } finally {
-        btn.loading = false;
-        calBtn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
+        if(calBtn) {
+          calBtn.loading = false;
+        }
       }
     },500)
   }
@@ -4959,7 +5027,9 @@ if(props.param.cTransMrk !== "1"){
 const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013"]
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = underwrite.value.getFromValue();
   res["user"] = user;
   res["user"]["opRelCde"] = user.opCde;
@@ -5066,7 +5136,9 @@ const submitUnderwritingFn = async () => {
 
   submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
