@@ -234,6 +234,10 @@ import { FIELD_MAP } from '@/constants/fieldMaps';
 import {saveAs} from "file-saver";
 const cPard = ref(null);
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
+// 核保信息
+const UndrOpnList = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
 
 watch(() => {
   const freeEditRefs = freeEditRef.value;
@@ -1919,6 +1923,29 @@ const tableObj = {
                     .then((res:any) => {
 
                     })
+                },
+            }),
+            createFreeButtonBase({
+                id: "taskVestige",
+                link: true,
+                tooltip: "核保信息",
+                type: "info",
+                size: "large",
+                icon: "DocumentChecked",
+                hideBtns: (row:any) => {
+                    if(row.cAppStatus == '1') {
+                        return true
+                    } else {
+                        return false
+                    }
+                },
+                tableClick: (row) => {
+                    dzmodal
+                        .open(UndrOpnList, { type: "", CAppNo: row.taskTyp === "I" ? row.cInquiryNo : row.cAppNo })
+                        .then((res: any) => {
+                            if (res.type === "ok") {
+                            }
+                        });
                 },
             }),
             // createFreeButtonBase({

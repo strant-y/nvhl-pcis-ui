@@ -1829,7 +1829,7 @@ async function loadAfter() {
         icon: "DocumentChecked",
         func: () => {
           dzmodal
-            .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
+            .open(UndrOpnList, { type: "", CAppNo: props.param?.cInquiryNo })
             .then((res: any) => {
               if (res.type === "ok") {
               }
