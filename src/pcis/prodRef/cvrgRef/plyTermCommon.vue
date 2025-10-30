@@ -98,18 +98,18 @@ const cardMainconfig = ref(
     title: "主条款信息",
     showInTitle: true,
     titleClass: "mainTitle",
-    titleBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "添加条款",
-        id: "addPlan_btn",
-        icon: "CirclePlus",
-        size: "small",
-        func: () => {
-          addTermData();
-        },
-      }),
-    ],
+    // titleBtns: [
+    //   createFreeButtonBase({
+    //     type: "primary",
+    //     label: "添加条款",
+    //     id: "addPlan_btn",
+    //     icon: "CirclePlus",
+    //     size: "small",
+    //     func: () => {
+    //       addTermData();
+    //     },
+    //   }),
+    // ],
   })
 );
 
