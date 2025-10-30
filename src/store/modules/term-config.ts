@@ -20,10 +20,17 @@ export const terConfig = defineStore(
     const configInit = () => {
       Object.assign(config, {});
     };
+    const selectReset = () => {
+      selectedRow.value = {
+        index: undefined,
+        data: undefined
+      };
+    };
     return {
       getConfig,
       addConfig,
       configInit,
+      selectReset,
       selectedRow
     };
   },

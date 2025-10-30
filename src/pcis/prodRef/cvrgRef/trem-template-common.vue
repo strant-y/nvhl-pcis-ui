@@ -251,7 +251,7 @@
               </el-row>
             </div>
           </template>
-          <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
+          <template v-if ="termFactormap && termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <table style="width: 100%">
                 <thead>
@@ -392,7 +392,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { terConfig } from "@/store/modules/term-config";
+import { terConfig, configInit } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
@@ -488,6 +488,8 @@ function update() {
   emit("update:modelValue", newData);
 }
 function initData(data: any) {
+  terconfig.selectReset();
+  showdataInit();
   const newData = JSON.parse(JSON.stringify(data));
   // 缓存条款数据
   const termData = JSON.parse(JSON.stringify(data));
@@ -852,6 +854,14 @@ function dataInit() {
       initMethod();
     });
   }
+}
+
+function showdataInit() {
+  collist.value = null;
+  factormap.value = null;
+  colInfo.value = null;
+  groupInfo.value = null;
+  termFactormap.value = null;
 }
 
 function getUseData(data: any){
