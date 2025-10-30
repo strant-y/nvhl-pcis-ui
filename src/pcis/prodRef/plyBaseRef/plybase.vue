@@ -324,10 +324,10 @@ const method = {
         };
         if (!p.initFlag) {
           setFormItem("Base.cSlsId", obj); //业务员工号
+          setValue("Base.cSlsId", "");
+          setValue("Base.cSlsNme", "");
         }
         setFormItem("Base.cSlsId", { rules: null }); //业务员工号
-        setValue("Base.cSlsId", "");
-        setValue("Base.cSlsNme", "");
       } else {
         const obj = {
           rules: [getRules("required", {})],
