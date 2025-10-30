@@ -692,12 +692,15 @@ const method = {
       interface Item {
         nInsuredHeadcount?: number | null | string;
       }
-      if (termrefList.length) {
-        termref?.setTermData({
-          termNo: termrefList[0]?.['Term.cUniqueTermNo'],  // 这个不是条款 需要 去方法里面打印看具体数据ID
-          planNo: termrefList[0]?.['Term.cPlanNo'],
-          factorProp: 'Term.nSeatTotal',
-        }, val);
+      for (let i = 0; i < termrefList.length; i++) {
+        const term = termrefList[i];
+        if (term['Term.cRdrTyp'] == '0') { // 判断是主条款
+          termref?.setTermData({
+            termNo: term['Term.cUniqueTermNo'],
+            planNo: term['Term.cPlanNo'],
+            factorProp: 'Term.nSeatTotal',
+          }, val);
+        }
       }
     }
   },
