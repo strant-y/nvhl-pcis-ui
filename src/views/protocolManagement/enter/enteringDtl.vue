@@ -325,26 +325,28 @@ onBeforeMount(async () => {
   }
 	if (props.type === "add") {
     const idata = getECargoData(idxParam);
-        nextTick(()=>{
+    nextTick(()=>{
 			formPage.value?.setFormDataById('AgreementBase',idata);
-            // 新增选择预付
-            if(props.payWay && props.payWay == '01'){
-              // 设置默认值, 给表单下拉项赋值
-              formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
-              const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
-              AgreementFeeWarn.setFormItem("ECargoBase.cPayWay", {
-                typeCode: 'ECargo_Pay_Ways',
-                codeParam: { payway: 'prepay' },
-                disabled: true
-              })
-            }else{
-              formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
-              const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
-              AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
-                typeCode: 'ECargo_Pay_Ways',
-                codeParam: { payway: 'nonPrepay' }
-              })
-            }
+      // 新增选择预付
+      if(props.payWay && props.payWay == '01'){
+        // 设置默认值, 给表单下拉项赋值
+        formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
+        formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cReceivedRmb": "CNY" })
+        const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+        AgreementFeeWarn.setFormItem("ECargoBase.cPayWay", {
+          typeCode: 'ECargo_Pay_Ways',
+          codeParam: { payway: 'prepay' },
+          disabled: true
+        })
+      }else{
+        formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cPayWay": props.payWay })
+        formPage.value?.setFormDataById('AgreementFeeWarn',{"ECargoBase.cReceivedRmb": "CNY" })
+        const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
+        AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+          typeCode: 'ECargo_Pay_Ways',
+          codeParam: { payway: 'nonPrepay' }
+        })
+      }
 		})
   }
   bthList.value.push(
