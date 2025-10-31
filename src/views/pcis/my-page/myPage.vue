@@ -4608,12 +4608,6 @@ const saveEdrPlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
 
-  // 特约信息中的使用分期缴费和使用一次缴费为二选一，提示用户删除某一个
-  if(!validateSpecialAgreement() && btn) {
-    btn.loading = false;
-    return false;
-  }
-
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
     res["EdrBase"]?.["EdrBase.cEdrRsnDetail"] != null &&
