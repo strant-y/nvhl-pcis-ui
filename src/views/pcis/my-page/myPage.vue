@@ -5602,6 +5602,15 @@ const validateTgt = () => {
       return false;
     }
   }
+  // 041007 标的信息 被监护人是否记名选是，人员清单信息必填
+  if(props.param?.cProdNo==='041007'){
+    let tableLenght = opertaor.getTableRefByKey("PersonnelDist041007").getTableData().length;  // 清单条数
+    let cIsRegistered =  opertaor.getTableRefByKey("tgt").getValue('Tgt.cIsRegistered');      // 是否单项工程
+    if(tableLenght ==0 && cIsRegistered=='1'){
+      ElMessage.warning("“被监护人是否记名”为是时，人员清单信息不能为空！");  
+      return false;
+    }
+  }
   return true;
 }
 
