@@ -67,7 +67,7 @@ onMounted(async () => {
     method,
     exRules
   );
-  Object.assign(formconfig1, formconfig11);
+  Object.assign(formconfig1, formconfig11, { preserveExpandedContent: true });
   //一般批改，部分要素可编辑
   const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
   setTimeout(() => {
