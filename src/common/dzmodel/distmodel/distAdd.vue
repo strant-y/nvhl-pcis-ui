@@ -67,7 +67,8 @@ const mapAddr = {
     "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
   },
   "AddressDist041001": {
-    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    // "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    "Dist.cDetailedAddress": "Dist.cDetailedAddress"
   },
   "AddressDist043020": {},
   "AdvertisementDist043011": {
@@ -203,6 +204,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
               params.dist['Dist.tSalesTime'] = moment(params.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
             }
             // 级联地址表格显示问题处理
+            debugger
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
               const addrInput = mapAddr[props.data.compKey];
               const keys = Object.keys(addrInput)
