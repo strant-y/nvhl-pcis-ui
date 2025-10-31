@@ -1161,6 +1161,23 @@ watch(
         },parkingNum);
       }
     }
+
+    // 041007 条款中的关联被保险人数量由清单中的关联监护人进行汇总;被监护人数量由清单中的被监护人姓名汇总
+    if(route.params.param?.cProdNo === '041007') {
+      const num = pageresult.list.length || 0;
+      if(route.params.param?.cGrpMrk == "1") {
+        opertaor.getTableRefs()['cvrg']?.setTermData({
+          termNo:route.params.param?.cTermNo,
+          planNo:'P1',
+          factorProp: 'Term.nRelatedInsuredCount',
+        },num);
+      }
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nWardTotal',
+      },num);
+    }
   }
 )
 const getSummary = async () => {
