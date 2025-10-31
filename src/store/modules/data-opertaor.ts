@@ -113,12 +113,20 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     page.pageInfo.forEach(info => {
                         const fsch = info.pageSchema;
                         if(readTab.includes(info.pageKey)){
-                            setread(fsch);
+                            setread(info.pageSchema);
                         }
-                        if(info.pageKey === 'base') {
+                        if(info.pageKey === 'base'){
                             fsch.editFlag = true;
                             fsch.fromSchema.forEach(item => {
-                                if(item.prop === 'Base.nAccidentLimit'){
+                                if(item.prop === 'Base.nAccidentLimit'){  //单独放开,每次事故赔偿限额字段
+                                    item.disabled = false;
+                                }
+                            })
+                        }
+                        if(info.pageKey === 'plyBase'){
+                            fsch.editFlag = true;
+                            fsch.fromSchema.forEach(item => {
+                                if(item.prop === 'Base.cSlsId'){          //单独放开,业务员编号
                                     item.disabled = false;
                                 }
                             })

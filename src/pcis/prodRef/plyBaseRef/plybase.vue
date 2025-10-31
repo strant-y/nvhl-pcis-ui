@@ -235,8 +235,8 @@ const method = {
           }
         }
       );
-      nextTick(() => {
-        const ciRef = opertaor.getTableRefs()['ci'];
+      
+      if(p.cTransMrk !== '1'){
         //代理业务 服务机构不可选
         if (val === "19002"){
           setFormItem("Base.cIntroDptcde", {btnItems: {
@@ -247,34 +247,18 @@ const method = {
               disabled: false,
             }});
         }
-        if (val === "19002" || val === "19003") {
-          // 非直销业务：清空业务员
-          if (ciRef) {
-            const ciData = ciRef.getFromValue();
-            ciData.forEach((row: any) => {
-              ciRef.setValueByRowKey("Ci.cSlsId", row._dataId, "");
-              ciRef.setValueByRowKey("Ci.cSlsNme", row._dataId, "");
-            });
-          }
-          //代理业务 | 经纪业务
+        if (val === "19002" || val === "19003" ) {
           const obj = {
             rules: [getRules("required", {})],
             btnItems: {
               disabled: false,
             },
           };
-          setFormItem("Base.cBrkrCde", {...obj,disabled:0}); //代理(经纪)人
+          setFormItem("Base.cBrkrCde", {...obj,disabled:false}); //代理(经纪)人
           setFormItem("Base.cBrkSlsCde", obj); //代理业务员
           setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
+
         } else {
-          // 直销业务：清空代理业务员和代理经纪人
-          if (ciRef) {
-            const ciData = ciRef.getFromValue();
-            ciData.forEach((row: any) => {
-              ciRef.setValueByRowKey("Ci.cBrkrCde", row._dataId, "");
-              ciRef.setValueByRowKey("Ci.cBrkSlsCde", row._dataId, "");
-            });
-          }
           const obj = {
             rules: [],
             disabled: true,
@@ -294,6 +278,35 @@ const method = {
           nextTick(() => {
             plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
           });
+        }
+      }
+      nextTick(() => {
+        const ciRef = opertaor.getTableRefs()['ci'];
+        if (val === "19002" || val === "19003") {
+          // 非直销业务：清空业务员
+          if (ciRef) {
+            const ciData = ciRef.getFromValue();
+            ciData.forEach((row: any) => {
+              ciRef.setValueByRowKey("Ci.cSlsId", row._dataId, "");
+              ciRef.setValueByRowKey("Ci.cSlsNme", row._dataId, "");
+            });
+          }
+          //代理业务 | 经纪业务
+          const obj = {
+            rules: [getRules("required", {})],
+            btnItems: {
+              disabled: false,
+            },
+          };
+        } else {
+          // 直销业务：清空代理业务员和代理经纪人
+          if (ciRef) {
+            const ciData = ciRef.getFromValue();
+            ciData.forEach((row: any) => {
+              ciRef.setValueByRowKey("Ci.cBrkrCde", row._dataId, "");
+              ciRef.setValueByRowKey("Ci.cBrkSlsCde", row._dataId, "");
+            });
+          }
         }
         if (!!ciRef) {
           ciRef.valideRequired();

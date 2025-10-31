@@ -40,7 +40,7 @@
                   </template>
                 </div>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-row :gutter="20">
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
@@ -61,6 +61,17 @@
                 </el-row>
               </el-col>
               <el-col :span="2">
+                <rtButton
+                  v-if="!btnItem.edit.hidden"
+                  @click="
+                    () => {
+                      emit('editPlan', termdata);
+                    }
+                  "
+                  :item="btnItem.edit"
+                />
+              </el-col>
+              <el-col :span="1">
                 <rtButton
                   v-if="!btnItem.delete.hidden"
                   @click="
@@ -240,7 +251,7 @@
               </el-row>
             </div>
           </template>
-          <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
+          <template v-if ="termFactormap && termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <table style="width: 100%">
                 <thead>
@@ -373,6 +384,7 @@
 </template>
 
 <script setup lang="ts">
+import { getCurrentInstance } from 'vue'
 import { getTRFactorJson,getPrdTermInfo,viewPdfProposal } from "@/api/prod";
 import {
   AppFreeEditMethod,
@@ -380,7 +392,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { terConfig } from "@/store/modules/term-config";
+import { terConfig, configInit } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
@@ -394,6 +406,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const pageparam = opertaor.getParam();
 const terconfig = terConfig();
+const instance = getCurrentInstance();
 const { getRules } = useValidator();
 const props = defineProps({
   modelValue: {
@@ -424,7 +437,7 @@ const effectiveShowConf = computed(() => {
   };
 });
 
-const emit = defineEmits(["update:modelValue", "delete"]);
+const emit = defineEmits(["update:modelValue", "delete", "editPlan"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
@@ -433,6 +446,11 @@ const riskList = ref<{ [key: string]: any }>({});
 
 const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  edit: {
+    type: "primary",
+    label: "条款编辑",
+    size: "small"
+  },
   delete: {
     label: "删除",
     size: "small"
@@ -470,10 +488,13 @@ function update() {
   emit("update:modelValue", newData);
 }
 function initData(data: any) {
+  terconfig.selectReset();
+  showdataInit();
   const newData = JSON.parse(JSON.stringify(data));
   // 缓存条款数据
   const termData = JSON.parse(JSON.stringify(data));
   termData.riskList = null;
+  instance.proxy.$forceUpdate();
   termdata.value = termData;
   if(termdata.value['Term.nSeatTotal']){
     const tgt = opertaor.getTableRefByKey("tgt");
@@ -833,6 +854,14 @@ function dataInit() {
       initMethod();
     });
   }
+}
+
+function showdataInit() {
+  collist.value = null;
+  factormap.value = null;
+  colInfo.value = null;
+  groupInfo.value = null;
+  termFactormap.value = null;
 }
 
 function getUseData(data: any){

@@ -1103,7 +1103,7 @@ function exChangeFunc() {
   const data: { [key: string]: any } = opertaor.getDataAll();
   extermConf.value = Object.assign({});
   // 043009个性化配置
-  if (pageparam.cProdNo === "043009") {
+  if (pageparam.cProdNo === "043009" && termdata.value['Term.cRdrTyp'] !== '1') {
     if (data["tgt"]["Tgt.cInsuranceMethod"]) {
       if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
         if (colInfo.value && colInfo.value.length > 0) {
