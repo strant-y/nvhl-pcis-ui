@@ -180,7 +180,7 @@ watch(
         if(isQuery.value) return
         eventBus.emit('goodsMxChange', newVal);
         // 02开头的货物明细清单，关联标的信息
-        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
+        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
            method.getTgtDetailFn();
            emit('savePlyInfo');
         }

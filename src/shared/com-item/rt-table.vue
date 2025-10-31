@@ -32,6 +32,7 @@
       :cell-style="getCellStyle"
       :header-cell-style="{color: '#000', fontWeight: 450, padding: '2px 2px'}"
       class="custom-table"
+      :preserve-expanded-content="item.preserveExpandedContent ? item.preserveExpandedContent : false"
     >
       <!-- 其他列定义 -->
       <el-table-column
