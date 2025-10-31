@@ -3855,6 +3855,12 @@ const savePlyInfo = async () => {
       }
   }
 
+  // 特约信息中的使用分期缴费和使用一次缴费为二选一，提示用户删除某一个
+  if(!validateSpecialAgreement() && btn) {
+    btn.loading = false;
+    return false;
+  }
+
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -4601,7 +4607,12 @@ const saveEdrPlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-  
+
+  // 特约信息中的使用分期缴费和使用一次缴费为二选一，提示用户删除某一个
+  if(!validateSpecialAgreement() && btn) {
+    btn.loading = false;
+    return false;
+  }
 
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
@@ -6074,6 +6085,23 @@ function handleRemoveReceived() {
     });
   });
 }
+
+function validateSpecialAgreement() {
+  const res = opertaor.getDataAll();
+  if(res['SpecialAgreement']?.length > 0) {
+    for(let i=0;i<res['SpecialAgreement'].length;i++){
+      const item = res['SpecialAgreement'][i];
+      if(res['base']['Base.cInstMrk'] === '0' && item['SpecialAgreement.cSpecialCode'] == '34201122'){// 一次交清
+        ElMessage.error(`特约信息中的第 ${item['SpecialAgreement.index']} 条特约信息与承保基本信息中的付费约定冲突，请删除该特约信息！`);
+        return false;
+      } else if(res['base']['Base.cInstMrk'] === '5' && item['SpecialAgreement.cSpecialCode'] == '34201123') {// 多次交清
+        ElMessage.error(`特约信息中的第 ${item['SpecialAgreement.index']} 条特约信息与承保基本信息中的付费约定冲突，请删除该特约信息！`);
+        return false;
+      }
+    }
+  }
+  return true;
+};
 
 /**
  * 检查缴费计划的有效性
