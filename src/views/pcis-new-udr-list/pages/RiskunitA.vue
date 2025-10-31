@@ -1644,11 +1644,15 @@ async function getRiskData() {
 
 // 关闭弹框
 const emit = defineEmits(['ok'])
+const closeLoading = ref(false);
 const handleBeforeClose = async (done:any) => {
   // 关闭弹框时如果保存过风险单位，需要调用再保保存险位接口，接口会返回标识
+  if(closeLoading.value) return;
+  closeLoading.value = true;
   if(saveFlag.value) {
     // 调用再保险位接口
     const { saveFlag, data } = await saveDataInfo() 
+    closeLoading.value = false;
     if(!saveFlag) return
     emit('ok', {...data, tableList: pageresult1.list})
     done()
