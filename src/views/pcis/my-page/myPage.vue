@@ -2739,8 +2739,11 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.SpecialAgreement[0]['SpecialAgreement.cTransMrk'] = "1"
         ops.SpecialAgreement[0]['SpecialAgreement.cIfMust'] = "1"
       }
-      if (props.param.cTransMrk === '1') {
+      // 有些保单证件类型的值仍然是110007，需要转换成01
+      if (ops.applicant) {
         ops.applicant['Applicant.cCertfCls'] = ops.applicant['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant['Applicant.cCertfCls'];
+      }
+      if(ops.insured) {
         ops.insured['Insured.cCertfCls'] = ops.insured['Insured.cCertfCls'] === '110007' ? '01' : ops.insured['Insured.cCertfCls'];
       }
     console.log("转换的数据", ops);
