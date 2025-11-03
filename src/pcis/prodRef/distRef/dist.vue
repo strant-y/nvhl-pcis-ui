@@ -1111,6 +1111,7 @@ const method = {
           confirmButtonText: "是",
           cancelButtonText: "否",
           type: "warning",
+          distinguishCancelAndClose: true,// 区分关闭和取消
         }
       ).then(async () => {// 选是则删除所有清单数据 接口不传cPkId
         const res:any = await deleteDistCheck(param);
@@ -1125,7 +1126,8 @@ const method = {
         }).catch((err:any) => {
           ElMessage.error(err.msg)
         })
-      }).catch(async () => {// 选否则删除本页选中数据
+      }).catch(async (action:any) => {// 选否则删除本页选中数据
+        if(action === 'close') return; // 关闭不做任何操作
         param['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
         const res:any = await deleteDistCheck(param);
         deleteDist(param).then(async(res: any) => {
