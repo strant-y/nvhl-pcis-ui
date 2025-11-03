@@ -1895,7 +1895,7 @@ const tableObj = {
                 tableClick: (row) => {
                     dzmodal
                         .open(TaskListVestige, { type: "Issuer",
-                            data: { objId: row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
+                            data: { objId: row["taskTyp"] === "I" ? row.cInquiryNo : row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
                                   ? "U"
                                   : "E" } })
                         .then((res:any) => {

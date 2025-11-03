@@ -573,6 +573,7 @@ const method = {
       }
     }
   },
+  // 修改后总保额(累计赔偿限额)change事件
   aAmtChange: (val: any) => {
     const namtExch = getValue('Base.nAmtRmbExch');
     if (!!namtExch) {
