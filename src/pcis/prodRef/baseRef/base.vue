@@ -580,19 +580,6 @@ const method = {
       // 计算折人民币保额
       setValue("Base.nRmbAmt", numMulti(namtExch, val));
     }
-    // 联共保主协议信息-共保总保额ciMasterAgreement
-    if(val && val > Number(getValue("Base.nCumulativeLimitModified") || 0)) {
-      ElMessage.warning("修改后总保额(累计赔偿限额)不能大于总保额(累计赔偿限额！");
-      setValue("Base.nAmt", getValue("Base.nCumulativeLimitModified"));
-      return;
-    }
-    const cCiMrkMap = ['1', '2', '3', '4'];
-    if(cCiMrkMap.includes(opertaor.getTableRefByKey('plyBase')?.getValue("Base.cCiMrk")) && getValue("Base.nCumulativeLimitModified")) {
-      opertaor.getTableRefByKey('ciMasterAgreement')?.setValue("Base.nCiJntAmt", val);
-      nextTick(() => {
-        ElMessage.warning("共保总保额发生变化，请重新计算保费！");
-      })
-    }
   },
   // 总保额(累计赔偿限额)汇率change事件
   nAmtRmbExchChange: (val: any) => {
@@ -604,20 +591,20 @@ const method = {
       }
     }
   },
-  // 是否修改累计赔偿限额 是和否change事件
+  // 是否修改每次事故赔偿限额 是和否change事件
   nAmtLimitManualChange: (val: any) => {
     if(val == '0'){
-      setFormItem("Base.nAmt", { disabled: true });
+        setFormItem("Base.nCumulativeLimitModified", { rules: [] });
     } else{
-      setFormItem("Base.nAmt", { disabled: false });
+        setFormItem("Base.nCumulativeLimitModified", { rules: [getRules("required", {})] });
     }
   },
-   // 是否修改每次事故赔偿限额
+   // 是否修改累计赔偿限额
   cAccidentLimitChange: (val: any) => {
     if(val == '0'){ // 否 
-        setFormItem("Base.nModifiedAccidentLimit", { rules: [], disabled: true });
+        setFormItem("Base.nModifiedAccidentLimit", { rules: [] });
     } else{  // 是 必填
-        setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})], disabled: false });
+        setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})] });
     }
   },
   // 总保费汇率change事件
