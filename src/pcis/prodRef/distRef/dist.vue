@@ -1093,40 +1093,80 @@ const method = {
       ElMessage.warning("请先选择要删除的数据");
       return;
     }
-    const param = {
+    const param:any = {
       cComponentTable: cComponentTableValue,
-      cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
+      // cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
     }
     if (route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
-
-    const res = await deleteDistCheck(param);
-    const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
-
-    ElMessageBox.confirm(
-        checkMsg,
+    // 增加是否删除全部判断，选是删除全部，选否删除选中项
+    if (pageresult.total > 10 && selectedRows.value.length === 10) {
+      ElMessageBox.confirm(
+        "是否删除全部？",
         "提示",
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: "是",
+          cancelButtonText: "否",
           type: "warning",
         }
-    ).then(() => {
-      deleteDist(param).then(async(res: any) => {
-        if (res.code === 200) {
-          ElMessage.success("删除成功");
-          const queryParams = distTableRef.value?.getPartnerPage(false);
-          method.handleQuery(queryParams, true);
-        } else {
-          ElMessage.error(res.msg);
-        }
-      }).catch((err:any) => {
-        ElMessage.error(err.msg)
-      })
-    });
+      ).then(async () => {// 选是则删除所有清单数据 接口不传cPkId
+        const res:any = await deleteDistCheck(param);
+        deleteDist(param).then(async(res: any) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            method.handleQuery(queryParams, true);
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err.msg)
+        })
+      }).catch(async () => {// 选否则删除本页选中数据
+        param['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
+        const res:any = await deleteDistCheck(param);
+        deleteDist(param).then(async(res: any) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            method.handleQuery(queryParams, true);
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err.msg)
+        })
+      });
+    } else {
+      param['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
+      const res:any = await deleteDistCheck(param);
+      const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
+
+      ElMessageBox.confirm(
+          checkMsg,
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+      ).then(() => {
+        deleteDist(param).then(async(res: any) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            method.handleQuery(queryParams, true);
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err.msg)
+        })
+      });
+    }
   }
 };
 
