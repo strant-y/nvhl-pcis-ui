@@ -1006,6 +1006,7 @@ function refreshData(flag?: boolean) {
     ...s,
     tm1: date1,
     tm2: date2,
+    cDptCde: user.value.companyId,
   };
   
   // 提取申请日期的开始时间和结束时间

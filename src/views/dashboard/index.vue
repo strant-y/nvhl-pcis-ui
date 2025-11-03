@@ -1046,7 +1046,7 @@ function init() {
 function getOrderInfo() {
   (async () => {
     try {
-      const res: any = await getAnalysis({ type: "ply_total" });
+      const res: any = await getAnalysis({ type: "ply_total", cDptCde: user.companyId });
       if (res.code === 200) {
         tabDataMap.value = res.dataMap;
         const keys = Object.keys(res.dataMap).filter(
@@ -1090,6 +1090,7 @@ async function handleRefreshEcharts() {
     const param = {
       // type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
       type: "ply",
+      cDptCde: user.companyId,
     };
     try {
       const res: any = await getAnalysis(param);
@@ -1145,6 +1146,7 @@ async function handleRefreshEcharts() {
   if (echartsOptionsData1.value.length < 1) {
     const param1 = {
       type: "fee",
+      cDptCde: user.companyId,
     };
     try {
       const res: any = await getAnalysis(param1);
@@ -1311,6 +1313,7 @@ const handleTabClick = (tab: any) => {
 const pageData = ref({
   pageSize: 10,
   pageNum: 1,
+  cDptCde: user.companyId,
 });
 function getAuditTableData() {
   let getList = null;
