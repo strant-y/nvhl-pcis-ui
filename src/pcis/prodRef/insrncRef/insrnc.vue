@@ -311,6 +311,8 @@ const method = {
     }
     setFormItem("Base.tReportBgnTm", { rules: null }); //延长报告期起始日期
     setFormItem("Base.tReportEndTm", { rules: null }); //延长报告期终止日期
+    clearValidate("Base.tReportEndTm");
+    clearValidate("Base.tReportBgnTm");
 
     //内索赔制 时，追溯/日落起止期必填
     if (val == "2") {
@@ -336,6 +338,8 @@ const method = {
         setFormItem("Base.tRunEndTm", { rules: [] }); //追溯/日落止期
         setFormItem("Base.tReportEndTm", { rules: [] }); //延长报告期终止日期
         setFormItem("Base.tReportBgnTm", { rules: [] }); //延长报告期起始日期
+        clearValidate("Base.tReportEndTm");
+        clearValidate("Base.tReportBgnTm");
       }
 
 
@@ -344,7 +348,7 @@ const method = {
       setFormItem("Base.tRunEndTm", { hidden: true }); //追溯/日落止期
       setFormItem("Base.nTracingDays", { hidden: true }); //追溯/日落天数
       setFormItem("Base.tReportBgnTm", { hidden: false }); //延长报告期起始日期
-      setFormItem("Base.tReportEndTm", { hidden: false }); //延长报告期终止日期
+      setFormItem("Base.tReportEndTm", { hidden: false }); //延长报告期终止日期Base.tReportEndTm
       setFormItem("Base.nReportDays", { hidden: false }); //延长报告期天数
     }
     // setValue("Base.cIsRetroSpect", "");
@@ -382,6 +386,8 @@ const method = {
         "Base.tReportEndTm": "",
         "Base.nReportDays": "",
       });
+      clearValidate("Base.tReportBgnTm");
+      clearValidate("Base.tReportEndTm");
     }
   },
   // 追溯起期
@@ -584,6 +590,10 @@ function getFormconfig() {
 function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   insrncEditRef?.value?.addProvide(key, value);
 }
+
+function clearValidate(key:any = null) {
+  insrncEditRef?.value?.clearValidate(key);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -591,7 +601,8 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
-  addProvide
+  addProvide,
+  clearValidate,
 });
 </script>
 
