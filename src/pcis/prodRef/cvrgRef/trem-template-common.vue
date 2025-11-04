@@ -26,9 +26,21 @@
                     <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
                     </el-badge>
+                    <!-- 增加应税、免税标识 -->
+                    <template v-if="term.isDutyfree">
+                      <span class="isDutyfree">
+                        <img :src="term.isDutyfree === '0' ? yingImageUrl : term.isDutyfree === '1' ? mianImageUrl : ''" alt="" srcset="">
+                      </span>
+                    </template>
                   </template>
                   <template v-else>
                     <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
+                    <!-- 增加应税、免税标识 -->
+                    <template v-if="term.isDutyfree">
+                      <span class="isDutyfree">
+                        <img :src="term.isDutyfree === '0' ? yingImageUrl : term.isDutyfree === '1' ? mianImageUrl : ''" alt="" srcset="">
+                      </span>
+                    </template>
                     <el-tooltip content="预览条款" placement="top">
                       <el-button
                         type="text"
@@ -456,6 +468,8 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
     size: "small"
   },
 });
+const yingImageUrl = ref(new URL(`../../../assets/img/ying.png`, import.meta.url).href);
+const mianImageUrl = ref(new URL(`../../../assets/img/mian.png`, import.meta.url).href);
 
 const {selectedRow} = storeToRefs(terconfig);
 
@@ -1483,5 +1497,13 @@ td {
 
 .crvg_form__ {
   margin-top: 3px;
+}
+
+.isDutyfree {
+  display: flex;
+  align-items: center;
+  img {
+    width: 18px;
+  }
 }
 </style>

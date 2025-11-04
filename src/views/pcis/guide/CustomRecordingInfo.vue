@@ -21,7 +21,11 @@
         v-model:pageresult="pageresult"
         ref="tableRef"
         @page-change="handleQuery(false)"
-      />
+      >
+        <template #column-isDutyFree="{ row }">
+          <img v-if="row.isDutyFree" :src="row.isDutyFree === '0' ? yingImageUrl : row.isDutyFree === '1' ? mianImageUrl : ''" alt="" srcset="" style="width: 22px;display: block;margin: 0 auto;">
+        </template>
+      </app-table>
     </div>
   </div>
 </template>
@@ -81,6 +85,8 @@ const params = ref<any>({});
 const checkedIcon = ref("rgb(170, 170, 170)");
 const tableRef = ref<AppTableMethod | null>(null);
 const countNum = ref(0);
+const yingImageUrl = ref(new URL(`../../../assets/img/ying.png`, import.meta.url).href);
+const mianImageUrl = ref(new URL(`../../../assets/img/mian.png`, import.meta.url).href);
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -183,6 +189,12 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "value",
         inputtype: "rtinput",
         title: `${labelNm.value}名称`,
+      },
+      {
+        prop: "isDutyFree",
+        inputtype: "rtinput",
+        title: `是否应税`,
+        slotName: "isDutyFree",
       },
     ],
   })
