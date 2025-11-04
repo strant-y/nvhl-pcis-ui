@@ -17,12 +17,20 @@
           </td>
           <td v-for="(it, kk) in formcof" :key="kk">
             <template v-if = "it['inputtype'] === 'rttag'">
-              <el-badge value="退" class="term_badge rt-custom-input rt-custom-select" :hidden="item['Term.cCancelMrk'] !== '1'" >
-                <from-item
-                v-model="item['Term.'+kk]"
-                :item="getterm(it,item)"
-              />
-              </el-badge>
+              <div style="display: flex;">
+                <el-badge value="退" class="term_badge rt-custom-input rt-custom-select" :hidden="item['Term.cCancelMrk'] !== '1'" >
+                  <from-item
+                  v-model="item['Term.'+kk]"
+                  :item="getterm(it,item)"
+                />
+                </el-badge>
+                <!-- 增加应税、免税标识 -->
+                <template v-if="term.isDutyfree">
+                  <span class="isDutyfree">
+                    <img :src="term.isDutyfree === '0' ? yingImageUrl : term.isDutyfree === '1' ? mianImageUrl : ''" alt="" srcset="">
+                  </span>
+                </template>
+              </div>
             </template>
             <template v-else>
               <div class="rt-custom-input rt-custom-select">
@@ -55,6 +63,7 @@
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { terConfig } from "@/store/modules/term-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal } from "@/api/prod";
 
 const emit = defineEmits(["update:modelValue", "delete"]);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -73,7 +82,37 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {});
+const term = ref<object>({});
+const yingImageUrl = ref(new URL(`../../../assets/img/ying.png`, import.meta.url).href);
+const mianImageUrl = ref(new URL(`../../../assets/img/mian.png`, import.meta.url).href);
+onMounted(() => {
+  let queryList: { [k: string]: any }[] = [];
+  let queryKey = props.planData[0]?.["Term.cClauseCode"];
+  props.planData[0].riskList.forEach((item: any) => {
+    let p: { [k: string]: any } = {};
+    Object.keys(item).forEach((key) => {
+      const v = item[key];
+      let newKey = "";
+      if (key.indexOf(".")) {
+        newKey = key.split(".")[1];
+      } else {
+        newKey = key;
+      }
+      if (newKey === "cLiabCode" && v) {
+        p["cRiskNo"] = v;
+        queryKey += v;
+      }
+    });
+    queryList.push(p);
+  });
+  const params = {
+    cTermNo: props.planData[0]?.["Term.cClauseCode"],
+    riskList: queryList,
+  };
+  getTRFactorJson(params).then((res: any) => {
+    term.value = res.data?.data?.term
+  })
+});
 
 const btnConf = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
@@ -173,5 +212,14 @@ td {
 }
 ::v-deep .term_badge .el-badge__content{
   top: 5px !important;
+}
+
+.isDutyfree {
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+  img {
+    height: 24px;
+  }
 }
 </style>
