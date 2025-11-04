@@ -130,7 +130,7 @@ const tableconfig = reactive<AppTableConfig>(
 
                  let list = formData.value;
                  const index = list.findIndex(
-                    item => item.cSpecialCode === row.cSpecialCode
+                    item => item.cSpecialCode === row.cSpecialCode && item.cPkId === row.cPkId
                   );
                     if (index !== -1) {
                       nextTick(()=>{
