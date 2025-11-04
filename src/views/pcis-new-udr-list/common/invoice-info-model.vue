@@ -170,7 +170,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CCertfCls",
         inputtype: "rtselect",
         title: "证件类型",
-        typeCode: "NATURAL_CERTIFICATE_ALL",
+        typeCode: "TYPE_OF_ID",
         params: { },
         clearable: true,
       },
