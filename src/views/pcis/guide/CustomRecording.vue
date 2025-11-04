@@ -403,6 +403,7 @@ import {
   qryUserCommonTerm,
   unUserUnUntionTerm,
   getPolicy,
+  checkRenewalDpt,
 } from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -608,23 +609,38 @@ function next() {
       }
       const data = formconfig1.value;
       if (formconfig1.value.cRenewMrk == "1") {
-        getPolicy({ cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig" }).then(
-          (res: any) => {
-            if (res.code == "200") {
-              // 续保保单的承保机构必须与选择的承保机构一致
-              if(res.res.composition.plyBase[0]?.['Base.cDptCde'] !== formconfig1.value.cDptCde) {
-                ElMessage.warning("续保保单的承保机构编码【"+ res.res.composition.plyBase[0]?.['Base.cDptCde'] +"】与当前选择的承保机构不符，请重新选择！");
-                return
-              }
-              if(res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
+        getPolicy({cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig"}).then(
+            async (res: any) => {
+              if (res.code == "200") {
+                //校验两个机构是否是同一个二级机构
+                var same;
+                await checkRenewalDpt({
+                  cDptCde_ply: res.res.composition.plyBase[0]?.['Base.cDptCde'],
+                  cDptCde_app: formconfig1.value.cDptCde
+                }).then((response: any) => {
+                  if (response.code === 200) {
+                    same = response.data == 1;
+                  } else {
+                    ElMessage.error(response.msg);
+                  }
+                });
+                if (!same) {
+                  ElMessage.warning("续保保单的承保机构编码【" + res.res.composition.plyBase[0]?.['Base.cDptCde'] + "】与当前选择的承保机构不在同一【二级机构】下，请重新选择！");
+                  return
+                }
+              if (res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
                 ElMessage.warning("该保单不允许续保，请重新选择！");
                 return
               }
               router.push({
                 path: "/pcisapp/myPage",
                 query: {
-                  param: JSON.stringify({ ...handleArray(res.res.composition.plyBase[0]), ...{ pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
-                      cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res } }),
+                  param: JSON.stringify({
+                    ...handleArray(res.res.composition.plyBase[0]), ...{
+                      pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
+                      cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
+                    }
+                  }),
                 },
               });
             } else {

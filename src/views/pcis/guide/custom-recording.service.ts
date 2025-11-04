@@ -27,6 +27,10 @@ export function getPolicy(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getPolicy`, queryParams);
 }
 
+export function checkRenewalDpt(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/checkRenewalDpt`, queryParams);
+}
+
 /*
  * 投保	自定义录单
  */
