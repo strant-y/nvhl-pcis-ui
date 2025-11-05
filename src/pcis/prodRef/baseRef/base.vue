@@ -591,7 +591,7 @@ const method = {
       return;
     }
     const cCiMrkMap = ['1', '2', '3', '4'];
-    if(cCiMrkMap.includes(opertaor.getTableRefByKey('plyBase')?.getValue("Base.cCiMrk")) && getValue("Base.nCumulativeLimitModified")) {
+    if(cCiMrkMap.includes(opertaor.getTableRefByKey('plyBase')?.getValue("Base.cCiMrk")) && getValue("Base.nCumulativeLimitModified") && getValue("Base.nCumulativeLimitModified") != val) {
       opertaor.getTableRefByKey('ciMasterAgreement')?.setValue("Base.nCiJntAmt", val);
       nextTick(() => {
         ElMessage.warning("共保总保额发生变化，请重新计算保费！");
