@@ -4148,32 +4148,6 @@ const calcPremiumEdr = async () => {
        ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
     return false;
   }
-  // 调用接口校验清单录入
-  const checkDistParam = { cAppNo: res.plyBase["Base.cAppNo"] };
-  const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
-  if(checkDistInfo?.code !== 200) {
-    ElMessage.error(checkDistInfo?.msg);
-    return;
-  }
-  if (checkDistInfo?.data?.code === -1){
-    ElMessage.error(checkDistInfo?.data?.msg);
-    return;
-  }
-  if (checkDistInfo?.data?.code === 1) {
-    try {
-      await ElMessageBox.confirm(
-          checkDistInfo?.data?.msg + "，是否继续",
-          "提示",
-          {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning",
-          }
-      );
-    } catch (e) {
-      return;
-    }
-  }
 
   const btn = getBtn("btnCalEdr");
   if(btn) {
@@ -4872,6 +4846,33 @@ if(props.param.cTransMrk !== "1"){
       }
         return;
     };  
+    
+    // 调用接口校验清单录入
+    const checkDistParam = { cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo") };
+    const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
+    if(checkDistInfo?.code !== 200) {
+      ElMessage.error(checkDistInfo?.msg);
+      return;
+    }
+    if (checkDistInfo?.data?.code === -1){
+      ElMessage.error(checkDistInfo?.data?.msg);
+      return;
+    }
+    if (checkDistInfo?.data?.code === 1) {
+      try {
+        await ElMessageBox.confirm(
+            checkDistInfo?.data?.msg + "，是否继续",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+        );
+      } catch (e) {
+        return;
+      }
+    }
     // const s = await saveDataInfo()
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
