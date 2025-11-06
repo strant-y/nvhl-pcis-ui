@@ -523,6 +523,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                   item.hidden = false;
                               }
                           });
+                      } else if (s["prodCNmeCn"] == "043002") {
+                          formconfig1.fromSchema?.forEach((item) => {
+                              if (
+                                item.prop === "cVinCode" || 
+                                item.prop === "cPlateNumber"
+                              ) {
+                                  item.hidden = false;
+                              }
+                          });
                       } else if (s["prodCNmeCn"] == "043004" || s["prodCNmeCn"] == "043005") {
                           formconfig1.fromSchema?.forEach((item) => {
                               if (
@@ -1020,7 +1029,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.prop === "cBorrowerName"||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
+                          item.prop === "cPrjCtgSubTyp" ||
+                          item.prop === "cVinCode" ||
+                          item.prop === "cPlateNumber"
                       ) {
                           item.hidden = true;
                       }
@@ -1078,7 +1089,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.prop === "cBorrowerName"||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
+                          item.prop === "cPrjCtgSubTyp" ||
+                          item.prop === "cVinCode" ||
+                          item.prop === "cPlateNumber"
                       ) {
                           item.hidden = true;
                       }
@@ -1147,7 +1160,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.prop === "cBorrowerName"||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
+                          item.prop === "cPrjCtgSubTyp" ||
+                          item.prop === "cVinCode" ||
+                          item.prop === "cPlateNumber"
                       ) {
                           item.hidden = true;
                       }
@@ -1483,6 +1498,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "cBorrowerName",
               inputtype: "rtinput",
               title: "借款人名称",
+              clearable: true,
+              hidden: true,
+          },
+          {
+              prop: "cVinCode",
+              inputtype: "rtinput",
+              title: "车架号",
+              clearable: true,
+              hidden: true,
+          },
+          {
+              prop: "cPlateNumber",
+              inputtype: "rtinput",
+              title: "车牌号",
               clearable: true,
               hidden: true,
           },
@@ -2423,6 +2452,15 @@ async function exportAE( flag?: boolean, isEs) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
+    if(s.tIssueTm && s.tIssueTm[1]) {
+        s.tIssueTm[1] = dayjs(s.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
+    if(s.tAppTm && s.tAppTm[1]) {
+        s.tAppTm[1] = dayjs(s.tAppTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
+    if(s.tEdrAppTm && s.tEdrAppTm[1]) {
+        s.tEdrAppTm[1] = dayjs(s.tEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
@@ -2961,6 +2999,12 @@ function processExpandParams(formData) {
         } else if (s["prodCNmeCn"] == "043001" && s["cLicenseNumber"]) {
             expandFlag = 1;
             expandVal = { "cLicenseNumber": s["cLicenseNumber"] };
+        } else if (s["prodCNmeCn"] == "043002" && s["cVinCode"] && s["cPlateNumber"]) {
+            expandFlag = 1;
+            expandVal = { 
+                "cVinCode": s["cVinCode"],
+                "cPlateNumber": s["cPlateNumber"],
+            };
         } else if ((s["prodCNmeCn"] == "043004" || s["prodCNmeCn"] == "043005") && s["cDetailedAddress"]) {
             expandFlag = 1;
             expandVal = { "cDetailedAddress": s["cDetailedAddress"] };
