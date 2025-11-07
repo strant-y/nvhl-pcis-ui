@@ -20,6 +20,12 @@
                       {{ term.cNmeCn }}
                     </el-text>
                   </div>
+                  <!-- 增加应税、免税标识 -->
+                  <template v-if="term.isDutyfree">
+                    <span class="isDutyfree">
+                      <img :src="term.isDutyfree === '0' ? yingImageUrl : term.isDutyfree === '1' ? mianImageUrl : ''" alt="" srcset="">
+                    </span>
+                  </template>
                   <template v-if="termdata['Term.cCancelMrk'] === '1'">
                     <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
@@ -462,6 +468,8 @@ const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
 const {selectedRow} = storeToRefs(terconfig);
 const zhuImageUrl = ref(new URL(`../../../assets/img/zhu.png`, import.meta.url).href);
 const fuImageUrl = ref(new URL(`../../../assets/img/fu.png`, import.meta.url).href);
+const yingImageUrl = ref(new URL(`../../../assets/img/ying.png`, import.meta.url).href);
+const mianImageUrl = ref(new URL(`../../../assets/img/mian.png`, import.meta.url).href);
 
 function termUpdate(){
   termDeductibleNote();
@@ -1107,7 +1115,7 @@ function exChangeFunc() {
   const data: { [key: string]: any } = opertaor.getDataAll();
   extermConf.value = Object.assign({});
   // 043009个性化配置
-  if (pageparam.cProdNo === "043009") {
+  if (pageparam.cProdNo === "043009" && termdata.value['Term.cRdrTyp'] !== '1') {
     if (data["tgt"]["Tgt.cInsuranceMethod"]) {
       if (data["tgt"]["Tgt.cInsuranceMethod"] !== "613001") {
         if (colInfo.value && colInfo.value.length > 0) {
@@ -1692,4 +1700,11 @@ td {
   margin: 30px 10px 10px 20px;
 }
 
+.isDutyfree {
+  display: flex;
+  align-items: center;
+  img {
+    width: 18px;
+  }
+}
 </style>

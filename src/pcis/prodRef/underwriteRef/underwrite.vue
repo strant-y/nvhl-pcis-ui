@@ -124,9 +124,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           type: "primary",
           disabled: true, // 批单不允许进行自主临分
           func: async () => {
+            setFormItem("riFacMrk", {
+              btnItems: {disabled: true}
+            });
             const riskDataIsMultiple = await getRiskDataIsMultiple();
             if(riskDataIsMultiple) {
               ElMessage.warning("多险位不可以自主临分，请检查险位信息。");
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: false}
+              });
               return;
             }
             const param = {
@@ -177,6 +183,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               setValue("cUndrMrk", "")
             } else {
               ElMessage.error(checkLibertyInfo.message);
+              setFormItem("riFacMrk", {
+                btnItems: {disabled: false}
+              });
             }
           },
         },
@@ -227,7 +236,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {disabled: true}
             });
             checkboxDisabledFlag.value = true
-            if (!bzFlag.value) {
+            if (!bzFlag.value && params.initFlag == false) {
               ElMessageBox.confirm(
                 "该业务认定为非水险比例分保合同除外业务，是否查看该险种合同除外责任并进一步确认。",
                 "提示",
@@ -648,9 +657,11 @@ function loadUwTabData() {
 }
 
 async function queryRiskCodelistFn() {
-  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cProdNo: params.cProdNo })
-  if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "200") {
+  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
+  if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "1") {
     contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
+    setFormItem("cIsExcluding", { disabled: queryRiskCodelistInfo.data?.cReadOnly === "1" ? false : true })
+    setValue("cIsExcluding", queryRiskCodelistInfo.data?.cExc || '')
   }
 }
 

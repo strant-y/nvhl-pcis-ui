@@ -102,7 +102,7 @@ const payConfirmInfoDetailRead = defineAsyncComponent(() => import("./pay-confir
 const tableRef = ref<AppTableMethod | null>(null);
 let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
-
+const env = import.meta.env;
 
 function extractCode(str:string) {
   // 匹配 "P+数字" 或 "纯数字"
@@ -840,7 +840,8 @@ const tableconfig = reactive<AppTableConfig>(
                         }
 
                          cPaySequences = multipleSelection.value[0]['cPaySequence'];
-        				window.open('http://t.yaic.com.cn:12003/02/'+cPaySequences)
+                         const url = env.MODE === "prod" ? 'https://pay.yaic.com.cn/02/' : 'http://t.yaic.com.cn:12003/02/';
+                        window.open(url + cPaySequences)
 					},
 				}),
 			// createFreeButtonBase({

@@ -535,7 +535,7 @@ const handelnInsuranceAmountList = ()=>{
     setFormItem('Dist.nInsuranceAmount',{disabled:false})
   }else if(nInsuranceAmountListB.includes(params?.cProdNo)){
     isShownInsuranceAmount.value = false
-    setFormItem('Dist.nInsuranceAmount',{disabled:true})
+    // setFormItem('Dist.nInsuranceAmount',{disabled:true})
   }
 }
 const nInvoiceValueChange = (val:any)=>{
@@ -550,6 +550,12 @@ const nInvoiceValueChange = (val:any)=>{
     setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
   }else {
     setValue('Dist.nInsuranceAmount',val)
+  }
+  // 如果发票金额有值， 保险金额不可编辑，否则可编辑
+  if(val) {
+    setFormItem("Dist.nInsuranceAmount", { disabled: true })
+  } else {
+    setFormItem("Dist.nInsuranceAmount", { disabled: false })
   }
 }
 const nAdditiveCoefficientChange = (val:any)=>{
@@ -592,6 +598,12 @@ const InvoiceCurrencyChange = (val:any)=>{
       setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100))
       setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
     }
+  }
+  // 发票金额币种如果有值，保险金额币种不可编辑，否则可编辑
+  if(val) {
+    setFormItem("Dist.cPrmCur", { disabled: true })
+  } else {
+    setFormItem("Dist.cPrmCur", { disabled: false })
   }
 }
 const nInsuranceAmountChange = (val:any)=>{
@@ -644,8 +656,8 @@ const cDocumentTypeChange = (val: any) => {
 
   const baseRuleMap: Record<string, any[]> = {
     "111": [getRules("idCard", {})], // 身份证
-    "110007": [getRules("socialCode", {})], // 统一社会信用代码
-    "19": [getRules("ariCard", {})], // 外国人证件号
+    "01": [getRules("socialCode", {})], // 统一社会信用代码
+    "553": [getRules("ariCard", {})], // 外国人证件号
     "110001": [getRules("orgCode", {})], // 组织机构编码
     default: [] // 默认无规则
   };

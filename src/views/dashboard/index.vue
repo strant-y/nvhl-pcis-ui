@@ -4,7 +4,8 @@
       <div class="code-box" style="position: absolute;right: 3px;">
         <div class="code-inner-box">
           <span>移动端二维码：</span>
-          <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="">
+          <img class="code-img" src="@/assets/img/dashbord/prod-QRCode.png" alt="" v-if="env.MODE === 'prod'">
+          <img class="code-img" src="@/assets/img/dashbord/QRCode.png" alt="" v-else>
         </div>
         <div class="code-inner-box">
           <span>在线缺陷平台：</span>
@@ -493,8 +494,10 @@ const moreBtnItem = ref({
   },
 });
 const labelIcon = "/src/assets/img/slash.png";
-const platformUrl =
-  "https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1";
+
+const env = import.meta.env;
+const platformUrl = env.MODE === "prod" ? 'https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68f5e3f9f367b2000104542a&projectId=Pi2GPKuRX7dZ4TCs&access_type=1': 'https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1';
+
 const ecahrtsRef = ref(null);
 let ecahrtsRefInstance: ECharts | null = null;
 const ecahrtsRef1 = ref(null);
@@ -1043,7 +1046,7 @@ function init() {
 function getOrderInfo() {
   (async () => {
     try {
-      const res: any = await getAnalysis({ type: "ply_total" });
+      const res: any = await getAnalysis({ type: "ply_total", cDptCde: user.companyId });
       if (res.code === 200) {
         tabDataMap.value = res.dataMap;
         const keys = Object.keys(res.dataMap).filter(
@@ -1087,6 +1090,7 @@ async function handleRefreshEcharts() {
     const param = {
       // type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
       type: "ply",
+      cDptCde: user.companyId,
     };
     try {
       const res: any = await getAnalysis(param);
@@ -1142,6 +1146,7 @@ async function handleRefreshEcharts() {
   if (echartsOptionsData1.value.length < 1) {
     const param1 = {
       type: "fee",
+      cDptCde: user.companyId,
     };
     try {
       const res: any = await getAnalysis(param1);
@@ -1308,6 +1313,7 @@ const handleTabClick = (tab: any) => {
 const pageData = ref({
   pageSize: 10,
   pageNum: 1,
+  cDptCde: user.companyId,
 });
 function getAuditTableData() {
   let getList = null;

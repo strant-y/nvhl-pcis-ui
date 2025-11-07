@@ -21,6 +21,11 @@
                 }
               }
             "
+            @editPlan="
+            (r) =>{
+              editPlanData(index,formData['m'][index]);
+            }
+            "
             :ref="
               (res) => {
                 tremTemplateRefs['m' + index] = res;
@@ -93,18 +98,18 @@ const cardMainconfig = ref(
     title: "主条款信息",
     showInTitle: true,
     titleClass: "mainTitle",
-    titleBtns: [
-      createFreeButtonBase({
-        type: "primary",
-        label: "添加条款",
-        id: "addPlan_btn",
-        icon: "CirclePlus",
-        size: "small",
-        func: () => {
-          addTermData();
-        },
-      }),
-    ],
+    // titleBtns: [
+    //   createFreeButtonBase({
+    //     type: "primary",
+    //     label: "添加条款",
+    //     id: "addPlan_btn",
+    //     icon: "CirclePlus",
+    //     size: "small",
+    //     func: () => {
+    //       addTermData();
+    //     },
+    //   }),
+    // ],
   })
 );
 
@@ -353,6 +358,49 @@ function updateEdrItem(terms: any[]) {
 // 绑定特殊验证器
 const exRules = {};
 
+function editPlanData(index,data) {
+  const param = opertaor.getParam();
+  let mainTerm = data["Term.cClauseCode"];
+  dialog.value?.open(
+    "addtremComView",
+    {
+      type: "show",
+      data: {
+        cProdNo: param.cProdNo,
+        showType: "main",
+        showMethod: "edit",
+        mainTerm: mainTerm,
+        isselectData: [data],
+        commonconf:commonCf.value[mainTerm]
+      },
+    },
+    {
+      isOk: (selectdata: any) => {
+        let nelist = [];
+        selectdata.forEach((item: any, index: number) => {
+          let riskList: { [key: string]: any }[] = [];
+          item.children?.forEach((e: any) => {
+            const f = data.riskList.filter((e1: any) => { 
+              return e1['TermRisktgt.cLiabCode'] === e['cRiskNo'];
+            });
+            if(f && f.length > 0) {
+              riskList.push(f[0]);
+            } else {
+              riskList.push({
+                "TermRisktgt.cLiabCode": e.cRiskNo,
+              });
+            }
+          });
+          data.riskList = riskList;
+        });
+        nextTick(() => { 
+          showFlush();
+        });
+      },
+    },
+    { title: "编辑条款", width: 50 }
+  );
+}
 function addTermData() {
   const param = opertaor.getParam();
   let mainTerm = "";

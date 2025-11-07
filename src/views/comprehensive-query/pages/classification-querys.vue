@@ -233,6 +233,11 @@ const cAppType = ref("A");
 import { FIELD_MAP } from '@/constants/fieldMaps';
 import {saveAs} from "file-saver";
 const cPard = ref(null);
+import { cannotCopy } from '@/utils/cannotCopyPlyNo';
+// 核保信息
+const UndrOpnList = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
 
 watch(() => {
   const freeEditRefs = freeEditRef.value;
@@ -273,7 +278,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               label: "查询",
               func: async () => {
                   const freeEditRefs = freeEditRef.value;
-                  freeEditRefs.validate().then((isValid) => {
+                  freeEditRefs?.validate().then((isValid:boolean) => {
                       if (isValid) {
                           handleQuery(false);
                       }
@@ -297,7 +302,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     tAppTm: [
-                        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                        dayjs(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     cDataTyp:"app",
@@ -514,6 +519,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           formconfig1.fromSchema?.forEach((item) => {
                               if (
                                 item.prop === "cLicenseNumber" 
+                              ) {
+                                  item.hidden = false;
+                              }
+                          });
+                      } else if (s["prodCNmeCn"] == "043002") {
+                          formconfig1.fromSchema?.forEach((item) => {
+                              if (
+                                item.prop === "cVinCode" || 
+                                item.prop === "cPlateNumber"
                               ) {
                                   item.hidden = false;
                               }
@@ -1015,7 +1029,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.prop === "cBorrowerName"||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
+                          item.prop === "cPrjCtgSubTyp" ||
+                          item.prop === "cVinCode" ||
+                          item.prop === "cPlateNumber"
                       ) {
                           item.hidden = true;
                       }
@@ -1073,7 +1089,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.prop === "cBorrowerName"||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
+                          item.prop === "cPrjCtgSubTyp" ||
+                          item.prop === "cVinCode" ||
+                          item.prop === "cPlateNumber"
                       ) {
                           item.hidden = true;
                       }
@@ -1142,7 +1160,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                           item.prop === "cBorrowerName"||
                           item.prop === "cPrjCtgTyp" ||
                           item.prop === "cPrjCtgMidTyp" ||
-                          item.prop === "cPrjCtgSubTyp"
+                          item.prop === "cPrjCtgSubTyp" ||
+                          item.prop === "cVinCode" ||
+                          item.prop === "cPlateNumber"
                       ) {
                           item.hidden = true;
                       }
@@ -1173,15 +1193,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "批改", value: "E" },
                   { label: "询价", value: "I" },
               ],
-              func: (val) => {
+              func: (val:any) => {
                   if (val === "A") {
                       // 投保
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
-                              // 设置默认值为最近3个月
+                              // 设置默认值为最近7天
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                              const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                              const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
@@ -1202,9 +1222,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tEdrAppTm") {
                               item.hidden = false; // 显示批改申请日期
-                            // 设置默认值为最近3个月
+                            // 设置默认值为最近7天
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
@@ -1220,9 +1240,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tInquiryTm") {
                               item.hidden = false; // 显示询价日期，询价单号
-                            // 设置默认值为最近3个月
+                            // 设置默认值为最近7天
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
@@ -1284,6 +1304,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
+              rules: [getRules("required", {})],
           },
           {
               prop: "tEdrAppTm",
@@ -1293,6 +1314,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
+              rules: [getRules("required", {})],
           },
           {
               prop: "tInquiryTm",
@@ -1303,6 +1325,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
               hidden: true,
+              rules: [getRules("required", {})],
           },
           {
               prop: "tIssueTm",
@@ -1475,6 +1498,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               prop: "cBorrowerName",
               inputtype: "rtinput",
               title: "借款人名称",
+              clearable: true,
+              hidden: true,
+          },
+          {
+              prop: "cVinCode",
+              inputtype: "rtinput",
+              title: "车架号",
+              clearable: true,
+              hidden: true,
+          },
+          {
+              prop: "cPlateNumber",
+              inputtype: "rtinput",
+              title: "车牌号",
               clearable: true,
               hidden: true,
           },
@@ -1730,7 +1767,7 @@ const extendColumns = [
         { label: "联保单", value: "6" },
     ] 
   },
-  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', lengthNum: 17, lengthIsNumber: true, optional: true, sortable: true},
+  { prop: 'tCrtTm', inputtype: "rtinput", title: '申请日期', lengthNum: 17, lengthIsNumber: true, optional: true, sortable: true, rules: [getRules("required", {})]},
   { prop: 'tUdrTm', inputtype: "rtinput", title: '核保日期', lengthNum: 17, lengthIsNumber: true, optional: true, sortable: true, slotName: "tUdrTm" },
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', lengthNum: 12, optional: true, align: 'left', },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', lengthNum: 12, optional: true, align: 'left', },
@@ -1813,7 +1850,7 @@ const tableObj = {
                 icon: "DocumentCopy",
                 hideBtns: (row: any) => {
                     // 联保单6不显示复制按钮;询价单没有复制;核保岗隐藏复制按钮
-                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value) {
+                    if (row.cCiMrk === "6" || row.taskTyp === "I" || !isCopyButtonVisible.value || row.cPlyNo?.length > 18 || cannotCopy(row.cPlyNo) || row.canCopy != 1) {
                         return true;
                     } else {
                         return false;
@@ -1887,7 +1924,7 @@ const tableObj = {
                 tableClick: (row) => {
                     dzmodal
                         .open(TaskListVestige, { type: "Issuer",
-                            data: { objId: row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
+                            data: { objId: row["taskTyp"] === "I" ? row.cInquiryNo : row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
                                   ? "U"
                                   : "E" } })
                         .then((res:any) => {
@@ -1915,6 +1952,29 @@ const tableObj = {
                     .then((res:any) => {
 
                     })
+                },
+            }),
+            createFreeButtonBase({
+                id: "taskVestige",
+                link: true,
+                tooltip: "核保信息",
+                type: "info",
+                size: "large",
+                icon: "DocumentChecked",
+                hideBtns: (row:any) => {
+                    if(row.cAppStatus == '1') {
+                        return true
+                    } else {
+                        return false
+                    }
+                },
+                tableClick: (row) => {
+                    dzmodal
+                        .open(UndrOpnList, { type: "", CAppNo: row.taskTyp === "I" ? row.cInquiryNo : row.cAppNo })
+                        .then((res: any) => {
+                            if (res.type === "ok") {
+                            }
+                        });
                 },
             }),
             // createFreeButtonBase({
@@ -1966,7 +2026,7 @@ onMounted(async () => {
          item.prop === "tEdrAppTm"
         ) {
             item.hidden = true; // 隐藏批改申请日期，询价投保日期，默认投保日期
-            item.rules = []; // 清除必填规则
+            // item.rules = []; // 清除必填规则
         }
     });
     freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
@@ -1987,7 +2047,7 @@ onMounted(async () => {
     ]);
     // 申请日期默认展示投保日期
     freeEditRef.value.setValue("tAppTm", [
-        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+        dayjs(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
 
@@ -2117,8 +2177,8 @@ async function queryAE( flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2146,8 +2206,8 @@ async function queryAE( flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2294,8 +2354,8 @@ async function queryI(flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2392,6 +2452,15 @@ async function exportAE( flag?: boolean, isEs) {
     const freeEditRefs = freeEditRef.value;
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
+    if(s.tIssueTm && s.tIssueTm[1]) {
+        s.tIssueTm[1] = dayjs(s.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
+    if(s.tAppTm && s.tAppTm[1]) {
+        s.tAppTm[1] = dayjs(s.tAppTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
+    if(s.tEdrAppTm && s.tEdrAppTm[1]) {
+        s.tEdrAppTm[1] = dayjs(s.tEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
+    }
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
@@ -2531,8 +2600,8 @@ async function exportI(flag?: boolean, isEs = false) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("申请日期时间范围请控制在两年内");
+        if (end.diff(start, "day", true) > 7) {
+            ElMessage.warning("申请日期时间范围请控制在7天内");
             return;
         }
     }
@@ -2930,6 +2999,12 @@ function processExpandParams(formData) {
         } else if (s["prodCNmeCn"] == "043001" && s["cLicenseNumber"]) {
             expandFlag = 1;
             expandVal = { "cLicenseNumber": s["cLicenseNumber"] };
+        } else if (s["prodCNmeCn"] == "043002" && s["cVinCode"] && s["cPlateNumber"]) {
+            expandFlag = 1;
+            expandVal = { 
+                "cVinCode": s["cVinCode"],
+                "cPlateNumber": s["cPlateNumber"],
+            };
         } else if ((s["prodCNmeCn"] == "043004" || s["prodCNmeCn"] == "043005") && s["cDetailedAddress"]) {
             expandFlag = 1;
             expandVal = { "cDetailedAddress": s["cDetailedAddress"] };

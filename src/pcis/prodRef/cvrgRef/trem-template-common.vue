@@ -26,17 +26,21 @@
                     <el-badge value="退" class="item">
                       <el-tag type="warning">{{ term.cNmeCn }}</el-tag>
                     </el-badge>
+                    <!-- 增加应税、免税标识 -->
+                    <template v-if="term.isDutyfree">
+                      <span class="isDutyfree">
+                        <img :src="term.isDutyfree === '0' ? yingImageUrl : term.isDutyfree === '1' ? mianImageUrl : ''" alt="" srcset="">
+                      </span>
+                    </template>
                   </template>
                   <template v-else>
                     <el-tag type="warning"  style="margin-right: 8px;">{{ term.cNmeCn }}</el-tag>
-                    <el-tooltip content="下载条款" placement="top">
-                      <el-button
-                        type="text"
-                        @click="downloadTerm"
-                        style="margin-right: 5px"
-                      ><rt-icon :item="{ icon: 'term' }" />
-                    </el-button>
-                    </el-tooltip>
+                    <!-- 增加应税、免税标识 -->
+                    <template v-if="term.isDutyfree">
+                      <span class="isDutyfree">
+                        <img :src="term.isDutyfree === '0' ? yingImageUrl : term.isDutyfree === '1' ? mianImageUrl : ''" alt="" srcset="">
+                      </span>
+                    </template>
                     <el-tooltip content="预览条款" placement="top">
                       <el-button
                         type="text"
@@ -48,7 +52,7 @@
                   </template>
                 </div>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-row :gutter="20">
                   <template v-for="(item, k) in termFactormap" :key="k">
                     <el-col :span="11" v-if="item.cPorpShowtitle === '1'">
@@ -69,6 +73,17 @@
                 </el-row>
               </el-col>
               <el-col :span="2">
+                <rtButton
+                  v-if="!btnItem.edit.hidden"
+                  @click="
+                    () => {
+                      emit('editPlan', termdata);
+                    }
+                  "
+                  :item="btnItem.edit"
+                />
+              </el-col>
+              <el-col :span="1">
                 <rtButton
                   v-if="!btnItem.delete.hidden"
                   @click="
@@ -248,7 +263,7 @@
               </el-row>
             </div>
           </template>
-          <template v-if ="termFactormap.length && effectiveShowConf.showTerm">
+          <template v-if ="termFactormap && termFactormap.length && effectiveShowConf.showTerm">
             <template v-if="termTitleConf.cFactorTabType === 'grid'">
               <table style="width: 100%">
                 <thead>
@@ -381,14 +396,15 @@
 </template>
 
 <script setup lang="ts">
-import { getTRFactorJson,getPrdTermInfo } from "@/api/prod";
+import { getCurrentInstance } from 'vue'
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { terConfig } from "@/store/modules/term-config";
+import { terConfig, configInit } from "@/store/modules/term-config";
 import { useValidator } from "@/typings/useValidator";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
@@ -402,6 +418,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const pageparam = opertaor.getParam();
 const terconfig = terConfig();
+const instance = getCurrentInstance();
 const { getRules } = useValidator();
 const props = defineProps({
   modelValue: {
@@ -432,7 +449,7 @@ const effectiveShowConf = computed(() => {
   };
 });
 
-const emit = defineEmits(["update:modelValue", "delete"]);
+const emit = defineEmits(["update:modelValue", "delete", "editPlan"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
 
@@ -441,11 +458,18 @@ const riskList = ref<{ [key: string]: any }>({});
 
 const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
+  edit: {
+    type: "primary",
+    label: "条款编辑",
+    size: "small"
+  },
   delete: {
     label: "删除",
     size: "small"
   },
 });
+const yingImageUrl = ref(new URL(`../../../assets/img/ying.png`, import.meta.url).href);
+const mianImageUrl = ref(new URL(`../../../assets/img/mian.png`, import.meta.url).href);
 
 const {selectedRow} = storeToRefs(terconfig);
 
@@ -478,10 +502,13 @@ function update() {
   emit("update:modelValue", newData);
 }
 function initData(data: any) {
+  terconfig.selectReset();
+  showdataInit();
   const newData = JSON.parse(JSON.stringify(data));
   // 缓存条款数据
   const termData = JSON.parse(JSON.stringify(data));
   termData.riskList = null;
+  instance.proxy.$forceUpdate();
   termdata.value = termData;
   if(termdata.value['Term.nSeatTotal']){
     const tgt = opertaor.getTableRefByKey("tgt");
@@ -705,97 +732,18 @@ function getTermData(){
   return newData;
 }
 /*
-条款下载
-*/
-function downloadTerm() {
-  const clauseLink = termdata.value["Term.cClauseLink"];
-  const newparam = { cTermNo: termdata.value['Term.cClauseCode'], pageNum: 1, pageSize: 10 };
-  const cWebsite = getPrdTermInfo(newparam)
-    .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        const cWebsite = data.cWebsite;
-        if (!cWebsite) {
-          ElMessage.warning("条款附件地址为空，请联系产品中心处理");
-          return;
-        }
-        const link = document.createElement('a');
-        link.href = cWebsite;
-        link.target = '_blank'; 
-        link.download = ''; 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        ElMessage.success("开始下载条款文档");
-      } else {
-        ElMessage.error(msg);
-      }
-    })
-}
-/*
 条款预览
 */
 function previewTerm() {
   const newparam = { cTermNo: termdata.value['Term.cClauseCode'], pageNum: 1, pageSize: 10 };
-  
-  getPrdTermInfo(newparam).then((res) => {
-    const { code, data, msg } = res;
-    if (200 === code) {
-      const cWebsite = data.cWebsite;
-      if (!cWebsite) {
-        ElMessage.warning("条款链接为空，无法预览");
-        return;
-      }
-      // 判断文件类型并进行相应预览
-      const fileExtension = getFileExtension(cWebsite).toLowerCase();
-      console.log("0000000",fileExtension,cWebsite);
-      if (fileExtension === 'pdf') {
-        // PDF文件使用浏览器内置查看器或新窗口打开
-        window.open(cWebsite, '_blank');
-      } else if (['doc', 'docx'].includes(fileExtension)) {
-        fetch(cWebsite, { method: 'HEAD' })
-          .then(response => {
-            if (response.ok) {
-              // 使用微软Office Online预览Word文档
-              const previewUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cWebsite)}&embedded=true`;
-              window.open(previewUrl, '_blank');
-            } else {
-              // 如果无法访问文件，则直接下载
-              ElMessage.info("无法在线预览文档，将直接下载");
-              const link = document.createElement('a');
-              link.href = cWebsite;
-              link.target = '_blank';
-              link.download = '';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }
-          })
-          .catch(error => {
-            // 如果出现网络错误，也直接下载
-            ElMessage.info("无法在线预览文档，将直接下载");
-            const link = document.createElement('a');
-            link.href = cWebsite;
-            link.target = '_blank';
-            link.download = '';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          });
-      } else {
-        // 其他文件类型直接下载
-        ElMessage.info("该文件类型不支持在线预览，将直接下载");
-        const link = document.createElement('a');
-        link.href = cWebsite;
-        link.target = '_blank';
-        link.download = '';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    } else {
-      ElMessage.error(msg);
-    }
+  viewPdfProposal(newparam).then((res) => {
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const previewUrl = url + '#toolbar=0&navpanes=0&scrollbar=0';
+    window.open(previewUrl, '_blank');
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 10000); // 10秒后释放URL对象
   });
 }
 /**
@@ -810,40 +758,6 @@ function getFileExtension(url) {
   // 获取扩展名
   const extension = filename.split('.').pop();
   return extension || '';
-}
-function previewWordDocument(url) {
-  // 创建一个隐藏的iframe来测试预览服务
-  const testIframe = document.createElement('iframe');
-  testIframe.style.display = 'none';
-  
-  // 首先尝试Google Docs Viewer
-  const googleDocsUrl = `https://docs.google.com/gviewer?url=${encodeURIComponent(url)}&embedded=true`;
-  
-  // 设置超时时间
-  const timeout = setTimeout(() => {
-    // 超时则使用Microsoft Office Online
-    document.body.removeChild(testIframe);
-    const officeOnlineUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
-    window.open(officeOnlineUrl, '_blank');
-  }, 3000);
-  
-  testIframe.onload = function() {
-    clearTimeout(timeout);
-    document.body.removeChild(testIframe);
-    // Google Docs Viewer可用，使用它来预览
-    window.open(googleDocsUrl, '_blank');
-  };
-  
-  testIframe.onerror = function() {
-    clearTimeout(timeout);
-    document.body.removeChild(testIframe);
-    // Google Docs Viewer不可用，尝试使用Microsoft Office Online
-    const officeOnlineUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
-    window.open(officeOnlineUrl, '_blank');
-  };
-  
-  document.body.appendChild(testIframe);
-  testIframe.src = googleDocsUrl;
 }
 
 onMounted(async () => {
@@ -954,6 +868,14 @@ function dataInit() {
       initMethod();
     });
   }
+}
+
+function showdataInit() {
+  collist.value = null;
+  factormap.value = null;
+  colInfo.value = null;
+  groupInfo.value = null;
+  termFactormap.value = null;
 }
 
 function getUseData(data: any){
@@ -1575,5 +1497,18 @@ td {
 
 .crvg_form__ {
   margin-top: 3px;
+}
+
+.isDutyfree {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+  img {
+    width: 18px;
+  }
+}
+
+:deep(.item .el-badge__content.is-fixed) {
+  top: 10px;
 }
 </style>

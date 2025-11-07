@@ -311,6 +311,8 @@ const method = {
     }
     setFormItem("Base.tReportBgnTm", { rules: null }); //延长报告期起始日期
     setFormItem("Base.tReportEndTm", { rules: null }); //延长报告期终止日期
+    clearValidate("Base.tReportEndTm");
+    clearValidate("Base.tReportBgnTm");
 
     //内索赔制 时，追溯/日落起止期必填
     if (val == "2") {
@@ -336,6 +338,8 @@ const method = {
         setFormItem("Base.tRunEndTm", { rules: [] }); //追溯/日落止期
         setFormItem("Base.tReportEndTm", { rules: [] }); //延长报告期终止日期
         setFormItem("Base.tReportBgnTm", { rules: [] }); //延长报告期起始日期
+        clearValidate("Base.tReportEndTm");
+        clearValidate("Base.tReportBgnTm");
       }
 
 
@@ -344,7 +348,7 @@ const method = {
       setFormItem("Base.tRunEndTm", { hidden: true }); //追溯/日落止期
       setFormItem("Base.nTracingDays", { hidden: true }); //追溯/日落天数
       setFormItem("Base.tReportBgnTm", { hidden: false }); //延长报告期起始日期
-      setFormItem("Base.tReportEndTm", { hidden: false }); //延长报告期终止日期
+      setFormItem("Base.tReportEndTm", { hidden: false }); //延长报告期终止日期Base.tReportEndTm
       setFormItem("Base.nReportDays", { hidden: false }); //延长报告期天数
     }
     // setValue("Base.cIsRetroSpect", "");
@@ -382,6 +386,8 @@ const method = {
         "Base.tReportEndTm": "",
         "Base.nReportDays": "",
       });
+      clearValidate("Base.tReportBgnTm");
+      clearValidate("Base.tReportEndTm");
     }
   },
   // 追溯起期
@@ -517,12 +523,16 @@ const method = {
 
   // 起运日期控制
   tDepartureDateDis: (date: any) => {
+    const cProdMap = ['020001', '020002', '020003', '020009', '020013'];
     const fs = insrncEditRef?.value?.getFromValue();
     if (fs) {
-      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间    
+      const startDate = new Date(fs["Base.tInsrncBgnTm"])   // 开始时间   
+      const before30Tm = dayjs(startDate).subtract(30, 'day').toDate().getTime();
       let cProdNo = route.params.param?.cProdNo
       if (cProdNo === "020014" || cProdNo === "020018") {
         return false;
+      } else if(cProdMap.includes(cProdNo)) {// 这5个产品起运日期不能早于保险起期前30天(暂定)
+        return date.getTime() < before30Tm
       } else {
         return date.getTime() < startDate.getTime()
       }
@@ -580,6 +590,10 @@ function getFormconfig() {
 function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   insrncEditRef?.value?.addProvide(key, value);
 }
+
+function clearValidate(key:any = null) {
+  insrncEditRef?.value?.clearValidate(key);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -587,7 +601,8 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
-  addProvide
+  addProvide,
+  clearValidate,
 });
 </script>
 
