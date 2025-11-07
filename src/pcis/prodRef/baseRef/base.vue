@@ -84,6 +84,10 @@ onMounted(async () => {
   if(params.cProdNo?.slice(0,2) === "02" && !hidenRatioCoefProdNoMap.includes(params.cProdNo)){
     setFormItem('Base.nRatioCoef', { hidden: true })
   }
+  // 历史数据补全-短期费率类型可编辑
+  if((params?.pageType === 'EDR_APP_NEW_SCENE' || params?.pageType === 'TEMPORARY_DEPOSIT') && (params.cTransMrk == '1' || params.cRsnCde === '99' || params.cEdrRsnBundle === '99' || params.cEdrRsnBundleCde === '99')) {
+    setFormItem('Base.cRatioTyp', { disabled: false })
+  }
   formconfig11.fromSchema?.forEach((item:any) => {
     if(item.prop === "Base.groupAmtCur") {
       item.labelLength = 11
@@ -569,11 +573,29 @@ const method = {
       }
     }
   },
+  // 修改后总保额(累计赔偿限额)change事件
   aAmtChange: (val: any) => {
     const namtExch = getValue('Base.nAmtRmbExch');
     if (!!namtExch) {
       // 计算折人民币保额
       setValue("Base.nRmbAmt", numMulti(namtExch, val));
+    }
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    // 联共保主协议信息-共保总保额ciMasterAgreement
+    if(val && getValue("Base.nCumulativeLimitModified") && val > Number(getValue("Base.nCumulativeLimitModified"))) {
+      ElMessage.warning("修改后总保额(累计赔偿限额)不能大于总保额(累计赔偿限额！");
+      setValue("Base.nAmt", getValue("Base.nCumulativeLimitModified"));
+      return;
+    }
+    const cCiMrkMap = ['1', '2', '3', '4'];
+    if(cCiMrkMap.includes(opertaor.getTableRefByKey('plyBase')?.getValue("Base.cCiMrk")) && getValue("Base.nCumulativeLimitModified") && getValue("Base.nCumulativeLimitModified") != val) {
+      opertaor.getTableRefByKey('ciMasterAgreement')?.setValue("Base.nCiJntAmt", val);
+      nextTick(() => {
+        ElMessage.warning("共保总保额发生变化，请重新计算保费！");
+      })
     }
   },
   // 总保额(累计赔偿限额)汇率change事件
@@ -586,20 +608,20 @@ const method = {
       }
     }
   },
-  // 是否修改每次事故赔偿限额 是和否change事件
+  // 是否修改累计赔偿限额 是和否change事件
   nAmtLimitManualChange: (val: any) => {
     if(val == '0'){
-        setFormItem("Base.nCumulativeLimitModified", { rules: [] });
+      setFormItem("Base.nAmt", { disabled: true });
     } else{
-        setFormItem("Base.nCumulativeLimitModified", { rules: [getRules("required", {})] });
+      setFormItem("Base.nAmt", { disabled: false });
     }
   },
-   // 是否修改累计赔偿限额
+   // 是否修改每次事故赔偿限额
   cAccidentLimitChange: (val: any) => {
     if(val == '0'){ // 否 
-        setFormItem("Base.nModifiedAccidentLimit", { rules: [] });
+        setFormItem("Base.nModifiedAccidentLimit", { rules: [], disabled: true });
     } else{  // 是 必填
-        setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})] });
+        setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})], disabled: false });
     }
   },
   // 总保费汇率change事件
@@ -743,7 +765,7 @@ const judgeShandongCase = async () => {
   const nPayNum = Number(baseData['Base.nPayNum'] || 0)  // "1"  缴费期数
 
   // 机构是山东分公司
-  if (!String(cDptCdeA).startsWith('0237')) return false;
+  if (!String(cDptCdeA).startsWith('023701')) return false;
   // 币种是人民币
   if (!['人民币', 'CNY'].includes(basePrm)) return false;
   // 联共保业务类型

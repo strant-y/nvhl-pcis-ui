@@ -14,11 +14,13 @@ import {
 import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
+const pcisQueryService = new PcisQueryService();
 const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -167,6 +169,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // suffix: "元"
       },
       {
+        // prop: "EdrBase.tNextEdrUdrTm",
         prop: "EdrBase.tEdrAppTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
@@ -175,6 +178,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled:true
       },
       {
+        // prop: "EdrBase.tNextEdrBgnTm",
         prop: "EdrBase.tEdrBgnTm",
         inputtype: "rtdatepicker",
         format:"YYYY-MM-DD HH:mm:ss",
@@ -182,8 +186,45 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "批单生效起期",
         func: (v:any) => {
           if(v){
-            // debugger
-            console.log(v,params)
+            const cPlyNo = edrbaseEditRef.value?.getValue("EdrBase.cPlyNo");
+            const parameter = {
+                CPlyNo: cPlyNo,
+                COperType: 'EdrBckBgn'
+            };
+            if(opertaor.isEditScene()){
+              pcisQueryService.qryTerminationInfo(parameter).then((res:any) => { 
+                const {code,data,msg} = res;
+                if(code === 200){
+                  if(data && data.CAppTyp === 'on'){
+                    return ;
+                  }else{
+                    const parms = {
+                        cPlyNo: cPlyNo,
+                    };
+                    pcisQueryService.getlatestPlyInfo(parms).then((res1:any) => { 
+                      const {code: code1,data: data1,msg: msg1} = res1;
+                      if(code1 === 200){
+                        if (data1['TEdrBgnTm']) {
+                            const edrBgnTm = dayjs(v).format('YYYY-MM-DD 00:00:00');
+                            const latestEdrBgnTm = dayjs(data1['TEdrBgnTm']).format('YYYY-MM-DD HH:mm:ss');
+                            if (dayjs(s).isBefore(latestEdrBgnTm, 'second')) {
+                                ElMessage.warning('本次批改生效时间不允许早于前一次批改生效时间！');
+                                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", null);
+                                return;
+                            }
+                        }
+                      } else {
+                        let message = '查询最新保批单信息异常';
+                        if (!!res['msg']) {
+                            message = res['msg'];
+                        }
+                        ElMessage.warning(message);
+                      }
+                    });
+                  }
+                }
+              });
+            }
           }
         },
         disabledDate: (time: Date) => {
@@ -192,11 +233,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
             const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
             const currentTm = new Date().getTime();
-            return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
+            const before30Tm = dayjs().subtract(30, 'day').toDate().getTime(); // 当前日期前30天
+            const before61Tm = dayjs().subtract(61, 'day').toDate().getTime(); // 当前日期前61天
+            if(["040011","040015"].includes(params["cProdNo"])) {// 这俩产品 批改生效起期允许往前选61天
+              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before61Tm ? new Date(beginTm).getTime() : before61Tm)
+            } else {
+              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before30Tm ? new Date(beginTm).getTime() : before30Tm)
+            }
+            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
+            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
           } else {
             return false;
           }
         },
+        // rules: [getRules("required", {})],
+        // disabled: params["cEdrType"]=='2'
       },
       {
         prop: "EdrBase.nDelayNum",
@@ -491,6 +542,14 @@ onMounted(() => {
           });
       }
     }
+    // // 批改申请日期
+    // if(!getValue("EdrBase.tNextEdrUdrTm")) {
+    //   setValue("EdrBase.tNextEdrUdrTm", dayjs().format("YYYY-MM-DD HH:mm:ss"))
+    // }
+    // // 批单生效起期
+    // if(!getValue("EdrBase.tNextEdrBgnTm")) {
+    //   setValue("EdrBase.tNextEdrBgnTm", dayjs().add(1,"day").format("YYYY-MM-DD 00:00:00"))
+    // }
   });
 });
 

@@ -441,7 +441,7 @@ const checkUser = () => {
 // 解析身份证
 const idAnalysis = (id:string)=>{
   const applicantValue = freeEditRef.value?.getFromValue() //tabref["AgreementApplicant"].getFormValue();
-  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='19')) {
+  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='553')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
@@ -452,7 +452,7 @@ const idAnalysis = (id:string)=>{
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   const age = new Date().getFullYear() - birthYear;
 
-  setValue("ECargoInsuredDist.cNation", "1"); // 国籍
+  setValue("ECargoInsuredDist.cNation", "CHN"); // 国籍
   setValue("ECargoInsuredDist.tBirthday", birthday);
   setValue("ECargoInsuredDist.nAge", age);
   setValue("ECargoInsuredDist.cSex", sex);
@@ -511,7 +511,7 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.cNation", {
        disabled: false,
      });
-   } else if ( val == "110007") {
+   } else if ( val == "01") {
      setFormItem("ECargoInsuredDist.tCertfBgnDate", {
        rules: [getRules("required", {})],
      });
@@ -541,7 +541,7 @@ const funCheckUser = (val:any)=>{
      setFormItem("ECargoInsuredDist.cNation", {
        disabled: false,
      });
-   } else if(val == "19"){
+   } else if(val == "553"){
      // 外国人证件号
      setFormItem("ECargoInsuredDist.cCertfCde", {
        rules: [getRules("required", {}),getRules("ariCard", {})],
@@ -640,7 +640,7 @@ const cIsIndvduBizChange = (val:any)=>{
       });
       clearValidate('ECargoInsuredDist.cSex')
 
-      setFormItem("ECargoInsuredDist.cCntrNme", { rules: [getRules("required", {})] });
+      // setFormItem("ECargoInsuredDist.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("ECargoInsuredDist.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
@@ -717,7 +717,7 @@ const cIsIndvduBizChange = (val:any)=>{
             code: "ECargoInsuredDist.cCertfCls",
             list: res
           })
-          setValue('ECargoInsuredDist.cCertfCls', '110007')
+          setValue('ECargoInsuredDist.cCertfCls', '01')
         });
     }else{
 

@@ -142,6 +142,7 @@ const refreshData = () => {
     cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
+    tAppTm: props.data.tAppTm
   }).then((res) => {
     if (res.data?.result) {
       pageresult.list = [];

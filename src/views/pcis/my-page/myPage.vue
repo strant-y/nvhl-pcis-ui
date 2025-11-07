@@ -1808,6 +1808,7 @@ async function loadAfter() {
     // 批改申请-新增
     const cAppNo = props.param.cAppNo;
     await loadAppPlyInfo(cAppNo);
+    edritem.value?.handleQuery();
     if (props.param.cEdrType === "1") {
       if (props.param["cRsnCde"] !== "FZ") {
         edrbase.value?.setValue("EdrBase.cEdrRsnDetail", [
@@ -1816,19 +1817,21 @@ async function loadAfter() {
       }
       if (props.param["cRsnCde"] !== "99") {
         nextTick(() => {
-        opertaor.setDisabledAll();
-        getEdrRsnItemFun(
-          props.param["cProdNo"],
-          props.param["cDptCde"],
-          props.param["cRsnCde"],
-          props.param["cRsnCde"],
-          props.param["cEdrType"],
-          props.param["cGrpMrk"]
-        );
+          opertaor.setDisabledAll();
+        })
+        nextTick(() => {
+          getEdrRsnItemFun(
+            props.param["cProdNo"],
+            props.param["cDptCde"],
+            props.param["cRsnCde"],
+            props.param["cRsnCde"],
+            props.param["cEdrType"],
+            props.param["cGrpMrk"]
+          );
 
-        // 用于处理 账户信息
-        let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
-        if(acctinfoInfo){
+          // 用于处理 账户信息
+          let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
+          if(acctinfoInfo){
             acctinfoInfo.setDisabledAll(false);  
             acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
               disabled: true
@@ -1836,7 +1839,7 @@ async function loadAfter() {
             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
               disabled: true
             })
-        }
+          }
         });
       }
       
@@ -2264,13 +2267,17 @@ async function loadAfter() {
           ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
           ops.plyBase['Base.cRemark'] = "" // 出单员备注
         }
-        // if(ops['ci'] && ops['ci'].length>0){
-        //   ops['ci'].forEach((item:any)=>{
-        //     if(item['Ci.nCiShare']){
-        //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
-        //     }
-        //   })
-        // }
+        
+        if(ops['ci'] && ops['ci'].length>0){
+          ops['ci'].forEach((item:any)=>{
+            item['Ci.cBrkrCde'] = "" // 代理经纪人
+            item['Ci.cBrkSlsCde'] = "" // 代理代理业务员
+            item['Ci.cCoinsurerCde'] = "" // 共保公司
+            item['Ci.cDptCde'] = "" // 出单机构
+            item['Ci.cSlsId'] = ""
+            item['Ci.cSlsNme'] = ""
+          })
+        }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
         // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -2460,17 +2467,19 @@ async function loadAfter() {
       },
     }),
   )
-
-  bthList.value.push(
-    // {isdivider: true},  //间隔符
-    createFreeButtonBase({
-      label: "返回",
-      func: () => {
-        tagsViewStore.back();
-        // history.back();
-      },
-    }),
-  );
+  
+  if(user.roles?.length > 0 && !user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {
+    bthList.value.push(
+      // {isdivider: true},  //间隔符
+      createFreeButtonBase({
+        label: "返回",
+        func: () => {
+          tagsViewStore.back();
+          // history.back();
+        },
+      }),
+    );
+  }
   rightBtnList.value.push(
     createFreeButtonBase({
       label: "历史赔案",
@@ -2730,7 +2739,21 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.SpecialAgreement[0]['SpecialAgreement.cTransMrk'] = "1"
         ops.SpecialAgreement[0]['SpecialAgreement.cIfMust'] = "1"
       }
+      // 有些保单证件类型的值仍然是110007，需要转换成01
+      if (ops.applicant) {
+        ops.applicant['Applicant.cCertfCls'] = ops.applicant['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant['Applicant.cCertfCls'];
+      }
+      if(ops.insured) {
+        ops.insured['Insured.cCertfCls'] = ops.insured['Insured.cCertfCls'] === '110007' ? '01' : ops.insured['Insured.cCertfCls'];
+      }
     console.log("转换的数据", ops);
+    if(ops["payinfo"] && ops["payinfo"].length > 0){
+      ops["payinfo"].forEach((item:any, index:number)=>{
+        if(item["Pay.nTms"] != index + 1){
+          item["Pay.nTms"] = index + 1;
+        }
+      })
+    }
     if (res["res"]["composition"]["EdrBase"]) {
         const EdrBaseData = res["res"]["composition"]["EdrBase"][0];
         if (
@@ -2878,7 +2901,7 @@ const calcPremium = () => {
         const cNeedfeeFlag = plyBase['Base.cNeedfeeFlag'];
 
         // 满足山东见费出单业务
-        if(cDptCde.startsWith('0237') && okProdPre.some(item => prod.startsWith(item)) 
+        if(cDptCde.startsWith('023701') && okProdPre.some(item => prod.startsWith(item)) 
         && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY") && (['0', '1'].includes(cClntMrk))){
             shanDongFlag = true;
             if (cClntMrk == '1' && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
@@ -3470,7 +3493,9 @@ const submitToUndrFn = async () => {
       // 调用再保险位接口
       // const s = await saveDataInfo()
       // if(!s) return;
-      btn.loading = true;
+      if(btn) {
+        btn.loading = true;
+      }
       const base = opertaor.getTableRefByKey("plyBase").getFromValue();
       res["user"] = user;
   
@@ -3491,14 +3516,18 @@ const submitToUndrFn = async () => {
       const baseValue = opertaor.getTableRefByKey("base").getFromValue();
       if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
         ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
-        btn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
         return;
       }
       // 校验标的信息中核定座位总数和投保座位数总数不一致！
       const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
       if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
         ElMessage.error("核定座位总数和投保座位数总数不一致！");
-        btn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
         return;
       }
 
@@ -3520,19 +3549,25 @@ const submitToUndrFn = async () => {
                     dangerouslyUseHTMLString: true,
                     type: 'warning'
                 });
-                btn.loading = false;
+                if(btn) {
+                  btn.loading = false;
+                }
                 return false;
             }
         } else {
             ElMessage.error({ message: blackRes.msg, duration: 3000 });
-            btn.loading = false;
+            if(btn) {
+              btn.loading = false;
+            }
             return false;
         }
 
       // 校验清单与条款方案是否一致
       const DistOK = await validateDistConsistency();
       if (!DistOK) { // 未通过阻断
-        btn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
         return;
       };   
       //校验联共保信息
@@ -3542,7 +3577,9 @@ const submitToUndrFn = async () => {
         const ciValue = opertaor.getTableRefByKey("ci")?.getFromValue() || '';
         const isCiValid = validateCiInfo();
         if (!isCiValid) {
-          btn.loading = false;
+          if(btn) {
+            btn.loading = false;
+          }
           return;
         }
       }
@@ -3560,7 +3597,9 @@ const submitToUndrFn = async () => {
       // 重新进行保费计算
       const calBtn = getBtn("btn010101");
       try {
-        calBtn.loading = true;
+        if(calBtn) {
+          calBtn.loading = true;
+        }
         const calcres: any = props.param?.pageName === "priceInquiry" ? await calculatePremium(calcData) : await appCalc(calcData);
         if (calcres.code === 200) {
           const newOp: any = opertaor.convertData(calcres);
@@ -3571,7 +3610,9 @@ const submitToUndrFn = async () => {
           validateciPrm()
           if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
-            btn.loading = false;
+            if(btn) {
+              btn.loading = false;
+            }
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
                 ElMessage({
@@ -3634,8 +3675,12 @@ const submitToUndrFn = async () => {
       } catch (err) {
         console.log("保费计算失败!" + err);
       } finally {
-        btn.loading = false;
-        calBtn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
+        if(calBtn) {
+          calBtn.loading = false;
+        }
       }
     });
   }
@@ -3784,7 +3829,9 @@ const savePlyInfo = async () => {
   // if(props.param.cTransMrk !== '1'){
     let saveFlag = false;
     const btn = getBtn("btn010102");
-    btn.loading = true;
+    if(btn) {
+      btn.loading = true;
+    }
   // }
   const res = opertaor.getDataAll();
   // 点击保存之前的申请单号 
@@ -3808,9 +3855,17 @@ const savePlyInfo = async () => {
       const basePrmCent = toCent(res['base']['Base.nPrm']);
        if(totalCent !== basePrmCent){
          ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-         btn.loading = false;
+          if(btn) {
+            btn.loading = false;
+          }
         return false;
       }
+  }
+
+  // 特约信息中的使用分期缴费和使用一次缴费为二选一，提示用户删除某一个
+  if(!validateSpecialAgreement() && btn) {
+    btn.loading = false;
+    return false;
   }
 
   res["user"] = user;
@@ -3840,7 +3895,9 @@ const savePlyInfo = async () => {
 
   if (res["cvrg"].length == 0) {
     ElMessage.error("请录入条款信息");
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     return false;
   }
   // 判断是否为历史补全保单 (cTransMrk === '1')
@@ -3851,7 +3908,9 @@ const savePlyInfo = async () => {
   console.log('res保存参数',res)
   const resInfo: any = props.param?.pageName === "priceInquiry" ? await saveInquiry(res) : await saveAppPlyInfo(res);
   console.log("saveAppPlyInfo-res", resInfo);
-  btn.loading = false;
+  if(btn) {
+    btn.loading = false;
+  }
   if (resInfo["code"] == "200") {
     const ops: any = opertaor.convertData(resInfo);
     console.log("转换的数据", ops);
@@ -4093,35 +4152,11 @@ const calcPremiumEdr = async () => {
        ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
     return false;
   }
-  // 调用接口校验清单录入
-  const checkDistParam = { cAppNo: res.plyBase["Base.cAppNo"] };
-  const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
-  if(checkDistInfo?.code !== 200) {
-    ElMessage.error(checkDistInfo?.msg);
-    return;
-  }
-  if (checkDistInfo?.data?.code === -1){
-    ElMessage.error(checkDistInfo?.data?.msg);
-    return;
-  }
-  if (checkDistInfo?.data?.code === 1) {
-    try {
-      await ElMessageBox.confirm(
-          checkDistInfo?.data?.msg + "，是否继续",
-          "提示",
-          {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning",
-          }
-      );
-    } catch (e) {
-      return;
-    }
-  }
 
   const btn = getBtn("btnCalEdr");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
 
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
@@ -4144,7 +4179,9 @@ const calcPremiumEdr = async () => {
   // }
 
   calcEdr(res).then((res) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     console.log("批改计算", res);
     if (res["code"] == "200") {
       let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
@@ -4286,7 +4323,9 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
  */
 const calcPremiumEdrSurrender = () => {
   const btn = getBtn("btn010101");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
@@ -4300,7 +4339,9 @@ const calcPremiumEdrSurrender = () => {
   }
 
   calcSurrenEdr(res).then((res: any) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     console.log("批改计算", res);
     if (res["code"] == "200") {
       ElMessage.success(
@@ -4348,7 +4389,9 @@ const calcPremiumEdrSurrender = () => {
 const saveApplicationEdr = async () => {
   let saveFlag = false;
   const btn = getBtn("btn010102");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4365,7 +4408,9 @@ const saveApplicationEdr = async () => {
   // 点击保存之前的申请单号
   const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
   const resInfo = await saveSurrenEdr(res)
-  btn.loading = false;
+  if(btn) {
+    btn.loading = false;
+  }
   console.log("退保保存", resInfo);
   if (resInfo["code"] == "200") {
     const ops = opertaor.convertData(resInfo);
@@ -4433,14 +4478,18 @@ const saveApplicationEdr = async () => {
  * **/
 const getSurrenderPrecisFun = () => {
   const btn = getBtn("btnCompare");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   getSurrenderPrecis(res).then((res) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     if (res["code"] == "200") {
       const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
       edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
@@ -4487,7 +4536,9 @@ const submitEdrToUndrSurrender = async () => {
   const f = await saveApplicationEdr();// 提交核保,需要默认执行一次保存操作
   if(f === false) return;
   const btn = getBtn("btn010103");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4501,7 +4552,9 @@ const submitEdrToUndrSurrender = async () => {
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   
   submitEdrSurrender(res).then((result) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     console.log("申请核保(退保、注销)", result);
     if (result["code"] == "200") {
       ElMessage.success(result.msg);
@@ -4527,13 +4580,14 @@ const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
   const btn = getBtn("saveEdr");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = opertaor.getDataAll();
   const dataALl = opertaor.getDataAll();
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-  
 
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
@@ -4547,7 +4601,9 @@ const saveEdrPlyInfo = async () => {
   
   const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
-  btn.loading = false;
+  if(btn) {
+    btn.loading = false;
+  }
   if(edrInfo["code"] == "200") {
     const ops = opertaor.convertData(edrInfo);
     console.log("转换的数据", ops);
@@ -4625,7 +4681,9 @@ const generateEndorse = async () => {
     return
   }
   const btn = getBtn("btnCompare");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -4646,7 +4704,9 @@ const generateEndorse = async () => {
   //   })
   // }
   getEndorseChange(res).then((res) => {
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     if (res["code"] == "200") {
       const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
       const edrRsn = res["data"]["data"]["edrRsn"]; //批文
@@ -4788,13 +4848,44 @@ if(props.param.cTransMrk !== "1"){
     // 校验清单与条款方案是否一致
     const DistOK = await validateDistConsistency();
     if (!DistOK) {
+      if(btn) {
         btn.loading = false;
+      }
         return;
     };  
+    
+    // 调用接口校验清单录入
+    const checkDistParam = { cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo") };
+    const checkDistInfo:any = await checkDistForSubmit(checkDistParam);
+    if(checkDistInfo?.code !== 200) {
+      ElMessage.error(checkDistInfo?.msg);
+      return;
+    }
+    if (checkDistInfo?.data?.code === -1){
+      ElMessage.error(checkDistInfo?.data?.msg);
+      return;
+    }
+    if (checkDistInfo?.data?.code === 1) {
+      try {
+        await ElMessageBox.confirm(
+            checkDistInfo?.data?.msg + "，是否继续",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+        );
+      } catch (e) {
+        return;
+      }
+    }
     // const s = await saveDataInfo()
     // if(!s) return;
     const btn = getBtn("btnSubmitEdr");
-    btn.loading = true;
+    if(btn) {
+      btn.loading = true;
+    }
     const res = {};
     const base = opertaor.getTableRefByKey("plyBase").getFromValue();
     res["user"] = user;
@@ -4803,7 +4894,9 @@ if(props.param.cTransMrk !== "1"){
     res["taskId"] = props.param.taskId ? props.param.taskId : null;
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
     const calBtn = getBtn("btnCalEdr");
-    calBtn.loading = true;
+    if(calBtn) {
+      calBtn.loading = true;
+    }
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
@@ -4883,7 +4976,9 @@ if(props.param.cTransMrk !== "1"){
           const oldPrm = calcData.base["Base.nPrm"];
           if (newPrm === oldPrm) {
             submitEdrToUndr(res).then((result) => {
-              btn.loading = false;
+              if(btn) {
+                btn.loading = false;
+              }
               console.log("批改申请核保", result);
               // ElMessage.success(res.msg);
               // history.back();
@@ -4910,8 +5005,12 @@ if(props.param.cTransMrk !== "1"){
       } catch (err) {
         console.log("保费计算失败!" + err);
       } finally {
-        btn.loading = false;
-        calBtn.loading = false;
+        if(btn) {
+          btn.loading = false;
+        }
+        if(calBtn) {
+          calBtn.loading = false;
+        }
       }
     },500)
   }
@@ -4951,7 +5050,9 @@ if(props.param.cTransMrk !== "1"){
 const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013"]
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
-  btn.loading = true;
+  if(btn) {
+    btn.loading = true;
+  }
   const res = underwrite.value.getFromValue();
   res["user"] = user;
   res["user"]["opRelCde"] = user.opCde;
@@ -5058,7 +5159,9 @@ const submitUnderwritingFn = async () => {
 
   submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);
-    btn.loading = false;
+    if(btn) {
+      btn.loading = false;
+    }
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){
@@ -5197,7 +5300,7 @@ const showJointInsuranceInfo = async () => {
       永安方总比例：<strong>${Math.round(totalShare * 100)}%</strong><br>
       永安方总保费：<strong>${totalPremium.toLocaleString()}元</strong><br>
       ${companyDetails.map(detail => 
-        `<span style="display: block;">${detail.name}->比例：${Math.round(detail.ratio)}->保额：${detail.amount}->保费：${detail.premium}</span>`
+        `<span style="display: block;">${detail.name}->比例：${detail.ratio}->保额：${detail.amount}->保费：${detail.premium}</span>`
       ).join('')}
     </div>
   `;
@@ -5507,7 +5610,7 @@ const validateShanDong = async () => {
   const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
 
   // 机构是山东分公司
-  if (!String(cDptCdeA).startsWith('0237')) return false;
+  if (!String(cDptCdeA).startsWith('023701')) return false;
   // 币种是人民币
   if (!['人民币', 'CNY'].includes(basePrm)) return false;
   // 联共保业务类型
@@ -5834,7 +5937,7 @@ function replacecInquiryNo(res:any) {
 }
 
 // 复制出单和模板出单清空原有的申请单号
-const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo"]
+const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo","cCrtCde","cUpdCde"]
 function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   if(res instanceof Array) {
     res.forEach((item:any) => {
@@ -6017,6 +6120,23 @@ function handleRemoveReceived() {
     });
   });
 }
+
+function validateSpecialAgreement() {
+  const res = opertaor.getDataAll();
+  if(res['SpecialAgreement']?.length > 0) {
+    for(let i=0;i<res['SpecialAgreement'].length;i++){
+      const item = res['SpecialAgreement'][i];
+      if(res['base']['Base.cInstMrk'] === '0' && item['SpecialAgreement.cSpecialCode'] == '34201122'){// 一次交清
+        ElMessage.error(`特约信息中的第 ${item['SpecialAgreement.index']} 条特约信息与承保基本信息中的付费约定冲突，请删除该特约信息！`);
+        return false;
+      } else if(res['base']['Base.cInstMrk'] === '5' && item['SpecialAgreement.cSpecialCode'] == '34201123') {// 多次交清
+        ElMessage.error(`特约信息中的第 ${item['SpecialAgreement.index']} 条特约信息与承保基本信息中的付费约定冲突，请删除该特约信息！`);
+        return false;
+      }
+    }
+  }
+  return true;
+};
 
 /**
  * 检查缴费计划的有效性

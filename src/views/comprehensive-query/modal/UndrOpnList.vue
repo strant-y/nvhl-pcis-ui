@@ -86,7 +86,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "CAntiLnderRisk",
         inputtype: "rtselect",
         title: "反洗钱风险",
-        minWidth: 80,
+        lengthNum: 5,
         loadData: [
           { value: "0", label: "低" },
           { value: "1", label: "中" },
@@ -98,7 +98,8 @@ const tableconfig = reactive<AppTableConfig>(
         // inputtype: "rtdatepicker", 
         inputtype: "rtinput",
         title: "核保时间",
-        minWidth: 80,
+        lengthNum: 19,
+        lengthIsNumber: true,
       },
       {
         prop: "CUndrOpn",

@@ -2,7 +2,11 @@
 <template>
   <div> 
     <myCard :cardConfig="cardconfig">
-      <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
+      <rttable v-model="formData" :item="tableconfig" ref="rttableFrom">
+        <template #column-cSpecialContent="{row}">
+          <div>{{ row.cSpecialContent }}</div>
+        </template>
+      </rttable>
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -126,7 +130,7 @@ const tableconfig = reactive<AppTableConfig>(
 
                  let list = formData.value;
                  const index = list.findIndex(
-                    item => item.cSpecialCode === row.cSpecialCode
+                    item => item.cSpecialCode === row.cSpecialCode && item.cPkId === row.cPkId
                   );
                     if (index !== -1) {
                       nextTick(()=>{
@@ -148,7 +152,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
          hideBtns: (row) => {
           // if (!row.cSpecialContent.includes("*")) return true;
-           return row.cIfMust === '1';
+           return row.cIfMust === '1' && row.cSpecialCode !== '34201122' && row.cSpecialCode !== '34201123';
         },
         tableClick: (row) => {
            ElMessageBox.confirm(
@@ -254,6 +258,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "特约内容",
         align: "left",
+        slotName: "cSpecialContent",
         //  width: 210,
       },
     ],
@@ -302,6 +307,7 @@ const refreshData = () => {
     cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
+    tAppTm: opertaor.getDataAll().insrnc?.['Base.tAppTm']
   }).then((res) => {
     if (res.data?.result) {
             let len = 0;
@@ -336,7 +342,12 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
-  refreshData();
+  const gettAppTm = setInterval(() => {
+    if(opertaor.getDataAll().insrnc?.['Base.tAppTm']) {
+      refreshData();
+      clearInterval(gettAppTm);
+    }
+  }, 500)
 });
 // 组件卸载时移除事件监听（避免内存泄漏）
 onUnmounted(() => {
@@ -407,6 +418,7 @@ const method = {
           cProdNo: param.cProdNo,
           cDptCde:param.cDptCde, 
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
+          tAppTm: opertaor.getDataAll().insrnc?.['Base.tAppTm'],
         },
       {
         getSelected(selectdata: any) {

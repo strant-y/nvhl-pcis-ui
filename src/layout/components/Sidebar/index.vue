@@ -75,6 +75,10 @@ const basePath = "/"
 const shorMenuList = ref([])
 
 onMounted(() => {
+  const roles = JSON.parse(sessionStorage.getItem("user") || "{}").roles;
+  if(roles?.length > 0 && roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {// 外部系统查看保单详情
+    return;
+  }
   dropdowmList.value = permissionStore.routes.filter((item:any) => {
     return item.path !== "/login" && item.path !== "/" && item.path !== "/redirect"
   })

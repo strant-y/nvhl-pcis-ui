@@ -108,7 +108,7 @@ onMounted(() => {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
       setFormItem("Applicant.cGreenIndustryList", { hidden: true, rules: null });
     }
-    if (!cProdNo.startsWith("05")) {
+    if (!cProdNo?.startsWith("05")) {
       setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
       setFormItem("Applicant.cShareholderNature", {
@@ -159,6 +159,10 @@ onMounted(() => {
     setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
     // 证件号码
     // setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
+    if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT") && (param.cTransMrk == '1' || param.cRsnCde === '99' || param.cEdrRsnBundle === '99' || param.cEdrRsnBundleCde === '99')) {
+      setFormItem("Applicant.cCertfCls", { disabled: false });
+      setFormItem("Applicant.cCertfCde", { disabled: false });
+    }
   });
 });
 // //给表单下拉项赋值
@@ -447,7 +451,7 @@ const method = {
       setFormItem("Applicant.tCertfEndDate", {
         rules: [getRules("required", {})],
       });
-    } else if (val == "110007") {
+    } else if (val == "01") {
       setFormItem("Applicant.tCertfBgnDate", {
         rules: [getRules("required", {})],
       });
@@ -940,7 +944,7 @@ const method = {
             list: res
           })
           if (val === '0') {
-            setValue('Applicant.cCertfCls', '110007');  // 法人默认机构代码
+            setValue('Applicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
     }
@@ -1081,7 +1085,7 @@ const method = {
       );
       setFormItem("Applicant.tCertfEndDate", { disabled: true });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   01  111
       // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {  rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", { disabled: true , rules: [getRules("required", {})],});
@@ -1097,7 +1101,7 @@ const method = {
       }
       setFormItem("Applicant.tCertfEndDate", { disabled: false });
 
-      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   110007  111
+      // let cCertfCls = getValue('Applicant.cCertfCls');  // 证件类型   01  111
       // if(cCertfCls ==="111" || cCertfCls ==="110008=7"){
       //     setFormItem("Applicant.tCertfBgnDate", {     rules: [getRules("required", {})],});
       //     setFormItem("Applicant.tCertfEndDate", {    rules: [getRules("required", {})],});
@@ -1332,7 +1336,7 @@ const method = {
     type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
     const ruleMap: Record<string, RuleType> = {
       "110001": "orgCode",
-      "110007": "socialCode",
+      "01": "socialCode",
       "111": "idCard",
       "07": "passPort",
       "553": "ariCard",
@@ -1386,10 +1390,12 @@ function setregistAdd() {
       if (code === 200) {
         const b = (data ? data["addStr"] : "") + a;
         setAddressStr("Applicant.cClntAddr", b);
+        setAddressStr("Applicant.cHabitualResidence", b);
       }
     });
   } else {
     setAddressStr("Applicant.cClntAddr", a);
+    setAddressStr("Applicant.cHabitualResidence", a);
   }
 }
 
@@ -1562,7 +1568,7 @@ function handleFileChange(event: Event) {
                 "Applicant.tCertfBgnDate",
                 cardInfo["BizLicenseOperatingPeriod"].split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效起期
               );
-              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("期限")) { // 证件有效期长期标识
+              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("期限") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "年月日") { // 证件有效期长期标识
                 setValue("Applicant.cLongendTyp", "1");
               } else {
                 setValue("Applicant.cLongendTyp", "0");
@@ -1572,7 +1578,7 @@ function handleFileChange(event: Event) {
                 );
               }
             }
-            setValue("Applicant.cCertfCls", "110007"); // 证件类型
+            setValue("Applicant.cCertfCls", "01"); // 证件类型
             setValue("Applicant.cClntMrk", "0"); // 投保人性质
           }
           checkUser();

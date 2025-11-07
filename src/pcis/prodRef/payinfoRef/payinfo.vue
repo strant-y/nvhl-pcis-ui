@@ -30,6 +30,7 @@ const props = defineProps({
 
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
+const param = opertaor.getParam();
 // Base.cCiMrk  联共保 字段   0 5非共保    1 2 主联   3 4 无联保  
 // Base.nCiOwnPrm   我司保费
 
@@ -45,6 +46,10 @@ watch(
   watchSource,
   ([newCCiMrk, newNCiOwnPrm], [oldCCiMrk, oldNCiOwnPrm]) => {
         // console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
+    // 批单直接退出
+    if(param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cAppTyp === "E")) {
+      return;
+    }
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
     }

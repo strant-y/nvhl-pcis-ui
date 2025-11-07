@@ -114,7 +114,7 @@ onMounted(async () => {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //将联共保业务默认值设置为0并存到store中
     productStore.setcCiMrk("0");
-    if (sessionStorage.getItem("toMyPageData")) {
+    if (sessionStorage.getItem("toMyPageData") && !param.cAppNo) {
       if (data.pageType && data.pageType === "app") {
         //新保时，续保单号隐藏
         setFormItem("Base.cOrigPlyNo", { hidden: true });
@@ -235,8 +235,15 @@ const method = {
           }
         }
       );
-      nextTick(() => {
-        const ciRef = opertaor.getTableRefs()['ci'];
+      
+      const obj = {
+        rules: [],
+        disabled: true,
+        btnItems: {
+          disabled: true,
+        },
+      };
+      if(p.cTransMrk !== '1'){
         //代理业务 服务机构不可选
         if (val === "19002"){
           setFormItem("Base.cIntroDptcde", {btnItems: {
@@ -247,6 +254,28 @@ const method = {
               disabled: false,
             }});
         }
+        if (val === "19002" || val === "19003" ) {
+            setFormItem("Base.cBrkrCde", {...obj,disabled:false}); //代理(经纪)人
+            setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+            setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
+
+        } else {
+            setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
+            setFormItem("Base.cBrkSlsCde", obj); //代理业务员
+
+            setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
+            if (!p.initFlag) {
+              setValue("Base.cBrkrCde", "");
+              setValue("Base.cBrkSlsCde", "");
+              setValue("Base.cAgtAgrNo", "");
+            }
+            nextTick(() => {
+              plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
+            });
+        }
+      }
+      nextTick(() => {
+        const ciRef = opertaor.getTableRefs()['ci'];
         if (val === "19002" || val === "19003") {
           // 非直销业务：清空业务员
           if (ciRef) {
@@ -263,9 +292,6 @@ const method = {
               disabled: false,
             },
           };
-          setFormItem("Base.cBrkrCde", {...obj,disabled:0}); //代理(经纪)人
-          setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-          setFormItem("Base.cAgtAgrNo", { rules: [getRules("required", {})] }); //代理合作协议
         } else {
           // 直销业务：清空代理业务员和代理经纪人
           if (ciRef) {
@@ -275,25 +301,6 @@ const method = {
               ciRef.setValueByRowKey("Ci.cBrkSlsCde", row._dataId, "");
             });
           }
-          const obj = {
-            rules: [],
-            disabled: true,
-            btnItems: {
-              disabled: true,
-            },
-          };
-          setFormItem("Base.cBrkrCde", obj); //代理(经纪)人
-          setFormItem("Base.cBrkSlsCde", obj); //代理业务员
-
-          setFormItem("Base.cAgtAgrNo", { rules: null }); //代理合作协议
-          if (!p.initFlag) {
-            setValue("Base.cBrkrCde", "");
-            setValue("Base.cBrkSlsCde", "");
-            setValue("Base.cAgtAgrNo", "");
-          }
-          nextTick(() => {
-            plyBaseEditRef.value?.clearValidate("Base.cBrkSlsCde");
-          });
         }
         if (!!ciRef) {
           ciRef.valideRequired();
@@ -319,15 +326,15 @@ const method = {
         const obj = {
           rules: null,
           btnItems: {
-            disabled: true,
+            disabled: false,
           },
         };
         if (!p.initFlag) {
           setFormItem("Base.cSlsId", obj); //业务员工号
+          setValue("Base.cSlsId", "");
+          setValue("Base.cSlsNme", "");
         }
         setFormItem("Base.cSlsId", { rules: null }); //业务员工号
-        setValue("Base.cSlsId", "");
-        setValue("Base.cSlsNme", "");
       } else {
         const obj = {
           rules: [getRules("required", {})],
@@ -521,6 +528,10 @@ const method = {
           },
         },
       },
+      {
+        isOk: (selectdata: any) => {
+        },
+      },
       { title: "业务员", width: 85 }
     );
   },
@@ -542,7 +553,7 @@ const method = {
       {
         type: "show",
         data: {
-          CDptCde: sessionData.value?.cDptCde,
+          CDptCde: sessionData.value?.cDptCde || getValue("Base.cDptCde"),
           cBsnsTyp: getValue("Base.cBsnsTyp"),
           cChaType: getValue("Base.cChaType"),
           cChaSubtype: getValue("Base.cChaSubtype"),
@@ -665,9 +676,9 @@ const method = {
         },
         method: {
           getSelected: (params) => {
-            setFormValue({
-              "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
-            });
+            // setFormValue({
+            //   "Base.cIntroSalecde": params.CSlsNme, //业务员员工号
+            // });
             codeListStore
               .queryCodeList(
                 {
@@ -681,8 +692,8 @@ const method = {
               )
               .then((res) => {
                 console.log("业务员=-==", res);
-                if (res && res.code == 200) {
-                  const codeValData = res.data;
+                if (res && res.length > 0) {
+                  const codeValData = res;
                   if (codeValData) {
                     // 服务机构业务员下拉和显示的值
                     setFormItem("Base.cIntroSalecde", {
@@ -728,7 +739,6 @@ const method = {
       setValue("Base.cPrjCtgMidTyp", "");
       setValue("Base.cPrjCtgSubTyp", "");
     }
-
     if (val) {
       // Base.cPrjCtgMidTyp
       // setFormItem("Base.cPrjCtgMidTyp", { rules: null, disabled: true });
@@ -736,7 +746,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "2",
           },
@@ -764,7 +774,7 @@ const method = {
         .queryCodeList({
           codeListName: "CPrjCtgTyp_List",
           codeListParam: {
-            CRangeCde: subDptCde.value,
+            // CRangeCde: subDptCde.value,
             CParCde: val,
             cLev: "3",
           },
@@ -826,8 +836,9 @@ function getCheckCdeptByCdptCde() {
                 {
                   codeListName: "CPrjCtgTyp_List",
                   codeListParam: {
-                    CRangeCde: subDptCde.value,
-                    // CParCde: "",
+                    // CRangeCde: subDptCde.value,
+                    CRangeCde: ['0200000000000', subDptCde.value],
+                    CParCde: '-1',
                     cLev: "1",
                   },
                 },

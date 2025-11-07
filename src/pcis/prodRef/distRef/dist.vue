@@ -180,7 +180,7 @@ watch(
         if(isQuery.value) return
         eventBus.emit('goodsMxChange', newVal);
         // 02开头的货物明细清单，关联标的信息
-        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
+        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
            method.getTgtDetailFn();
            emit('savePlyInfo');
         }
@@ -281,6 +281,14 @@ onMounted(async () => {
     // 关联实际用工地址列表展示
     if(r['prop'] === 'Dist.cEmploymentAddress'){
       eventBus.on('setMap-EmployeeDist043009', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
+    }
+    // 关联项目地址列表展示
+    if(r['prop'] === 'Dist.cProjectAddress'){
+      eventBus.on('setMap-ProjectDist045001', (data: any) => {
         if(data.list && data.list.length > 0) {
           r.loadData = data.list
         }
@@ -641,6 +649,19 @@ const method = {
           }
           eventBus.emit('setMap-EmployeeDist043009', {
             code: 'Dist.cEmploymentAddress',
+            list: pageresult.list.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          });
+        }
+
+        // 045001 set 关联项目地址 下拉值
+        if(props.compKey === 'ProjectDist045001'){
+          eventBus.emit('setMap-ProjectDist045001', {
+            code: 'Dist.cProjectAddress',
             list: pageresult.list.map((m: any) => {
               return {
                 label: m['Dist.cDetailedAddress'],
@@ -1072,40 +1093,82 @@ const method = {
       ElMessage.warning("请先选择要删除的数据");
       return;
     }
-    const param = {
+    const param:any = {
       cComponentTable: cComponentTableValue,
-      cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
+      // cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
     }
     if (route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
-
-    const res = await deleteDistCheck(param);
-    const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
-
-    ElMessageBox.confirm(
-        checkMsg,
+    // 增加是否删除全部判断，选是删除全部，选否删除选中项
+    if (pageresult.total > 10 && selectedRows.value.length === 10) {
+      ElMessageBox.confirm(
+        "是否删除全部？",
         "提示",
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: "是",
+          cancelButtonText: "否",
           type: "warning",
+          distinguishCancelAndClose: true,// 区分关闭和取消
         }
-    ).then(() => {
-      deleteDist(param).then(async(res: any) => {
-        if (res.code === 200) {
-          ElMessage.success("删除成功");
-          const queryParams = distTableRef.value?.getPartnerPage(false);
-          method.handleQuery(queryParams, true);
-        } else {
-          ElMessage.error(res.msg);
-        }
-      }).catch((err:any) => {
-        ElMessage.error(err.msg)
-      })
-    });
+      ).then(async () => {// 选是则删除所有清单数据 接口不传cPkId
+        const res:any = await deleteDistCheck(param);
+        deleteDist(param).then(async(res: any) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            method.handleQuery(queryParams, true);
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err.msg)
+        })
+      }).catch(async (action:any) => {// 选否则删除本页选中数据
+        if(action === 'close') return; // 关闭不做任何操作
+        param['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
+        const res:any = await deleteDistCheck(param);
+        deleteDist(param).then(async(res: any) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            method.handleQuery(queryParams, true);
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err.msg)
+        })
+      });
+    } else {
+      param['cPkId'] = selectedRows.value.map((row: any) => row['Dist.cPkId']);
+      const res:any = await deleteDistCheck(param);
+      const checkMsg = res.code === 500 ? res.msg : "是否确认删除选中的数据？";
+
+      ElMessageBox.confirm(
+          checkMsg,
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+      ).then(() => {
+        deleteDist(param).then(async(res: any) => {
+          if (res.code === 200) {
+            ElMessage.success("删除成功");
+            const queryParams = distTableRef.value?.getPartnerPage(false);
+            method.handleQuery(queryParams, true);
+          } else {
+            ElMessage.error(res.msg);
+          }
+        }).catch((err:any) => {
+          ElMessage.error(err.msg)
+        })
+      });
+    }
   }
 };
 

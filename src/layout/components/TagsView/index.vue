@@ -19,7 +19,7 @@
         <i-ep-close
           class="close-icon"
           size="12px"
-          v-if="!isAffix(tag)"
+          v-if="!isAffix(tag) && !isRole173"
           @click.prevent.stop="closeSelectedTag(tag)"
         />
       </router-link>
@@ -83,6 +83,8 @@ const appStore = useAppStore();
 const { visitedViews } = storeToRefs(tagsViewStore);
 const settingsStore = useSettingsStore();
 const layout = computed(() => settingsStore.layout);
+const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+const isRole173 = user.roles?.length > 0 && user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173");
 
 const selectedTag = ref<TagView>({
   path: "",
@@ -156,6 +158,9 @@ function filterAffixTags(routes: RouteRecordRaw[], basePath = "/") {
       }
     }
   });
+  if(user.roles?.length > 0 && user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {// 外部系统查看保单详情
+    tags = tags.filter(item => item.path !== "/dashboard")
+  }
   return tags;
 }
 

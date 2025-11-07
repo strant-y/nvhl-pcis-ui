@@ -732,12 +732,15 @@ const method = {
       interface Item {
         nInsuredHeadcount?: number | null | string;
       }
-      if (termrefList.length) {
-        termref?.setTermData({
-          termNo: termrefList[0]?.['Term.cUniqueTermNo'],  // 这个不是条款 需要 去方法里面打印看具体数据ID
-          planNo: termrefList[0]?.['Term.cPlanNo'],
-          factorProp: 'Term.nSeatTotal',
-        }, val);
+      for (let i = 0; i < termrefList.length; i++) {
+        const term = termrefList[i];
+        if (term['Term.cRdrTyp'] == '0') { // 判断是主条款
+          termref?.setTermData({
+            termNo: term['Term.cUniqueTermNo'],
+            planNo: term['Term.cPlanNo'],
+            factorProp: 'Term.nSeatTotal',
+          }, val);
+        }
       }
     }
   },
@@ -1287,7 +1290,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDestAirportCountry') && getValue('Tgt.cDestAirportCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDestAirportCountry') && getValue('Tgt.cDestAirportCountry') != res.cCountryCn && getValue('Tgt.cDestAirportCountry') != res.cCountryEn) {
             ElMessage.error('目的地国家和目的地机场国家要求一致')
             return
           }
@@ -1356,7 +1359,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDepartureAirportCountry') && getValue('Tgt.cDepartureAirportCountry') != res.cCountryCn && getValue('Tgt.cDepartureAirportCountry') != res.cCountryEn) {
             ElMessage.error('起运地国家和起运机场国家要求一致')
             return
           }
@@ -1428,7 +1431,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDispatchCountry') && getValue('Tgt.cDispatchCountry') != res.cCountryCn && getValue('Tgt.cDispatchCountry') != res.cCountryEn) {
             ElMessage.error('起运地国家和起运机场国家要求一致')
             return
           }
@@ -1498,7 +1501,7 @@ const method = {
       { type: "departure", data: { whichType: whichType.value, isYW } },
       {
         isOk: (res: any) => {
-          if (getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn) {
+          if (getValue('Tgt.cDestinationCountry') && getValue('Tgt.cDestinationCountry') != res.cCountryCn && getValue('Tgt.cDestinationCountry') != res.cCountryEn) {
             ElMessage.error('目的地国家和目的地机场国家要求一致')
             return
           }

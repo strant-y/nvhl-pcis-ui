@@ -278,6 +278,19 @@ export function getBasicKindList(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/getBasicKindList`, queryParams);
 }
 /**
+ * 查询数据处理任务
+ */
+export function qryTerminationDataList(queryParams: any): AxiosPromise<any> {
+  return post(`/oa/qryTerminationDataList`, queryParams);
+}
+
+/**
+ * 操作数据处理开关
+ */
+export function dealTerminationData(ops: any): AxiosPromise<any> {
+    return post(`oa/dealTerminationData`, ops);
+}
+/**
  * 修改险类状态
  *
  * @param queryParams
