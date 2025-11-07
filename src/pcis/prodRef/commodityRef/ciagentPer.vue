@@ -474,7 +474,6 @@ onMounted(() => {
     nextTick(() => {
       setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
     });
-  }
 });
 
 defineExpose({
