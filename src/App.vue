@@ -71,8 +71,8 @@ watchEffect(() => {
   background: var(--el-color-primary) !important; // 跟主题色切换
 }
 ::-webkit-scrollbar {
-  width: 4px; /* 垂直滚动条宽度 */
-  height: 4px; /* 水平滚动条高度 */
+  width: 8px; /* 垂直滚动条宽度 */
+  height: 8px; /* 水平滚动条高度 */
 }
 
 ::-webkit-scrollbar-track {

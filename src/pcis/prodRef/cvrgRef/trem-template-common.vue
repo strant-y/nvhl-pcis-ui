@@ -1502,8 +1502,13 @@ td {
 .isDutyfree {
   display: flex;
   align-items: center;
+  margin-left: 20px;
   img {
     width: 18px;
   }
+}
+
+:deep(.item .el-badge__content.is-fixed) {
+  top: 10px;
 }
 </style>

@@ -114,7 +114,7 @@ onMounted(async () => {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //将联共保业务默认值设置为0并存到store中
     productStore.setcCiMrk("0");
-    if (sessionStorage.getItem("toMyPageData")) {
+    if (sessionStorage.getItem("toMyPageData") && !param.cAppNo) {
       if (data.pageType && data.pageType === "app") {
         //新保时，续保单号隐藏
         setFormItem("Base.cOrigPlyNo", { hidden: true });
@@ -534,6 +534,10 @@ const method = {
           },
         },
       },
+      {
+        isOk: (selectdata: any) => {
+        },
+      },
       { title: "业务员", width: 85 }
     );
   },
@@ -555,7 +559,7 @@ const method = {
       {
         type: "show",
         data: {
-          CDptCde: sessionData.value?.cDptCde,
+          CDptCde: sessionData.value?.cDptCde || getValue("Base.cDptCde"),
           cBsnsTyp: getValue("Base.cBsnsTyp"),
           cChaType: getValue("Base.cChaType"),
           cChaSubtype: getValue("Base.cChaSubtype"),

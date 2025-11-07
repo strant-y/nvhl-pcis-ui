@@ -891,6 +891,13 @@ const method = {
 
           policyService.importCi(params).then((res: any) => {
             if (res.code === 200) {
+              const ciDataLength = opertaor.getTableRefByKey("ci")?.getFromValue()?.length || 0;
+              res.data?.successList?.forEach((item:any, index:number) => {
+                freeEditRef?.value?.addRowByData({
+                  ...item,
+                  'Ci.nSeqNo': ciDataLength + (index + 1)
+                })
+              })
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
