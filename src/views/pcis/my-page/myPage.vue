@@ -5689,7 +5689,7 @@ const validateShanDong = async () => {
 
 // 047001 校验标的信息中的预估代驾人员数量(人)、预估代驾订单数量(单)二选一必填
 const validateTgt = () => {
-  const tgtData = opertaor.getTableRefByKey("tgt").getFromValue();
+  const tgtData = opertaor.getTableRefByKey("tgt")?.getFromValue();
   if(props.param?.cProdNo === "047001") {
     if(!tgtData['Tgt.nProxyDrivers'] && !tgtData['Tgt.nOrderQuantity']) {
       ElMessage.error("标的信息预估代驾人员数量(人)、预估代驾订单数量(单)不能全部为空！")
@@ -5698,10 +5698,19 @@ const validateTgt = () => {
   }
   //  041012  是否单项工程逻辑
   if(props.param?.cProdNo==='041012'){
-    let tableLenght = opertaor.getTableRefByKey("SurveyDist041012").getTableData().length;  // 清单条数
-    let cIsSingle =  opertaor.getTableRefByKey("tgt").getValue('Tgt.cIsSingle');      // 是否单项工程
+    let tableLenght = opertaor.getTableRefByKey("SurveyDist041012")?.getTableData().length;  // 清单条数
+    let cIsSingle =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsSingle');      // 是否单项工程
     if(tableLenght ==0 && cIsSingle==0){
       ElMessage.warning("“是否单项工程”为否时，勘察工程项目清单不能为空！");  
+      return false;
+    }
+  }
+  // 041007 标的信息 被监护人是否记名选是，人员清单信息必填
+  if(props.param?.cProdNo==='041007'){
+    let tableLenght = opertaor.getTableRefByKey("PersonnelDist041007")?.getTableData().length;  // 清单条数
+    let cIsRegistered =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsRegistered');      // 是否单项工程
+    if(tableLenght ==0 && cIsRegistered=='1'){
+      ElMessage.warning("“被监护人是否记名”为是时，人员清单信息不能为空！");  
       return false;
     }
   }

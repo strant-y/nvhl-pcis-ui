@@ -67,7 +67,8 @@ const mapAddr = {
     "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
   },
   "AddressDist041001": {
-    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    // "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    "Dist.cDetailedAddress": "Dist.cDetailedAddress"
   },
   "AddressDist043020": {},
   "AdvertisementDist043011": {

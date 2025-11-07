@@ -965,6 +965,18 @@ function dataInit() {
   if(pageparam.cProdNo === "041014" && pageparam.cGrpMrk == "0") {
     termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
   }
+  // 041007 团单展示 关联被保险人要素且必填
+  if(pageparam.cProdNo === "041007") {
+    if(pageparam.cGrpMrk == "1") {
+      termFactormap.value.forEach((item:any) => {
+        if(item.prop === "Term.nRelatedInsuredCount") {
+          item.required = true
+        }
+      })
+    } else {
+      termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
+    }
+  }
 }
 
 function getUseData(data: any){

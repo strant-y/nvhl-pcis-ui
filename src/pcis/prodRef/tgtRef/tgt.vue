@@ -159,6 +159,10 @@ onMounted(async () => {
   if (params.cProdNo === '090003') {
     setFormItem("Tgt.cProjectName", { rules: [] })
   }
+  // 041007 被监护人数必填
+  if(params.cProdNo === '041007') {
+    setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
+  }
 
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
