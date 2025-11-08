@@ -2454,7 +2454,7 @@ async function loadAfter() {
     rightBtnList.value = basicRightBtn.filter(item => !item.hidden);
   } 
   let imageStr = '影像管理';
-  if(pageMethod.isReadOnlyScene(opertaor)){
+  if(pageMethod.imageReadonly(opertaor)){
     imageStr = '影像查看';
   }
   bthList.value.push(
