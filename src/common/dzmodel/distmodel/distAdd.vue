@@ -458,6 +458,23 @@ onMounted(() => {
     if((route.params.param.cProdNo == '041014' || route.params.param.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {
       item.btnItems.disabled = false;
     }
+    // 041007 如果证件号码为空，根据出生年月计算年龄
+    if (item.prop === 'Dist.tBirthDate' && route.params.param.cProdNo == '041007') {
+      item.func = (val:any) => {
+        const cIdentificationNumber = getValue('Dist.cIdentificationNumber')
+        if(val && !cIdentificationNumber) {
+          const year = parseInt(val.split('-')[0])
+          const month = parseInt(val.split('-')[1])
+          const currentYear = new Date().getFullYear();
+          const currentMonth = new Date().getMonth() + 1;
+          let age = currentYear - year;
+          if(currentMonth < month) {// 如果当前月份 < 出生月份 年龄减1
+            age--
+          }
+          setValue('Dist.nAge', age)
+        }
+      }
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
