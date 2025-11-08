@@ -3501,12 +3501,12 @@ const submitToUndrFn = async () => {
   
       // 询价单申请核保参数
       if(props.param?.pageName === "priceInquiry") {
-        res["taskId"] = 0;
+        res["taskId"] = props.param.taskId ? props.param.taskId.toString() : 0;
         res["openPolicy"] = null;
         res["cInquiryNo"] = base["Base.cInquiryNo"];
       } else {
         res["appNo"] = base["Base.cAppNo"];
-        res['taskId'] = props.param.taskId;
+        res['taskId'] = props.param.taskId ? props.param.taskId.toString() : null;
       }
 
 
@@ -4545,7 +4545,7 @@ const submitEdrToUndrSurrender = async () => {
     ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
-  res["taskId"] = props.param.taskId ? props.param.taskId : null;
+  res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
   res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
@@ -4891,7 +4891,7 @@ if(props.param.cTransMrk !== "1"){
     res["user"] = user;
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
-    res["taskId"] = props.param.taskId ? props.param.taskId : null;
+    res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
     const calBtn = getBtn("btnCalEdr");
     if(calBtn) {
@@ -5021,7 +5021,7 @@ if(props.param.cTransMrk !== "1"){
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
     res["cTransMrk"] = props.param.cTransMrk;
-    res["taskId"] = props.param.taskId ? props.param.taskId : null;
+    res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
     submitEdrToUndr(res).then((result) => {
         // btn.loading = false;
         console.log("批改申请核保", result);
