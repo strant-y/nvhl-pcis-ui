@@ -1626,7 +1626,7 @@ function handleFileChange(event: Event) {
             setValue(
               "Insured.tBirthday",
               cardInfo["date_of_birth"]["value"]
-                ? cardInfo["date_of_birth"]["value"].replace(".", "-")
+                ? cardInfo["date_of_birth"]["value"].replaceAll(".", "-")
                 : null
             );
             if (cardInfo["period_of_validity"]["value"]) {
