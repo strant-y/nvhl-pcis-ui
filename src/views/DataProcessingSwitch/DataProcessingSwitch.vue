@@ -86,13 +86,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         rules: [getRules("required", {})],
         loadData: [
-          {value: 'TerEdr', label: '终保后批改'},
-          {value: 'SurBck', label: '一般退保倒签'},
-          {value: 'CanBck', label: '注销倒签'},
-          {value: 'EdrUpdPrm', label: '批改时手动修改保费'},
-          {value: 'EdrBckBgn', label: '批改时允许倒签批改生效时间'},
-          {value: 'SurUpdPrm', label: '一般退保手动修改退保费'},
-          {value: 'EdrUpdRate', label: '修改批减手续费比例'}
+          { value: 'TerEdr', label: '终保后批改' },
+          { value: 'SurBck', label: '一般退保倒签' },
+          { value: 'CanBck', label: '注销倒签' },
+          { value: 'SurPrm', label: '一般退保手动修改退保总保费' },
+          { value: 'AppPrm', label: '投保手动修改保费' },
+          { value: 'EdrPrm', label: '一般批改手动修改险别保费' },
+          { value: 'CancelM1', label: '取消免费延期校验' },
         ],
       },
       {
@@ -189,26 +189,25 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: (val,row) => {
+        func: async (val:any,row:any) => {
           console.log(val);
           console.log(row);
 
           let saveType = null;
           const s = freeEditRef.value?.getFromValue(); //获取表单数据
           if(val === 'on'){
-            freeEditRef.value?.validate().then((res) => {
-              if(!res){
-                tableRef.value?.setValueByRowKey("cAppTyp", row._dataId, val === 'off');  //如果验证不通过,则不修改状态
-                return ;
-              }
-            });
+            const r = await freeEditRef.value?.validateField("cTitleOa");
+            if(!r){
+              tableRef.value?.setValueByRowKey("cAppTyp", row._dataId, val === 'off');  //如果验证不通过,则不修改状态
+              return;
+            }
           }
           const params = {
             forms: Object.assign(s,{cAppTyp:val}),
             list: [row]
           }
 
-          dealTerminationData(params).then((res) => {
+          dealTerminationData(params).then((res:any) => {
             if(res.code === 200){
               handleQuery();
             }else{
@@ -294,7 +293,7 @@ async function handleQuery(flag?: boolean) {
     if(r){
       const param = Object.assign(s);
       qryTerminationDataList(param)
-        .then((res) => {
+        .then((res:any) => {
           const { code, data, msg } = res;
           if (200 === code) {
             pageresult.list = [];
