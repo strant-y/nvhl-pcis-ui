@@ -2297,12 +2297,15 @@ async function queryAE( flag?: boolean, isEs = false) {
       })
     }else{
         qryPolicyNewList(param)
-        .then((res) => {
+        .then((res:any) => {
             const { code, data, msg } = res;
             if (200 === code) {
                 pageresult.list = [];
                 pageresult.list = data.result;
                 pageresult.total = data.total;
+                if(data.code == '0') {
+                    ElMessage.error(data.message)
+                }
             } else {
                 ElMessage.error(msg);
             }
@@ -2419,12 +2422,15 @@ async function queryI(flag?: boolean, isEs = false) {
       })
     }else{
       qryPolicyNewList(param)
-        .then((res) => {
+        .then((res:any) => {
             const { code, data, msg } = res;
             if (200 === code) {
                 pageresult.list = [];
                 pageresult.list = data.result;
                 pageresult.total = data.total;
+                if(data.code == '0') {
+                    ElMessage.error(data.message)
+                }
             } else {
                 ElMessage.error(msg);
             }
