@@ -718,8 +718,8 @@ function getAddressstr(val:any, row: any, pitem: any){
 }
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
-   const a = freeEditRef?.value?.getValue(getv1[0].prop);
-   const b = freeEditRef?.value?.getValue(getv2[0].prop);
+   const a = freeEditRef?.value?.getValue(getv1[0]?.prop);
+   const b = freeEditRef?.value?.getValue(getv2[0]?.prop);
 
    const setS = setv.prop;
    if (a) {

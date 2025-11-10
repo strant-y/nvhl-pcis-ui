@@ -1822,8 +1822,8 @@ const method = {
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
-  const a = tgtEditRef?.value?.getValue(getv1[0].prop);
-  const b = tgtEditRef?.value?.getValue(getv2[0].prop);
+  const a = tgtEditRef?.value?.getValue(getv1[0]?.prop);
+  const b = tgtEditRef?.value?.getValue(getv2[0]?.prop);
 
   const setS = setv.prop;
   if (a) {
