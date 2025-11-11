@@ -415,6 +415,8 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
+            // 如果是免赔信息则不刷新保障信息
+            if(props.compKey?.includes('DeductibleDist')) return;
             const cvrgRef = opertaor.getTableRefs()['cvrg'];
             try {
               cvrgRef?.refushCvrgInfo();
@@ -469,6 +471,8 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+          // 如果是免赔信息则不刷新保障信息
+          if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           try {
             if(cvrgRef) {
@@ -519,6 +523,8 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
+                // 如果是免赔信息则不刷新保障信息
+                if(props.compKey?.includes('DeductibleDist')) return;
                 const cvrgRef = opertaor.getTableRefs()['cvrg'];
                 try {
                     cvrgRef?.refushCvrgInfo();
