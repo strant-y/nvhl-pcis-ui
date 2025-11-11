@@ -53,6 +53,9 @@ watch(
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
     }
+    if(param.pageType === "readonly") {
+      return;
+    }
     nextTick(() => {
       nPrmFun();
     })
