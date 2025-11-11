@@ -554,7 +554,17 @@ const nAdditiveCoefficientChange = (val:any)=>{
 }
 const InvoiceCurrencyChange = (val:any)=>{
   console.log('发票金额币种')
-  if (val !== "CNY") {
+  if(!val) {
+    setValue("Dist.nInvoiceExch", null); // 发票金额汇率
+    setValue('Dist.cPrmCur',"") // 保险金额币种
+    setValue('Dist.nRmbAmount',Number(getValue('Dist.nInvoiceValue'))) // 折人民币发票金额（元）
+    const bonusRatioData =  getValue('Dist.nAdditiveCoefficient') // 加成系数（%）
+    const goodsValueData = getValue('Dist.nInvoiceValue') // 发票金额
+    if(bonusRatioData && goodsValueData && !isShownInsuranceAmount.value){
+      setValue('Dist.nInsuranceAmount',goodsValueData * (1 + bonusRatioData/100)) // 保险金额
+      setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch')) // 折人民币保险金额
+    }
+  } else if (val !== "CNY") {
     codeListStore
         .queryCodeList({
           codeListName: "WEB_BAS_CHGRATE",
@@ -595,11 +605,16 @@ const InvoiceCurrencyChange = (val:any)=>{
 const nInsuranceAmountChange = (val:any)=>{
   if(val){
     setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+  } else {
+    setValue('Dist.nRmbLimit',null)
   }
 }
 const InsurancecurrencyChange = (val:any)=>{
   console.log('保险金额币种')
-  if (val !== "CNY") {
+  if(!val) {
+    setValue("Dist.nAmtExch", null);
+    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+  } else if (val !== "CNY") {
     codeListStore
         .queryCodeList({
           codeListName: "WEB_BAS_CHGRATE",
