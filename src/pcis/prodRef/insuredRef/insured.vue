@@ -1733,7 +1733,7 @@ function resetFn() {
   const params = {
     type: param.pageName === "priceInquiry" ? 'I' : 'A',
     param: param.pageName === "priceInquiry" ? param.cInquiryNo : param.cAppNo,
-    entity: 'Applicant'
+    entity: 'Insured'
   }
   reset(params).then(() => {
   }).catch((err:any) => {
