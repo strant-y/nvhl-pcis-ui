@@ -393,3 +393,8 @@ export function validShanDong(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/validShanDong`, queryParams);
 }
 
+// 客户重置
+export function reset(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/reset`, queryParams);
+}
+

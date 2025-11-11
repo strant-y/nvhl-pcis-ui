@@ -24,6 +24,7 @@ const productStore = useProductStore();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import {calculateAgeFromIdCard} from "@/utils/common";
+import { reset } from "@/api/query";
 
 const props = defineProps({
   pageSchema: {
@@ -196,6 +197,7 @@ const method = {
       setFormItem("ECargoApplicant.cCertfCde", {
         disabled: false,
       });
+      resetFn()
     }
     setFormValue(applicantValue);
   },
@@ -957,6 +959,20 @@ function setDisabledAll(isDisabled: boolean) {
 }
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   applicantEditRef?.value?.addProvide(key, value);
+}
+
+function resetFn() {
+  const cEcAgrAppNo = formPage?.getComponentRefById('AgreementBase')?.getValue('ECargoBase.cEcAgrAppNo');
+  if(!cEcAgrAppNo) return;
+  const params = {
+    type: 'E',
+    param: cEcAgrAppNo,
+    entity: 'ECargoApplicant'
+  }
+  reset(params).then(() => {
+  }).catch((err:any) => {
+    console.log(err)
+  })
 }
 defineExpose({
   getFormValue,
