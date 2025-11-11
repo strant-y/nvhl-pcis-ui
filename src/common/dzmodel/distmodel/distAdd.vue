@@ -263,8 +263,8 @@ const isObjectValid = (obj: any) => {
 };
 onMounted(() => {
   dataParams.value = opertaor.getDataAll();
-  appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  cGrpMrk.value = route.params.param.cGrpMrk;
+  appNo.value = dataParams.value?.plyBase["Base.cAppNo"];
+  cGrpMrk.value = route.params.param?.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){

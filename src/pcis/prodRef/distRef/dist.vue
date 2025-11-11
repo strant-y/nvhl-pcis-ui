@@ -495,12 +495,12 @@ const method = {
     const alldata: any = opertaor.getDataAll();
     const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
-      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      param['cInquiryNo'] = opertaor.getDataAll()?.plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
-      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      param['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"]
     }
 
     let fromSchema = tableconfig.value.fromSchema;
