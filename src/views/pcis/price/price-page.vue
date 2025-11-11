@@ -5588,7 +5588,7 @@ const validateShanDong = async () => {
 
 // 047001 校验标的信息中的预估代驾人员数量(人)、预估代驾订单数量(单)二选一必填
 const validateTgt = () => {
-  const tgtData = opertaor.getTableRefByKey("tgt").getFromValue();
+  const tgtData = opertaor.getTableRefByKey("tgt")?.getFromValue();
   if(props.param?.cProdNo === "047001") {
     if(!tgtData['Tgt.nProxyDrivers'] && !tgtData['Tgt.nOrderQuantity']) {
       ElMessage.error("标的信息预估代驾人员数量(人)、预估代驾订单数量(单)不能全部为空！")
