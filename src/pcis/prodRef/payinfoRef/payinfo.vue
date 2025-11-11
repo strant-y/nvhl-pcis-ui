@@ -46,12 +46,15 @@ watch(
   watchSource,
   ([newCCiMrk, newNCiOwnPrm], [oldCCiMrk, oldNCiOwnPrm]) => {
         // console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
-    // 批单直接退出
-    if(param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cAppTyp === "E")) {
+    // 批单直接退出 核保直接退出
+    if(param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cAppTyp === "E") || param.pageType === "PLY_UW_PROCESS_SCENE") {
       return;
     }
     if (newCCiMrk === oldCCiMrk && newNCiOwnPrm === oldNCiOwnPrm) {
       return; // 值没变，直接退出，不执行后续逻辑
+    }
+    if(param.pageType === "readonly") {
+      return;
     }
     nextTick(() => {
       nPrmFun();
