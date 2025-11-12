@@ -45,7 +45,6 @@ const dzmodal = useDzModal();
 const AddResponsibilityModal = defineAsyncComponent(
   () => import("./AddResponsibilityModal.vue")
 );
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { dataParam } from "@/store/modules/dataParam";
 const paramparam = dataParam();
@@ -145,7 +144,7 @@ const tableconfig = reactive<AppTableConfig>(
             return;
           } else {
             dzmodal
-              .open(AddResponsibilityModal, { type: "add", data: {} })
+              .open(AddResponsibilityModal, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();
