@@ -832,6 +832,8 @@ function previewTerm() {
     setTimeout(() => {
       URL.revokeObjectURL(url);
     }, 10000); // 10秒后释放URL对象
+  }).catch((err:any) => {
+    ElMessage.error(err.message)
   });
 }
 onMounted(async () => {
