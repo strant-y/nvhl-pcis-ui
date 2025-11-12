@@ -1187,7 +1187,7 @@ function handleSelectionChange(selection: any) {
 watch(
   () => pageresult.list,
   (item) => {
-    if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+    if((route.params.param?.cProdNo === '040003' || route.params.param?.cProdNo === '059002') && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
     // 043022 特种设备第三者责任保险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总
@@ -1266,7 +1266,7 @@ const getSummary = async () => {
       num = res.data.nEstimatedSalesQuantity
     }
   })
-  const sums = ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
+  const sums = route.params.param?.cProdNo === '059002' ? ['','汇总','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`] : ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
   tableconfig.value.showSummary = true;
   tableconfig.value.summaryMethod = () => sums;
 }
