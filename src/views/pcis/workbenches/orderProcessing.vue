@@ -636,7 +636,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "DocumentCopy",
         hideBtns: (row: any) => {
           // 联保单不显示复制按钮
-          if ((row.baseType !== "询价" && row.cCiMrk !== "6") && row.cPlyNo?.length <= 18 && !cannotCopy(row.cPlyNo) && row.canCopy == 1) {
+          if ((row.baseType !== "询价" && row.cCiMrk !== "6") && (row.cPlyNo && row.cPlyNo?.length <= 18 || !row.cPlyNo) && !cannotCopy(row.cPlyNo) && row.canCopy == 1) {
             return false;
           } else {
             return true;
