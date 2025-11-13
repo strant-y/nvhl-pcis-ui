@@ -506,6 +506,10 @@ export function getPrdTermInfo(queryParams: any): AxiosPromise<any> {
 export function viewPdfProposal(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/viewPdfProposal`, queryParams, { responseType: 'blob' });
 }
+/* 条款预览-条款详情*/
+export function viewPdfProposalPost(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/viewPdfProposal`, queryParams);
+}
 /**
  * 条款配置-关联附加条款列表
  * @param queryParams
