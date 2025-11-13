@@ -401,6 +401,11 @@ function addTermData() {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          // 043002增加附加条款时，如果标的信息中的投保司乘人员座位总数有值则添加到条款中
+          const nInsuredcompanySeats = opertaor.getDataAll()?.['tgt']?.['Tgt.nInsuredcompanySeats']
+          if (parparam.cProdNo === "043002" && nInsuredcompanySeats) {
+            data["Term.nInsuredcompanySeats"] = nInsuredcompanySeats;
+          }
           // 数据初始化
           initTermData(item,data);
           data.riskList = riskList;
