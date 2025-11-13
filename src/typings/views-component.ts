@@ -11,6 +11,10 @@ const ViewsCachedKeyMap : any = {
     'price-inquiry-recording': 'PriceInquiryRecording',
     // 'edr-qry-endorse-list': '',
     'posite-page': 'posite-page',
+    'classification-querys': 'classification-querys',
+    'PendUdrListQuery': 'PendUdrListQuery',
+    'InquiryUdrListQuery': 'InquiryUdrListQuery',
+    'orderProcessing': 'orderProcessing',
 };
 
 export function getCompName(name: string): string {

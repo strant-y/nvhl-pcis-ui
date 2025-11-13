@@ -15,5 +15,13 @@ export const pageMethod = {
         }else{
             return false;
         }
+    },
+    imageReadonly: function(opertaor: any){
+        const param = opertaor.getParam();
+        if(param.pageType === "UW_READ_SCENE"){
+            return true;
+        }else{
+            return false;
+        }
     }
 };

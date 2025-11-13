@@ -255,6 +255,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                                     if (conf.fromSchema && conf.fromSchema.length > 0) {
                                         conf.fromSchema.forEach(gf => {
                                             if (gf.prop === item) {
+                                                gf.disabled = false;
                                                 conf.editList.push(gf.prop);
                                             }
                                         });
