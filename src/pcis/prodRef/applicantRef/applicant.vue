@@ -55,7 +55,7 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
-import { getAddressStr, qryCustomer } from "@/api/query";
+import { getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -398,6 +398,7 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         disabled: false,
       });
+      resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -1622,6 +1623,20 @@ function addProvide<T>(key: InjectionKey<T> | string, value: T) {
 function getCodeListMap() {
   return applicantEditRef.value?.getCodeListMap();
 }
+// 客户重置
+function resetFn() {
+  if(!param.cAppNo) return;
+  const params = {
+    type: param.pageName === "priceInquiry" ? 'I' : 'A',
+    param: param.pageName === "priceInquiry" ? param.cInquiryNo : param.cAppNo,
+    entity: 'Applicant'
+  }
+  reset(params).then(() => {
+  }).catch((err:any) => {
+    console.log(err)
+  })
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
