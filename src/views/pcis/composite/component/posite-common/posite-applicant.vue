@@ -149,7 +149,7 @@ onMounted(() => {
     
     if(param.cProdNo === '043009'){
       setFormItem("Applicant.cAgencyReason",{hidden: true});
-      setFormItem("Applicant.cLegalRepresentative",{hidden: true});
+      setFormItem("Applicant.cLegalRepresentative",{hidden: false});
       setFormItem("Applicant.cEnterpriseTel",{hidden: true});
     }
     
