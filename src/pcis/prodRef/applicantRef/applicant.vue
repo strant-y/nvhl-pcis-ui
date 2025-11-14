@@ -55,7 +55,7 @@ const props = defineProps({
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
-import { getAddressStr, qryCustomer } from "@/api/query";
+import { getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -144,7 +144,7 @@ onMounted(() => {
 
     if (param.cProdNo === '043009') {
       setFormItem("Applicant.cAgencyReason", { hidden: true });
-      setFormItem("Applicant.cLegalRepresentative", { hidden: true });
+      setFormItem("Applicant.cLegalRepresentative", { hidden: false });
       setFormItem("Applicant.cEnterpriseTel", { hidden: true });
     }else{
       setFormItem("Applicant.cAgencyReason", { hidden: false });
@@ -398,6 +398,7 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         disabled: false,
       });
+      resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -714,9 +715,6 @@ const method = {
       setFormItem("Applicant.cFirmscaleTyp", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.cLegalRepresentative", {
-        rules: [getRules("required", {})],
-      });
 
       // 性别 、年龄、生日个人必填
       setFormItem("Applicant.tBirthday", {
@@ -889,9 +887,6 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
-        rules: [],
-      });
-      setFormItem("Applicant.cLegalRepresentative", {
         rules: [],
       });
 
@@ -1527,7 +1522,7 @@ function handleFileChange(event: Event) {
             setValue(
               "Applicant.tBirthday",
               cardInfo["date_of_birth"]["value"]
-                ? cardInfo["date_of_birth"]["value"].replace(".", "-")
+                ? cardInfo["date_of_birth"]["value"].replaceAll(".", "-")
                 : null
             );
             if (cardInfo["period_of_validity"]["value"]) {
@@ -1622,6 +1617,20 @@ function addProvide<T>(key: InjectionKey<T> | string, value: T) {
 function getCodeListMap() {
   return applicantEditRef.value?.getCodeListMap();
 }
+// 客户重置
+function resetFn() {
+  if(!param.cAppNo) return;
+  const params = {
+    type: param.pageName === "priceInquiry" ? 'I' : 'A',
+    param: param.pageName === "priceInquiry" ? param.cInquiryNo : param.cAppNo,
+    entity: 'Applicant'
+  }
+  reset(params).then(() => {
+  }).catch((err:any) => {
+    console.log(err)
+  })
+}
+
 defineExpose({
   getFromValue,
   setFormValue,

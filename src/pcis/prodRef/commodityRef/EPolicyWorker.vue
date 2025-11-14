@@ -9,14 +9,12 @@ import { AppFreeEditConfig, AppFreeEditMethod, createAppFreeEditConfig, createFr
 import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/app-table-config'
 import { createFreeButtonBase, FreeButtonBase } from '@/shared/button-config'
 import { useValidator } from '@/typings/useValidator'
-import { dataOpertaor } from '@/store/modules/data-opertaor'
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
 import { rsaEncoder, base64encoder } from '@/utils/encipher'
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const policyService = new PolicyService()
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator()
 import { useRoute } from 'vue-router'
 // @ts-ignore

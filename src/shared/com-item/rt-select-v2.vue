@@ -28,6 +28,7 @@
         @change="handleChange"
         :style="{'min-width': item.minWidth || '50px'}"
         :fit-input-width="false"
+        popper-class="rt-select-popper"
       >
         <template
           #label="{ label, value }"
@@ -493,5 +494,10 @@ defineExpose({
 <style lang="scss" scoped>
 :deep(.el-select__wrapper) {
   padding: 4px 6px;
+}
+</style>
+<style>
+.rt-select-popper .el-select-dropdown {
+  width: fit-content!important;
 }
 </style>

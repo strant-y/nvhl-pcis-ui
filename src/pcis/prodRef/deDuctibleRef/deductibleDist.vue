@@ -397,7 +397,14 @@ const method = {
         },
         { 
           getSelected(selectdata: any) {
-              let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData"))?.['deductibleDist'] || [];
+              let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem("getAppPolicyData") || '{}')?.['deductibleDist'] || [];
+              sessionSpecialAgreement.forEach((item:any) => {
+                // 为了防止复制出单获取特约时把sessionSpecialAgreement里的申请单号传过去导致保存后原单数据丢失
+                if(item.cAppNo !== opertaor.getDataAll().plyBase?.['Base.cAppNo']) {
+                  delete item.cAppNo
+                  delete item.cPkId
+                }
+              })
               const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cDeductibleClass', ['cDeductibleContent']);
            
               const mergeAndNumberArraysPreserveOrder = (a: [], b: []): any[] => {

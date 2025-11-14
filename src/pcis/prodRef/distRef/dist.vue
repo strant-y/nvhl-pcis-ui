@@ -184,8 +184,8 @@ watch(
            method.getTgtDetailFn();
            emit('savePlyInfo');
         }
-        // 010001, 010002, 010003产品地址编码根据清单内容下拉框展示
-        const targetProducts = ['010001', '010002', '010003'];
+        // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
+        const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
          if( route.params.param?.cProdNo.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
             const cvrgRef = opertaor.getTableRefs()['cvrg'];
             cvrgRef?.getAddrSeqOptions();
@@ -415,6 +415,8 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
+            // 如果是免赔信息则不刷新保障信息
+            if(props.compKey?.includes('DeductibleDist')) return;
             const cvrgRef = opertaor.getTableRefs()['cvrg'];
             try {
               cvrgRef?.refushCvrgInfo();
@@ -469,6 +471,8 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+          // 如果是免赔信息则不刷新保障信息
+          if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           try {
             if(cvrgRef) {
@@ -491,12 +495,12 @@ const method = {
     const alldata: any = opertaor.getDataAll();
     const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
-      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      param['cInquiryNo'] = opertaor.getDataAll()?.plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
-      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      param['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"]
     }
 
     let fromSchema = tableconfig.value.fromSchema;
@@ -519,6 +523,8 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
+                // 如果是免赔信息则不刷新保障信息
+                if(props.compKey?.includes('DeductibleDist')) return;
                 const cvrgRef = opertaor.getTableRefs()['cvrg'];
                 try {
                     cvrgRef?.refushCvrgInfo();
@@ -1181,8 +1187,65 @@ function handleSelectionChange(selection: any) {
 watch(
   () => pageresult.list,
   (item) => {
-    if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+    if((route.params.param?.cProdNo === '040003' || route.params.param?.cProdNo === '059002') && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
+    }
+    // 043022 特种设备第三者责任保险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总
+    // 041014 特种设备责任险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总 标的信息中：特种设备数量与清单数量一致
+    if(route.params.param?.cProdNo === '043022' || route.params.param?.cProdNo === '041014') {
+      const num = pageresult.list.length || 0;
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nEquipmentCount',
+      },num);
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nDevicesNumber',num);
+    }
+    // 047003 非机动车第三者责任保险 标的信息中：“投保总座位数（座）”要素，由清单中“投保座位数”汇总；“投保总车辆数（个）”要素，由清单中总车辆汇总；
+    if(route.params.param?.cProdNo === '047003') {
+      const carNum = pageresult.list.length || 0;
+      const seatNum = pageresult.list.map(item => Number(item['Dist.nInsuredSeats']) || 0).reduce((total, value) => total + value, 0)
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalSeats',seatNum)
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalCars',carNum)
+    }
+    // 049001 食品卫生责任险 条款中的关联地址数量根据清单进行汇总
+    // 043005 机动车停车场责任险 条款信息中：关联地址数量、关联地址车位总数根据清单进行汇总
+    // 043004 火灾公众责任险 条款中的关联地址数量根据清单进行汇总
+    // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
+    // 041011 食品安全责任险 条款中的关联地址数量根据清单进行汇总
+    const nAddressCountProdNoMap = ['049001','043005','043004','043011','041011'];
+    if(nAddressCountProdNoMap.includes(route.params.param?.cProdNo)) {
+      const num = pageresult.list.length || 0;
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nAddressCount',
+      },num);
+      if(route.params.param?.cProdNo === '043005') {
+        const parkingNum = pageresult.list?.map(item => Number(item["Dist.nParkingNumber"]) || 0).reduce((total, value) => total + value, 0)
+        opertaor.getTableRefs()['cvrg']?.setTermData({
+          termNo:route.params.param?.cTermNo,
+          planNo:'P1',
+          factorProp: 'Term.nParkingTotal',
+        },parkingNum);
+      }
+    }
+
+    // 041007 条款中的关联被保险人数量由清单中的关联监护人进行汇总;被监护人数量由清单中的被监护人姓名汇总
+    if(route.params.param?.cProdNo === '041007') {
+      const num = pageresult.list.length || 0;
+      if(route.params.param?.cGrpMrk == "1") {
+        opertaor.getTableRefs()['cvrg']?.setTermData({
+          termNo:route.params.param?.cTermNo,
+          planNo:'P1',
+          factorProp: 'Term.nRelatedInsuredCount',
+        },num);
+      }
+      opertaor.getTableRefs()['cvrg']?.setTermData({
+        termNo:route.params.param?.cTermNo,
+        planNo:'P1',
+        factorProp: 'Term.nWardTotal',
+      },num);
     }
   }
 )
@@ -1203,7 +1266,7 @@ const getSummary = async () => {
       num = res.data.nEstimatedSalesQuantity
     }
   })
-  const sums = ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
+  const sums = route.params.param?.cProdNo === '059002' ? ['','汇总','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`] : ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
   tableconfig.value.showSummary = true;
   tableconfig.value.summaryMethod = () => sums;
 }

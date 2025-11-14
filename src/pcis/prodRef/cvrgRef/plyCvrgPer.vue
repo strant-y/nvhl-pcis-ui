@@ -237,6 +237,12 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          // 080011 费率默认1000
+          if (parparam.cProdNo === '080011') {
+            riskList.forEach((item:any) => {
+              item['TermRisktgt.nItemRate'] = 1000;
+            })
+          }
           if(item.cUniqueTermNo && item.cPrimaryMrk === '1'){
             // 部分条款责任互斥,所以互斥条款,不再加载对应的责任信息
             data.riskList = [];
@@ -400,6 +406,11 @@ function addTermData() {
           }
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          // 043002增加附加条款时，如果标的信息中的投保司乘人员座位总数有值则添加到条款中
+          const nInsuredcompanySeats = opertaor.getDataAll()?.['tgt']?.['Tgt.nInsuredcompanySeats']
+          if (parparam.cProdNo === "043002" && nInsuredcompanySeats) {
+            data["Term.nInsuredcompanySeats"] = nInsuredcompanySeats;
           }
           // 数据初始化
           initTermData(item,data);

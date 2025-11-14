@@ -36,7 +36,7 @@ import { useValidator } from "@/typings/useValidator";
 import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
-import { getAddressStr, qryCustomer } from "@/api/query";
+import { getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
@@ -1027,6 +1027,7 @@ const method = {
       setFormItem('Insured.cLongendTyp', {
         disabled: false
       })
+      resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -1626,7 +1627,7 @@ function handleFileChange(event: Event) {
             setValue(
               "Insured.tBirthday",
               cardInfo["date_of_birth"]["value"]
-                ? cardInfo["date_of_birth"]["value"].replace(".", "-")
+                ? cardInfo["date_of_birth"]["value"].replaceAll(".", "-")
                 : null
             );
             if (cardInfo["period_of_validity"]["value"]) {
@@ -1726,6 +1727,20 @@ function cancel() {
 function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   insuredEditRef?.value?.addProvide(key, value);
 }
+// 客户重置
+function resetFn() {
+  if(!param.cAppNo) return;
+  const params = {
+    type: param.pageName === "priceInquiry" ? 'I' : 'A',
+    param: param.pageName === "priceInquiry" ? param.cInquiryNo : param.cAppNo,
+    entity: 'Insured'
+  }
+  reset(params).then(() => {
+  }).catch((err:any) => {
+    console.log(err)
+  })
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
