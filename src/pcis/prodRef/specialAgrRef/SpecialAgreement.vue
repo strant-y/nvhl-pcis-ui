@@ -429,6 +429,11 @@ const method = {
               if(!item.cLanguageCode) {
                 item.cLanguageCode = "zh-CN"
               }
+              // 为了防止复制出单获取特约时把sessionSpecialAgreement里的申请单号传过去导致保存后原单数据丢失
+              if(item.cAppNo !== opertaor.getDataAll().plyBase?.['Base.cAppNo']) {
+                delete item.cAppNo
+                delete item.cPkId
+              }
             })
             console.log('缓存问题',sessionSpecialAgreement )
             console.log('缓存问题2selectdata',selectedData )
