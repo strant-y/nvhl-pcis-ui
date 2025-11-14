@@ -1416,7 +1416,8 @@ const initPage = async () => {
     props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
     (props.param?.cAppTyp == "E" && props.param.cRsnCde !== '99') ||
     props.param?.pageType === "readonly" ||
-    props.param?.pageType === "UW_READ_SCENE"
+    props.param?.pageType === "UW_READ_SCENE" ||
+    props.param?.pageType === "EDR_APP_NEW_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
   }
@@ -5047,7 +5048,7 @@ if(props.param.cTransMrk !== "1"){
 /**
  * 核保信息 提交
  */
-const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013"]
+const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013","010002"]
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
   if(btn) {
@@ -5083,7 +5084,7 @@ const submitUnderwritingFn = async () => {
     //   }
     // }
     if(props.param['cEdrRsnBundleCde'] != "99") {// 批改原因为99的核保时不需要调用再保的一系类前端接口
-      if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
+      if(res.cUndrMrk === "A") {//核保选项为同意时
         const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
         const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
         const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
