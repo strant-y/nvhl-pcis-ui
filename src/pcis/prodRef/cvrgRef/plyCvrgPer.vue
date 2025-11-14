@@ -568,9 +568,11 @@ function refushData(datas: any) {
 function getFromValue() {
   let redata: any[] = [];
   const terms: any[] = [];
+  let i = 1;
   Object.keys(formData.value).forEach((item) => {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
+      i["Term.NSeqNo"] = i++;
       if (i["riskList"]) {
         i["Term.riskList"] = i["riskList"].map((m: any) => {
           return m;
