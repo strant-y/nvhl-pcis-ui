@@ -720,12 +720,10 @@ function deleteTermByNo(plan: any, t: any) {
 function getFromValue() {
   let redata: any[] = [];
   Object.keys(planData.value).forEach((plan) => {
-    let i = 1;
     Object.keys(planData.value[plan]).forEach((item) => {
       planData.value[plan][item].forEach((d: any) => {
         const i = JSON.parse(JSON.stringify(d));
         i["Term.cPlanNo"] = plan;
-        i["Term.NSeqNo"] = i++;
         if (i["riskList"]) {
           i["Term.riskList"] = i["riskList"];
           delete i["riskList"];
