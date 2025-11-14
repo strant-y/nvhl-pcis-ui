@@ -109,16 +109,23 @@ onMounted(async () => {
   }
 
   // 040005 办学许可证号
-  if (params.cProdNo === '040005') {
-    setFormItem("Tgt.cLicenseNumber", { rules: [] });
-  } else if (params.cProdNo === '020013') {
+  const requiredRulesNo = ['020018','020013'];// 必填加号码校验的产品
+  const rulesNo = ['020002','020006','020009','020014'];// 号码校验的产品
+  const requiredNo = ['041011','049001']// 必填校验的产品
+  if (requiredRulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
     });
-  } else {
+  } else if(rulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
       rules: [getRules("vehiclePlate", {})],
     });
+  } else if(requiredNo.includes(params.cProdNo)) {
+    setFormItem("Tgt.cLicenseNumber", {
+      rules: [getRules("required", {})],
+    });
+  } else {
+    setFormItem("Tgt.cLicenseNumber", { rules: [] });
   }
 
   //040008  040011  呼号必填
@@ -151,6 +158,10 @@ onMounted(async () => {
   // 090003产品 工程名称非必填
   if (params.cProdNo === '090003') {
     setFormItem("Tgt.cProjectName", { rules: [] })
+  }
+  // 041007 被监护人数必填
+  if(params.cProdNo === '041007') {
+    setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
   }
 
   //  运输工具名称
@@ -474,6 +485,21 @@ const method = {
           rules: [getRules("required", {})],
         });
       }
+      // 工程名称、工程总造价、勘察造价、勘察项目地址必填
+      if (params.cProdNo === '041012') {
+        setFormItem('Tgt.cProjectName', {
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.nTotalCost', {
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.nSurveyPrice', {
+          rules: [getRules("required", {})],
+        });
+        setFormItem('Tgt.SurveyProjectProp', {
+          rules: [getRules("required", {})],
+        });
+      }
 
     } else {
       setFormItem('Tgt.nTotalCost', {
@@ -511,6 +537,20 @@ const method = {
         });
       }
 
+      if (params.cProdNo === '041012') {
+        setFormItem('Tgt.cProjectName', {
+          rules: null,
+        });
+        setFormItem('Tgt.nTotalCost', {
+          rules: null,
+        });
+        setFormItem('Tgt.nSurveyPrice', {
+          rules: null,
+        });
+        setFormItem('Tgt.SurveyProjectProp', {
+          rules: null,
+        });
+      }
     }
 
   },
@@ -1702,13 +1742,88 @@ const method = {
       setValue('Tgt.cRailwayMode', '02')
     }
 
-  }
-
+  },
+  // 特种设备种类
+  cEquipmentTypesFunc: () => {
+    dialog.value?.open(
+      "specialCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("Tgt.cEquipmentCategory", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Tgt.cEquipmentCategory", `${data.cde}${data.cnm}`);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      {  width: 85 }
+    );
+  },
+  // 行业性质(弹框与国民经济行业分类一样)
+  funcNdustryCate: () => {
+    dialog.value?.open(
+      "ndustryCateModal",
+      {
+        type: "show",
+        method: {
+          getdbClickData: (data:any) => {
+            setFormItem("Tgt.cIndustryNature", {
+              loadData: [{ label: data.cnm, value: data.cde }],
+            });
+            setValue("Tgt.cIndustryNature", data.cde);
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      { title: "行业性质", width: "70" }
+    );
+  },
+  // 是否为上市公司
+  cIsListedChange: (val:any) => {
+    if(val === "1") {// 选是 上市时间 上市地点 股票代码必填
+      setFormItem("Tgt.tListingTime", { rules: [getRules("required", {})] })
+      setFormItem("Tgt.cListingLocation", { rules: [getRules("required", {})] })
+      setFormItem("Tgt.cStockCode", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.tListingTime", { rules: [] })
+      setFormItem("Tgt.cListingLocation", { rules: [] })
+      setFormItem("Tgt.cStockCode", { rules: [] })
+    }
+  },
+  // 是否包含退市后责任（run-off）
+  cIncludeDelistingChange: (val:any) => {
+    if(val === "1") {// 选是 ___年必填
+      setFormItem("Tgt.cSpecificYears", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cSpecificYears", { rules: [] })
+    }
+  },
+  // 企业类别
+  cEnterpriseCategoryChange: (val:any) => {
+    if(val === "NV04900104") {// 选其他 所属行业必填
+      setFormItem("Tgt.cIndustryAffiliation", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cIndustryAffiliation", { rules: [] })
+    }
+  },
+  // 工程勘察资质
+  cSurveyQualificationChange: (val:any) => {
+    if(val === "2" || val === "3" || val === "4") {// 选专业XX资质 工程勘察专业类型必填
+      setFormItem("Tgt.cEngineeringType", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cEngineeringType", { rules: [] })
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
-  const a = tgtEditRef?.value?.getValue(getv1[0].prop);
-  const b = tgtEditRef?.value?.getValue(getv2[0].prop);
+  const a = tgtEditRef?.value?.getValue(getv1[0]?.prop);
+  const b = tgtEditRef?.value?.getValue(getv2[0]?.prop);
 
   const setS = setv.prop;
   if (a) {
@@ -1819,8 +1934,12 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        } else {
+        }else {
           Object.assign(item, obj);
+          if(item.inputtype==='rtinputgroup'){
+              Object.assign(item.groupList[0], obj);
+              Object.assign(item.groupList[1], obj);
+          }
         }
       }
     });

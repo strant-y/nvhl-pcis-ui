@@ -2,6 +2,7 @@ export const iconMap = {
   'plyBase': 'icon-wenjianban1',
   'applicant': 'icon-mti-huishang',
   'insured': 'icon-changyongshoukuanrenguanli',
+  'insuredDist': 'icon-changyongshoukuanrenguanli',
   'insrnc': 'icon-lishicaozuojilu',
   'dist': 'icon-wenjuantiaocha',
   'distSummary': 'icon-zu9120',

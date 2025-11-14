@@ -1161,7 +1161,7 @@ const valideRequired = () => {
           freeEditRef.value?.setRowFieldProp(rowData._dataId, "Ci.cPolicyNo", "disabled", false)
           const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
           if (rowItem) {
-          //   rowItem['Ci.cSlsId']['btnItems'].disabled = true;
+            // rowItem['Ci.cSlsId']['btnItems'].disabled = true;
             rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
             rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
           }
@@ -1192,7 +1192,7 @@ const valideRequired = () => {
             );
             const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
             if (rowItem) {
-            //  rowItem['Ci.cSlsId']['btnItems'].disabled = false; // 放大镜按钮可编辑
+            //   rowItem['Ci.cSlsId']['btnItems'].disabled = false; // 放大镜按钮可编辑
               rowItem['Ci.cBrkrCde']['btnItems'].disabled = true;
               rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
             }
@@ -1219,7 +1219,7 @@ const valideRequired = () => {
             );
             const rowItem = freeEditRef.value?.getRowAllItemRefById(rowData._dataId)
             if (rowItem) {
-            //  rowItem['Ci.cSlsId']['btnItems'].disabled = true;
+              // rowItem['Ci.cSlsId']['btnItems'].disabled = true;
               rowItem['Ci.cBrkrCde']['btnItems'].disabled = false;
               rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = false;
             }

@@ -144,7 +144,7 @@ onMounted(() => {
 
     if (param.cProdNo === '043009') {
       setFormItem("Applicant.cAgencyReason", { hidden: true });
-      setFormItem("Applicant.cLegalRepresentative", { hidden: true });
+      setFormItem("Applicant.cLegalRepresentative", { hidden: false });
       setFormItem("Applicant.cEnterpriseTel", { hidden: true });
     }else{
       setFormItem("Applicant.cAgencyReason", { hidden: false });
@@ -715,9 +715,6 @@ const method = {
       setFormItem("Applicant.cFirmscaleTyp", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.cLegalRepresentative", {
-        rules: [getRules("required", {})],
-      });
 
       // 性别 、年龄、生日个人必填
       setFormItem("Applicant.tBirthday", {
@@ -890,9 +887,6 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
-        rules: [],
-      });
-      setFormItem("Applicant.cLegalRepresentative", {
         rules: [],
       });
 
@@ -1528,7 +1522,7 @@ function handleFileChange(event: Event) {
             setValue(
               "Applicant.tBirthday",
               cardInfo["date_of_birth"]["value"]
-                ? cardInfo["date_of_birth"]["value"].replace(".", "-")
+                ? cardInfo["date_of_birth"]["value"].replaceAll(".", "-")
                 : null
             );
             if (cardInfo["period_of_validity"]["value"]) {

@@ -445,6 +445,7 @@ const tableconfig = reactive<AppTableConfig>(
                   ...{
                     pageType: "TEMPORARY_DEPOSIT",
                     pageName: "priceInquiry",
+                    taskId: row.curtTask || row.taskId
                   },
                 }),
               },
@@ -459,7 +460,7 @@ const tableconfig = reactive<AppTableConfig>(
               query: {
                 param: JSON.stringify({
                   ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                  ...{ pageType: "TEMPORARY_DEPOSIT", taskId: row.curtTask || row.taskId },
                 }),
               },
             });

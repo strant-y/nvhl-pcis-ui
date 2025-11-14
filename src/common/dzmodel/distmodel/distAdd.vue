@@ -67,7 +67,8 @@ const mapAddr = {
     "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
   },
   "AddressDist041001": {
-    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    // "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    "Dist.cDetailedAddress": "Dist.cDetailedAddress"
   },
   "AddressDist043020": {},
   "AdvertisementDist043011": {
@@ -149,6 +150,16 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 ElMessage.error('出生年月和证件号码需至少填写一项');
                 return; // 阻止后续保存逻辑
                 }
+            }
+            // 047003、043003清单新增 车架号和车牌号码二选一
+            const productsNoMap = ['047003','043003'];
+            const cVinCode = getValue('Dist.cVinCode');
+            const cPlateNumber = getValue('Dist.cPlateNumber')
+            if (productsNoMap.includes(productNo)) {
+              if (!cVinCode && !cPlateNumber) {
+                ElMessage.error('车牌号码和车架号需至少填写一项');
+                return; // 阻止后续保存逻辑
+              }
             }
             const isValid = await freeEditRef.value?.validate();
             if(isValid){
@@ -252,8 +263,8 @@ const isObjectValid = (obj: any) => {
 };
 onMounted(() => {
   dataParams.value = opertaor.getDataAll();
-  appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  cGrpMrk.value = route.params.param.cGrpMrk;
+  appNo.value = dataParams.value?.plyBase["Base.cAppNo"];
+  cGrpMrk.value = route.params.param?.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
@@ -296,9 +307,9 @@ onMounted(() => {
 
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
-    if(item.prop =='Dist.cVinCode'){
-     item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
-    }
+    // if(item.prop =='Dist.cVinCode'){
+    //  item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
+    // }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
       if(cGrpMrk.value === '1') {
@@ -442,6 +453,27 @@ onMounted(() => {
             ...p,
             disabled: idx > nextIdx     // 未开始
         }));
+    }
+    // 解决特种设备清单信息新增数据后点击编辑或新增，表单中特种设备种类的按钮无法点击
+    if((route.params.param.cProdNo == '041014' || route.params.param.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {
+      item.btnItems.disabled = false;
+    }
+    // 041007 如果证件号码为空，根据出生年月计算年龄
+    if (item.prop === 'Dist.tBirthDate' && route.params.param.cProdNo == '041007') {
+      item.func = (val:any) => {
+        const cIdentificationNumber = getValue('Dist.cIdentificationNumber')
+        if(val && !cIdentificationNumber) {
+          const year = parseInt(val.split('-')[0])
+          const month = parseInt(val.split('-')[1])
+          const currentYear = new Date().getFullYear();
+          const currentMonth = new Date().getMonth() + 1;
+          let age = currentYear - year;
+          if(currentMonth < month) {// 如果当前月份 < 出生月份 年龄减1
+            age--
+          }
+          setValue('Dist.nAge', age)
+        }
+      }
     }
     newSchema.push(item);
   }
@@ -701,8 +733,8 @@ function getAddressstr(val:any, row: any, pitem: any){
 }
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
-   const a = freeEditRef?.value?.getValue(getv1[0].prop);
-   const b = freeEditRef?.value?.getValue(getv2[0].prop);
+   const a = freeEditRef?.value?.getValue(getv1[0]?.prop);
+   const b = freeEditRef?.value?.getValue(getv2[0]?.prop);
 
    const setS = setv.prop;
    if (a) {
