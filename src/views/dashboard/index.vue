@@ -1354,7 +1354,7 @@ function getAuditTableData() {
 }
 // 待办列表页码点击事件
 function handlePageChange(data: any) {
-  pageData.value = data;
+  pageData.value = {...pageData.value, ...data};
   if (isAudit.value) {
     getAuditTableData();
   }
