@@ -119,6 +119,16 @@
               v-model="formconfig1.cPlyNo"
             >
             </el-input>
+            <rt-button
+              :item="{
+                type: 'primary',
+                label: '查询',
+                btnStyle: {'margin-left': '10px'},
+                func: () => {
+                  renewalQuery();
+                },
+              }"
+            />
           </el-form-item>
 					<!-- 协议出单需要展示的字段 -->
 					<el-row v-if="formconfig1.cRecordType == '9'">
@@ -404,6 +414,8 @@ import {
   unUserUnUntionTerm,
   getPolicy,
   checkRenewalDpt,
+  getAppPolicyComponent,
+  getAppPolicyForRenewal,
 } from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -446,6 +458,7 @@ const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
 const termDialog = defineAsyncComponent(() => import("./termDialog.vue"));
+const renewalDialog = defineAsyncComponent(() => import("./renewalDialog.vue"));
 const formconfig1:any = ref({
   cDptCde: "",
   cDptCnm: "",
@@ -609,7 +622,7 @@ function next() {
       }
       const data = formconfig1.value;
       if (formconfig1.value.cRenewMrk == "1") {
-        getPolicy({cPlyNo: formconfig1.value.cPlyNo, queryTyp: "orig"}).then(
+        getAppPolicyForRenewal({ cPlyNo: formconfig1.value.cPlyNo, components: [renewalComponent.value] }).then(
             async (res: any) => {
               if (res.code == "200") {
                 //校验两个机构是否是同一个二级机构
@@ -1049,6 +1062,35 @@ watch(
     }
   }
 );
+
+// 续保查询
+const renewalComponent = ref({})
+function renewalQuery() {
+  if(!formconfig1.value.cPlyNo) {
+    ElMessage.warning("请输入上年保单号！")
+    return;
+  }
+  getAppPolicyComponent({ cPlyNo: formconfig1.value.cPlyNo }).then((res:any) => {
+    if(res.res.length > 0) {
+      dzmodal
+        .open(renewalDialog, { 
+          type: "Issuer",
+          cPlyNo: formconfig1.value.cPlyNo,
+          options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
+          selected: Object.keys(res.res[0]).map((item:any) => item)
+        })
+        .then((res: any) => {
+          if(res.type === 'ok') {
+            renewalComponent.value = res.body.component
+          }
+        });
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch(err => {
+    ElMessage.error(err.msg || err)
+  })
+}
 </script>
 
 <style scoped>

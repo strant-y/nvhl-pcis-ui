@@ -773,6 +773,7 @@ const tableconfig = reactive<AppTableConfig>(
 
 
 					},
+                    hidden: env.MODE === "prod" ? true : false
 				}),
 				createFreeButtonBase({
 					type: "primary",
