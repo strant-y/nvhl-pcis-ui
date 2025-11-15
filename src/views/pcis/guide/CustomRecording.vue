@@ -234,7 +234,7 @@
 					>
 						<el-radio-group v-model="formconfig1.cGrpMrk">
 							<el-radio value="0">个单</el-radio>
-							<!-- <el-radio value="1">团单</el-radio> -->
+							<el-radio value="1">团单</el-radio>
 						</el-radio-group>
 					</el-form-item>
           <el-form-item style="margin-left: 170px;" v-if="formconfig1.cRenewMrk == '1'">

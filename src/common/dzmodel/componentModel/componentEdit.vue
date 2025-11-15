@@ -286,14 +286,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           showFactorList.value = true;
           pageQuerySelect(true);
 
-          if (["dist", "ECargoInsured", "ECargoTransportDist", "ECargoGoodsTgt"].includes(index)) {
+          if (["dist", "ECargoInsured", "ECargoTransportDist", "ECargoGoodsTgt", "insuredDist"].includes(index)) {
             showEditBtnFlag.value = true;
           } else {
             showEditBtnFlag.value = false;
           }
           formconfig1.endBtns?.forEach((e: any) => {
             if (e.id === "DistFactorBtn") {
-              if (index === "dist") {
+              if (index === "dist" || index === "insuredDist") {
                 // 清单信息时,可以额外录入清单编辑按钮
                 e.hidden = false;
               } else {
