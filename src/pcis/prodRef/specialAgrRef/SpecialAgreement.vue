@@ -130,7 +130,7 @@ const tableconfig = reactive<AppTableConfig>(
 
                  let list = formData.value;
                  const index = list.findIndex(
-                    item => item.cSpecialCode === row.cSpecialCode && item.cPkId === row.cPkId
+                    item => item.cSpecialCode === row.cSpecialCode && item.cPkId === row.cPkId && item.nSeqNo === row.nSeqNo
                   );
                     if (index !== -1) {
                       nextTick(()=>{
@@ -428,6 +428,11 @@ const method = {
             sessionSpecialAgreement.forEach((item:any) => {
               if(!item.cLanguageCode) {
                 item.cLanguageCode = "zh-CN"
+              }
+              // 为了防止复制出单获取特约时把sessionSpecialAgreement里的申请单号传过去导致保存后原单数据丢失
+              if(item.cAppNo !== opertaor.getDataAll().plyBase?.['Base.cAppNo']) {
+                delete item.cAppNo
+                delete item.cPkId
               }
             })
             console.log('缓存问题',sessionSpecialAgreement )
