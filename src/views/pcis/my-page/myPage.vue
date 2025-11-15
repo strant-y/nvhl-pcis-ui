@@ -5716,6 +5716,13 @@ const validateTgt = () => {
       return false;
     }
   }
+  // 计划开工日期、计划完工日期和工期两者二选一必填
+  if(['059011','059012','059013','059016','059018','059017'].includes(props.param?.cProdNo)) {
+    if(!(tgtData['Tgt.tConstructionPeriod'] || (tgtData['Tgt.tCommencementDate'] && tgtData['Tgt.tCompletionDate']))) {
+      ElMessage.warning("标的信息中计划开工日期、计划完工日期和工期两者必填一个！")
+      return false;
+    }
+  }
   return true;
 }
 

@@ -1819,6 +1819,34 @@ const method = {
       setFormItem("Tgt.cEngineeringType", { rules: [] })
     }
   },
+  // 计划开工日期
+  tCommencementDateChange:(v:any)=>{
+    const end = getValue("Tgt.tCompletionDate");
+    const tm = moment(end).diff(moment(v), "days");
+    if (!end || !v) {
+      return;
+    }
+    if (tm < 0) {
+      ElMessage.warning("计划完工日期不能小于计划开工日期");
+      setValue("Tgt.tCommencementDate", null);
+      return;
+    }
+    setValue("Tgt.tConstructionPeriod", tm);
+  },
+  // 计划完工日期
+  tCompletionDateChange:(v:any)=>{
+    const start = getValue("Tgt.tCommencementDate");
+    if (!start || !v) {
+      return;
+    }
+    const tm = moment(v).diff(moment(start), "days");
+    if (tm < 0) {
+      ElMessage.warning("划完工日期不能小于划开工日期");
+      setValue("Tgt.tCompletionDate", null);
+      return;
+    }
+    setValue("Tgt.tConstructionPeriod", tm);
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
