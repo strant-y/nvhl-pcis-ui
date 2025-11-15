@@ -28,6 +28,7 @@ import CostInformation from "@/views/pcis-new-udr-list/pages/CostInformation.vue
 import { constantRoutes } from "@/router";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { saveAs } from "file-saver";
+import Decimal from "decimal.js";
 const policyService = new PolicyService();
 const productStore = useProductStore();
 const dialogRef = ref<DialogMethod | null>(null);
@@ -453,7 +454,7 @@ const method = {
     //   .reduce((sum, row) => sum + Number(row["Ci.nCiShare"] || 0), 0);
     // 如果当前值 + 其他行 >= 100，则限制当前行最大值为 100 - 其他行总和
     if (Number(val) + totalOther > 1) {
-      const maxVal = 1 - totalOther;
+      const maxVal = new Decimal(1).minus(new Decimal(totalOther)).toNumber();
       freeEditRef?.value?.setValueByRowKey("Ci.nCiShare", rowId, maxVal);
       return;
     }
@@ -935,8 +936,8 @@ const updateMasterAgreementValues = () => {
       freeEditRef?.value?.setValueByRowKey("Ci.nCiAmt", row._dataId, ciAmt.toFixed(2));
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, ciPrm.toFixed(2));
       // 累加到总和
-      totalAmt += ciAmt;
-      totalPrm += ciPrm;
+      totalAmt += Number(ciAmt.toFixed(2));
+      totalPrm += Number(ciPrm.toFixed(2));
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
     } else {
