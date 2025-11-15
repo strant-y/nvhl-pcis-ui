@@ -89,6 +89,7 @@ import  specialCateModal  from "./commodityRef/specialCateModal.vue";
 import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
+import insuredDistRef from "./insuredDistRef/insuredDist.vue"; // 被保人清单
 
 /** 组合出单公共组件 **/
 import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
@@ -123,6 +124,7 @@ const componentMap = {
   ciMasterAgreementRef: ciMasterAgreementRef,
   ourCompanyCiShareRef: ourCompanyCiShareRef,
   insrncRef: insrncRef,
+	insuredDistRef: insuredDistRef,
   baseafterRef: baseafterRef,
   informationRef: informationRef,
   SpecialAgreement: specialAgr, //录单页面中的特约信息组件
