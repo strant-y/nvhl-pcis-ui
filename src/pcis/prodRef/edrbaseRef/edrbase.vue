@@ -277,7 +277,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           } else if(v && tRepStopExtEndTm) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
             const time = dayjs(tRepStopExtEndTm).diff(dayjs(v))
-            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(params.tInsrncEndTm).add(time))
+            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(lastInsrncEndTm.value).add(time))
           }
         },
       },
@@ -301,7 +301,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           } else if(v && tRepStopExtBgnTm) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
             const time = dayjs(v).diff(dayjs(tRepStopExtBgnTm))
-            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(params.tInsrncEndTm).add(time))
+            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(lastInsrncEndTm.value).add(time))
           }
         },
       },
@@ -550,8 +550,31 @@ onMounted(() => {
     // if(!getValue("EdrBase.tNextEdrBgnTm")) {
     //   setValue("EdrBase.tNextEdrBgnTm", dayjs().add(1,"day").format("YYYY-MM-DD 00:00:00"))
     // }
+    if(params.cRsnCde === '46') {
+      const getPlyNoInterval = setInterval(async ()=>{
+        const cPlyNo = edrbaseEditRef.value?.getValue("EdrBase.cPlyNo");
+        if(cPlyNo) {
+          clearInterval(getPlyNoInterval)
+          await getLastInsrncEndTm(cPlyNo)
+        }
+      },500)
+    }
   });
 });
+
+const lastInsrncEndTm = ref('');
+// 获取保单的保险止期
+async function getLastInsrncEndTm (cPlyNo:any) {
+  await pcisQueryService.getLastInsrncEndTm({cPlyNo: cPlyNo}).then((res:any) => {
+    if(res.code == 200 && res.data) {
+      lastInsrncEndTm.value = res.data
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch(err => {
+    ElMessage.error(err.msg)
+  })
+}
 
 function getFormconfig() {
   return formconfig1;
