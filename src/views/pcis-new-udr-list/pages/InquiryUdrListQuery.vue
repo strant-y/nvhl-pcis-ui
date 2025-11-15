@@ -428,6 +428,172 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   })
 );
 
+const tableBtns = [
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "接收",
+    type: "info",
+    size: "large",
+    icon: "Message",
+    iconSize: "25",
+    // hideBtns: (row: any) => {
+    //   if (row.udrType === "1") {
+    //     return false;
+    //   } else {
+    //     return true;
+    //   }
+    // },
+    hidden: true,
+    tableClick: (row) => {
+      //待核保任务 接收
+      handle_hasReceived(row);
+    },
+  }),
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "修改",
+    type: "success",
+    size: "large",
+    icon: "Edit",
+    iconSize: "25",
+    hideBtns: (row: any) => {
+      if (row.udrType === "2") {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    tableClick: (row) => {
+      if (row.udrType === "2") updateUdr(row);
+    },
+  }),
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "取消接收",
+    type: "info",
+    size: "large",
+    icon: "Message",
+    iconSize: "25",
+    hideBtns: (row: any) => {
+      if (row.udrType === "2") {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    tableClick: (row) => {
+      handleWorkFlow(row, "removeReceived");
+    },
+  }),
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "撤回",
+    type: "danger",
+    size: "large",
+    icon: "return",
+    iconSize: "25",
+    hideBtns: (row: any) => {
+      if (row.udrType === "3") {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    tableClick: (row) => {
+      // showDetails(row)
+      const res = {};
+      res["cUndrMrk"] = "RB";
+      res["undrMrk"] = "RB";
+      res["user"] = JSON.parse(sessionStorage.getItem("user"));
+      res["user"]["opRelCde"] = "10030892";
+      res["inquiryNo"] = row.objId;
+      res["taskId"] = row.curtTask;
+      res["appTyp"] = row.cAppTyp;
+      res["cAntiLnderRisk"] = "0"; //关联交易确认
+      res["cIsTransaction"] = "0"; //反洗钱风险
+      res["CRiBesprakMrk"] = "0"; // 预约分保标志
+      res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
+      res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
+      res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
+        "userName"
+      ]; // 退回指定核保人员名称
+      console.log(res);
+      let submitUnder;
+      submitUnder = submitUnderwrite(res);
+      submitUnder.then((res) => {
+        console.log("submitUnderwrite-res", res);
+        if (res["code"] == "200") {
+          ElMessage.success(res.msg);
+          handleQuery();
+        } else {
+          ElMessage.error(res.msg);
+        }
+      });
+    },
+  }),
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "查看",
+    type: "danger",
+    size: "large",
+    icon: "View",
+    iconSize: "25",
+    hideBtns: (row: any) => {
+      if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    tableClick: (row) => {
+      showDetails(row);
+    },
+  }),
+  createFreeButtonBase({
+    id: "score",
+    link: true,
+    tooltip: "承保流程",
+    type: "danger",
+    size: "large",
+    icon: "Refresh",
+    iconSize: "25",
+    hideBtns: (row: any) => {
+      if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    tableClick: (row) => {
+      let data;
+      if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
+        data = { objId: row.objId, sysType: row.objExt };
+      } else {
+        data = {
+          objId: row.cInquiryNo,
+          sysType:
+            !!row["cAppTyp"] &&
+            ("A" === row["cAppTyp"] || "P" === row["cAppTyp"])
+              ? "U"
+              : "E",
+        };
+      }
+      dzmodal
+        .open(TaskListVestige, { type: "Issuer", data })
+        .then((res: any) => {
+          if (res.type === "ok") {
+            refreshData(true);
+          }
+        });
+    },
+  }),
+]
+
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -456,13 +622,14 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Message",
         iconSize: "25",
-        hideBtns: (row: any) => {
-          if (row.udrType === "1") {
-            return false;
-          } else {
-            return true;
-          }
-        },
+        // hideBtns: (row: any) => {
+        //   if (row.udrType === "1") {
+        //     return false;
+        //   } else {
+        //     return true;
+        //   }
+        // },
+        hidden: true,
         tableClick: (row) => {
           //待核保任务 接收
           handle_hasReceived(row);
@@ -935,6 +1102,11 @@ function refreshData(flag?: boolean) {
       // loading.value = false;
       if (res && res.code === 200 && res.data) {
         ElMessage.success({ message: "查询完毕！", duration: 3000 });
+        if(params.udrType === "1") {
+          tableconfig.tableBtn = []
+        } else {
+          tableconfig.tableBtn = tableBtns
+        }
         pageresult.list = res.data;
         pageresult.total = res.total;
       } else {
