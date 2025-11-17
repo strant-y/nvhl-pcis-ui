@@ -172,6 +172,11 @@ onMounted(() => {
       setFormItem("Applicant.cCertfCls", { disabled: false });
       setFormItem("Applicant.cCertfCde", { disabled: false });
     }
+    // 043009 投保人性质只能选法人
+    if(param.cProdNo === '043009') {
+      setFormItem("Applicant.cClntMrk", { loadData: [{ label: '法人', value: '0' }] })
+      setValue("Applicant.cClntMrk", '0')
+    }
   });
 });
 // //给表单下拉项赋值
