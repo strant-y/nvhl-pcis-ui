@@ -4212,6 +4212,15 @@ const calcPremiumEdr = async () => {
         );
       edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
+      
+      if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntAmt", nAmt.value);
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntPrm", nPrm.value);
+      }
 
     
       const payinfoRef = opertaor.getTableRefs()["payinfo"];
@@ -5713,6 +5722,13 @@ const validateTgt = () => {
     let cIsRegistered =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsRegistered');      // 是否单项工程
     if(tableLenght ==0 && cIsRegistered=='1'){
       ElMessage.warning("“被监护人是否记名”为是时，人员清单信息不能为空！");  
+      return false;
+    }
+  }
+  // 计划开工日期、计划完工日期和工期两者二选一必填
+  if(['059011','059012','059013','059016','059018','059017'].includes(props.param?.cProdNo)) {
+    if(!(tgtData['Tgt.tConstructionPeriod'] || (tgtData['Tgt.tCommencementDate'] && tgtData['Tgt.tCompletionDate']))) {
+      ElMessage.warning("标的信息中计划开工日期、计划完工日期和工期两者必填一个！")
       return false;
     }
   }
