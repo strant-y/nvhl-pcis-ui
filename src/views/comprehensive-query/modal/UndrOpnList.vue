@@ -8,7 +8,11 @@
         ref="tableRef"
         @selection-change="handleSelectionChange"
         @page-change="handleQuery(false)"
-      />
+      >
+        <template #column-CUndrOpn="{row}">
+          <div>{{ row.CUndrOpn }}</div>
+        </template>
+      </app-table>
     </div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
@@ -105,7 +109,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "CUndrOpn",
         inputtype: "rtinput",
         title: "核保意见",
-        minWidth: 180,
+        align: "left",
+        slotName: "CUndrOpn"
       },
     ],
   })

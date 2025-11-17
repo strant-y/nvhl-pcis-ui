@@ -1,7 +1,22 @@
 <template>
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-        @page-change="handleQuery(false, false)" />
+        @page-change="handleQuery(false, false)">
+        <template #column-tInsrncBgnTm="{ row }">
+            <div>
+                <div v-if="row.tInsrncBgnTm">
+                    <span v-html="row.tInsrncBgnTm?.replace(/T/g, ' ')"></span>
+                </div>
+            </div>
+        </template>
+        <template #column-tIssueTm="{ row }">
+            <div>
+                <div v-if="row.tIssueTm">
+                    <span v-html="row.tIssueTm?.replace(/T/g, ' ')"></span>
+                </div>
+            </div>
+        </template>
+    </app-table>
 </template>
 
 <script setup lang="ts">
@@ -9,14 +24,12 @@ import { AppFreeEditConfig, AppFreeEditMethod, createAppFreeEditConfig, createFr
 import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/app-table-config'
 import { createFreeButtonBase, FreeButtonBase } from '@/shared/button-config'
 import { useValidator } from '@/typings/useValidator'
-import { dataOpertaor } from '@/store/modules/data-opertaor'
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
 import { rsaEncoder, base64encoder } from '@/utils/encipher'
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 const policyService = new PolicyService()
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 const { getRules } = useValidator()
 import { useRoute } from 'vue-router'
 // @ts-ignore
@@ -124,12 +137,15 @@ const tableconfig = reactive<AppTableConfig>(
             {
                 prop: 'tInsrncBgnTm',
                 inputtype: 'rtinput',
-                title: '保险起期'
+                title: '保险起期',
+                slotName: 'tInsrncBgnTm'
             },
             {
                 prop: 'tIssueTm',
                 inputtype: 'rtinput',
-                title: '签单日期'
+                title: '签单日期',
+                slotName: 'tIssueTm'
+
             },
             {
                 prop: 'cResvTxt10',

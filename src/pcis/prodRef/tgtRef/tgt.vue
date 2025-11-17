@@ -1707,8 +1707,8 @@ const method = {
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
-  const a = tgtEditRef?.value?.getValue(getv1[0].prop);
-  const b = tgtEditRef?.value?.getValue(getv2[0].prop);
+  const a = tgtEditRef?.value?.getValue(getv1[0]?.prop);
+  const b = tgtEditRef?.value?.getValue(getv2[0]?.prop);
 
   const setS = setv.prop;
   if (a) {
@@ -1819,8 +1819,12 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        } else {
+        }else {
           Object.assign(item, obj);
+          if(item.inputtype==='rtinputgroup'){
+              Object.assign(item.groupList[0], obj);
+              Object.assign(item.groupList[1], obj);
+          }
         }
       }
     });

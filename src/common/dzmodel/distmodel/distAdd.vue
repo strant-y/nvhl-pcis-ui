@@ -67,7 +67,8 @@ const mapAddr = {
     "Dist.SchoolAddressProp": "Dist.cDetailedAddress"
   },
   "AddressDist041001": {
-    "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    // "Dist.JingYingAddress043009": "Dist.cDetailedAddress"
+    "Dist.cDetailedAddress": "Dist.cDetailedAddress"
   },
   "AddressDist043020": {},
   "AdvertisementDist043011": {
@@ -252,8 +253,8 @@ const isObjectValid = (obj: any) => {
 };
 onMounted(() => {
   dataParams.value = opertaor.getDataAll();
-  appNo.value = dataParams.value.plyBase["Base.cAppNo"];
-  cGrpMrk.value = route.params.param.cGrpMrk;
+  appNo.value = dataParams.value?.plyBase["Base.cAppNo"];
+  cGrpMrk.value = route.params.param?.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
@@ -701,8 +702,8 @@ function getAddressstr(val:any, row: any, pitem: any){
 }
 
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
-   const a = freeEditRef?.value?.getValue(getv1[0].prop);
-   const b = freeEditRef?.value?.getValue(getv2[0].prop);
+   const a = freeEditRef?.value?.getValue(getv1[0]?.prop);
+   const b = freeEditRef?.value?.getValue(getv2[0]?.prop);
 
    const setS = setv.prop;
    if (a) {

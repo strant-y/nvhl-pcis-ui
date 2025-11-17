@@ -1416,7 +1416,8 @@ const initPage = async () => {
     props.param?.pageType === "PLY_UW_PROCESS_SCENE" ||
     (props.param?.cAppTyp == "E" && props.param.cRsnCde !== '99') ||
     props.param?.pageType === "readonly" ||
-    props.param?.pageType === "UW_READ_SCENE"
+    props.param?.pageType === "UW_READ_SCENE" ||
+    props.param?.pageType === "EDR_APP_NEW_SCENE"
   ) {
     opertaor.setReadOnly(formconfig11);
   }
@@ -3367,6 +3368,10 @@ const submitToUndrFn = async () => {
       }
     }
 
+    if(!validateTgt()) {
+      return;
+    }
+
     //040005 校验 地址清单总数 和 学生人数（人）
     //    if(props.param.cProdNo ==='040005'){
     //         const isUnEqual = await checkStudentValidity();
@@ -3497,12 +3502,12 @@ const submitToUndrFn = async () => {
   
       // 询价单申请核保参数
       if(props.param?.pageName === "priceInquiry") {
-        res["taskId"] = 0;
+        res["taskId"] = props.param.taskId ? props.param.taskId.toString() : 0;
         res["openPolicy"] = null;
         res["cInquiryNo"] = base["Base.cInquiryNo"];
       } else {
         res["appNo"] = base["Base.cAppNo"];
-        res['taskId'] = props.param.taskId;
+        res['taskId'] = props.param.taskId ? props.param.taskId.toString() : null;
       }
 
 
@@ -3935,7 +3940,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "inquiryToApp" || props.param?.pageType === "orig") && saveDistBatchFlag.value) {
+    if(props.param?.pageType === "orig" && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
@@ -4207,6 +4212,15 @@ const calcPremiumEdr = async () => {
         );
       edrbase.value?.setFormValue(EdrBaseData);
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
+      
+      if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntAmt", nAmt.value);
+        opertaor
+          .getTableRefByKey("ciMasterAgreement")
+          .setValue("Base.nCiJntPrm", nPrm.value);
+      }
 
     
       const payinfoRef = opertaor.getTableRefs()["payinfo"];
@@ -4541,7 +4555,7 @@ const submitEdrToUndrSurrender = async () => {
     ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
     : null;
   res["plyNo"] = edrbase.value?.getFromValue()["EdrBase.cPlyNo"];
-  res["taskId"] = props.param.taskId ? props.param.taskId : null;
+  res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
   res["data"] = opertaor.getDataAll();
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
@@ -4790,6 +4804,9 @@ const submitEdrToUndrFun = async () => {
     // btn.loading = false;
     return;
   }
+  if(!validateTgt()) {
+    return;
+  }
     if(props.param.cTransMrk !== "1" ){
     const edrBaseValidate = await edrbase.value?.validate();
      if(!edrBaseValidate) {
@@ -4884,7 +4901,7 @@ if(props.param.cTransMrk !== "1"){
     res["user"] = user;
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
-    res["taskId"] = props.param.taskId ? props.param.taskId : null;
+    res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
     const calBtn = getBtn("btnCalEdr");
     if(calBtn) {
@@ -5014,7 +5031,7 @@ if(props.param.cTransMrk !== "1"){
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
     res["cTransMrk"] = props.param.cTransMrk;
-    res["taskId"] = props.param.taskId ? props.param.taskId : null;
+    res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
     submitEdrToUndr(res).then((result) => {
         // btn.loading = false;
         console.log("批改申请核保", result);
@@ -5040,7 +5057,7 @@ if(props.param.cTransMrk !== "1"){
 /**
  * 核保信息 提交
  */
-const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013"]
+const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013","010002"]
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
   if(btn) {
@@ -5229,8 +5246,8 @@ const showJointInsuranceInfo = async () => {
 
   // 定义分公司编码到中文名称的映射表
   const branchCodeToName: { [key: string]: string } = {
-    '0244010000000': '北京分公司',
-    '0261010000000': '山东分公司',
+    '0211010000000': '北京分公司',
+    '0237010000000': '山东分公司',
     '0237020000000': '青岛分公司',
     '0213010000000': '河北分公司',
     '0214010000000': '山西分公司',
@@ -5257,6 +5274,7 @@ const showJointInsuranceInfo = async () => {
     '0236010000000': '江西分公司',
     '0234010000000': '安徽分公司',
     '0235010000000': '福建分公司',
+    '0212010000000': '天津分公司',
   };
 
   // 计算总保额、总保费
@@ -5679,6 +5697,43 @@ const validateShanDong = async () => {
     return true;
   }
 };
+
+// 047001 校验标的信息中的预估代驾人员数量(人)、预估代驾订单数量(单)二选一必填
+const validateTgt = () => {
+  const tgtData = opertaor.getTableRefByKey("tgt")?.getFromValue();
+  if(props.param?.cProdNo === "047001") {
+    if(!tgtData['Tgt.nProxyDrivers'] && !tgtData['Tgt.nOrderQuantity']) {
+      ElMessage.error("标的信息预估代驾人员数量(人)、预估代驾订单数量(单)不能全部为空！")
+      return false;
+    }
+  }
+  //  041012  是否单项工程逻辑
+  if(props.param?.cProdNo==='041012'){
+    let tableLenght = opertaor.getTableRefByKey("SurveyDist041012")?.getTableData().length;  // 清单条数
+    let cIsSingle =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsSingle');      // 是否单项工程
+    if(tableLenght ==0 && cIsSingle==0){
+      ElMessage.warning("“是否单项工程”为否时，勘察工程项目清单不能为空！");
+      return false;
+    }
+  }
+  // 041007 标的信息 被监护人是否记名选是，人员清单信息必填
+  if(props.param?.cProdNo==='041007'){
+    let tableLenght = opertaor.getTableRefByKey("PersonnelDist041007")?.getTableData().length;  // 清单条数
+    let cIsRegistered =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsRegistered');      // 是否单项工程
+    if(tableLenght ==0 && cIsRegistered=='1'){
+      ElMessage.warning("“被监护人是否记名”为是时，人员清单信息不能为空！");
+      return false;
+    }
+  }
+  // 计划开工日期、计划完工日期和工期两者二选一必填
+  if(['059011','059012','059013','059016','059018','059017'].includes(props.param?.cProdNo)) {
+    if(!(tgtData['Tgt.tConstructionPeriod'] || (tgtData['Tgt.tCommencementDate'] && tgtData['Tgt.tCompletionDate']))) {
+      ElMessage.warning("标的信息中计划开工日期、计划完工日期和工期两者必填一个！")
+      return false;
+    }
+  }
+  return true;
+}
 
 opertaor.setFatherPage({
   currentIndex: currentIndex,

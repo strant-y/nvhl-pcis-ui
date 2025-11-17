@@ -23,13 +23,12 @@ import { saveRiskInfo, saveCvrgRiskRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps<{
   data: Object;
   type: string;
+  idxParam: Object;
 }>();
+const opertaor = dataOpertaor(props.idxParam.opertaorProps);
 const emits = defineEmits(["ok", "cancel"]);
 const dialogVisible = ref(true);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
