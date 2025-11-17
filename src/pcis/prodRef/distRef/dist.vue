@@ -415,6 +415,8 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
+            // 如果是免赔信息则不刷新保障信息
+            if(props.compKey?.includes('DeductibleDist')) return;
             const cvrgRef = opertaor.getTableRefs()['cvrg'];
             try {
               cvrgRef?.refushCvrgInfo();
@@ -469,6 +471,8 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
+          // 如果是免赔信息则不刷新保障信息
+          if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           try {
             if(cvrgRef) {
@@ -491,12 +495,12 @@ const method = {
     const alldata: any = opertaor.getDataAll();
     const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
-      param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      param['cInquiryNo'] = opertaor.getDataAll()?.plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
-      param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+      param['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"]
     }
 
     let fromSchema = tableconfig.value.fromSchema;
@@ -519,6 +523,8 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
+                // 如果是免赔信息则不刷新保障信息
+                if(props.compKey?.includes('DeductibleDist')) return;
                 const cvrgRef = opertaor.getTableRefs()['cvrg'];
                 try {
                     cvrgRef?.refushCvrgInfo();

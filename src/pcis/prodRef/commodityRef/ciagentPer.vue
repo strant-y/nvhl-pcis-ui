@@ -442,6 +442,38 @@ onMounted(() => {
     nextTick(() => {
       setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
     });
+    //查询中类数据，用于默认回显  { BsnsTyp: val, scene: "PLY_APP_NEW_SCENE" }
+    getChaTypeList({ BsnsTyp: props.data.data.cBsnsTyp, scene: "PLY_APP_NEW_SCENE" }).then((res) => {
+      if (null != res && null != res["code"]) {
+        if (res["code"] === 200) {
+          const obj = {
+            loadData: res.data,
+          };
+          setFormItem("CChaType", obj);
+          setValue("CChaType", props.data.data.cChaType);
+        }
+      }
+    });
+    const paramSub = {
+      CChaType: props.data.data.cChaType,
+      flag: 1,
+
+      scene: "PLY_APP_NEW_SCENE",
+    };
+    getChaSubtypList(paramSub).then((res) => {
+      if (null != res && null != res["code"]) {
+        if (res["code"] === 200) {
+          const obj = {
+            loadData: res.data,
+          };
+          setFormItem("CChaSubtype", obj);
+          setValue("CChaSubtype", props.data.data.cChaSubtype);
+        }
+      }
+    });
+    nextTick(() => {
+      setValue("CDptCde", props.data.data.rowData['Ci.cDptCde']);
+    });
 });
 
 defineExpose({

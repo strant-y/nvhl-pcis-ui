@@ -18,9 +18,9 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+// import { dataOpertaor } from "@/store/modules/data-opertaor";
+// const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+// const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { saveProdEdrRsnInfo, getProdEdrRsnInfo } from "@/api/prod"; // api接口
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();

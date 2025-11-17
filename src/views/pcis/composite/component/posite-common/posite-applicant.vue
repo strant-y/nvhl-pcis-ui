@@ -83,6 +83,7 @@ const formconfig = ref({
   fileInputType: "1"
 });
 import { readFile } from "@/api/file";
+import { listChrDepts } from "@/api/dept";
 const tCertfDate = ref<any[]>([]);
 const  cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
 const maindialogVisible = ref(false) // ocr识别弹框打开
@@ -95,7 +96,7 @@ onMounted(() => {
     getRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async () => {
     //是否小微企业，默认非必填、只读
     // setFormItem("Applicant.cIsMicroEntpris", {
     //   rules: null,
@@ -1106,7 +1107,7 @@ const method = {
   },
 
   // 单位性质
- cWorkDptChange:(val: any) => {
+cWorkDptChange:(val: any) => {
   const clientNature = getValue('Applicant.cClntMrk');
   const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
   const requiredRule = [getRules("required", {})];

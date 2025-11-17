@@ -31,6 +31,14 @@ export function checkRenewalDpt(queryParams: any): AxiosPromise<any> {
     return post(`/policy/checkRenewalDpt`, queryParams);
 }
 
+export function getAppPolicyComponent(queryParams: any): AxiosPromise<any> {
+    return post(`policy/getAppPolicyComponent`, queryParams);
+}
+
+export function getAppPolicyForRenewal(queryParams: any): AxiosPromise<any> {
+    return post(`policy/getAppPolicyForRenewal`, queryParams);
+}
+
 /*
  * 投保	自定义录单
  */

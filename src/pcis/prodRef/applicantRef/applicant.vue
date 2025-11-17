@@ -57,6 +57,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
 import { getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import { listChrDepts } from "@/api/dept";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -85,7 +86,7 @@ onMounted(() => {
     getRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async () => {
     //是否小微企业，默认非必填、只读
     // setFormItem("Applicant.cIsMicroEntpris", {
     //   rules: null,
@@ -1528,7 +1529,7 @@ function handleFileChange(event: Event) {
             setValue(
               "Applicant.tBirthday",
               cardInfo["date_of_birth"]["value"]
-                ? cardInfo["date_of_birth"]["value"].replace(".", "-")
+                ? cardInfo["date_of_birth"]["value"].replaceAll(".", "-")
                 : null
             );
             if (cardInfo["period_of_validity"]["value"]) {
