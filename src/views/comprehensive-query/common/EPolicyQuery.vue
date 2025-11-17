@@ -55,23 +55,16 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/store'
+import { codeListViewStore, useUserStore } from '@/store'
 import { useValidator } from '@/typings/useValidator'
-import { useRouter, useRoute } from 'vue-router'
-const { getRules } = useValidator()
-const router = useRouter()
-const route = useRoute()
+import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
-import { codeListViewStore } from '@/store'
-const codeListStore = codeListViewStore()
 import { AppFreeEditConfig, AppFreeEditMethod, createAppFreeEditConfig } from '@/shared/app-free-edit-config'
-const freeEditRef = ref<AppFreeEditMethod | null>(null)
 import { createFreeButtonBase, FreeButtonBase } from '@/shared/button-config'
 import { AppTableConfig, AppTableMethod, createTableEditConfig } from '@/shared/app-table-config'
 import { useDzModal } from '@/common/dzmodel/DzModalService'
-import { SCENE_PLY_APP_READ } from '@/constants/tab-constants'
 import { PcisQueryService } from '@/views/payinfoManagement/service/pcis-query-service'
-import { rsaEncoder, base64encoder } from '@/utils/encipher'
+import { base64encoder, rsaEncoder } from '@/utils/encipher'
 import { DialogMethod } from '@/common/dzmodel/ComDialogConf'
 import { DocumentCopy } from "@element-plus/icons-vue";
 // @ts-ignore
@@ -79,6 +72,12 @@ import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
 import moment from 'moment'
 import { getProdEnableList } from "@/api/prod";
+
+const { getRules } = useValidator()
+const router = useRouter()
+const route = useRoute()
+const codeListStore = codeListViewStore()
+const freeEditRef = ref<AppFreeEditMethod | null>(null)
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()
 const user: any = ref(userStore.user) || ref({ companyId: '', opCde: '', companyCnm: '' })
@@ -167,11 +166,11 @@ function extractCode(str: string) {
     return str.match(pattern)?.[0] || "";
 }
 const kindData: any = computed(() => {
-  return prodTotalDatas.value.map((item: any) => ({
-    label: item.code + " " + item.value,
-    value: item.code,
-    list: item.list,
-  }));
+    return prodTotalDatas.value.map((item: any) => ({
+        label: item.code + " " + item.value,
+        value: item.code,
+        list: item.list,
+    }));
 });
 const cProdData = ref([]);
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -240,8 +239,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                 },
                 loadData: kindData,
-                func: (val:any) => {
-                    setValue("cProdNo","")
+                func: (val: any) => {
+                    setValue("cProdNo", "")
                     cTermNo = "";      // 重置条款编码
                     cPard.value = val;
                     formconfig1.fromSchema?.forEach((item) => {
@@ -266,9 +265,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         kindData.value.forEach((item: any) => {
                             if (val.includes(item.value)) {
                                 const list = item.list.map((item: any) => ({
-                                label: item.code + " " + item.value,
-                                value: item.code,
-                                list: item.list,
+                                    label: item.code + " " + item.value,
+                                    value: item.code,
+                                    list: item.list,
                                 }));
                                 options = options.concat(list);
                             }
@@ -280,7 +279,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         setFormItem("CProdNo", { loadData: [] });
                         freeEditRef.value?.setValue("CProdNo", null);
                     }
-              },
+                },
             },
             {
                 prop: 'CProdNo',
@@ -301,14 +300,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     if (val && val.length > 0) {
                         let options: any = [];
                         cProdData.value.forEach((item: any) => {
-                        if (val.includes(item.value)) {
-                            const list = item.list.map((item: any) => ({
-                            label: item.code + " " + item.value,
-                            value: item.code,
-                            list: item.list,
-                            }));
-                            options = options.concat(list);
-                        }
+                            if (val.includes(item.value)) {
+                                const list = item.list.map((item: any) => ({
+                                    label: item.code + " " + item.value,
+                                    value: item.code,
+                                    list: item.list,
+                                }));
+                                options = options.concat(list);
+                            }
                         });
                         setFormItem("CTermNo", { loadData: options });
                         freeEditRef.value?.setValue("CTermNo", null);
@@ -586,11 +585,11 @@ const tableconfig = reactive<AppTableConfig>(
 
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
-  getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
-    if (res.data && res.data.length > 0) {
-      prodTotalDatas.value = res.data;
-    }
-  });
+    getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
+        if (res.data && res.data.length > 0) {
+            prodTotalDatas.value = res.data;
+        }
+    });
 });
 
 onMounted(async () => {
