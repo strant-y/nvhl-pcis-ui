@@ -1831,7 +1831,7 @@ const method = {
       setValue("Tgt.tCommencementDate", null);
       return;
     }
-    setValue("Tgt.tConstructionPeriod", tm);
+    setValue("Tgt.tConstructionPeriod", tm + 1);
   },
   // 计划完工日期
   tCompletionDateChange:(v:any)=>{
@@ -1845,7 +1845,7 @@ const method = {
       setValue("Tgt.tCompletionDate", null);
       return;
     }
-    setValue("Tgt.tConstructionPeriod", tm);
+    setValue("Tgt.tConstructionPeriod", tm + 1);
   },
 };
 
