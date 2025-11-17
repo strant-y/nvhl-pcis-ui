@@ -190,7 +190,9 @@ watch(
           const cvrgRefInterval = setInterval(() => {
             const cvrgRef = opertaor.getTableRefs()['cvrg'];
             if(cvrgRef?.getAddrSeqOptions) {
-              cvrgRef?.getAddrSeqOptions();
+              cvrgRef?.getAddrSeqOptions().then(() => {
+                cvrgRef?.refushCvrgInfo()
+              });
               clearInterval(cvrgRefInterval)
             }
           },500)
