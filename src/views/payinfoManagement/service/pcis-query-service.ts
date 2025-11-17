@@ -702,6 +702,10 @@ export class PcisQueryService {
 		queryEcargoRelevancePolicyInsured(ops: any): AxiosPromise<any> {
 			return post(`ecargo/queryEcargoRelevancePolicyInsured`, ops);
 		}
-	
-	
+	/**
+     * 报停展期批改查询保单的保险止期
+     */
+	getLastInsrncEndTm(ops: any): AxiosPromise<any> {
+        return post(`policy/getLastInsrncEndTm`, ops);
+    }
 }
