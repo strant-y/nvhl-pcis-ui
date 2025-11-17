@@ -100,6 +100,10 @@
               </span>
             </div>
           </el-form-item>
+					<div class="option">
+            <el-checkbox v-model="remember" label="记住密码" size="small" />
+            <a class="forgot" @click="forgetPwd">忘记密码？</a>
+          </div>
           <!-- <el-checkbox> 30天内免登录</el-checkbox> -->
           <!-- 登录按钮 -->
           <el-button
@@ -239,12 +243,192 @@
       v-model:dialogShow="dialogShow"
       :username="thirdPartyData.mobile"
     />
+		<!-- 验证码校验 -->
+		<el-dialog
+			v-model="isVisible"
+			title="验证码校验"
+			width="450px"
+			append-to-body
+			:destroy-on-close="true"
+			:close-on-click-modal="false"
+			@close="isVisible = false"
+		>
+			<el-form
+				ref="loginFormrRef"
+				:model="loginData"
+				:rules="loginRules"
+				class="login-form"
+				label-position="top"
+			>
+				<!-- 用户名 -->
+				<el-form-item prop="username" style="backgroundColor:#f7f7f7">
+					<div class="input_item__ flex-y-center w-full">
+						<span class="icon-box">
+							<svg-icon icon-class="user" class="mx-2" />
+						</span>
+						<el-input
+							ref="username"
+							v-model="loginData.username"
+							name="username"
+							size="large"
+							disabled
+						/>
+					</div>
+				</el-form-item>
+				<!-- 验证码 -->
+				<el-form-item prop="captchaCode">
+					<div class="input_item__ flex-y-center w-full">
+						<span class="icon-box captcha-icon-box">
+							<svg-icon icon-class="captcha" class="mx-2" />
+						</span>
+						<el-input
+							ref="captchaCode"
+							v-model="loginData.captchaCode"
+							auto-complete="off"
+							size="large"
+							class="flex-1"
+							placeholder="验证码"
+						/>
+						<!-- 验证码-->
+						<span style="width: 72px; text-align: right">
+							<el-button
+								v-if="verifyTime === 0"
+								class="mr-1 w-72px"
+								:loading="loading"
+								type="primary"
+								size="small"
+								plain
+								@click="getCaptcha"
+								>获取验证码</el-button
+							>
+							<el-tag v-else disabled class="mr-1" type="primary"
+								>{{ verifyTime }}秒</el-tag
+							>
+						</span>
+					</div>
+				</el-form-item>
+				<!-- 登录按钮 -->
+				<el-button
+					:loading="loading"
+					type="primary"
+					size="large"
+					class="w-full"
+					@click.prevent="handleSubmit"
+					>验证
+				</el-button>
+			</el-form>
+		</el-dialog>
+		<!-- 密码修改 -->
+		<el-dialog
+    v-model="isModifyPwd"
+    title="密码修改"
+    :close-on-click-modal="false"
+    width="640px"
+    @close="handleClose"
+    class="password-dialog"
+  >
+    <div class="password-container">
+      <el-alert
+        v-if="error"
+        type="error"
+        :title="error"
+        show-icon
+        class="mb-lg"
+      />
+
+      <div class="password-tips">
+        <span>提示：请键入新密码，然后再次键入新密码进行确认。</span>
+        <br />
+        <span>修改密码默认生效期为三个月</span>
+      </div>
+
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        label-width="20px"
+        class="password-form"
+      >
+        <!-- 账户名（只读） -->
+        <el-form-item style="backgroundColor:#f7f7f7">
+          <el-input
+            v-model="form.usercde"
+            placeholder="账户名"
+            :disabled="true"
+            size="large"
+            prefix-icon="User"
+          />
+        </el-form-item>
+
+        <!-- 新密码（带强度提示） -->
+        <el-form-item prop="newPwd">
+          <el-popover
+            placement="right"
+            trigger="focus"
+            v-model:visible="passwordPopoverVisible"
+            :width="240"
+            popper-class="password-strength-popover"
+          >
+            <template #reference>
+              <el-input
+                v-model="form.newPwd"
+                placeholder="新密码"
+                type="password"
+                size="large"
+                prefix-icon="Lock"
+                @input="checkPasswordStrength"
+              />
+            </template>
+            <div class="password-strength-content">
+              <div :class="`strength-indicator ${status}`">
+                强度：{{ statusText }}
+              </div>
+              <div class="progress-container">
+                <el-progress
+                  :percentage="progress"
+                  :stroke-width="6"
+                  :status="progressStatus"
+                  show-text
+                />
+              </div>
+              <p class="strength-hint">
+                请至少输入 8 个字符。请不要使用容易被猜到的密码。
+              </p>
+            </div>
+          </el-popover>
+        </el-form-item>
+
+        <!-- 确认新密码 -->
+        <el-form-item prop="confirmNewPwd" :rules="confirmRule">
+          <el-input
+            v-model="form.confirmNewPwd"
+            placeholder="确认新密码"
+            type="password"
+            size="large"
+            prefix-icon="Lock"
+          />
+        </el-form-item>
+      </el-form>
+
+      <div class="password-actions">
+        <el-button
+          type="primary"
+          size="large"
+          :loading="loading3"
+          @click="savePwd"
+          class="password-btn"
+        >
+          确认修改
+        </el-button>
+      </div>
+    </div>
+  </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useSettingsStore, useUserStore, useAppStore } from "@/store";
-import { getCaptchaApi } from "@/api/auth";
+import { getCaptchaApi, getOperInfoApi, forgetAndModifyPasswordApi } from "@/api/auth";
 import { LoginData } from "@/api/auth/types";
 import { Sunny, Moon } from "@element-plus/icons-vue";
 import { LocationQuery, LocationQueryValue, useRoute } from "vue-router";
@@ -281,6 +465,7 @@ const loginFormRef = ref(ElForm); // 登录表单ref
 const { height } = useWindowSize();
 const passwordType = ref("password"); // 密码类型
 const isMouseDown = ref(false); // 鼠标按下状态
+const remember = ref(false); // 记住密码
 const showPassword = () => {
   passwordType.value = "text";
   isMouseDown.value = true
@@ -570,6 +755,198 @@ function handleLoginChange() {
     loginData.value.captchaCode = "";
   }
 }
+
+/**
+ * 忘记密码
+ */
+const loginFormrRef = ref(ElForm); // 忘记密码验证表单ref
+const isVisible = ref(false)
+const forgetPwdVerify = ref(false)
+const account = ref('11111')
+const forgetPwd = () => {
+	loginFormRef.value?.validateField('username').then((valid: boolean) => {
+    if (valid) {
+			getOperInfoApi(loginData.value)
+			.then((res) => {
+				const { msg, code, phoneNO, serial, src} = res;
+				verifyData.value.serial = serial;
+				verifyData.value.phoneNO = phoneNO;
+				const param = src === '0' ? loginData.value.username : phoneNO;
+				if (200 === code && !!serial && !!param) {
+					account.value = param;
+					isVisible.value = true;
+					forgetPwdVerify.value = true;
+				} else {
+					ElMessage.error(msg || "系统出错");
+				}
+			})
+			.catch(() => {})
+			.finally(() => {
+			});
+    }
+  });
+}
+
+/**
+ * 忘记密码短信验证码校验提交
+ */
+const isModifyPwd = ref(false)
+const form = ref({
+	usercde: '',
+	oldPassword: '',
+	newPwd: '',
+	confirmNewPwd: '',
+})
+const handleSubmit = () => {
+  loginFormrRef.value?.validateField('captchaCode').then((valid: boolean) => {
+    if (valid) {
+      loading.value = true;
+			// 验证类型
+			let verifyType = 'login';
+			if (forgetPwdVerify.value) { // 忘记密码验证
+        verifyType = 'forget';
+      }
+      const params = {
+				serial: verifyData.value.serial,
+        code: loginData.captchaCode || '',
+        verifyType,
+      };
+      verifyCodeApi(params).then((res) => {
+				if (null != res && null != res['code'] && res['code'] == 200) {
+					// 忘记密码或密码过期验证通过弹出修改密码框
+					if (forgetPwdVerify.value) {
+						form3.value.usercde = loginData.value.username;
+						form3.value.oldPassword = '';
+						form3.value.newPwd = '';
+						form3.value.confirmNewPwd = '';
+						isModifyPwd.value = true;
+					}
+					loading.value = false;
+				} else {
+        	ElMessage.error(msg);
+      	}
+			}).catch((err) => console.log(err))
+			.finally(() => (loading.value = false));;
+    }
+  });
+};
+
+// 表单引用
+const formRef = ref(null);
+// 数据状态
+const error = ref('');
+const loading3 = ref(false);
+const overduePwdVerify = ref(false);
+const passwordPopoverVisible = ref(false);
+
+// 密码强度计算
+const status = computed(() => {
+  if (!form.value.newPwd) return 'weak';
+  if (form.value.newPwd.length < 8) return 'weak';
+  
+  // 强度规则：数字+字母+特殊字符
+  const hasDigit = /\d/.test(form.value.newPwd);
+  const hasLetter = /[a-zA-Z]/.test(form.value.newPwd);
+  const hasSpecial = /[^a-zA-Z0-9]/.test(form.value.newPwd);
+  
+  if (hasDigit && hasLetter && hasSpecial) return 'strong';
+  if (hasDigit || hasLetter) return 'medium';
+  return 'weak';
+});
+
+const progress = computed(() => {
+  if (!form.value.newPwd) return 0;
+  if (form.value.newPwd.length < 8) return 20;
+  return Math.min(form.value.newPwd.length * 10, 100);
+});
+
+const statusText = computed(() => {
+  return {
+    weak: '太短',
+    medium: '中',
+    strong: '强',
+  }[status.value];
+});
+
+const progressStatus = computed(() => {
+  return {
+    weak: 'exception',
+    medium: 'warning',
+    strong: 'success',
+  }[status.value];
+});
+
+// 表单验证规则
+const rules = {
+  oldPassword: [
+    { required: true, message: '请输入原密码！', trigger: 'blur' },
+  ],
+  newPwd: [
+    { required: true, message: '请输入新密码！', trigger: 'blur' },
+    { min: 8, message: '密码长度至少8位', trigger: 'blur' },
+  ],
+  confirmNewPwd: [
+    { required: true, message: '请确认新密码！', trigger: 'blur' },
+  ],
+};
+
+const confirmRule = [
+  { required: true, message: '请确认新密码！', trigger: 'blur' },
+  {
+    validator: (rule, value) => {
+      if (value !== form.value.newPwd) {
+        return Promise.reject('两次输入的密码不匹配！');
+      }
+      return Promise.resolve();
+    },
+    trigger: 'blur',
+  },
+];
+
+// 方法
+const checkPasswordStrength = () => {
+  // 强度提示在输入时自动更新
+  passwordPopoverVisible.value = !!form.value.newPwd;
+};
+
+const savePwd = async () => {
+  try {
+    const valid = await formRef.value.validate();
+    if (!valid) return;
+    
+    loading3.value = true;
+    error.value = '';
+
+		forgetAndModifyPasswordApi(form.value).then((res) => {
+			const { msg, code, phoneNO, serial, src} = res;
+			if (200 == code ) {
+				isModifyPwd.value = false;
+				isVisible.value = false;
+				forgetPwdVerify.value = false;
+				overduePwdVerify.value = false;
+				visible.value = false;
+    		ElMessage.success('密码修改成功！');
+			} else {
+				ElMessage.error(msg || "系统出错");
+			}
+		})
+  } catch (err) {
+    error.value = '密码修改失败，请重试';
+  } finally {
+    loading3.value = false;
+  }
+};
+
+const handleClose = () => {
+  isModifyPwd.value = false;
+  error.value = '';
+  form.value = {
+    usercde: form.value.usercde,
+    oldPassword: '',
+    newPwd: '',
+    confirmNewPwd: '',
+  };
+};
 </script>
 
 <style lang="scss" scoped>
@@ -672,7 +1049,7 @@ function handleLoginChange() {
 :deep(.el-form-item) {
   border: 1px solid #d0d2d9;
   border-radius: 8px;
-  width: 243px;
+  // width: 243px;
 
   .icon-box {
     border-radius: 8px 0 0 8px;
@@ -730,5 +1107,74 @@ function handleLoginChange() {
 
 .getCaptcha_ {
   cursor: pointer;
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot {
+  color: #3a76c6;
+}
+
+.password-dialog {
+  :deep(.el-dialog__body) {
+    padding: 20px 30px;
+  }
+}
+
+.password-container {
+  padding: 0 10px;
+}
+
+.password-tips {
+  margin-bottom: 24px;
+  color: #606266;
+  font-size: 14px;
+}
+
+.password-form {
+  margin-bottom: 24px;
+}
+
+.password-strength-popover {
+  padding: 10px 0;
+}
+
+.strength-indicator {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.strength-indicator.weak {
+  color: #ff4d4f;
+}
+
+.strength-indicator.medium {
+  color: #faad14;
+}
+
+.strength-indicator.strong {
+  color: #52c41a;
+}
+
+.progress-container {
+  margin-bottom: 12px;
+}
+
+.strength-hint {
+  color: #909399;
+  font-size: 12px;
+  margin: 0;
+}
+
+.password-actions {
+  text-align: center;
+}
+
+.password-btn {
+  width: 100%;
 }
 </style>
