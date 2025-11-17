@@ -86,7 +86,8 @@
                         <from-item
                             v-model="props.row[i.prop]"
                             :item="formItems[props.row._dataId][i.prop]"
-                            :showLabel=" item.editFlag || (editIndex !== props.row._dataId) ? true : (item.editList && item.editList.length > 0 ? !item.editList?.includes(i.prop) : true) && (editIndex === props.row._dataId) "
+                            :showLabel=" item.editFlag ? (editIndex !== props.row._dataId ? true : false) : 
+                            editIndex !== props.row._dataId ? true : (item.editList && item.editList.length > 0 ? !item.editList?.includes(i.prop) : true) && (editIndex === props.row._dataId) "
                             :row="props.row"
                         />
                       </div>

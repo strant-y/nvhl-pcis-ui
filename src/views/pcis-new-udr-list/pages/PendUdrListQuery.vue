@@ -703,13 +703,13 @@ const tableconfig = reactive<AppTableConfig>(
         align: 'left',
         lengthNum: 12,
       },
-      {
-        prop: "cMinUndrCls",
-        inputtype: "rtinput",
-        title: "最小可核级别",
-        align: 'left',
-        lengthNum: 12,
-      },
+      // {
+      //   prop: "cMinUndrCls",
+      //   inputtype: "rtinput",
+      //   title: "最小可核级别",
+      //   align: 'left',
+      //   lengthNum: 12,
+      // },
       {
         prop: "state",
         inputtype: "rtselect",
