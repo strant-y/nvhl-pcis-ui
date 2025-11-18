@@ -960,6 +960,19 @@ const tableconfig = reactive<AppTableConfig>(
                 lengthIsNumber: true,
 			},
 			{
+				prop: "cPayEndTm",
+				inputtype: "rtinput",
+				title: "支付号有效止期",
+                lengthNum: 17,
+                lengthIsNumber: true,
+			},
+			{
+				prop: "cCanPay",
+				inputtype: "rtinput",
+				title: "支付号状态",
+                lengthNum: 5,
+			},
+			{
 				prop: "nPrm",
 				inputtype: "rtinput",
 				title: "保费金额",
