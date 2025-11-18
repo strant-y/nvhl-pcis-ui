@@ -187,15 +187,8 @@ watch(
         // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
         const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
         if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
-          const cvrgRefInterval = setInterval(() => {
-            const cvrgRef = opertaor.getTableRefs()['cvrg'];
-            if(cvrgRef?.getAddrSeqOptions) {
-              cvrgRef?.getAddrSeqOptions().then(() => {
-                cvrgRef?.refushCvrgInfo()
-              });
-              clearInterval(cvrgRefInterval)
-            }
-          },500)
+          const cvrgRef = opertaor.getTableRefs()['cvrg'];
+          cvrgRef?.getAddrSeqOptions()
         }
       }
     }
@@ -426,6 +419,7 @@ const method = {
             if(props.compKey?.includes('DeductibleDist')) return;
             const cvrgRef = opertaor.getTableRefs()['cvrg'];
             try {
+              cvrgRef?.getAddrSeqOptions();
               cvrgRef?.refushCvrgInfo();
             } catch (ignore) {
             }
@@ -483,6 +477,7 @@ const method = {
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           try {
             if(cvrgRef) {
+              cvrgRef?.getAddrSeqOptions();
               cvrgRef.refushCvrgInfo();
             }
           } catch (ignore) {
@@ -534,7 +529,8 @@ const method = {
                 if(props.compKey?.includes('DeductibleDist')) return;
                 const cvrgRef = opertaor.getTableRefs()['cvrg'];
                 try {
-                    cvrgRef?.refushCvrgInfo();
+                  cvrgRef?.getAddrSeqOptions();
+                  cvrgRef?.refushCvrgInfo();
                 } catch (ignore) {}
               },
             },
