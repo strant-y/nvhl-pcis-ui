@@ -60,11 +60,14 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
+const renewalDialog = defineAsyncComponent(() => import("../pcis/guide/renewalDialog.vue"));
 import { useUserStore } from "@/store/modules/user";
 import {saveAs} from "file-saver";
 import {useRouter} from "vue-router";
 import dayjs from "dayjs";
 import moment from "moment/moment";
+import { getAppPolicyComponent, getAppPolicyForRenewal } from "../pcis/guide/custom-recording.service";
+import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 const router = useRouter();
 const userStore = useUserStore();
 const user = ref(userStore.user);
@@ -362,28 +365,56 @@ const handleArray = (obj:any)=>{
 
 const getRenewal = (row:any)=>{
    console.log('一键续保。。。',row.cPlyNo)
-  getPolicy({cPlyNo:row.cPlyNo,queryTyp: "orig", cRenewMrk: "1",})
-      .then((res) => {
-        const { code, res:data, msg } = res;
-        if (200 === code) {
-          router.push({
-            path: "/pcisapp/myPage",
-            query: {
-              param: JSON.stringify({ ...handleArray(data.composition.plyBase[0] ),...{cDptCnm:row.cDptCnm,cTermNme:row.cTermNme,cTermNo:row.cTermNo}, ...{ pageType: "orig" } }),
-            },
-          });
-          sessionStorage.setItem(
-              "toMyPageData",
-              JSON.stringify({
-                ...JSON.parse(sessionStorage.getItem("toMyPageData")),
-                ...{ pageType: "orig" },
-              })
+  if(row.cPlyNo?.length > 18) {
+    ElMessage.error("历史数据的保单, 不允许续保");
+    return;
+  }
+  if (cannotCopy(row.cPlyNo)) {
+    ElMessage.error("该保单不允许续保");
+    return;
+  }
+  getAppPolicyComponent({ cPlyNo: row.cPlyNo }).then((res:any) => {
+    if(res.res.length > 0) {
+      dzmodal
+        .open(renewalDialog, { 
+          type: "Issuer",
+          cPlyNo: row.cPlyNo,
+          options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
+          selected: Object.keys(res.res[0]).map((item:any) => item)
+        })
+        .then((res: any) => {
+          if(res.type === 'ok') {
+            const renewalComponent = res.body.component;
+            getAppPolicyForRenewal({ cPlyNo: row.cPlyNo, components: [renewalComponent] }).then((res: any) => {
+              if (res.code == "200") {
+                if (res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
+                  ElMessage.warning("该保单不允许续保，请重新选择！");
+                  return
+                }
+                router.push({
+                  path: "/pcisapp/myPage",
+                  query: {
+                    param: JSON.stringify({
+                      ...handleArray(res.res.composition.plyBase[0]), ...{
+                        pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
+                        cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
+                      }
+                    }),
+                  },
+                });
+              } else {
+                ElMessage.error(res.msg);
+              }
+            }
           );
-        } else {
-          ElMessage.error(msg);
-        }
-      })
-      .finally(() => {});
+          }
+        });
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch(err => {
+    ElMessage.error(err.msg || err)
+  })
 }
 
 //导出
