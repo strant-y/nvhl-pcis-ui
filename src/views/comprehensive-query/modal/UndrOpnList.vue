@@ -86,17 +86,17 @@ const tableconfig = reactive<AppTableConfig>(
         title: "核保选项",
         minWidth: 80,
       },
-      {
-        prop: "CAntiLnderRisk",
-        inputtype: "rtselect",
-        title: "反洗钱风险",
-        lengthNum: 5,
-        loadData: [
-          { value: "0", label: "低" },
-          { value: "1", label: "中" },
-          { value: "2", label: "高" },
-        ],
-      },
+      // {
+      //   prop: "CAntiLnderRisk",
+      //   inputtype: "rtselect",
+      //   title: "反洗钱风险",
+      //   lengthNum: 5,
+      //   loadData: [
+      //     { value: "0", label: "低" },
+      //     { value: "1", label: "中" },
+      //     { value: "2", label: "高" },
+      //   ],
+      // },
       {
         prop: "TUpdTm",
         // inputtype: "rtdatepicker", 
@@ -145,7 +145,10 @@ function handleQuery(flag?: boolean) {
     .then((res: any) => {
       if (200 === res.code) {
         pageresult.list = [];
-        pageresult.list = res.data;
+        pageresult.list = res.data.map((item:any) => ({
+          ...item,
+          TUpdTm: item.TUpdTm?.replaceAll('T',' ')
+        }));
         pageresult.total = res.total;
       } else {
         ElMessage.error(res.msg);

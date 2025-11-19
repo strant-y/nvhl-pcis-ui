@@ -288,23 +288,23 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
         func: (v) => {
           if ("A" === v) {
-            setValue("cUndrOpnList", "");
             if ("E" === params["cAppTyp"]) {
               setFormItem("cUndrOpnList", {
                 loadData: [{ label: "审核通过", value: "6" }],
               });
+              setValue("cUndrOpnList", "6");
             } else {
               setFormItem("cUndrOpnList", {
                 loadData: [{ label: "审核通过", value: "0" }],
               });
+              setValue("cUndrOpnList", "0");
             }
           } else if ("R" === v) {
-            setValue("cUndrOpnList", "");
             setFormItem("cUndrOpnList", {
               loadData: [{ label: "提交上级", value: "5" }],
             });
+            setValue("cUndrOpnList", "5");
           } else {
-            setValue("cUndrOpnList", "");
             setFormItem("cUndrOpnList", {
               loadData: [
                 { label: "缺少必要信息", value: "1" },
@@ -316,6 +316,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 { label: "其他", value: "9" },
               ],
             });
+            setValue("cUndrOpnList", "9");
           }
           if ("T" === v) {
             setValue("cBckOp", "");

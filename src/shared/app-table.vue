@@ -317,4 +317,7 @@ defineExpose({
 .table_header_has-title-btns :deep(.el-card__header) {
   //padding: 10px 20px;
 }
+:deep(.el-card__body) {
+  padding: 10px 20px;
+}
 </style>
