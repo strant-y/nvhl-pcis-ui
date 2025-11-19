@@ -163,6 +163,10 @@ onMounted(async () => {
   if(params.cProdNo === '041007') {
     setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
   }
+  // 089030 建筑结构非必填
+  if(params.cProdNo === '089030') {
+    setFormItem("Tgt.cBuildingStructure", { rules: [] })
+  }
 
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
