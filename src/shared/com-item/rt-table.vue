@@ -185,6 +185,7 @@
         @change="handleSelectionChange"
         v-if="item.showSelection ? item.showSelection : false"
         :align="item.align ? item.align : 'center'"
+        width="30"
       />
       <template v-for="(i, index) in item.fromSchema" :key="index">
         <template v-if="i.isShow !== false">
