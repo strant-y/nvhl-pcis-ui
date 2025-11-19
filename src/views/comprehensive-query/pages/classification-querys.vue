@@ -296,7 +296,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   freeEditRefs?.setFormValue({
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                    cLoadSub: 1,
+                    cLoadSub: 0,
                     tIssueTm: [
                         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -981,7 +981,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "是", value: 1 },
                   { label: "否", value: 0 },
               ],
-              defaultValue: 1,
+              defaultValue: 0,
           },
           {
               prop: "cKindNo",
@@ -2031,6 +2031,7 @@ onMounted(async () => {
     });
     freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
     freeEditRef.value.setValue("cAppTyp","A") ; // 任务类型默认值 为投保
+    freeEditRef.value.setValue("cLoadSub",0)
     freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
@@ -2127,7 +2128,7 @@ async function queryAE( flag?: boolean, isEs = false) {
         s.tEdrAppTm[1] = dayjs(s.tEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
     }
     if (s.cLoadSub == null) {
-        s.cLoadSub = "1";
+        s.cLoadSub = "0";
     }
     // 使用公共方法处理展开列传参
     const { expandFlag, expandVal } = processExpandParams(s);
@@ -2323,7 +2324,7 @@ async function queryI(flag?: boolean, isEs = false) {
         s.tInquiryTm[1] = dayjs(s.tInquiryTm[1]).format("YYYY-MM-DD 23:59:59")
     }
     if (s.cLoadSub == null) {
-        s.cLoadSub = "1";
+        s.cLoadSub = "0";
     }
     const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
@@ -2468,7 +2469,7 @@ async function exportAE( flag?: boolean, isEs) {
         s.tEdrAppTm[1] = dayjs(s.tEdrAppTm[1]).format("YYYY-MM-DD 23:59:59")
     }
     if (s.cLoadSub == null) {
-        s.cLoadSub = "1";
+        s.cLoadSub = "0";
     }
     const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
@@ -2572,7 +2573,7 @@ async function exportI(flag?: boolean, isEs = false) {
     const r = tableRefs.getPartnerPage(flag); //获取分页数据
     const s = freeEditRefs.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {
-        s.cLoadSub = "1";
+        s.cLoadSub = "0";
     }
     const { expandFlag, expandVal } = processExpandParams(s);
     pageresult.list = [];
@@ -3278,5 +3279,8 @@ defineExpose({
   -webkit-line-clamp: 2;
   word-break: break-all;
   overflow: hidden;
+}
+:deep(.el-table thead th) {
+    font-weight: 600!important;
 }
 </style>

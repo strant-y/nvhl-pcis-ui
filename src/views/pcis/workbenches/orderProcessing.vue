@@ -206,7 +206,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             baseType: "询价",
             cAppNme: "",
             cDptCde: user.companyId,
-            cLoadSub: 1,
+            cLoadSub: 0,
             cKindNo: null,
             cAppNo: "",
             cPlyNo: "",
@@ -270,7 +270,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "是", value: 1 },
           { label: "否", value: 0 },
         ],
-        defaultValue: 1,
+        defaultValue: 0,
       },
       {
         prop: "baseType",
@@ -901,7 +901,7 @@ onMounted(() => {
     ],
   });
   const param:any = {
-    cLoadSub: 1,
+    cLoadSub: 0,
     cDptCde: user.companyId,
     tAppTm: [
       dayjs().subtract(7, "day").format("YYYY-MM-DD 00:00:00"),
@@ -1072,5 +1072,8 @@ function setFormItem(key: any, obj: any) {
   -webkit-line-clamp: 2;
   word-break: break-all;
   overflow: hidden;
+}
+:deep(.el-table thead th) {
+  font-weight: 600!important;
 }
 </style>

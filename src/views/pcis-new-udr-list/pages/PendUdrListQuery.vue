@@ -174,7 +174,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cAppNme: "",
             cInsuredNme: "",
             companyId: user.value.companyId,
-            cLoadSub: 1,
+            cLoadSub: 0,
             cKindNo: null,
             cAppNo: "",
             cPlyNo: "",
@@ -298,7 +298,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cLoadSub",
         inputtype: "rtcheckbox",
         title: "包含下级机构",
-        defaultValue: 1,
+        defaultValue: 0,
         keymap: {
           y: 1,
           n: 0,
@@ -982,7 +982,7 @@ onMounted(async () => {
   });
   const param = {
     companyId: user.value.companyId,
-    cLoadSub: 1,
+    cLoadSub: 0,
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
         "YYYY-MM-DD 00:00:00"
@@ -1813,5 +1813,8 @@ const copyText = (text: any) => {
 .primmaryColor {
   color: var(--el-color-primary);
   cursor: pointer;
+}
+:deep(.el-table thead th) {
+  font-weight: 600!important;
 }
 </style>
