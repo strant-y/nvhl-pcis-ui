@@ -265,10 +265,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         hidden: params.cRsnCde != "46",
-        disabledDate: (time: Date) => {
-          const tInsrncBgnTm = params.tInsrncBgnTm;
-          return time.getTime() < new Date(tInsrncBgnTm).getTime()
-        },
+        // disabledDate: (time: Date) => {
+        //   const tInsrncBgnTm = params.tInsrncBgnTm;
+        //   return time.getTime() < new Date(tInsrncBgnTm).getTime()
+        // },
         func: (v) => {
           const tRepStopExtEndTm = getValue("EdrBase.tRepStopExtEndTm")
           if(v && tRepStopExtEndTm && new Date(v).getTime() > new Date(tRepStopExtEndTm).getTime()) {
@@ -289,10 +289,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         hidden: params.cRsnCde != "46",
-        disabledDate: (time: Date) => {
-          const tInsrncEndTm = params.tInsrncEndTm;
-          return time.getTime() > new Date(tInsrncEndTm).getTime()
-        },
+        // disabledDate: (time: Date) => {
+        //   const tInsrncEndTm = params.tInsrncEndTm;
+        //   return time.getTime() > new Date(tInsrncEndTm).getTime()
+        // },
         func: (v) => {
           const tRepStopExtBgnTm = getValue("EdrBase.tRepStopExtBgnTm")
           if(v && tRepStopExtBgnTm && new Date(v).getTime() < new Date(tRepStopExtBgnTm).getTime()) {
