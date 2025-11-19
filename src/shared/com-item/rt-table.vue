@@ -185,6 +185,7 @@
         @change="handleSelectionChange"
         v-if="item.showSelection ? item.showSelection : false"
         :align="item.align ? item.align : 'center'"
+        width="30"
       />
       <template v-for="(i, index) in item.fromSchema" :key="index">
         <template v-if="i.isShow !== false">
@@ -1043,5 +1044,8 @@ function isrequired(i: any) {
 }
 :deep(.methodColumn .el-button+.el-button) {
   margin-left: 0;
+}
+:deep(.el-table__body tr.hover-row>td.el-table__cell),:deep(.el-table__body tr.el-table__row--striped.hover-row>td.el-table__cell) {
+  background-color: #e1e8f2;
 }
 </style>
