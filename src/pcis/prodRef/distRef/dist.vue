@@ -293,6 +293,14 @@ onMounted(async () => {
           r.loadData = data.list
         }
       })
+		}
+		// 团单营业场所地址清单关联被保险人清单
+		if (r['prop'] === 'Dist.cRelatedInsured') {
+      eventBus.on('setMap-AddressDist040001', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
     }
   });
   tableconfig.value.tableBtnType = "btn";
@@ -678,8 +686,27 @@ const method = {
               }
             })
           });
-        }
+				}
 
+				// 040001 set 关联被保险人 下拉值
+				if (props.compKey === 'AddressDist040001') {
+					if(pageresult.list.length>0){
+						pageresult.list.forEach((item: any) => {
+							if (item['Dist.cRelatedInsured']) {
+								item['Dist.cRelatedInsured'] = item['Dist.cRelatedInsured'].split(',')
+							}
+						})
+					}
+					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue()
+					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
+						label: i['InsuredDist.cInsuredNme'],
+						value: i['InsuredDist.cPkId']
+					})) : []
+					eventBus.emit('setMap-AddressDist040001', {
+						code: 'Dist.cRelatedInsured',
+						list
+					});
+        }
         // 刷新汇总表格
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
@@ -1379,6 +1406,18 @@ function getFatherPageOldProductResData() {
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['Dist.cDetailedAddress'],
             value: i['Dist.cPkId']
+          })) : []
+        }
+      });
+		}
+		// 团单营业场所地址清单关联被保险人清单
+    if(props.compKey === 'AddressDist040001') {
+			oldPageSchema.value.fromSchema.forEach((item: any) => {
+        if(item.prop === 'Dist.cRelatedInsured') {
+          const list = opertaor.getTableRefByKey('GrpMember')?.getTableData()
+          item.loadData = list.length > 0 ? list.map((i:any) => ({
+            label: i['InsuredDist.cInsuredNme'],
+            value: i['InsuredDist.cPkId']
           })) : []
         }
       });

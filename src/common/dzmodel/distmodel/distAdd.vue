@@ -202,7 +202,11 @@ const formconfig1 = ref<AppFreeEditConfig>(
 
 						if(params.dist['Dist.tSalesTime']) {
               params.dist['Dist.tSalesTime'] = moment(params.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
-            }
+							}
+						// AddressDist040001营业场所地址清单-Dist.cRelatedInsured关联被保险人
+						if (params.dist['Dist.cRelatedInsured']) {
+							params.dist['Dist.cRelatedInsured'] = params.dist['Dist.cRelatedInsured'].toString()
+						}
             // 级联地址表格显示问题处理
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
               const addrInput = mapAddr[props.data.compKey];
@@ -313,12 +317,14 @@ onMounted(() => {
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
       if(cGrpMrk.value === '1') {
-        const insured = opertaor.getDataAll()['insured'];
-        if (insured && insured['Insured.cInsuredCde']) {
-          setTimeout(() => {
-            setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
-          }, 100);
-        }
+        // const insured = opertaor.getDataAll()['insured'];
+        // if (insured && insured['Insured.cInsuredCde']) {
+        //   setTimeout(() => {
+        //     setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
+        //   }, 100);
+        // }
+				item["btnItems"]["func"] = cRelatedInsuredChange;
+				item["btnItems"]["disabled"] = false;
       }else {
         item['rules'] = [];
         item["hidden"] = true;
@@ -821,6 +827,36 @@ function setFormItem(key: any, obj: any) {
   }
 }
 
+
+const cRelatedInsuredChange = () => {
+    // const param = opertaor.getParam();
+    dialog.value?.open(
+      "cRelatedInsuredModal",
+      {
+        type: "show",
+				data: {
+					cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"] || '',
+					selectedData: getValue("Dist.cRelatedInsured") || []
+				},
+        method: {
+          getdbClickData: (data) => {
+						let loadData = []
+						let datavalue = []
+						data.value.forEach((item)=>{
+							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
+							datavalue.push(item['InsuredDist.cPkId'])
+						})
+            setValue("Dist.cRelatedInsured", datavalue);
+
+            setFormItem("Dist.cRelatedInsured", {loadData,disabled: false});
+            dialog.value?.handleClose();
+          },
+        },
+      },
+      {},
+      { title: "关联被保险人", width: 85 }
+    );
+};
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
