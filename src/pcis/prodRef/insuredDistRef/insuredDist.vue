@@ -117,14 +117,14 @@ onMounted(async () => {
           icon: "search2",
           tooltip: "查询",
           func: () => {
-						// handleQuery()
+						handleQuery()
           },
         },
         {
           icon: "RefreshRight",
           tooltip: "重置",
           func: () => {
-            // cardResetFn();
+            cardResetFn();
           },
         },
       ],
@@ -167,12 +167,19 @@ onMounted(async () => {
   cComponentTableValue = getCComponentTableValue();
   nextTick(()=>{
     eventBus.on('insuredChange', loadDatOne);
-    eventBus.on('insuredRefresh', insuredRefresh);
-		
-    const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo']
-    if(cAppNo){
-      loadData()
+		eventBus.on('insuredRefresh', insuredRefresh);
+		const param = opertaor.getParam();
+		let cAppNo = "";
+    if (opertaor.getDataAll()['plyBase']['Base.cAppNo']) {
+      cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'];
+    } else if(param.cOrgAppNo){
+      cAppNo = param.cOrgAppNo;
+    } else if(param.pageType !== "copy") {
+      cAppNo = param.cAppNo
     }
+    if(cAppNo){
+      loadData(cAppNo)
+		}
   })
 });
 function hasPropertyWithValue(arr, property) {
@@ -206,9 +213,9 @@ const loadDatOne = (val:any)=>{
   })
 }
 // 查询
-const loadData = (flag = true)=>{
+const loadData = (cAppNodata = '',flag = true)=>{
   const r = distTableRef.value?.getPartnerPage(flag); //获取分页数据
-	const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
+	const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || cAppNodata
 	let param = Object.assign({
 		cComponentTable:cComponentTableValue,
 		cAppNo:cAppNo || ''},r);
@@ -287,10 +294,10 @@ const method = {
 	// 新增
   addmethod: (row: any) => {
 		const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
-    // if (cAppNo == '' || cAppNo == undefined) {
-    //   ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
-    //   return;
-    // }
+    if (cAppNo == '' || cAppNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
     dialog.value?.open(
         cargoDistAdd,
         {
@@ -389,23 +396,6 @@ const method = {
         }
       });
     });
-  },
-
-	handleQuery: () => {
-    // let tgtRef = opertaor.getTableRefByKey('tgt')
-    // const param = opertaor.getParam();
-    // let app = "";
-    // if (param.cOrgAppNo) {
-    //   app = param.cOrgAppNo;
-    // } else if (opertaor.getDataAll().plyBase["Base.cAppNo"]) {
-    //   app = opertaor.getDataAll().plyBase["Base.cAppNo"];
-    // } else {
-    //   app = route.params.param.cAppNo
-    // }
-    // const selData = {
-    //   cComponentTable: cComponentTableValue,
-    //   cAppNo: app,
-    // };
   },
 
 	setregistAdd() {
@@ -601,6 +591,20 @@ function setUnDisabledByKeyList(key: any) {
   });
 }
 
+function cardResetFn(){
+	const tableEditRefs = cardRef.value;
+	const s = tableEditRefs?.getFromValue(); //获取表单数据
+	for (const k in s) {
+			s[k] = null;
+	}
+	tableEditRefs?.setFormValue({...s})
+	handleQuery()
+}
+
+function handleQuery() {
+  loadData();
+}
+
 function setTableData(data: any) {
   pageresult.list = data.map((item: any, index: any) => {
     return {
@@ -677,7 +681,7 @@ defineExpose({
   getFormConfig,
   validate,
   setUnDisabledByKeyList,
-  handleQuery: method.handleQuery,
+  handleQuery,
   setTableData,
   getFormBtn,
   setDisabledAll,

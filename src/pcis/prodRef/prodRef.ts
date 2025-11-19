@@ -61,6 +61,7 @@ import deductibleDist from "./deDuctibleRef/deductibleDist.vue"
 // import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
+import  cRelatedInsuredModal  from "./commodityRef/cRelatedInsuredModal.vue";
 import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
@@ -177,7 +178,8 @@ const componentMap = {
   ciagentWorker: ciagentWorker,
   eCargociagentPer: eCargociagentPer,
   eCargociagentWorker: eCargociagentWorker,
-  ndustryCateModal:ndustryCateModal,
+	ndustryCateModal: ndustryCateModal,
+	cRelatedInsuredModal:cRelatedInsuredModal,
   cOccupCdeModal:cOccupCdeModal,
   prdFixSpec: prdFixSpec,
   deductibleFix: deductibleFix,
