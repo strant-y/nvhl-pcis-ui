@@ -957,6 +957,7 @@ function refreshData(flag?: boolean) {
   if(param.baseType) {
     param.baseType = [param.baseType];
   }
+  formconfig1.endBtns[0].loading = true
   selectTask(param)
     .then((res: any) => {
       if (res.code === 200) {
@@ -965,9 +966,11 @@ function refreshData(flag?: boolean) {
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
       }
+      formconfig1.endBtns[0].loading = false
     })
     .catch((err: any) => {
       ElMessage.error({ message: err.msg, duration: 3000 });
+      formconfig1.endBtns[0].loading = false
     });
 }
 

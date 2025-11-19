@@ -457,13 +457,14 @@ const searchItem = {
   itemWidth: 30,
   prefixIcon: "Search",
 };
-const searchBtnItem = {
+const searchBtnItem = reactive({
   label: "搜索",
   type: "primary",
+  loading: false,
   func: () => {
     handleSearch(searchValue.value);
   },
-};
+});
 const issueBtnItem = ref({
   label: "出单统计图",
   type: "primary",
@@ -1793,6 +1794,7 @@ const toQuery2 = (data: any) => {
 
 // 输入框查询
 function handleSearch(val: any) {
+  searchBtnItem.loading = true;
   if (isOperate.value) {
     //出单员
     const param = Object.assign({
@@ -1808,6 +1810,7 @@ function handleSearch(val: any) {
       AppKey.query.pcis_query_search,
       JSON.stringify(param)
     );
+    searchBtnItem.loading = false;
     router.push({ path: "/query/classification-querys" });
   } else if (isAudit.value) {
     //核保员
@@ -1829,6 +1832,7 @@ function handleSearch(val: any) {
       AppKey.query.pcis_query_newudrlist,
       JSON.stringify(param)
     );
+    searchBtnItem.loading = false;
     router.push({ path: "/pcis-new-udr-list/PendUdrListQuery" });
   }
 }
