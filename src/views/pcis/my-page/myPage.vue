@@ -5057,7 +5057,7 @@ if(props.param.cTransMrk !== "1"){
 /**
  * 核保信息 提交
  */
-const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013"]
+const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013","010002"]
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
   if(btn) {
@@ -5712,7 +5712,7 @@ const validateTgt = () => {
     let tableLenght = opertaor.getTableRefByKey("SurveyDist041012")?.getTableData().length;  // 清单条数
     let cIsSingle =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsSingle');      // 是否单项工程
     if(tableLenght ==0 && cIsSingle==0){
-      ElMessage.warning("“是否单项工程”为否时，勘察工程项目清单不能为空！");  
+      ElMessage.warning("“是否单项工程”为否时，勘察工程项目清单不能为空！");
       return false;
     }
   }
@@ -5721,7 +5721,7 @@ const validateTgt = () => {
     let tableLenght = opertaor.getTableRefByKey("PersonnelDist041007")?.getTableData().length;  // 清单条数
     let cIsRegistered =  opertaor.getTableRefByKey("tgt")?.getValue('Tgt.cIsRegistered');      // 是否单项工程
     if(tableLenght ==0 && cIsRegistered=='1'){
-      ElMessage.warning("“被监护人是否记名”为是时，人员清单信息不能为空！");  
+      ElMessage.warning("“被监护人是否记名”为是时，人员清单信息不能为空！");
       return false;
     }
   }

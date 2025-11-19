@@ -163,6 +163,15 @@ const cAppStatusOptions = computed(() => {
     return taskStatusOptions;
   }
 });
+// 核保信息
+const UndrOpnList = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
+// 任务痕迹
+const TaskListVestige = defineAsyncComponent(
+    () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "出单任务处理",
@@ -671,6 +680,54 @@ const tableconfig = reactive<AppTableConfig>(
               },
             });
           }
+        },
+      }),
+      createFreeButtonBase({
+        id: "taskVestige",
+        link: true,
+        tooltip: "任务痕迹",
+        type: "info",
+        size: "large",
+        icon: "SetUp",
+        hideBtns: (row:any) => {
+          if(row.cAppStatus == '1') {
+            return true
+          } else {
+            return false
+          }
+        },
+        tableClick: (row) => {
+          dzmodal
+            .open(TaskListVestige, { type: "Issuer",
+              data: { objId: row["baseType"] === "询价" ? row.cInquiryNo : row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
+                ? "U"
+                : "E" } })
+            .then((res:any) => {
+
+            })
+        },
+      }),
+      createFreeButtonBase({
+        id: "taskVestige",
+        link: true,
+        tooltip: "核保信息",
+        type: "info",
+        size: "large",
+        icon: "DocumentChecked",
+        hideBtns: (row:any) => {
+          if(row.cAppStatus == '1') {
+            return true
+          } else {
+            return false
+          }
+        },
+        tableClick: (row) => {
+          dzmodal
+            .open(UndrOpnList, { type: "", CAppNo: row.baseType === "询价" ? row.cInquiryNo : row.cAppNo })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
         },
       }),
     ],
