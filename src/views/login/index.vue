@@ -101,7 +101,7 @@
             </div>
           </el-form-item>
 					<div class="option">
-            <el-checkbox v-model="remember" label="记住密码" size="small" />
+            <el-checkbox v-model="remember" label="记住账户" size="small" />
             <a class="forgot" @click="forgetPwd">忘记密码？</a>
           </div>
           <!-- <el-checkbox> 30天内免登录</el-checkbox> -->
@@ -261,7 +261,7 @@
 				label-position="top"
 			>
 				<!-- 用户名 -->
-				<el-form-item prop="username" style="backgroundColor:#f7f7f7">
+				<el-form-item prop="username" style="background-color:#f7f7f7">
 					<div class="input_item__ flex-y-center w-full">
 						<span class="icon-box">
 							<svg-icon icon-class="user" class="mx-2" />
@@ -307,7 +307,7 @@
 						</span>
 					</div>
 				</el-form-item>
-				<!-- 登录按钮 -->
+				<!-- 验证按钮 -->
 				<el-button
 					:loading="loading"
 					type="primary"
@@ -350,7 +350,7 @@
         class="password-form"
       >
         <!-- 账户名（只读） -->
-        <el-form-item style="backgroundColor:#f7f7f7">
+        <el-form-item style="background-color:#f7f7f7">
           <el-input
             v-model="form.usercde"
             placeholder="账户名"
@@ -359,7 +359,16 @@
             prefix-icon="User"
           />
         </el-form-item>
-
+				<!-- 原密码（条件显示） -->
+        <el-form-item v-if="overduePwdVerify" prop="oldPassword">
+          <el-input
+            v-model="form.oldPassword"
+            placeholder="原密码"
+            type="password"
+            size="large"
+						prefix-icon="Lock"
+          />
+        </el-form-item>
         <!-- 新密码（带强度提示） -->
         <el-form-item prop="newPwd">
           <el-popover
@@ -428,7 +437,7 @@
 
 <script setup lang="ts">
 import { useSettingsStore, useUserStore, useAppStore } from "@/store";
-import { getCaptchaApi, getOperInfoApi, forgetAndModifyPasswordApi } from "@/api/auth";
+import { getCaptchaApi, getOperInfoApi, forgetAndModifyPasswordApi, verifyCodeApi } from "@/api/auth";
 import { LoginData } from "@/api/auth/types";
 import { Sunny, Moon } from "@element-plus/icons-vue";
 import { LocationQuery, LocationQueryValue, useRoute } from "vue-router";
@@ -615,12 +624,26 @@ function handleLogin() {
       loading.value = true;
       userStore
         .login(loginData.value)
-        .then((res) => {
-          const { msg, code, phoneNO, serial } = res;
-          verifyData.value.serial = serial;
-          verifyData.value.phoneNO = phoneNO;
-          if (200 === code) {
-            verifyFlag.value = true;
+				.then((res) => {
+					const { msg, code, phoneNO, serial, src } = res;
+					if (200 == code) {
+						verifyData.value.serial = serial;
+						verifyData.value.phoneNO = phoneNO;
+						if ('密码不在有效期内' == msg) {
+							ElMessage.error('密码不在有效期内,请验证后修改密码！');
+							overduePwdVerify.value = true;
+							isVisible.value = true
+							return false
+						}
+						// remember me ---记住账户
+						if (true === remember.value) {
+							localStorage.setItem("RemenberMe", loginData.value.username);
+						} else {
+							localStorage.removeItem("RemenberMe");
+						}
+						const param = src === '0' ? loginData.value.username : phoneNO;
+						account.value = param;
+						verifyFlag.value = true;
             // 获取验证码
             getCaptcha({ serial: serial });
           } else {
@@ -746,7 +769,11 @@ onMounted(() => {
       settingsStore.changeTheme(key);
     }
   });
-
+	if(localStorage.getItem("RemenberMe")){
+		const RemenberMeData = localStorage.getItem("RemenberMe")
+		remember.value = RemenberMeData? true : false
+		loginData.value.username = RemenberMeData
+	}
 });
 
 function handleLoginChange() {
@@ -772,7 +799,7 @@ const forgetPwd = () => {
 				verifyData.value.serial = serial;
 				verifyData.value.phoneNO = phoneNO;
 				const param = src === '0' ? loginData.value.username : phoneNO;
-				if (200 === code && !!serial && !!param) {
+				if (200 === code && !!serial) {
 					account.value = param;
 					isVisible.value = true;
 					forgetPwdVerify.value = true;
@@ -805,20 +832,22 @@ const handleSubmit = () => {
 			let verifyType = 'login';
 			if (forgetPwdVerify.value) { // 忘记密码验证
         verifyType = 'forget';
-      }
+			} else if (overduePwdVerify.value) {
+				verifyType = 'overdue';
+			}
       const params = {
 				serial: verifyData.value.serial,
-        code: loginData.captchaCode || '',
-        verifyType,
+        code: loginData.value.captchaCode || '',
+				verifyType,
       };
-      verifyCodeApi(params).then((res) => {
+			verifyCodeApi(params).then((res) => {
 				if (null != res && null != res['code'] && res['code'] == 200) {
 					// 忘记密码或密码过期验证通过弹出修改密码框
-					if (forgetPwdVerify.value) {
-						form3.value.usercde = loginData.value.username;
-						form3.value.oldPassword = '';
-						form3.value.newPwd = '';
-						form3.value.confirmNewPwd = '';
+					if (forgetPwdVerify.value || overduePwdVerify.value) {
+						form.value.usercde = loginData.value.username;
+						form.value.oldPassword = '';
+						form.value.newPwd = '';
+						form.value.confirmNewPwd = '';
 						isModifyPwd.value = true;
 					}
 					loading.value = false;
@@ -912,19 +941,31 @@ const checkPasswordStrength = () => {
 const savePwd = async () => {
   try {
     const valid = await formRef.value.validate();
-    if (!valid) return;
+		if (!valid) return;
+
+		let type = null;
+		if (forgetPwdVerify.value) {
+				type = 'forget';
+		}
+		const userparam = {
+			userId: form.value.usercde,
+			oldPassword: form.value.oldPassword,
+			password: form.value.newPwd,
+			serial: verifyData.value.serial,
+			code: loginData.value.captchaCode || '',
+			type: type,
+		};
     
     loading3.value = true;
     error.value = '';
 
-		forgetAndModifyPasswordApi(form.value).then((res) => {
+		forgetAndModifyPasswordApi(userparam).then((res) => {
 			const { msg, code, phoneNO, serial, src} = res;
 			if (200 == code ) {
 				isModifyPwd.value = false;
 				isVisible.value = false;
 				forgetPwdVerify.value = false;
 				overduePwdVerify.value = false;
-				visible.value = false;
     		ElMessage.success('密码修改成功！');
 			} else {
 				ElMessage.error(msg || "系统出错");
