@@ -812,6 +812,13 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
       },
       {
+        prop: "udrClsCde",
+        inputtype: "rtinput",
+        title: "当前核保级别",
+        align: 'left',
+        lengthNum: 12,
+      },
+      {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
@@ -862,13 +869,6 @@ const tableconfig = reactive<AppTableConfig>(
         title: "任务提交人",
         align: 'left',
         lengthNum: 5,
-      },
-      {
-        prop: "udrClsCde",
-        inputtype: "rtinput",
-        title: "当前核保级别",
-        align: 'left',
-        lengthNum: 12,
       },
       // {
       //   prop: "cMinUndrCls",
