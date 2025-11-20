@@ -519,6 +519,10 @@ onMounted(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);
   } else {
+    // 010006 机动车辆类型默认其他
+    if(route.params?.param?.cProdNo == '010006'){
+      setValue("Dist.cVehicleType", "X")
+    }
   }
   nextTick(() => {
     handelnInsuranceAmountList()
