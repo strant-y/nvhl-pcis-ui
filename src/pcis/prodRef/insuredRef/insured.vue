@@ -318,7 +318,9 @@ const method = {
   func1: () => { },
   // 客户名称
   funCheckUser: (val: any) => {
-
+    if (param.initFlag) {
+      return;
+    }
     if (val) {
       // 去除首位空格
       setValue("Insured.cInsuredNme", val.trim())
@@ -490,6 +492,9 @@ const method = {
     const param = opertaor.getParam();
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
+    if (param.initFlag) {
+      return;
+    }
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
@@ -1238,30 +1243,26 @@ const method = {
   },
   // 证件号码 change
   cCertfCdeChange: (val: any) => {
-    setTimeout(() => {
-
-      const param = opertaor.getParam();
-      if (param.initFlag) {
-        return;
+    const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    const tabref = opertaor.getTableRefs();
+    const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
+    if (cCertfCls == "111") {
+      if (val) {
+        const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
+        insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
+          if (isValid) {
+            idAnalysis(val)
+          }
+        })
       }
-      checkUser();
-      const tabref = opertaor.getTableRefs();
-      const cCertfCls = tabref["insured"].getFromValue()["Insured.cCertfCls"];
-      if (cCertfCls == "111") {
-        if (val) {
-          const certfCde = tabref["insured"].getFromValue()["Insured.cCertfCde"];
-          insuredEditRef.value?.validateField('Insured.cCertfCde').then((isValid) => {
-            if (isValid) {
-              idAnalysis(val)
-            }
-          })
-        }
-      } else if (cCertfCls == '01') {
-        // setValue('Insured.cTaxRegistrationNo', val)
-        // setValue('Insured.cOrganizationCode', val)
-      }
-
-    }, 10)
+    } else if (cCertfCls == '01') {
+      // setValue('Insured.cTaxRegistrationNo', val)
+      // setValue('Insured.cOrganizationCode', val)
+    }
+    checkUser();
   },
   emailChange: (val) => {
     if (val) {
