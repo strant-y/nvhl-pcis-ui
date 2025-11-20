@@ -633,6 +633,8 @@ function handleLogin() {
 							ElMessage.error('密码不在有效期内,请验证后修改密码！');
 							overduePwdVerify.value = true;
 							isVisible.value = true
+							// 获取验证码
+							getCaptcha({ serial: serial });
 							return false
 						}
 						// remember me ---记住账户
@@ -803,6 +805,8 @@ const forgetPwd = () => {
 					account.value = param;
 					isVisible.value = true;
 					forgetPwdVerify.value = true;
+          // 获取验证码
+          getCaptcha({ serial: serial });
 				} else {
 					ElMessage.error(msg || "系统出错");
 				}
