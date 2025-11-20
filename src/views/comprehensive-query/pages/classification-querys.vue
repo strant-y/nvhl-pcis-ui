@@ -296,7 +296,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   freeEditRefs?.setFormValue({
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                    cLoadSub: 1,
+                    cLoadSub: '1',
                     tIssueTm: [
                         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -978,10 +978,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtradio",
               title: "是否包含下级",
               loadData: [
-                  { label: "是", value: 1 },
-                  { label: "否", value: 0 },
+                  { label: "是", value: '1' },
+                  { label: "否", value: '0' },
               ],
-              defaultValue: 1,
+              defaultValue: '1',
           },
           {
               prop: "cKindNo",
@@ -2031,7 +2031,7 @@ onMounted(async () => {
     });
     freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
     freeEditRef.value.setValue("cAppTyp","A") ; // 任务类型默认值 为投保
-    freeEditRef.value.setValue("cLoadSub",1)
+    freeEditRef.value.setValue("cLoadSub",'1')
     freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
