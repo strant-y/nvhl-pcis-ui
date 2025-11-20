@@ -174,7 +174,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cAppNme: "",
             cInsuredNme: "",
             companyId: user.value.companyId,
-            cLoadSub: 1,
+            cLoadSub: 0,
             cKindNo: null,
             cAppNo: "",
             cPlyNo: "",
@@ -218,6 +218,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           res["backUndrDptCde"] = null; // 退回指定核保级别机构编码
           res["backUndrClsCde"] = null; // 退回指定核保级别编码
           res["backUndrDptCnm"] = null; // 退回指定核保人员名称
+          formconfig1.endBtns[2].loading = true;
           submitUnderwriting(res).then((result: any) => {
             if (result["code"] == "200") {
               ElMessage.success(result.msg);
@@ -225,6 +226,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             } else {
               ElMessage.error(result.msg);
             }
+            formconfig1.endBtns[2].loading = false;
           });
         },
       }),
@@ -298,7 +300,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cLoadSub",
         inputtype: "rtcheckbox",
         title: "包含下级机构",
-        defaultValue: 1,
+        defaultValue: 0,
         keymap: {
           y: 1,
           n: 0,
@@ -982,7 +984,7 @@ onMounted(async () => {
   });
   const param = {
     companyId: user.value.companyId,
-    cLoadSub: 1,
+    cLoadSub: 0,
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
         "YYYY-MM-DD 00:00:00"
@@ -1103,9 +1105,11 @@ const exportDown = () => {
     CType: "undrList",
     CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
   };
+  formconfig1.endBtns[3].loading = true;
   policyService
     .excelDown(param)
     .then((res: any) => {
+      formconfig1.endBtns[3].loading = false;
       if (res.size <= 0) {
         ElMessage.error({ message: "下载出错", duration: 3000 });
         return;
@@ -1116,6 +1120,7 @@ const exportDown = () => {
     .catch((error: any) => {
       console.log("出错了", error);
       ElMessage.error({ message: "下载出错", duration: 3000 });
+      formconfig1.endBtns[3].loading = false;
     });
 };
 
@@ -1188,7 +1193,7 @@ function refreshData(flag?: boolean) {
 
   delete params.tm1;
   delete params.tm2;
-
+  formconfig1.endBtns[0].loading = true;
   getAppTask(params)
     .then((res: any) => {
       // loading.value = false;
@@ -1218,9 +1223,11 @@ function refreshData(flag?: boolean) {
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
       }
+      formconfig1.endBtns[0].loading = false;
     })
     .catch((error: any) => {
       ElMessage.error({ message: error.msg, duration: 3000 });
+      formconfig1.endBtns[0].loading = false;
     });
 }
 
@@ -1813,5 +1820,8 @@ const copyText = (text: any) => {
 .primmaryColor {
   color: var(--el-color-primary);
   cursor: pointer;
+}
+:deep(.el-table thead th) {
+  font-weight: 600!important;
 }
 </style>

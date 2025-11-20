@@ -6620,4 +6620,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   padding: 20px;
   font-family: 'Microsoft YaHei', sans-serif;
 }
+.el-input.is-disabled .el-input__inner {
+  cursor: default;
+}
 </style>
