@@ -174,10 +174,20 @@ onMounted(async () => {
     setFormItem("Tgt.cUnderwritingArea", { rules: [] })
   }
   // 040014、110001、110003、110004 船舶种类必填
-  if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003') {
+  if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110004') {
     setFormItem("Tgt.ShipClassProp", { rules: [getRules("required", {})] })
   } else {
     setFormItem("Tgt.ShipClassProp", { rules: [] })
+  }
+  // 040014、110003、110005、110001 制造用途必填
+  if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110005') {
+    setFormItem("Tgt.cManufacturingPurpose", { rules: [getRules("required", {})] })
+  } else {
+    setFormItem("Tgt.cManufacturingPurpose", { rules: [] })
+  }
+  // 110006 船龄非只读
+  if(params.cProdNo === '110006') {
+    setFormItem("Tgt.nShipAge", { readonly: false, disabled: false })
   }
 
   //  运输工具名称
