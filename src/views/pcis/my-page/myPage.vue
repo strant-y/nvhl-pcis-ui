@@ -5736,6 +5736,24 @@ const validateTgt = () => {
   return true;
 }
 
+const savePagePlyInfo = ()=> {
+  if(props.param.pageType === "app" || (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1' && props.param.cAppTyp !== 'E') || props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
+    return savePlyInfo();
+  } else if(props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE"){
+    return saveEdrPlyInfo();
+  } else if(props.param.pageType === "EDR_APP_NEW_SCENE" || (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !=='1')) {
+    if (props.param.cEdrType === "1") {
+      return saveEdrPlyInfo();
+    } else {
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        return saveEdrPlyInfo();
+      }else{
+        return saveApplicationEdr();
+      }
+    }
+  }
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -5746,6 +5764,7 @@ opertaor.setFatherPage({
   getEdrbaseValue: getEdrbaseValue,
   getOldProductResData: getOldProductResData,
   setEdrValue: setEdrValue,
+  savePlyInfo: savePagePlyInfo,
 });
 
 function getEdrbaseValue(key:any) {

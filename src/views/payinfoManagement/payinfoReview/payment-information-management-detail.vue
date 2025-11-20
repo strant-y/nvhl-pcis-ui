@@ -2,7 +2,9 @@
 <template>
   <el-dialog v-model="dialogVisible" width="90%">
     <div>
-      <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" @update-datas="fromUpdata" />
+      <el-config-provider :locale="enLocale">
+        <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" @update-datas="fromUpdata" />
+      </el-config-provider>
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button :item="{
           type: 'primary',
@@ -43,6 +45,9 @@ import {
   createTableEditConfig,
   MyTableMethod,
 } from "@/shared/app-table-config";
+import { ElConfigProvider } from 'element-plus';
+import zhCn from "element-plus/es/locale/lang/zh-cn";
+const enLocale = zhCn;
 
 const props = defineProps({
   data: Object,

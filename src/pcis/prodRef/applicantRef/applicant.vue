@@ -371,6 +371,9 @@ const method = {
   },
   // 客户姓名 
   funCheckUser: (val: any) => {
+    if (param.initFlag) {
+      return;
+    }
     if (val) {
       setValue("Applicant.cAppNme", val.trim())// 去除首位空格
 
@@ -567,6 +570,9 @@ const method = {
     //     setFormItem("Applicant.cGreenIndustryList", { disabled: true }); // 是否绿色产业客户
     // }
     const param = opertaor.getParam(); 
+    if (param.initFlag) {
+      return;
+    }
     if (val === "0") {
       // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
       setFormItem("Applicant.tBirthday", {
@@ -1224,6 +1230,9 @@ const method = {
   },
   // 证件号码change
   cCertfCdeChange: (val: any) => {
+    if (param.initFlag) {
+      return;
+    }
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
     if (cCertfCls == "111") {

@@ -163,6 +163,32 @@ onMounted(async () => {
   if(params.cProdNo === '041007') {
     setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
   }
+  // 089030 建筑结构非必填
+  if(params.cProdNo === '089030') {
+    setFormItem("Tgt.cBuildingStructure", { rules: [] })
+  }
+  // 010021 承保区域必填 其他非必填
+  if(params.cProdNo === '010021') {
+    setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
+  } else {
+    setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+  }
+  // 040014、110001、110003、110004 船舶种类必填
+  if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110004') {
+    setFormItem("Tgt.ShipClassProp", { rules: [getRules("required", {})] })
+  } else {
+    setFormItem("Tgt.ShipClassProp", { rules: [] })
+  }
+  // 040014、110003、110005、110001 制造用途必填
+  if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110005') {
+    setFormItem("Tgt.cManufacturingPurpose", { rules: [getRules("required", {})] })
+  } else {
+    setFormItem("Tgt.cManufacturingPurpose", { rules: [] })
+  }
+  // 110006 船龄非只读
+  if(params.cProdNo === '110006') {
+    setFormItem("Tgt.nShipAge", { readonly: false, disabled: false })
+  }
 
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
