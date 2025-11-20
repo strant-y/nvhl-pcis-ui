@@ -213,6 +213,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 params.dist[addrValueKey] = params.dist[inputGroupKey];
               }
             }
+            formconfig1.value.titleBtns[0].loading = true
             saveDist(params).then((res) => {
               if (res.code === 200) {
                 // const cvrgRef = opertaor.getTableRefs()['cvrg'];
@@ -229,6 +230,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
               } else {
                 ElMessage.error(res.msg);
               }
+              formconfig1.value.titleBtns[0].loading = false
             });
           }
           // freeEditRef.value?.validate().then(() => {
