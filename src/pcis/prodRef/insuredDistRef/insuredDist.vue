@@ -364,9 +364,13 @@ const method = {
 				if (res.code === 200) {
 					ElMessage.success("删除成功");
 					loadData()
+				} else {
+					ElMessage.error(res.msg || '删除失败');
 				}
 			});
-		}).catch(()=>{})
+		}).catch((err) => {
+			ElMessage.error(err.msg || '删除失败');
+		})
   },
 	// 批量删除
   batchDelete() {
@@ -393,7 +397,9 @@ const method = {
         if (res.code === 200) {
           ElMessage.success("删除成功");
           loadData()
-        }
+				} else {
+					ElMessage.error(res.msg || '删除失败');
+				}
       });
     });
   },
