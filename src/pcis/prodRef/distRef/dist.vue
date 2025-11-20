@@ -206,6 +206,24 @@ onMounted(async () => {
   if(route.params.param?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
+  formconfig11.value.fromSchema?.forEach((item:any)=>{
+    // 010006、019003 发动机号必填
+    if(item['prop'] ==='Dist.cEngineNumber'){
+      if(['019003', '010006'].includes(params.cProdNo)) {
+        item['rules'] = [getRules("required", {})];
+      } else {
+        item['rules'] = [];
+      }
+    }
+    // 019003、080026 生产厂家必填
+    if(item['prop'] ==='Dist.cProduceFactory'){
+      if(['019003', '080026'].includes(params.cProdNo)) {
+        item['rules'] = [getRules("required", {})];
+      } else {
+        item['rules'] = [];
+      }
+    }
+  })
   // if(params.cProdNo === '040003'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
   //     if(item['prop'] ==='Dist.cProductType'){
