@@ -146,7 +146,7 @@ onMounted(async () => {
   tableconfig.value.fromSchema = formconfig1.value.fromSchema;
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
-    fromSchema: formconfig1.value.distSchema,
+    // fromSchema: formconfig1.value.distSchema,
   });
   if(props.pageSchema.fromUi) {
     tableconfig.value.fromUi['groupBy'] = props.pageSchema.fromUi['groupBy']
@@ -590,7 +590,7 @@ function setUnDisabledByKeyList(key: any) {
     }
   });
 }
-
+const cardRef = ref<MyCardMethod | null>(null);
 function cardResetFn(){
 	const tableEditRefs = cardRef.value;
 	const s = tableEditRefs?.getFromValue(); //获取表单数据
@@ -601,8 +601,37 @@ function cardResetFn(){
 	handleQuery()
 }
 
-function handleQuery() {
-  loadData();
+function handleQuery(queryParams: any = { pageNum: 1, pageSize: 10 }) {
+  distTableRef.value?.setPartnerPage(queryParams);
+	const s = cardRef.value?.getFromValue() || {};
+	// 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+	for (let k in s) {
+		if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+			s[k] = s[k].replace('undefined', '')
+		}
+	}
+  const selData = {
+    cAppNo: opertaor.getDataAll()['plyBase']['Base.cAppNo'] || '',
+		cComponentTable: cComponentTableValue,
+    cClauseCode: route.params.param?.cTermNo, //条款编码  
+    cProdNo: route.params.param?.cProdNo,  //产品号
+		...formconfig1.value,
+		...queryParams
+  };
+	selData.InsuredDist = JSON.parse(JSON.stringify(s))
+	cargoApi.selectDistNew(selData).then((res: any) => {
+		if(res.code === 200) {
+			if(res.data.data.length > 0 ){
+				pageresult.list = res.data.data
+				pageresult.total = res.data.total
+			} else {
+				pageresult.list = []
+				pageresult.total = 0
+			}
+		}else {
+			ElMessage.success(res.msg);
+		}
+	})
 }
 
 function setTableData(data: any) {
