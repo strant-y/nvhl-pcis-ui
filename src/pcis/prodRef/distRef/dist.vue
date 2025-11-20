@@ -698,6 +698,7 @@ const method = {
 					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
 						label: i['InsuredDist.cInsuredNme'],
 						value: i['InsuredDist.cPkId']
+						// value: i['InsuredDist.cInsuredCde']
 					})) : []
 					eventBus.emit('setMap-AddressDist040001', {
 						code: 'Dist.cRelatedInsured',
@@ -1415,6 +1416,7 @@ function getFatherPageOldProductResData() {
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['InsuredDist.cInsuredNme'],
             value: i['InsuredDist.cPkId']
+            // value: i['InsuredDist.cInsuredCde']
           })) : []
         }
       });
