@@ -132,7 +132,7 @@ const tableconfig = reactive<AppTableConfig>(
                     if (val) {
                         // 检查是否只包含数字
                         // if (!/^\d+$/.test(val)) {
-                        if (!/^[A-Z0-9]+$/.test(val))
+                        if (!/^[A-Z0-9]+$/.test(val)) {
                             ElMessage.warning('保单编号只能包含数字和大写字母');
                             // 清空当前输入值
                             if (row && row._dataId) {
