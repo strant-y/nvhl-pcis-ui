@@ -441,14 +441,7 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
-            // 如果是免赔信息则不刷新保障信息
-            if(props.compKey?.includes('DeductibleDist')) return;
-            const cvrgRef = opertaor.getTableRefs()['cvrg'];
-            try {
-              cvrgRef?.getAddrSeqOptions();
-              cvrgRef?.refushCvrgInfo();
-            } catch (ignore) {
-            }
+            refreshCvrg()
           },
         },
         { width: "60" }
@@ -498,16 +491,7 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
-          // 如果是免赔信息则不刷新保障信息
-          if(props.compKey?.includes('DeductibleDist')) return;
-          const cvrgRef = opertaor.getTableRefs()['cvrg'];
-          try {
-            if(cvrgRef) {
-              cvrgRef?.getAddrSeqOptions();
-              cvrgRef.refushCvrgInfo();
-            }
-          } catch (ignore) {
-          }
+          refreshCvrg()
         } else {
           ElMessage.error(res.msg);
         }
@@ -551,13 +535,7 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
-                // 如果是免赔信息则不刷新保障信息
-                if(props.compKey?.includes('DeductibleDist')) return;
-                const cvrgRef = opertaor.getTableRefs()['cvrg'];
-                try {
-                  cvrgRef?.getAddrSeqOptions();
-                  cvrgRef?.refushCvrgInfo();
-                } catch (ignore) {}
+                refreshCvrg()
               },
             },
             { width: "60" }
@@ -957,6 +935,7 @@ const method = {
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
+              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "全量导入失败");
             }
@@ -1031,6 +1010,7 @@ const method = {
               ElMessage.success(`导入完成：${res.data.msg}`);
               tableconfig.value.formconfig.titleBtns[2].loading = false;
               method.handleQuery();
+              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
               tableconfig.value.formconfig.titleBtns[2].loading = false;
@@ -1175,6 +1155,7 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
+            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1190,6 +1171,7 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
+            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1216,6 +1198,7 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
+            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1318,6 +1301,24 @@ const getSummary = async () => {
   const sums = route.params.param?.cProdNo === '059002' ? ['','汇总','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`] : ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
   tableconfig.value.showSummary = true;
   tableconfig.value.summaryMethod = () => sums;
+}
+
+// 刷新保障信息
+async function refreshCvrg() {
+  // 如果是免赔信息则不刷新保障信息
+  if(props.compKey?.includes('DeductibleDist')) return;
+  const cProdNos = ['010001','010002','010003','010004','010020'];
+  if(route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) {
+    const cvrgRef = opertaor.getTableRefs()['cvrg'];
+    const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
+    if(savePlyInfo) {
+      try {
+        cvrgRef?.getAddrSeqOptions();
+        cvrgRef?.refushCvrgInfo();
+      } catch (ignore) {
+      }
+    }
+  }
 }
 
 function setUnDisabledByKeyList(key: any) {
