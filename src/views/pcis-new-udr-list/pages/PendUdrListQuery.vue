@@ -1035,6 +1035,10 @@ onUnmounted(() => {
     sessionStorage.removeItem("navToOrderUdrListQuery");
 });
 
+onActivated(() => {
+  handleQuery();
+});
+
 // 绑定方法
 const method = {
   func1: () => {
