@@ -804,9 +804,9 @@ const method = {
         setFormItem("Base.cCanclfeersnCde", { hidden: true });
         setFormItem("Base.cCanclfeeFlg", { hidden: true });
       })
-    } else {
-      setFormItem("Base.cCanclfeersnCde", { hidden: false });
-      setFormItem("Base.cCanclfeeFlg", { hidden: false });
+    } else {// 选择否 不见费出单原因必填，隐藏特殊不见费出单
+      setFormItem("Base.cCanclfeersnCde", { hidden: false, rules: [getRules("required", {})], disabled: false });
+      setFormItem("Base.cCanclfeeFlg", { hidden: true });
     }
   },
   // 保单号
