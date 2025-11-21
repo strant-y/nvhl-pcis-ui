@@ -10,13 +10,19 @@ const encryptByMD5 = (data: string): string => {
   return res.toString();
 };
 export const base64encoder = (Context): any => {
-  return fromByteArray(new TextEncoder().encode(Context)).replaceAll('+','-');
+  return fromByteArray(new TextEncoder().encode(Context));
 };
 export const base64decoder = (Context): any => {
-  return new TextDecoder().decode(toByteArray(Context.replaceAll('-','+')));
+  return new TextDecoder().decode(toByteArray(Context));
 };
 export const encryptParameter = (Context) => {
   return base64encoder(Context);
+};
+export const encryptParameterRouter = (Context) => {
+  return fromByteArray(new TextEncoder().encode(Context)).replaceAll('+','-');
+};
+export const descryptParameterRouter = (Context) => {
+  return new TextDecoder().decode(toByteArray(Context.replaceAll('-','+')));
 };
 
 export const descryptParameter = (Context) => {
