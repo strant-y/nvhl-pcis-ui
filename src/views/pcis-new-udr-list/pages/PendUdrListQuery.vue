@@ -174,7 +174,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cAppNme: "",
             cInsuredNme: "",
             companyId: user.value.companyId,
-            cLoadSub: 0,
+            cLoadSub: '0',
             cKindNo: null,
             cAppNo: "",
             cPlyNo: "",
@@ -300,10 +300,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cLoadSub",
         inputtype: "rtcheckbox",
         title: "包含下级机构",
-        defaultValue: 0,
+        defaultValue: '0',
         keymap: {
-          y: 1,
-          n: 0,
+          y: '1',
+          n: '0',
         },
       },
       {
@@ -812,6 +812,13 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
       },
       {
+        prop: "udrClsCde",
+        inputtype: "rtinput",
+        title: "当前核保级别",
+        align: 'left',
+        lengthNum: 12,
+      },
+      {
         prop: "cTermNme",
         inputtype: "rtinput",
         title: "条款名称",
@@ -863,13 +870,6 @@ const tableconfig = reactive<AppTableConfig>(
         align: 'left',
         lengthNum: 5,
       },
-      {
-        prop: "udrClsCde",
-        inputtype: "rtinput",
-        title: "当前核保级别",
-        align: 'left',
-        lengthNum: 12,
-      },
       // {
       //   prop: "cMinUndrCls",
       //   inputtype: "rtinput",
@@ -877,27 +877,27 @@ const tableconfig = reactive<AppTableConfig>(
       //   align: 'left',
       //   lengthNum: 12,
       // },
-      {
-        prop: "state",
-        inputtype: "rtselect",
-        title: "任务状态",
-        lengthNum: 5,
-        align: "left",
-        loadData: [
-          { label: "未接收", value: "0" },
-          { label: "已接收", value: "1" },
-          { label: "暂存", value: "2" },
-          { label: "已完成", value: "3" },
-          { label: "已撤回", value: "4" },
-          { label: "已解除接收", value: "5" },
-          { label: "已退回", value: "6" },
-          { label: "已申请改派", value: "7" },
-          { label: "已改派", value: "8" },
-          { label: "已委托", value: "9" },
-          { label: "已重做", value: "10" },
-          { label: "已上报", value: "11" },
-        ],
-      },
+      // {
+      //   prop: "state",
+      //   inputtype: "rtselect",
+      //   title: "任务状态",
+      //   lengthNum: 5,
+      //   align: "left",
+      //   loadData: [
+      //     { label: "未接收", value: "0" },
+      //     { label: "已接收", value: "1" },
+      //     { label: "暂存", value: "2" },
+      //     { label: "已完成", value: "3" },
+      //     { label: "已撤回", value: "4" },
+      //     { label: "已解除接收", value: "5" },
+      //     { label: "已退回", value: "6" },
+      //     { label: "已申请改派", value: "7" },
+      //     { label: "已改派", value: "8" },
+      //     { label: "已委托", value: "9" },
+      //     { label: "已重做", value: "10" },
+      //     { label: "已上报", value: "11" },
+      //   ],
+      // },
     ],
   })
 );
@@ -984,7 +984,7 @@ onMounted(async () => {
   });
   const param = {
     companyId: user.value.companyId,
-    cLoadSub: 0,
+    cLoadSub: '0',
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
         "YYYY-MM-DD 00:00:00"
