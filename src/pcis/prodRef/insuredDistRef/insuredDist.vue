@@ -358,7 +358,8 @@ const method = {
 			const param = {
 				cComponentTable:cComponentTableValue,
 				cPkId: [row['InsuredDist.cPkId']],
-				cAppNo: cAppNo || ''
+				cAppNo: cAppNo || '',
+				cProdNo: route.params.param?.cProdNo,  //产品号
 			}
 			deleteDist(param).then((res: any) => {
 				if (res.code === 200) {
@@ -390,7 +391,8 @@ const method = {
       const param = {
 				cComponentTable:cComponentTableValue,
         cPkId: selectedRows.value.map((row: any) => row['InsuredDist.cPkId']),
-        cAppNo:''
+        cAppNo:'',
+				cProdNo: route.params.param?.cProdNo,  //产品号
       }
       param['cAppNo'] = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
       deleteDist(param).then((res: any) => {

@@ -221,7 +221,7 @@ function setSelected() {
   if (lastSelected && lastSelected.length) {
     // const sarr = lastSelected.map((f: any) => f["cDeductibleClass"]);
     pageresult.list.forEach(f => {
-      if (lastSelected.includes(f["InsuredDist.cInsuredCde"])) {
+      if (lastSelected.includes(f["InsuredDist.cPkId"])) {
         tableRef.value!.toggleRowSelection(f, true, true);
       }
     })
