@@ -223,6 +223,14 @@ onMounted(async () => {
         item['rules'] = [];
       }
     }
+    // 010006、019003 厂牌型号必填
+    if(item['prop'] ==='Dist.cBrandModel'){
+      if(['010006', '019003'].includes(params.cProdNo)) {
+        item['rules'] = [getRules("required", {})];
+      } else {
+        item['rules'] = [];
+      }
+    }
   })
   // if(params.cProdNo === '040003'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
