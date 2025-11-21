@@ -1156,6 +1156,22 @@ async function save() {
     processedData = rest;
   }
   const dataToSave = cloneDeep(processedData);
+  // 如果AgreementBase和AgreementFeeWarn中的tInsrncBgnTm、tInsrncEndTm、tAppTm的入参值不一样，要修改成一样的
+  const tInsrncBgnTm1 = dataToSave.AgreementBase['ECargoBase.tInsrncBgnTm']
+  const tInsrncBgnTm2 = dataToSave.AgreementFeeWarn['ECargoBase.tInsrncBgnTm']
+  if(tInsrncBgnTm1 && tInsrncBgnTm2 && new Date(tInsrncBgnTm1).getTime() !== new Date(tInsrncBgnTm2).getTime()) {
+    dataToSave.AgreementFeeWarn['ECargoBase.tInsrncBgnTm'] = tInsrncBgnTm1
+  }
+  const tInsrncEndTm1 = dataToSave.AgreementBase['ECargoBase.tInsrncEndTm']
+  const tInsrncEndTm2 = dataToSave.AgreementFeeWarn['ECargoBase.tInsrncEndTm']
+  if(tInsrncEndTm1 && tInsrncEndTm2 && new Date(tInsrncEndTm1).getTime() !== new Date(tInsrncEndTm2).getTime()) {
+    dataToSave.AgreementFeeWarn['ECargoBase.tInsrncBgnTm'] = tInsrncEndTm1
+  }
+  const tAppTm1 = dataToSave.AgreementBase['ECargoBase.tAppTm']
+  const tAppTm2 = dataToSave.AgreementFeeWarn['ECargoBase.tAppTm']
+  if(tAppTm1 && tAppTm2 && new Date(tAppTm1).getTime() !== new Date(tAppTm2).getTime()) {
+    dataToSave.AgreementFeeWarn['ECargoBase.tInsrncBgnTm'] = tAppTm1
+  }
   dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
   const res = await cargoApi.save({
     ...dataToSave,
