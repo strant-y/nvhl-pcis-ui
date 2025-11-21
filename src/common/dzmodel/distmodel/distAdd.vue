@@ -6,6 +6,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -854,9 +855,8 @@ const cRelatedInsuredChange = () => {
 							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
 							datavalue.push(item['InsuredDist.cPkId'])
 						})
-            setValue("Dist.cRelatedInsured", datavalue);
-
-            setFormItem("Dist.cRelatedInsured", {loadData});
+						setValue("Dist.cRelatedInsured", datavalue);
+						setFormItem("Dist.cRelatedInsured", { loadData });
             dialog.value?.handleClose();
           },
         },
