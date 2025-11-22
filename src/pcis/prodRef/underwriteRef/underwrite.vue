@@ -278,8 +278,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrOpnList",
         inputtype: "rtselect",
         title: "核保意见选项",
-        loadData: [
+        loadData: params.pageName === "priceInquiry" ? [
           { label: "审核通过", value: "0" },
+          { label: "缺少必要信息", value: "1" },
+          { label: "修改承保条件", value: "2" },
+          { label: "费用超标", value: "3" },
+          { label: "拒绝承保", value: "4" },
+          { label: "提交上级", value: "5" },
+          { label: "录入错误", value: "7" },
+          { label: "资料不全", value: "8" },
+          { label: "其他", value: "9" },
+        ]:
+        [
+          { label: "审核通过", value: "E" === params["cAppTyp"] ? "6": "0" },
           { label: "缺少必要信息", value: "1" },
           { label: "修改承保条件", value: "2" },
           { label: "费用超标", value: "3" },
@@ -389,36 +400,37 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         func: (v) => {
-          if ("A" === v) {
-            setValue("cUndrOpnList", "");
-            if ("E" === params["cAppTyp"]) {
-              setFormItem("cUndrOpnList", {
-                loadData: [{ label: "审核通过", value: "6" }],
-              });
-            } else {
-              setFormItem("cUndrOpnList", {
-                loadData: [{ label: "审核通过", value: "0" }],
-              });
-            }
-          } else if ("R" === v) {
-            setValue("cUndrOpnList", "");
-            setFormItem("cUndrOpnList", {
-              loadData: [{ label: "提交上级", value: "5" }],
-            });
-          } else {
-            setValue("cUndrOpnList", "");
-            setFormItem("cUndrOpnList", {
-              loadData: [
-                { label: "缺少必要信息", value: "1" },
-                { label: "修改承保条件", value: "2" },
-                { label: "费用超标", value: "3" },
-                { label: "拒绝承保", value: "4" },
-                { label: "录入错误", value: "7" },
-                { label: "资料不全", value: "8" },
-                { label: "其他", value: "9" },
-              ],
-            });
-          }
+          // if ("A" === v) {
+          //   setValue("cUndrOpnList", "");
+          //   if ("E" === params["cAppTyp"]) {
+          //     setFormItem("cUndrOpnList", {
+          //       loadData: [{ label: "审核通过", value: "6" }],
+          //     });
+          //   } else {
+          //     setFormItem("cUndrOpnList", {
+          //       loadData: [{ label: "审核通过", value: "0" }],
+          //     });
+          //   }
+          // } else if ("R" === v) {
+          //   setValue("cUndrOpnList", "");
+          //   setFormItem("cUndrOpnList", {
+          //     loadData: [{ label: "提交上级", value: "5" }],
+          //   });
+          // } else {
+          //   setValue("cUndrOpnList", "");
+          //   setFormItem("cUndrOpnList", {
+          //     loadData: [
+          //       { label: "缺少必要信息", value: "1" },
+          //       { label: "修改承保条件", value: "2" },
+          //       { label: "费用超标", value: "3" },
+          //       { label: "拒绝承保", value: "4" },
+          //       { label: "录入错误", value: "7" },
+          //       { label: "资料不全", value: "8" },
+          //       { label: "其他", value: "9" },
+          //     ],
+          //   });
+          // }
+          
           if ("T" === v) {
             setValue("cBckOp", "");
             setFormItem("cBckOp", {
