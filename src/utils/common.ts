@@ -1,5 +1,5 @@
 import Clipboard from "clipboard";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import { descryptParameter, encryptParameter, descryptParameterRouter } from "@/utils/encipher";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {Tooltip} from "@/common/dztooltip/tooltipOptions";
 
@@ -55,7 +55,7 @@ export function descryptParameterToQuery(query: any): any {
       if ((!['encrypted'].includes(key) && query[key]) || (key === 'encrypted' && query[key] && typeof query['param'] !== 'object')) {
         let keyData = query[key];
         if(!['componentKey'].includes(key) && typeof keyData === CommonConstants.TYPE_OF_STRING && keyData.length > 1) {
-          keyData = descryptParameter(query[key]);
+          keyData = descryptParameterRouter(query[key]);
         }
         if (!!keyData) {
           data.JMquery[key] = query[key];

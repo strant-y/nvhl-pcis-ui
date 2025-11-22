@@ -5615,6 +5615,7 @@ opertaor.setFatherPage({
   getEdrbaseValue: getEdrbaseValue,
   getOldProductResData: getOldProductResData,
   setEdrValue: setEdrValue,
+  savePlyInfo: savePlyInfo,
 });
 
 function getEdrbaseValue(key:any) {
