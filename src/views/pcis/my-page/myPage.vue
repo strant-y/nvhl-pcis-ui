@@ -3872,6 +3872,7 @@ const savePlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  res["plyBase"]["Base.cGrpMrk"] = props.param.cGrpMrk;
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -5093,7 +5094,7 @@ const submitUnderwritingFn = async () => {
     //   }
     // }
     if(props.param['cEdrRsnBundleCde'] != "99") {// 批改原因为99的核保时不需要调用再保的一系类前端接口
-      if(res.cUndrMrk === "A" && props.param?.cProdNo.slice(0,2) !== "04") {//核保选项为同意时(04产品核保同意直接走核保提交接口)
+      if(res.cUndrMrk === "A") {//核保选项为同意时
         const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
         const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
         const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
@@ -5735,6 +5736,24 @@ const validateTgt = () => {
   return true;
 }
 
+const savePagePlyInfo = ()=> {
+  if(props.param.pageType === "app" || (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1' && props.param.cAppTyp !== 'E') || props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
+    return savePlyInfo();
+  } else if(props.param.pageType === "EDR_APP_MODIFY_BOUNCED_SCENE"){
+    return saveEdrPlyInfo();
+  } else if(props.param.pageType === "EDR_APP_NEW_SCENE" || (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !=='1')) {
+    if (props.param.cEdrType === "1") {
+      return saveEdrPlyInfo();
+    } else {
+      if(props.param.cRsnCde === '99' || props.param.cTransMrk === '1'){
+        return saveEdrPlyInfo();
+      }else{
+        return saveApplicationEdr();
+      }
+    }
+  }
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -5745,6 +5764,7 @@ opertaor.setFatherPage({
   getEdrbaseValue: getEdrbaseValue,
   getOldProductResData: getOldProductResData,
   setEdrValue: setEdrValue,
+  savePlyInfo: savePagePlyInfo,
 });
 
 function getEdrbaseValue(key:any) {
