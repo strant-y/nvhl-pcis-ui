@@ -275,73 +275,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         hidden: params.pageName === "priceInquiry"
       },
       {
-        prop: "cUndrMrk",
-        inputtype: "rtselect",
-        title: "核保选项",
-        loadData: [
-          {value: 'A', label: '同意'},
-          {value: 'R', label: '上报'},
-          {value: 'B', label: '退回给出单员'},
-          {value: 'T', label: '退回至指定核保级别人员'}
-        ],
-        rules: [getRules("required", {})],
-        clearable: true,
-        func: (v) => {
-          if ("A" === v) {
-            setValue("cUndrOpnList", "");
-            if ("E" === params["cAppTyp"]) {
-              setFormItem("cUndrOpnList", {
-                loadData: [{ label: "审核通过", value: "6" }],
-              });
-            } else {
-              setFormItem("cUndrOpnList", {
-                loadData: [{ label: "审核通过", value: "0" }],
-              });
-            }
-          } else if ("R" === v) {
-            setValue("cUndrOpnList", "");
-            setFormItem("cUndrOpnList", {
-              loadData: [{ label: "提交上级", value: "5" }],
-            });
-          } else {
-            setValue("cUndrOpnList", "");
-            setFormItem("cUndrOpnList", {
-              loadData: [
-                { label: "缺少必要信息", value: "1" },
-                { label: "修改承保条件", value: "2" },
-                { label: "费用超标", value: "3" },
-                { label: "拒绝承保", value: "4" },
-                { label: "录入错误", value: "7" },
-                { label: "资料不全", value: "8" },
-                { label: "其他", value: "9" },
-              ],
-            });
-          }
-          if ("T" === v) {
-            setValue("cBckOp", "");
-            setFormItem("cBckOp", {
-              hidden: false,
-              rules: [getRules("required", {})],
-            });
-            const param = {
-              usrDptCde: user["companyId"],
-              operId: user["opCde"],
-              prodNo: params.cProdNo,
-              appNo: params.cAppNo,
-              dptCde: params.cDptCde,
-            };
-            console.log(param);
-            getBackClsListUrlFn(param);
-          } else {
-            setFormItem("cBckOp", {
-              hidden: true,
-              rules: "",
-            });
-            setValue("cBckOp", "");
-          }
-        },
-      },
-      {
         prop: "cUndrOpnList",
         inputtype: "rtselect",
         title: "核保意见选项",
@@ -410,7 +343,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           n: "0",
         },
       },
-
+      {
+        itemWidth: 1
+      },
       {
         prop: "cIsRiskExp",
         inputtype: "rtselect",
@@ -420,6 +355,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { value: "1", label: "是" },
           { value: "0", label: "否" },
         ],
+        itemWidth: 1,
         clearable: true,
         hidden: params.pageName === "priceInquiry" ? true : false,
         func: (val:any) => {
@@ -436,7 +372,80 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
         }
       },
-
+      {
+        itemWidth: 1,
+        hidden: params.pageName === "priceInquiry" ? true : false,
+      },
+      {
+        prop: "cUndrMrk",
+        inputtype: "rtselect",
+        title: "核保选项",
+        loadData: [
+          {value: 'A', label: '同意'},
+          {value: 'R', label: '上报'},
+          {value: 'B', label: '退回给出单员'},
+          {value: 'T', label: '退回至指定核保级别人员'}
+        ],
+        rules: [getRules("required", {})],
+        clearable: true,
+        func: (v) => {
+          if ("A" === v) {
+            setValue("cUndrOpnList", "");
+            if ("E" === params["cAppTyp"]) {
+              setFormItem("cUndrOpnList", {
+                loadData: [{ label: "审核通过", value: "6" }],
+              });
+            } else {
+              setFormItem("cUndrOpnList", {
+                loadData: [{ label: "审核通过", value: "0" }],
+              });
+            }
+          } else if ("R" === v) {
+            setValue("cUndrOpnList", "");
+            setFormItem("cUndrOpnList", {
+              loadData: [{ label: "提交上级", value: "5" }],
+            });
+          } else {
+            setValue("cUndrOpnList", "");
+            setFormItem("cUndrOpnList", {
+              loadData: [
+                { label: "缺少必要信息", value: "1" },
+                { label: "修改承保条件", value: "2" },
+                { label: "费用超标", value: "3" },
+                { label: "拒绝承保", value: "4" },
+                { label: "录入错误", value: "7" },
+                { label: "资料不全", value: "8" },
+                { label: "其他", value: "9" },
+              ],
+            });
+          }
+          if ("T" === v) {
+            setValue("cBckOp", "");
+            setFormItem("cBckOp", {
+              hidden: false,
+              rules: [getRules("required", {})],
+            });
+            const param = {
+              usrDptCde: user["companyId"],
+              operId: user["opCde"],
+              prodNo: params.cProdNo,
+              appNo: params.cAppNo,
+              dptCde: params.cDptCde,
+            };
+            console.log(param);
+            getBackClsListUrlFn(param);
+          } else {
+            setFormItem("cBckOp", {
+              hidden: true,
+              rules: "",
+            });
+            setValue("cBckOp", "");
+          }
+        },
+      },
+      {
+        itemWidth: 1
+      },
       {
         prop: "cBckOp",
         inputtype: "rtselect",
