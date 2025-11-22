@@ -943,6 +943,10 @@ onUnmounted(() => {
     sessionStorage.removeItem(AppKey.query.pcis_query_newudrlist);
 });
 
+onActivated(() => {
+  handleQuery();
+});
+
 // 绑定方法
 const method = {
   func1: () => {

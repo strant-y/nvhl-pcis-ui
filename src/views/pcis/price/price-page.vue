@@ -6488,4 +6488,10 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .el-input.is-disabled .el-input__inner {
   cursor: default;
 }
+.el-select__wrapper.is-disabled,.el-select__wrapper.is-disabled .el-select__selected-item {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: default;
+}
 </style>

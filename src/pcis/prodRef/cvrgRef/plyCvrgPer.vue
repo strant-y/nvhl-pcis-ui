@@ -169,6 +169,7 @@ const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquir
 const pageName = computed(() => opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
+const exli = ref(['010001','010002','010003','010004','010020']);
 
 const props = defineProps({
   pageSchema: {
@@ -490,6 +491,9 @@ function deleteTermByNo(t: any) {
 }
 
 function refushCvrgInfo() {
+  if(!(parparam.cProdNo.startsWith("02") || exli.value.filter(item => item.cProdNo === parparam.cProdNo).length > 0 )) {
+    return;
+  }
   const selData: any = {
     cComponentTable: 'Term',
   };

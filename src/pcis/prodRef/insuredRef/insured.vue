@@ -1592,7 +1592,7 @@ function handleFileChange(event: Event) {
               tCertfDate.value = cardInfo["validate_date"].split("-");
               setValue(
                 "Insured.tCertfBgnDate",
-                cardInfo["validate_date"].split("-")[0]
+                cardInfo["validate_date"].split("-")[0]?.replaceAll('.','-')
               );
               if (cardInfo["validate_date"].split("-")[1] === "长期") {
                 setValue("Insured.cLongendTyp", "1");
@@ -1600,7 +1600,7 @@ function handleFileChange(event: Event) {
                 setValue("Insured.cLongendTyp", "0");
                 setValue(
                   "Insured.tCertfEndDate",
-                  cardInfo["validate_date"].split("-")[1]
+                  cardInfo["validate_date"].split("-")[1]?.replaceAll('.','-')
                 );
               }
             }

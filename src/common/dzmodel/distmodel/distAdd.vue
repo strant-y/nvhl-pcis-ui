@@ -343,6 +343,7 @@ onMounted(() => {
           setValue('Dist.tBirthDate', formattedBirthDate);
           const age = calculateAgeFromIdCard(val);
           setValue('Dist.nAge', age);
+
         }
         if(val && val.length === 18 && getValue('Dist.cDocumentType') === '111') {
           const age = calculateAgeFromIdCard(val);

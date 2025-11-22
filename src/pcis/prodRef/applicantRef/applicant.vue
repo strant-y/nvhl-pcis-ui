@@ -1517,7 +1517,7 @@ function handleFileChange(event: Event) {
               tCertfDate.value = cardInfo["validate_date"].split("-");
               setValue(
                 "Applicant.tCertfBgnDate",
-                cardInfo["validate_date"].split("-")[0]
+                cardInfo["validate_date"].split("-")[0]?.replaceAll('.','-')
               );
               if (cardInfo["validate_date"].split("-")[1] === "长期") {
                 setValue("Applicant.cLongendTyp", "1");
@@ -1525,7 +1525,7 @@ function handleFileChange(event: Event) {
                 setValue("Applicant.cLongendTyp", "0");
                 setValue(
                   "Applicant.tCertfEndDate",
-                  cardInfo["validate_date"].split("-")[1]
+                  cardInfo["validate_date"].split("-")[1]?.replaceAll('.','-')
                 );
               }
             }
