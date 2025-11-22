@@ -176,7 +176,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cAppNme: "",
             cInsuredNme: "",
             companyId: user.value.companyId,
-            cLoadSub: 1,
+            cLoadSub: '0',
             cKindNo: null,
             cProdNo: null,
             cTermNo: null,
@@ -225,6 +225,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           res["backUndrClsCde"] = null; // 退回指定核保级别编码
           res["backUndrDptCnm"] = null; // 退回指定核保人员名称
           console.log(res);
+          formconfig1.endBtns[2].loading = true;
           let submitUnder;
           submitUnder = submitUnderwrite(res);
           submitUnder.then((res) => {
@@ -235,6 +236,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             } else {
               ElMessage.error(res.msg);
             }
+            formconfig1.endBtns[2].loading = false;
           });
         },
       }),
@@ -309,10 +311,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtcheckbox",
         title: "包含下级机构",
         showKey: [5],
-        defaultValue: 1,
+        defaultValue: '0',
         keymap: {
-          y: 1,
-          n: 0,
+          y: '1',
+          n: '0',
         },
       },
       {
@@ -854,27 +856,27 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 17,
         lengthIsNumber: true,
       },
-      {
-        prop: "state",
-        inputtype: "rtselect",
-        title: "任务状态",
-        lengthNum: 5,
-        align: "left",
-        loadData: [
-          { label: "未接收", value: "0" },
-          { label: "已接收", value: "1" },
-          { label: "暂存", value: "2" },
-          { label: "已完成", value: "3" },
-          { label: "已撤回", value: "4" },
-          { label: "已解除接收", value: "5" },
-          { label: "已退回", value: "6" },
-          { label: "已申请改派", value: "7" },
-          { label: "已改派", value: "8" },
-          { label: "已委托", value: "9" },
-          { label: "已重做", value: "10" },
-          { label: "已上报", value: "11" },
-        ],
-      },
+      // {
+      //   prop: "state",
+      //   inputtype: "rtselect",
+      //   title: "任务状态",
+      //   lengthNum: 5,
+      //   align: "left",
+      //   loadData: [
+      //     { label: "未接收", value: "0" },
+      //     { label: "已接收", value: "1" },
+      //     { label: "暂存", value: "2" },
+      //     { label: "已完成", value: "3" },
+      //     { label: "已撤回", value: "4" },
+      //     { label: "已解除接收", value: "5" },
+      //     { label: "已退回", value: "6" },
+      //     { label: "已申请改派", value: "7" },
+      //     { label: "已改派", value: "8" },
+      //     { label: "已委托", value: "9" },
+      //     { label: "已重做", value: "10" },
+      //     { label: "已上报", value: "11" },
+      //   ],
+      // },
     ],
   })
 );
@@ -923,7 +925,7 @@ onMounted(async () => {
   });
   freeEditRef.value?.setFormValue({
     companyId: user.value.companyId,
-    cLoadSub: 1,
+    cLoadSub: '0',
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
         "YYYY-MM-DD 00:00:00"
@@ -939,6 +941,10 @@ onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
   sessionStorage.getItem(AppKey.query.pcis_query_newudrlist) &&
     sessionStorage.removeItem(AppKey.query.pcis_query_newudrlist);
+});
+
+onActivated(() => {
+  handleQuery();
 });
 
 // 绑定方法
@@ -1011,9 +1017,11 @@ const exportDown = () => {
     CType: "undrList",
     CLoadSub: freeEditRef.value?.getValue("CLoadSub"),
   };
+  formconfig1.endBtns[3].loading = true;
   policyService
     .excelDown(param)
     .then((res: any) => {
+      formconfig1.endBtns[3].loading = false;
       if (res.size <= 0) {
         ElMessage.error({ message: "下载出错", duration: 3000 });
         return;
@@ -1024,6 +1032,7 @@ const exportDown = () => {
     .catch((error: any) => {
       console.log("出错了", error);
       ElMessage.error({ message: "下载出错", duration: 3000 });
+      formconfig1.endBtns[3].loading = false;
     });
 };
 
@@ -1096,7 +1105,7 @@ function refreshData(flag?: boolean) {
 
   delete params.tm1;
   delete params.tm2;
-
+  formconfig1.endBtns[0].loading = true;
   getInquiryTask(params)
     .then((res: any) => {
       // loading.value = false;
@@ -1112,9 +1121,11 @@ function refreshData(flag?: boolean) {
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
       }
+      formconfig1.endBtns[0].loading = false;
     })
     .catch((error: any) => {
       ElMessage.error({ message: error.msg, duration: 3000 });
+      formconfig1.endBtns[0].loading = false;
     });
 }
 
@@ -1696,5 +1707,8 @@ function setFormItem(key: any, obj: any) {
 }
 :deep(.el-button-group .el-button) {
   width: 80px;
+}
+:deep(.el-table thead th) {
+  font-weight: 600!important;
 }
 </style>

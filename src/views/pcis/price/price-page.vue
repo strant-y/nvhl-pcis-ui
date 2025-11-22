@@ -6484,4 +6484,7 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   width: auto !important;
   max-width: 80% !important;
 }
+.el-input.is-disabled .el-input__inner {
+  cursor: default;
+}
 </style>

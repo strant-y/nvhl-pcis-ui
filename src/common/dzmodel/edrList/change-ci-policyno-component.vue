@@ -131,8 +131,9 @@ const tableconfig = reactive<AppTableConfig>(
                 func: (val: string, row: any) => {
                     if (val) {
                         // 检查是否只包含数字
-                        if (!/^\d+$/.test(val)) {
-                            ElMessage.warning('保单编号只能输入数字');
+                        // if (!/^\d+$/.test(val)) {
+                        if (!/^[A-Z0-9]+$/.test(val)) {
+                            ElMessage.warning('保单编号只能包含数字和大写字母');
                             // 清空当前输入值
                             if (row && row._dataId) {
                                 tableRef.value?.setValueByRowKey("cPolicyNo", row._dataId, "");
@@ -140,8 +141,8 @@ const tableconfig = reactive<AppTableConfig>(
                             return;
                         }
                         // 检查长度是否超过20位
-                        if (val.length > 20) {
-                            ElMessage.warning('保单编号不能超过20位');
+                        if (val.length > 30) {
+                            ElMessage.warning('保单编号不能超过30位');
                             // 清空当前输入值
                             if (row && row._dataId) {
                                 tableRef.value?.setValueByRowKey("cPolicyNo", row._dataId, "");

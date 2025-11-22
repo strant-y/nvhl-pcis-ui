@@ -296,7 +296,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   freeEditRefs?.setFormValue({
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-                    cLoadSub: 1,
+                    cLoadSub: '1',
                     tIssueTm: [
                         dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
@@ -978,10 +978,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               inputtype: "rtradio",
               title: "是否包含下级",
               loadData: [
-                  { label: "是", value: 1 },
-                  { label: "否", value: 0 },
+                  { label: "是", value: '1' },
+                  { label: "否", value: '0' },
               ],
-              defaultValue: 1,
+              defaultValue: '1',
           },
           {
               prop: "cKindNo",
@@ -2031,6 +2031,7 @@ onMounted(async () => {
     });
     freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
     freeEditRef.value.setValue("cAppTyp","A") ; // 任务类型默认值 为投保
+    freeEditRef.value.setValue("cLoadSub",'1')
     freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
@@ -2269,9 +2270,15 @@ async function queryAE( flag?: boolean, isEs = false) {
     }
 
     console.log('param----------', param);
+    if(isEs) {
+        setFormItem('cQueryStr',{btnItems: {loading: true}})
+    } else {
+        formconfig1.endBtns[0].loading = true
+    }
     if (isESBool.value) {
       queryInsuredList(param)
       .then((res) => {
+        setFormItem('cQueryStr',{btnItems: {loading: false}})
         const { code, data, msg } = res;
         if (200 === code) {
           let convertedData = [];
@@ -2298,6 +2305,7 @@ async function queryAE( flag?: boolean, isEs = false) {
     }else{
         qryPolicyNewList(param)
         .then((res:any) => {
+            formconfig1.endBtns[0].loading = false
             const { code, data, msg } = res;
             if (200 === code) {
                 pageresult.list = [];
@@ -2393,10 +2401,16 @@ async function queryI(flag?: boolean, isEs = false) {
         param.IndexName = 'ply_inquiry_ik';
         param.IndexType = 'ply_inquiry_info';
     }
+    if(isEs) {
+        setFormItem('cQueryStr',{btnItems: {loading: true}})
+    } else {
+        formconfig1.endBtns[0].loading = true
+    }
 
     if (isESBool.value) {
      queryInsuredList(param)
       .then((res) => {
+        setFormItem('cQueryStr',{btnItems: {loading: false}})
         const { code, data, msg } = res;
         if (200 === code) {
           let convertedData = [];
@@ -2423,6 +2437,7 @@ async function queryI(flag?: boolean, isEs = false) {
     }else{
       qryPolicyNewList(param)
         .then((res:any) => {
+            formconfig1.endBtns[0].loading = false
             const { code, data, msg } = res;
             if (200 === code) {
                 pageresult.list = [];
@@ -2552,7 +2567,9 @@ async function exportAE( flag?: boolean, isEs) {
         param.IndexName = 'ply_insured_ik';
         param.IndexType = 'ply_insured_info';
     }
+    formconfig1.endBtns[2].loading = true
     policyService.searchFileDown(param).then((res: any) => {
+        formconfig1.endBtns[2].loading = false
         if (res.size <= 0) {
             ElMessage.error({ message: '下载出错', duration: 3000 });
             return;
@@ -2561,6 +2578,7 @@ async function exportAE( flag?: boolean, isEs) {
         const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
         saveAs(blob, fileName);
     }).catch((err: any) => {
+        formconfig1.endBtns[2].loading = false
         ElMessage.error({ message: err, duration: 3000 });
     });
 }
@@ -2646,8 +2664,10 @@ async function exportI(flag?: boolean, isEs = false) {
         param.IndexName = 'ply_inquiry_ik';
         param.IndexType = 'ply_inquiry_info';
     }
+    formconfig1.endBtns[2].loading = true
 
     policyService.searchFileDown(param).then((res: any) => {
+        formconfig1.endBtns[2].loading = false
         if (res.size <= 0) {
             ElMessage.error({ message: '下载出错', duration: 3000 });
             return;
@@ -2656,6 +2676,7 @@ async function exportI(flag?: boolean, isEs = false) {
         const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
         saveAs(blob, fileName);
     }).catch((err: any) => {
+        formconfig1.endBtns[2].loading = false
         ElMessage.error({ message: err, duration: 3000 });
     });
 }
@@ -3278,5 +3299,8 @@ defineExpose({
   -webkit-line-clamp: 2;
   word-break: break-all;
   overflow: hidden;
+}
+:deep(.el-table thead th) {
+    font-weight: 600!important;
 }
 </style>

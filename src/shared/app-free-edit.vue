@@ -401,4 +401,7 @@ defineExpose({
 :deep(.el-input-number.is-without-controls .el-input__wrapper) {
   padding: 1px 5px;
 }
+:deep(.el-card__body) {
+  padding: 10px 20px;
+}
 </style>

@@ -523,6 +523,11 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("Ci.cPolicyNo", rowId, cleanedValue);
         return;
       }
+      if(val.length > 30) {
+        ElMessage.warning('保单编号不能超过30位');
+        const rowId = row._dataId;
+        freeEditRef?.value?.setValueByRowKey("Ci.cPolicyNo", rowId, '');
+      }
     }
   },
   //开户行大类改变

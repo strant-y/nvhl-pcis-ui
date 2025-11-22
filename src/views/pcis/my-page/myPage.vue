@@ -1417,12 +1417,12 @@ const initPage = async () => {
     (props.param?.cAppTyp == "E" && props.param.cRsnCde !== '99') ||
     props.param?.pageType === "readonly" ||
     props.param?.pageType === "UW_READ_SCENE" ||
-    props.param?.pageType === "EDR_APP_NEW_SCENE"
+    (props.param?.pageType === "EDR_APP_NEW_SCENE" && props.param.cRsnCde !== "99")  // 不包含数据补全的批改
   ) {
     opertaor.setReadOnly(formconfig11);
   }
 
-  if(props.param.cEdrType == "1" && props.param.cRsnCde === '99'){    //数据补全,数据状态初始化
+  if(props.param.cEdrType === "1" && props.param.cRsnCde === '99'){    //数据补全,数据状态初始化
     opertaor.setAddData(formconfig11);
   }
 
@@ -6619,5 +6619,8 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
 .joint-insurance-dialog .el-message-box__content {
   padding: 20px;
   font-family: 'Microsoft YaHei', sans-serif;
+}
+.el-input.is-disabled .el-input__inner {
+  cursor: default;
 }
 </style>
