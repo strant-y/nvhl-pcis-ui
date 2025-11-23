@@ -5615,6 +5615,7 @@ opertaor.setFatherPage({
   getEdrbaseValue: getEdrbaseValue,
   getOldProductResData: getOldProductResData,
   setEdrValue: setEdrValue,
+  savePlyInfo: savePlyInfo,
 });
 
 function getEdrbaseValue(key:any) {
@@ -6485,6 +6486,12 @@ $btn-icon-bg-color-5: rgb(230, 251, 234);
   max-width: 80% !important;
 }
 .el-input.is-disabled .el-input__inner {
+  cursor: default;
+}
+.el-select__wrapper.is-disabled,.el-select__wrapper.is-disabled .el-select__selected-item {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
   cursor: default;
 }
 </style>
