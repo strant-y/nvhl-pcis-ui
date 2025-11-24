@@ -1266,6 +1266,9 @@ const valideRequired = () => {
         //     rowItem['Ci.cBrkSlsCde']['btnItems'].disabled = true;
         //   }
         // }
+        // 收款人账号
+        freeEditRef.value?.setRowFieldProp(
+            rowData._dataId, "Ci.cAcctNo", "rules", [getRules('bankNum',{})]);
 
         handleEdrAppNewSceneRules()
       }

@@ -658,6 +658,17 @@ const taxValidation = () => {
     }
 };
 
+/**
+ * 银行卡
+ */
+const bankNum = () => {
+  return {
+    pattern: /^(\d{9,26})$/,
+    message: "收款人账号 银行卡号格式不对!",
+    trigger: "blur"
+  }
+}
+
 
   const getRules = (type: any, param: any) => {
     if (type === "required") {
@@ -755,6 +766,9 @@ const taxValidation = () => {
     }
     if(type == 'contactInformation') {
       return contactInformation()
+    }
+    if(type == 'bankNum') {
+      return bankNum()
     }
   };
   const validorMap = {
