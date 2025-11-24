@@ -678,11 +678,15 @@ function loadUwTabData() {
 }
 
 async function queryRiskCodelistFn() {
-  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
+  const queryRiskCodelistInfo:any = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
   if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "1") {
     contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
     setFormItem("cIsExcluding", { disabled: queryRiskCodelistInfo.data?.cReadOnly === "1" ? false : true })
     setValue("cIsExcluding", queryRiskCodelistInfo.data?.cExc || '')
+    // 05大类调整：是否可以编辑如果再保返回的是"是" 前端控制必须去选择是否合同除外业务。
+    if(params.cProdNo?.startsWith('05') && queryRiskCodelistInfo.data?.cReadOnly === "1") {
+      setFormItem("cIsExcluding", { rules: [getRules('required',{})] })
+    }
   }
 }
 
