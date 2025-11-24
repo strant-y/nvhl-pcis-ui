@@ -130,10 +130,7 @@ watch(
 );
 
 opertaor.setParam(routeQryParams?.rowData);
-onBeforeMount(() => {
-  if(routeQryParams?.rowData){
-    initPage();
-  }
+onBeforeMount(async() => {
 });
 /**
  * 数据初始化
@@ -867,47 +864,52 @@ const submit = () => {
   });
 }
 
-onMounted(() => {
-  if (routeQryParams?.type == 'planConfigAdd') {
-    nextTick(() => {
-      freeEditRef.value?.setValue("cKindNo", routeQryParams?.rowData.cKindNo);
-      freeEditRef.value?.setValue("cProdNo", routeQryParams?.rowData.cProdNo);
-    });
-  } else {
-    let param = {
-      cPlanNo: props.goodsType=='goods'? props.goodsData.cPlanNo:  routeQryParams.rowData.cPlanNo
-    };
-
-    policyService.getPlanBase(param).then(result => {
-      if (result['code'] === 200) {
-        freeEditRef.value?.setFormValue(result.data.data)
-
-        // 根据公式计算弹框
-        payinfo.value = result.data.data.cCalcFormula == 3 ? true : false;
-        // payinfo.value = true
-        if (payinfo.value) {
-          initData();
-        }
-
-      } else {
-        ElMessage.error(result['msg']);
-      }
-    });
-    policyService.getPlanCvrg(param).then(result => {
-      if (result['code'] === 200) {
-        const ops = { cvrg: result.data.cvrg }
-        opertaor.setDataAll(ops);
-      } else {
-        ElMessage.error(result['msg']);
-      }
-    });
+onMounted(async() => {
+  if(routeQryParams?.rowData){
+    await initPage();
   }
-  // || props.type == 'goods'
   nextTick(() => {
-    if (routeQryParams?.type == 'planConfigview' || routeQryParams?.type == 'under' ||props.goodsType=='goods' ) {
-      freeEditRef.value.setDisabledAll();
-      opertaor.setDisabledAll();
+    if (routeQryParams?.type == 'planConfigAdd') {
+      nextTick(() => {
+        freeEditRef.value?.setValue("cKindNo", routeQryParams?.rowData.cKindNo);
+        freeEditRef.value?.setValue("cProdNo", routeQryParams?.rowData.cProdNo);
+      });
+    } else {
+      let param = {
+        cPlanNo: props.goodsType=='goods'? props.goodsData.cPlanNo:  routeQryParams.rowData.cPlanNo
+      };
+
+      policyService.getPlanBase(param).then(result => {
+        if (result['code'] === 200) {
+          freeEditRef.value?.setFormValue(result.data.data)
+
+          // 根据公式计算弹框
+          payinfo.value = result.data.data.cCalcFormula == 3 ? true : false;
+          // payinfo.value = true
+          if (payinfo.value) {
+            initData();
+          }
+
+        } else {
+          ElMessage.error(result['msg']);
+        }
+      });
+      policyService.getPlanCvrg(param).then(result => {
+        if (result['code'] === 200) {
+          const ops = { cvrg: result.data.cvrg }
+          opertaor.setDataAll(ops);
+        } else {
+          ElMessage.error(result['msg']);
+        }
+      });
     }
+    // || props.type == 'goods'
+    nextTick(() => {
+      if (routeQryParams?.type == 'planConfigview' || routeQryParams?.type == 'under' ||props.goodsType=='goods' ) {
+        freeEditRef.value.setDisabledAll();
+        opertaor.setDisabledAll();
+      }
+    });
   });
 });
 //给表单下拉项赋值
