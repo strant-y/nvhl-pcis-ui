@@ -698,6 +698,19 @@ const getRiskDataIsMultiple = async () => {
   return flag;
 }
 
+// 判断风险单位划分列表中的CRiskLvlCde值是否为null
+const getRiskDataCriskLvlCde = async () => {
+  let flag = false;
+  const riskQueryInfo:any = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  if(riskQueryInfo && riskQueryInfo.code === "200") {
+    if(riskQueryInfo.data && !riskQueryInfo.data[0]?.CRiskLvlCde) {
+      ElMessage.warning('请先进行险位划分!')
+      flag = true
+    }
+  }
+  return flag;
+}
+
 function setRiskunitDisabled() {
   // 风险单位划分按钮置灰
   riskunitDisabledFlag.value = true
@@ -716,6 +729,7 @@ defineExpose({
   setValue,
   getValue,
   setRiskunitDisabled,
+  getRiskDataCriskLvlCde,
 });
 </script>
 <style lang="scss" scoped>
