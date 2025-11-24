@@ -223,9 +223,9 @@ onMounted(async () => {
         item['rules'] = [];
       }
     }
-    // 010006、019003 厂牌型号必填
+    // 010006、019003 厂牌型号必填 010009 品牌型号必填
     if(item['prop'] ==='Dist.cBrandModel'){
-      if(['010006', '019003'].includes(params.cProdNo)) {
+      if(['010006', '019003', '010009'].includes(params.cProdNo)) {
         item['rules'] = [getRules("required", {})];
       } else {
         item['rules'] = [];
