@@ -5159,6 +5159,14 @@ const submitUnderwritingFn = async () => {
       }
     }
   }
+  /* 01大类调整：单险位风险等级不再存默认值，根据再保返回的风险等级存值，多险位的话，风险等级返回的是null,前端进行校验，如果风险等级为null，
+    必须进行险位划分。 */
+  if(res.cUndrMrk === "A" && props.param?.cProdNo?.startsWith('01')) {
+    const riskDataCriskLvlCde = await underwrite.value?.getRiskDataCriskLvlCde();
+    if(riskDataCriskLvlCde) {
+      return;
+    }
+  }
   let submitUnder;
   // 询价单
   if (props.param?.pageName === "priceInquiry") {

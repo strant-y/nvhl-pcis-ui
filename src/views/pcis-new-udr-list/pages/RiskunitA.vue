@@ -622,6 +622,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         id: "btnSplit",
         label: "拆分",
         type: "success",
+        disabled: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401',
         func: () => {
           if (!selectRow1.value.cPkId)
             return ElMessage.warning("请选择一条风险单位");
@@ -632,6 +633,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         id: "btnDelete",
         label: "删除",
         type: "success",
+        disabled: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401',
         func: () => {
           if (!selectRow1.value.cPkId) {
             return ElMessage.warning("请选择一条风险单位");
@@ -645,6 +647,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         id: "btnSave",
         label: "保存风险单位",
         type: "success",
+        disabled: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401',
         func: () => {
           saveDatas();
         },
@@ -653,6 +656,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         id: "score",
         label: "分保试算",
         type: "success",
+        disabled: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401',
         func: () => {
           if (!selectRow1.value.cPkId)
             return ElMessage.warning("请选择一条风险单位");

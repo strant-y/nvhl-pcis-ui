@@ -678,11 +678,15 @@ function loadUwTabData() {
 }
 
 async function queryRiskCodelistFn() {
-  const queryRiskCodelistInfo = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
+  const queryRiskCodelistInfo:any = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
   if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "1") {
     contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
     setFormItem("cIsExcluding", { disabled: queryRiskCodelistInfo.data?.cReadOnly === "1" ? false : true })
     setValue("cIsExcluding", queryRiskCodelistInfo.data?.cExc || '')
+    // 05大类调整：是否可以编辑如果再保返回的是"是" 前端控制必须去选择是否合同除外业务。
+    if(params.cProdNo?.startsWith('05') && queryRiskCodelistInfo.data?.cReadOnly === "1") {
+      setFormItem("cIsExcluding", { rules: [getRules('required',{})] })
+    }
   }
 }
 
@@ -692,6 +696,19 @@ const getRiskDataIsMultiple = async () => {
   const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
     if(riskQueryInfo.data && riskQueryInfo.data.length > 1) {
+      flag = true
+    }
+  }
+  return flag;
+}
+
+// 判断风险单位划分列表中的CRiskLvlCde值是否为null
+const getRiskDataCriskLvlCde = async () => {
+  let flag = false;
+  const riskQueryInfo:any = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  if(riskQueryInfo && riskQueryInfo.code === "200") {
+    if(riskQueryInfo.data && !riskQueryInfo.data[0]?.CRiskLvlCde) {
+      ElMessage.warning('请先进行险位划分!')
       flag = true
     }
   }
@@ -716,6 +733,7 @@ defineExpose({
   setValue,
   getValue,
   setRiskunitDisabled,
+  getRiskDataCriskLvlCde,
 });
 </script>
 <style lang="scss" scoped>
