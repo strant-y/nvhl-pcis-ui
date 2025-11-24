@@ -96,7 +96,7 @@ onMounted(async () => {
   }
   // Tgt.cShippingType
   // 运输方式  020011  020013 这两种产品 非必填
-  if (params.cProdNo === '020011' || params.cProdNo === '020013') {
+  if (params.cProdNo === '020011' || params.cProdNo === '020013' || params.cProdNo === '043012' || params.cProdNo === '110006') {
     setFormItem("Tgt.cShippingType", { rules: [] });
   } else {
     setFormItem("Tgt.cShippingType", { rules: [getRules("required", { 'trigger': 'blur' })] });
