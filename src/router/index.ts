@@ -1,5 +1,5 @@
 import {createRouter, createWebHashHistory, RouteLocationRaw, RouteRecordRaw} from "vue-router";
-import {base64encoder, encryptParameter, encryptParameterRouter} from "@/utils/encipher";
+import {base64encoder, encryptParameter} from "@/utils/encipher";
 import {useTagsViewStore} from "@/store";
 import {CommonConstants} from "@/constants/CommonConstants";
 
@@ -122,7 +122,7 @@ export function encryptRouterParam(location: RouteLocationRaw) {
     for (const key in location.query) {
       if (Object.prototype.hasOwnProperty.call(location.query, key)) {
         if (!['encrypted', 'componentKey'].includes(key) && location.query[key]) {
-          location.query[key] = encryptParameterRouter(location.query[key]);
+          location.query[key] = encryptParameter(location.query[key]);
         }
       }
     }

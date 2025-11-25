@@ -53,19 +53,7 @@ export function resolveTokenApi(param) {
   return post(`/resolveToken`, {source: param});
 }
 
-/**
- * 忘记密码
- */
-export function getOperInfoApi(param) {
-  return post(`/getOperInfo`, {source: param});
-}
 
-/**
- * 修改密码
- */
-export function forgetAndModifyPasswordApi(param) {
-  return post(`/forgetAndModifyPassword`, {source: param});
-}
 
 
 

@@ -40,14 +40,12 @@ import {
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
 import { useValidator } from "@/typings/useValidator";
-import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const props = defineProps<{
   visible: boolean;
   data: object
 }>();
-let cAddrData:any = null;
+let cAddrData = null;
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
   (e: "save"): void;
@@ -87,16 +85,11 @@ const formconfig = reactive<AppFreeEditConfig>(
         func: (row: any) => {
           cAddrData = row;
           if (row) {
-            codeListStore.queryCodeList({
-              codeListName: "Continent_Country",
-              codeListParam: {cAddr: row},
-            }).then((res) => {
-              setFormItem('cAraCde', { loadData: res })
-            });
-          } else {
-            setFormItem('cAraCde', { loadData: [] })
+            setFormItem('cAraCde', {
+              typeCode: "Continent_Country",
+              codeParam: { cAddr: row }
+            })
           }
-          setValue('cAraCde','')
         },
       },
       {
@@ -106,16 +99,11 @@ const formconfig = reactive<AppFreeEditConfig>(
          clearable: true,
         func: (row: any) => {
           if (row) {
-            codeListStore.queryCodeList({
-              codeListName: "Country_City",
-              codeListParam: {cAddr: cAddrData, cAraCde: row},
-            }).then((res) => {
-              setFormItem('cCtyCnm', { loadData: res })
-            });
-          } else {
-            setFormItem('cCtyCnm', { loadData: [] })
+            setFormItem('cCtyCnm', {
+              typeCode: "Country_City",
+              codeParam: { cAddr: cAddrData, cAraCde: row }
+            })
           }
-          setValue('cCtyCnm','')
         }
       },
       {

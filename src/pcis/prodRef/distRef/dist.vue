@@ -184,11 +184,11 @@ watch(
            method.getTgtDetailFn();
            emit('savePlyInfo');
         }
-        // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
-        const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
-        if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
-          const cvrgRef = opertaor.getTableRefs()['cvrg'];
-          cvrgRef?.getAddrSeqOptions()
+        // 010001, 010002, 010003产品地址编码根据清单内容下拉框展示
+        const targetProducts = ['010001', '010002', '010003'];
+         if( route.params.param?.cProdNo.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
+            const cvrgRef = opertaor.getTableRefs()['cvrg'];
+            cvrgRef?.getAddrSeqOptions();
         }
       }
     }
@@ -206,32 +206,6 @@ onMounted(async () => {
   if(route.params.param?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
-  formconfig11.value.fromSchema?.forEach((item:any)=>{
-    // 010006、019003 发动机号必填
-    if(item['prop'] ==='Dist.cEngineNumber'){
-      if(['019003', '010006'].includes(params.cProdNo)) {
-        item['rules'] = [getRules("required", {})];
-      } else {
-        item['rules'] = [];
-      }
-    }
-    // 019003、080026 生产厂家必填
-    if(item['prop'] ==='Dist.cProduceFactory'){
-      if(['019003', '080026'].includes(params.cProdNo)) {
-        item['rules'] = [getRules("required", {})];
-      } else {
-        item['rules'] = [];
-      }
-    }
-    // 010006、019003 厂牌型号必填
-    if(item['prop'] ==='Dist.cBrandModel'){
-      if(['010006', '019003'].includes(params.cProdNo)) {
-        item['rules'] = [getRules("required", {})];
-      } else {
-        item['rules'] = [];
-      }
-    }
-  })
   // if(params.cProdNo === '040003'){
   //   formconfig11.value.fromSchema?.forEach(item=>{
   //     if(item['prop'] ==='Dist.cProductType'){
@@ -315,14 +289,6 @@ onMounted(async () => {
     // 关联项目地址列表展示
     if(r['prop'] === 'Dist.cProjectAddress'){
       eventBus.on('setMap-ProjectDist045001', (data: any) => {
-        if(data.list && data.list.length > 0) {
-          r.loadData = data.list
-        }
-      })
-		}
-		// 团单营业场所地址清单关联被保险人清单
-		if (r['prop'] === 'Dist.cRelatedInsured') {
-      eventBus.on('setMap-AddressDist040001', (data: any) => {
         if(data.list && data.list.length > 0) {
           r.loadData = data.list
         }
@@ -449,7 +415,13 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
-            refreshCvrg()
+            // 如果是免赔信息则不刷新保障信息
+            if(props.compKey?.includes('DeductibleDist')) return;
+            const cvrgRef = opertaor.getTableRefs()['cvrg'];
+            try {
+              cvrgRef?.refushCvrgInfo();
+            } catch (ignore) {
+            }
           },
         },
         { width: "60" }
@@ -499,7 +471,15 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
-          refreshCvrg()
+          // 如果是免赔信息则不刷新保障信息
+          if(props.compKey?.includes('DeductibleDist')) return;
+          const cvrgRef = opertaor.getTableRefs()['cvrg'];
+          try {
+            if(cvrgRef) {
+              cvrgRef.refushCvrgInfo();
+            }
+          } catch (ignore) {
+          }
         } else {
           ElMessage.error(res.msg);
         }
@@ -543,7 +523,12 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
-                refreshCvrg()
+                // 如果是免赔信息则不刷新保障信息
+                if(props.compKey?.includes('DeductibleDist')) return;
+                const cvrgRef = opertaor.getTableRefs()['cvrg'];
+                try {
+                    cvrgRef?.refushCvrgInfo();
+                } catch (ignore) {}
               },
             },
             { width: "60" }
@@ -690,28 +675,8 @@ const method = {
               }
             })
           });
-				}
-
-				// 040001 set 关联被保险人 下拉值
-				if (props.compKey === 'AddressDist040001') {
-					if(pageresult.list.length>0){
-						pageresult.list.forEach((item: any) => {
-							if (item['Dist.cRelatedInsured']) {
-								item['Dist.cRelatedInsured'] = item['Dist.cRelatedInsured'].split(',')
-							}
-						})
-					}
-					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue()
-					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
-						label: i['InsuredDist.cInsuredNme'],
-						value: i['InsuredDist.cPkId']
-						// value: i['InsuredDist.cInsuredCde']
-					})) : []
-					eventBus.emit('setMap-AddressDist040001', {
-						code: 'Dist.cRelatedInsured',
-						list
-					});
         }
+
         // 刷新汇总表格
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
@@ -943,7 +908,6 @@ const method = {
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
-              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "全量导入失败");
             }
@@ -1018,7 +982,6 @@ const method = {
               ElMessage.success(`导入完成：${res.data.msg}`);
               tableconfig.value.formconfig.titleBtns[2].loading = false;
               method.handleQuery();
-              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
               tableconfig.value.formconfig.titleBtns[2].loading = false;
@@ -1163,7 +1126,6 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
-            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1179,7 +1141,6 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
-            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1206,7 +1167,6 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
-            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1227,65 +1187,8 @@ function handleSelectionChange(selection: any) {
 watch(
   () => pageresult.list,
   (item) => {
-    if((route.params.param?.cProdNo === '040003' || route.params.param?.cProdNo === '059002') && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+    if(route.params.param?.cProdNo === '040003' && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
-    }
-    // 043022 特种设备第三者责任保险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总
-    // 041014 特种设备责任险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总 标的信息中：特种设备数量与清单数量一致
-    if(route.params.param?.cProdNo === '043022' || route.params.param?.cProdNo === '041014') {
-      const num = pageresult.list.length || 0;
-      opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
-        planNo:'P1',
-        factorProp: 'Term.nEquipmentCount',
-      },num);
-      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nDevicesNumber',num);
-    }
-    // 047003 非机动车第三者责任保险 标的信息中：“投保总座位数（座）”要素，由清单中“投保座位数”汇总；“投保总车辆数（个）”要素，由清单中总车辆汇总；
-    if(route.params.param?.cProdNo === '047003') {
-      const carNum = pageresult.list.length || 0;
-      const seatNum = pageresult.list.map(item => Number(item['Dist.nInsuredSeats']) || 0).reduce((total, value) => total + value, 0)
-      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalSeats',seatNum)
-      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalCars',carNum)
-    }
-    // 049001 食品卫生责任险 条款中的关联地址数量根据清单进行汇总
-    // 043005 机动车停车场责任险 条款信息中：关联地址数量、关联地址车位总数根据清单进行汇总
-    // 043004 火灾公众责任险 条款中的关联地址数量根据清单进行汇总
-    // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
-    // 041011 食品安全责任险 条款中的关联地址数量根据清单进行汇总
-    const nAddressCountProdNoMap = ['049001','043005','043004','043011','041011'];
-    if(nAddressCountProdNoMap.includes(route.params.param?.cProdNo)) {
-      const num = pageresult.list.length || 0;
-      opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
-        planNo:'P1',
-        factorProp: 'Term.nAddressCount',
-      },num);
-      if(route.params.param?.cProdNo === '043005') {
-        const parkingNum = pageresult.list?.map(item => Number(item["Dist.nParkingNumber"]) || 0).reduce((total, value) => total + value, 0)
-        opertaor.getTableRefs()['cvrg']?.setTermData({
-          termNo:route.params.param?.cTermNo,
-          planNo:'P1',
-          factorProp: 'Term.nParkingTotal',
-        },parkingNum);
-      }
-    }
-
-    // 041007 条款中的关联被保险人数量由清单中的关联监护人进行汇总;被监护人数量由清单中的被监护人姓名汇总
-    if(route.params.param?.cProdNo === '041007') {
-      const num = pageresult.list.length || 0;
-      if(route.params.param?.cGrpMrk == "1") {
-        opertaor.getTableRefs()['cvrg']?.setTermData({
-          termNo:route.params.param?.cTermNo,
-          planNo:'P1',
-          factorProp: 'Term.nRelatedInsuredCount',
-        },num);
-      }
-      opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
-        planNo:'P1',
-        factorProp: 'Term.nWardTotal',
-      },num);
     }
   }
 )
@@ -1306,27 +1209,9 @@ const getSummary = async () => {
       num = res.data.nEstimatedSalesQuantity
     }
   })
-  const sums = route.params.param?.cProdNo === '059002' ? ['','汇总','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`] : ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
+  const sums = ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
   tableconfig.value.showSummary = true;
   tableconfig.value.summaryMethod = () => sums;
-}
-
-// 刷新保障信息
-async function refreshCvrg() {
-  // 如果是免赔信息则不刷新保障信息
-  if(props.compKey?.includes('DeductibleDist')) return;
-  const cProdNos = ['010001','010002','010003','010004','010020'];
-  if(route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) {
-    const cvrgRef = opertaor.getTableRefs()['cvrg'];
-    const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
-    if(savePlyInfo) {
-      try {
-        cvrgRef?.getAddrSeqOptions();
-        cvrgRef?.refushCvrgInfo();
-      } catch (ignore) {
-      }
-    }
-  }
 }
 
 function setUnDisabledByKeyList(key: any) {
@@ -1434,19 +1319,6 @@ function getFatherPageOldProductResData() {
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['Dist.cDetailedAddress'],
             value: i['Dist.cPkId']
-          })) : []
-        }
-      });
-		}
-		// 团单营业场所地址清单关联被保险人清单
-    if(props.compKey === 'AddressDist040001') {
-			oldPageSchema.value.fromSchema.forEach((item: any) => {
-        if(item.prop === 'Dist.cRelatedInsured') {
-          const list = opertaor.getTableRefByKey('GrpMember')?.getTableData()
-          item.loadData = list.length > 0 ? list.map((i:any) => ({
-            label: i['InsuredDist.cInsuredNme'],
-            value: i['InsuredDist.cPkId']
-            // value: i['InsuredDist.cInsuredCde']
           })) : []
         }
       });

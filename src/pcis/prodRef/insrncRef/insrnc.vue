@@ -286,10 +286,6 @@ const method = {
       setFormValue(baseBefore);
     }
     nRatioCoefFunc()
-    // 059010 借款止期的值和保险止期一致
-    if(route.params.param?.cProdNo === '059010') {
-      setValue('Base.tRunEndTm', v)
-    }
     // 如果批改原因是免费延期，根据保险止期的变化计算出延长天数
     if (route.params.param?.cRsnCde == "FZ" && tInsrncEndTm.value) {
       const days = moment(v).add(1, 'second').diff(moment(tInsrncEndTm.value), "days");
@@ -543,24 +539,7 @@ const method = {
     } else {
       return false;
     }
-  },
-
-  // 借款起期
-  tRunBgnTmChange: (v:any) => {
-    const param = opertaor.getParam();
-    const isInit = param.initFlag; // 是否是初始化状态
-    if (isInit) return;
-    const endTm = getValue('Base.tRunEndTm')
-    if(v && endTm && dayjs(endTm).isBefore(dayjs(v))) {
-      setValue('Base.tRunBgnTm', '')
-      ElMessage.warning("借款起期不能大于借款止期")
-    } else if (v && endTm) {
-      const days = dayjs(endTm).add(1, 'second').diff(v, 'day')
-      setValue('Base.cTmLoanTrm', days)
-    } else if (!v || !endTm) {
-      setValue('Base.cTmLoanTrm', '')
-    }
-  },
+  }
 
 };
 

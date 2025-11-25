@@ -879,7 +879,7 @@ function getTplOptions() {
   const param = {
     'PrdProdTemplate.CProdNo': formconfig1.value.cProdNo,
     'PrdProdTemplate.CCrtCde': userStore.user.opCde,
-    pageNum: 1,
+    pageNo: 1,
     pageSize: 1000,
   }
   policyService.searchTemplate(param).then((res:any) => {
