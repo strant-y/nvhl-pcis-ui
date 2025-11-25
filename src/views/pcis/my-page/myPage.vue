@@ -3901,6 +3901,16 @@ const savePlyInfo = async () => {
       btn.loading = false;
     }
     return false;
+  } else if(res["cvrg"].length > 0) {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
+        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+          return getAddrSeqData.find((i:any) => i.value === item)?.id
+        })?.join(',')
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
   }
   // 判断是否为历史补全保单 (cTransMrk === '1')
   if (props.param.cTransMrk === '1') {
@@ -4608,6 +4618,18 @@ const saveEdrPlyInfo = async () => {
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
+  }
+
+  if(res["cvrg"]?.length > 0) {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
+        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+          return getAddrSeqData.find((i:any) => i.value === item)?.id
+        })?.join(',')
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
   }
   
   const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];

@@ -3889,6 +3889,16 @@ const savePlyInfo = async () => {
     ElMessage.error("请录入条款信息");
     btn.loading = false;
     return false;
+  } else if(res["cvrg"].length > 0) {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
+        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+          return getAddrSeqData.find((i:any) => i.value === item)?.id
+        })?.join(',')
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
   }
 
   // 判断是否为历史补全保单 (cTransMrk === '1')

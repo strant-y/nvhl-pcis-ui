@@ -598,6 +598,9 @@ function setFormValue(value: any) {
     creData["riskList"] = creData["Term.riskList"];
     terms.push(creData["Term.cClauseCode"]);
     delete creData["Term.riskList"];
+    if(creData['Term.cDistCodeNo']) {
+      creData['Term.cDistCodeNo'] = creData['Term.cDistCodeNo'].split(',')
+    }
     plandata.push(creData);
   });
   refushData(plandata);
