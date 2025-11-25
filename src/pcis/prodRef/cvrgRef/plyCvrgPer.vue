@@ -491,7 +491,7 @@ function deleteTermByNo(t: any) {
 }
 
 function refushCvrgInfo() {
-  if(!(parparam.cProdNo.startsWith("02") || exli.value.filter(item => item.cProdNo === parparam.cProdNo).length > 0 )) {
+  if(!(parparam.cProdNo.startsWith("02") || exli.value.filter(item => item === parparam.cProdNo).length > 0 )) {
     return;
   }
   const selData: any = {
