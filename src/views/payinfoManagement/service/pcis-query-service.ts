@@ -33,7 +33,6 @@ export class PcisQueryService {
     queryEmpEpolicyPolicyListUrl = 'edr/getEmpPolicyList'; // 查询雇主责任保批单列表信息
     generatingEPolicyUrl = 'epolicy/generatingEPolicy';// 生成电子保单
     downloadEPolicyUrl = 'epolicy/downloadData';// 下载电子保单
-    batchDownloadEPolicyUrl = 'epolicy/batchDownloadEPolicy';// 批量下载电子保单
     qryDiaryListUrl = 'policy/getDiaryList';
     qryChangeFeeListUrl = 'edr/qryChangeFeeList';
     loadFeeInfoUrl = 'edr/getFeeInfo';
@@ -492,17 +491,6 @@ export class PcisQueryService {
      */
     downloadEPolicy(ops: any) {
         return request.post(`${this.downloadEPolicyUrl}`,ops, {
-            responseType: 'blob'
-        });
-    }
-
-    /**
-     * 下载电子保单
-     * @param ops 
-     * @returns 
-     */
-    batchDownloadEPolicy(ops: any) {
-        return request.post(`${this.batchDownloadEPolicyUrl}`,ops, {
             responseType: 'blob'
         });
     }

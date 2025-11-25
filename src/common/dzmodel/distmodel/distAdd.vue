@@ -6,7 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import {
   AppTableConfig,
   createTableEditConfig,
@@ -152,16 +151,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 return; // 阻止后续保存逻辑
                 }
             }
-            // 047003、043003清单新增 车架号和车牌号码二选一
-            const productsNoMap = ['047003','043003'];
-            const cVinCode = getValue('Dist.cVinCode');
-            const cPlateNumber = getValue('Dist.cPlateNumber')
-            if (productsNoMap.includes(productNo)) {
-              if (!cVinCode && !cPlateNumber) {
-                ElMessage.error('车牌号码和车架号需至少填写一项');
-                return; // 阻止后续保存逻辑
-              }
-            }
             const isValid = await freeEditRef.value?.validate();
             if(isValid){
             const s = freeEditRef.value?.getFromValue();
@@ -203,11 +192,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
 
 						if(params.dist['Dist.tSalesTime']) {
               params.dist['Dist.tSalesTime'] = moment(params.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
-							}
-						// AddressDist040001营业场所地址清单-Dist.cRelatedInsured关联被保险人
-						if (params.dist['Dist.cRelatedInsured']) {
-							params.dist['Dist.cRelatedInsured'] = params.dist['Dist.cRelatedInsured'].toString()
-						}
+            }
             // 级联地址表格显示问题处理
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
               const addrInput = mapAddr[props.data.compKey];
@@ -218,7 +203,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 params.dist[addrValueKey] = params.dist[inputGroupKey];
               }
             }
-            formconfig1.value.titleBtns[0].loading = true
             saveDist(params).then((res) => {
               if (res.code === 200) {
                 // const cvrgRef = opertaor.getTableRefs()['cvrg'];
@@ -235,7 +219,6 @@ const formconfig1 = ref<AppFreeEditConfig>(
               } else {
                 ElMessage.error(res.msg);
               }
-              formconfig1.value.titleBtns[0].loading = false
             });
           }
           // freeEditRef.value?.validate().then(() => {
@@ -314,20 +297,18 @@ onMounted(() => {
 
     // 车架号校验
     // Dist.cVinCode  getRules   { rules: [getRules("faxNumber", {})] }
-    // if(item.prop =='Dist.cVinCode'){
-    //  item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
-    // }
+    if(item.prop =='Dist.cVinCode'){
+     item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
+    }
     // 043009 关联被保人
     if(item.prop === 'Dist.cRelatedInsured'){
       if(cGrpMrk.value === '1') {
-        // const insured = opertaor.getDataAll()['insured'];
-        // if (insured && insured['Insured.cInsuredCde']) {
-        //   setTimeout(() => {
-        //     setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
-        //   }, 100);
-        // }
-				item["btnItems"]["func"] = cRelatedInsuredChange;
-				item["btnItems"]["disabled"] = false;
+        const insured = opertaor.getDataAll()['insured'];
+        if (insured && insured['Insured.cInsuredCde']) {
+          setTimeout(() => {
+            setValue('Dist.cRelatedInsured', insured['Insured.cPkId']);
+          }, 100);
+        }
       }else {
         item['rules'] = [];
         item["hidden"] = true;
@@ -466,27 +447,6 @@ onMounted(() => {
             disabled: idx > nextIdx     // 未开始
         }));
     }
-    // 解决特种设备清单信息新增数据后点击编辑或新增，表单中特种设备种类的按钮无法点击
-    if((route.params.param.cProdNo == '041014' || route.params.param.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {
-      item.btnItems.disabled = false;
-    }
-    // 041007 如果证件号码为空，根据出生年月计算年龄
-    if (item.prop === 'Dist.tBirthDate' && route.params.param.cProdNo == '041007') {
-      item.func = (val:any) => {
-        const cIdentificationNumber = getValue('Dist.cIdentificationNumber')
-        if(val && !cIdentificationNumber) {
-          const year = parseInt(val.split('-')[0])
-          const month = parseInt(val.split('-')[1])
-          const currentYear = new Date().getFullYear();
-          const currentMonth = new Date().getMonth() + 1;
-          let age = currentYear - year;
-          if(currentMonth < month) {// 如果当前月份 < 出生月份 年龄减1
-            age--
-          }
-          setValue('Dist.nAge', age)
-        }
-      }
-    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
@@ -531,10 +491,6 @@ onMounted(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);
   } else {
-    // 010006 机动车辆类型默认其他
-    if(route.params?.param?.cProdNo == '010006'){
-      setValue("Dist.cVehicleType", "X")
-    }
   }
   nextTick(() => {
     handelnInsuranceAmountList()
@@ -835,37 +791,6 @@ function setFormItem(key: any, obj: any) {
   }
 }
 
-
-const cRelatedInsuredChange = () => {
-    // const param = opertaor.getParam();
-    dialog.value?.open(
-      "cRelatedInsuredModal",
-      {
-        type: "show",
-				data: {
-					cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"] || '',
-					selectedData: getValue("Dist.cRelatedInsured") || []
-				},
-        method: {
-          getdbClickData: (data) => {
-						let loadData = []
-						let datavalue = []
-						data.value.forEach((item)=>{
-							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
-							// datavalue.push(item['InsuredDist.cInsuredCde'])
-							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
-							datavalue.push(item['InsuredDist.cPkId'])
-						})
-						setValue("Dist.cRelatedInsured", datavalue);
-						setFormItem("Dist.cRelatedInsured", { loadData });
-            dialog.value?.handleClose();
-          },
-        },
-      },
-      {},
-      { title: "关联被保险人", width: 85 }
-    );
-};
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();

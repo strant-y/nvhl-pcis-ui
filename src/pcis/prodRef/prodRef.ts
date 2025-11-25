@@ -61,7 +61,6 @@ import deductibleDist from "./deDuctibleRef/deductibleDist.vue"
 // import prodaudit from "./commonRef/prodaudit.vue";
 import clauseConfBasicInfo from "./commonRef/ClauseConfBasicInfo.vue";
 import  ndustryCateModal  from "./commodityRef/ndustryCateModal.vue";
-import  cRelatedInsuredModal  from "./commodityRef/cRelatedInsuredModal.vue";
 import  cOccupCdeModal  from "./commodityRef/cOccupCdeModal.vue";
 
 import agentPre from "./commodityRef/agentPer.vue" //代理(经济)人
@@ -90,7 +89,6 @@ import  specialCateModal  from "./commodityRef/specialCateModal.vue";
 import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
-import insuredDistRef from "./insuredDistRef/insuredDist.vue"; // 被保人清单
 
 /** 组合出单公共组件 **/
 import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
@@ -125,7 +123,6 @@ const componentMap = {
   ciMasterAgreementRef: ciMasterAgreementRef,
   ourCompanyCiShareRef: ourCompanyCiShareRef,
   insrncRef: insrncRef,
-	insuredDistRef: insuredDistRef,
   baseafterRef: baseafterRef,
   informationRef: informationRef,
   SpecialAgreement: specialAgr, //录单页面中的特约信息组件
@@ -178,8 +175,7 @@ const componentMap = {
   ciagentWorker: ciagentWorker,
   eCargociagentPer: eCargociagentPer,
   eCargociagentWorker: eCargociagentWorker,
-	ndustryCateModal: ndustryCateModal,
-	cRelatedInsuredModal:cRelatedInsuredModal,
+  ndustryCateModal:ndustryCateModal,
   cOccupCdeModal:cOccupCdeModal,
   prdFixSpec: prdFixSpec,
   deductibleFix: deductibleFix,

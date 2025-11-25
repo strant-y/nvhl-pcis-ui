@@ -10,8 +10,6 @@ import {useProductStore} from "@/store/modules/prod";
 import {useValidator} from "@/typings/useValidator";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
@@ -60,34 +58,6 @@ const method = {
         setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
       };
     });
-  },
-  // 大洲
-  cAddrChange: (val:any) => {
-    setValue('Tgt.cAraCde','')
-    if (val) {
-      codeListStore.queryCodeList({
-        codeListName: "Continent_Country",
-        codeListParam: {cAddr: val},
-      }).then((res) => {
-        setFormItem('Tgt.cAraCde', { loadData: res })
-      });
-    } else {
-      setFormItem('Tgt.cAraCde', { loadData: [] })
-    }
-  },
-  // 国家
-  cAraCdeChange: (val:any) => {
-    setValue('Tgt.cCtyCnm','')
-    if (val) {
-      codeListStore.queryCodeList({
-        codeListName: "Country_City",
-        codeListParam: {cAddr: getValue('Tgt.cAddr'), cAraCde: val},
-      }).then((res) => {
-        setFormItem('Tgt.cCtyCnm', { loadData: res })
-      });
-    } else {
-      setFormItem('Tgt.cCtyCnm', {loadData: []})
-    }
   },
 };
 // 绑定特殊验证器

@@ -18,12 +18,6 @@ export const base64decoder = (Context): any => {
 export const encryptParameter = (Context) => {
   return base64encoder(Context);
 };
-export const encryptParameterRouter = (Context) => {
-  return fromByteArray(new TextEncoder().encode(Context)).replaceAll('+','-');
-};
-export const descryptParameterRouter = (Context) => {
-  return new TextDecoder().decode(toByteArray(Context.replaceAll('-','+')));
-};
 
 export const descryptParameter = (Context) => {
   return base64decoder(Context);

@@ -123,14 +123,6 @@ const buttonList = [
         }
     }),
     createFreeButtonBase({
-        label: '批量下载',
-        type: 'primary',
-        id: 'batchDownloadEPolicy',
-        func: () => {
-            batchDownloadEPolicy()
-        }
-    }),
-    createFreeButtonBase({
         type: 'primary',
         label: '查询',
         func: async () => {
@@ -884,8 +876,6 @@ function downloadEPolicy() {
     }
     if (plyTyp == 'EDR') {
         plyNo = selectData[0].cEdrNo
-    } else if (plyTyp == 'TBD') {
-        plyNo = selectData[0].cAppNo
     }
     const data = {
         plyNo: base64encoder(rsaEncoder(plyNo)),
@@ -910,65 +900,6 @@ function downloadEPolicy() {
         .finally(() => {
             setButton(btn, false)
         })
-}
-
-/**
- * 批量下载
- */
-function batchDownloadEPolicy() {
-    const btn = getBtn('batchDownloadEPolicy')
-    const plyTyp = freeEditRef.value?.getValue('CPlyTyp')
-    if (plyTyp == null || plyTyp == undefined) {
-        ElMessage.warning('请选择单证类型!')
-        return
-    }
-    const selectData = tableRef.value?.getselectionData()
-    if (!selectData || selectData.length <= 0) {
-        ElMessage.warning('所选记录为空！')
-        return
-    }
-    let targetPlyNo = ''
-    selectData.forEach((item: any, idx: number) => {
-        let plyNo = item.cPlyNo
-        if (plyTyp == 'EDR') {
-            plyNo = item.cEdrNo
-        } else if (plyTyp == 'TBD') {
-            plyNo = item.cAppNo
-        }
-        if (idx == 0) {
-            targetPlyNo += plyNo;
-        } else {
-            targetPlyNo += ',' + plyNo;
-        }
-    })
-    const data = {
-        plyNo: base64encoder(rsaEncoder(targetPlyNo)),
-        type: 'EXP_EPOLICY_IMP_PDF',
-        impType: plyTyp
-    }
-    setButton(btn, true)
-    pcisQueryService
-        .batchDownloadEPolicy(data)
-        .then((res: any) => {
-            if (res == '' || res == '500' || res.data.size <= 3) {
-                ElMessage.error('批量下载，请核实是否有生成电子' + platTypeMap[plyTyp] + '！')
-                return
-            }
-            if (res.code == 500) {
-                ElMessage.error('批量下载' + platTypeMap[plyTyp] + '出错，请联系管理员！')
-                return
-            }
-            const fileName = 'epolicyPdfFile.zip'
-            const blob = new Blob([res.data], { type: 'application/octet-stream;charset=UTF-8' })
-            saveAs(blob, fileName)
-        })
-        .catch(e => {
-            ElMessage.error('批量下载电子单据下载失败' + e)
-        })
-        .finally(() => {
-            setButton(btn, false)
-        })
-
 }
 
 function formatTwoLine(text, num = 7) {

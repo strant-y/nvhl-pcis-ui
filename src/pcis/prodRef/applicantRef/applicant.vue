@@ -145,16 +145,8 @@ onMounted(() => {
 
     if (param.cProdNo === '043009') {
       setFormItem("Applicant.cAgencyReason", { hidden: true });
+      setFormItem("Applicant.cLegalRepresentative", { hidden: true });
       setFormItem("Applicant.cEnterpriseTel", { hidden: true });
-      // 福建分公司下的机构 法定代表人、经营范围必填
-      await getDptCdeList();
-      if(isFujianBranch.value) {
-        setFormItem("Applicant.cLegalRepresentative", { hidden: false, rules: [getRules("required", {})] });
-        setFormItem("Applicant.cBusinessScope", { hidden: false, rules: [getRules("required", {})] });
-      } else {
-        setFormItem("Applicant.cLegalRepresentative", { hidden: false });
-        setFormItem("Applicant.cBusinessScope", { hidden: false });
-      }
     }else{
       setFormItem("Applicant.cAgencyReason", { hidden: false });
       setFormItem("Applicant.cLegalRepresentative", { hidden: false });
@@ -366,9 +358,6 @@ const method = {
   },
   // 客户姓名 
   funCheckUser: (val: any) => {
-    if (param.initFlag) {
-      return;
-    }
     if (val) {
       setValue("Applicant.cAppNme", val.trim())// 去除首位空格
 
@@ -565,9 +554,6 @@ const method = {
     //     setFormItem("Applicant.cGreenIndustryList", { disabled: true }); // 是否绿色产业客户
     // }
     const param = opertaor.getParam(); 
-    if (param.initFlag) {
-      return;
-    }
     if (val === "0") {
       // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
       setFormItem("Applicant.tBirthday", {
@@ -583,6 +569,9 @@ const method = {
         hidden: true,
       });
       setFormItem("Applicant.cOccupTyp", {
+        hidden: true,
+      });
+      setFormItem("Applicant.cBusinessScope", {
         hidden: true,
       });
       setFormItem("Applicant.cMrgCde", {
@@ -687,17 +676,9 @@ const method = {
       //   rules: isSpecialCase ? requiredRule : []
       // });
       // 法定代表人/责任人
-      if(param.cProdNo === '043009' && isFujianBranch.value) {
-        setFormItem("Applicant.cLegalRepresentative", { rules: [getRules("required", {})] });
-        setFormItem("Applicant.cBusinessScope", { rules: [getRules("required", {})] });
-      } else {
-        setFormItem("Applicant.cLegalRepresentative", {
-          rules: isSpecialCase ? requiredRule : []
-        });
-        setFormItem("Applicant.cBusinessScope", {
-          hidden: true,
-        });
-      }
+      setFormItem("Applicant.cLegalRepresentative", {
+        rules: isSpecialCase ? requiredRule : []
+      });
       // 企业成立日
       setFormItem("Applicant.tEstablishingDate", {
         rules: isSpecialCase ? requiredRule : []
@@ -733,6 +714,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cLegalRepresentative", {
         rules: [getRules("required", {})],
       });
 
@@ -771,7 +755,6 @@ const method = {
       });
       setFormItem("Applicant.cBusinessScope", {
         hidden: false,
-        rules: []
       });
       setFormItem("Applicant.cMrgCde", {
         hidden: false,
@@ -908,6 +891,9 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [],
+      });
+      setFormItem("Applicant.cLegalRepresentative", {
         rules: [],
       });
 
@@ -1225,9 +1211,6 @@ const method = {
   },
   // 证件号码change
   cCertfCdeChange: (val: any) => {
-    if (param.initFlag) {
-      return;
-    }
     const tabref = opertaor.getTableRefs();
     const cCertfCls = tabref["applicant"].getFromValue()["Applicant.cCertfCls"];
     if (cCertfCls == "111") {
@@ -1306,13 +1289,9 @@ const method = {
       rules: isSpecialCase ? requiredRule : []
     });
     // 法定代表人/责任人
-    if(param.cProdNo === '043009' && isFujianBranch.value) {
-      setFormItem("Applicant.cLegalRepresentative", { rules: [getRules("required", {})] });
-    } else {
-      setFormItem("Applicant.cLegalRepresentative", {
-        rules: isSpecialCase ? requiredRule : []
-      });
-    }
+    setFormItem("Applicant.cLegalRepresentative", {
+      rules: isSpecialCase ? requiredRule : []
+    });
     // 企业成立日
     setFormItem("Applicant.tEstablishingDate", {
       rules: isSpecialCase ? requiredRule : []
@@ -1658,17 +1637,7 @@ function resetFn() {
     console.log(err)
   })
 }
-// 查询分公司机构
-const isFujianBranch = ref(false);
-async function getDptCdeList() {
-  const res = await listChrDepts({cDptCde: '0235010000000', cDptCls: '2'})
-  if(res.data?.length > 0) {
-    const cDptCdeList = res.data.map((item:any) => { return item.cDptCde})
-    if(cDptCdeList.includes(param.cDptCde)) {
-      isFujianBranch.value = true;
-    }
-  }
-}
+
 defineExpose({
   getFromValue,
   setFormValue,
