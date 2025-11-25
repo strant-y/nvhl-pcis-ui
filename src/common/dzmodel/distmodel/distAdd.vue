@@ -218,6 +218,12 @@ const formconfig1 = ref<AppFreeEditConfig>(
                 params.dist[addrValueKey] = params.dist[inputGroupKey];
               }
             }
+            // 02大类和01部分产品保存清单时需要先调用保存再执行保存操作，避免清单更新后刷新条款时丢失未保存的条款数据
+            const cProdNos = ['010001','010002','010003','010004','010020'];
+            if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.data.compKey?.includes('DeductibleDist')) {
+              const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
+              if(!savePlyInfo) return;
+            }
             formconfig1.value.titleBtns[0].loading = true
             saveDist(params).then((res) => {
               if (res.code === 200) {
