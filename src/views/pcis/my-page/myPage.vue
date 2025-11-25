@@ -4623,10 +4623,12 @@ const saveEdrPlyInfo = async () => {
   if(res["cvrg"]?.length > 0) {
     res["cvrg"].forEach((item:any) => {
       if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
-        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
-        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
-          return getAddrSeqData.find((i:any) => i.value === item)?.id
-        })?.join(',')
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
         item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
       }
     })
