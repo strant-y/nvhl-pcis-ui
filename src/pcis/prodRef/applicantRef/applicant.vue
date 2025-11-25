@@ -1349,7 +1349,7 @@ const method = {
   cOperaterCertfTypChange: (val: any) => {
     console.log('证件种类', val)
     const param = opertaor.getParam();
-    if (!param.initFlag) {
+    if (param.initFlag) {
       return;
     }
     // 清除报错信息
@@ -1364,7 +1364,7 @@ const method = {
       "07": "passPort",
       "553": "ariCard",
     };
-    baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
     if (cClntMrk == '0') {
       baseRules = [getRules("required", {}), ...baseRules]
     }

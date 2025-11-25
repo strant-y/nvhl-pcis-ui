@@ -1427,6 +1427,9 @@ const method = {
 
   // 办理人员证件种类
   cOperaterCertfTypChange: (val: any) => {
+    if (param.initFlag) {
+      return;
+    }
     // 清除报错信息
     clearValidate('Insured.cOperaterCertfCde')
     let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
@@ -1439,7 +1442,7 @@ const method = {
       "07": "passPort",
       "553": "ariCard",
     };
-    baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
     if (cClntMrk == '0') {
       baseRules = [getRules("required", {}), ...baseRules]
     }
