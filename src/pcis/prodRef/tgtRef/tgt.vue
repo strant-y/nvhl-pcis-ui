@@ -1052,6 +1052,8 @@ const method = {
       if (val == '01') {
         setValue("Tgt.cShipClassTwo", null);
         setValue("Tgt.cShipClassThree", null);
+      } else if(val == '02' || val == '03') {
+        setValue("Tgt.cShipClassThree", null);
       }
     }
     if (val == '01') { //rules: [getRules("required", {})]
@@ -1066,7 +1068,6 @@ const method = {
     if (val == '02' || val == '03') {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
       let cShipClassTwo = getValue('Tgt.cShipClassTwo');
-      setValue("Tgt.cShipClassThree", null);
       codeListStore
         .queryCodeList(
           {
@@ -1104,7 +1105,11 @@ const method = {
 
     } else if (val) {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
-      setValue("Tgt.cShipClassThree", null);
+    }
+    if (!params.initFlag) {
+      if (val && val !== '15') {
+        setValue("Tgt.cShipClassThree", null);
+      }
     }
   },
   // 核定座位总数
