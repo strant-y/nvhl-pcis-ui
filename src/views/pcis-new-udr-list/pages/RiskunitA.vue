@@ -294,6 +294,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "风险单位名称",
         rules: [getRules("required", {})],
         clearable: true,
+        disabled: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401',
         func: (val:any) => {
           pageresult1.list.forEach(item => {
             if(item.cPkId === selectRow1.value.cPkId) {
@@ -312,6 +313,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         loadData: CRiskLvlCde_Options,
+        disabled: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401',
         func: (val: any) => {
           const selectedItem = CRiskLvlCde_Options.value.find(
             (item: any) => item.value === val
@@ -614,9 +616,9 @@ const tableconfig1 = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "风险单位信息",
     editFlag: true,
-    editList: ["cDetailedAddress","cRemark"],
+    editList: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401' ? [] : ["cDetailedAddress","cRemark"],
     tableBtnType: "btn",
-    showSelection: true,
+    showSelection: opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] === '0125111401' ? false : true,
     titleBtns: [
       createFreeButtonBase({
         id: "btnSplit",
