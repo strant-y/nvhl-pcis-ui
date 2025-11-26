@@ -487,6 +487,10 @@ onMounted(() => {
         setFormItem("Dist.nRmbLimit", { disabled: true });
         setFormItem("Dist.cRemarks", { disabled: true });
     }
+    // 040001 变更清单信息时 方案号置灰
+    if(props.data.rowData.cProdNo === '040001' && props.data.rowData.cRsnCde === "10"){
+      setFormItem("Dist.cPlanNo", { disabled: true });
+    }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);
