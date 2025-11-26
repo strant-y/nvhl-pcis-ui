@@ -1469,6 +1469,32 @@ function setFormValue(value: any) {
     console.log('************ ci  setFormValue  -> ', tableValue)
     valideRequired()
   }, 500);
+  nextTick(()=>{
+    const dataList = getFromValue();
+    dataList.forEach((item:any)=>{
+      if(item['Ci.cBankRelTyp']) {
+        const bankRelTypeArr = item['Ci.cBankRelTyp'].split('_')
+        const isdefault = bankRelTypeArr[2] || ''; // 1=直连，0=非直连
+        if (isdefault === "1") {
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankPro", "rules", [getRules("required", {})]);
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankArea", "rules", [getRules("required", {})]);
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankCounty", "rules", []);
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cPubPri", "rules", [getRules("required", {})]);
+        } else if (isdefault === "0") {
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankPro", "rules", [getRules("required", {})]);
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankArea", "rules", [getRules("required", {})]);
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankCounty", "rules", [getRules("required", {})]);
+          freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cPubPri", "rules", [getRules("required", {})]);
+        }
+      } else {
+        freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankPro", "rules", []);
+        freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankArea", "rules", []);
+        freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankCounty", "rules", []);
+        freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankAddr", "rules", []);
+        freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cPubPri", "rules", []);
+      }
+    })
+  })
 }
 function setValueByRowKey(props: string, rowId: any, value: any) {
   return freeEditRef?.value?.setValueByRowKey(props, rowId, value);
