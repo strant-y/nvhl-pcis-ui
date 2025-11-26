@@ -310,6 +310,7 @@ onMounted(async () => {
       eventBus.on('setMap-EmployeeDist043009', (data: any) => {
         if(data.list && data.list.length > 0) {
           r.loadData = data.list
+          handleQuery()
         }
       })
     }
