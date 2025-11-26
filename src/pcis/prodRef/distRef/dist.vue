@@ -719,7 +719,7 @@ const method = {
 							}
 						})
 					}
-					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue()
+					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
 					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
 						label: i['InsuredDist.cInsuredNme'],
 						value: i['InsuredDist.cPkId']
