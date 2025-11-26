@@ -236,6 +236,19 @@ onMounted(async () => {
     } else {
       setFormItem('Tgt.cDestinationPort', { disabled: false })
     }
+    eventBus.on('setUnDisabledDone', (val:any) => {
+      if(val) {
+        const data = getFromValue();
+        const cShipClassOne = data['Tgt.cShipClassOne']
+        const cShipClassTwo = data['Tgt.cShipClassTwo']
+        if(cShipClassOne == '02' || cShipClassOne == '03') {
+          setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+        }
+        if(cShipClassTwo && cShipClassTwo != '15') {
+          setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+        }
+      }
+    })
   })
 });
 function hasEnglish(str: any) {
