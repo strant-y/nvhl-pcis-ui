@@ -191,6 +191,17 @@ watch(
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           cvrgRef?.getAddrSeqOptions()
         }
+        if(route.params.param?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
+          eventBus.emit('setMap-EmployeeDist043009', {
+            code: 'Dist.cEmploymentAddress',
+            list: pageresult.list.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          });
+        }
       }
     }
 );
