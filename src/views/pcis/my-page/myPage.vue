@@ -2741,11 +2741,15 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.SpecialAgreement[0]['SpecialAgreement.cIfMust'] = "1"
       }
       // 有些保单证件类型的值仍然是110007，需要转换成01
-      if (ops.applicant) {
+      if (ops.applicant && ops.applicant['Applicant.cCertfCls']) {
         ops.applicant['Applicant.cCertfCls'] = ops.applicant['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant['Applicant.cCertfCls'];
+      } else if(Array.isArray(ops.applicant) && ops.applicant[0]?.['Applicant.cCertfCls']) {
+        ops.applicant[0]['Applicant.cCertfCls'] = ops.applicant[0]['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant[0]['Applicant.cCertfCls'];
       }
-      if(ops.insured) {
+      if(ops.insured && ops.insured['Insured.cCertfCls']) {
         ops.insured['Insured.cCertfCls'] = ops.insured['Insured.cCertfCls'] === '110007' ? '01' : ops.insured['Insured.cCertfCls'];
+      } else if(Array.isArray(ops.insured) && ops.insured[0]?.['Insured.cCertfCls']) {
+        ops.insured[0]['Insured.cCertfCls'] = ops.insured[0]['Insured.cCertfCls'] === '110007' ? '01' : ops.insured[0]['Insured.cCertfCls'];
       }
     console.log("转换的数据", ops);
     if(ops["payinfo"] && ops["payinfo"].length > 0){
