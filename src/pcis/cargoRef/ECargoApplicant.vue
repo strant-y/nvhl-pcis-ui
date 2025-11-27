@@ -62,6 +62,8 @@ onMounted(() => {
     //   disabled: true,
     // });
     setValue("ECargoApplicant.cNation", "CHN"); // 国籍默认中国
+    // 客户名称增加校验规则
+    setFormItem("ECargoApplicant.cAppNme", { rules: [getRules("cAppNme", {})], });
     
     // 处理邮编
     setFormItem("ECargoApplicant.cZipCde", {

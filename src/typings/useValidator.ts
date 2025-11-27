@@ -669,6 +669,16 @@ const bankNum = () => {
   }
 }
 
+/**
+ * 客户名称
+ */
+const cAppNme = () => {
+  return {
+    pattern: /^[\u4e00-\u9fa5\u00B7,a-zA-Z\s]{2,}$/,
+    message: "客户名称 只允许为 中文和·和,或者 字母和空格，且字母汉字长度至少2个",
+    trigger: "blur"
+  }
+}
 
   const getRules = (type: any, param: any) => {
     if (type === "required") {
@@ -769,6 +779,9 @@ const bankNum = () => {
     }
     if(type == 'bankNum') {
       return bankNum()
+    }
+    if(type == 'cAppNme') {
+      return cAppNme()
     }
   };
   const validorMap = {

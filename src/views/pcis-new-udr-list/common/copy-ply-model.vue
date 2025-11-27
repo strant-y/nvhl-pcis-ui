@@ -492,6 +492,7 @@ const confirm = async () => {
       cTermNme: selected.value[0].cTermNme,//条款名称
       cTermNo: selected.value[0].cTermNo,// 条款code值
       cProdNme: selected.value[0].cProdNme,//产品名称
+      cPolicySource: selected.value[0].cPolicySource,
     });
   }
 };
