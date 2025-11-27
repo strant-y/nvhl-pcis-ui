@@ -493,6 +493,19 @@ const method = {
     const tabref = opertaor.getTableRefs();
     const InsuredValue = tabref["insured"].getFromValue();
     if (param.initFlag) {
+      if(val === "0") {
+        codeListStore
+          .queryCodeList({
+            codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+            codeListParam: {},
+          })
+          .then((res) => {
+            insuredEditRef.value?.addCodeListMap({
+              code: "Insured.cCertfCls",
+              list: res
+            })
+          });
+      }
       return;
     }
     checkUser();
