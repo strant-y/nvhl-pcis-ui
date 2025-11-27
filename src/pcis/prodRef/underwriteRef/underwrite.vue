@@ -707,7 +707,7 @@ const getRiskDataCriskLvlCde = async () => {
   let flag = false;
   const riskQueryInfo:any = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
-    if(riskQueryInfo.data && !riskQueryInfo.data[0]?.CRiskLvlCde) {
+    if(riskQueryInfo.data && !riskQueryInfo.data[0]?.cRiskLvlCde) {
       ElMessage.warning('请先进行险位划分!')
       flag = true
     }
