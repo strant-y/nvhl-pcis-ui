@@ -607,6 +607,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnPosition: ref<any>(""),
     tableBtnFixed: "right",
     rowDbClickFun:(row:any)=> rowDbClick(row),
+    columnWidthByCalc: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -786,7 +787,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        lengthNum: 3,
+        // lengthNum: 3,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -801,7 +802,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         // slotName: "cDptCnm",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cTermNme",
@@ -809,7 +810,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         // slotName: "cTermNme",
         align: 'left',
-        lengthNum: 13,
+        // lengthNum: 13,
       },
       {
         prop: "cAppNme",
@@ -817,7 +818,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         // slotName: "cAppNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -825,27 +826,27 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         // slotName: "cInsuredNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        lengthNum: 5,
+        // lengthNum: 5,
       },
       {
         prop: "bsTm1",
         inputtype: "rtinput",
         title: "询价日期",
-        lengthNum: 17,
+        // lengthNum: 17,
         lengthIsNumber: true,
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "提交时间",
-        lengthNum: 17,
+        // lengthNum: 17,
         lengthIsNumber: true,
       },
       // {
