@@ -515,6 +515,9 @@ const method = {
       setFormItem("Applicant.cSex", {
         rules: null
       });
+      setFormItem("Applicant.cNation", {
+        rules: [getRules('required',{})],
+      });
  
       productStore.setcClntMrk(val);
       // 办理人
@@ -655,6 +658,9 @@ const method = {
       });
       setFormItem("Applicant.cSex", {
         rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cNation", {
+        rules: [],
       });
       setFormItem("Applicant.cWorkDpt", { rules: null });
       setFormItem("Applicant.cIsMicroEntpris", {

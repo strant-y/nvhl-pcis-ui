@@ -555,7 +555,7 @@ const method = {
     // }
     const param = opertaor.getParam(); 
     if (val === "0") {
-      // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 投保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏,国籍必填可修改
       setFormItem("Applicant.tBirthday", {
         hidden: true,
       });
@@ -566,7 +566,7 @@ const method = {
         hidden: true,
       });
       setFormItem("Applicant.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("Applicant.cOccupTyp", {
         hidden: true,
@@ -748,7 +748,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Applicant.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("Applicant.cOccupTyp", {
         hidden: false,

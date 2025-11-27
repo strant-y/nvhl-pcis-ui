@@ -493,7 +493,7 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-      // 被保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 被保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏，国籍必填可修改
       setFormItem("Insured.tBirthday", {
         hidden: true,
       });
@@ -504,7 +504,7 @@ const method = {
         hidden: true,
       });
       setFormItem("Insured.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("Insured.cOccupTyp", {
         hidden: true,
@@ -720,7 +720,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Insured.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("Insured.cOccupTyp", {
         hidden: false,
