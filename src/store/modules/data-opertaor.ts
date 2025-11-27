@@ -1,16 +1,21 @@
 import { defineStore } from "pinia";
 import { useProductStore, useTagsViewStore } from "@/store";
+import {OpertaorPosit} from "@/views/pcis/support/composite.types";
 
 interface OpertaorProps {
+    // 唯一键
     id: string;
+    // 类型
     type?: string;
+    // 格式化页面数据
+    allDataFormat?: (id: string, pageData: any) => any
 }
 
 type StoreCache = Map<string, ReturnType<typeof defineStore>>
 const dataOpertaorMap: StoreCache = new Map();
 
 export const dataOpertaor = (props: OpertaorProps) => {
-    const {id, type} = props;
+    const {id, type, allDataFormat} = props;
     return storeFactory(id, defineStore(`dataOpertaor-${id}`, () => {
 
         const productStore = useProductStore();
@@ -60,7 +65,6 @@ export const dataOpertaor = (props: OpertaorProps) => {
         };
 
         const setDataAll = (alldata: any) => {
-
             param.initFlag = true;
             Object.keys(alldata).forEach((key) => {
                 if (tableRefs[key] && tableRefs[key].setFormValue && Object.keys(alldata[key]).length != 0) {
@@ -87,6 +91,14 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
+            console.log('############## -> getDataAll()')
+            // 组合出单场景
+            if(type === OpertaorPosit) {
+                if(allDataFormat && typeof allDataFormat === 'function') {
+                    const allFData = allDataFormat(id, res)
+                    if(allFData) return allFData;
+                }
+            }
             return res;
         };
         const setReadOnly = (formconfig: any) => {
@@ -427,7 +439,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
             });
             return r;
         }
-        const validateAll = async (): Promise<boolean> => {
+        const validateAll = async (isMessage: boolean = true): Promise<boolean> => {
             // 1. 收集所有验证Promise并保留对应key
             const entries = Object.entries(tableRefs); // 保留[key, ref]的映射关系
             const ci = productStore.checkCiMrk();
@@ -441,7 +453,10 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 }
             });
             // 险别验证独立完成
-            const cv = await tableRefs['cvrg'].validate();
+            let cv;
+            if(tableRefs['cvrg']) {
+                cv = await tableRefs['cvrg'].validate();
+            }
             // 2. 等待所有Promise完成并关联结果与key
             const results = await Promise.all(validationPromises);
             // 3. 关联每个结果与对应的key
@@ -462,7 +477,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     pageObj.forEach((page: any) =>{
                         const info = page.pageInfo;
                         info.forEach((i: any) =>{
-                            if(i.pageKey === item.key){
+                            if(i.pageKey === item.key && isMessage){
                                 ElMessage.error(i.pageTtile + '存在验证失败数据，请确认！');
                             }
                         })
@@ -470,7 +485,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     return item.key
                 });
 
-                if(!cv){
+                if(!cv && isMessage){
                     ElMessage.error('保障信息存在验证失败数据，请确认！');
                 }
             // 5. 返回验证结果和失败详情
@@ -554,6 +569,9 @@ export function clearDataOpertaorByPageKey(pageKey: string) {
     }
 }
 
+export type {OpertaorProps};
+
+
 /**
  * 缓存管理
  */
@@ -576,6 +594,3 @@ function storeFactory(
     }
     return storeRef.value;
 }
-
-
-export type {OpertaorProps};

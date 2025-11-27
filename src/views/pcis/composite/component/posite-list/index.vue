@@ -49,7 +49,7 @@ const formconfig = ref(createAppGridEditConfig({
   ],
   fromSchema: [
     {
-      prop: 'cPositeNo',
+      prop: 'cCombinationNo',
       inputtype: 'rtinput',
       title: '组合申请单号',
       disabled: true,
@@ -96,15 +96,17 @@ const formconfig = ref(createAppGridEditConfig({
       func: async (value: string, rowData: any) => {
         if(value) {
           const list = gridEditRef.value?.getFromValue();
-          const rows = list.filter(f => f['cProdNo'] === value);
+          const rows = list.filter((f: any) => f['cProdNo'] === value);
           if (rows && rows.length > 1) {
             ElMessage.warning('该产品已存在，请重新选择');
             rowData['cProdNo'] = undefined;
             return;
           }
           await setProdNme(rowData, value);
-          emit('update:prodList',);
-          emit('prodListChange', gridEditRef.value?.getFromValue());
+          const updList = gridEditRef.value?.getFromValue()
+          console.log('### prodListChange', updList);
+          emit('update:prodList', updList);
+          emit('prodListChange', updList);
         }
       },
       onInit: (options: any) => {
@@ -150,14 +152,15 @@ const setProdNme = async (rowData: any, cProdNo: string) => {
 };
 
 onMounted(() => {
-  console.log('props.prodList', props.prodList)
   if(props.prodList) {
+    gridEditRef.value?.setFormValue([]);
     gridEditRef.value?.setFormValue(props.prodList);
   }
 });
 
 watch(() => props.prodList, (newVal) => {
   if(newVal) {
+    gridEditRef.value?.setFormValue([]);
     gridEditRef.value?.setFormValue(newVal);
   }
 });
