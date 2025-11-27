@@ -254,6 +254,11 @@ function readInit(pageData: any) {
   const data = trimPageData(pageData);
   pageView.value.setPageAllData(data);
   pageView.value.setPageDisabledAll();
+  bthList.value.forEach(item => {
+    if(item && ['btn010102', 'btn010103'].includes(item.id)) {
+      item.hidden = true;
+    }
+  })
   console.log('readInit', data);
 }
 
@@ -353,8 +358,25 @@ const submitToUndrFn = () => {
   positeApi.submitCombination(params).then((res: any) => {
     console.log('submitCombination-res', res);
     if(res.code === 200) {
-      const pageData = trimPageData({...res.data});
-      pageView.value.setPageAllData(pageData);
+      // const pageData = trimPageData({...res.data});
+      const newParams = getNewParams({
+        pageType: POSITE_PAGE_TYPE_READ,
+      });
+      router.replace({
+        path: "/pcisapp/posite-page",
+        query: {
+          param: JSON.stringify({...newParams}),
+        },
+      }).then(() => {
+        console.log('replace props.param', props.param);
+        pageView.value.updatePageParams(props.param, productList.value);
+        pageView.value.setPageDisabledAll();
+        bthList.value.forEach(item => {
+          if(item && ['btn010102', 'btn010103'].includes(item.id)) {
+            item.disabled = true;
+          }
+        })
+      });
     }else {
       ElMessage.error(res.msg)
     }
