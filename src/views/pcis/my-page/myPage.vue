@@ -5778,7 +5778,14 @@ const validateShanDong = async () => {
           return true;
         }
       }
+      // 最后一期保费缴纳时间不晚于保险责任终止日前30个自然日
+      const lastPayEndTm = dayjs(payinfoRef[payinfoRef.length - 1]['Pay.tPayEndTm']).add(1,'second');// 最后一期缴费止期
+      if(lastPayEndTm.isAfter(tmEnd.subtract(30, 'day'))) {
+        ElMessage.warning(`山东见费业务最后一期保费缴纳时间不晚于保险责任终止日前30个自然日！`);
+        return true;
+      }
     }
+
   }
 };
 
