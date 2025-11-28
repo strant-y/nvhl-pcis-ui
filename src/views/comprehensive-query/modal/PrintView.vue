@@ -496,7 +496,7 @@ function smartbipreview() {
         CPrnFmp: formData?.cPrnFmp,
         CPrnTarget: formData?.cPrnTarget,
         CLanguage: formData?.cLanguage,
-        nTms: formData?.nTms,
+        nTms: formData?.nTms || '1',
         CEdrPrjNo: props.data?.nEdrPrjNo,
       };
       pcisQueryService
