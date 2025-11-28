@@ -1939,13 +1939,13 @@ const tableObj = {
                 type: "primary",
                 size: "large",
                 icon: "Printer",
-                hideBtns: (row:any) => {
-                    if(row.cAppStatus == '5' || row.cAppStatus == '6') {
-                        return false
-                    } else {
-                        return true
-                    }
-                },
+                // hideBtns: (row:any) => {
+                //     if(row.cAppStatus == '5' || row.cAppStatus == '6') {
+                //         return false
+                //     } else {
+                //         return true
+                //     }
+                // },
                 tableClick: (row) => {
                   dzmodal
                     .open(PrintView, { type: "edit", data: row })
