@@ -5765,6 +5765,20 @@ const validateShanDong = async () => {
       ElMessage.warning(`山东见费业务分期缴费首期应收保费不低于${message}！`)
       return true;
     }
+    // 分期缴费，分期间隔不得长于已交保费占总保费比例对应的保险期限比例
+    if(payinfoRef.length > 1) {
+      for(let i = 1; i < payinfoRef.length; i++) {
+        const tPayBgnTm = dayjs(payinfoRef[i]['Pay.tPayBgnTm']);// 缴费起期
+        const tPayEndTm = dayjs(payinfoRef[i]['Pay.tPayEndTm']).add(1,'second');// 缴费止期
+        const intervalDays = tPayEndTm.diff(tPayBgnTm, 'day');// 分期间隔天数
+        const paidRatio = payinfoRef[i]['Pay.nPayablePrm'] / basePrmCur;// 应收保费占总保费的比例
+        const allowedIntervalDays = Math.floor(Number(insrnc['Base.cTmSysCde']) * paidRatio);
+        if(intervalDays > allowedIntervalDays) {
+          ElMessage.warning(`山东见费业务分期间隔不得长于已交保费占总保费比例对应的保险期限比例！`);
+          return true;
+        }
+      }
+    }
   }
 };
 
