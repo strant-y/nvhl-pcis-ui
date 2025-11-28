@@ -5639,6 +5639,8 @@ const validateShanDong = async () => {
   const applicantData = opertaor.getTableRefByKey("applicant").getFromValue();
   const insrncData = opertaor.getTableRefByKey("insrnc").getFromValue();
   const baseData = opertaor.getTableRefByKey("base").getFromValue();
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
 
   // 解构并统一命名
   const {
@@ -5730,6 +5732,39 @@ const validateShanDong = async () => {
       opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
     })
     return true;
+  }
+  // 投保人为非个人且单张保单签单保费大于10万元
+  if (AppcClntMrk == "0" && Number(basePrmCur) > 100000 ) {
+    const nPayNum = Number(baseData['Base.nPayNum'] || 0)  // "1"  缴费期数
+    /* ---------- 计算保险期限（自然年） ---------- */
+    const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+    const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
+    const wholeYears = tmEnd.diff(tmStart, 'year'); 
+    const maxPhase = 4 + Math.max(0, wholeYears - 1);
+    /* ---------- 取期数---------- */
+    const payInfoFirstPrm = Number(payinfoRef[0]?.['Pay.nPayablePrm']);// 缴费计划第一期应收保费
+    const quarterPrm = basePrmCur / 4; // 总保费的四分之一
+    if (nPayNum > maxPhase || nPayNum !== payinfoRef.length) {
+      const remainDays = tmEnd.subtract(wholeYears, 'year').diff(tmStart, 'day')
+      const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+      const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+      ElMessageBox.alert(
+        `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`,
+        "提示", 
+        {
+            confirmButtonText: "确定",
+            type: "warning",
+        })
+        .then(() => {
+          opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
+          opertaor.getTableRefByKey("base").shanDongFun();  
+        })
+      return true;
+    } else if((quarterPrm < 50000 && payInfoFirstPrm < 50000) || (quarterPrm >= 50000 && payInfoFirstPrm < quarterPrm)) {
+      const message = quarterPrm < 50000 ? '5万元' : `总保费的25%`
+      ElMessage.warning(`山东见费业务分期缴费首期应收保费不低于${message}！`)
+      return true;
+    }
   }
 };
 
