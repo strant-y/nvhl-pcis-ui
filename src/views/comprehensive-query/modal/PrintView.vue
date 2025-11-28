@@ -121,7 +121,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 3,
         func: (value: any) => {
 
-           setFormItem('cPrnNo',{btnItems:{ disabled:true,}})
+          setFormItem('cPrnNo',{btnItems:{ disabled:true,}})
           console.log(value)
           setPrnTemplate();
           const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
@@ -131,7 +131,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
           if (!!CPlyType) {
             freeEditRef.value?.setValue("cPlyType", "");
-          }
+					}
+					// 缴费通知书查询缴费期数并展示供选择
+					if (value == 'W') {
+						const param = { CPrnType: value, cAppNo: props.data?.cAppNo };
+						pcisQueryService
+							.getgetNTms(param)
+							.then((res: any) => {
+								if (res.code === 200) {
+									let loadData = generateTimesOptions(res.data)
+									setFormItem('nTms', { hidden: false, loadData })
+								} else {
+									ElMessage.error(res.msg);
+								}
+							})
+							.catch((err) => {
+								ElMessage.error(err);
+							});
+					}
           /*服务卡号使用条件限定：
               1.单据大类必须为保单（前台校验即可）
               2.产品必须为060030
@@ -180,6 +197,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
           check060024FlagCancle(value);
         },
+			},
+			{
+        prop: "nTms",
+        inputtype: "rtselect",
+        title: "缴费期次",
+        loadData: [],
+				itemWidth: 3,
+				rules: [getRules("required", {})],
+				hidden: true,
       },
       {
         prop: "cAppNo",
@@ -466,6 +492,7 @@ function smartbipreview() {
         CPrnFmp: formData?.cPrnFmp,
         CPrnTarget: formData?.cPrnTarget,
         CLanguage: formData?.cLanguage,
+        nTms: formData?.nTms,
         CEdrPrjNo: props.data?.nEdrPrjNo,
       };
       pcisQueryService
@@ -642,6 +669,24 @@ function setFormItem(key: any, obj: any) {
 function getFormItem(key:any, prop:any) {
   const item = formconfig1.fromSchema?.find((item) => item.prop === key);
   return item ? item[prop] : null;
+}
+
+/**
+ * 根据传入的数字生成指定长度的 {label, value} 数组
+ * @param {number} n - 要生成的次数（必须为正整数）
+ * @returns {{label: string, value: number}[]} 生成的选项数组
+ */
+function generateTimesOptions(n) {
+  // 安全处理：确保 n 是正整数
+  const count = Math.max(0, Math.floor(Number(n) || 0));
+  
+  return Array.from({ length: count }, (_, index) => {
+    const value = index + 1;
+    return {
+      label: `${value}期`,
+      value: value.toString()
+    };
+  });
 }
 </script>
 
