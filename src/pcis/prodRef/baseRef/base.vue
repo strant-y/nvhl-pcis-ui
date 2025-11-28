@@ -361,7 +361,7 @@ const shanDongFun = () => {
         "Pay.tPayEndTm": payEnd.format('YYYY-MM-DD HH:mm:ss'),
         "Pay.nOwnPrm":  plans[i],  // 我司
         "Pay.nPayablePrm": plans[i], // 应收
-        "Pay.nPrmVar": 0     // 差额
+        "Pay.nPrmVar": plans[i]     // 差额
       }
       payinfoArr.push(val);
   }
