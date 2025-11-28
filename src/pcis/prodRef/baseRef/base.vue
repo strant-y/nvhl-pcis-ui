@@ -336,7 +336,7 @@ const shanDongFun = () => {
   const plans = cents.map(v => v / 100);
 
   /* ---------- 6. 时间规则 ---------- */
-  const lastPayMaxTm = tmEndRaw.subtract(31, 'day');   // 责任终止前 30 天
+  const lastPayMaxTm = tmEndRaw.subtract(30, 'day');   // 责任终止前 30 天
 
   const phaseDays = tmEnd.diff(tmStart, 'day') / nPayNum
   
