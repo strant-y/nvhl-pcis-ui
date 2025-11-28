@@ -123,7 +123,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
           setFormItem('cPrnNo',{btnItems:{ disabled:true,}})
           console.log(value)
-          setPrnTemplate();
           const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
           const CPlyType = freeEditRef.value?.getValue("cPlyType");
           if (!!CPrnNo) {
@@ -139,8 +138,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 							.getgetNTms(param)
 							.then((res: any) => {
 								if (res.code === 200) {
-									let loadData = generateTimesOptions(res.data)
-									setFormItem('nTms', { hidden: false, loadData })
+									if (res.data > 1) {
+										let loadData = generateTimesOptions(res.data)
+										setFormItem('nTms', { hidden: false, loadData })
+									}
+									setPrnTemplate(res.data);
 								} else {
 									ElMessage.error(res.msg);
 								}
@@ -148,6 +150,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 							.catch((err) => {
 								ElMessage.error(err);
 							});
+					} else {
+						setPrnTemplate();
 					}
           /*服务卡号使用条件限定：
               1.单据大类必须为保单（前台校验即可）
@@ -513,7 +517,7 @@ function smartbipreview() {
 }
 
 // 设置打印模板
-function setPrnTemplate() {
+function setPrnTemplate(time) {
   setYNCvrg(props.data?.cAppNo);
   freeEditRef.value?.setValue("cPrnFmp", null);
   setFormItem("cPrnFmp", { loadData: [] });
@@ -532,7 +536,21 @@ function setPrnTemplate() {
     .then((result: any) => {
       if (result.code === 200) {
         _PrnTemplate.value = result.data;
-        if (result["codelist"].length > 0) {
+				if (result["codelist"].length > 0) {
+					// 选择缴费通知书 如果有大于1的期次，打印模板展示分期类，反之展示相反的
+					if (param.CPrnType == "W") {
+						if (time == 1) {
+							result.codelist = result.codelist.filter(item => {
+  							return !['FQJFTZS', 'CJFQJFTZS'].includes(item.value);
+							});
+							freeEditRef.value?.setValue("cPrnFmp", 'JFTZS')
+						} else if (time > 1) {
+							result.codelist = result.codelist.filter(item => {
+  							return !['JFTZS', 'CJJFTZS'].includes(item.value);
+							});
+							freeEditRef.value?.setValue("cPrnFmp", 'FQJFTZS')
+						}
+					}
           if (props.data?.cProdNo === "060024") {
             let index = null;
             if ("0253" == param.CDptCde.substring(0, 4) && isflag.value) {
