@@ -566,6 +566,19 @@ const method = {
     // }
     const param = opertaor.getParam(); 
     if (param.initFlag) {
+      if(val === "0") {
+        codeListStore
+          .queryCodeList({
+            codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+            codeListParam: {},
+          })
+          .then((res) => {
+            applicantEditRef.value?.addCodeListMap({
+              code: "Applicant.cCertfCls",
+              list: res
+            })
+          });
+      }
       return;
     }
     if (val === "0") {
