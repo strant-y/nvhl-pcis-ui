@@ -13,24 +13,16 @@
         <span>¥ {{ row.nPrm.toLocaleString() }}</span>
       </template>
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cDptCnm || ''" class="twoLine"></span>
       </template>
       <template #column-cTermNme="{ row, column, index }">
-        <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="row.cTermNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cTermNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNme="{ row, column, index }">
-        <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="row.cAppNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cAppNme || ''" class="twoLine"></span>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNoInfo="{ row, column, index }">
         <div class="policy-info-cell">
@@ -174,7 +166,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cAppNme: "",
             cInsuredNme: "",
             companyId: user.value.companyId,
-            cLoadSub: 0,
+            cLoadSub: '0',
             cKindNo: null,
             cAppNo: "",
             cPlyNo: "",
@@ -300,10 +292,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cLoadSub",
         inputtype: "rtcheckbox",
         title: "包含下级机构",
-        defaultValue: 0,
+        defaultValue: '0',
         keymap: {
-          y: 1,
-          n: 0,
+          y: '1',
+          n: '0',
         },
       },
       {
@@ -611,6 +603,7 @@ const tableconfig = reactive<AppTableConfig>(
     fixed: true,
     tableBtnPosition: "right",
     rowDbClickFun:(row:any)=> rowDbClick(row),
+    columnWidthByCalc: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -778,7 +771,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "baseType",
         inputtype: "rtinput",
-        lengthNum: 4,
+        // lengthNum: 4,
         title: "任务类型",
       },
       {
@@ -794,7 +787,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        lengthNum: 3,
+        // lengthNum: 3,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -809,7 +802,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         slotName: "cDptCnm",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 20,
+      },
+      {
+        prop: "udrClsCde",
+        inputtype: "rtinput",
+        title: "当前核保级别",
+        align: 'left',
+        // lengthNum: 12,
       },
       {
         prop: "cTermNme",
@@ -817,7 +817,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         slotName: "cTermNme",
         align: 'left',
-        lengthNum: 13,
+        // lengthNum: 25,
       },
       {
         prop: "cAppNme",
@@ -825,7 +825,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         slotName: "cAppNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -833,14 +833,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         slotName: "cInsuredNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
         title: "保费",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
         lengthIsNumber: true,
         formatter:(val:any) => {
           return val.toLocaleString()
@@ -853,7 +853,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "datetimerange", // 显示日期和时间选择器
         format: "YYYY-MM-DD HH:mm:ss", // 显示在界面上的格式
         valueFormat: "YYYY-MM-DD HH:mm:ss", // 传递给后端的值格式
-        lengthNum: 17,
+        // lengthNum: 17,
         lengthIsNumber: true,
       },
       {
@@ -861,14 +861,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        lengthNum: 5,
-      },
-      {
-        prop: "udrClsCde",
-        inputtype: "rtinput",
-        title: "当前核保级别",
-        align: 'left',
-        lengthNum: 12,
+        // lengthNum: 5,
       },
       // {
       //   prop: "cMinUndrCls",
@@ -877,27 +870,27 @@ const tableconfig = reactive<AppTableConfig>(
       //   align: 'left',
       //   lengthNum: 12,
       // },
-      {
-        prop: "state",
-        inputtype: "rtselect",
-        title: "任务状态",
-        lengthNum: 5,
-        align: "left",
-        loadData: [
-          { label: "未接收", value: "0" },
-          { label: "已接收", value: "1" },
-          { label: "暂存", value: "2" },
-          { label: "已完成", value: "3" },
-          { label: "已撤回", value: "4" },
-          { label: "已解除接收", value: "5" },
-          { label: "已退回", value: "6" },
-          { label: "已申请改派", value: "7" },
-          { label: "已改派", value: "8" },
-          { label: "已委托", value: "9" },
-          { label: "已重做", value: "10" },
-          { label: "已上报", value: "11" },
-        ],
-      },
+      // {
+      //   prop: "state",
+      //   inputtype: "rtselect",
+      //   title: "任务状态",
+      //   lengthNum: 5,
+      //   align: "left",
+      //   loadData: [
+      //     { label: "未接收", value: "0" },
+      //     { label: "已接收", value: "1" },
+      //     { label: "暂存", value: "2" },
+      //     { label: "已完成", value: "3" },
+      //     { label: "已撤回", value: "4" },
+      //     { label: "已解除接收", value: "5" },
+      //     { label: "已退回", value: "6" },
+      //     { label: "已申请改派", value: "7" },
+      //     { label: "已改派", value: "8" },
+      //     { label: "已委托", value: "9" },
+      //     { label: "已重做", value: "10" },
+      //     { label: "已上报", value: "11" },
+      //   ],
+      // },
     ],
   })
 );
@@ -984,7 +977,7 @@ onMounted(async () => {
   });
   const param = {
     companyId: user.value.companyId,
-    cLoadSub: 0,
+    cLoadSub: '0',
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
         "YYYY-MM-DD 00:00:00"
@@ -1033,6 +1026,10 @@ onUnmounted(() => {
     sessionStorage.removeItem(AppKey.query.pcis_query_newudrlist);
   sessionStorage.getItem("navToOrderUdrListQuery") &&
     sessionStorage.removeItem("navToOrderUdrListQuery");
+});
+
+onActivated(() => {
+  handleQuery();
 });
 
 // 绑定方法

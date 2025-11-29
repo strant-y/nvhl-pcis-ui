@@ -10,24 +10,16 @@
       @page-change="handleQuery(false)"
     >
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cDptCnm || ''" class="twoLine"></span>
       </template>
       <template #column-cTermNme="{ row, column, index }">
-        <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="row.cTermNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cTermNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNme="{ row, column, index }">
-        <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="row.cAppNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cAppNme || ''" class="twoLine"></span>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
       </template><template #column-cInquiryNo="{ row, column, index }">
         <div>
           <div class="policy-number-row" v-if="row.cAppNo">
@@ -176,7 +168,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             cAppNme: "",
             cInsuredNme: "",
             companyId: user.value.companyId,
-            cLoadSub: 0,
+            cLoadSub: '0',
             cKindNo: null,
             cProdNo: null,
             cTermNo: null,
@@ -311,10 +303,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtcheckbox",
         title: "包含下级机构",
         showKey: [5],
-        defaultValue: 0,
+        defaultValue: '0',
         keymap: {
-          y: 1,
-          n: 0,
+          y: '1',
+          n: '0',
         },
       },
       {
@@ -615,6 +607,7 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnPosition: ref<any>(""),
     tableBtnFixed: "right",
     rowDbClickFun:(row:any)=> rowDbClick(row),
+    columnWidthByCalc: true,
     tableBtn: [
       createFreeButtonBase({
         id: "score",
@@ -794,7 +787,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "preDptName",
         inputtype: "rtinput",
         title: "分公司",
-        lengthNum: 3,
+        // lengthNum: 3,
         formatter:(val:any) => {
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -809,7 +802,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         // slotName: "cDptCnm",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cTermNme",
@@ -817,7 +810,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         // slotName: "cTermNme",
         align: 'left',
-        lengthNum: 13,
+        // lengthNum: 13,
       },
       {
         prop: "cAppNme",
@@ -825,7 +818,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         // slotName: "cAppNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -833,50 +826,50 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         // slotName: "cInsuredNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        lengthNum: 5,
+        // lengthNum: 5,
       },
       {
         prop: "bsTm1",
         inputtype: "rtinput",
         title: "询价日期",
-        lengthNum: 17,
+        // lengthNum: 17,
         lengthIsNumber: true,
       },
       {
         prop: "crtTm",
         inputtype: "rtinput",
         title: "提交时间",
-        lengthNum: 17,
+        // lengthNum: 17,
         lengthIsNumber: true,
       },
-      {
-        prop: "state",
-        inputtype: "rtselect",
-        title: "任务状态",
-        lengthNum: 5,
-        align: "left",
-        loadData: [
-          { label: "未接收", value: "0" },
-          { label: "已接收", value: "1" },
-          { label: "暂存", value: "2" },
-          { label: "已完成", value: "3" },
-          { label: "已撤回", value: "4" },
-          { label: "已解除接收", value: "5" },
-          { label: "已退回", value: "6" },
-          { label: "已申请改派", value: "7" },
-          { label: "已改派", value: "8" },
-          { label: "已委托", value: "9" },
-          { label: "已重做", value: "10" },
-          { label: "已上报", value: "11" },
-        ],
-      },
+      // {
+      //   prop: "state",
+      //   inputtype: "rtselect",
+      //   title: "任务状态",
+      //   lengthNum: 5,
+      //   align: "left",
+      //   loadData: [
+      //     { label: "未接收", value: "0" },
+      //     { label: "已接收", value: "1" },
+      //     { label: "暂存", value: "2" },
+      //     { label: "已完成", value: "3" },
+      //     { label: "已撤回", value: "4" },
+      //     { label: "已解除接收", value: "5" },
+      //     { label: "已退回", value: "6" },
+      //     { label: "已申请改派", value: "7" },
+      //     { label: "已改派", value: "8" },
+      //     { label: "已委托", value: "9" },
+      //     { label: "已重做", value: "10" },
+      //     { label: "已上报", value: "11" },
+      //   ],
+      // },
     ],
   })
 );
@@ -925,7 +918,7 @@ onMounted(async () => {
   });
   freeEditRef.value?.setFormValue({
     companyId: user.value.companyId,
-    cLoadSub: 0,
+    cLoadSub: '0',
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
         "YYYY-MM-DD 00:00:00"
@@ -941,6 +934,10 @@ onUnmounted(() => {
   //组件销毁，清除sessionStorage数据
   sessionStorage.getItem(AppKey.query.pcis_query_newudrlist) &&
     sessionStorage.removeItem(AppKey.query.pcis_query_newudrlist);
+});
+
+onActivated(() => {
+  handleQuery();
 });
 
 // 绑定方法

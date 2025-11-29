@@ -322,6 +322,9 @@ onMounted(() => {
           const birthDateFromId = val.substring(6, 14);
           const formattedBirthDate = `${birthDateFromId.substring(0, 4)}-${birthDateFromId.substring(4, 6)}-${birthDateFromId.substring(6, 8)}`;
           setValue('Dist.tBirthDate', formattedBirthDate);
+          const age = calculateAgeFromIdCard(val);
+          setValue('Dist.nAge', age);
+
         }
         if(val && val.length === 18 && getValue('Dist.cDocumentType') === '111') {
           const age = calculateAgeFromIdCard(val);
@@ -483,6 +486,10 @@ onMounted(() => {
         setFormItem("Dist.nRmbAmount", { disabled: true });
         setFormItem("Dist.nRmbLimit", { disabled: true });
         setFormItem("Dist.cRemarks", { disabled: true });
+    }
+    // 040001 变更清单信息时 方案号置灰
+    if(props.data.rowData.cProdNo === '040001' && props.data.rowData.cRsnCde === "10"){
+      setFormItem("Dist.cPlanNo", { disabled: true });
     }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
