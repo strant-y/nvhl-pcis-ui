@@ -5134,6 +5134,9 @@ const submitUnderwritingFn = async () => {
             nEdrPrjNo: plyBase['Base.nEdrPrjNo']
           }
           const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+          if(btn) {
+            btn.loading = false;
+          }
           if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
             ElMessage.error(queryFacSts.message);
             return
@@ -5160,6 +5163,9 @@ const submitUnderwritingFn = async () => {
           }
           // 调用强制临分
           const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
+          if(btn) {
+            btn.loading = false;
+          }
           if(queryRiFacMrk && queryRiFacMrk.code === '0') {
             ElMessage.error(queryRiFacMrk.message);
             underwrite.value?.setRiskunitDisabled()
@@ -5169,6 +5175,9 @@ const submitUnderwritingFn = async () => {
       } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
         // 先查询临分标识
         const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+        if(btn) {
+          btn.loading = false;
+        }
         if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
           const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
           if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
@@ -5187,6 +5196,9 @@ const submitUnderwritingFn = async () => {
     必须进行险位划分。 */
   if(res.cUndrMrk === "A" && props.param?.cProdNo?.startsWith('01') && opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] !== '0125111401') {
     const riskDataCriskLvlCde = await underwrite.value?.getRiskDataCriskLvlCde();
+    if(btn) {
+      btn.loading = false;
+    }
     if(riskDataCriskLvlCde) {
       return;
     }
@@ -5226,6 +5238,11 @@ const submitUnderwritingFn = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  }).catch((err) => {
+    if(btn) {
+      btn.loading = false;
+    }
+    ElMessage.error(err.msg || err);
   });
 };
 /**
