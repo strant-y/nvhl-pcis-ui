@@ -4056,7 +4056,7 @@ const getEdrRsnItemFun = (
           edrList.push("Btn_" + key["cEdrItem"]);
         }
       });
-      opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      opertaor.setUnDisabledByKeyList(edrList, props.param?.cRsnCde); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);

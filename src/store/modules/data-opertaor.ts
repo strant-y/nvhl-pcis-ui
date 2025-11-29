@@ -227,10 +227,12 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 }
             });
         }
-        const setUnDisabledByKeyList = (list: any[]) => {
+        const setUnDisabledByKeyList = (list: any[], cRsnCde?: any) => {
             if (list && list.length > 0) {
                 list.forEach((item: string) => {
                     Object.keys(tableRefs).forEach(key => {
+                        // 批改原因为变更清单时，清单才能放开，其他批改原因放开时需要区分免赔和清单
+                        if(cRsnCde !== '10' && key.includes('Dist') && !key.includes('DeductibleDist')) return;
                         if (tableRefs[key] && tableRefs[key].getFormconfig) {
                             const conf = tableRefs[key].getFormconfig();
                             if (!item.startsWith('Btn_')) { // 非按钮控制
