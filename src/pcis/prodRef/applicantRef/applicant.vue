@@ -581,7 +581,6 @@ const method = {
             })
           });
       }
-      return;
     }
     if (val === "0") {
       // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
@@ -642,29 +641,30 @@ const method = {
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
+
+      setFormItem("Applicant.cWorkDpt", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cIsMicroEntpris", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cIsIndvduBiz", {
+        disabled: true,
+      });
+      // 是否绿色产业客户
+      setFormItem("Applicant.cGreenIndustryCustomers", {
+        disabled: false,
+      });
+
+      // 绿色客户 如果为时就放开
+      if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
+        setFormItem("Applicant.cGreenIndustryList", {
+          rules: [getRules("required", {})],
+          disabled: false,
+        });
+      }
+
       if (!param.initFlag) {
-        setFormItem("Applicant.cWorkDpt", {
-          disabled: false,
-        });
-        setFormItem("Applicant.cIsMicroEntpris", {
-          disabled: false,
-        });
-        setFormItem("Applicant.cIsIndvduBiz", {
-          disabled: true,
-        });
-        // 是否绿色产业客户
-        setFormItem("Applicant.cGreenIndustryCustomers", {
-          disabled: false,
-        });
-
-        // 绿色客户 如果为时就放开
-        if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
-          setFormItem("Applicant.cGreenIndustryList", {
-            rules: [getRules("required", {})],
-            disabled: false,
-          });
-        }
-
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
       }

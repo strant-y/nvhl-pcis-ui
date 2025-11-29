@@ -507,7 +507,6 @@ const method = {
             })
           });
       }
-      return;
     }
     checkUser();
     // val  0法人 1个人
@@ -584,22 +583,20 @@ const method = {
       setFormItem("Insured.cGreenIndustryCustomers", {
         rules: [getRules("required", {})],
       });
-      if (!param.initFlag) {
-        setFormItem("Insured.cIsMicroEntpris", {
+      setFormItem("Insured.cIsMicroEntpris", {
+        disabled: false,
+      });
+      setFormItem("Insured.cIsIndvduBiz", {
+        disabled: true,
+      });
+      setFormItem("Insured.cGreenIndustryCustomers", {
+        disabled: false,
+      });
+      if (getValue('Insured.cGreenIndustryCustomers') == '1') {
+        setFormItem("Insured.cGreenIndustryList", {
+          rules: [getRules("required", {})],
           disabled: false,
         });
-        setFormItem("Insured.cIsIndvduBiz", {
-          disabled: true,
-        });
-        setFormItem("Insured.cGreenIndustryCustomers", {
-          disabled: false,
-        });
-        if (getValue('Insured.cGreenIndustryCustomers') == '1') {
-          setFormItem("Insured.cGreenIndustryList", {
-            rules: [getRules("required", {})],
-            disabled: false,
-          });
-        }
       }
       // 参加社会统筹标志
       setFormItem("Insured.cParticiinsocTyp", {
@@ -770,20 +767,18 @@ const method = {
       setFormItem("Insured.cEnterpriseTel", {
         rules: [],
       });
-      if (!param.initFlag) {
-        setFormItem("Insured.cWorkDpt", {
-          disabled: false,
-        });
-        setFormItem("Insured.cIsMicroEntpris", {
-          disabled: true,
-        });
-        setFormItem("Insured.cIsIndvduBiz", {
-          disabled: false,
-        });
-        setFormItem("Insured.cGreenIndustryCustomers", {
-          disabled: true,
-        });
-      }
+      setFormItem("Insured.cWorkDpt", {
+        disabled: false,
+      });
+      setFormItem("Insured.cIsMicroEntpris", {
+        disabled: true,
+      });
+      setFormItem("Insured.cIsIndvduBiz", {
+        disabled: false,
+      });
+      setFormItem("Insured.cGreenIndustryCustomers", {
+        disabled: true,
+      });
 
       setFormItem("Insured.cCntrNme", { rules: null });
       setFormItem("Insured.tOperaterCertfEndTm", { rules: null });
