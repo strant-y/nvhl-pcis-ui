@@ -4056,7 +4056,7 @@ const getEdrRsnItemFun = (
           edrList.push("Btn_" + key["cEdrItem"]);
         }
       });
-      opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      opertaor.setUnDisabledByKeyList(edrList, props.param?.cRsnCde); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
@@ -5106,77 +5106,89 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)(批单核保不需要走这一步)
-  // if(res.cUndrMrk === "A" && props.param.cPolicySource === "6" && props.param?.cAppTyp !== "E") {
-  //   const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
-  //   if(checkoutnInfo?.code !== "1") {
-  //     ElMessage.warning(checkoutnInfo.message);
-  //     btn.loading = false;
-  //     return
-  //   }
-  // }
-  if(props.param['cEdrRsnBundleCde'] != "99") {// 批改原因为99的核保时不需要调用再保的一系类前端接口
-    if(res.cUndrMrk === "A") {//核保选项为同意时
-      const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
-      const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
-      const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
-      const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-      const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
-      const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
-      if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiFacCde'] === '1') {//如果临分标识为2，cRiFacCde值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
-        // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
-        const param = {
-          cAppNo: props.param?.cAppNo,
-          cAppTyp: props.param?.cAppTyp,
-          cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],
-          nEdrPrjNo: plyBase['Base.nEdrPrjNo']
+  // 01、02、04、05大类的需要走校验，其他的直接走提交
+  if(['01','02','04','05'].includes(props.param?.cProdNo?.slice(0,2))) {
+    // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)(批单核保不需要走这一步)
+    // if(res.cUndrMrk === "A" && props.param.cPolicySource === "6" && props.param?.cAppTyp !== "E") {
+    //   const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
+    //   if(checkoutnInfo?.code !== "1") {
+    //     ElMessage.warning(checkoutnInfo.message);
+    //     btn.loading = false;
+    //     return
+    //   }
+    // }
+    if(props.param['cEdrRsnBundleCde'] != "99") {// 批改原因为99的核保时不需要调用再保的一系类前端接口
+      if(res.cUndrMrk === "A") {//核保选项为同意时
+        const deductibleDist = opertaor.getTableRefByKey("deductibleDist")?.getTableData();
+        const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
+        const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
+        const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+        const insrnc = opertaor.getTableRefByKey("insrnc")?.getFromValue();
+        const edrbase = opertaor.getTableRefByKey("edrbase")?.getFromValue();
+        if(plyBase['Base.cRiFacMrk'] === '2' && plyBase['Base.cRiFacCde'] === '1') {//如果临分标识为2，cRiFacCde值为1时，需要调查询临分状态接口，返回值为0,1,6阻断，其他继续核保
+          // 调用接口查询临分状态(0未报价 1未确认 2已确认 3账单已生成 4部分账单已传财务 5账单全部已传财务 6没有临分数据)
+          const param = {
+            cAppNo: props.param?.cAppNo,
+            cAppTyp: props.param?.cAppTyp,
+            cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],
+            nEdrPrjNo: plyBase['Base.nEdrPrjNo']
+          }
+          const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+          if(btn) {
+            btn.loading = false;
+          }
+          if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
+            ElMessage.error(queryFacSts.message);
+            return
+          }
+        } else {
+          const param = {
+            cAppNo: props.param?.cAppNo,// 保批单申请单号
+            cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
+            cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
+            cDptCde: props.param?.cDptCde,// 机构代码
+            cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
+            cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
+            cProdNme: props.param?.cTermNme,// 产品名称
+            cProdNo: props.param?.cProdNo,//产品编码
+            cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
+            // nAmtChgRate: "1.00",// 保额币种汇率
+            nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
+            // nPrmChgRate: "1.00",// 保费币种汇率
+            tAppTm: insrnc['Base.tAppTm'],// 投保日期
+            tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
+            // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
+            tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
+            tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
+          }
+          // 调用强制临分
+          const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
+          if(btn) {
+            btn.loading = false;
+          }
+          if(queryRiFacMrk && queryRiFacMrk.code === '0') {
+            ElMessage.error(queryRiFacMrk.message);
+            underwrite.value?.setRiskunitDisabled()
+            return
+          }
         }
-        const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
-        if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
-          ElMessage.error(queryFacSts.message);
-          return
+      } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
+        // 先查询临分标识
+        const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+        if(btn) {
+          btn.loading = false;
         }
-      } else {
-        const param = {
-          cAppNo: props.param?.cAppNo,// 保批单申请单号
-          cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
-          cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
-          cDptCde: props.param?.cDptCde,// 机构代码
-          cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
-          cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
-          cProdNme: props.param?.cTermNme,// 产品名称
-          cProdNo: props.param?.cProdNo,//产品编码
-          cStockMrk: props.param?.cGrpMrk == "0" ? insured['Insured.cStkMrk'] : applicant['Applicant.cStkMrk'],// 股东业务标志(团单1取投保人标识，个单0取被保人标识)
-          // nAmtChgRate: "1.00",// 保额币种汇率
-          nEdrPrjNo: plyBase['Base.nEdrPrjNo'],// 批改序号
-          // nPrmChgRate: "1.00",// 保费币种汇率
-          tAppTm: insrnc['Base.tAppTm'],// 投保日期
-          tEdrBgnTm: edrbase?['EdrBase.tEdrBgnTm']:'',// 批改生效起期
-          // tEdrEndTm: "2025-05-07 13:57:37",// 批改生效止期
-          tInsrncBgnTm: insrnc['Base.tInsrncBgnTm'],// 保险起期
-          tInsrncEndTm: insrnc['Base.tInsrncEndTm'],// 保险止期
-        }
-        // 调用强制临分
-        const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
-        if(queryRiFacMrk && queryRiFacMrk.code === '0') {
-          ElMessage.error(queryRiFacMrk.message);
-          underwrite.value?.setRiskunitDisabled()
-          return
-        }
-      }
-    } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
-      // 先查询临分标识
-      const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
-      if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
-        const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
-        if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
-          // 自主临分
-          ElMessage.warning("该申请单已进入再保流程，核保意见不允许选择‘退回’，如需退回，请线下联系再保部告知投保单号");
+        if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
+          const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
+          if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
+            // 自主临分
+            ElMessage.warning("该申请单已进入再保流程，核保意见不允许选择‘退回’，如需退回，请线下联系再保部告知投保单号");
+            return;
+          }
+        } else {
+          ElMessage.error(queryCRiFacMrk.message);
           return;
         }
-      } else {
-        ElMessage.error(queryCRiFacMrk.message);
-        return;
       }
     }
   }
@@ -5184,6 +5196,9 @@ const submitUnderwritingFn = async () => {
     必须进行险位划分。 */
   if(res.cUndrMrk === "A" && props.param?.cProdNo?.startsWith('01') && opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] !== '0125111401') {
     const riskDataCriskLvlCde = await underwrite.value?.getRiskDataCriskLvlCde();
+    if(btn) {
+      btn.loading = false;
+    }
     if(riskDataCriskLvlCde) {
       return;
     }
@@ -5223,6 +5238,11 @@ const submitUnderwritingFn = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  }).catch((err) => {
+    if(btn) {
+      btn.loading = false;
+    }
+    ElMessage.error(err.msg || err);
   });
 };
 /**

@@ -314,7 +314,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               label: "导出",
               func: async () => {
                   const freeEditRefs = freeEditRef.value;
-                  freeEditRefs.validate().then((isValid) => {
+                  freeEditRefs?.validate().then((isValid:boolean) => {
                       if (isValid) {
                           exportFileList(false);
                       }
@@ -2456,7 +2456,7 @@ async function queryI(flag?: boolean, isEs = false) {
 // 导出
 async function exportFileList(flag?: boolean) {
   const freeEditRefs = freeEditRef.value;
-  const s = freeEditRefs.getFromValue();
+  const s = freeEditRefs?.getFromValue();
   const appType = s.cAppTyp || 'A';
   cAppType.value = appType;
 
@@ -2471,8 +2471,8 @@ async function exportFileList(flag?: boolean) {
 async function exportAE( flag?: boolean, isEs) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
-    const r = tableRefs.getPartnerPage(flag); //获取分页数据
-    const s = freeEditRefs.getFromValue(); //获取表单数据
+    const r = tableRefs?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRefs?.getFromValue(); //获取表单数据
     if(s.tIssueTm && s.tIssueTm[1]) {
         s.tIssueTm[1] = dayjs(s.tIssueTm[1]).format("YYYY-MM-DD 23:59:59")
     }
@@ -2486,7 +2486,7 @@ async function exportAE( flag?: boolean, isEs) {
         s.cLoadSub = "1";
     }
     const { expandFlag, expandVal } = processExpandParams(s);
-    pageresult.list = [];
+    // pageresult.list = [];
     // 清空多余参数
     delete s.cProdNo;
     if (
@@ -2536,7 +2536,7 @@ async function exportAE( flag?: boolean, isEs) {
     param["expandVal"] = expandVal;    // 扩展列字段
 
     param["type"] = 'search';
-    param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
+    param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user") || '{}').opCde;
     param["ises"] = isEs;
 
     // 清空询价日期参数
@@ -2587,13 +2587,13 @@ async function exportAE( flag?: boolean, isEs) {
 async function exportI(flag?: boolean, isEs = false) {
     const tableRefs = tableRef.value;
     const freeEditRefs = freeEditRef.value;
-    const r = tableRefs.getPartnerPage(flag); //获取分页数据
-    const s = freeEditRefs.getFromValue(); //获取表单数据
+    const r = tableRefs?.getPartnerPage(flag); //获取分页数据
+    const s = freeEditRefs?.getFromValue(); //获取表单数据
     if (s.cLoadSub == null) {
         s.cLoadSub = "1";
     }
     const { expandFlag, expandVal } = processExpandParams(s);
-    pageresult.list = [];
+    // pageresult.list = [];
     // 清空其他日期参数
     s.tAppTm = null;
     s.tEdrAppTm = null;
@@ -2643,7 +2643,7 @@ async function exportI(flag?: boolean, isEs = false) {
     param["expandVal"] = expandVal;    // 扩展列字段 
 
     param["type"] = 'search';
-    param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
+    param["cCrtCde"] = JSON.parse(sessionStorage.getItem("user") || '{}').opCde;
     param["ises"] = isEs;
 
     // 清空其他日期参数
