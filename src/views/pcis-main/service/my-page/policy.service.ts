@@ -1673,8 +1673,10 @@ queryProdDptCde(ops) {
  * 缴费计划导出
  * @param ops
  */
-exportWebappPayToExcel(ops) {
-	return request.post('/query/exportWebappPayToExcel', ops);
+exportWebappPayToExcel(data) {
+  return request.post(`/query/exportWebappPayToExcel`, data, {
+      responseType: 'blob'
+  });
 }
 
 
