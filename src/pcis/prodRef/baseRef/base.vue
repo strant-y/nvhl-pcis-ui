@@ -341,13 +341,17 @@ const shanDongFun = () => {
   const phaseDays = tmEnd.diff(tmStart, 'day') / nPayNum
   
   let val = {};
-  let payinfoArr = [];
+  let payinfoArr:any = [];
   for (let i = 0; i < nPayNum; i++) {
-    const payBgn = tmStart.add(i * phaseDays, 'day');
-    const payEnd = i === nPayNum - 1
-      ? lastPayMaxTm
-      : tmStart.add((i + 1) * phaseDays, 'day').subtract(1, 'second');
+    // const payBgn = tmStart.add(i * phaseDays, 'day');
+    // const payEnd = i === nPayNum - 1
+    //   ? lastPayMaxTm
+    //   : tmStart.add((i + 1) * phaseDays, 'day').subtract(1, 'second');
 
+    const payBgn = i > 0 ? dayjs(payinfoArr[i - 1]['Pay.tPayEndTm']).add(1, 'day').startOf('day') : tmStart;
+    // 分期缴费日期间隔最大值 = 应收保费 / 总保费 * 保险期间天数
+    const days = Math.floor((plans[i] / Number(base['Base.nPrm'])) * Number(insrnc['Base.cTmSysCde']));
+    const payEnd = i === nPayNum - 1 ? dayjs(insrnc['Base.tInsrncEndTm']).subtract(30, 'day') : dayjs(payBgn).add(days, 'days').endOf('day');
     if (i === nPayNum - 1 && payEnd.isAfter(lastPayMaxTm)) {
       ElMessage.error('最后一期缴费时间不得晚于保险责任终止日前 30 个自然日')
       return true
