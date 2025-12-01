@@ -134,7 +134,7 @@
         <span v-html="row.nEdrPrjNo || ''"></span>
       </template>
       <template #column-cProdNmeCn="{ row }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
+        <el-tooltip :content="row.cProdNmeCn" placement="top">
             <span v-html="row.cProdNmeCn || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
