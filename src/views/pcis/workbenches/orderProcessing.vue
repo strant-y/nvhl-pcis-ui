@@ -124,6 +124,7 @@ const { withdraw } = NewUdrListService();
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
+import {POSITE_PAGE_TYPE_READ, POSITE_PAGE_TYPE_SAVE} from "@/views/pcis/support/composite.types";
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
@@ -272,6 +273,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           { label: "询价", value: "询价" },
           { label: "投保", value: "投保" },
           { label: "批改", value: "批改" },
+          { label: "组合单", value: "组合单" },
         ],
         func: (val: any) => {
           if (val === "询价") {
@@ -280,6 +282,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             setFormItem("taskStatus", { loadData: taskStatusOptions });
           }
           freeEditRef.value?.setValue("taskStatus", null);
+          if (val === "组合单") {
+            const cCombinationNo = freeEditRef.value?.getFromSchemaItem('cCombinationNo');
+            // cCombinationNo.itemConfig.rules = [getRules("required", {})]
+            console.log(cCombinationNo);
+          }
         },
         rules: [getRules("required", {})],
       },
@@ -384,6 +391,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         clearable: true,
       },
       {
+        prop: "cCombinationNo",
+        inputtype: "rtinput",
+        title: "组合单号",
+        clearable: true,
+      },
+      {
         prop: "tAppTm",
         inputtype: "rtdatepicker",
         title: "申请日期",
@@ -450,6 +463,8 @@ const tableconfig = reactive<AppTableConfig>(
                 }),
               },
             });
+          } else if ((row.cCombinationNo && row.cCombinationNo !== '') || row.baseType === "组合单") {
+              skipPositePage({...row,...{ pageType: POSITE_PAGE_TYPE_SAVE }});
           } else {
             const data = row;
             if (row["cEdrRsnBundleCde"]) {
@@ -682,6 +697,12 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 4,
       },
       {
+        prop: "cCombinationNo",
+        inputtype: "rtinput",
+        title: "组合单号",
+        lengthNum: 21,
+      },
+      {
         prop: "cInquiryNo",
         inputtype: "rtinput",
         title: "申请单号/询价单号",
@@ -811,18 +832,22 @@ const pageresult = reactive<Pageresult>({
 
 // 行双击查看详情
 function handleDblClick(row:any) {
-  router.push({
-    path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
-    query: {
-      param:
-        row.baseType === "询价"
-          ? JSON.stringify({
-              ...row,
-              ...{ pageType: "readonly", pageName: "priceInquiry" },
-            })
-          : JSON.stringify({ ...row, ...{ pageType: "readonly" } }),
-    },
-  });
+  if(row.cCombinationNo && row.cCombinationNo !== '') {
+    skipPositePage({ ...row, ...{ pageType: POSITE_PAGE_TYPE_READ }});
+  }else {
+    router.push({
+      path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
+      query: {
+        param:
+            row.baseType === "询价"
+                ? JSON.stringify({
+                  ...row,
+                  ...{ pageType: "readonly", pageName: "priceInquiry" },
+                })
+                : JSON.stringify({ ...row, ...{ pageType: "readonly" } }),
+      },
+    });
+  }
 }
 
 const prodTotalDatas = ref([]);
@@ -900,10 +925,12 @@ function refreshData(flag?: boolean) {
   if(param.baseType) {
     param.baseType = [param.baseType];
   }
+  console.log('param', param);
   selectTask(param)
     .then((res: any) => {
       if (res.code === 200) {
         pageresult.list = res.data || [];
+        console.log('pageresult.list', pageresult.list);
         pageresult.total = res.total || 0;
       } else {
         ElMessage.error({ message: res.msg, duration: 3000 });
@@ -978,6 +1005,31 @@ function setFormItem(key: any, obj: any) {
       }
     });
   }
+}
+
+/**
+ * 跳转组合出单页面
+ * @param row
+ */
+function skipPositePage(row: any) {
+  policyService.getCombinationProdList({ // 先查询组合产品信息
+    cCombinationNo: row.cCombinationNo
+  }).then((res) => {
+    console.log('getCombinationProdList-res', res);
+    if(res.code === 200) {
+      router.push({
+        path: '/pcisapp/posite-page',
+        query: {
+          param: JSON.stringify({
+            ...row,
+            cProdDtlList: res.data
+          })
+        },
+      });
+    }else {
+      ElMessage.error(res.msg);
+    }
+  })
 }
 </script>
 <style lang="scss" scoped>

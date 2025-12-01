@@ -1684,4 +1684,10 @@ saveTotalSalary(data) {
 // selectTotalSalary(data) {
 //     return request.post(`${this.selectTotalSalaryUrl}`, data);
 //   }
+
+
+
+    getCombinationProdList(param: any) {
+        return request.post(`/policy/getCombinationProdList`, param);
+    }
 }
