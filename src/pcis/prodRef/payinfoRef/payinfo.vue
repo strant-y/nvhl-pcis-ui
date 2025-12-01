@@ -226,7 +226,7 @@ const method = {
       .exportWebappPayToExcel(param)
       .then((res: any) => {
 				if (res.size <= 0) {
-					ElMessage.error({ message: "下载出错", duration: 3000 });
+					ElMessage.error({ message: "导出出错", duration: 3000 });
 					return;
 				}
 				const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
@@ -236,7 +236,7 @@ const method = {
 				saveAs(blob, fileName);
 			})
 			.catch(() => {
-				ElMessage.error("模板下载失败");
+				ElMessage.error("导出出错");
 			});
 	}
 };
