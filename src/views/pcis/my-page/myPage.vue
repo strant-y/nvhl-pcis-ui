@@ -2741,11 +2741,15 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.SpecialAgreement[0]['SpecialAgreement.cIfMust'] = "1"
       }
       // 有些保单证件类型的值仍然是110007，需要转换成01
-      if (ops.applicant) {
+      if (ops.applicant && ops.applicant['Applicant.cCertfCls']) {
         ops.applicant['Applicant.cCertfCls'] = ops.applicant['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant['Applicant.cCertfCls'];
+      } else if(Array.isArray(ops.applicant) && ops.applicant[0]?.['Applicant.cCertfCls']) {
+        ops.applicant[0]['Applicant.cCertfCls'] = ops.applicant[0]['Applicant.cCertfCls'] === '110007' ? '01' : ops.applicant[0]['Applicant.cCertfCls'];
       }
-      if(ops.insured) {
+      if(ops.insured && ops.insured['Insured.cCertfCls']) {
         ops.insured['Insured.cCertfCls'] = ops.insured['Insured.cCertfCls'] === '110007' ? '01' : ops.insured['Insured.cCertfCls'];
+      } else if(Array.isArray(ops.insured) && ops.insured[0]?.['Insured.cCertfCls']) {
+        ops.insured[0]['Insured.cCertfCls'] = ops.insured[0]['Insured.cCertfCls'] === '110007' ? '01' : ops.insured[0]['Insured.cCertfCls'];
       }
     console.log("转换的数据", ops);
     if(ops["payinfo"] && ops["payinfo"].length > 0){
@@ -2919,7 +2923,7 @@ const calcPremium = () => {
                 })
                 return;
             };
-            if (cClntMrk == '0' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
+            if (cClntMrk == '0' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0') && !needCalc.value){
                 ElMessageBox.alert(
                 "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
                 "提示", 
@@ -5654,6 +5658,8 @@ const validateShanDong = async () => {
   const applicantData = opertaor.getTableRefByKey("applicant").getFromValue();
   const insrncData = opertaor.getTableRefByKey("insrnc").getFromValue();
   const baseData = opertaor.getTableRefByKey("base").getFromValue();
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
 
   // 解构并统一命名
   const {
@@ -5745,6 +5751,60 @@ const validateShanDong = async () => {
       opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
     })
     return true;
+  }
+  // 投保人为非个人且单张保单签单保费大于10万元
+  if (AppcClntMrk == "0" && Number(basePrmCur) > 100000 ) {
+    const nPayNum = Number(baseData['Base.nPayNum'] || 0)  // "1"  缴费期数
+    /* ---------- 计算保险期限（自然年） ---------- */
+    const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+    const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
+    const wholeYears = tmEnd.diff(tmStart, 'year'); 
+    const maxPhase = 4 + Math.max(0, wholeYears - 1);
+    /* ---------- 取期数---------- */
+    const payInfoFirstPrm = Number(payinfoRef[0]?.['Pay.nPayablePrm']);// 缴费计划第一期应收保费
+    const quarterPrm = basePrmCur / 4; // 总保费的四分之一
+    if (nPayNum > maxPhase || nPayNum !== payinfoRef.length) {
+      const remainDays = tmEnd.subtract(wholeYears, 'year').diff(tmStart, 'day')
+      const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+      const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+      ElMessageBox.alert(
+        `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`,
+        "提示", 
+        {
+            confirmButtonText: "确定",
+            type: "warning",
+        })
+        .then(() => {
+          opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
+          opertaor.getTableRefByKey("base").shanDongFun();  
+        })
+      return true;
+    } else if((quarterPrm < 50000 && payInfoFirstPrm < 50000) || (quarterPrm >= 50000 && payInfoFirstPrm < quarterPrm)) {
+      const message = quarterPrm < 50000 ? '5万元' : `总保费的25%`
+      ElMessage.warning(`山东见费业务分期缴费首期应收保费不低于${message}！`)
+      return true;
+    }
+    // 分期缴费，分期间隔不得长于已交保费占总保费比例对应的保险期限比例
+    if(payinfoRef.length > 1) {
+      for(let i = 0; i < payinfoRef.length; i++) {
+        const tPayBgnTm = dayjs(payinfoRef[i]['Pay.tPayBgnTm']);// 缴费起期
+        const tPayEndTm = dayjs(payinfoRef[i]['Pay.tPayEndTm']).add(1,'second');// 缴费止期
+        const intervalDays = tPayEndTm.diff(tPayBgnTm, 'day');// 分期间隔天数
+        const paidRatio = payinfoRef[i]['Pay.nPayablePrm'] / basePrmCur;// 应收保费占总保费的比例
+        const allowedIntervalDays = Math.floor(Number(insrnc['Base.cTmSysCde']) * paidRatio);
+        if(intervalDays > allowedIntervalDays) {
+          ElMessage.warning(`山东见费业务缴费计划第 ${i + 1} 条分期间隔不得长于已交保费占总保费比例对应的保险期限比例！`);
+          return true;
+        }
+      }
+      // 最后一期保费缴纳时间不晚于保险责任终止日前30个自然日
+      const lastPayEndTm = dayjs(payinfoRef[payinfoRef.length - 1]['Pay.tPayEndTm']).add(1,'second');// 最后一期缴费止期
+      if(lastPayEndTm.isAfter(tmEnd.subtract(30, 'day'))) {
+        ElMessage.warning(`山东见费业务最后一期保费缴纳时间不晚于保险责任终止日前30个自然日！`);
+        return true;
+      }
+    }
+
   }
 };
 

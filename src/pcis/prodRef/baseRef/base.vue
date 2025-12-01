@@ -336,7 +336,7 @@ const shanDongFun = () => {
   const plans = cents.map(v => v / 100);
 
   /* ---------- 6. 时间规则 ---------- */
-  const lastPayMaxTm = tmEndRaw.subtract(31, 'day');   // 责任终止前 30 天
+  const lastPayMaxTm = tmEndRaw.subtract(30, 'day');   // 责任终止前 30 天
 
   const phaseDays = tmEnd.diff(tmStart, 'day') / nPayNum
   
@@ -361,7 +361,7 @@ const shanDongFun = () => {
         "Pay.tPayEndTm": payEnd.format('YYYY-MM-DD HH:mm:ss'),
         "Pay.nOwnPrm":  plans[i],  // 我司
         "Pay.nPayablePrm": plans[i], // 应收
-        "Pay.nPrmVar": 0     // 差额
+        "Pay.nPrmVar": plans[i]     // 差额
       }
       payinfoArr.push(val);
   }
