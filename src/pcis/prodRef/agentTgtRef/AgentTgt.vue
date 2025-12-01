@@ -55,9 +55,13 @@ const method = {
         setValue("Tgt.cCheckerCde",res.body.cSryDoc);   // 代理人
         setValue("Tgt.cAddr",res.body.cAddr);   // 大洲
         // setValue("Tgt.cCountry",res.body.id);  // ?国家
-        setValue("Tgt.cAraCde",res.body.cAraCde); // ?国家
-        setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
-        setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
+        nextTick(()=>{
+          setValue("Tgt.cAraCde",res.body.cAraCde); // ?国家
+          nextTick(()=>{
+            setValue("Tgt.cCtyCnm", res.body.cCtyCnm);  // 城市
+            setValue("Tgt.cCode",  res.body.cSrvyCde);  // 城市
+          })
+        })
       };
     });
   },

@@ -236,6 +236,19 @@ onMounted(async () => {
     } else {
       setFormItem('Tgt.cDestinationPort', { disabled: false })
     }
+    eventBus.on('setUnDisabledDone', (val:any) => {
+      if(val) {
+        const data = getFromValue();
+        const cShipClassOne = data['Tgt.cShipClassOne']
+        const cShipClassTwo = data['Tgt.cShipClassTwo']
+        if(cShipClassOne == '02' || cShipClassOne == '03') {
+          setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+        }
+        if(cShipClassTwo && cShipClassTwo != '15') {
+          setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
+        }
+      }
+    })
   })
 });
 function hasEnglish(str: any) {
@@ -1052,6 +1065,8 @@ const method = {
       if (val == '01') {
         setValue("Tgt.cShipClassTwo", null);
         setValue("Tgt.cShipClassThree", null);
+      } else if(val == '02' || val == '03') {
+        setValue("Tgt.cShipClassThree", null);
       }
     }
     if (val == '01') { //rules: [getRules("required", {})]
@@ -1066,7 +1081,6 @@ const method = {
     if (val == '02' || val == '03') {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
       let cShipClassTwo = getValue('Tgt.cShipClassTwo');
-      setValue("Tgt.cShipClassThree", null);
       codeListStore
         .queryCodeList(
           {
@@ -1104,7 +1118,11 @@ const method = {
 
     } else if (val) {
       setFormItem('Tgt.cShipClassThree', { disabled: true, rules: null })
-      setValue("Tgt.cShipClassThree", null);
+    }
+    if (!params.initFlag) {
+      if (val && val !== '15') {
+        setValue("Tgt.cShipClassThree", null);
+      }
     }
   },
   // 核定座位总数
