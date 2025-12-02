@@ -77,14 +77,13 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "CUndrCnm",
         inputtype: "rtinput",
         title: "核保人名称",
-        minWidth: 80,
         fixed: "left",
       },
       {
         prop: "CUndrMrk",
         inputtype: "rtinput",
         title: "核保选项",
-        minWidth: 80,
+        lengthNum: 6,
       },
       // {
       //   prop: "CAntiLnderRisk",
