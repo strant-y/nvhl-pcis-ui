@@ -3897,10 +3897,12 @@ const savePlyInfo = async () => {
   } else if(res["cvrg"].length > 0) {
     res["cvrg"].forEach((item:any) => {
       if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
-        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
-        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
-          return getAddrSeqData.find((i:any) => i.value === item)?.id
-        })?.join(',')
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
         item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
       }
     })
@@ -4049,7 +4051,7 @@ const getEdrRsnItemFun = (
           edrList.push("Btn_" + key["cEdrItem"]);
         }
       });
-      opertaor.setUnDisabledByKeyList(edrList); // 根据list集合,放开需要的要素
+      opertaor.setUnDisabledByKeyList(edrList, props.param?.cRsnCde); // 根据list集合,放开需要的要素
       ElMessage.success(res.msg);
     } else {
       ElMessage.error(res.msg);
@@ -4616,10 +4618,12 @@ const saveEdrPlyInfo = async () => {
   if(res["cvrg"]?.length > 0) {
     res["cvrg"].forEach((item:any) => {
       if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
-        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
-        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
-          return getAddrSeqData.find((i:any) => i.value === item)?.id
-        })?.join(',')
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
         item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
       }
     })
@@ -5097,8 +5101,8 @@ const submitUnderwritingFn = async () => {
   if(props.param?.pageName === "priceInquiry") {
     res["inquiryNo"] = props.param.cInquiryNo;
   }
-  // cProdMap中的产品是一期上线的需要走校验，其他的直接走提交
-  if(cProdMap.includes(props.param?.cProdNo)) {
+  // 01、02、04、05大类的需要走校验，其他的直接走提交
+  if(['01','02','04','05'].includes(props.param?.cProdNo?.slice(0,2))) {
     // 投保单核保同意提交前校验是否需要划分风险单位(只判断询价转投保)(批单核保不需要走这一步)
     // if(res.cUndrMrk === "A" && props.param.cPolicySource === "6" && props.param?.cAppTyp !== "E") {
     //   const checkoutnInfo:any = await checkoutn({ cAppNo: props.param.cAppNo });
@@ -5125,6 +5129,9 @@ const submitUnderwritingFn = async () => {
             nEdrPrjNo: plyBase['Base.nEdrPrjNo']
           }
           const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
+          if(btn) {
+            btn.loading = false;
+          }
           if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
             ElMessage.error(queryFacSts.message);
             return
@@ -5151,6 +5158,9 @@ const submitUnderwritingFn = async () => {
           }
           // 调用强制临分
           const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
+          if(btn) {
+            btn.loading = false;
+          }
           if(queryRiFacMrk && queryRiFacMrk.code === '0') {
             ElMessage.error(queryRiFacMrk.message);
             underwrite.value?.setRiskunitDisabled()
@@ -5160,6 +5170,9 @@ const submitUnderwritingFn = async () => {
       } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
         // 先查询临分标识
         const queryCRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryCRiFacMrkXJ({cAppNo: props.param?.cAppNo}) : await policyService.queryCRiFacMrk({cAppNo: props.param?.cAppNo});
+        if(btn) {
+          btn.loading = false;
+        }
         if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
           const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
           if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
@@ -5176,8 +5189,11 @@ const submitUnderwritingFn = async () => {
   }
   /* 01大类调整：单险位风险等级不再存默认值，根据再保返回的风险等级存值，多险位的话，风险等级返回的是null,前端进行校验，如果风险等级为null，
     必须进行险位划分。 */
-  if(res.cUndrMrk === "A" && props.param?.cProdNo?.startsWith('01')) {
+  if(res.cUndrMrk === "A" && props.param?.cProdNo?.startsWith('01') && opertaor.getDataAll()?.cvrg?.[0]['Term.cUniqueTermNo'] !== '0125111401') {
     const riskDataCriskLvlCde = await underwrite.value?.getRiskDataCriskLvlCde();
+    if(btn) {
+      btn.loading = false;
+    }
     if(riskDataCriskLvlCde) {
       return;
     }
@@ -5217,6 +5233,11 @@ const submitUnderwritingFn = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  }).catch((err) => {
+    if(btn) {
+      btn.loading = false;
+    }
+    ElMessage.error(err.msg || err);
   });
 };
 /**
@@ -5806,9 +5827,11 @@ const validateTgt = () => {
     }
   }
   // 计划开工日期、计划完工日期和工期两者二选一必填
-  if(['059011','059012','059013','059016','059018','059017'].includes(props.param?.cProdNo)) {
+  if(['059011','059012','059013','059016','059018','059017','059931'].includes(props.param?.cProdNo)) {
     if(!(tgtData['Tgt.tConstructionPeriod'] || (tgtData['Tgt.tCommencementDate'] && tgtData['Tgt.tCompletionDate']))) {
-      ElMessage.warning("标的信息中计划开工日期、计划完工日期和工期两者必填一个！")
+      const title = props.param?.cProdNo === '059013' ? '标的信息' : '建设工程信息';
+      const key = ['059017','059931'].includes(props.param?.cProdNo) ? '开工日期、完工日期' : '计划开工日期、计划完工日期';
+      ElMessage.warning(title + "中" + key + "和工期两者必填一个！")
       return false;
     }
   }

@@ -7,6 +7,7 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import {saveAs} from "file-saver";
 
 const route = useRoute();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -16,7 +17,9 @@ import {
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
 import { numAdd } from "@/utils/Math";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 
+const policyService = new PolicyService();
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -208,7 +211,45 @@ const method = {
       let differNum = nCiOwnPrm - num // 差额
       getFromValue()[getFromValue().length - 1]['Pay.nOwnPrm'] = getFromValue()[getFromValue().length - 1]['Pay.nOwnPrm'] + differNum
     }
-  }
+	},
+	// 导出
+	exportExcel: () => {
+    const cappNo  = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
+    if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+      return;
+    }
+    const param = { cAppNo: cappNo }
+    policyService
+    .exportWebappPayToExcel(param)
+    .then((res: any) => {
+			if (!res || !res.data) {
+				ElMessage.error({ message: "导出出错: 响应数据为空", duration: 3000 });
+				return;
+			}
+			let fileName = param.cAppNo + '_缴费计划.xlsx';
+			if (res.headers && res.headers['content-disposition']) {
+				try {
+					const disposition = res.headers['content-disposition'];
+					const filenameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+					if (filenameMatch && filenameMatch[1]) {
+						fileName = decodeURIComponent(filenameMatch[1].replace(/['"]/g, ''));
+					}
+				} catch (error) {
+					console.warn('解析文件名失败:', error);
+				}
+			}
+			// 创建Blob对象
+			const blob = new Blob([res.data], {
+				type: res.headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+			});
+			// 使用FileSaver下载
+			saveAs(blob, fileName);
+		})
+		.catch((error: any) => {
+			ElMessage.error(error.message || "导出出错");
+		});
+	}
 };
 
 // 绑定特殊验证器

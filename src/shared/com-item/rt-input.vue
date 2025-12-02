@@ -240,7 +240,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
       n = newModelValue + "";
     }
   }else if (props.item.type === "percent") {
-    n = newModelValue? (new Decimal(newModelValue).times(100).toString() + "") : "";
+    n = (newModelValue || newModelValue == 0)? (new Decimal(newModelValue).times(100).toString() + "") : "";
   }else if (props.item.type === "permill") {
     n = newModelValue? (new Decimal(newModelValue).times(1000).toString() + "") : "";
   }else{

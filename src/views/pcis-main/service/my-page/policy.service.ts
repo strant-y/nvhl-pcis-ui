@@ -1669,7 +1669,15 @@ queryProdDptCde(ops) {
     return request.post('/policy/queryProdDptCde', ops);
 }
 
-
+/**
+ * 缴费计划导出
+ * @param ops
+ */
+exportWebappPayToExcel(data) {
+  return request.post(`/query/exportWebappPayToExcel`, data, {
+      responseType: 'blob'
+  });
+}
 
 
 // 工资总额列表

@@ -94,6 +94,8 @@ onMounted(() => {
     // });
     
     setValue("Applicant.cNation", "CHN"); // 国籍默认中国
+    // 客户名称增加校验规则
+    setFormItem("Applicant.cAppNme", { rules: [getRules("cAppNme", {})], });
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
     const cProdNo = param.cProdNo;
     if (
@@ -579,7 +581,6 @@ const method = {
             })
           });
       }
-      return;
     }
     if (val === "0") {
       // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
@@ -640,29 +641,30 @@ const method = {
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
+
+      setFormItem("Applicant.cWorkDpt", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cIsMicroEntpris", {
+        disabled: false,
+      });
+      setFormItem("Applicant.cIsIndvduBiz", {
+        disabled: true,
+      });
+      // 是否绿色产业客户
+      setFormItem("Applicant.cGreenIndustryCustomers", {
+        disabled: false,
+      });
+
+      // 绿色客户 如果为时就放开
+      if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
+        setFormItem("Applicant.cGreenIndustryList", {
+          rules: [getRules("required", {})],
+          disabled: false,
+        });
+      }
+
       if (!param.initFlag) {
-        setFormItem("Applicant.cWorkDpt", {
-          disabled: false,
-        });
-        setFormItem("Applicant.cIsMicroEntpris", {
-          disabled: false,
-        });
-        setFormItem("Applicant.cIsIndvduBiz", {
-          disabled: true,
-        });
-        // 是否绿色产业客户
-        setFormItem("Applicant.cGreenIndustryCustomers", {
-          disabled: false,
-        });
-
-        // 绿色客户 如果为时就放开
-        if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
-          setFormItem("Applicant.cGreenIndustryList", {
-            rules: [getRules("required", {})],
-            disabled: false,
-          });
-        }
-
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
       }
@@ -1362,7 +1364,7 @@ const method = {
   cOperaterCertfTypChange: (val: any) => {
     console.log('证件种类', val)
     const param = opertaor.getParam();
-    if (!param.initFlag) {
+    if (param.initFlag) {
       return;
     }
     // 清除报错信息
@@ -1377,7 +1379,7 @@ const method = {
       "07": "passPort",
       "553": "ariCard",
     };
-    baseRules = ruleMap[val] ? [getRules(ruleMap[val])] : [];
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
     if (cClntMrk == '0') {
       baseRules = [getRules("required", {}), ...baseRules]
     }

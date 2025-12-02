@@ -167,6 +167,7 @@ const oldPageSchema = ref<any>({});
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 const addedPlans = ref<string[]>([]);
 const isQuery = ref(false)
+const cProdNos = ['010001','010002','010003','010004','010020'];
 
 watch(
     () => pageresult.list,
@@ -189,6 +190,17 @@ watch(
         if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           cvrgRef?.getAddrSeqOptions()
+        }
+        if(route.params.param?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
+          eventBus.emit('setMap-EmployeeDist043009', {
+            code: 'Dist.cEmploymentAddress',
+            list: pageresult.list.map((m: any) => {
+              return {
+                label: m['Dist.cDetailedAddress'],
+                value: m['Dist.cPkId']
+              }
+            })
+          });
         }
       }
     }
@@ -309,6 +321,7 @@ onMounted(async () => {
       eventBus.on('setMap-EmployeeDist043009', (data: any) => {
         if(data.list && data.list.length > 0) {
           r.loadData = data.list
+          handleQuery()
         }
       })
     }
@@ -493,7 +506,12 @@ const method = {
           cancelButtonText: "取消",
           type: "warning",
         }
-    ).then(() => {
+    ).then(async () => {
+      // 02大类和01部分产品删除清单时需要先调用保存在执行删除操作，避免清单更新后刷新条款时丢失未保存的条款数据
+      if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+        const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
+        if(!savePlyInfo) return;
+      }
       deleteDist(param).then((res: any) => {
         if (res.code === 200) {
           ElMessage.success("删除成功");
@@ -701,7 +719,7 @@ const method = {
 							}
 						})
 					}
-					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue()
+					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
 					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
 						label: i['InsuredDist.cInsuredNme'],
 						value: i['InsuredDist.cPkId']
@@ -915,7 +933,7 @@ const method = {
         const file = input.files[0];
         const reader = new FileReader();
 
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           const base64String = e.target?.result as string;
 
           // ✅ 此处赋值有效
@@ -935,6 +953,11 @@ const method = {
             params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
           }
           
+          // 02大类和01部分产品导入清单时需要先调用保存再执行操作，避免清单更新后刷新条款时丢失未保存的条款数据
+          if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+            const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
+            if(!savePlyInfo) return;
+          }
           policyService.importDist(params).then((res) => {
             if (res.code === 200) {
               titleInfo.value = {
@@ -989,7 +1012,7 @@ const method = {
         const file = input.files[0];
         const reader = new FileReader();
 
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           const base64String = e.target?.result as string;
 
           // ✅ 此处赋值有效
@@ -1007,7 +1030,11 @@ const method = {
           if(route.params.param?.pageName === "priceInquiry") {
             params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
           }
-
+          // 02大类和01部分产品导入清单时需要先调用保存再执行操作，避免清单更新后刷新条款时丢失未保存的条款数据
+          if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+            const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
+            if(!savePlyInfo) return;
+          }
           policyService.importDistIncrement(params).then((res) => {
             
             if (res.code === 200) {
@@ -1144,6 +1171,11 @@ const method = {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+    }
+    // 02大类和01部分产品删除清单时需要先调用保存再执行操作，避免清单更新后刷新条款时丢失未保存的条款数据
+    if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+      const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
+      if(!savePlyInfo) return;
     }
     // 增加是否删除全部判断，选是删除全部，选否删除选中项
     if (pageresult.total > 10 && selectedRows.value.length === 10) {
@@ -1315,16 +1347,12 @@ const getSummary = async () => {
 async function refreshCvrg() {
   // 如果是免赔信息则不刷新保障信息
   if(props.compKey?.includes('DeductibleDist')) return;
-  const cProdNos = ['010001','010002','010003','010004','010020'];
   if(route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) {
     const cvrgRef = opertaor.getTableRefs()['cvrg'];
-    const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
-    if(savePlyInfo) {
-      try {
-        cvrgRef?.getAddrSeqOptions();
-        cvrgRef?.refushCvrgInfo();
-      } catch (ignore) {
-      }
+    try {
+      cvrgRef?.getAddrSeqOptions();
+      cvrgRef?.refushCvrgInfo();
+    } catch (ignore) {
     }
   }
 }

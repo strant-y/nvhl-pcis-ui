@@ -121,9 +121,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 3,
         func: (value: any) => {
 
-           setFormItem('cPrnNo',{btnItems:{ disabled:true,}})
+          setFormItem('cPrnNo',{btnItems:{ disabled:true,}})
           console.log(value)
-          setPrnTemplate();
           const CPrnNo = freeEditRef.value?.getValue("cPrnNo");
           const CPlyType = freeEditRef.value?.getValue("cPlyType");
           if (!!CPrnNo) {
@@ -131,7 +130,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
           if (!!CPlyType) {
             freeEditRef.value?.setValue("cPlyType", "");
-          }
+					}
+					// 缴费通知书查询缴费期数并展示供选择
+					if (value == 'W') {
+						const param = { CPrnType: value, cAppNo: props.data?.cAppNo };
+						pcisQueryService
+							.getgetNTms(param)
+							.then((res: any) => {
+								if (res.code === 200) {
+									if (res.data > 1) {
+										let loadData = generateTimesOptions(res.data)
+										setFormItem('nTms', { hidden: false, loadData })
+									}
+									setPrnTemplate(res.data);
+								} else {
+									ElMessage.error(res.msg);
+								}
+							})
+							.catch((err) => {
+								ElMessage.error(err);
+							});
+					} else {
+						setPrnTemplate();
+					}
           /*服务卡号使用条件限定：
               1.单据大类必须为保单（前台校验即可）
               2.产品必须为060030
@@ -180,6 +201,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           }
           check060024FlagCancle(value);
         },
+			},
+			{
+        prop: "nTms",
+        inputtype: "rtselect",
+        title: "缴费期次",
+        loadData: [],
+				itemWidth: 3,
+				rules: [getRules("required", {})],
+				hidden: true,
       },
       {
         prop: "cAppNo",
@@ -466,6 +496,7 @@ function smartbipreview() {
         CPrnFmp: formData?.cPrnFmp,
         CPrnTarget: formData?.cPrnTarget,
         CLanguage: formData?.cLanguage,
+        nTms: formData?.nTms || '1',
         CEdrPrjNo: props.data?.nEdrPrjNo,
       };
       pcisQueryService
@@ -486,7 +517,7 @@ function smartbipreview() {
 }
 
 // 设置打印模板
-function setPrnTemplate() {
+function setPrnTemplate(time) {
   setYNCvrg(props.data?.cAppNo);
   freeEditRef.value?.setValue("cPrnFmp", null);
   setFormItem("cPrnFmp", { loadData: [] });
@@ -505,7 +536,21 @@ function setPrnTemplate() {
     .then((result: any) => {
       if (result.code === 200) {
         _PrnTemplate.value = result.data;
-        if (result["codelist"].length > 0) {
+				if (result["codelist"].length > 0) {
+					// 选择缴费通知书 如果有大于1的期次，打印模板展示分期类，反之展示相反的
+					if (param.CPrnType == "W") {
+						if (time == 1) {
+							result.codelist = result.codelist.filter(item => {
+  							return !['FQJFTZS', 'CJFQJFTZS'].includes(item.value);
+							});
+							freeEditRef.value?.setValue("cPrnFmp", 'JFTZS')
+						} else if (time > 1) {
+							result.codelist = result.codelist.filter(item => {
+  							return !['JFTZS', 'CJJFTZS'].includes(item.value);
+							});
+							freeEditRef.value?.setValue("cPrnFmp", 'FQJFTZS')
+						}
+					}
           if (props.data?.cProdNo === "060024") {
             let index = null;
             if ("0253" == param.CDptCde.substring(0, 4) && isflag.value) {
@@ -642,6 +687,24 @@ function setFormItem(key: any, obj: any) {
 function getFormItem(key:any, prop:any) {
   const item = formconfig1.fromSchema?.find((item) => item.prop === key);
   return item ? item[prop] : null;
+}
+
+/**
+ * 根据传入的数字生成指定长度的 {label, value} 数组
+ * @param {number} n - 要生成的次数（必须为正整数）
+ * @returns {{label: string, value: number}[]} 生成的选项数组
+ */
+function generateTimesOptions(n) {
+  // 安全处理：确保 n 是正整数
+  const count = Math.max(0, Math.floor(Number(n) || 0));
+  
+  return Array.from({ length: count }, (_, index) => {
+    const value = index + 1;
+    return {
+      label: `${value}期`,
+      value: value.toString()
+    };
+  });
 }
 </script>
 
