@@ -4813,9 +4813,9 @@ const submitEdrToUndrFun = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong()) {
-    return;
-  }
+  // if (await validateShanDong()) {
+  //   return;
+  // }
   if (!baseValite()) {
     // btn.loading = false;
     return;
