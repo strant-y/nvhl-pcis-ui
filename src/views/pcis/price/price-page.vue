@@ -3309,7 +3309,7 @@ function checkShow(k:any){
         'ci','ourCompanyCiShare',
        ].includes(k.pageKey)){  // 联共保组件,通过isCiJiMrk 控制
         r = isCiJiMrk.value;
-    }else if (k.pageKey === 'distSummary') {  //隐藏全部汇总清单组件
+    }else if (k.pageKey === 'distSummary' && props.param?.cProdNo !== '110006') {  //隐藏全部汇总清单组件 110006产品需要展示清单汇总
       r = false;
     }else if(k.pageKey === 'payinfo' && props.param?.pageName === "priceInquiry") {// 询价隐藏缴费计划
       r = false;

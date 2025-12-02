@@ -244,6 +244,12 @@ onMounted(async () => {
               item['TermRisktgt.nItemRate'] = 1000;
             })
           }
+          // 110005 保险价值确定方式 默认出险时的市场价值
+          if (parparam.cProdNo === '110005') {
+            riskList.forEach((item:any) => {
+              item['TermRisktgt.cValueMethod'] = '589003';
+            })
+          }
           if(item.cUniqueTermNo && item.cPrimaryMrk === '1'){
             // 部分条款责任互斥,所以互斥条款,不再加载对应的责任信息
             data.riskList = [];

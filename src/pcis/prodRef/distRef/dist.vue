@@ -1319,6 +1319,13 @@ watch(
         factorProp: 'Term.nWardTotal',
       },num);
     }
+    // 040021 标的信息 预估集装箱吞吐总量 预估散货吞吐总量的值根据清单中的对应字段进行汇总
+    if(route.params.param?.cProdNo === '040021') {
+      const nContainerThroughput = pageresult.list.map(item => Number(item['Dist.nBoxesNumber']) || 0).reduce((total, value) => total + value, 0)
+      const nBulkThroughput = pageresult.list.map(item => Number(item['Dist.nGoodsTonnage']) || 0).reduce((total, value) => total + value, 0)
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nContainerThroughput',nContainerThroughput)
+      opertaor.getTableRefs()['tgt']?.setValue('Tgt.nBulkThroughput',nBulkThroughput)
+    }
   }
 )
 const getSummary = async () => {
