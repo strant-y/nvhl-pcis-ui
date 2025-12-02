@@ -3897,10 +3897,12 @@ const savePlyInfo = async () => {
   } else if(res["cvrg"].length > 0) {
     res["cvrg"].forEach((item:any) => {
       if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
-        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
-        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
-          return getAddrSeqData.find((i:any) => i.value === item)?.id
-        })?.join(',')
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
         item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
       }
     })
@@ -4617,7 +4619,7 @@ const saveEdrPlyInfo = async () => {
     res["cvrg"].forEach((item:any) => {
       if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
         if(sessionStorage.getItem("getAddrSeqData")) {
-          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '{}')
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
           item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
             return getAddrSeqData.find((i:any) => i.value === item)?.id
           })?.join(',')
@@ -4815,9 +4817,9 @@ const submitEdrToUndrFun = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong()) {
-    return;
-  }
+  // if (await validateShanDong()) {
+  //   return;
+  // }
   if (!baseValite()) {
     // btn.loading = false;
     return;

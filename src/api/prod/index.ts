@@ -1624,4 +1624,13 @@ export function checkCancelM1IsOff(queryParams: any): AxiosPromise<any> {
   return post(`/policy/checkCancelM1IsOff`, queryParams);
 }
 
+// ilog强制转人工查询
+export function getEfcManual(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getEfcManual`, queryParams);
+}
+
+// ilog强制转人工提交
+export function setEfcManual(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/setEfcManual`, queryParams);
+}
 
