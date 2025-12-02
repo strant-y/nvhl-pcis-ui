@@ -54,7 +54,7 @@ import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-ed
 import {eventBus} from "@/utils/event-bus";
 import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-import { getTgtDetailByDist } from "@/api/query";
+import { getTgtDetailByDist, getTermDetailByDist } from "@/api/query";
 
 
 const { getRules } = useValidator();
@@ -189,7 +189,38 @@ watch(
         if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           cvrgRef?.getAddrSeqOptions()
-        }
+				}
+
+				// 协议
+				if (props.compKey === 'CargoDist020001') {
+						let tgtRef = opertaor.getTableRefByKey('cvrg');
+            if(newVal.length>0){
+							const paramA = {
+								cPkId: newVal.map(item => item['Dist.cPkId'])
+							};
+
+							if(route.params.param?.pageName === "priceInquiry") {
+								paramA['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+								if(!paramA['cInquiryNo']) return false
+							}else {
+								paramA['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"];
+								if(!paramA['cAppNo']) return false
+							}
+							getTermDetailByDist(paramA).then((res: any) => {
+								if (res["code"] == "200") {
+									const ids = newVal.map(item => item['Dist.nSeqNo']).join(',');
+              		const codeNos = newVal.map(item => item['Dist.cCodeNo']).join(',');
+									const cPkIds = newVal.map(item => item['Dist.cPkId']).join(',');
+									tgtRef.setCargoSeq(codeNos, cPkIds, res.data?.nInsuranceAmount);
+								} else {
+									ElMessage.error(res.msg);
+								}
+							});
+						} else {
+							tgtRef.setCargoSeq('','','');
+						}
+						tgtRef.DistdataFlash('m0')
+				}
       }
     }
 );

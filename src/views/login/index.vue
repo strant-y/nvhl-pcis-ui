@@ -16,8 +16,11 @@
         </div>
       </div>
     </div>
-      <div class="login-container-form" >
-        <el-card class="login-card" v-show="showLoginCard">
+		<div class="login-container-form" >
+		<el-tabs v-model="activeTab" v-show="showLoginCard" stretch class="login-tabs" @tab-click="handleTabClick">
+        <!-- 账号密码登录 -->
+        <el-tab-pane label="账号密码登录" name="account">
+        <el-card class="login-card">
             <h2>账号登录</h2>
         <el-form
           v-if="inside"
@@ -230,7 +233,79 @@
         </el-form>
         <!-- <el-checkbox v-model="agreeTerms">已阅读并同意《用户服务协议》和《隐私政策》</el-checkbox> -->
       </el-card>
-    </div>
+   
+	</el-tab-pane>
+	<!-- 手机验证码登录 -->
+	<el-tab-pane label="手机验证码登录" name="mobile">
+		<el-card class="login-card">
+        <h2>手机号登录</h2>
+        <el-form
+          ref="phoneNumberRef"
+          :model="phoneNumberData"
+          :rules="thirdPartyRules"
+          class="login-form"
+          label-position="top"
+        >
+          <!-- 手机号 -->
+          <el-form-item prop="mobile">
+            <div class="input_item__ flex-y-center w-full">
+              <span class="icon-box">
+                <el-icon class="mx-2"><Iphone /></el-icon>
+              </span>
+              <el-input
+                v-model="phoneNumberData.mobile"
+                :placeholder="$t('login.mobile')"
+                name="mobile"
+                size="large"
+                @keyup.enter="thirdPartyLogin"
+              />
+            </div>
+          </el-form-item>
+          <!-- 验证码 -->
+          <el-form-item prop="captchaCode">
+            <div class="input_item__ flex-y-center w-full">
+              <span class="icon-box">
+                <svg-icon icon-class="captcha" class="mx-2" />
+              </span>
+              <el-input
+                v-model="phoneNumberData.captchaCode"
+                auto-complete="off"
+                size="large"
+                class="flex-1"
+                :placeholder="$t('login.captchaCode')"
+                @keyup.enter="verifyCode"
+              />
+              <!---->
+              <!-- 验证码-->
+              <el-button
+                v-if="verifyTime === 0"
+                class="mr-1 w-72px"
+                :loading="loading"
+                type="primary"
+                size="small"
+                plain
+                @click="getphoneNumCaptcha"
+                >获取验证码</el-button
+              >
+              <el-tag v-else disabled class="mr-1" type="primary"
+                >{{ verifyTime }}秒</el-tag
+              >
+            </div>
+          </el-form-item>
+          <!-- 登录按钮 -->
+          <el-button
+            :loading="loading"
+            type="primary"
+            size="large"
+            class="w-full"
+            @click.prevent="phoneNumberLogin"
+            >{{ $t("login.login") }}
+          </el-button>
+        </el-form>
+      </el-card>
+	</el-tab-pane>
+</el-tabs>
+</div>
   </el-row>
     <!-- <el-button type="primary" @click="test" >测试</el-button> -->
     <!-- ICP备案 -->
@@ -692,7 +767,7 @@ function verifyCode() {
     serial: verifyData.value.serial,
   };
   // 内部
-  if (inside.value) {
+  if (inside.value && activeTab.value == "account") {
     params.code = loginData.value.captchaCode;
     // 验证码
     loginFormRef.value.validate((valid: boolean) => {
@@ -700,8 +775,12 @@ function verifyCode() {
         userStore.verifyCode(params);
       }
     });
-  } else {
-    params.code = thirdPartyData.value.captchaCode;
+	} else {
+		if (activeTab.value == "mobile") {
+			params.code = phoneNumberData.value.captchaCode;
+		} else {
+			params.code = thirdPartyData.value.captchaCode;
+		}
     thirdPartyRef.value.validate((valid: boolean) => {
       if (valid) {
         userStore.verifyCode(params).then((res) => {
@@ -992,6 +1071,66 @@ const handleClose = () => {
     confirmNewPwd: '',
   };
 };
+
+const activeTab = ref("account"); // 默认选中账号登录
+const phoneNumberRef = ref(null);
+const phoneNumberData = ref({
+	mobile: "",
+	captchaCode: "",
+	inside: true
+});
+// tabs标签页切换
+const handleTabClick = (tab) => {
+  activeTab.value = tab.name;
+  // 可在此重置某些状态（如清空验证码倒计时等）
+}
+// 手机验证码登录获取验证码
+const getphoneNumCaptcha = () => {
+	phoneNumberRef.value?.validateField('mobile').then((valid: boolean) => {
+		if (valid) {
+			// 获取验证码
+			getCaptchaApi(phoneNumberData.value).then((res) => {
+				const { code, msg, data } = res;
+				if (200 === code) {
+					if (!inside.value) {
+						verifyData.value.serial = data.serial;
+					}
+					// 设置倒计时值为60秒
+					verifyTime.value = 60;
+					verifyCountZero();
+					ElMessage.success(msg);
+				} else {
+					verifyTime.value = 0;
+					ElMessage.error(msg);
+				}
+			})
+				.catch((err) => console.log(err))
+				.finally(() => (loading.value = false));
+		}
+	});
+}
+// 手机验证码登录提交
+const phoneNumberLogin = () => {
+  phoneNumberRef.value.validate((valid: boolean) => {
+    if (valid) {
+      loading.value = true;
+			userStore.login(phoneNumberData.value).then((res) => {
+				const { msg, code, phoneNO, serial, src } = res;
+				if (200 == code) {
+					verifyData.value.serial = serial;
+					verifyData.value.phoneNO = phoneNO
+					verifyCode()
+				} else {
+					ElMessage.error(msg || "系统出错");
+				}
+			})
+			.catch(() => {})
+			.finally(() => {
+				loading.value = false;
+			});
+    }
+  });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1052,8 +1191,8 @@ const handleClose = () => {
     position: static; /* 移除 position 干扰 */
     float: none; /* 移除 float 干扰 */
     margin-right: 50px; // 在最右侧留有50px的空间
-
     .login-card {
+			width: 300px;
       margin: auto; // 垂直居中
       border-radius: 8px;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -1089,6 +1228,16 @@ const handleClose = () => {
       }
     }
   }
+}
+
+:deep(.el-tabs){
+	.el-tabs__nav-wrap::after {
+		height: 1px;
+	}
+	.el-tabs__item {
+		font-size: 16px;
+		font-weight: 700;
+	}
 }
 
 :deep(.el-form-item) {

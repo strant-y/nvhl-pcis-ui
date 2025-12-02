@@ -209,6 +209,35 @@
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
 							<el-form-item
+                id="cRiskNme"
+								label="责任编码"
+								prop="cRiskNme"
+								:rules="[getRules('required', {})]"
+							>
+								<el-select
+									style="width: 500px"
+									v-model="formconfig1.cRiskNme"
+									placeholder="请选择"
+									clearable
+									:disabled="true"
+								>
+									<el-option
+										v-for="item in options"
+										:label="item.cNmeCn"
+										:value="item.cTermNo"
+									/>
+								</el-select>
+								<el-button
+									@click="getRiskNo"
+									icon="Search"
+									type="primary"
+								></el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row v-if="formconfig1.cRecordType == '9'">
+						<el-col :span="24">
+							<el-form-item
                                 id="cInsuredNme"
 								label="被保人"
 								prop="cInsuredNme"
@@ -465,7 +494,9 @@ const formconfig1:any = ref({
   cRenewMrk: "0",
   cGrpMrk: "0",
   dptCde:  "",
-  // cNmeCn: "",
+	// cNmeCn: "",
+	cRiskNme: "", // 责任名称
+  cRiskNo: "", // 责任编码
   cTermNme: "", // 条款名称
   cTermNo: "", // 条款代码
   cProdNo: "", // 产品编码
@@ -861,7 +892,9 @@ function handleRecordTypeChange(val:any) {
     labelNm.value = "条款";
     formconfig1.value.cIsPlan = '0';
   }
-  handleQuery()
+	handleQuery()
+	formconfig1.value.cRiskNme = "";
+	formconfig1.value.cRiskNo = "";
   formconfig1.value.cTermNme = "";
   formconfig1.value.cTermNo = "";
   formconfig1.value.cProdNo = "";
@@ -997,6 +1030,41 @@ function getTermNme (){
 				const selectedTerm = res.body;
 				formconfig1.value.cTermNo = selectedTerm.code;
 				formconfig1.value.cTermNme = selectedTerm.value;
+				RiskCodeList.value = selectedTerm.list
+      }
+    });
+}
+
+/**
+ * 责任编码
+ */
+const RiskCodeList = ref(null) // 责任下拉值
+// 协议出单-责任编码查询弹窗页面引入
+const riskCodeInfo = defineAsyncComponent(
+  () => import("@/views/pcis/my-page/components/risk-code-info.vue")
+);
+
+// 协议出单-责任编码查询弹窗打开
+function getRiskNo (){
+	if(!formconfig1.value.cEcAgrNo && !formconfig1.value.cEcAgrAppNo){
+		ElMessage.warning("请先选择协议号！");
+		return false
+	}
+	if(!formconfig1.value.cProdNo && !formconfig1.value.cProdNme){
+		ElMessage.warning("请先选择产品编码！");
+		return false
+	}
+	if(!formconfig1.value.cTermNo && !formconfig1.value.cTermNme){
+		ElMessage.warning("请先选择条款代码！");
+		return false
+	}
+	dzmodal
+    .open(riskCodeInfo, { type: "Issuer", data: {codelist: RiskCodeList.value} })
+    .then((res: any) => {
+      if (res.type === "ok") {
+				const selectedTerm = res.body;
+				formconfig1.value.cRiskNo = selectedTerm.code;
+				formconfig1.value.cRiskNme = selectedTerm.value;
       }
     });
 }
@@ -1037,28 +1105,36 @@ watch(
         tplOptions.value = [];
         formconfig1.value.cPkId = "";
       }
-    }
+		} else {
+			// 条款代码变化，清空责任编码
+			formconfig1.value.cRiskNo   = '';
+    	formconfig1.value.cRiskNme  = '';
+		}
   }
 );
 watch(
   () => formconfig1.value.cEcAgrNo,
   () => {
-    // 协议号变化，立即清空后续三项
+    // 协议号变化，立即清空后续四项
     formconfig1.value.cProdNo   = '';
     formconfig1.value.cProdNme  = '';
     formconfig1.value.cTermNo   = '';
-    formconfig1.value.cTermNme  = '';
+		formconfig1.value.cTermNme = '';
+		formconfig1.value.cRiskNo   = '';
+    formconfig1.value.cRiskNme  = '';
     formconfig1.value.cInsuredCde = '';
-    formconfig1.value.cInsuredNme = '';
+		formconfig1.value.cInsuredNme = '';
   }
 );
 watch(
   () => formconfig1.value.cProdNo,
   () => {
     if(formconfig1.value.cRecordType == '9') {
-      // 协议出单 产品编码变化，立即清空条款代码
+      // 协议出单 产品编码变化，立即清空条款代码、责任编码
       formconfig1.value.cTermNo   = '';
-      formconfig1.value.cTermNme  = '';
+			formconfig1.value.cTermNme = '';
+			formconfig1.value.cRiskNo   = '';
+			formconfig1.value.cRiskNme = '';
     }
   }
 );
