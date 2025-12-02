@@ -759,6 +759,8 @@ const detailcodeList = [
   { id: "25", name: "货物明细表批改" },
   { id: "25", name: "增加保费" },
   { id: "27", name: "变更赔偿限额" },
+  { id: "80", name: "变更保额" },
+  { id: "81", name: "变更险别" },
 ];
 
 
@@ -4769,7 +4771,7 @@ const generateEndorse = async () => {
                   return false;
                 }
             // 收款人账号
-            const CAcctNo = acctinfoRef.getValue('Acctinfo.cAcctNo')
+            const CAcctNo = acctinfoRef?.getValue('Acctinfo.cAcctNo')
             if (!!CAcctNo) {
             } else {
                 ElMessage.error("收款人账号不能为空!");
@@ -4777,7 +4779,7 @@ const generateEndorse = async () => {
             }
 
             // 收款人户名
-            const CAcctNme = acctinfoRef.getValue('Acctinfo.cAcctNme')
+            const CAcctNme = acctinfoRef?.getValue('Acctinfo.cAcctNme')
             if (!!CAcctNme) {
             } else {
                 ElMessage.error("收款人户名不能为空!");
@@ -4785,7 +4787,7 @@ const generateEndorse = async () => {
             }
 
             // 收款银行大类
-            const CBankRelTyp = acctinfoRef.getValue('Acctinfo.cBankRelTyp')
+            const CBankRelTyp = acctinfoRef?.getValue('Acctinfo.cBankRelTyp')
             if (!!CBankRelTyp) {
             } else {
                 ElMessage.error("收款银行大类不能为空!");
