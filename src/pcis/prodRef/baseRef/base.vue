@@ -769,7 +769,7 @@ const judgeShandongCase = async () => {
   const nPayNum = Number(baseData['Base.nPayNum'] || 0)  // "1"  缴费期数
 
   // 机构是山东分公司
-  if (!String(cDptCdeA).startsWith('023701')) return false;
+  if (!String(cDptCdeA).startsWith('02370') || String(cDptCdeA).startsWith('023702')) return false;
   // 币种是人民币
   if (!['人民币', 'CNY'].includes(basePrm)) return false;
   // 联共保业务类型
