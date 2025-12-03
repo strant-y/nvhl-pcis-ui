@@ -342,7 +342,7 @@ const query = (param: any) => {
       });
       
       let cProdNo = route.params.param?.cProdNo;
-      if (cProdNo == "040002") {
+      if (cProdNo == "040002" && param.cComponentTable !== 'VehicleDist') {
           if(pageresult.list.length>0){
             const termref = opertaor.getTableRefByKey("cvrg");
             interface Item {
