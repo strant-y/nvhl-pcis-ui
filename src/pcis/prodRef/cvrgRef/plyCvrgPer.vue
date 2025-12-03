@@ -654,14 +654,14 @@ async function validate() {
 function showFlush() {
   Object.keys(tremTemplateRefs.value).forEach((item: any) => {
     if (tremTemplateRefs.value[item]) {
-      tremTemplateRefs.value[item].dataFlash();
+      tremTemplateRefs.value[item]?.dataFlash();
     }
   });
   updateBtn();
 }
 
 function DistdataFlash(item) {
-  tremTemplateRefs.value[item].dataFlash();
+  tremTemplateRefs.value[item]?.dataFlash();
 }
 
 function updateBtn() {

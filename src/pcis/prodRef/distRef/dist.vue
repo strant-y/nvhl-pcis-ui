@@ -173,12 +173,34 @@ watch(
     (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
-        // 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
+				// 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
         if(route.params.param?.cProdNo === '043003') {
           opertaor.getTableRefByKey('tgt')?.setValue('Tgt.nInsuredCars', pageresult.list.length)
-        }
-        if(isQuery.value) return
-        eventBus.emit('goodsMxChange', newVal);
+				}
+				const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
+				if (ProdNo.includes(route.params.param.cProdNo)) {
+					const cTradeNum = newVal.map(item => item['Dist.cTradeNum']).join(','); // 贸易合同号
+					const cInvoiceNum = newVal.map(item => item['Dist.cInvoiceNum']).join(','); // 发票号
+					const cBillNum = newVal.map(item => item['Dist.cBillNum']).join(','); // 提单号
+					const cLetterNum = newVal.map(item => item['Dist.cLetterNum']).join(','); // 信用证号
+					const cMarkLabel = newVal.map(item => item['Dist.cMarkLabel']).join(','); // 标记(唛头标签)
+					const cPackageMethod = newVal.map(item => codeListStore.getLabelByValue('packaging_method',item['Dist.cPackageMethod'])).join(','); // 包装方式
+					const nInsuranceAmount = newVal.reduce((sum, obj) => sum + (obj['Dist.nInsuranceAmount'] || 0), 0); // 保险金额
+					let tgtRef = opertaor.getTableRefByKey('tgt');
+					tgtRef.setValue('Tgt.cTradeNum', cTradeNum);
+					tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum);
+					tgtRef.setValue('Tgt.cLadingNum', cBillNum);
+					tgtRef.setValue('Tgt.cCreditNum', cLetterNum);
+					tgtRef.setValue('Tgt.cMarkLabel', cMarkLabel);
+					tgtRef.setValue('Tgt.cPackageMethod', cPackageMethod);
+					tgtRef.setValue('Tgt.nInsuranceAmount', nInsuranceAmount);
+				} else {
+					if (!isQuery.value) {
+						eventBus.emit('goodsMxChange', newVal);
+					}
+				}
+				if (isQuery.value) return
+				
         // 02开头的货物明细清单，关联标的信息
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
            method.getTgtDetailFn();
@@ -806,10 +828,10 @@ const method = {
                         let cInvoiceNum = res.data?.cInvoiceNum;
                         let nGoodsNum = res.data?.nGoodsNum;
                         tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
-                        tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
-                        tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
-                        tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
-                        tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
+                        tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo) // 货物名称
+                        tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue) // 发票金额
+                        tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum) // 发票号
+                        tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum) // 货物数量
                     },100)
               })
         } else {
