@@ -3095,7 +3095,7 @@ const calcPremium = () => {
       const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
       const nPayNum = Number(ops['base']?.['Base.nPayNum'] || 0)  // "1"  缴费期数
       const cNeedfeeFlag = ops['plyBase']?.['Base.cNeedfeeFlag'];
-      if(cDptCde.startsWith('023701') && okProdPre.some(item => prod.startsWith(item)) 
+      if(cDptCde.startsWith('02370') && !cDptCde.startsWith('023702') && okProdPre.some(item => prod.startsWith(item)) 
         && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY") && (['0', '1'].includes(cClntMrk))){
         shanDongFlag = true;
         if (cClntMrk == '1' && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
@@ -5510,7 +5510,7 @@ const validateShanDong = async () => {
   const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
 
   // 机构是山东分公司
-  if (!String(cDptCdeA).startsWith('023701')) return false;
+  if (!String(cDptCdeA).startsWith('02370') || String(cDptCdeA).startsWith('023702')) return false;
   // 币种是人民币
   if (!['人民币', 'CNY'].includes(basePrm)) return false;
   // 联共保业务类型
