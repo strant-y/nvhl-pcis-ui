@@ -397,7 +397,7 @@
 
 <script setup lang="ts">
 import { getCurrentInstance } from 'vue'
-import { getTRFactorJson,getPrdTermInfo,viewPdfProposal } from "@/api/prod";
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal,viewPdfProposalPost } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -736,14 +736,22 @@ function getTermData(){
 */
 function previewTerm() {
   const newparam = { cTermNo: termdata.value['Term.cClauseCode'], pageNum: 1, pageSize: 10 };
-  viewPdfProposal(newparam).then((res) => {
-    const blob = new Blob([res.data], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const previewUrl = url + '#toolbar=0&navpanes=0&scrollbar=0';
-    window.open(previewUrl, '_blank');
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 10000); // 10秒后释放URL对象
+  viewPdfProposalPost(newparam).then((res:any) => {
+    if(res.code != '1') {
+      ElMessage.error(res.message)
+    } else {
+      viewPdfProposal(newparam).then((res:any) => {
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const previewUrl = url + '#toolbar=0&navpanes=0&scrollbar=0';
+        window.open(previewUrl, '_blank');
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 10000); // 10秒后释放URL对象
+      })
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err.message)
   });
 }
 /**
