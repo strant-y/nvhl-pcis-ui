@@ -1320,8 +1320,8 @@ async function getTableDataAll() {
     }
   }
   const res:any = await selectDist(selData);
-  if (res.code === 200 && res.data.data?.length > 0) {
-    return res.data.data
+  if (res.code === 200) {
+    return res.data.data?.length > 0 ? res.data.data : []
   } else {
     ElMessage.error(res.msg)
     return []
