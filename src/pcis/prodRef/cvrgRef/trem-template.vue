@@ -930,9 +930,9 @@ function dataInit() {
         term.value = data.data.term;
         termFactormap.value = getUseData(data.data.termFactormap);
         // 给 Term.cDistCodeNo地址编码下拉框赋值
-        const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
-        if (cAddrSeq) {
-            cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+        const cAddrSeq:any = termFactormap.value.find((item:any) => item.prop === 'Term.cDistCodeNo');
+        if (cAddrSeq && pageparam.cProdNo.startsWith("01")) {
+          cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
         }
         methodLink(termFactormap.value);
         riskMethodLink(factormap.value);
