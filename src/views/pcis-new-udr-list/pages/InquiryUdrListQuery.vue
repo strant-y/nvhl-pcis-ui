@@ -477,7 +477,7 @@ const tableBtns = [
     tooltip: "取消接收",
     type: "info",
     size: "large",
-    icon: "Message",
+    icon: "Release",
     iconSize: "25",
     hideBtns: (row: any) => {
       if (row.udrType === "2") {
