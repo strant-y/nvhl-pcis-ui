@@ -330,6 +330,15 @@ onMounted(async () => {
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
   }
+  // 解决040002变更清单信息批改单暂存单打开时雇员清单职业类别出现不显示问题(是在获取批改项后职业类别显示内容消失，未找到原因所以只能在setUnDisabledByKeyList执行后调用查询方法让职业类别显示)
+  if(route.params.param?.cProdNo === '040002' && (route.params.param?.pageType === "EDR_APP_NEW_SCENE" ||
+      (route.params.param?.pageType == "TEMPORARY_DEPOSIT" && route.params.param?.cAppTyp == "E"))) {
+    eventBus.on('setUnDisabledDone', (val:any) => {
+      if(val) {
+	      handleQuery()
+      }
+    })
+  }
 });
 
 // const  modifyRules = (data, fieldValue)=> {
