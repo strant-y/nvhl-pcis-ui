@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useProductStore, useTagsViewStore } from "@/store";
+import { eventBus } from "@/utils/event-bus";
 
 interface OpertaorProps {
     id: string;
@@ -298,6 +299,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     }
                 })
             }
+            eventBus.emit('setUnDisabledDone', true)
         }
 
         const mapSetData = (data) => {
