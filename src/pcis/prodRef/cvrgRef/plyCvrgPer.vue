@@ -604,7 +604,7 @@ function setFormValue(value: any) {
     creData["riskList"] = creData["Term.riskList"];
     terms.push(creData["Term.cClauseCode"]);
     delete creData["Term.riskList"];
-    if(creData['Term.cDistCodeNo']) {
+    if(creData['Term.cDistCodeNo'] && parparam.cProdNo.startsWith("01")) {// Term.cDistCodeNo 01产品是下拉多选 02 是输入框选择货物后带出
       creData['Term.cDistCodeNo'] = creData['Term.cDistCodeNo'].split(',')
     }
     plandata.push(creData);
