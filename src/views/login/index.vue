@@ -240,8 +240,8 @@
 		<el-card class="login-card">
         <h2>手机号登录</h2>
         <el-form
-          ref="phoneNumberRef"
-          :model="phoneNumberData"
+          ref="thirdPartyRef"
+          :model="thirdPartyData"
           :rules="thirdPartyRules"
           class="login-form"
           label-position="top"
@@ -253,7 +253,7 @@
                 <el-icon class="mx-2"><Iphone /></el-icon>
               </span>
               <el-input
-                v-model="phoneNumberData.mobile"
+                v-model="thirdPartyData.mobile"
                 :placeholder="$t('login.mobile')"
                 name="mobile"
                 size="large"
@@ -261,14 +261,37 @@
               />
             </div>
           </el-form-item>
+					<!-- 图形验证码-->
+          <el-form-item prop="imageCaptchaCode" v-if="!verifyFlag">
+            <div class="input_item__ flex-y-center w-full justify-between">
+              <span class="icon-box">
+                <el-icon class="mx-2"><Lock /></el-icon>
+              </span>
+              <el-input
+                v-model="thirdPartyData.imageCaptchaCode"
+                :placeholder="$t('login.imageCaptchaCode')"
+                name="imageCaptcha"
+                auto-complete="off"
+                size="large"
+                class="flex-1 mr-1"
+                @keyup.enter="thirdPartyLogin"
+              />
+              <imagCaptcha
+                class="mr-1"
+                ref="imagCaptchaRef"
+                :width="100"
+                title="点击刷新"
+              />
+            </div>
+          </el-form-item>
           <!-- 验证码 -->
-          <el-form-item prop="captchaCode">
+          <el-form-item  v-if="verifyFlag" prop="captchaCode">
             <div class="input_item__ flex-y-center w-full">
               <span class="icon-box">
                 <svg-icon icon-class="captcha" class="mx-2" />
               </span>
               <el-input
-                v-model="phoneNumberData.captchaCode"
+                v-model="thirdPartyData.captchaCode"
                 auto-complete="off"
                 size="large"
                 class="flex-1"
@@ -284,7 +307,7 @@
                 type="primary"
                 size="small"
                 plain
-                @click="getphoneNumCaptcha"
+                @click="getCaptcha"
                 >获取验证码</el-button
               >
               <el-tag v-else disabled class="mr-1" type="primary"
@@ -292,14 +315,26 @@
               >
             </div>
           </el-form-item>
+
           <!-- 登录按钮 -->
           <el-button
+						v-if="!verifyFlag"
             :loading="loading"
             type="primary"
             size="large"
             class="w-full"
             @click.prevent="phoneNumberLogin"
             >{{ $t("login.login") }}
+          </el-button>
+          <!-- 验证码 提交按钮 -->
+          <el-button
+            v-if="verifyFlag"
+            :loading="loading"
+            type="primary"
+            size="large"
+            class="w-full"
+            @click.prevent="verifyCode"
+            >{{ $t("login.submit") }}
           </el-button>
         </el-form>
       </el-card>
@@ -776,11 +811,7 @@ function verifyCode() {
       }
     });
 	} else {
-		if (activeTab.value == "mobile") {
-			params.code = phoneNumberData.value.captchaCode;
-		} else {
-			params.code = thirdPartyData.value.captchaCode;
-		}
+		params.code = thirdPartyData.value.captchaCode;
     thirdPartyRef.value.validate((valid: boolean) => {
       if (valid) {
         userStore.verifyCode(params).then((res) => {
@@ -1074,60 +1105,46 @@ const handleClose = () => {
 
 const activeTab = ref("account"); // 默认选中账号登录
 const phoneNumberRef = ref(null);
-const phoneNumberData = ref({
-	mobile: "",
-	captchaCode: "",
-	inside: true
-});
 // tabs标签页切换
 const handleTabClick = (tab) => {
   activeTab.value = tab.name;
   // 可在此重置某些状态（如清空验证码倒计时等）
 }
-// 手机验证码登录获取验证码
-const getphoneNumCaptcha = () => {
-	phoneNumberRef.value?.validateField('mobile').then((valid: boolean) => {
-		if (valid) {
-			// 获取验证码
-			getCaptchaApi(phoneNumberData.value).then((res) => {
-				const { code, msg, data } = res;
-				if (200 === code) {
-					if (!inside.value) {
-						verifyData.value.serial = data.serial;
-					}
-					// 设置倒计时值为60秒
-					verifyTime.value = 60;
-					verifyCountZero();
-					ElMessage.success(msg);
-				} else {
-					verifyTime.value = 0;
-					ElMessage.error(msg);
-				}
-			})
-				.catch((err) => console.log(err))
-				.finally(() => (loading.value = false));
-		}
-	});
-}
+
 // 手机验证码登录提交
 const phoneNumberLogin = () => {
-  phoneNumberRef.value.validate((valid: boolean) => {
-    if (valid) {
-      loading.value = true;
-			userStore.login(phoneNumberData.value).then((res) => {
-				const { msg, code, phoneNO, serial, src } = res;
-				if (200 == code) {
-					verifyData.value.serial = serial;
-					verifyData.value.phoneNO = phoneNO
-					verifyCode()
-				} else {
-					ElMessage.error(msg || "系统出错");
-				}
-			})
-			.catch(() => {})
-			.finally(() => {
-				loading.value = false;
-			});
+	if (!thirdPartyData.value.imageCaptchaCode) {
+    ElMessage.warning("请输入图片中的验证码！");
+  }
+  thirdPartyRef.value.validate((valid: boolean) => {
+		if (valid) {
+			const flag = imagCaptchaRef.value.validate(
+        thirdPartyData.value.imageCaptchaCode
+			);
+			if (flag) {
+				loading.value = true;
+				userStore.login(thirdPartyData.value).then((res) => {
+					const { msg, code, phoneNO, serial, src } = res;
+					if (200 == code) {
+						verifyFlag.value = true;
+						verifyData.value.serial = serial;
+						verifyData.value.phoneNO = phoneNO
+        		getCaptcha(thirdPartyData.value);
+					} else {
+						ElMessage.error(msg || "系统出错");
+					}
+				})
+				.catch(() => {})
+				.finally(() => {
+					loading.value = false;
+				});
+      } else {
+        thirdPartyData.value.imageCaptchaCode = undefined;
+        ElMessage.error("验证码有误，请重新输入！");
+        setTimeout(() => {
+          thirdPartyRef.value.clearValidate(["imageCaptchaCode"]);
+        }, 100);
+      }
     }
   });
 }
