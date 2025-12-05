@@ -493,6 +493,19 @@ onMounted(() => {
         }
       }
     }
+    // 房屋建成日期不能大于投保日期
+    if(item.prop === 'Dist.tCompletionDate' && route.params.param.cProdNo == '089005') {
+      item.disabledDate = (time: Date) => {
+        const tAppTm = opertaor.getDataAll().insrnc['Base.tAppTm'];
+        return time.getTime() > new Date(tAppTm).getTime();
+      }
+      // 房屋使用年限 = 投保日期 - 房屋建成日期 向上取整
+      item.func = (val:any) => {
+        const tAppTm = opertaor.getDataAll().insrnc['Base.tAppTm'];
+        const year = Math.ceil(moment(tAppTm).diff(moment(val), 'years', true));
+        setValue('Dist.nServiceLife', year);
+      }
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
