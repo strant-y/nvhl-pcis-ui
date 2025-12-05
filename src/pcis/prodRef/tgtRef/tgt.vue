@@ -1891,6 +1891,14 @@ const method = {
     }
     setValue("Tgt.tConstructionPeriod", tm + 1);
   },
+  // 运输范围
+  cToolTransportationScopeChange:(val:any)=>{
+    if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
+      setFormItem("Tgt.cMunicipalityDirectly", { rules: [getRules("required", {})] })
+    } else {
+      setFormItem("Tgt.cMunicipalityDirectly", { rules: [] })
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

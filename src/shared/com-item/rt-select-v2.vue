@@ -498,6 +498,9 @@ defineExpose({
 </style>
 <style>
 .rt-select-popper .el-select-dropdown {
-  width: fit-content!important;
+  width: auto!important;
+}
+.rt-select-popper .el-select-dropdown__item {
+  width: auto!important;
 }
 </style>
