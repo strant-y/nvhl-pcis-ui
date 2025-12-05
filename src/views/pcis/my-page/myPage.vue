@@ -4984,7 +4984,9 @@ if(props.param.cTransMrk !== "1"){
           const newOp: any = opertaor.convertData(calcres);
           const newPrm = newOp.base["Base.nPrm"];
           const oldPrm = calcData.base["Base.nPrm"];
-          if (newPrm === oldPrm) {
+          const newAmt = newOp.base["Base.nAmt"];
+          const oldAmt = calcData.base["Base.nAmt"];
+          if (newPrm === oldPrm && newAmt === oldAmt) {
             submitEdrToUndr(res).then((result) => {
               if(btn) {
                 btn.loading = false;
@@ -5009,7 +5011,7 @@ if(props.param.cTransMrk !== "1"){
             });
           } else {
             needCalc.value = true;
-            ElMessage.error("保费发生变化,请重新进行保费计算!");
+            ElMessage.error("保额或保费发生变化,请重新进行保费计算!");
           }
         }
       } catch (err) {
