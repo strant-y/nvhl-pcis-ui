@@ -737,7 +737,7 @@ function getTermData(){
 function previewTerm() {
   const newparam = { cTermNo: termdata.value['Term.cClauseCode'], pageNum: 1, pageSize: 10 };
   viewPdfProposalPost(newparam).then((res:any) => {
-    if(res.code != '1') {
+    if(res.code == '0') {
       ElMessage.error(res.message)
     } else {
       viewPdfProposal(newparam).then((res:any) => {
