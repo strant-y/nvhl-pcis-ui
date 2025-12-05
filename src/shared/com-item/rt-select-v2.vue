@@ -27,7 +27,7 @@
         @visible-change="showOptions"
         @change="handleChange"
         :style="{'min-width': item.minWidth || '50px'}"
-        :fit-input-width="false"
+        :fit-input-width="fitInputWidth()"
         popper-class="rt-select-popper"
       >
         <template
@@ -479,6 +479,10 @@ function setChangeInfo(content: any) {
   }
 }
 
+function fitInputWidth() {
+  return false;
+}
+
 onUnmounted(() => {
   if(Object.keys(codeListMap).length > 0) {
     const rowId = props.row && props.row._dataId ? props.row._dataId : '';
@@ -502,5 +506,6 @@ defineExpose({
 }
 .rt-select-popper .el-select-dropdown__item {
   width: auto!important;
+  min-width: 100%;
 }
 </style>
