@@ -500,7 +500,8 @@ defineExpose({
 .rt-select-popper .el-select-dropdown {
   width: auto!important;
 }
-.rt-select-popper .el-select-dropdown__item {
+/* .rt-select-popper .el-select-dropdown__item {
   width: auto!important;
-}
+  min-width: 100%
+} */
 </style>
