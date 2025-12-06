@@ -5,15 +5,15 @@
       title="选择付费方式"
       @close="closeDialog"
     >
-    <div style="height:150px">
+    <div>
       <el-form
         ref="dataFormRef"
         :model="formData"
         :rules="rules"
-        label-width="80px"
+        label-width="100px"
       >
         <el-form-item label="付费方式" prop="paymentMethod">
-          <el-select-v2 v-model="formData.paymentMethod" size="large" :options="paymentMethodList" placeholder="请选择付费方式">
+          <el-select-v2 v-model="formData.paymentMethod" size="large" :options="paymentMethodList" :disabled="formData.cRenewMrk == '1'" placeholder="请选择付费方式">
             <!-- <el-option
                 v-for="(item, index) in paymentMethodList"
                 :key="index"
@@ -53,6 +53,41 @@
                 @change="selectedItem"
             />
         </el-form-item>
+				<el-form-item
+            id="cRenewMrk"
+            label="投保标识"
+            prop="cRenewMrk"
+            :rules="[getRules('required', {})]"
+          >
+            <el-radio-group v-model="formData.cRenewMrk">
+              <el-radio value="0">新保</el-radio>
+              <el-radio value="1">续保</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item
+            id="cPlyNo"
+            v-if="formData.cRenewMrk == '1'"
+            label="上年保单号"
+            prop="cPlyNo"
+            :rules="[getRules('required', {})]"
+          >
+            <el-input
+              style="width: 300px"
+              placeholder="请输入续保保单号"
+              v-model="formData.cPlyNo"
+            >
+            </el-input>
+						<rt-button
+              :item="{
+                type: 'primary',
+                label: '查询',
+                btnStyle: {'margin-left': '10px'},
+                func: () => {
+                  renewalQuery();
+                },
+              }"
+            />
+          </el-form-item>
       </el-form>
     </div>
       <template #footer>
@@ -71,7 +106,19 @@ import { ref } from "vue";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {codelistQuery} from "@/api/dict";
 import { listChrDepts } from "@/api/dept";
-import {useUserStore} from "@/store";
+import { useUserStore } from "@/store";
+import {
+  checkRenewalDpt,
+  getECargoPolicyComponent,
+	getECargoPolicyForRenewal,
+	getECargoPolicyPayment,
+} from "../../pcis/guide/custom-recording.service";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { useRouter } from "vue-router";
+import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
+const policyService = new PolicyService();
+const dzmodal = useDzModal();
+const router = useRouter();
 const paymentMethodList = ref([
     {label:'预付', value:'01'},
     {label:'非预付', value:'02'}
@@ -96,7 +143,9 @@ const formData = reactive<DictTypeForm>({
     paymentMethod: '',
     cDptCde: "",
     cDptCnm: "",
-    dptCde:"",
+		dptCde: "",
+		cRenewMrk: "0",
+		cPlyNo: "",
 });
 const userStore = useUserStore();
 const dptCdeList = ref<any[]>([]);
@@ -129,7 +178,7 @@ const getDptCdeList = ()=> {
 
 // 查询出单机构
 const cDptCdeLoading = ref(false);
-const getCDptCdeList = (data: any)=> {
+const getCDptCdeList = (data: any, data2) => {
     cDptCdeLoading.value = true;
     listChrDepts({cDptRelCde: data,cSignDptMrk: '1',cDptCls: '2'}).then(({data, code}) => {
         if (code === 200) {
@@ -140,7 +189,10 @@ const getCDptCdeList = (data: any)=> {
 
           // 清空已选择的承保机构
           formData.cDptCde = "";
-          formData.cDptCnm = "";
+					formData.cDptCnm = "";
+					if (data2) {
+						selectedItem(data2)
+					}
         }
         cDptCdeLoading.value = false;
     }).catch(err => console.error(err));
@@ -168,16 +220,74 @@ const method = {};
 
 // 确定
 function confirm() {
-  dataFormRef.value.validate((isValid: boolean) => {
+  dataFormRef.value.validate(async(isValid: boolean) => {
     if (isValid) {
       const param = formData.paymentMethod;
       const dptCde = formData.dptCde;
       const cDptCde = formData.cDptCde;
-      const cDptCnm = formData.cDptCnm;
-      if (param) {
-        closeDialog();
-        emits("ok", { param,dptCde,cDptCde,cDptCnm });
-      }
+			const cDptCnm = formData.cDptCnm;
+			// 点击下一步前校验，如果data为true则继续，否则阻断并提示
+			if (formData.cRenewMrk === "1") {
+				const queryProdDptCdeParam:any = { cDptCde }
+        if(formData.cPlyNo?.length > 19) {
+          ElMessage.error("历史数据的保单, 不允许续保");
+          return;
+        }
+        // if (cannotCopy(formData.cPlyNo)) {
+        //   ElMessage.error("该保单不允许续保");
+        //   return;
+        // }
+        queryProdDptCdeParam['cPlyNo'] = formData.cPlyNo 
+      	const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
+				if(queryProdDptCde.data !== true) {
+					ElMessage.error(queryProdDptCde.msg)
+					return
+				}
+      	const data = formData.value;
+				getECargoPolicyForRenewal({ cEcAgrNo: formData.cPlyNo, components: [renewalComponent.value] }).then(
+					async (res: any) => {
+						if (res.code == "200") {
+						//校验两个机构是否是同一个二级机构
+							// var same;
+							// await checkRenewalDpt({
+							// 	cDptCde_ply: res.res.composition.AgreementBase[0]?.['ECargoBase.cDptCde'],
+							// 	cDptCde_app: formData.cDptCde
+							// }).then((response: any) => {
+							// 	if (response.code === 200) {
+							// 		same = response.data == 1;
+							// 	} else {
+							// 		ElMessage.error(response.msg);
+							// 	}
+							// });
+							// if (!same) {
+							// 	ElMessage.warning("续保保单的承保机构编码【" + res.res.composition.AgreementBase[0]?.['ECargoBase.cDptCde'] + "】与当前选择的承保机构不在同一【二级机构】下，请重新选择！");
+							// 	return
+							// }
+							// if (res.res.composition.AgreementBase[0]?.['ECargoBase.cTransMrk'] === '1') {
+							// 	ElMessage.warning("该保单不允许续保，请重新选择！");
+							// 	return
+							// }
+							closeDialog();
+							router.push({
+								path: "/protocolManagement/enteringDtl",
+								query: {
+									param: JSON.stringify({res}),
+									type: 'orig',
+									payWay: param
+								},
+							});
+						} else {
+							ElMessage.error(res.msg);
+						}
+					}
+				);
+			} else {
+				if (param) {
+        	closeDialog();
+        	emits("ok", { param,dptCde,cDptCde,cDptCnm });
+      	}
+			}
+      
     }
   });
 }
@@ -195,6 +305,49 @@ function resetForm() {
   formData.paymentMethod = undefined;
 }
 
+// 续保查询
+const renewalDialog = defineAsyncComponent(() => import("../../pcis/guide/renewalDialog.vue"));
+const renewalComponent = ref({})
+function renewalQuery() {
+  if(!formData.cPlyNo) {
+    ElMessage.warning("请输入上年保单号！")
+    return;
+  }
+	getECargoPolicyComponent({ cPlyNo: formData.cPlyNo }).then((res: any) => {
+    if(res.res.length > 0) {
+      dzmodal
+        .open(renewalDialog, { 
+          type: "Issuer",
+          cPlyNo: formData.cPlyNo,
+          options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
+          selected: Object.keys(res.res[0]).map((item:any) => item)
+        })
+        .then((res: any) => {
+					if (res.type === 'ok') {
+						renewalComponent.value = res.body.component
+						// 续保根据单号获取付费方式
+						getECargoPolicyPayment({ cPlyNo: formData.cPlyNo }).then((res1: any) => {
+							if (res1 && res1.code == 200) {
+								formData.paymentMethod = res1.data.paymentMethod
+								formData.dptCde = res1.data.dptCde
+								// formData.cDptCde = res1.data.cDptCde
+								getCDptCdeList(res1.data.dptCde, res1.data.cDptCde)
+              } else {
+                ElMessage.error(res1.msg);
+              }
+						})
+						.catch((err: any) => {
+              ElMessage.error(err.msg);
+            });
+          }
+        });
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch(err => {
+    ElMessage.error(err.msg || err)
+  })
+}
 </script>
 
 <style scoped>
