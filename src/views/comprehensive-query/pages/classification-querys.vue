@@ -1201,7 +1201,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示投保日期
                               // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                              const startDate = moment(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                              const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
