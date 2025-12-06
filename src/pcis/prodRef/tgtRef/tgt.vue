@@ -299,7 +299,7 @@ const wagesInfoModel = () => {
   });
 }
 //水运规则    "Tgt.cTransportationName",
-const tgtWaterMatterList: Array<string> = ["Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.tConstructionYear", "Tgt.nTransTotalTon", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge"]
+const tgtWaterMatterList: Array<string> = ["Tgt.cShipName", "Tgt.cTransportVoyage", "Tgt.tConstructionYear", "Tgt.nTransTotalTon", "Tgt.cShipRegistration", "Tgt.nTransportationShipAge", "Tgt.cShipType", "Tgt.cShipClassOne", "Tgt.cShipClassTwo", "Tgt.cShipClassThree", "Tgt.cOldshipSurcharge","Tgt.cLicenseNumber","Tgt.cFrameNumber"]
 //水运外其他规则
 const tgtOtherMatterList: Array<string> = ["Tgt.cLicenseNumber", "Tgt.cFrameNumber", "Tgt.cTransitMode"]
 //非水运隐藏

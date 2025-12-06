@@ -561,7 +561,22 @@ const method = {
       setValue('Base.cTmLoanTrm', '')
     }
   },
-
+  // 试车期起期
+  tTrialBgnTmChange: (v:any) => {
+    const endTm = getValue('Base.tTrialEndTm')
+    if(v && endTm && dayjs(endTm).isBefore(dayjs(v))) {
+      setValue('Base.tTrialBgnTm', '')
+      ElMessage.warning("试车期起期不能大于试车期止期")
+    }
+  },
+  // 试车期止期
+  tTrialEndTmChange: (v:any) => {
+    const bgnTm = getValue('Base.tTrialBgnTm')
+    if(v && bgnTm && dayjs(bgnTm).isAfter(dayjs(v))) {
+      setValue('Base.tTrialEndTm', '')
+      ElMessage.warning("试车期止期不能小于试车期起期")
+    }
+  },
 };
 
 // 绑定特殊验证器

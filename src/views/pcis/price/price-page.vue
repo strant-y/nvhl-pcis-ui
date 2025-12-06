@@ -1373,6 +1373,15 @@ const initPage = async () => {
   if(props.param.cTermNo === "0420092701"){
     exParams = { exp:'1' }
   }
+  if(props.param.cTermNo === "0419110501"){
+    exParams = { exp:'5' }
+  }
+  if(props.param.cTermNo === "0422022401"){
+    exParams = { exp:'7' }
+  }
+  if(props.param.cTermNo === "0424091305"){
+    exParams = { exp:'9' }
+  }
   let pageparams = {
     CProdNo: props.param.cProdNo,
     CGrpMrk: props.param.cGrpMrk,
