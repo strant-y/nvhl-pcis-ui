@@ -104,7 +104,7 @@ onMounted(() => {
     // });
     setValue("Applicant.cNation", "CHN"); // 国籍默认中国
     // 客户名称增加校验规则
-    setFormItem("Applicant.cAppNme", { rules: [getRules("cAppNme", {})], });
+    setFormItem("Applicant.cAppNme", { rules: [getRules("required", {}), getRules("cAppNme", {})], });
     //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
     const cProdNo = param.cProdNo;
     if (

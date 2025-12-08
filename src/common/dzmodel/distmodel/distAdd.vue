@@ -506,6 +506,22 @@ onMounted(() => {
         setValue('Dist.nServiceLife', year);
       }
     }
+    // 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
+    if(item.prop === 'Dist.cDeductibleClass' && route.params.param.cProdNo == '090001') {
+      item.func = (val:any) => {
+        setFormItem('Dist.cItemLiability', { loadData: [] })
+        if(val) {
+          codeListStore
+            .queryCodeList({
+              codeListName: val === '第三者责任' ? 'mianpeileixing2' : 'mianpeileixing',
+              codeListParam:{},
+            })
+            .then((res) => {
+              setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res })
+            });
+        }
+      }
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;

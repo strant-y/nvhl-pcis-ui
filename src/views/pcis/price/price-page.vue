@@ -3104,6 +3104,8 @@ const calcPremium = () => {
       const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
       const nPayNum = Number(ops['base']?.['Base.nPayNum'] || 0)  // "1"  缴费期数
       const cNeedfeeFlag = ops['plyBase']?.['Base.cNeedfeeFlag'];
+      // 不见费出单原因
+      const cCanclfeersnCde = ops['plyBase']?.['Base.cCanclfeersnCde'];
       if(cDptCde.startsWith('02370') && !cDptCde.startsWith('023702') && okProdPre.some(item => prod.startsWith(item)) 
         && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY") && (['0', '1'].includes(cClntMrk))){
         shanDongFlag = true;
@@ -3131,7 +3133,7 @@ const calcPremium = () => {
             opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
             opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
           })
-        } else if (isShortTerm && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')) {
+        } else if (isShortTerm && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0') && cCanclfeersnCde!='NVPSM04') {// NVPSM04 政府主导或财政支持的统保项目
           ElMessageBox.alert(
           "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
           "提示", 
@@ -5517,6 +5519,9 @@ const validateShanDong = async () => {
   const basePrmCur = parseFloat(baseData["Base.nPrm"] || 0); //承保基本信息 总保费 
   const cInstMrk = baseData['Base.cInstMrk'] || '0'; // 缴费次数 
   const basePrm = baseData["Base.cPrmCur"]; //承保基本信息 总保费币种   // "CNY"
+  const cNeedfeeFlag = baseData['Base.cNeedfeeFlag'];
+  // 不见费出单原因
+  const cCanclfeersnCde = baseData['Base.cCanclfeersnCde'];
 
   // 机构是山东分公司
   if (!String(cDptCdeA).startsWith('02370') || String(cDptCdeA).startsWith('023702')) return false;
@@ -5579,20 +5584,22 @@ const validateShanDong = async () => {
     })
     return true;
   }
-  const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
-  if (isShortTerm) {
-     ElMessageBox.alert(
-    "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
-    "提示", 
-    {
-      confirmButtonText: "确定",
-      type: "warning",
-    })
-    .then(() => {
-      opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-      opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
-    })
-    return true;
+  if(cNeedfeeFlag == '0' && cCanclfeersnCde!='NVPSM04'){
+    const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
+    if (isShortTerm) {
+      ElMessageBox.alert(
+      "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
+      "提示", 
+      {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+      .then(() => {
+        opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+        opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+      })
+      return true;
+    }
   }
   // 投保人为非个人且单张保单签单保费大于10万元
   if (AppcClntMrk == "0" && Number(basePrmCur) > 100000 ) {
