@@ -195,8 +195,12 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 });
             }
         }
-        const setDisabledAll = () => {
-            Object.keys(tableRefs).forEach(key => {
+        const setDisabledAll = (targetKeys?: string[]) => {
+						// 如果传了 targetKeys，只处理这些 key；否则处理所有 key
+						const keysToProcess = targetKeys && targetKeys.length > 0
+						? targetKeys.filter(key => tableRefs.hasOwnProperty(key)) // 确保 key 存在
+						: Object.keys(tableRefs);
+            keysToProcess.forEach(key => {
                 if (tableRefs[key] && tableRefs[key].getFormconfig) {
                     // 配置层面已经实现只读,这里不再实现
                     const f = tableRefs[key].getFormconfig();

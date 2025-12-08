@@ -214,14 +214,20 @@ onMounted(async () => {
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
-    };
+		};
+		if (parparam.cRecordType == '9') {
+			param.riskList = [parparam.cRiskNo] 
+		}
     qryProdRelTermRiskList(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         let plans: any[] = [];
         data.forEach((item: any) => {
           let riskList: { [key: string]: any }[] = [];
-          item.children?.forEach((e: any) => {
+					item.children?.forEach((e: any) => {
+						if (parparam.cRecordType == '9' && e.cRiskNo != parparam.cRiskNo) {
+							return false
+						}
             riskList.push({
               "TermRisktgt.cLiabCode": e.cRiskNo,
               "TermRisktgt.cDeductibleMethod": "01",
@@ -250,7 +256,7 @@ onMounted(async () => {
               item['TermRisktgt.cValueMethod'] = '589003';
             })
           }
-          if(item.cUniqueTermNo && item.cPrimaryMrk === '1'){
+          if(item.cUniqueTermNo && item.cPrimaryMrk === '1' && parparam.cRecordType != '9'){
             // 部分条款责任互斥,所以互斥条款,不再加载对应的责任信息
             data.riskList = [];
           }else{  
@@ -369,7 +375,8 @@ function addTermData() {
       data: {
         cProdNo: param.cProdNo,
         isselectData: iss,
-        cEcAgrNo:param?.cEcAgrNo || ''
+				cEcAgrNo: param?.cEcAgrNo || '',
+				cRecordType: parparam.cRecordType
       },
     },
     {
@@ -596,19 +603,44 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  const terms: any[] = [];
-  formData.value = {};
-  let plandata: any[] = [];
-  value.forEach((item: any) => {
-    let creData = JSON.parse(JSON.stringify(item));
-    creData["riskList"] = creData["Term.riskList"];
-    terms.push(creData["Term.cClauseCode"]);
-    delete creData["Term.riskList"];
+  const getvalue = getFromValue();
+  const terms: string[] = [];
+  const plandata: any[] = [];
+
+  // 公共处理单个 item 的函数
+  const processItem = (item: any) => {
+    const newItem = JSON.parse(JSON.stringify(item)); // 深拷贝
+    newItem.riskList = newItem['Term.riskList'];
+    terms.push(newItem['Term.cClauseCode']);
+    delete newItem['Term.riskList'];
+
     if(creData['Term.cDistCodeNo'] && parparam.cProdNo.startsWith("01")) {// Term.cDistCodeNo 01产品是下拉多选 02 是输入框选择货物后带出
-      creData['Term.cDistCodeNo'] = creData['Term.cDistCodeNo'].split(',')
+      newItem['Term.cDistCodeNo'] = newItem['Term.cDistCodeNo'].split(',');
     }
-    plandata.push(creData);
-  });
+
+    return newItem;
+  };
+
+  if (parparam.cRecordType == '9' && getvalue.length > 0) {
+    // 复用 getvalue 中 cRdrTyp === '0' 的项，并用 value 中的 nRateVal 更新
+    getvalue.forEach((baseItem: any) => {
+      if (baseItem['Term.cRdrTyp'] == '0') {
+        // 用 value[0] 的 nRateVal 更新
+        const rateVal = value[0]?.['Term.nRateVal']; // 或根据索引/匹配逻辑
+        if (rateVal != undefined && baseItem['Term.riskList']?.[0]) {
+          baseItem['Term.riskList'][0]['TermRisktgt.nItemRate'] = rateVal;
+        }
+        plandata.push(processItem(baseItem));
+      }
+    });
+  } else {
+    // 直接处理 value 中每一项
+    value.forEach((item: any) => {
+      plandata.push(processItem(item));
+    });
+  }
+
+  formData.value = {};
   refushData(plandata);
   updateEdrItem(terms);
 }
@@ -628,10 +660,14 @@ async function validate() {
 function showFlush() {
   Object.keys(tremTemplateRefs.value).forEach((item: any) => {
     if (tremTemplateRefs.value[item]) {
-      tremTemplateRefs.value[item].dataFlash();
+      tremTemplateRefs.value[item]?.dataFlash();
     }
   });
   updateBtn();
+}
+
+function DistdataFlash(item) {
+  tremTemplateRefs.value[item]?.dataFlash();
 }
 
 function updateBtn() {
@@ -735,14 +771,14 @@ function calcCheck(){
   };
 }
 const setCargoSeq = (value: string, pkId: string, amount: string) => {
-  const {index, data} = selectedRow.value;
+	const { index, data } = selectedRow.value;
   if(formData.value['m'] && formData.value['m'].length > 0) {
-    if(data['Term.cClauseCode']) {
+    if(data && data['Term.cClauseCode']) {
       formData.value['m'][index]['Term.cDistCodeNo'] = value;
       formData.value['m'][index]['Term.cDistPkId'] = pkId;
       formData.value['m'][index]['Term.nInsuranceAmount'] = amount;
       selectedRow.value.data = formData.value['m'][index];
-    }else {
+    }else if (index) {
       formData.value['m'][index]['riskList'].forEach((item: any) => {
         if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
           item['TermRisktgt.cDistCodeNo'] = value;
@@ -751,7 +787,13 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
           selectedRow.value.data = item;
         }
       });
-    }
+		} else {
+			formData.value['m'][0]['riskList'].forEach((item: any) => {
+        item['TermRisktgt.cDistCodeNo'] = value;
+        item['TermRisktgt.cDistPkId'] = pkId;
+        item['TermRisktgt.nInsuranceAmount'] = amount;
+      });
+		}
   }
   emit('savePlyInfo');
 };
@@ -790,7 +832,9 @@ defineExpose({
   setTermData,
   refushCvrgInfo,
   getAddrSeqOptions,
-  getPlanNo,
+	getPlanNo,
+	setCargoSeq,
+	DistdataFlash,
 });
 </script>
 

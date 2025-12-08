@@ -1574,16 +1574,17 @@ async function loadAfter() {
 				cEcAgrAppNo: props.param.cEcAgrAppNo, // 协议申请单号
 				cProdNo: props.param.cProdNo, // 产品编码
 				cTermNo: props.param.cTermNo, // 条款代码
+				cRiskNo: props.param.cRiskNo, // 责任编码
 				cInsuredCde: props.param.cInsuredCde, // 被保人代码
 				insuredNme: props.param.cInsuredNme, // 被保人名称
 			}
 			const res: any = await queryEcargoRelevancePolicyDetails(params);
-			if(res["code"] == 200){
+			if (res["code"] == 200) {	
 				if(!!res.data.policyApplication?.composition){
 					dataInit.value.insured = res.data.policyApplication?.composition?.insured[0] || {};
 					dataInit.value.applicant = res.data.policyApplication?.composition?.applicant[0] || {};
-					// dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || {};
-          dataInit.value.SpecialAgreement = res.data.policyApplication?.composition?.SpecialAgreement || {};
+					dataInit.value.cvrg = res.data.policyApplication?.composition?.cvrg || [];
+          dataInit.value.SpecialAgreement = res.data.policyApplication?.composition?.SpecialAgreement || [];
           dataInit.value.base["Base.cFinTyp"] = res.data.policyApplication?.composition?.plyBase[0]["Base.cFinTyp"] || "";
           dataInit.value.base["Base.cInstMrk"] = res.data.policyApplication?.composition?.plyBase[0]["Base.cInstMrk"] || "0";
           dataInit.value.base["Base.nPayNum"] = res.data.policyApplication?.composition?.plyBase[0]["Base.nPayNum"] || "1";
@@ -1607,8 +1608,12 @@ async function loadAfter() {
 				return false;
 			}
 		}
-    nextTick(() => {
-      opertaor.setDataAll(dataInit.value);
+		nextTick(() => {
+			opertaor.setDataAll(dataInit.value);
+			// 协议录单，基本信息和投保人信息只读
+			if (props.param.cRecordType === 9) {
+				opertaor.setDisabledAll(['plyBase','applicant'])
+			}
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1' && props.param.cAppTyp !== 'E') {
     // 暂存单

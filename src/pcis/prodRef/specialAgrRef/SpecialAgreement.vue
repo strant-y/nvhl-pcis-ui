@@ -43,6 +43,7 @@ import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useI
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formData = ref<any[]>([]);
+const param = opertaor.getParam();
 // const formData = reactive([]);
 const dzmodal = useDzModal();
 const dialog = ref<DialogMethod | null>(null);
@@ -274,7 +275,7 @@ const addData =()=>{
       }
     })
     if(isAdd){
-         ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
+      ElMessage.warning("分期付费业务，需在特别约定中增加及时缴纳保费的提示信息");
       obj =[...formData.value, { 
         addIndex: 1,
         cIfEdit: "0",
@@ -343,8 +344,10 @@ onMounted(async () => {
     item.index = index + 1;
   });
   const gettAppTm = setInterval(() => {
-    if(opertaor.getDataAll().insrnc?.['Base.tAppTm']) {
-      refreshData();
+		if (opertaor.getDataAll().insrnc?.['Base.tAppTm']) {
+			if (param.cRecordType != '9') {
+				refreshData();
+			}
       clearInterval(gettAppTm);
     }
   }, 500)
