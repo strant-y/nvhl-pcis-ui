@@ -543,7 +543,7 @@ import { initMultiCodeList } from "@/api/code-list-service";
 import { getAppPolicyList, getInquiryPolicyList} from "@/api/query";
 import {encryptRouterParam} from "@/router";
 import SvgIcon from "@/components/SvgIcon/index.vue";
-import { distRequiredMap } from './requiredDistMap';
+import { distRequiredMap, clickableProducts } from './requiredDistMap';
 import { ElTable, ElTableColumn } from 'element-plus';
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
@@ -1000,6 +1000,15 @@ const getWindExploration = ()=>{
     });
 }
 
+// 问卷信息
+const questionnaireInfo = () => {
+	// 假设你想打开 /dashboard 页面
+	const baseUrl = import.meta.env.VITE_APP_API_WJ_URL
+	const	cProdNo = props.param.cProdNo
+	const	cKindNo = cProdNo.substring(0, 2)
+	const url = `${baseUrl}/cover?cKindNo=${cKindNo}&cProdNo=${cProdNo}&cNumNo=${getNo.value}`;
+	window.open(url, '_blank');
+}
 
 //  复制保单
 const copyPolicyFun = () => {
@@ -1514,7 +1523,7 @@ function renderComponents() {
  * 页面加载后
  */
 async function loadAfter() {
-   if(props.param?.cTransMrk === '1' && props.param?.pageType === 'EDR_APP_NEW_SCENE'){ //历史数据补全
+  if(props.param?.cTransMrk === '1' && props.param?.pageType === 'EDR_APP_NEW_SCENE'){ //历史数据补全
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     bthList.value = edrAddDataBtn;
@@ -1563,7 +1572,22 @@ async function loadAfter() {
 						startWindExploration(); 
 					},
         }),
-      );
+			);
+			if (clickableProducts.includes(props.param?.cProdNo)) {
+				bthList.value.push(
+					createFreeButtonBase({
+						label: "问卷信息",
+						type: "primary",
+						func: () => {
+							if (getNo.value == '暂无') {
+								ElMessage.error('询价单号为空,请保存后操作!');
+								return false;
+							}
+							questionnaireInfo(); 
+						},
+					}),
+				)
+			}
     } else {
       bthList.value = basicBtn;
       rightBtnList.value = basicRightBtn.filter(item => !item.hidden)
@@ -1636,6 +1660,21 @@ async function loadAfter() {
 						},
 					}),
 				)
+				if (clickableProducts.includes(props.param?.cProdNo)) {
+					bthList.value.push(
+						createFreeButtonBase({
+							label: "问卷信息",
+							type: "primary",
+							func: () => {
+								if (getNo.value == '暂无') {
+									ElMessage.error('询价单号为空,请保存后操作!');
+									return false;
+								}
+								questionnaireInfo(); 
+							},
+						}),
+					)
+				}
 			}
     }
 
