@@ -3860,6 +3860,14 @@ const savePlyInfo = async () => {
       }
   }
 
+  if(!res['insrnc']['Base.tInsrncBgnTm'] || !res['insrnc']['Base.tInsrncEndTm']) {
+    ElMessage.error('保险起期和保险止期不能为空！');
+    if(btn) {
+      btn.loading = false;
+    }
+    return false;
+  }
+
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
