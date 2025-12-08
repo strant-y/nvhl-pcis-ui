@@ -187,34 +187,20 @@ watch(
 					const cPackageMethod = newVal.map(item => codeListStore.getLabelByValue('packaging_method',item['Dist.cPackageMethod'])).join(','); // 包装方式
 					const nInsuranceAmount = newVal.reduce((sum, obj) => sum + (obj['Dist.nInsuranceAmount'] || 0), 0); // 保险金额
 					let tgtRef = opertaor.getTableRefByKey('tgt');
-					tgtRef.setValue('Tgt.cTradeNum', cTradeNum);
-					tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum);
-					tgtRef.setValue('Tgt.cLadingNum', cBillNum);
-					tgtRef.setValue('Tgt.cCreditNum', cLetterNum);
-					tgtRef.setValue('Tgt.cMarkLabel', cMarkLabel);
-					tgtRef.setValue('Tgt.cPackageMethod', cPackageMethod);
+					tgtRef.setValue('Tgt.cTradeNum', cTradeNum || '');
+					tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum || '');
+					tgtRef.setValue('Tgt.cLadingNum', cBillNum || '');
+					tgtRef.setValue('Tgt.cCreditNum', cLetterNum || '');
+					tgtRef.setValue('Tgt.cMarkLabel', cMarkLabel || '');
+					tgtRef.setValue('Tgt.cPackageMethod', cPackageMethod || '');
 					tgtRef.setValue('Tgt.nInsuranceAmount', nInsuranceAmount);
 				} else {
 					if (!isQuery.value) {
 						eventBus.emit('goodsMxChange', newVal);
 					}
 				}
-				if (isQuery.value) return
-				
-        // 02开头的货物明细清单，关联标的信息
-        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
-           method.getTgtDetailFn();
-           emit('savePlyInfo');
-        }
-        // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
-        const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
-        if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
-          const cvrgRef = opertaor.getTableRefs()['cvrg'];
-          cvrgRef?.getAddrSeqOptions()
-				}
-
 				// 协议
-				if (props.compKey === 'CargoDist020001') {
+				if (props.pageSchema.title === '货物明细信息') {
 						let tgtRef = opertaor.getTableRefByKey('cvrg');
             if(newVal.length>0){
 							const paramA = {
@@ -242,6 +228,19 @@ watch(
 							tgtRef.setCargoSeq('','','');
 						}
 						tgtRef.DistdataFlash('m0')
+				}
+				if (isQuery.value) return
+				
+        // 02开头的货物明细清单，关联标的信息
+        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
+           method.getTgtDetailFn();
+           emit('savePlyInfo');
+        }
+        // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
+        const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
+        if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
+          const cvrgRef = opertaor.getTableRefs()['cvrg'];
+          cvrgRef?.getAddrSeqOptions()
 				}
       }
     }
