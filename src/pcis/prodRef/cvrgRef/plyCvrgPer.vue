@@ -614,7 +614,7 @@ function setFormValue(value: any) {
     terms.push(newItem['Term.cClauseCode']);
     delete newItem['Term.riskList'];
 
-    if(creData['Term.cDistCodeNo'] && parparam.cProdNo.startsWith("01")) {// Term.cDistCodeNo 01产品是下拉多选 02 是输入框选择货物后带出
+    if(newItem['Term.cDistCodeNo'] && parparam.cProdNo.startsWith("01")) {// Term.cDistCodeNo 01产品是下拉多选 02 是输入框选择货物后带出
       newItem['Term.cDistCodeNo'] = newItem['Term.cDistCodeNo'].split(',');
     }
 
