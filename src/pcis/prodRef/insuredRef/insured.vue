@@ -107,7 +107,7 @@ onMounted(() => {
     cProdNo === "043005" ||
     cProdNo === "043011"
   ) {
-    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
   }
   if (cProdNo === '130003') {
     setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -612,6 +612,7 @@ const method = {
       // 为法人 国民经济行业必填
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
+        btnItems: { disabled: false }
       });
 
       // 单位性质 --为企业做必填校验
@@ -842,10 +843,11 @@ const method = {
         cProdNo === "043005" ||
         cProdNo === "043011"
       ) {
-        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
       } else {
         setFormItem("Insured.cTrdCde", {
           rules: null,
+          btnItems: { disabled: true }
         });
       }
 

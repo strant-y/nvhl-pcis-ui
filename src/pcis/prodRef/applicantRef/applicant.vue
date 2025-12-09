@@ -103,7 +103,7 @@ onMounted(() => {
       cProdNo === "043005" ||
       cProdNo === "043011"
     ) {
-      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
     }
     if (cProdNo === '130003') {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -719,6 +719,7 @@ const method = {
       // 为法人 国民经济行业必填
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
+        btnItems: { disabled: false }
       });
       setFormItem("Applicant.cIsMicroEntpris", {
         rules: [getRules("required", {})],
@@ -855,11 +856,12 @@ const method = {
         cProdNo === "043005" ||
         cProdNo === "043011"
       ) {
-        setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+        setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
 
       } else {
         setFormItem("Applicant.cTrdCde", {
           rules: [],
+          btnItems: { disabled: true }
         });
       }
       //实名认证方式
