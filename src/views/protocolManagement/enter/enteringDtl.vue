@@ -385,10 +385,6 @@ onBeforeMount(async () => {
 			}
 		})
 	}
-  nextTick(() => {
-    const agreementBase = formPage.value?.getComponentRefById('AgreementBase');
-    agreementBase.addProvide(CommonConstants.FORM_EQ_EXCLUDE_KEY, ['ECargoBase.cEcAgrAppNo', 'ECargoBase.tOprTm', 'ECargoBase.tIssueTm"'])
-  })
   bthList.value.push(
       createFreeButtonBase({
         label: "返回",
