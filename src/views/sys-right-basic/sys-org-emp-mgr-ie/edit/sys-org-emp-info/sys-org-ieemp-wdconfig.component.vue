@@ -183,7 +183,7 @@ function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const formParam = getFrom();
-      const param = Object.assign({ type: props.type, flag: "ie" }, formParam);
+      const param = Object.assign({ type: props.type, isie: "1" }, formParam);
       saveKindInfo(param)
         .then((res) => {
           const { code, data, msg } = res;
@@ -240,7 +240,7 @@ function handleQuery(flag?: boolean) {
 	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
 	const s = freeEditRef.value?.getFromValue(); //获取表单数据
 	const param = Object.assign(s, r);	
-	param.flag = "ie"
+	param.isie = "1"
 	sysRolechatsMgrService.searchPlan(param)
 		.then((res) => {
 			const { code, data, msg } = res;

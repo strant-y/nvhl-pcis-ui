@@ -312,8 +312,7 @@ function handleQuery(flag?: boolean) {
       const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
       const s = freeEditRef.value?.getFromValue(); //获取表单数据
 			const param = Object.assign(s, r);
-			param.flag = "ie"
-			debugger
+			param.isie = "1"
       sysOrgEmpMgrService.qryOrgEmpList(param)
       .then((res) => {
         const { code, data, msg } = res;

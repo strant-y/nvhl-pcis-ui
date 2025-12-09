@@ -107,7 +107,7 @@ function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const formParam = getFrom();
-      const param = Object.assign({ type: props.type, flag:"ie" }, formParam);
+      const param = Object.assign({ type: props.type, isie: "1" }, formParam);
       saveKindInfo(param)
         .then((res) => {
           const { code, data, msg } = res;

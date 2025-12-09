@@ -314,7 +314,7 @@ function save() {
     if (isValid) {
       //const formParam = getFrom();
       let s = freeEditRef.value?.getFromValue(); 
-      const param = Object.assign({ type: props.type, cIsValid: '1',flag: "ie" }, s);
+      const param = Object.assign({ type: props.type, cIsValid: '1', isie: "1" }, s);
       sysOrgEmpMgrService.saveOrgEmpInfo(param)
         .then((res) => {
           const { code, data, msg } = res;
