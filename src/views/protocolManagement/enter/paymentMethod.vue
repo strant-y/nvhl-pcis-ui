@@ -31,6 +31,7 @@
             <el-select-v2
                 v-model="formData.dptCde"
                 :options="dptCdeList"
+								:disabled="formData.cRenewMrk == '1'"
                 placeholder="分公司"
                 size="large"
                 filterable
@@ -45,6 +46,7 @@
             <el-select-v2
                 v-model="formData.cDptCde"
                 :options="cDptCdeList"
+								:disabled="formData.cRenewMrk == '1'"
                 placeholder="承保机构"
                 size="large"
                 :loading="cDptCdeLoading"
@@ -228,45 +230,14 @@ function confirm() {
 			const cDptCnm = formData.cDptCnm;
 			// 点击下一步前校验，如果data为true则继续，否则阻断并提示
 			if (formData.cRenewMrk === "1") {
-				const queryProdDptCdeParam:any = { cDptCde }
         if(formData.cPlyNo?.length > 19) {
           ElMessage.error("历史数据的保单, 不允许续保");
           return;
         }
-        // if (cannotCopy(formData.cPlyNo)) {
-        //   ElMessage.error("该保单不允许续保");
-        //   return;
-        // }
-        queryProdDptCdeParam['cPlyNo'] = formData.cPlyNo 
-      	const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
-				if(queryProdDptCde.data !== true) {
-					ElMessage.error(queryProdDptCde.msg)
-					return
-				}
       	const data = formData.value;
 				getECargoPolicyForRenewal({ cEcAgrNo: formData.cPlyNo, components: [renewalComponent.value] }).then(
 					async (res: any) => {
 						if (res.code == "200") {
-						//校验两个机构是否是同一个二级机构
-							// var same;
-							// await checkRenewalDpt({
-							// 	cDptCde_ply: res.res.composition.AgreementBase[0]?.['ECargoBase.cDptCde'],
-							// 	cDptCde_app: formData.cDptCde
-							// }).then((response: any) => {
-							// 	if (response.code === 200) {
-							// 		same = response.data == 1;
-							// 	} else {
-							// 		ElMessage.error(response.msg);
-							// 	}
-							// });
-							// if (!same) {
-							// 	ElMessage.warning("续保保单的承保机构编码【" + res.res.composition.AgreementBase[0]?.['ECargoBase.cDptCde'] + "】与当前选择的承保机构不在同一【二级机构】下，请重新选择！");
-							// 	return
-							// }
-							// if (res.res.composition.AgreementBase[0]?.['ECargoBase.cTransMrk'] === '1') {
-							// 	ElMessage.warning("该保单不允许续保，请重新选择！");
-							// 	return
-							// }
 							closeDialog();
 							router.push({
 								path: "/protocolManagement/enteringDtl",
