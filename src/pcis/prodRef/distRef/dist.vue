@@ -197,6 +197,10 @@ watch(
 					} else {
 						distParam['cAppNo'] = app;
 					}
+					let nAdditiveCoefficient = ''
+					if (pageresult.list.length > 0) {
+						nAdditiveCoefficient = pageresult.list[0]['Dist.nAdditiveCoefficient'] // 加成系数（%）
+					}
 					getTgtDetailByDist(distParam).then((res: any) => {
 						if (res["code"] == "200") {
 							const cTradeNum = res.data?.cTradeNum; // 贸易合同号
@@ -214,6 +218,7 @@ watch(
 							tgtRef.setValue('Tgt.cMarkLabel', cMarkLabel);
 							tgtRef.setValue('Tgt.cPackageMethod', cPackageMethod);
 							tgtRef.setValue('Tgt.nInsuranceAmount', nInsuranceAmount);
+							tgtRef.setValue('Tgt.nAdditiveCoefficient', nAdditiveCoefficient);
 						} else {
 							ElMessage.error(res.msg);
 						}
