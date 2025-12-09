@@ -723,6 +723,7 @@ const method = {
   //特殊不见费出单change事件
   specSalesFunc: (val) => {
     // 修改不见费出单原因校验
+    const p = opertaor.getParam();
     if (val == 1) {
       setFormItem("Base.cCanclfeersnCde", {
         rules: [getRules("required", {})],
@@ -733,9 +734,11 @@ const method = {
         setFormItem("Base.cCanclfeersnCde", { typeCode: 'YN_NV_NoPayseeMoeny' });
 
       }
-        } else {
+    } else {
       setFormItem("Base.cCanclfeersnCde", { rules: null, disabled: true });
-      setValue("Base.cCanclfeersnCde", "");
+      if (!p.initFlag) {
+        setValue("Base.cCanclfeersnCde", "");
+      }
     }
   },
   //项目类别大类change事件
