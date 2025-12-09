@@ -72,7 +72,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "text",
         inputtype: "rtinput",
         title: "特约内容",
-        minWidth: 180,
+				minWidth: 180,
+				align: "left"
       },
     ],
   })

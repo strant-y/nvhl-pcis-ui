@@ -39,6 +39,19 @@ export function getAppPolicyForRenewal(queryParams: any): AxiosPromise<any> {
     return post(`policy/getAppPolicyForRenewal`, queryParams);
 }
 
+export function getECargoPolicyComponent(queryParams: any): AxiosPromise<any> {
+	return post(`policy/getECargoPolicyComponent`, queryParams);
+}
+
+export function getECargoPolicyForRenewal(queryParams: any): AxiosPromise<any> {
+	return post(`policy/getECargoPolicyForRenewal`, queryParams);
+}
+
+export function getECargoPolicyPayment(queryParams: any): AxiosPromise<any> {
+	return post(`policy/getECargoPolicyPayment`, queryParams);
+}
+
+
 /*
  * 投保	自定义录单
  */

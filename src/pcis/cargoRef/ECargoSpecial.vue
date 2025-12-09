@@ -256,7 +256,8 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cSpecialContent",
         inputtype: "rtinput",
-        title: "特约内容",
+				title: "特约内容",
+				align: "left"
       },
     ],
   })
@@ -266,7 +267,6 @@ const tableconfig = reactive<AppTableConfig>(
 // 获取默认信息
 
 const addData = () => {
-  debugger
   // 等于江苏分公司加上此条跳跃
   if (params.dptCde !== "0232010000000") return;
   let obj = [];

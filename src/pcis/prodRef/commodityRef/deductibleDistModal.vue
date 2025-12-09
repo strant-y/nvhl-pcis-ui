@@ -138,6 +138,7 @@ const tableConfig = reactive<AppTableConfig>(
         prop: "cNmeCn",
         title: "特约内容",
         inputtype: "rtinput",
+				align: "left"
       },
       {
         prop: "cIfEdit",

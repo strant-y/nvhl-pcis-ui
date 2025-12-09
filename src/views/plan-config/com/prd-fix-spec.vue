@@ -59,11 +59,13 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "PrdFixSpec.CNmeCn",
         inputtype: 'rtinput',
         title: "特约内容",
+				align: "left"
       },
       {
         prop: "PrdFixSpec.CNmeEn",
         inputtype: 'rtinput',
         title: "英文名",
+				align: "left"
       },
     ],
   })
