@@ -1147,7 +1147,10 @@ function renewalQuery() {
     return;
   }
   getAppPolicyComponent({ cPlyNo: formconfig1.value.cPlyNo }).then((res:any) => {
-    if(res.res.length > 0) {
+    debugger
+    if (res.code == 500){
+      ElMessage.error(res.msg)
+    }else if(res.res.length > 0) {
       dzmodal
         .open(renewalDialog, { 
           type: "Issuer",
