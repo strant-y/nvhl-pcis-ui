@@ -294,7 +294,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-                @savePlyInfo="savePlyInfo"
+                @savePlyInfo="savePagePlyInfo"
               />
             </div>
           </template>
