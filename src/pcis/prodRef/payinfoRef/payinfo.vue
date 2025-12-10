@@ -48,7 +48,19 @@ const watchSource = computed(() => {
 watch(
   watchSource,
   ([newCCiMrk, newNCiOwnPrm], [oldCCiMrk, oldNCiOwnPrm]) => {
-        // console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
+		// console.log('watch’',newCCiMrk, newNCiOwnPrm,oldCCiMrk, oldNCiOwnPrm)
+		// 只要有缴费计划组件，就展示导出按钮
+		if (
+			param?.pageType === "PLY_UW_PROCESS_SCENE" ||
+			param?.cAppTyp == "E" ||
+			param?.pageType === "readonly" ||
+			param?.pageType === "UW_READ_SCENE" ||
+			param?.pageType === "EDR_APP_NEW_SCENE"   // 不包含数据补全的批改
+		) {
+			formconfig1.titleBtns.forEach((item) => {
+				if(item.id == 'exp_btn') item.hidden = false
+			})
+		}
     // 批单直接退出 核保直接退出
     if(param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cAppTyp === "E") || param.pageType === "PLY_UW_PROCESS_SCENE") {
       return;
