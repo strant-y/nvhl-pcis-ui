@@ -362,12 +362,7 @@ onBeforeMount(async () => {
 					eventBus.emit('insuredChange', cEcAgrAppNo.value);
 					eventBus.emit('transportChange', cEcAgrAppNo.value);
 				}
-				let dataForm:any ={...res.res.composition,AgreementBase:res.res.composition?.AgreementBase[0],AgreementApplicant:res.res.composition?.AgreementApplicant[0],AgreementFeeWarn:res.res.composition?.AgreementBase[0] ,AgreementAcctinfo:res.res.composition?.AgreementAcctinfo[0]  }
-				delete dataForm.AgreementEdrEcargoBase
-				delete dataForm.AgreementDistGoods
-				delete dataForm.AgreementTgtSummary
-				delete dataForm.AgreementDistInsured
-				delete dataForm.AgreementDistTransport
+				let dataForm:any ={ ...res.res.composition,AgreementBase:res.res.composition?.AgreementBase[0],AgreementApplicant:res.res.composition?.AgreementApplicant[0],AgreementFeeWarn:res.res.composition?.AgreementBase[0] ,AgreementAcctinfo:res.res.composition?.AgreementAcctinfo[0] }
 				const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
 				dataForm['AgreementBase']['ECargoBase.cRenewMrk'] = '1'
 				dataForm['AgreementBase']['ECargoBase.cEcAgrNo'] = ''
