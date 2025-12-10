@@ -9,3 +9,6 @@ export const distRequiredMap = {
   "080011": { flagKey: 'Tgt.cRegisteredInsurance', distName: '清单信息', cComponentTable: 'PersonnelDist', flagName: '记名投保', distCode: 'PersonnelDist080011' },
   "059003": { flagKey: 'Tgt.cIsinsuranceRegistered', distName: '清单信息', cComponentTable: 'EmployeeDist', flagName: '是否记名投保', distCode: 'EmployeeDist059003' },
 }
+
+// 问卷信息展示产品、白名单：仅允许这些产品点击按钮
+export const clickableProducts = [ '010001', '010002', '010003','010004', '010005', '010007','010008', '010009', '010020','070001', '070002', '070005']

@@ -13,7 +13,8 @@ export function loginApi(data: LoginData): AxiosPromise<LoginResult> {
   return post(`/login`,{
       source: rsaEncoder(JSON.stringify({
         username: data.username,
-        passwd: data.password
+				passwd: data.password,
+				phoneNo: data.mobile
       }))
   })
 }

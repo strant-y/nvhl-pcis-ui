@@ -352,7 +352,7 @@ const tableconfig = reactive<AppTableConfig>(
 				inputtype: "rtinput",
 				title: "协议号",
         lengthNum: 22,
-        lengthIsNumber: true,
+        // lengthIsNumber: true,
 				slotName: "policyInfo"
 			},
       {
@@ -373,8 +373,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppId",
         inputtype: "rtinput",
         title: "客户编号",
-        lengthNum: 12,
-        lengthIsNumber: true,
+        // lengthNum: 12,
+        // lengthIsNumber: true,
       },
       {
         prop: "cAppNme",
@@ -382,7 +382,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "客户名称",
         slotName: "cAppNme",
         align: 'left',
-        lengthNum: 9,
+        // lengthNum: 9,
       },
       {
         prop: "cDptCnm",
@@ -390,14 +390,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "出单机构",
         slotName: "cDptCnm",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
 			{
 				prop: "InsurancePeriod",
 				inputtype: "rtinput",
 				title: "协议期间",
-        lengthNum: 36,
-        lengthIsNumber: true,
+        // lengthNum: 36,
+        // lengthIsNumber: true,
 			},
       // {
       //   prop: "tInsrncBgnTm",
@@ -415,8 +415,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "协议状态",
-        lengthNum: 7,
-        align: "left",
+        // lengthNum: 7,
+        // align: "left",
         loadData: appStatusOptions.value
       },
       // {

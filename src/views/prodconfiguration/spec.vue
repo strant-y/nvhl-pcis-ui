@@ -168,7 +168,8 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cNmeEn",
         inputtype: "rtinput",
-        title: "英文名",
+				title: "英文名",
+				align: "left",
       },
       {
         prop: "cNmeCn",
@@ -176,6 +177,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "textarea",
         title: "特约内容",
         loadData: inputtype,
+				align: "left",
       },
       {
         prop: "cStatus",

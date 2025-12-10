@@ -20,6 +20,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import {checkAppBase} from "@/api/prod";
 import { cloneDeep } from "lodash-es";
 import moment from "moment";
+import dayjs from "dayjs";
 import Decimal from "decimal.js";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
@@ -293,7 +294,7 @@ onBeforeMount(async () => {
   config[0].pageInfo = config[0].pageInfo.sort((a, b) => a.sort - b.sort)
   // 页面初始化
   formPage.value?.setFormConfig(config);
-  if( ['add','edit'].includes(props.type)){
+  if( ['add','edit', 'orig'].includes(props.type)){
     bthList.value = basicBtn
   }
   //审核
@@ -323,7 +324,7 @@ onBeforeMount(async () => {
       await query();
     })
   }
-	if (props.type === "add") {
+	if (props.type === "add" || props.type === "orig") {
     const idata = getECargoData(idxParam);
     nextTick(()=>{
 			formPage.value?.setFormDataById('AgreementBase',idata);
@@ -348,7 +349,46 @@ onBeforeMount(async () => {
         })
       }
 		})
-  }
+	}
+	// 协议续保
+	if (props.type === "orig") {
+		nextTick(()=>{
+			const res = props.param.res
+			// 续保复制
+			if (res) {
+				cEcAgrAppNo.value = res["res"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
+				if(cEcAgrAppNo.value){
+					eventBus.emit('goodsChange', cEcAgrAppNo.value);
+					eventBus.emit('insuredChange', cEcAgrAppNo.value);
+					eventBus.emit('transportChange', cEcAgrAppNo.value);
+				}
+				let dataForm:any ={...res.res.composition,AgreementBase:res.res.composition?.AgreementBase[0],AgreementApplicant:res.res.composition?.AgreementApplicant[0],AgreementFeeWarn:res.res.composition?.AgreementBase[0] ,AgreementAcctinfo:res.res.composition?.AgreementAcctinfo[0]  }
+				delete dataForm.AgreementEdrEcargoBase
+				delete dataForm.AgreementDistGoods
+				delete dataForm.AgreementTgtSummary
+				delete dataForm.AgreementDistInsured
+				delete dataForm.AgreementDistTransport
+				const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
+				dataForm['AgreementBase']['ECargoBase.cRenewMrk'] = '1'
+				dataForm['AgreementBase']['ECargoBase.cEcAgrNo'] = ''
+				dataForm['AgreementBase']['ECargoBase.cOprCde'] = user.userName // 录单人为当前用户
+				dataForm['AgreementBase']['ECargoBase.cOrigPlyNo'] = cEcAgrNo
+				dataForm.AgreementBase['ECargoBase.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+				dataForm['AgreementBase']['ECargoBase.cAppStatus'] = ''
+				dataForm['AgreementBase']['ECargoBase.cRiFacMrk'] = null
+				dataForm['AgreementBase']['ECargoBase.cRiFacOpn'] = null
+				dataForm['AgreementBase']['ECargoBase.cRiFacCde'] = null
+				formPage.value?.setAllFormData(dataForm);
+				// 暂存数据
+				console.log('缓存的数据',dataForm['AgreementSpecial'])
+				sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+			}
+		})
+	}
+  nextTick(() => {
+    const agreementBase = formPage.value?.getComponentRefById('AgreementBase');
+    agreementBase.addProvide(CommonConstants.FORM_EQ_EXCLUDE_KEY, ['ECargoBase.cEcAgrAppNo', 'ECargoBase.tOprTm', 'ECargoBase.tIssueTm"'])
+  })
   bthList.value.push(
       createFreeButtonBase({
         label: "返回",
@@ -1407,6 +1447,38 @@ function decimalMinus(a:any,b:any) {
   const v1 = convertNumber(a)
   const v2 = convertNumber(b)
   return new Decimal(v1).minus(new Decimal(v2)).toNumber()
+}
+
+
+// 复制出单和模板出单清空原有的申请单号
+const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo","cCrtCde","cUpdCde","cEcAgrNo"]
+function clearCAppNo(res:any, mapList:any = clearKeyMap) {
+	if(res instanceof Array) {
+		res.forEach((item:any) => {
+			item = clearCAppNo(item, mapList)
+		})
+	} else if(res instanceof Object) {
+		for (const key in res) {
+			if(res[key] instanceof Object || res[key] instanceof Array) {
+				res[key] = clearCAppNo(res[key], mapList)
+			} else if (res.hasOwnProperty(key)) {
+				if(key.indexOf('.') !== -1) {
+					const k0 = key.split('.')[0];
+					const k1 = key.split('.')[1];
+					if(mapList.indexOf(k1) !== -1) {
+						res[`${k0}.${k1}`] = null
+					}
+				} else {
+					if(key === "cEcAgrNo") {
+						res[key] = null
+					}
+				}
+			}
+		}
+	} else {
+		res = null
+	}
+	return res;
 }
 </script>
 <style lang="scss" scoped>

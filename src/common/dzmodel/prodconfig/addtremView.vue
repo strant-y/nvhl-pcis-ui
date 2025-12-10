@@ -262,7 +262,10 @@ onMounted(async () => {
           const risks = tremMap.value[item.cUniqueTermNo];
           item.children?.forEach((i: any) => {
               if(risks.includes(i.cRiskNo)){
-                i.disabled = param.type !== 'ECargo';
+								i.disabled = param.type !== 'ECargo';
+								if (param.cRecordType == '9') {
+									i.disabled = true
+								}
               }
           });
         }
@@ -272,7 +275,15 @@ onMounted(async () => {
             item.children?.forEach((i: any) => {
               i.disabled = param.type !== 'ECargo';
             });
-          }
+					} else {
+						// 协议出单主险不能修改
+						if (param.cRecordType == '9') {
+							item.disabled = true;
+            	item.children?.forEach((i: any) => {
+								i.disabled = true
+            	});
+						}
+					}
         })
       });
       nextTick(() => {

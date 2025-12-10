@@ -1,7 +1,7 @@
 <!-- 协议号-查询 -->
 <template>
   <div>
-    <el-dialog v-if="maindialogVisible" v-model="maindialogVisible" width="70%" title="条款代码查询">
+    <el-dialog v-if="maindialogVisible" v-model="maindialogVisible" width="70%" title="责任编码查询">
         <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef" />
     </el-dialog>
   </div>
@@ -62,12 +62,12 @@ const tableconfig = reactive<AppTableConfig>(
 			{
         prop: "code",
         inputtype: 'rtinput',
-        title: "条款代码",
+        title: "责任编码",
       },
       {
         prop: "value",
         inputtype: 'rtinput',
-        title: "条款名称",
+        title: "责任名称",
       },
     ],
 		rowDbClickFun:(row: any)=>{

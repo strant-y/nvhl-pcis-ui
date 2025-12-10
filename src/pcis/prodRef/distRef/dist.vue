@@ -54,7 +54,7 @@ import { AppFreeEditMethod, createAppFreeEditConfig } from "@/shared/app-free-ed
 import {eventBus} from "@/utils/event-bus";
 import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-import { getTgtDetailByDist } from "@/api/query";
+import { getTgtDetailByDist, getTermDetailByDist } from "@/api/query";
 
 
 const { getRules } = useValidator();
@@ -169,17 +169,97 @@ const addedPlans = ref<string[]>([]);
 const isQuery = ref(false)
 const cProdNos = ['010001','010002','010003','010004','010020'];
 
+// 货物信息回填到标的信息的产品
+const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017'])
+
 watch(
     () => pageresult.list,
     (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
-        // 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
+				// 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
         if(route.params.param?.cProdNo === '043003') {
           opertaor.getTableRefByKey('tgt')?.setValue('Tgt.nInsuredCars', pageresult.list.length)
-        }
-        if(isQuery.value) return
-        eventBus.emit('goodsMxChange', newVal);
+				}
+				// 货物信息在满足这些产品时，需要回填到标的信息中
+				if (ProdNo.value.includes(route.params.param.cProdNo)) {
+					const param = opertaor.getParam();
+					let app = "";
+					if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+							app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+					} else if(param.cOrgAppNo){
+							app = param.cOrgAppNo;
+					} else if(param.pageType !== "copy") {
+							app = param.cAppNo
+					}
+					let distParam = {};
+					if(route.params.param?.pageName === "priceInquiry") {
+						distParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+					} else {
+						distParam['cAppNo'] = app;
+					}
+					let nAdditiveCoefficient = ''
+					if (pageresult.list.length > 0) {
+						nAdditiveCoefficient = pageresult.list[0]['Dist.nAdditiveCoefficient'] // 加成系数（%）
+					}
+					getTgtDetailByDist(distParam).then((res: any) => {
+						if (res["code"] == "200") {
+							const cTradeNum = res.data?.cTradeNum; // 贸易合同号
+							const cLadingNum = res.data?.cLadingNum; // 提单号
+							const cCreditNum = res.data?.cCreditNum; // 信用证号
+							const cMarkLabel = res.data?.cMarkLabel; // 标记(唛头标签)
+							const cPackageMethod = res.data?.cPackageMethod; // 包装方式
+							const nInsuranceAmount = res.data?.nInsuranceAmount; // 保险金额
+							const cInvoiceNum = res.data?.cInvoiceNum; // 发票号
+							let tgtRef = opertaor.getTableRefByKey('tgt');
+							tgtRef.setValue('Tgt.cTradeNum', cTradeNum);
+							tgtRef.setValue('Tgt.cLadingNum', cLadingNum);
+							tgtRef.setValue('Tgt.cCreditNum', cCreditNum);
+							tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum) 
+							tgtRef.setValue('Tgt.cMarkLabel', cMarkLabel);
+							tgtRef.setValue('Tgt.cPackageMethod', cPackageMethod);
+							tgtRef.setValue('Tgt.nInsuranceAmount', nInsuranceAmount);
+							tgtRef.setValue('Tgt.nAdditiveCoefficient', nAdditiveCoefficient);
+						} else {
+							ElMessage.error(res.msg);
+						}
+					})
+				}
+				if (!isQuery.value && !ProdNo.value.includes(route.params.param.cProdNo)) {
+					eventBus.emit('goodsMxChange', newVal);
+				}
+				// 协议
+				if (props.pageSchema.title === '货物明细信息') {
+						let tgtRef = opertaor.getTableRefByKey('cvrg');
+            if(newVal.length>0){
+							const paramA = {
+								cPkId: newVal.map(item => item['Dist.cPkId'])
+							};
+
+							if(route.params.param?.pageName === "priceInquiry") {
+								paramA['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+								if(!paramA['cInquiryNo']) return false
+							}else {
+								paramA['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"];
+								if(!paramA['cAppNo']) return false
+							}
+							getTermDetailByDist(paramA).then((res: any) => {
+								if (res["code"] == "200") {
+									const ids = newVal.map(item => item['Dist.nSeqNo']).join(',');
+              		const codeNos = newVal.map(item => item['Dist.cCodeNo']).join(',');
+									const cPkIds = newVal.map(item => item['Dist.cPkId']).join(',');
+									tgtRef.setCargoSeq(codeNos, cPkIds, res.data?.nInsuranceAmount);
+								} else {
+									ElMessage.error(res.msg);
+								}
+							});
+						} else {
+							tgtRef.setCargoSeq('','','');
+						}
+						tgtRef.DistdataFlash('m0')
+				}
+				if (isQuery.value) return
+				
         // 02开头的货物明细清单，关联标的信息
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
            method.getTgtDetailFn();
@@ -789,14 +869,14 @@ const method = {
                          let tgtRef = opertaor.getTableRefByKey('tgt');
                         let cWaybillNumber = res.data?.cWaybillNumber;
                         let cGoodsNo = res.data?.cGoodsNo;
-                        let nInvoicceValue = res.data?.nInvoicceValue;
+                        let nInvoicceValue = res.data?.nInvoiceValue;
                         let cInvoiceNum = res.data?.cInvoiceNum;
                         let nGoodsNum = res.data?.nGoodsNum;
                         tgtRef.setValue('Tgt.cWaybillNumber', cWaybillNumber)
-                        tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo)
-                        tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue)
-                        tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum)
-                        tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum)
+												tgtRef.setValue('Tgt.cGoodsNo', cGoodsNo) // 货物名称
+												tgtRef.setValue('Tgt.nInvoicceValue', nInvoicceValue) // 发票金额
+                        tgtRef.setValue('Tgt.cInvoiceNum', cInvoiceNum) // 发票号
+                        tgtRef.setValue('Tgt.nGoodsNum', nGoodsNum) // 货物数量
                     },100)
               })
         } else {

@@ -1,4 +1,4 @@
-<!-- 自定义录单 -->
+<!-- 外不协议录单 -->
 <template>
   <div class="searchbar el-card app-container">
     <!-- <div class="el-card__header">
@@ -19,41 +19,10 @@
           :rules="[getRules('required', {})]"
         >
           <el-radio-group v-model="formconfig1.cRecordType" @change="handleRecordTypeChange">
-            <el-radio :value="1">自定义录单</el-radio>
-            <el-radio :value="5">方案录单</el-radio>
-            <el-radio :value="7">模板出单</el-radio>
             <el-radio :value="9">协议出单</el-radio>
-            <el-radio :value="10">组合出单</el-radio>
           </el-radio-group>
         </el-form-item>
-        <div>
-          <el-form-item
-            id="tpl"
-            v-if="formconfig1.cRecordType === 7"
-            label="选择模板"
-            prop="tpl"
-            style="width: 400px"
-            :rules="[getRules('required', {})]"
-          >
-            <el-select-v2
-              v-model="formconfig1.tpl"
-              :options="tplOptions"
-              placeholder="选择模板"
-              size="large"
-              filterable
-              @change="selectedTpl"
-            />
-          </el-form-item>
-          <el-form-item
-            id="seldef"
-            v-if="formconfig1.cRecordType === 7"
-            label="模板描述"
-            prop="seldef"
-            style="width: 600px"
-          >
-            <div>{{ formconfig1.seldef }}</div>
-          </el-form-item>
-        </div>
+
 				<div>
 					<el-form-item
             id="dptCde"
@@ -92,44 +61,8 @@
 						/>
 					</el-form-item>
 				</div>
-        <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 9">
+        <template v-if="formconfig1.cRecordType == 9">
           <h4 style="margin: 0 20px">投保信息</h4>
-          <el-form-item
-            id="cRenewMrk"
-						v-if="formconfig1.cRecordType == '1'"
-            label="投保标识"
-            prop="cRenewMrk"
-            :rules="[getRules('required', {})]"
-          >
-            <el-radio-group v-model="formconfig1.cRenewMrk">
-              <el-radio value="0">新保</el-radio>
-              <el-radio value="1">续保</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item
-            id="cPlyNo"
-            v-if="formconfig1.cRenewMrk == '1'"
-            label="上年保单号"
-            prop="cPlyNo"
-            :rules="[getRules('required', {})]"
-          >
-            <el-input
-              style="width: 300px"
-              placeholder="请输入续保保单号"
-              v-model="formconfig1.cPlyNo"
-            >
-            </el-input>
-            <rt-button
-              :item="{
-                type: 'primary',
-                label: '查询',
-                btnStyle: {'margin-left': '10px'},
-                func: () => {
-                  renewalQuery();
-                },
-              }"
-            />
-          </el-form-item>
 					<!-- 协议出单需要展示的字段 -->
 					<el-row v-if="formconfig1.cRecordType == '9'">
 						<el-col :span="24">
@@ -263,163 +196,6 @@
 						</el-col>
 					</el-row>
         </template>
-				<template v-if="formconfig1.cRecordType != 9">
-					<h4 style="margin: 0 20px">选择{{ labelNm }}</h4>
-					<el-form-item
-            id="cGrpMrk"
-						label="团个属性"
-						prop="cGrpMrk"
-						:rules="[getRules('required', {})]"
-					>
-						<el-radio-group v-model="formconfig1.cGrpMrk">
-							<el-radio value="0">个单</el-radio>
-							<el-radio value="1">团单</el-radio>
-						</el-radio-group>
-					</el-form-item>
-          <el-form-item style="margin-left: 170px;" v-if="formconfig1.cRenewMrk == '1'">
-            <rt-button
-              :item="{
-                type: 'primary',
-                label: '下一步',
-                func: () => {
-                  next();
-                },
-              }"
-            />
-          </el-form-item>
-				</template>
-				<template v-if="formconfig1.cRecordType != 9">
-					<el-tooltip placement="top">
-						<template #content>
-							可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
-						</template>
-						<h4
-							style="margin: 0 20px; width: 200px"
-							v-if="formconfig1.cRenewMrk !== '1'"
-						>
-							常用{{ labelNm }}
-							<el-icon size="20" style="vertical-align: middle; color: red"
-								><InfoFilled
-							/></el-icon>
-						</h4>
-					</el-tooltip>
-					<el-row v-if="formconfig1.cRenewMrk !== '1'">
-            <el-col :span="24" v-if="formconfig1.cRecordType != 10">
-              <div>
-                <VueDraggable
-                    class="eachCon"
-                    v-model="termList"
-                    :animation="150"
-                    @update="updateOptionAll"
-                >
-                  <el-card
-                      v-for="(item, index) in termList"
-                      :key="index"
-                      :class="item.checked ? 'checked eachItems' : 'eachItems'"
-                      shadow="hover"
-                      @click="handleClick(item, index)"
-                  >
-                    <p class="titles">
-                      <el-icon size="20" style="vertical-align: middle"
-                      ><Fold
-                      /></el-icon>
-                      <span :title="item.prodCnm" class="">
-												{{ item.prodCnm }}
-											</span>
-                      <el-icon
-                          :size="25"
-                          style="color: rgb(250, 219, 20)"
-                          @click.stop="handleStarClick(item)"
-                      ><StarFilled
-                      /></el-icon>
-                    </p>
-                    <p class="txt" v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 7">{{ item.termNo }} - {{ item.termCnm }}</p>
-                    <p class="txt" v-else>{{ item.planNo }} - {{ item.planCnm }}</p>
-                  </el-card>
-                </VueDraggable>
-              </div>
-            </el-col>
-            <el-col :span="24" v-if="formconfig1.cRecordType === 10">
-              <el-form-item
-                  :label="`${labelNm}名称`"
-                  prop="cProdList"
-                  :rules="[getRules('required', {})]"
-              >
-                <el-select
-                    style="width: 500px"
-                    v-model="formconfig1.cProdList"
-                    placeholder="请选择"
-                    @clear="handleClear"
-                    multiple
-                    clearable
-                    :disabled="true"
-                >
-                  <el-option
-                      v-for="item in prodList"
-                      :label="item.label"
-                      :value="item.value"
-                  />
-                </el-select>
-                <el-button
-                    @click="selectProdList"
-                    icon="Search"
-                    type="primary"
-                ></el-button>
-              </el-form-item>
-              <el-form-item>
-                <rt-button
-                  :item="{
-                    type: 'primary',
-                    label: '下一步',
-                    func: () => {
-                      next();
-                    },
-                  }"
-                />
-              </el-form-item>
-            </el-col>
-            <el-col :span="24" v-else>
-              <el-form-item
-                  :label="`${labelNm}名称`"
-                  prop="cTermNme"
-                  :rules="[getRules('required', {})]"
-              >
-                <el-select
-                    style="width: 500px"
-                    v-model="formconfig1.cTermNme"
-                    placeholder="请选择"
-                    @change="handleChange"
-                    @clear="handleClear"
-                    clearable
-                    :disabled="true"
-                >
-                  <el-option
-                      v-for="item in options"
-                      :label="item.cNmeCn"
-                      :value="item.cTermNo"
-                  />
-                </el-select>
-                <el-button
-                    @click="showModal"
-                    icon="Search"
-                    type="primary"
-                ></el-button>
-              </el-form-item>
-              <el-form-item>
-                <rt-button
-                  :item="{
-                    type: 'primary',
-                    label: '下一步',
-                    func: () => {
-                      next();
-                    },
-                  }"
-                />
-              </el-form-item>
-            </el-col>
-					</el-row>
-				</template>
-
       </el-form>
     </div>
   </div>
@@ -502,7 +278,7 @@ const formconfig1:any = ref({
   cProdNo: "", // 产品编码
   cProdNme: "", // 产品名称
   cPlyNo: "",
-  cRecordType: 1,
+  cRecordType: 9,
   cIsPlan:'0',
 	cEcAgrNo: '', // 协议号
 	cEcAgrAppNo: '', // 协议申请单号
@@ -1147,10 +923,7 @@ function renewalQuery() {
     return;
   }
   getAppPolicyComponent({ cPlyNo: formconfig1.value.cPlyNo }).then((res:any) => {
-    debugger
-    if (res.code == 500){
-      ElMessage.error(res.msg)
-    }else if(res.res.length > 0) {
+    if(res.res.length > 0) {
       dzmodal
         .open(renewalDialog, { 
           type: "Issuer",
