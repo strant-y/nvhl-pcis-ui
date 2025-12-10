@@ -498,8 +498,8 @@ const tableBtns = [
     size: "large",
     icon: "return",
     iconSize: "25",
-    hideBtns: (row: any) => {
-      if (row.udrType === "3") {
+		hideBtns: (row: any) => {
+      if (row.udrType === "3" && !!row.curtTask) {
         return false;
       } else {
         return true;
@@ -683,8 +683,8 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "return",
         iconSize: "25",
-        hideBtns: (row: any) => {
-          if (row.udrType === "3") {
+				hideBtns: (row: any) => {
+          if (row.udrType === "3" && !!row.curtTask) {
             return false;
           } else {
             return true;
