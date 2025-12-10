@@ -3042,6 +3042,18 @@ const calcPremium = () => {
       btn.loading = false;
     }
     return;
+  } else {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
   }
 
   const termref = opertaor.getTableRefByKey("cvrg");

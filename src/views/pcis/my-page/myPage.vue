@@ -294,7 +294,7 @@
                 :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'"
                 :pageSchema="k.pageSchema"
                 :compKey="k.pageCode"
-                @savePlyInfo="savePlyInfo"
+                @savePlyInfo="savePagePlyInfo"
               />
             </div>
           </template>
@@ -2965,6 +2965,18 @@ const calcPremium = () => {
       btn.loading = false;
     }
     return;
+  } else {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
   }
   
   const termref = opertaor.getTableRefByKey("cvrg");
@@ -3713,10 +3725,6 @@ const submitToUndrFn = async () => {
               }else{
                  ElMessage.error(undr.msg);
               }
-              
-
-
-
             }
           } else {
             needCalc.value = true;
@@ -4203,6 +4211,16 @@ const calcPremiumEdr = async () => {
     } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
       nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
     }
+    // 处理条款中的地址编码格式应该为字符串逗号隔开
+    if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+      if(sessionStorage.getItem("getAddrSeqData")) {
+        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+          return getAddrSeqData.find((i:any) => i.value === item)?.id
+        })?.join(',')
+      }
+      item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+    }
   })
   const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
   let originalnAmt = 0;
@@ -4419,6 +4437,20 @@ const calcPremiumEdrSurrender = () => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
 
+  if (res["cvrg"]?.length > 0) {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
+  }
+
   calcSurrenEdr(res).then((res: any) => {
     if(btn) {
       btn.loading = false;
@@ -4473,7 +4505,7 @@ const saveApplicationEdr = async () => {
   if(btn) {
     btn.loading = true;
   }
-  const res = {};
+  const res:any = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
     ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4485,6 +4517,20 @@ const saveApplicationEdr = async () => {
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+
+  if (res["data"]?.["cvrg"]?.length > 0) {
+    res["data"]["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
+  }
   console.log(res);
   // 点击保存之前的申请单号
   const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
@@ -4567,16 +4613,16 @@ const getSurrenderPrecisFun = () => {
   res["EdrBase"] = edrbase.value?.getFromValue();
   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-  getSurrenderPrecis(res).then((res) => {
+  getSurrenderPrecis(res).then((result:any) => {
     if(btn) {
       btn.loading = false;
     }
-    if (res["code"] == "200") {
-      const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
+    if (result["code"] == "200") {
+      const cEdrCtnt = result["data"]["data"]["cEdrCtnt"]; //批文
       edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
-      ElMessage.success(res.msg);
+      ElMessage.success(result.msg);
     } else {
-      ElMessage.error(res.msg);
+      ElMessage.error(result.msg);
     }
   });
 };
@@ -4620,7 +4666,7 @@ const submitEdrToUndrSurrender = async () => {
   if(btn) {
     btn.loading = true;
   }
-  const res = {};
+  const res:any = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
     ? edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -5025,6 +5071,16 @@ if(props.param.cTransMrk !== "1"){
           } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
             nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
           }
+
+          if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+            if(sessionStorage.getItem("getAddrSeqData")) {
+              const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+              item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+                return getAddrSeqData.find((i:any) => i.value === item)?.id
+              })?.join(',')
+            }
+            item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+          }
         })
         const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
         let originalnAmt = 0;
@@ -5112,21 +5168,27 @@ if(props.param.cTransMrk !== "1"){
     },500)
   }
 }else {
-    const res = {};
+    const btn = getBtn("btnSubmitEdr");
+    if(btn) {
+      btn.loading = true;
+    }
+    const res:any = {};
     const base = opertaor.getTableRefByKey("plyBase").getFromValue();
     res["user"] = user;
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
     res["cTransMrk"] = props.param.cTransMrk;
     res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
-    submitEdrToUndr(res).then((result) => {
+    submitEdrToUndr(res).then((result:any) => {
         // btn.loading = false;
         console.log("批改申请核保", result);
         // ElMessage.success(res.msg);
         // history.back();
         if (result["code"] == "200") {
           ElMessage.success(result.msg);
-          btn.disabled = true;
+          if(btn) {
+            btn.disabled = true;
+          }
           if(result['cDecision'] === '1' || result['cDecision'] === '2'){
             tagsViewStore.delView({"name": "my-page",
               "title": "申请单录入",
@@ -5150,7 +5212,7 @@ const submitUnderwritingFn = async () => {
   if(btn) {
     btn.loading = true;
   }
-  const res = underwrite.value.getFromValue();
+  const res = underwrite.value?.getFromValue();
   res["user"] = user;
   res["user"]["opRelCde"] = user.opCde;
   res["appNo"] = props.param.cAppNo;
