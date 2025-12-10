@@ -263,7 +263,7 @@ watch(
         // 02开头的货物明细清单，关联标的信息
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
            method.getTgtDetailFn();
-           emit('savePlyInfo');
+          //  emit('savePlyInfo');
         }
         // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
         const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
