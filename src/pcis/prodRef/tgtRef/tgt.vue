@@ -190,7 +190,8 @@ onMounted(async () => {
     setFormItem("Tgt.nShipAge", { readonly: false, disabled: false })
 	}
 	// Tgt.cGreenPowerType\Tgt.cGreenPowerOther隐藏
-	if (params.cProdNo === '040008' || params.cProdNo === '040011' || params.cProdNo === '040014' || params.cProdNo === '040015' || params.cProdNo === '041013' || params.cProdNo === '110001' || params.cProdNo === '110002' ) {
+	const cGreendHideNo = ['040008','040011','040014','040015','041013','110001','110002','110003','110004','110005']// 需要隐藏产品
+	if (cGreendHideNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cGreenPowerType", { hidden: true })
     setFormItem("Tgt.cGreenPowerOther", { hidden: true })
 	}
