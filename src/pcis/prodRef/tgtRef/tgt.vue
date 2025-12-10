@@ -188,7 +188,12 @@ onMounted(async () => {
   // 110006 船龄非只读
   if(params.cProdNo === '110006') {
     setFormItem("Tgt.nShipAge", { readonly: false, disabled: false })
-  }
+	}
+	// Tgt.cGreenPowerType\Tgt.cGreenPowerOther隐藏
+	if (params.cProdNo === '040008' || params.cProdNo === '040011' || params.cProdNo === '040014' || params.cProdNo === '040015' || params.cProdNo === '041013' || params.cProdNo === '110001' || params.cProdNo === '110002' ) {
+    setFormItem("Tgt.cGreenPowerType", { hidden: true })
+    setFormItem("Tgt.cGreenPowerOther", { hidden: true })
+	}
 
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
@@ -1898,7 +1903,27 @@ const method = {
     } else {
       setFormItem("Tgt.cMunicipalityDirectly", { rules: [] })
     }
-  },
+	},
+	// 是否绿色动力能源
+	cGreenPowerFlagfun: (val: any) => {
+		setValue("Tgt.cGreenPowerType", null);
+		setValue("Tgt.cGreenPowerOther", null);
+		if (val === "01") {// 是否绿色动力能源 选择是(01)---展示 绿色动力能源类型选择框
+      setFormItem("Tgt.cGreenPowerType", { hidden: false, rules: [getRules("required", {})] })
+		} else {
+			setFormItem("Tgt.cGreenPowerType", { hidden: true, rules: [] })
+			setFormItem("Tgt.cGreenPowerOther", { hidden: true, rules: [] })
+    }
+	},
+	// 绿色动力能源类型
+	cGreenPowerTypefun: (val: any) => {
+		setValue("Tgt.cGreenPowerOther", null);
+		if (val === "05") {// 绿色动力能源类型 选择其他（05）---展示 其他输入框切必填
+      setFormItem("Tgt.cGreenPowerOther", { hidden: false, rules: [getRules("required", {})] })
+		} else {
+      setFormItem("Tgt.cGreenPowerOther", { hidden: true, rules: [] })
+    }
+	},
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
