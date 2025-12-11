@@ -714,4 +714,10 @@ export class PcisQueryService {
 		getgetNTms(ops: any): AxiosPromise<any> {
 				return post(`smartbi/getNTms`, ops);
 		}
+		/**
+		 * 出单任务处理-询价-意见反馈保存
+		 */
+		inquiryFeedback(ops: any): AxiosPromise<any> {
+			return post(`policy/inquiryFeedback`, ops);
+		}
 }

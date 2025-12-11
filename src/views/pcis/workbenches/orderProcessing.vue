@@ -150,6 +150,7 @@ const taskStatusOptions = [
   { label: "见费出单退回", value: "8" },
 ];
 const inquiryTaskStatusOptions = [
+	{ label: "失效", value: "0" },
   { label: "暂存", value: "1" },
   { label: "已提交", value: "2" },
   { label: "询价退回/撤回", value: "3" },
@@ -170,6 +171,10 @@ const UndrOpnList = defineAsyncComponent(
 // 任务痕迹
 const TaskListVestige = defineAsyncComponent(
     () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+// 反馈意见
+const feedbackOpinion = defineAsyncComponent(
+    () => import("@/views/pcis-new-udr-list/common/feedbackOpinion.vue")
 );
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -288,7 +293,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           } else {
             setFormItem("taskStatus", { loadData: taskStatusOptions });
           }
-          freeEditRef.value?.setValue("taskStatus", null);
+					freeEditRef.value?.setValue("taskStatus", null);
+					tableconfig.fromSchema?.forEach((e: any) => {
+            if (e.prop == "cStatus") {
+              if (val === "询价") {
+                e.isShow = true ;
+              } else {
+                e.isShow = false;
+              }
+            }
+          });
         },
         rules: [getRules("required", {})],
       },
@@ -416,7 +430,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    editList: ["cStatus"],
     tableBtnType: "btn",
     tableBtnWidth: 80,
     tableBtnPosition: "right",
@@ -729,6 +742,35 @@ const tableconfig = reactive<AppTableConfig>(
               }
             });
         },
+			}),
+			createFreeButtonBase({
+        id: "febackOpin",
+        link: true,
+        tooltip: "反馈意见",
+        type: "info",
+        size: "large",
+        icon: "Document",
+        hideBtns: (row:any) => {
+          if(row.cStatus == '0') {
+            return false
+          } else {
+            return true
+          }
+        },
+        tableClick: (row) => {
+          dzmodal
+						.open(feedbackOpinion, {
+							type: "",
+							CAppNo: row.baseType === "询价" ? row.cInquiryNo : row.cAppNo,
+							cFeedback: row.cFeedback,
+							cFailMsg: row.cFailMsg
+						})
+						.then((res: any) => {
+              if (res.type === "ok") {
+								handleQuery();
+              }
+            });
+        },
       }),
     ],
     fromSchema: [
@@ -853,6 +895,17 @@ const tableconfig = reactive<AppTableConfig>(
         loadData: cAppStatusOptions,
         lengthNum: 7,
         align: "left",
+			},
+			{
+        prop: "cStatus",
+        inputtype: "rtinput",
+        title: "状态",
+        lengthNum: 7,
+				align: "left",
+				isShow: false,
+				formatter: (val: any) => {
+          return val == '0' ? "失效":"有效"
+        }
       },
     ],
   })
