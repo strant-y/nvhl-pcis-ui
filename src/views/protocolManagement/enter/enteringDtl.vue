@@ -91,7 +91,7 @@ const basicBtn = [
     type: "success",
     id: "submit",
     func: () => {
-      imageUploadManage();
+      imageManage();
     },
   }),
 ]
@@ -1196,6 +1196,15 @@ async function save() {
       ElMessage.success(res.msg);
     }
     return isOk
+}
+function imageManage() {
+  const allFromData = formPage.value?.getAllFormData();
+  const base = allFromData['AgreementBase'];
+  if(base?.['ECargoBase.cOprCde'] == user.opCde) {
+    imageUploadManage()
+  } else {
+    imageView()
+  }
 }
 // 影像上传管理
 const imageUploadManage = () => {
