@@ -6172,107 +6172,107 @@ const checkPaymentValidityYN = () => {
     if (((payNum > 1 && appTyp === 'A') || ((parseFloat(edrPrjNo) !== (parseFloat(payNum) - 1)) && appTyp === 'E'))) {
       const calcPrm = parseFloat(nPrm) * parseFloat(nPrmRmbExch);
 
-      if (calcPrm < 500000) {
-        ElMessage.error("云南分公司见费出单时保费小于或等于50万的业务,不允许分期缴费!");
-        flag = false;
-      } else {
-        const insrncBgnTm = insrncBefore["Base.tInsrncBgnTm"];
-        const insrncEndTm = insrncBefore["Base.tInsrncEndTm"];
-
-        if (insrncBgnTm && insrncEndTm) {
-          const bgnDate = new Date(insrncBgnTm);
-          const endDate = new Date(insrncEndTm);
-          const nMonths = monthBetween(bgnDate, endDate);
-          const nYears = Math.floor(nMonths / 12);
-          const restMonths = nMonths % 12;
-
-          let aboutPayNum = 0;
-          if (nYears < 1 || (nYears === 1 && restMonths === 0)) {
-            aboutPayNum = 3;
-          } else if ((nYears === 1 && restMonths > 0) || (nYears === 2 && restMonths === 0)) {
-            aboutPayNum = 4;
-          } else if ((nYears === 2 && restMonths > 0) || (nYears === 3 && restMonths === 0)) {
-            aboutPayNum = 5;
-          } else if ((nYears === 3 && restMonths > 0) || (nYears === 4 && restMonths === 0)) {
-            aboutPayNum = 6;
-          } else {
-            aboutPayNum = 7;
-          }
-
-          if (payNum > aboutPayNum) {
-            if (nMonths <= 12) {
-              ElMessage.error(`云南机构见费出单时，保险期限≤1年的非车险业务，缴期交费期数小于等于${aboutPayNum}期！`);
-            } else if (nMonths > 12 && nMonths <= 24) {
-              ElMessage.error(`云南机构见费出单时，保险期限＞1年且≤2年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
-            } else if (nMonths > 24 && nMonths <= 36) {
-              ElMessage.error(`云南机构见费出单时，保险期限＞2年且≤3年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
-            } else if (nMonths > 36 && nMonths <= 48) {
-              ElMessage.error(`云南机构见费出单时，保险期限＞3年且≤4年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
-            } else if (nMonths > 48 && nMonths <= 60) {
-              ElMessage.error(`云南机构见费出单时，保险期限＞4年且≤5年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
-            } else {
-              ElMessage.error(`云南机构见费出单时，保险期限>5年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
-            }
-            flag = false;
-          } else {
-            // 检查首期保费
-            if (payData.length > 0) {
-              const firstPayablePrm = payData[0]["Pay.nPayablePrm"] || 0;
-              const fistPrm = parseFloat(firstPayablePrm) * parseFloat(nPrmRmbExch);
-              const calcPrm = parseFloat(nPrm) * 0.4 * parseFloat(nPrmRmbExch);
-
-              if (fistPrm < calcPrm) {
-                ElMessage.error("首期应收保费必须大于或等于总保费的40%");
-                flag = false;
-              }
-            }
-
-            // 检查缴费间隔
-            for (let i = 0; i < payNum - 1; i++) {
-              const beforeDateStr = payData[i]["Pay.tPayEndTm"];
-              const afterBgnTmStr = payData[i + 1]["Pay.tPayBgnTm"];
-
-              if (beforeDateStr && afterBgnTmStr) {
-                const beforeDate = new Date(beforeDateStr);
-                const afterBgnTm = new Date(afterBgnTmStr);
-
-                if (monthBetween(beforeDate, afterBgnTm) > 12) {
-                  ElMessage.error("缴费间隔不得超过12个月!");
-                  return false;
-                }
-              }
-            }
-
-            // 检查最后一期保费
-            if (payData.length > 0) {
-              const lastPayData = payData[payData.length - 1];
-              const lastPayPrm = lastPayData["Pay.nPayablePrm"] || 0;
-              const lastPayPrmCalc = parseFloat(lastPayPrm) * parseFloat(nPrmRmbExch);
-              const lastLowPrm = parseFloat(nPrm) * 0.1;
-
-              if (lastPayPrmCalc > lastLowPrm) {
-                ElMessage.error("最后一期保费必须小于或者等于总保费的10%!");
-                return false;
-              }
-
-              // 检查最后一期缴费时间
-              const tPayEndTm = lastPayData["Pay.tPayEndTm"];
-              const tInsrncEndTm = insrncBefore["Base.tInsrncEndTm"];
-
-              if (tPayEndTm && tInsrncEndTm) {
-                const payEndDate = new Date(tPayEndTm);
-                const insrncEndDate = new Date(tInsrncEndTm);
-
-                if (payEndDate > insrncEndDate) {
-                  ElMessage.error("最后一期缴费时间必须小于等于保单保险止期!");
-                  return false;
-                }
-              }
-            }
-            flag = true;
-          }
-        }
-      }
+      // if (calcPrm < 500000) {
+      //   ElMessage.error("云南分公司见费出单时保费小于或等于50万的业务,不允许分期缴费!");
+      //   flag = false;
+      // } else {
+      //   const insrncBgnTm = insrncBefore["Base.tInsrncBgnTm"];
+      //   const insrncEndTm = insrncBefore["Base.tInsrncEndTm"];
+      //
+      //   if (insrncBgnTm && insrncEndTm) {
+      //     const bgnDate = new Date(insrncBgnTm);
+      //     const endDate = new Date(insrncEndTm);
+      //     const nMonths = monthBetween(bgnDate, endDate);
+      //     const nYears = Math.floor(nMonths / 12);
+      //     const restMonths = nMonths % 12;
+      //
+      //     let aboutPayNum = 0;
+      //     if (nYears < 1 || (nYears === 1 && restMonths === 0)) {
+      //       aboutPayNum = 3;
+      //     } else if ((nYears === 1 && restMonths > 0) || (nYears === 2 && restMonths === 0)) {
+      //       aboutPayNum = 4;
+      //     } else if ((nYears === 2 && restMonths > 0) || (nYears === 3 && restMonths === 0)) {
+      //       aboutPayNum = 5;
+      //     } else if ((nYears === 3 && restMonths > 0) || (nYears === 4 && restMonths === 0)) {
+      //       aboutPayNum = 6;
+      //     } else {
+      //       aboutPayNum = 7;
+      //     }
+      //
+      //     if (payNum > aboutPayNum) {
+      //       if (nMonths <= 12) {
+      //         ElMessage.error(`云南机构见费出单时，保险期限≤1年的非车险业务，缴期交费期数小于等于${aboutPayNum}期！`);
+      //       } else if (nMonths > 12 && nMonths <= 24) {
+      //         ElMessage.error(`云南机构见费出单时，保险期限＞1年且≤2年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+      //       } else if (nMonths > 24 && nMonths <= 36) {
+      //         ElMessage.error(`云南机构见费出单时，保险期限＞2年且≤3年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+      //       } else if (nMonths > 36 && nMonths <= 48) {
+      //         ElMessage.error(`云南机构见费出单时，保险期限＞3年且≤4年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+      //       } else if (nMonths > 48 && nMonths <= 60) {
+      //         ElMessage.error(`云南机构见费出单时，保险期限＞4年且≤5年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+      //       } else {
+      //         ElMessage.error(`云南机构见费出单时，保险期限>5年的非车险业务，分期缴费期数小于等于${aboutPayNum}期！`);
+      //       }
+      //       flag = false;
+      //     } else {
+      //       // 检查首期保费
+      //       if (payData.length > 0) {
+      //         const firstPayablePrm = payData[0]["Pay.nPayablePrm"] || 0;
+      //         const fistPrm = parseFloat(firstPayablePrm) * parseFloat(nPrmRmbExch);
+      //         const calcPrm = parseFloat(nPrm) * 0.4 * parseFloat(nPrmRmbExch);
+      //
+      //         if (fistPrm < calcPrm) {
+      //           ElMessage.error("首期应收保费必须大于或等于总保费的40%");
+      //           flag = false;
+      //         }
+      //       }
+      //
+      //       // 检查缴费间隔
+      //       for (let i = 0; i < payNum - 1; i++) {
+      //         const beforeDateStr = payData[i]["Pay.tPayEndTm"];
+      //         const afterBgnTmStr = payData[i + 1]["Pay.tPayBgnTm"];
+      //
+      //         if (beforeDateStr && afterBgnTmStr) {
+      //           const beforeDate = new Date(beforeDateStr);
+      //           const afterBgnTm = new Date(afterBgnTmStr);
+      //
+      //           if (monthBetween(beforeDate, afterBgnTm) > 12) {
+      //             ElMessage.error("缴费间隔不得超过12个月!");
+      //             return false;
+      //           }
+      //         }
+      //       }
+      //
+      //       // 检查最后一期保费
+      //       if (payData.length > 0) {
+      //         const lastPayData = payData[payData.length - 1];
+      //         const lastPayPrm = lastPayData["Pay.nPayablePrm"] || 0;
+      //         const lastPayPrmCalc = parseFloat(lastPayPrm) * parseFloat(nPrmRmbExch);
+      //         const lastLowPrm = parseFloat(nPrm) * 0.1;
+      //
+      //         if (lastPayPrmCalc > lastLowPrm) {
+      //           ElMessage.error("最后一期保费必须小于或者等于总保费的10%!");
+      //           return false;
+      //         }
+      //
+      //         // 检查最后一期缴费时间
+      //         const tPayEndTm = lastPayData["Pay.tPayEndTm"];
+      //         const tInsrncEndTm = insrncBefore["Base.tInsrncEndTm"];
+      //
+      //         if (tPayEndTm && tInsrncEndTm) {
+      //           const payEndDate = new Date(tPayEndTm);
+      //           const insrncEndDate = new Date(tInsrncEndTm);
+      //
+      //           if (payEndDate > insrncEndDate) {
+      //             ElMessage.error("最后一期缴费时间必须小于等于保单保险止期!");
+      //             return false;
+      //           }
+      //         }
+      //       }
+      //       flag = true;
+      //     }
+      //   }
+      // }
     } else {
       flag = true;
     }
