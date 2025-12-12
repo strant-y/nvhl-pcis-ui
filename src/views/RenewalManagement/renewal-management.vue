@@ -407,7 +407,7 @@ const getRenewal = (row:any)=>{
     ElMessage.error("该保单不允许续保");
     return;
 	}
-	if (row.cPrnType == "01") {
+	if (row.appType == "ply") {
 		getAppPolicyComponent({ cPlyNo: row.cPlyNo }).then((res:any) => {
 			if(res.res.length > 0) {
 				dzmodal
@@ -450,7 +450,7 @@ const getRenewal = (row:any)=>{
 		}).catch(err => {
 			ElMessage.error(err.msg || err)
 		})
-	} else if (row.cPrnType == "02") {
+	} else if (row.appType == "eCargo") {
 		getECargoPolicyComponent({ cPlyNo: row.cPlyNo }).then((res:any) => {
 			if(res.res.length > 0) {
 				dzmodal
