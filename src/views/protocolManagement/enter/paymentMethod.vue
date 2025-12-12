@@ -242,7 +242,7 @@ function confirm() {
 							router.push({
 								path: "/protocolManagement/enteringDtl",
 								query: {
-									param: JSON.stringify({res}),
+									param: JSON.stringify({res,dptCde,cDptCde,cDptCnm}),
 									type: 'orig',
 									payWay: param
 								},

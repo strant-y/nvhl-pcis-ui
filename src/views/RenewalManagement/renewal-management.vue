@@ -66,7 +66,7 @@ import {saveAs} from "file-saver";
 import {useRouter} from "vue-router";
 import dayjs from "dayjs";
 import moment from "moment/moment";
-import { getAppPolicyComponent, getAppPolicyForRenewal, getECargoPolicyComponent, getECargoPolicyForRenewal, } from "../pcis/guide/custom-recording.service";
+import { getAppPolicyComponent, getAppPolicyForRenewal, getECargoPolicyComponent, getECargoPolicyForRenewal,getECargoPolicyPayment } from "../pcis/guide/custom-recording.service";
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 const router = useRouter();
 const userStore = useUserStore();
@@ -463,24 +463,36 @@ const getRenewal = (row:any)=>{
 						options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
 						selected: Object.keys(res.res[0]).map((item:any) => item)
 					})
-					.then((res: any) => {
-						if(res.type === 'ok') {
-							const renewalComponent = res.body.component;
-							getECargoPolicyForRenewal({ cPlyNo: row.cEcAgrNo, components: [renewalComponent] }).then((res: any) => {
-								if (res.code == "200") {
-									router.push({
-										path: "/protocolManagement/enteringDtl",
-										query: {
-											param: JSON.stringify({res}),
-											type: 'orig',
-											payWay: param
-										},
-									});
+					.then((res1: any) => {
+						if (res1.type === 'ok') {
+							// 续保根据单号获取付费方式
+							getECargoPolicyPayment({ cPlyNo: row.cEcAgrNo }).then((res2: any) => {
+								if (res2 && res2.code == 200) {
+									const paymentMethod = res2.data.paymentMethod
+									const dptCde = res2.data.dptCde
+									const cDptCde = res2.data.cDptCde
+									const renewalComponent = res1.body.component;
+									getECargoPolicyForRenewal({ cEcAgrNo: row.cEcAgrNo, components: [renewalComponent] }).then((res3: any) => {
+										if (res3.code == "200") {
+											router.push({
+												path: "/protocolManagement/enteringDtl",
+												query: {
+													param: JSON.stringify({res:res3,dptCde,cDptCde}),
+													type: 'orig',
+													payWay: paymentMethod
+												},
+											});
+										} else {
+											ElMessage.error(res3.msg);
+										}
+									})
 								} else {
-									ElMessage.error(res.msg);
+									ElMessage.error(res2.msg);
 								}
-							}
-						);
+							})
+							.catch((err: any) => {
+								ElMessage.error(err.msg);
+							});
 						}
 					});
 			} else {
