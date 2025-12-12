@@ -71,6 +71,7 @@ import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 const router = useRouter();
 const userStore = useUserStore();
 const user = ref(userStore.user);
+const queryLoading = ref(false);         // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "续保管理",
@@ -78,7 +79,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "查询",
+				label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery();
         },
@@ -179,7 +181,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               }
             }
 					});
-					handleQuery();
+					pageresult.list = [];
+        	pageresult.total = 0;
 				},
       },
       {
@@ -451,19 +454,19 @@ const getRenewal = (row:any)=>{
 			ElMessage.error(err.msg || err)
 		})
 	} else if (row.appType == "eCargo") {
-		getECargoPolicyComponent({ cPlyNo: row.cPlyNo }).then((res:any) => {
+		getECargoPolicyComponent({ cPlyNo: row.cEcAgrNo }).then((res:any) => {
 			if(res.res.length > 0) {
 				dzmodal
 					.open(renewalDialog, { 
 						type: "Issuer",
-						cPlyNo: row.cPlyNo,
+						cPlyNo: row.cEcAgrNo,
 						options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
 						selected: Object.keys(res.res[0]).map((item:any) => item)
 					})
 					.then((res: any) => {
 						if(res.type === 'ok') {
 							const renewalComponent = res.body.component;
-							getECargoPolicyForRenewal({ cPlyNo: row.cPlyNo, components: [renewalComponent] }).then((res: any) => {
+							getECargoPolicyForRenewal({ cPlyNo: row.cEcAgrNo, components: [renewalComponent] }).then((res: any) => {
 								if (res.code == "200") {
 									router.push({
 										path: "/protocolManagement/enteringDtl",
@@ -524,7 +527,8 @@ const exRules = {
 
 const handleQuery = (flag = true) => {
   freeEditRef.value?.validate().then((isValid) => {
-    if(isValid) {
+		if (isValid) {
+			queryLoading.value = true;
       refreshData(flag)
     } else {
       ElMessage.error("请填写必填项");
@@ -566,7 +570,9 @@ function refreshData(flag?: boolean) {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+		.finally(() => {
+			queryLoading.value = false;
+		});
 }
 
 // 多选事件
