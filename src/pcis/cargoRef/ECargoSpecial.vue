@@ -53,6 +53,7 @@ const params = JSON.parse(query.value?.param ? descryptParameter(query.value.par
 
 const idxParam = inject('idxParam');
 const formPage: FormPage = idxParam?.formPage;
+const param = idxParam.param;
 
 const cardconfig = ref(creatCardConfig({}));
 const moveUpTimer = ref(null);
@@ -351,9 +352,10 @@ onMounted(async () => {
   formData.value = [];
   formData.value.forEach((item, index) => {
     item.index = index + 1;
-  });
-
-  refreshData();
+	});
+	if (param.type != 'orig') {
+		refreshData();
+	}
 
 
   console.log('router', params)

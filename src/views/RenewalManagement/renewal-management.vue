@@ -49,7 +49,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
+import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, findECargoRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
@@ -66,11 +66,12 @@ import {saveAs} from "file-saver";
 import {useRouter} from "vue-router";
 import dayjs from "dayjs";
 import moment from "moment/moment";
-import { getAppPolicyComponent, getAppPolicyForRenewal } from "../pcis/guide/custom-recording.service";
+import { getAppPolicyComponent, getAppPolicyForRenewal, getECargoPolicyComponent, getECargoPolicyForRenewal,getECargoPolicyPayment } from "../pcis/guide/custom-recording.service";
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 const router = useRouter();
 const userStore = useUserStore();
 const user = ref(userStore.user);
+const queryLoading = ref(false);         // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "续保管理",
@@ -78,7 +79,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     endBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "查询",
+				label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery();
         },
@@ -95,6 +97,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 							moment(new Date()).format("YYYY-MM-DD 23:59:59"),
 						],
 						cDptCde: "0200000000000",
+    				cPrnType: "01",
 						cLoadSub:1
   				});
         },
@@ -148,6 +151,39 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           y: 1,
           n: 0,
         },
+			},
+			{
+        prop: "cPrnType",
+        inputtype: "rtselect",
+        title: "单据类型",
+				clearable: true,
+				loadData: [
+					{ label: "自定义续保",value: "01"},
+					{ label: "协议续保",value: "02"},
+				],
+        rules: [getRules("required", {})],
+				func: (value: any) => {
+					if (value == "02") {
+						setFormItem("cKindNo", { hidden: true })
+						setFormItem("cProdNo", { hidden: true })
+						setFormItem("tAppTm", { title: "有效止期" })
+					} else {
+						setFormItem("cKindNo", { hidden: false })
+						setFormItem("cProdNo", { hidden: false })
+						setFormItem("tAppTm", { title: "保险止期" })
+					}
+					tableconfig.fromSchema?.forEach((e: any) => {
+            if (e.prop === "cTermNo") {
+              if (value == "02") {
+                e.isShow = false;
+              } else {
+                e.isShow = true;
+              }
+            }
+					});
+					pageresult.list = [];
+        	pageresult.total = 0;
+				},
       },
       {
         prop: "cKindNo",
@@ -339,6 +375,7 @@ onMounted(async () => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ],
     cDptCde: "0200000000000",
+    cPrnType: "01",
     cLoadSub:1
   });
   setFormItem("cDptCde", {
@@ -372,49 +409,99 @@ const getRenewal = (row:any)=>{
   if (cannotCopy(row.cPlyNo)) {
     ElMessage.error("该保单不允许续保");
     return;
-  }
-  getAppPolicyComponent({ cPlyNo: row.cPlyNo }).then((res:any) => {
-    if(res.res.length > 0) {
-      dzmodal
-        .open(renewalDialog, { 
-          type: "Issuer",
-          cPlyNo: row.cPlyNo,
-          options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
-          selected: Object.keys(res.res[0]).map((item:any) => item)
-        })
-        .then((res: any) => {
-          if(res.type === 'ok') {
-            const renewalComponent = res.body.component;
-            getAppPolicyForRenewal({ cPlyNo: row.cPlyNo, components: [renewalComponent] }).then((res: any) => {
-              if (res.code == "200") {
-                if (res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
-                  ElMessage.warning("该保单不允许续保，请重新选择！");
-                  return
-                }
-                router.push({
-                  path: "/pcisapp/myPage",
-                  query: {
-                    param: JSON.stringify({
-                      ...handleArray(res.res.composition.plyBase[0]), ...{
-                        pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
-                        cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
-                      }
-                    }),
-                  },
-                });
-              } else {
-                ElMessage.error(res.msg);
-              }
-            }
-          );
-          }
-        });
-    } else {
-      ElMessage.error(res.msg)
-    }
-  }).catch(err => {
-    ElMessage.error(err.msg || err)
-  })
+	}
+	if (row.appType == "ply") {
+		getAppPolicyComponent({ cPlyNo: row.cPlyNo }).then((res:any) => {
+			if(res.res.length > 0) {
+				dzmodal
+					.open(renewalDialog, { 
+						type: "Issuer",
+						cPlyNo: row.cPlyNo,
+						options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
+						selected: Object.keys(res.res[0]).map((item:any) => item)
+					})
+					.then((res: any) => {
+						if(res.type === 'ok') {
+							const renewalComponent = res.body.component;
+							getAppPolicyForRenewal({ cPlyNo: row.cPlyNo, components: [renewalComponent] }).then((res: any) => {
+								if (res.code == "200") {
+									if (res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
+										ElMessage.warning("该保单不允许续保，请重新选择！");
+										return
+									}
+									router.push({
+										path: "/pcisapp/myPage",
+										query: {
+											param: JSON.stringify({
+												...handleArray(res.res.composition.plyBase[0]), ...{
+													pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
+													cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
+												}
+											}),
+										},
+									});
+								} else {
+									ElMessage.error(res.msg);
+								}
+							}
+						);
+						}
+					});
+			} else {
+				ElMessage.error(res.msg)
+			}
+		}).catch(err => {
+			ElMessage.error(err.msg || err)
+		})
+	} else if (row.appType == "eCargo") {
+		getECargoPolicyComponent({ cPlyNo: row.cEcAgrNo }).then((res:any) => {
+			if(res.res.length > 0) {
+				dzmodal
+					.open(renewalDialog, { 
+						type: "Issuer",
+						cPlyNo: row.cEcAgrNo,
+						options: Object.keys(res.res[0]).map((item:any) => ({ label: res.res[0][item], value: item })),
+						selected: Object.keys(res.res[0]).map((item:any) => item)
+					})
+					.then((res1: any) => {
+						if (res1.type === 'ok') {
+							// 续保根据单号获取付费方式
+							getECargoPolicyPayment({ cPlyNo: row.cEcAgrNo }).then((res2: any) => {
+								if (res2 && res2.code == 200) {
+									const paymentMethod = res2.data.paymentMethod
+									const dptCde = res2.data.dptCde
+									const cDptCde = res2.data.cDptCde
+									const renewalComponent = res1.body.component;
+									getECargoPolicyForRenewal({ cEcAgrNo: row.cEcAgrNo, components: [renewalComponent] }).then((res3: any) => {
+										if (res3.code == "200") {
+											router.push({
+												path: "/protocolManagement/enteringDtl",
+												query: {
+													param: JSON.stringify({res:res3,dptCde,cDptCde}),
+													type: 'orig',
+													payWay: paymentMethod
+												},
+											});
+										} else {
+											ElMessage.error(res3.msg);
+										}
+									})
+								} else {
+									ElMessage.error(res2.msg);
+								}
+							})
+							.catch((err: any) => {
+								ElMessage.error(err.msg);
+							});
+						}
+					});
+			} else {
+				ElMessage.error(res.msg)
+			}
+		}).catch(err => {
+			ElMessage.error(err.msg || err)
+		})
+	}
 }
 
 //导出
@@ -452,7 +539,8 @@ const exRules = {
 
 const handleQuery = (flag = true) => {
   freeEditRef.value?.validate().then((isValid) => {
-    if(isValid) {
+		if (isValid) {
+			queryLoading.value = true;
       refreshData(flag)
     } else {
       ElMessage.error("请填写必填项");
@@ -470,10 +558,15 @@ function refreshData(flag?: boolean) {
   if ( (Date.parse(param.tInsrncEndTm) - Date.parse(param.tInsrncBgnTm)) >= (180 * 1000 * 60 * 60 * 24)) {
     ElMessage.warning("保险起止日期范围请控制在距离当前时间半年以内");
     return;
-  }
-  console.log('param)))))))))))))))))))',param)
-  findRenewalInsurance(param)
-    .then((res) => {
+	}
+	console.log('param)))))))))))))))))))', param)
+	let data
+	if (s.cPrnType == "01") {
+		data = findRenewalInsurance(param)
+	} else if (s.cPrnType == "02") {
+		data = findECargoRenewalInsurance(param)
+	}
+	data.then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];
@@ -489,7 +582,9 @@ function refreshData(flag?: boolean) {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+		.finally(() => {
+			queryLoading.value = false;
+		});
 }
 
 // 多选事件

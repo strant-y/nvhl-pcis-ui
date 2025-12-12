@@ -1544,13 +1544,22 @@ export function carSelCountryPort(queryParams: any): AxiosPromise<any> {
   return post(`/cargoInsurance/selCountryPort`, queryParams);
 }
 /**
- * 获取续保列表
+ * 获取自定义续保列表
  *
  * @param queryParams
  */
 export function findRenewalInsurance(queryParams: any): AxiosPromise<any> {
     return post(`/policy/findRenewalInsurance`, queryParams);
 }
+/**
+ * 获取协议续保列表
+ *
+ * @param queryParams
+ */
+export function findECargoRenewalInsurance(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/findECargoRenewalInsurance`, queryParams);
+}
+
 /**
  * 续保列表导出
  *
