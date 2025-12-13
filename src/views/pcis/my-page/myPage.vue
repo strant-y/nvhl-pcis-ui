@@ -2498,12 +2498,12 @@ async function loadAfter() {
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
-        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist"
-        });
-        distMap.forEach((item:any) => {
-          getDistData(props.param?.cInquiryNo, item)
-        });
+        // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        //   return item.pageKey === "dist"
+        // });
+        // distMap.forEach((item:any) => {
+        //   getDistData(props.param?.cInquiryNo, item)
+        // });
       }
     })
     bthList.value = basicBtn;
@@ -4019,7 +4019,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "orig" || props.param?.pageType === "inquiryToApp") && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "orig") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);
