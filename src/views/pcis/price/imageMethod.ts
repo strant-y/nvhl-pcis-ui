@@ -27,7 +27,7 @@ export const imageMethod = {
       return;
     }
 
-    if (pageMethod.isReadOnlyScene(opertaor)) {
+    if (pageMethod.isReadOnlyScene(opertaor) || opertaor.getDataAll().plyBase?.['Base.cOprCde'] != user.opCde) {
       // let ParamNo = null;
       policyService
         .imageInfoShow({ ParamNo: ParamNo })

@@ -293,6 +293,7 @@ onMounted(async () => {
     // 车牌号校验 vehiclePlate
   if(item.prop =='Dist.cPlateNumber'){
      item['rules'] = [getRules("vehiclePlate", {})];
+     item.iconInfo = "（新车未上牌，请在此录入【新车未上牌】）"
     }
 
     // 车架号校验

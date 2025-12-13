@@ -151,6 +151,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 								ElMessage.error(err);
 							});
 					} else {
+						setFormItem('nTms', { hidden: true, loadData: [] })
 						setPrnTemplate();
 					}
           /*服务卡号使用条件限定：

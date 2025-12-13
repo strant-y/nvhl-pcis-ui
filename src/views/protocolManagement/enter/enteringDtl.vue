@@ -91,7 +91,7 @@ const basicBtn = [
     type: "success",
     id: "submit",
     func: () => {
-      imageUploadManage();
+      imageManage();
     },
   }),
 ]
@@ -1165,12 +1165,12 @@ async function save() {
   const tInsrncEndTm1 = dataToSave.AgreementBase['ECargoBase.tInsrncEndTm']
   const tInsrncEndTm2 = dataToSave.AgreementFeeWarn['ECargoBase.tInsrncEndTm']
   if(tInsrncEndTm1 && tInsrncEndTm2 && new Date(tInsrncEndTm1).getTime() !== new Date(tInsrncEndTm2).getTime()) {
-    dataToSave.AgreementFeeWarn['ECargoBase.tInsrncBgnTm'] = tInsrncEndTm1
+    dataToSave.AgreementFeeWarn['ECargoBase.tInsrncEndTm'] = tInsrncEndTm1
   }
   const tAppTm1 = dataToSave.AgreementBase['ECargoBase.tAppTm']
   const tAppTm2 = dataToSave.AgreementFeeWarn['ECargoBase.tAppTm']
   if(tAppTm1 && tAppTm2 && new Date(tAppTm1).getTime() !== new Date(tAppTm2).getTime()) {
-    dataToSave.AgreementFeeWarn['ECargoBase.tInsrncBgnTm'] = tAppTm1
+    dataToSave.AgreementFeeWarn['ECargoBase.tAppTm'] = tAppTm1
   }
   dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
   const res = await cargoApi.save({
@@ -1196,6 +1196,15 @@ async function save() {
       ElMessage.success(res.msg);
     }
     return isOk
+}
+function imageManage() {
+  const allFromData = formPage.value?.getAllFormData();
+  const base = allFromData['AgreementBase'];
+  if(base?.['ECargoBase.cOprCde'] == user.opCde) {
+    imageUploadManage()
+  } else {
+    imageView()
+  }
 }
 // 影像上传管理
 const imageUploadManage = () => {
