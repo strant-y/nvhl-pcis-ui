@@ -963,7 +963,7 @@ const setCusBenefitInfo = () => {
   }
 
   dzmodal
-    .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam })
+    .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam,data: props.param, getNo: getNo.value })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -1249,6 +1249,15 @@ const edrBtn = [
     id: "btnSubmitEdr",
     func: () => {
       submitEdrToUndrFun();
+    },
+  }),
+	createFreeButtonBase({
+    label: "反洗钱扩展信息",
+		type: "primary",
+		hidden: props.param.cRsnCde != 'BH',
+    buttonColor: bottomBtnColor1,
+    func: () => {
+      setCusBenefitInfo();
     },
   }),
 ];

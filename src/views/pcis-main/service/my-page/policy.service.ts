@@ -1139,19 +1139,13 @@ saveAMLExtendInfo(data) {
  
 
 // 反洗钱扩展信息查询  投保人 被保人通用
-getAMLExtendInfoByAppNo(appNo: string, CCusFlag: string) {
-    return request.post('/policy/getAMLExtendInfoByAppNo', {
-        'CAppNo': appNo,
-        'CCusFlag': CCusFlag
-    });
+getAMLExtendInfoByAppNo(ops) {
+    return request.post('/policy/getAMLExtendInfoByAppNo', ops);
 }
 
 // 反洗钱受益人所有人信息 table
-getAMLCusBnfcInfoByAppNo(CAppNo: string, CCusFlag: string) {
-    return request.post('/policy/getAMLCusBnfcInfoByAppNo', {
-        'CAppNo': CAppNo,
-        'CCusFlag': CCusFlag
-    });
+getAMLCusBnfcInfoByAppNo(ops) {
+    return request.post('/policy/getAMLCusBnfcInfoByAppNo', ops);
 }
 
 /**
