@@ -164,14 +164,27 @@ const tableFromSchema = [
 		inputtype: "rtswitch",
 		title: "就职状态",
 		keymap: {
-			y: "1",
-			n: "0",
+			y: "2",
+			n: "3",
 		},
 		activeText: '在职',
 		inactiveText: '离司',
 		inlinePrompt: true,
-		func: (val) => {
-			console.log(val);
+		func: (val: string, row: any) => {
+			const paramss = {
+				CEmpCde: row.cEmpCde,
+				CIsValid: val
+			};
+			// 就职状态 orgempmgr/changeOrgEmpStatus  入参  CEmpCde 员工号 CIsValid  2无效 3有效
+			const getEmpDatas = sysOrgEmpMgrService.changeOrgEmpStatus(paramss);
+			getEmpDatas.then((res: any) => {
+				if (res['code'] == "200") {
+					ElMessage.success(res.msg);
+				} else {
+					ElMessage.error(res.msg);
+				}
+				handleQuery();
+			});
 		},
 	}
 ]
@@ -224,7 +237,7 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "view",
 						data: row,
 						title: titlemsg,
-						CEmpCde: ''
+						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();
@@ -246,7 +259,7 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "update",
 						data: row,
 						title: titlemsg,
-						CEmpCde: ''
+						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();
