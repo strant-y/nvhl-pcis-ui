@@ -726,22 +726,22 @@ const method = {
   //特殊不见费出单change事件
   specSalesFunc: (val:any) => {
     // 修改不见费出单原因校验
-    const p = opertaor.getParam();
-    if (val == 1) {
-      setFormItem("Base.cCanclfeersnCde", {
-        rules: [getRules("required", {})],
-        disabled: false,
-      });
-      const CDptCde = getValue("Base.cDptCde");
-      if (CDptCde.startsWith('0253')) {
-        setFormItem("Base.cCanclfeersnCde", { typeCode: 'YN_NV_NoPayseeMoeny' });
-      }
-    } else {
-      setFormItem("Base.cCanclfeersnCde", { rules: null, disabled: true });
-      if (!p.initFlag) {
-        setValue("Base.cCanclfeersnCde", "");
-      }
-    }
+    // const p = opertaor.getParam();
+    // if (val == 1) {
+    //   setFormItem("Base.cCanclfeersnCde", {
+    //     rules: [getRules("required", {})],
+    //     disabled: false,
+    //   });
+    //   const CDptCde = getValue("Base.cDptCde");
+    //   if (CDptCde.startsWith('0253')) {
+    //     setFormItem("Base.cCanclfeersnCde", { typeCode: 'YN_NV_NoPayseeMoeny' });
+    //   }
+    // } else {
+    //   setFormItem("Base.cCanclfeersnCde", { rules: null, disabled: true });
+    //   if (!p.initFlag) {
+    //     setValue("Base.cCanclfeersnCde", "");
+    //   }
+    // }
   },
   //项目类别大类change事件
   cPrjCtgTypChange: (val) => {
