@@ -447,9 +447,10 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         hideBtns: (row: any) => {
           if (
-            row.taskStatus == "1" ||
+            (row.taskStatus == "1" ||
             row.taskStatus == "3" ||
-            row.taskStatus == "8"
+            row.taskStatus == "8") && 
+            row.cOprCde == user.opCde 
           ) {
             return false;
           } else {
