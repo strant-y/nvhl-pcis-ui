@@ -284,7 +284,7 @@ onMounted(async () => {
 		const paramss = {
       CEmpCde: props.cEmpCde
 		};
-		const getEmpDatas = sysOrgEmpMgrService.loadOrgEmpIeInfo(paramss);
+		const getEmpDatas = sysOrgEmpMgrService.loadOrgEmpInfo(paramss);
 		getEmpDatas.then((res: any) => {
 				if (null != res && null != res['code']) {
 						if (res['code'] === 200) {
@@ -314,7 +314,7 @@ function save() {
     if (isValid) {
       //const formParam = getFrom();
       let s = freeEditRef.value?.getFromValue(); 
-      const param = Object.assign({ type: props.type, cIsValid: '2', isie: "1" }, s);
+      const param = Object.assign({ type: props.type, cIsValid: '1', isie: "1" }, s);
       sysOrgEmpMgrService.saveOrgEmpInfo(param)
         .then((res) => {
           const { code, data, msg } = res;

@@ -17,18 +17,20 @@
       @blur="queryDpt"
     />
     <div class="tree" v-loading="loading">
-      <el-tree
-        ref="deptTreeRef"
-        class="mt-2 select-tree"
-        :data="deptList"
-        :props="{ children: 'children', label: 'label', disabled: '' }"
-        :expand-on-click-node="false"
-        :filter-node-method="handleFilter"
-        :render-after-expand="true"
-        :default-expand-all="false"
-        highlight-current
-        @node-click="handleNodeClick"
-      />
+			<div class="tree-wrapper">
+				<el-tree
+					ref="deptTreeRef"
+					class="mt-2 select-tree"
+					:data="deptList"
+					:props="{ children: 'children', label: 'label', disabled: '' }"
+					:expand-on-click-node="false"
+					:filter-node-method="handleFilter"
+					:render-after-expand="true"
+					:default-expand-all="false"
+					highlight-current
+					@node-click="handleNodeClick"
+				/>
+			</div>
     </div>
   </el-card>
 </template>
@@ -38,6 +40,12 @@
   overflow-y: auto;
   overflow-x: auto;
   width: 100%;
+}
+
+/* 关键：让 tree-wrapper 宽度由内容撑开 */
+.tree-wrapper {
+  display: inline-block;
+  min-width: 100%; /* 至少占满容器 */
 }
 :deep(.select-tree){
   margin-right: 30px;
