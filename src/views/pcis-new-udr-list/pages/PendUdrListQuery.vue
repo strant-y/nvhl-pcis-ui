@@ -809,7 +809,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         slotName: "cDptCnm",
         align: 'left',
-        lengthNum: 12,
+        lengthNum: 20,
       },
       {
         prop: "udrClsCde",
@@ -824,7 +824,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         slotName: "cTermNme",
         align: 'left',
-        lengthNum: 13,
+        lengthNum: 25,
       },
       {
         prop: "cAppNme",
@@ -832,7 +832,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         slotName: "cAppNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -840,7 +840,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         slotName: "cInsuredNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "nPrm",
@@ -868,7 +868,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        lengthNum: 5,
+        // lengthNum: 5,
       },
       // {
       //   prop: "cMinUndrCls",
