@@ -1909,7 +1909,7 @@ async function loadAfter() {
         const ops = clearCAppNo(opertaor.convertData(res));
         ops['plyBase']['Base.cRenewMrk'] = '1'
         ops['plyBase']['Base.cPlyNo'] = ''
-        ops['plyBase']['Base.cOprCde'] = user.userName // 录单人为当前用户
+        ops['plyBase']['Base.cOprCde'] = user.opCde // 录单人为当前用户
         ops['plyBase']['Base.cOrigPlyNo'] = cPlyNo
         ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2076,7 +2076,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
-          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
           ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
           ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
@@ -2254,7 +2254,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
-          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
           ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
           ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
@@ -2426,7 +2426,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
-          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
           ops.plyBase['Base.cNeedfeeFlag'] = "1"// 是否见费出单设置默认值
         }
