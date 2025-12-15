@@ -72,7 +72,7 @@ export const getData = (opertaor: any) => {
     //是否可疑交易，默认否
     dataInit["Base.cSusBusiness"] = "0";
     //录单人 默认系统操作员..
-    dataInit["Base.cOprCde"] = user.userName;
+    dataInit["Base.cOprCde"] = user.opCde;
     //录单人联系方式  默认操作员的
     if (user.phoneNO !== null && user.phoneNO !== "") {
       dataInit["Base.cCiOprRel"] = user.phoneNO;
@@ -179,7 +179,7 @@ export const getECargoData = (idxParam: any) => {
     //是否可疑交易，默认否
     dataInit["ECargoBase.cSusBusiness"] = "0";
     //录单人 默认系统操作员..
-    dataInit["ECargoBase.cOprCde"] = user.userName;
+    dataInit["ECargoBase.cOprCde"] = user.opCde;
     //录单人联系方式  默认操作员的
     if (user.phoneNO !== null && user.phoneNO !== "") {
       dataInit["ECargoBase.cCiOprRel"] = user.phoneNO;

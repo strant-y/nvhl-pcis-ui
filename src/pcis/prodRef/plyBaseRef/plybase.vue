@@ -823,7 +823,15 @@ const method = {
         ],
       })
     }
-  }
+  },
+  // 录单人
+  cOprCdeChange:(val:any) => {
+    if(val) {
+      setFormItem("Base.cOprCde", {
+        codeParam: { 'cOperId': val },
+      });
+    }
+  },
 };
 
 // 绑定特殊验证器
