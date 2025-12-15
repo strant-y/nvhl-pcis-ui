@@ -57,7 +57,7 @@ const plyBaseEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
-const user = JSON.parse(sessionStorage.getItem("user"));
+const user = JSON.parse(sessionStorage.getItem("user") || '{}');
 console.log("user", user);
 const subDptCde = ref(); //所属分公司
 
@@ -824,6 +824,14 @@ const method = {
           { label: "不计", value: "3" },
         ],
       })
+    }
+  },
+  // 录单人
+  cOprCdeChange:(val:any) => {
+    if(val) {
+      setFormItem("Base.cOprCde", {
+        codeParam: { 'cOperId': val },
+      });
     }
   }
 };
