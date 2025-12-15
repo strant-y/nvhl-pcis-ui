@@ -1561,12 +1561,21 @@ export function findECargoRenewalInsurance(queryParams: any): AxiosPromise<any> 
 }
 
 /**
- * 续保列表导出
+ * 续保管理---自定义续保列表导出
  *
  * @param queryParams
  */
 export function exportRenewalInsurance(data:any) {
   return request.post(`/policy/exportRenewalInsurance`, data, { responseType: 'blob'});
+}
+
+/**
+ * 续保管理---协议续保列表导出
+ *
+ * @param queryParams
+ */
+export function exportECargoRenewalInsurance(data:any) {
+  return request.post(`/policy/exportECargoRenewalInsurance`, data, { responseType: 'blob'});
 }
 /**
  * 一键续保
