@@ -164,8 +164,8 @@ const tableFromSchema = [
 		inputtype: "rtswitch",
 		title: "就职状态",
 		keymap: {
-			y: "2",
-			n: "3",
+			y: "1",
+			n: "0",
 		},
 		activeText: '在职',
 		inactiveText: '离司',
@@ -175,7 +175,6 @@ const tableFromSchema = [
 				CEmpCde: row.cEmpCde,
 				CIsValid: val
 			};
-			// 就职状态 orgempmgr/changeOrgEmpStatus  入参  CEmpCde 员工号 CIsValid  2无效 3有效
 			const getEmpDatas = sysOrgEmpMgrService.changeOrgEmpStatus(paramss);
 			getEmpDatas.then((res: any) => {
 				if (res['code'] == "200") {

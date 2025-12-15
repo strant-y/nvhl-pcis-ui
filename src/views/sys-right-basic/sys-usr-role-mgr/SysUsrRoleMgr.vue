@@ -2,10 +2,11 @@
   <div class="app-container">
     <el-row :gutter="10">
       <el-col :span="6">
-        <div class="gutter-row"
-          style="height: 35rem; width: 100%; overflow: scroll; overflow-x: scroll;">
-          <el-tree :data="_nodes" :props="defaultProps" :load="loadNode" :show-line="true" :expand-on-click-node="false"
+        <div class="gutter-row">
+					<div class="tree-wrapper">
+          	<el-tree :data="_nodes" :props="defaultProps" :load="loadNode" :show-line="true" :expand-on-click-node="false"
             lazy accordion @node-click="handleNodeClick"></el-tree>
+					</div>
         </div>
       </el-col>
       <el-col :span="18">
@@ -115,7 +116,19 @@ onMounted(() => {
 <style scoped lang="scss">
 .gutter-row {
   background: var(--el-fill-color-blank);
+	height: 35rem;
+  width: 100%;
+  overflow-x: auto; /* 允许横向滚动 */
+  overflow-y: auto; /* 纵向也需要滚动 */
+  position: relative;
 }
+
+/* 关键：让 tree-wrapper 宽度由内容撑开 */
+.tree-wrapper {
+  display: inline-block;
+  min-width: 100%; /* 至少占满容器 */
+}
+
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
 }
