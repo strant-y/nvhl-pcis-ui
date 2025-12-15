@@ -2108,9 +2108,11 @@ async function loadAfter() {
         if(ops.cvrg && ops.cvrg.length > 0) {
           ops.cvrg.forEach((item:any) => {
             delete item['Term.cPkId']
-            item['Term.riskList'].forEach((i:any) => {
-              delete i['Term.cPkId']
-            })
+            if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                delete i['Term.cPkId']
+              })
+            }
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -2284,9 +2286,11 @@ async function loadAfter() {
         if(ops.cvrg && ops.cvrg.length > 0) {
           ops.cvrg.forEach((item:any) => {
             delete item['Term.cPkId']
-            item['Term.riskList'].forEach((i:any) => {
-              delete i['Term.cPkId']
-            })
+            if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                delete i['Term.cPkId']
+              })
+            }
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -2454,9 +2458,11 @@ async function loadAfter() {
         if(ops.cvrg && ops.cvrg.length > 0) {
           ops.cvrg.forEach((item:any) => {
             delete item['Term.cPkId']
-            item['Term.riskList'].forEach((i:any) => {
-              delete i['Term.cPkId']
-            })
+            if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                delete i['Term.cPkId']
+              })
+            }
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -3961,13 +3967,13 @@ const savePlyInfo = async () => {
       return {
         ...item,
         'Term.cAppNo': cAppNo,
-        'Term.riskList': item['Term.riskList'].map((risk:any) => {
+        'Term.riskList': item['Term.riskList'] && Array.isArray(item['Term.riskList']) ? item['Term.riskList'].map((risk:any) => {
           delete risk['TermRisktgt.cPkId'];
           return {
             ...risk,
             'TermRisktgt.cAppNo': cAppNo,
           };
-        }),
+        }) : [],
       }
     });
   }
