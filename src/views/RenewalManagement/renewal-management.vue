@@ -49,7 +49,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
-import {deleteFactorBykey, exportRenewalInsurance, findRenewalInsurance, findECargoRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
+import {deleteFactorBykey, exportRenewalInsurance,exportECargoRenewalInsurance, findRenewalInsurance, findECargoRenewalInsurance, getBasicKindList, getPolicy} from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
@@ -511,8 +511,14 @@ const exportExcel = () => {
   if ( (Date.parse(param.tInsrncEndTm) - Date.parse(param.tInsrncBgnTm)) >= (180 * 1000 * 60 * 60 * 24)) {
     ElMessage.warning("保险起止日期范围请控制在半年以内");
     return;
-  }
- exportRenewalInsurance(param).then((res) => {
+	}
+	let data
+	if (s.cPrnType == "01") {
+		data = exportRenewalInsurance(param)
+	} else if (s.cPrnType == "02") {
+		data = exportECargoRenewalInsurance(param)
+	}
+	data.then((res) => {
     if (res.size <= 0) {
       ElMessage.error({ message: "导出出错", duration: 3000 });
       return;
