@@ -2534,8 +2534,6 @@ async function loadAfter() {
       label: imageStr,
       type: "warning",
       func: () => {
-        console.log(opertaor.getDataAll().plyBase?.['Base.cOprCde'])
-      debugger
        imageMethod.showImage(opertaor);
       },
     }),
@@ -3962,7 +3960,7 @@ const savePlyInfo = async () => {
     res["applicant"]["Applicant.cAppNo"] = cAppNo;
     res["insured"]["Insured.cAppNo"] = cAppNo;
     delete res["insured"]["Insured.cPkId"];
-    res["cvrg"] = res["cvrg"].map((item:any) => {
+    res["cvrg"] = res["cvrg"]?.map((item:any) => {
       delete item["Term.cPkId"];
       return {
         ...item,
