@@ -2519,8 +2519,6 @@ async function loadAfter() {
       label: imageStr,
       type: "warning",
       func: () => {
-        console.log(opertaor.getDataAll().plyBase?.['Base.cOprCde'])
-      debugger
        imageMethod.showImage(opertaor);
       },
     }),
