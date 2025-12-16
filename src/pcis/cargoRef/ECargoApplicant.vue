@@ -904,7 +904,7 @@ const method = {
   },
   //注册地市是否同上
    isSameChange : (val:any) => {
-    if (initFlag.value) {
+    if (!initFlag.value) {
       return;
     }
     if (val == "1") {

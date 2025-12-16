@@ -1291,6 +1291,7 @@ const checkUser = () => {
               });
 
               setValue('ECargoInsuredDist.cInsuredCde', data[0]['ECargoInsuredDist.cCargoAppCde']);
+              setValue('ECargoInsuredDist.cCertfCde', data[0]['ECargoInsuredDist.cCargoCertfCde']);
               let userId = getValue('ECargoInsuredDist.cCertfCde')
               idAnalysis(userId)
             }
@@ -1304,7 +1305,7 @@ const checkUser = () => {
 // 解析身份证
 const idAnalysis = (id:string)=>{
   const applicantValue = freeEditRef.value?.getFromValue() //tabref["AgreementApplicant"].getFormValue();
-  if (  id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='553')) {
+  if ( !id || id.length !== 18 || (applicantValue["ECargoInsuredDist.cCertfCls"] !=='111' && applicantValue["ECargoInsuredDist.cCertfCls"] !=='553')) {
     return false
   }
   const birthYear = parseInt(id.substring(6, 10), 10);
