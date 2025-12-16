@@ -297,7 +297,7 @@ onMounted(async () => {
 						if (res['code'] === 200) {
 								const usermsg = res['data'];
 								nextTick(()=>{
-									freeEditRef.value?.setFormValue(props.data);
+									freeEditRef.value?.setFormValue(usermsg);
 								})
 						}
 				}

@@ -236,7 +236,7 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "view",
 						data: row,
 						title: titlemsg,
-						CEmpCde: ''
+						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();
@@ -258,7 +258,7 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "update",
 						data: row,
 						title: titlemsg,
-						CEmpCde: ''
+						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();
