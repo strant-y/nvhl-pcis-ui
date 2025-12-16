@@ -1681,7 +1681,12 @@ selectTotalSalary(data) {
 // 工资总额-保存
 saveTotalSalary(data) {
     return request.post(`${this.saveTotalSalaryUrl}`, data);
-  }
+}
+	
+// 个人代理查询业务员信息
+getPrivateSelsList(data) {
+	return request.post(`/policy/getPrivateSelsList`, data);
+}
 // // 工资总额-
 // selectTotalSalary(data) {
 //     return request.post(`${this.selectTotalSalaryUrl}`, data);
