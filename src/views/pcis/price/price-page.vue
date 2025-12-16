@@ -1861,7 +1861,7 @@ async function loadAfter() {
           dzmodal
             .open(TaskListVestige, {
               type: "Issuer",
-              data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
+              data: { objId: props.param?.cInquiryNo, sysType: props.param?.sysType },
             })
             .then((res: any) => {
               if (res.type === "ok") {

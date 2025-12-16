@@ -907,7 +907,13 @@ const loadUndrClsListOptions = async (cProdNo: string) => {
 
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
-  getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
+	let params = {
+		level: 2,
+		type: 1,
+		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+	}
+  getProdEnableList(params).then((res: any) => {
     if (res.data && res.data.length > 0) {
       prodTotalDatas.value = res.data;
     }

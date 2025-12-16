@@ -294,7 +294,15 @@ const tplOptions = ref([])
 // 条款下拉数据
 function loadOptions(type:number = 1) {// 条款 1 方案 5 模板 7
   console.log('pppp',type)
-  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2, type };
+	const param = {
+		pageNo: 1,
+		pageSize: 999,
+		CEnableFlag: "1",
+		level: 2,
+		type,
+		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+	};
 
   console.log('param ',param)
   getProdEnableList(param).then((res:any) => {
