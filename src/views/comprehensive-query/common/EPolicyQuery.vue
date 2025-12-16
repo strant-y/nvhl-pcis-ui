@@ -595,7 +595,7 @@ const prodTotalDatas = ref([]);
 onBeforeMount(() => {
 		let params = {
 			level: 2,
-			type: 1
+			type: 1,
 			cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
 			cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
 		}
