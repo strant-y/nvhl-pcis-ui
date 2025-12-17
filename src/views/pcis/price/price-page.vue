@@ -1044,8 +1044,8 @@ const getWindExploration = ()=>{
 const questionnaireInfo = () => {
 	// 假设你想打开 /dashboard 页面
 	const baseUrl = import.meta.env.VITE_APP_API_WJ_URL
-	const	cProdNo = props.param.cProdNo
-	const	cKindNo = cProdNo.substring(0, 2)
+	const	cProdNo = props.param.cTermNo
+	const	cKindNo = props.param.cProdNo.substring(0, 2)
   const url = `${baseUrl}/cover?cKindNo=${cKindNo}&cProdNo=${cProdNo}&cNumNo=${getNo.value}`;
   window.open(url, '_blank');
 }
