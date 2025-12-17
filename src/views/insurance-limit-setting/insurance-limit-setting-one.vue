@@ -167,7 +167,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "客户性质",
         clearable: true,
         loadData: [],
-        func: (val) => {
+        typeCode: "INSURE_NATURE_CACHE",
+        func: (val:any) => {
           handleNatureChange(val)
         }
       },
@@ -200,6 +201,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "股东性质",
         clearable: true,
         loadData: [],
+        typeCode: "INSURE_NATURE_CACHE",
         func: (val) => {
           handleNatureChange2(val)
         }
@@ -415,28 +417,26 @@ const refreshData = (reset = true) => {
 
 //客户性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange = (value: string) => {
-  const item = freeEditRef.value?.getFromSchemaItem('customerIdType')
   if (value === '1') {
-    item['loadData'] = codeListMap['persionType']
+    setFormItem("customerIdType", { loadData: codeListMap['persionType'] })
   } else if (value === '0') {
-    item['loadData'] = codeListMap['NV049001']
+    setFormItem("customerIdType", { loadData: codeListMap['NV049001'] })
   }
   freeEditRef.value?.setValue('customerIdType', null) //清空客户证件类型
   freeEditRef.value?.clearValidate('customerIdType')
   freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
-  freeEditRef.value.clearValidate('customerIdNumber') //
+  freeEditRef.value?.clearValidate('customerIdNumber') //
   freeEditRef.value?.setValue('customerName', null) //清空客户名称值
-  freeEditRef.value.clearValidate('customerName')
+  freeEditRef.value?.clearValidate('customerName')
 }
 
 //股东性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange2 = (value: string) => {
-  const item = freeEditRef.value?.getFromSchemaItem('shareholderIdType')
   if (value === '1') {
-    item['loadData'] = codeListMap['persionType']
+    setFormItem("shareholderIdType", { loadData: codeListMap['persionType'] })
     companyCodeData.value = codeListMap['persionType']
   } else if (value === '0') {
-    item['loadData'] = codeListMap['NV049001']
+    setFormItem("shareholderIdType", { loadData: codeListMap['NV049001'] })
     companyCodeData.value = codeListMap['NV049001']
   }
   freeEditRef.value?.setValue('shareholderIdType', null) //清空股东证件类型
@@ -450,9 +450,9 @@ const handleNatureChange2 = (value: string) => {
 //证件类型change
 const handleCertificateChange = (value: string) => {
   freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
-  freeEditRef.value.clearValidate('customerIdNumber') //
+  freeEditRef.value?.clearValidate('customerIdNumber') //
   freeEditRef.value?.setValue('customerName', null) //清空客户名称值
-  freeEditRef.value.clearValidate('customerName')
+  freeEditRef.value?.clearValidate('customerName')
   if (value == '111') { // 身份证号
     CCertfCdeRules.value = [getRules("idCard", {})]
   } else if (value == '01') { // 统一社会信用代码
@@ -528,7 +528,7 @@ onMounted(() => {
 	}, false, true).then(res => {
 		if (res) {
       nextTick(() => {
-        const item = freeEditRef.value.getFromSchemaItem('productCategories')
+        const item = freeEditRef.value?.getFromSchemaItem('productCategories')
         item.loadData = res
       })
 			codeListMap['kind'] = res;
@@ -543,8 +543,8 @@ onMounted(() => {
 	}, false, true).then(res => {
 		if (res) {
       nextTick(() => {
-        const item = freeEditRef.value.getFromSchemaItem('customerNature')
-        const item2 = freeEditRef.value.getFromSchemaItem('shareholderNature')
+        const item = freeEditRef.value?.getFromSchemaItem('customerNature')
+        const item2 = freeEditRef.value?.getFromSchemaItem('shareholderNature')
         item.loadData = res
         item2.loadData = res
       })
