@@ -3755,6 +3755,14 @@ const submitToUndrFn = async () => {
           if (newPrm === oldPrm && newAmt === oldAmt) {
             const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
             btn.loading = false;
+            // 三十天校验提示
+            if(undr.repetitionHint) {
+              ElMessage.error(undr.repetitionHint);
+            }
+            // 限额值校验提示
+            if(undr.insuranceHint) {
+              ElMessage.error(undr.insuranceHint);
+            }
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
                 ElMessage({
@@ -5229,6 +5237,14 @@ const submitUnderwritingFn = async () => {
   submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);
     btn.loading = false;
+    // 三十天校验提示
+    if(res.repetitionHint) {
+      ElMessage.error(res.repetitionHint);
+    }
+    // 限额值校验提示
+    if(res.insuranceHint) {
+      ElMessage.error(res.insuranceHint);
+    }
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
       if(res['cDecision'] === '1' || res['cDecision'] === '2'){

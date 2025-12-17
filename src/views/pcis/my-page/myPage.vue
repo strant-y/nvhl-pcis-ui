@@ -3691,6 +3691,14 @@ const submitToUndrFn = async () => {
             if(btn) {
               btn.loading = false;
             }
+            // 三十天校验提示
+            if(undr.repetitionHint) {
+              ElMessage.error(undr.repetitionHint);
+            }
+            // 限额值校验提示
+            if(undr.insuranceHint) {
+              ElMessage.error(undr.insuranceHint);
+            }
             if (undr["code"] == 200) {
               if(undr['cDecision'] !== '0'){
                 ElMessage({
@@ -5143,9 +5151,17 @@ if(props.param.cTransMrk !== "1"){
           const newAmt = newOp.base["Base.nAmt"];
           const oldAmt = calcData.base["Base.nAmt"];
           if (newPrm === oldPrm && newAmt === oldAmt) {
-            submitEdrToUndr(res).then((result) => {
+            submitEdrToUndr(res).then((result:any) => {
               if(btn) {
                 btn.loading = false;
+              }
+              // 三十天校验提示
+              if(result.repetitionHint) {
+                ElMessage.error(result.repetitionHint);
+              }
+              // 限额值校验提示
+              if(result.insuranceHint) {
+                ElMessage.error(result.insuranceHint);
               }
               console.log("批改申请核保", result);
               // ElMessage.success(res.msg);
@@ -5199,6 +5215,14 @@ if(props.param.cTransMrk !== "1"){
         console.log("批改申请核保", result);
         // ElMessage.success(res.msg);
         // history.back();
+        // 三十天校验提示
+        if(result.repetitionHint) {
+          ElMessage.error(result.repetitionHint);
+        }
+        // 限额值校验提示
+        if(result.insuranceHint) {
+          ElMessage.error(result.insuranceHint);
+        }
         if (result["code"] == "200") {
           ElMessage.success(result.msg);
           if(btn) {
@@ -5355,6 +5379,14 @@ const submitUnderwritingFn = async () => {
     console.log("submitUnderwriting-res", res);
     if(btn) {
       btn.loading = false;
+    }
+    // 三十天校验提示
+    if(res.repetitionHint) {
+      ElMessage.error(res.repetitionHint);
+    }
+    // 限额值校验提示
+    if(res.insuranceHint) {
+      ElMessage.error(res.insuranceHint);
     }
     if (res["code"] == "200") {
       ElMessage.success(res.msg);
