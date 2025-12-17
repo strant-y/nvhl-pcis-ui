@@ -68,7 +68,7 @@ if (props.pageType === 'one') {
   settingOne.value = [
     {
       prop: "productCategories",
-      inputtype: "rtcascader",
+      inputtype: "rtselect",
       title: "产品大类",
       clearable: true,
       typeCode: "KIND_LIST_GRT",
@@ -133,7 +133,7 @@ if (props.pageType === 'one') {
     },
     {
       prop: "clauseCode",
-      inputtype: "rtcascader",
+      inputtype: "rtselect",
       title: "条款",
       clearable: true,
       typeCode: "PROD_LIST",
