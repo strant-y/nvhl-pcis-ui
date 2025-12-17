@@ -1646,7 +1646,8 @@ function getCodeListMap() {
 }
 // 客户重置
 function resetFn() {
-  if(!param.cAppNo) return;
+  const cAppNo = opertaor.getTableRefByKey('plyBase')?.getFromValue()?.['Base.cAppNo'];
+  if(!param.cAppNo || !cAppNo) return;
   const params = {
     type: param.pageName === "priceInquiry" ? 'I' : 'A',
     param: param.pageName === "priceInquiry" ? param.cInquiryNo : param.cAppNo,
