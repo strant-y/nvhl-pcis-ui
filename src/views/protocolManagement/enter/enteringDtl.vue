@@ -824,7 +824,7 @@ function query() {
           if (props.param?.cEdrType == "1") {
             sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
             const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
-            const newcEdrRsnDetail = JSON.parse(res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail']);
+            const newcEdrRsnDetail = JSON.parse(res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'] || '{}');
             if (props.param["cRsnCde"] != "FZ") {
             //   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
             //     props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],

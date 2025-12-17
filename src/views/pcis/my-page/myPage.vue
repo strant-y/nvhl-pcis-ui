@@ -511,7 +511,7 @@ import {
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -3684,6 +3684,9 @@ const submitToUndrFn = async () => {
               });
               // 申请核保成功后按钮设置为不可点击
               const btn = getBtn("btn010103");
+              if(btn) {
+                btn.loading = true;
+              }
 
               if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
                 tagsViewStore.delView({"name": "my-page",
@@ -3701,7 +3704,6 @@ const submitToUndrFn = async () => {
                 showClose: true,message:undr.msg,duration:6000,type: 'success'
               });
             }
-              btn.disabled = true;
             //关闭当前tab页面
             // this.$router.back();
 
@@ -3775,6 +3777,9 @@ const submitToUndrFn = async () => {
                 });
                 // 申请核保成功后按钮设置为不可点击
                 const btn = getBtn("btn010103");
+                if(btn) {
+                  btn.disabled = true;
+                }
 
                 if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
                   tagsViewStore.delView({"name": "my-page",
@@ -3792,7 +3797,6 @@ const submitToUndrFn = async () => {
                   showClose: true,message:undr.msg,duration:6000,type: 'success'
                 });
               }
-                btn.disabled = true;
               //关闭当前tab页面
               // this.$router.back();
 
@@ -5081,9 +5085,6 @@ if(props.param.cTransMrk !== "1"){
     // 校验清单与条款方案是否一致
     const DistOK = await validateDistConsistency();
     if (!DistOK) {
-      if(btn) {
-        btn.loading = false;
-      }
         return;
     };  
     
@@ -5292,6 +5293,9 @@ if(props.param.cTransMrk !== "1"){
               }
             });
           } else {
+            if(btn) {
+              btn.loading = false;
+            }
             needCalc.value = true;
             ElMessage.error("保额或保费发生变化,请重新进行保费计算!");
           }
@@ -5321,35 +5325,42 @@ if(props.param.cTransMrk !== "1"){
     res["cTransMrk"] = props.param.cTransMrk;
     res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
     submitEdrToUndr(res).then((result:any) => {
-        // btn.loading = false;
-        console.log("批改申请核保", result);
-        // ElMessage.success(res.msg);
-        // history.back();
-        // 三十天校验提示
-        if(result.repetitionHint) {
-          ElMessage.error(result.repetitionHint);
+      if(btn) {
+        btn.loading = false;
+      }
+      console.log("批改申请核保", result);
+      // ElMessage.success(res.msg);
+      // history.back();
+      // 三十天校验提示
+      if(result.repetitionHint) {
+        ElMessage.error(result.repetitionHint);
+      }
+      // 限额值校验提示
+      if(result.insuranceHint) {
+        ElMessage.error(result.insuranceHint);
+      }
+      if (result["code"] == "200") {
+        ElMessage.success(result.msg);
+        if(btn) {
+          btn.disabled = true;
         }
-        // 限额值校验提示
-        if(result.insuranceHint) {
-          ElMessage.error(result.insuranceHint);
+        if(result['cDecision'] === '1' || result['cDecision'] === '2'){
+          tagsViewStore.delView({"name": "my-page",
+            "title": "申请单录入",
+            "path": "/pcisapp/myPage",
+            "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+            router.replace({ path: "/dashboard" });
+          });
         }
-        if (result["code"] == "200") {
-          ElMessage.success(result.msg);
-          if(btn) {
-            btn.disabled = true;
-          }
-          if(result['cDecision'] === '1' || result['cDecision'] === '2'){
-            tagsViewStore.delView({"name": "my-page",
-              "title": "申请单录入",
-              "path": "/pcisapp/myPage",
-              "fullPath": "/pcisapp/myPage"}).then((res: any) => {
-              router.replace({ path: "/dashboard" });
-            });
-          }
-        } else {
-          ElMessage.error(result.msg);
-        }
-      });
+      } else {
+        ElMessage.error(result.msg);
+      }
+    }).catch(err => {
+      if(btn) {
+        btn.disabled = false;
+      }
+      ElMessage.error(err.msg);
+    });
   }
 };
 /**
