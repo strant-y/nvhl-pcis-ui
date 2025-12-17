@@ -809,7 +809,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "承保机构",
         // slotName: "cDptCnm",
         align: 'left',
-        lengthNum: 12,
+        lengthNum: 20,
       },
       {
         prop: "cTermNme",
@@ -817,7 +817,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "条款名称",
         // slotName: "cTermNme",
         align: 'left',
-        lengthNum: 13,
+        lengthNum: 25,
       },
       {
         prop: "cAppNme",
@@ -825,7 +825,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "投保人名称",
         // slotName: "cAppNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "cInsuredNme",
@@ -833,14 +833,14 @@ const tableconfig = reactive<AppTableConfig>(
         title: "被保人名称",
         // slotName: "cInsuredNme",
         align: 'left',
-        lengthNum: 12,
+        // lengthNum: 12,
       },
       {
         prop: "preUserName",
         inputtype: "rtinput",
         title: "任务提交人",
         align: 'left',
-        lengthNum: 5,
+        // lengthNum: 5,
       },
       {
         prop: "bsTm1",
@@ -907,7 +907,13 @@ const loadUndrClsListOptions = async (cProdNo: string) => {
 
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
-  getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
+	let params = {
+		level: 2,
+		type: 1,
+		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+	}
+  getProdEnableList(params).then((res: any) => {
     if (res.data && res.data.length > 0) {
       prodTotalDatas.value = res.data;
     }

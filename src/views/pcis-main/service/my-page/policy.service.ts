@@ -1139,19 +1139,13 @@ saveAMLExtendInfo(data) {
  
 
 // 反洗钱扩展信息查询  投保人 被保人通用
-getAMLExtendInfoByAppNo(appNo: string, CCusFlag: string) {
-    return request.post('/policy/getAMLExtendInfoByAppNo', {
-        'CAppNo': appNo,
-        'CCusFlag': CCusFlag
-    });
+getAMLExtendInfoByAppNo(ops) {
+    return request.post('/policy/getAMLExtendInfoByAppNo', ops);
 }
 
 // 反洗钱受益人所有人信息 table
-getAMLCusBnfcInfoByAppNo(CAppNo: string, CCusFlag: string) {
-    return request.post('/policy/getAMLCusBnfcInfoByAppNo', {
-        'CAppNo': CAppNo,
-        'CCusFlag': CCusFlag
-    });
+getAMLCusBnfcInfoByAppNo(ops) {
+    return request.post('/policy/getAMLCusBnfcInfoByAppNo', ops);
 }
 
 /**
@@ -1687,7 +1681,12 @@ selectTotalSalary(data) {
 // 工资总额-保存
 saveTotalSalary(data) {
     return request.post(`${this.saveTotalSalaryUrl}`, data);
-  }
+}
+	
+// 个人代理查询业务员信息
+getPrivateSelsList(data) {
+	return request.post(`/policy/getPrivateSelsList`, data);
+}
 // // 工资总额-
 // selectTotalSalary(data) {
 //     return request.post(`${this.selectTotalSalaryUrl}`, data);

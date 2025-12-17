@@ -286,15 +286,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 onMounted(async () => {
-  if (props.type === "update") {
-    nextTick(()=>{
-      freeEditRef.value?.setFormValue(props.data);
-    })
-  }
-  if(props.type === "view"){
-    nextTick(()=>{
-      freeEditRef.value?.setFormValue(props.data);
-    })
+  if (props.type === "update" || props.type === "view") {
+		// 获取IE员工详情
+		const paramss = {
+      CEmpCde: props.cEmpCde
+		};
+		const getEmpDatas = sysOrgEmpMgrService.loadOrgEmpInfo(paramss);
+		getEmpDatas.then((res: any) => {
+				if (null != res && null != res['code']) {
+						if (res['code'] === 200) {
+								const usermsg = res['data'];
+								nextTick(()=>{
+									freeEditRef.value?.setFormValue(usermsg);
+								})
+						}
+				}
+		});
   }
   if(props.type === "add"){
     nextTick(()=>{

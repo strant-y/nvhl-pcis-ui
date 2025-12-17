@@ -31,6 +31,7 @@ import {eventBus} from "@/utils/event-bus";
 import {calculateAgeFromIdCard} from "@/utils/common";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import moment from "moment";
+import { deductibleTemple,deductibleKey, fillTemplate } from "@/pcis/prodRef/cvrgRef/titleTemple";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const param = ref({});
@@ -519,6 +520,24 @@ onMounted(() => {
             .then((res) => {
               setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res })
             });
+        }
+      }
+    }
+    // 免赔率、免赔额输入后自动生成免赔说明
+    if(item.prop === 'Dist.nDductRate' || item.prop === 'Dist.nDductAmt') {
+      item.func = (val:any) => {
+        const nDductAmt = getValue("Dist.nDductAmt");
+        const nDductRate = getValue("Dist.nDductRate");
+        const k = (nDductAmt !== null && nDductAmt !== undefined ? '1':'0') + '' + (nDductRate !== null && nDductRate !== undefined ? '1':'0') ;
+        const strt = deductibleTemple.value[k];
+        if(strt){
+          const filledString = fillTemplate(strt, {
+            amount: nDductAmt,
+            rate: nDductRate,
+          });
+          setValue("Dist.cDductDesc", filledString)
+        } else {
+          setValue("Dist.cDductDesc", "")
         }
       }
     }

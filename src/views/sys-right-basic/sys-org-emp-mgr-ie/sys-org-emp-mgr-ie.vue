@@ -2,16 +2,18 @@
   <el-row>
     <el-col :span="6" class="col-md-6">
       <el-card :bordered="false" class="index-blk">
-        <div style="height: 35rem; width: 100%; overflow: scroll; overflow-x: scroll;">
-          <el-tree
-            :data="nodes"
-            :props="defaultProps"
-            :show-line="true"
-            lazy
-            :expand-on-click-node="false"
-            :load="getChildren"
-            @node-click="onEvent"
-          ></el-tree>
+        <div class="tree-scroll-container">
+					<div class="tree-wrapper">
+						<el-tree
+							:data="nodes"
+							:props="defaultProps"
+							:show-line="true"
+							lazy
+							:expand-on-click-node="false"
+							:load="getChildren"
+							@node-click="onEvent"
+						></el-tree>
+					</div>
         </div>
       </el-card>
     </el-col>
@@ -130,5 +132,19 @@ export default defineComponent({
   }
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
+}
+
+.tree-scroll-container {
+  height: 35rem;
+  width: 100%;
+  overflow-x: auto; /* 允许横向滚动 */
+  overflow-y: auto; /* 纵向也需要滚动 */
+  position: relative;
+}
+
+/* 关键：让 tree-wrapper 宽度由内容撑开 */
+.tree-wrapper {
+  display: inline-block;
+  min-width: 100%; /* 至少占满容器 */
 }
 </style>

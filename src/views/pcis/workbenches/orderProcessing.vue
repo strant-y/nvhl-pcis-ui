@@ -447,9 +447,10 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         hideBtns: (row: any) => {
           if (
-            row.taskStatus == "1" ||
+            (row.taskStatus == "1" ||
             row.taskStatus == "3" ||
-            row.taskStatus == "8"
+            row.taskStatus == "8") && 
+            row.cOprCde == user.opCde 
           ) {
             return false;
           } else {
@@ -497,7 +498,7 @@ const tableconfig = reactive<AppTableConfig>(
         size: "large",
         icon: "Delete",
         hideBtns: (row: any) => {
-          if (row.taskStatus == "1" || row.taskStatus == "3" || row.taskStatus == "8") {
+          if ((row.taskStatus == "1" || row.taskStatus == "3" || row.taskStatus == "8") && row.cOprCde == user.opCde) {
             return false;
           } else {
             return true;
@@ -937,7 +938,13 @@ function handleDblClick(row:any) {
 
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
-  getProdEnableList({ level: 2, type: 1 }).then((res: any) => {
+	let params = {
+		level: 2,
+		type: 1,
+		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+	}
+  getProdEnableList(params).then((res: any) => {
     if (res.data && res.data.length > 0) {
       prodTotalDatas.value = res.data;
     }

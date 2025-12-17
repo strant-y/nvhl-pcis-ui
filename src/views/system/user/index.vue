@@ -538,7 +538,9 @@ async function openDialog(row: UserPageVO) {
   await loadRoleOptions();
   if (!!row) {
     isAdd.value = false;
-    dialog.title = "修改用户";
+		dialog.title = "修改用户";
+		row.tPwdStrtTm = moment(row.tPwdStrtTm).format("YYYY-MM-DD");
+		row.tPwdEndTm = moment(row.tPwdEndTm).format("YYYY-MM-DD 23:59:59");
     Object.assign(formData, row);
   } else {
     isAdd.value = true;

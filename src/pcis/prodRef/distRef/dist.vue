@@ -332,6 +332,22 @@ onMounted(async () => {
   //   })
   // }
 
+  if(props.compKey === 'VehicleDist040002') {
+    formconfig11.value.fromSchema.forEach((item:any) => {
+      if(item.prop === 'Dist.cPlanNo') {
+        item.lengthNum = 5
+      }
+      if(item.prop === 'Dist.nInsuredSeats') {
+        item.lengthNum = 8
+      }
+      if(item.prop === 'Dist.nApprovedSeats') {
+        item.lengthNum = 8
+      }
+      if(item.prop === 'Dist.nApprovedWeight') {
+        item.lengthNum = 7
+      }
+    })
+  }
 
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;

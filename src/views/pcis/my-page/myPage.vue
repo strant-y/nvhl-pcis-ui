@@ -963,7 +963,7 @@ const setCusBenefitInfo = () => {
   }
 
   dzmodal
-    .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam })
+    .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam,data: props.param, getNo: getNo.value })
     .then((res: any) => {
       if (res.type === "ok") {
       }
@@ -1249,6 +1249,15 @@ const edrBtn = [
     id: "btnSubmitEdr",
     func: () => {
       submitEdrToUndrFun();
+    },
+  }),
+	createFreeButtonBase({
+    label: "反洗钱扩展信息",
+		type: "primary",
+		hidden: props.param.cRsnCde != 'BH',
+    buttonColor: bottomBtnColor1,
+    func: () => {
+      setCusBenefitInfo();
     },
   }),
 ];
@@ -1964,7 +1973,7 @@ async function loadAfter() {
         const ops = clearCAppNo(opertaor.convertData(res));
         ops['plyBase']['Base.cRenewMrk'] = '1'
         ops['plyBase']['Base.cPlyNo'] = ''
-        ops['plyBase']['Base.cOprCde'] = user.userName // 录单人为当前用户
+        ops['plyBase']['Base.cOprCde'] = user.opCde // 录单人为当前用户
         ops['plyBase']['Base.cOrigPlyNo'] = cPlyNo
         ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
         ops['plyBase']['Base.cAppStatus'] = ''
@@ -2099,9 +2108,11 @@ async function loadAfter() {
         if(ops.cvrg && ops.cvrg.length > 0) {
           ops.cvrg.forEach((item:any) => {
             delete item['Term.cPkId']
-            item['Term.riskList'].forEach((i:any) => {
-              delete i['Term.cPkId']
-            })
+            if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                delete i['Term.cPkId']
+              })
+            }
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -2129,7 +2140,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
-          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
           ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
           ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
@@ -2275,9 +2286,11 @@ async function loadAfter() {
         if(ops.cvrg && ops.cvrg.length > 0) {
           ops.cvrg.forEach((item:any) => {
             delete item['Term.cPkId']
-            item['Term.riskList'].forEach((i:any) => {
-              delete i['Term.cPkId']
-            })
+            if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                delete i['Term.cPkId']
+              })
+            }
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -2305,7 +2318,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
-          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
           ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
           ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
@@ -2445,9 +2458,11 @@ async function loadAfter() {
         if(ops.cvrg && ops.cvrg.length > 0) {
           ops.cvrg.forEach((item:any) => {
             delete item['Term.cPkId']
-            item['Term.riskList'].forEach((i:any) => {
-              delete i['Term.cPkId']
-            })
+            if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+              item['Term.riskList'].forEach((i:any) => {
+                delete i['Term.cPkId']
+              })
+            }
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -2475,7 +2490,7 @@ async function loadAfter() {
         if(ops.plyBase) {
           ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
-          ops.plyBase['Base.cOprCde'] = user.userName // 录单人为当前用户
+          ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
           ops.plyBase['Base.cNeedfeeFlag'] = "1"// 是否见费出单设置默认值
         }
@@ -2498,12 +2513,12 @@ async function loadAfter() {
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
-        const distMap = formconfig1[0].pageInfo.filter((item:any) => {
-          return item.pageKey === "dist"
-        });
-        distMap.forEach((item:any) => {
-          getDistData(props.param?.cInquiryNo, item)
-        });
+        // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+        //   return item.pageKey === "dist"
+        // });
+        // distMap.forEach((item:any) => {
+        //   getDistData(props.param?.cInquiryNo, item)
+        // });
       }
     })
     bthList.value = basicBtn;
@@ -3945,18 +3960,18 @@ const savePlyInfo = async () => {
     res["applicant"]["Applicant.cAppNo"] = cAppNo;
     res["insured"]["Insured.cAppNo"] = cAppNo;
     delete res["insured"]["Insured.cPkId"];
-    res["cvrg"] = res["cvrg"].map((item:any) => {
+    res["cvrg"] = res["cvrg"]?.map((item:any) => {
       delete item["Term.cPkId"];
       return {
         ...item,
         'Term.cAppNo': cAppNo,
-        'Term.riskList': item['Term.riskList'].map((risk:any) => {
+        'Term.riskList': item['Term.riskList'] && Array.isArray(item['Term.riskList']) ? item['Term.riskList'].map((risk:any) => {
           delete risk['TermRisktgt.cPkId'];
           return {
             ...risk,
             'TermRisktgt.cAppNo': cAppNo,
           };
-        }),
+        }) : [],
       }
     });
   }
@@ -4019,7 +4034,7 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "orig" || props.param?.pageType === "inquiryToApp") && saveDistBatchFlag.value) {
+    if((props.param?.pageType === "orig") && saveDistBatchFlag.value) {
       // 保存清单
       const appNo = plyBase["Base.cAppNo"];
       saveDist(appNo);

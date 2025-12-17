@@ -1,17 +1,21 @@
 <template>
   <div class="app-container">
     <div class="left-container">
-      <el-tree
-        :data="treeData"
-        :props="defaultProps"
-        :load="loadNode" 
-        :show-line="true"
-        :expand-on-click-node="false"
-            lazy accordion
-        @node-click="handleNodeClick"
-        ref="treeRef"
-        class="tree-container"
-      />
+			<div class="tree-scroll-container">
+				<div class="tree-wrapper">
+					<el-tree
+						:data="treeData"
+						:props="defaultProps"
+						:load="loadNode" 
+						:show-line="true"
+						:expand-on-click-node="false"
+								lazy accordion
+						@node-click="handleNodeClick"
+						ref="treeRef"
+						class="tree-container"
+					/>
+				</div>
+			</div>
     </div>
     <div class="right-container">
       <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -505,7 +509,6 @@ defineExpose({
   flex: 1;
   padding: 10px;
   border-right: 1px solid #ccc;
-  overflow: auto; /* 添加滚动条 */
 }
 
 .right-container {
@@ -519,5 +522,19 @@ defineExpose({
 }
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
+}
+
+.tree-scroll-container {
+  height: 35rem;
+  width: 400px;
+  overflow-x: auto; /* 允许横向滚动 */
+  overflow-y: auto; /* 纵向也需要滚动 */
+  position: relative;
+}
+
+/* 关键：让 tree-wrapper 宽度由内容撑开 */
+.tree-wrapper {
+  display: inline-block;
+  min-width: 100%; /* 至少占满容器 */
 }
 </style>

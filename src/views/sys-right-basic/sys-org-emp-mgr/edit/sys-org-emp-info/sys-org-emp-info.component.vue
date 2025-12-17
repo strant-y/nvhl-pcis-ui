@@ -170,8 +170,20 @@ const tableFromSchema = [
 		activeText: '在职',
 		inactiveText: '离司',
 		inlinePrompt: true,
-		func: (val) => {
-			console.log(val);
+		func: (val: string, row: any) => {
+			const paramss = {
+				CEmpCde: row.cEmpCde,
+				CIsValid: val
+			};
+			const getEmpDatas = sysOrgEmpMgrService.changeOrgEmpStatus(paramss);
+			getEmpDatas.then((res: any) => {
+				if (res['code'] == "200") {
+					ElMessage.success(res.msg);
+				} else {
+					ElMessage.error(res.msg);
+				}
+				handleQuery();
+			});
 		},
 	}
 ]
@@ -224,7 +236,7 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "view",
 						data: row,
 						title: titlemsg,
-						CEmpCde: ''
+						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();
@@ -246,7 +258,7 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "update",
 						data: row,
 						title: titlemsg,
-						CEmpCde: ''
+						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
 							handleQuery();

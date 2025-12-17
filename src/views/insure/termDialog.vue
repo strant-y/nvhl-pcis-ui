@@ -171,7 +171,9 @@ function loadTree() {
   nodes.value = [];
   const param = {
     name: formconfig1.value.name,
-    level: 2,
+		level: 2,
+		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {

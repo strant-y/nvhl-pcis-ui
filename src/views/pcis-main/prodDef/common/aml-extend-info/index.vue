@@ -1,10 +1,10 @@
 <template>
   <el-dialog :close-on-click-modal="false"  v-model="dialogVisible"  @close="close" width="90%" title="反洗钱扩展信息">
     <el-config-provider :locale="locale">
-      <appExtendInfo  :idxParam="idxParam" v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
-      <insExtendInfo  :idxParam="idxParam" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
+      <appExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
+      <insExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
     </el-config-provider>
-		<div style="margin-top: 20px" :style="{ textAlign: 'right' }">
+		<div v-if="!saveHidden" style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
           :item="{
             type: 'primary',
@@ -65,6 +65,7 @@ const props = defineProps({
   data: Object,
   type:String,
   idxParam:Object,
+  getNo:String,
 });
 
 const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
@@ -80,6 +81,7 @@ const tableRef = ref<MyTableMethod | null>(null);
 const appTableShow = ref(false);
 const appExtendInfoRef=ref(null);
 const inextendRef=ref(null);
+const saveHidden=ref(false);
 const policyService = new PolicyService();
 
 const schemaMap = reactive<Record<string, any>>({
@@ -92,8 +94,9 @@ const cardConfig = reactive<CardConfig>(
 	})
 );
 onMounted(async () => {
-
-  
+	if (!!props.data?.cRsnCde && props.data?.cRsnCde == "BH" && !props.getNo) {
+		saveHidden.value = true
+	}
   if (props.type === "edit" && props.data) {
     setTimeout(() => {
       console.log(989,props.data)
@@ -120,8 +123,9 @@ const method = {
 };
 /** 保存 */
 const save = async () => {
-  let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
-  let CAppTyp =  props.data?.CAppTyp ?  props.data.CAppTyp: 'A'; // CAppTyp：投保单是A,批单是E
+	let CAppNo = opertaor.getDataAll()['applicant']['Applicant.cAppNo'];   // 申请单号
+	let cPlyNo = opertaor.getDataAll()['applicant']['Applicant.cPlyNo'];   // 保单号
+  let CAppTyp = props.data?.cRsnCde == 'BH' ?  'E': 'A'; // CAppTyp：投保单是A,批单是E
   let opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
   let controlFlag = props.controlFlag;
   let params = {
@@ -143,7 +147,9 @@ const save = async () => {
     }
  
   }
-
+	if (CAppTyp == "E") {
+		params.CPlyNo = cPlyNo
+	}
   
   // 投保人  获取投保人参数和数据
   let appInfo = null

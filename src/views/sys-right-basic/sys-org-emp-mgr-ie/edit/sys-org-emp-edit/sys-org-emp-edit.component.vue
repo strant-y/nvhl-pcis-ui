@@ -43,7 +43,6 @@ const props = defineProps({
   title: String,
   cDptCde: String, //机构代码
   cEmpCde: String, //员工代码
-
 });
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
@@ -101,9 +100,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         typeCode: "EMP_DPT_LIST_NOCACHE",
         disabled: true,
-        rules: [getRules("required", {
-          trigger: 'change'
-        })]
       },
       {
         prop: 'cSex',
@@ -180,7 +176,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'cCtfctNo',
         title: '证件号码',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
         disabled: isDisabled,
       },
       {
@@ -193,14 +188,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'cTel',
         title: '联系电话',
         inputtype: "rtinput",
-        rules: [getRules("phone", {})],
         disabled: isDisabled,
       },
       {
         prop: 'cMobile',
         title: '手机',
         inputtype: "rtinput",
-        rules: [getRules("phoneNo", {})],
+        rules: [getRules("required", {}), getRules("phoneNo", {})],
         disabled: isDisabled,
       },
       {
@@ -213,7 +207,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'cZipCde',
         title: '邮编',
         inputtype: "rtinput",
-        rules: [getRules("required", {}), getRules("signlessInt", {}), getRules("specifyLength", {len: 6})],
         disabled: isDisabled,
       },
       {
@@ -286,15 +279,22 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 );
 
 onMounted(async () => {
-  if (props.type === "update") {
-    nextTick(()=>{
-      freeEditRef.value?.setFormValue(props.data);
-    })
-  }
-  if(props.type === "view"){
-    nextTick(()=>{
-      freeEditRef.value?.setFormValue(props.data);
-    })
+	if (props.type === "update" || props.type === "view") {
+		// 获取IE员工详情
+		const paramss = {
+      CEmpCde: props.cEmpCde
+		};
+		const getEmpDatas = sysOrgEmpMgrService.loadOrgEmpInfo(paramss);
+		getEmpDatas.then((res: any) => {
+				if (null != res && null != res['code']) {
+						if (res['code'] === 200) {
+								const usermsg = res['data'];
+								nextTick(()=>{
+									freeEditRef.value?.setFormValue(usermsg);
+								})
+						}
+				}
+		});
   }
   if(props.type === "add"){
     nextTick(()=>{
@@ -308,7 +308,7 @@ const method = {
   func1: () => {
   },
 };
-/** 查询 */
+/** 保存 */
 function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {

@@ -22,6 +22,7 @@ import { cloneDeep } from "lodash-es";
 import moment from "moment";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
+import {CommonConstants} from "@/constants/CommonConstants";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
@@ -52,7 +53,7 @@ let idxParam = reactive({
   opertaorProps: { id: 'enteringDtl' },
   formPage: formPage.value,
   param: { ...props.param, ...{cacheKey:cacheKey.value,acctinfoFlag:true,type:props?.type || props.param?.type}},
-  user: JSON.parse(sessionStorage.getItem("user")),
+  user: JSON.parse(sessionStorage.getItem("user") || '{}'),
   ciJiMrk: '0',
   readonly: computed(() => ['view','audit'].includes(props?.type || props.param?.type) || (props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType) )),
 });

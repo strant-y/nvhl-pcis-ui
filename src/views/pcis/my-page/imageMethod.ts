@@ -29,7 +29,7 @@ export const imageMethod = {
       return;
     }
 
-    if (pageMethod.imageReadonly(opertaor)) {
+    if (pageMethod.imageReadonly(opertaor) || (opertaor.getDataAll().plyBase?.['Base.cOprCde'] != user.opCde && opertaor.getDataAll().plyBase?.['Base.cOprCde'] != user.opCnm)) {
       // let ParamNo = null;
       policyService
         .imageInfoShow({ ParamNo: ParamNo })

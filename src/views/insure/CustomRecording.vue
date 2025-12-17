@@ -225,7 +225,14 @@ const formconfig1 = ref({
 const selectTreeItem = ref({});
 // 条款下拉数据
 function loadOptions() {
-  const param = { pageNo: 1, pageSize: 999, CEnableFlag: "1", level: 2 };
+	const param = {
+		pageNo: 1,
+		pageSize: 999,
+		CEnableFlag: "1",
+		level: 2,
+		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+	};
   getProdEnableList(param).then((res) => {
     if (res.code === 200) {
       options.value = res.data.result;
