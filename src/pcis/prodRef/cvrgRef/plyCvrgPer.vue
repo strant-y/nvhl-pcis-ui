@@ -197,6 +197,10 @@ onMounted(async () => {
   );
   let deleteId = 0 ;
   if(formconfig11.titleBtns){
+    // 020018不需要选择货物按钮
+    if(parparam.cProdNo === '020018') {
+      formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
+    }
     formconfig11.titleBtns.forEach((item: any,index :number) => {
       if(item.id === 'selectGoods'){
         deleteId = index;
