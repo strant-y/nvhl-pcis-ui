@@ -107,12 +107,12 @@ const tableconfig = reactive<AppGridEditConfig>(
 					let maxSeqNo = 0; // 初始设为 0，这样即使空数组，+1 后也是 1
 					if (value.length > 0) {
 						maxSeqNo = value.reduce((max, item) => {
-							const val = item['cSeqNo'];
+							const val = item['nSeqNo'];
 							return (typeof val === 'number' && !isNaN(val) && val > max) ? val : max;
 						}, 0); // 初始值设为 0 更安全
 					}
 					const nextSeqNo = maxSeqNo + 1;
-					tableRef.value?.addRowByData({ cGrpMrk: "0", cSeqNo: nextSeqNo });
+					tableRef.value?.addRowByData({ cGrpMrk: "0", nSeqNo: nextSeqNo });
 				},
 			}),
 			createFreeButtonBase({
