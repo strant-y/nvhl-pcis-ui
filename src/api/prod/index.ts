@@ -1652,3 +1652,13 @@ export function setEfcManual(queryParams: any): AxiosPromise<any> {
   return post(`/policy/setEfcManual`, queryParams);
 }
 
+// 获取财产险/机损险保单号下拉选项
+export function queryCAssPlyNo(queryParams: any): AxiosPromise<any> {
+  return post(`/underwriting/query/queryCAssPlyNo`, queryParams);
+}
+
+// 获取累计保额信息
+export function coverageHint(queryParams: any): AxiosPromise<any> {
+  return post(`/custShare/coverageHint`, queryParams);
+}
+

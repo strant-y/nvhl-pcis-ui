@@ -17,7 +17,7 @@ import { transpileModule } from "typescript";
 import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
-import { getDelayCount, getNewSysDays, checkCdeptByCdptCde, checkCancelM1IsOff } from "@/api/prod/";
+import { getDelayCount, getNewSysDays, checkCdeptByCdptCde, checkCancelM1IsOff, qryTerminationDataList } from "@/api/prod/";
 const route = useRoute();
 const { getRules } = useValidator();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -136,11 +136,12 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
 
     //  接口  开关校验
-    const resOff = await checkCancelM1IsOff({ cPlyNo: plyNo, CancelM1: 'CancelM1' });
+    const resOff = await qryTerminationDataList({ cPlyNo: plyNo, CancelM1: 'CancelM1' })
 
     // 开关关闭：按产品规则拦截
+    if (resOff?.data?.[0]?.cAppTyp === 'on') {
 
-    if (!resOff?.res) {
+    } else {
       const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
       const nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);
       const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);

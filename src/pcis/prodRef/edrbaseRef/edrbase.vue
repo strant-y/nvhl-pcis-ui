@@ -19,6 +19,8 @@ import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { qryTerminationDataList } from "@/api/prod";
+import Decimal from "decimal.js";
 
 const pcisQueryService = new PcisQueryService();
 const codeListStore = codeListViewStore();
@@ -248,6 +250,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
         // rules: [getRules("required", {})],
         // disabled: params["cEdrType"]=='2'
+      },
+      {
+        prop: "EdrBase.nRefundPrm",
+        inputtype: "rtinput",
+        title: "退保费",
+        disabled: true,
+        hidden: params.cRsnCde != "s1" && params.cRsnCde != "s2" ,
+        rules: [getRules("required", {})],
+        func: (val:any) => {
+          const nBefEdrPrm = getValue('EdrBase.nBefEdrPrm')?.replaceAll(',','');
+          if(new Decimal(val).gt(new Decimal(nBefEdrPrm))) {
+            ElMessage.warning('退保费不能大于原保费！')
+            setValue("EdrBase.nRefundPrm", nBefEdrPrm)
+          } else if(params.cRsnCde == "s2" && !params.initFlag){
+            setValue("EdrBase.nPrmVar", new Decimal(0).sub(new Decimal(val)))
+            setValue("EdrBase.nPrm", new Decimal(nBefEdrPrm).add(new Decimal(getValue('EdrBase.nPrmVar'))))
+          }
+        }
       },
       {
         prop: "EdrBase.nDelayNum",
@@ -558,6 +578,17 @@ onMounted(() => {
           await getLastInsrncEndTm(cPlyNo)
         }
       },500)
+    }
+    
+    // 根据数据控制开关设置条款中的可编辑项
+    if(params.pageType === 'TEMPORARY_DEPOSIT' && params.cEdrType && params.cRsnCde === 's2') {
+      qryTerminationDataList({ cAppNo: params.cAppNo, cOperType: 'SurPrm' }).then((res:any) => {
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            setFormItem("EdrBase.nRefundPrm",{ disabled: false })
+          }
+        }
+      })
     }
   });
 });

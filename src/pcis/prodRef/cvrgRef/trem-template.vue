@@ -388,7 +388,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost } from "@/api/prod";
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost, queryCAssPlyNo, qryTerminationDataList } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -626,6 +626,34 @@ function initData(data: any) {
         num += Number(item['Term.nSeatCount'] || 0)
       })
       opertaor.getTableRefByKey("tgt")?.setValue("Tgt.nSeatCapacity", num)
+    }
+    // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
+    // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
+    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) {
+      // TermRisktgt
+      const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+      let nInsuranceFee:number = 0;
+      cvrgData.forEach((item:any) => {
+        if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
+          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
+          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
+          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+        }
+        nInsuranceFee += Number(item['Term.nInsuranceFee'])
+      })
+      opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
+      opertaor.getFatherPage().afterCalcPremium()
+    }
+    // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
+    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
+      const nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
+      const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm'];
+      if(newData['Term.nInsuranceFee'] != nPrm) {
+        opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", newData['Term.nInsuranceFee'])
+        opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", newData['Term.nInsuranceFee'])
+        opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(newData['Term.nInsuranceFee']).sub(new Decimal(nBefEdrPrm)))
+      }
     }
   });
 }
@@ -913,6 +941,7 @@ function dataInit() {
         }
       })
     }
+    setPropertyNoOptions()
     methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
     if (props.disabledFlag) {
       setDisabledAll();
@@ -955,6 +984,7 @@ function dataInit() {
           }
         })
       }
+      setPropertyNoOptions()
       methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
       if (props.disabledFlag) {
         setDisabledAll();
@@ -984,6 +1014,27 @@ function dataInit() {
     } else {
       termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
     }
+  }
+}
+
+// 给 Term.nPropertyNo财产险/机损险保单号下拉框赋值
+function setPropertyNoOptions() {
+  const nPropertyNo:any = termFactormap.value.find((item:any) => item.prop === 'Term.nPropertyNo');
+  if (nPropertyNo) {
+    queryCAssPlyNo({}).then((res:any) => {
+      if ('1' === res.code) {
+        if(res.data && res.data.length > 0) {
+          nPropertyNo.loadData = res.data?.map((item:any) => {
+            return {
+              value: item.cPlyNo,
+              label: item.cPlyNo
+            }
+          });
+        }
+      } else {
+        ElMessage.error(res.message);
+      }
+    });
   }
 }
 
@@ -1036,6 +1087,38 @@ function initMethod(){
         cDeductibleMethod[0]['defaultValue'] = "01"
       }
     }
+  // 根据数据控制开关设置条款中的可编辑项(投保单)
+  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A') {
+    qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
+      if(res?.code == 200 && res.data?.length > 0) {
+        if(res.data[0]?.cAppTyp === 'on') {
+          if (termFactormap && termFactormap.value.length > 0) {
+            termFactormap.value.forEach((item: any) => {
+              if(item.prop === 'Term.nInsuranceFee') {
+                item.disabled = false;
+              }
+            });
+          }
+        }
+      }
+    })
+  }
+  // 根据数据控制开关设置条款中的可编辑项(批单)
+  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType) {
+    qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
+      if(res?.code == 200 && res.data?.length > 0) {
+        if(res.data[0]?.cAppTyp === 'on') {
+          if (termFactormap && termFactormap.value.length > 0) {
+            termFactormap.value.forEach((item: any) => {
+              if(item.prop === 'Term.nInsuranceFee') {
+                item.disabled = false;
+              }
+            });
+          }
+        }
+      }
+    })
+  }
 }
 
 /**
