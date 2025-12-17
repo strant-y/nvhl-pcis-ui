@@ -1532,7 +1532,8 @@ defineExpose({
   initProxySales,
   intiAgentBroker,
   valideRequired,
-  addProvide
+  addProvide,
+  updateMasterAgreementValues,
 });
 </script>
 

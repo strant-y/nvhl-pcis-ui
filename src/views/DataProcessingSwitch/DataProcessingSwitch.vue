@@ -88,10 +88,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         loadData: [
           { value: 'TerEdr', label: '终保后批改' },
           { value: 'SurBck', label: '一般退保倒签' },
-          { value: 'CanBck', label: '注销倒签' },
+          // { value: 'CanBck', label: '注销倒签' },
           { value: 'SurPrm', label: '一般退保手动修改退保总保费' },
           { value: 'AppPrm', label: '投保手动修改保费' },
-          { value: 'EdrPrm', label: '一般批改手动修改险别保费' },
+          { value: 'EdrPrm', label: '一般批改手动修改责任保费' },
           { value: 'CancelM1', label: '取消免费延期校验' },
         ],
       },
@@ -136,7 +136,7 @@ const tableconfig = reactive<AppTableConfig>(
     endBtns: [
       createFreeButtonBase({
         id: "score",
-        label: "选择全部打开",
+        label: "打开开关",
         type: "primary",
         func: function () {
            openAll();
@@ -144,7 +144,7 @@ const tableconfig = reactive<AppTableConfig>(
       }),
       createFreeButtonBase({
         id: "score",
-        label: "选择全部关闭",
+        label: "关闭开关",
         type: "primary",
         func: function () {
            closeAll();
@@ -288,7 +288,13 @@ const exRules = {
 /** 查询 */
 async function handleQuery(flag?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  if(s.cPlyNo || s.cAppNo) {
+  if(!s.cAppNo && s.cOperType === 'AppPrm') {
+    ElMessage.warning('投保手动修改保费，请录入申请单号!');
+  } else if(!s.cAppNo && s.cOperType === 'EdrPrm') {
+    ElMessage.warning('一般批改手动修改责任保费，请录入申请单号!');
+  } else if(!s.cAppNo && s.cOperType === 'SurPrm') {
+    ElMessage.warning('一般退保手动修改退保总保费，请录入申请单号!');
+  } else if(s.cPlyNo || s.cAppNo) {
     const r = await freeEditRef.value?.validateField("cOperType");
     if(r){
       const param = Object.assign(s);
@@ -305,7 +311,7 @@ async function handleQuery(flag?: boolean) {
         .finally(() => {});
     }
   }else{
-    ElMessage.error('保单号/申请单号至少录入一个');
+    ElMessage.warning('保单号/申请单号至少录入一个');
   }
 }
 
