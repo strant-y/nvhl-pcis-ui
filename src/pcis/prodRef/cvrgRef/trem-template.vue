@@ -388,7 +388,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost } from "@/api/prod";
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost, queryCAssPlyNo } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -913,6 +913,7 @@ function dataInit() {
         }
       })
     }
+    setPropertyNoOptions()
     methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
     if (props.disabledFlag) {
       setDisabledAll();
@@ -955,6 +956,7 @@ function dataInit() {
           }
         })
       }
+      setPropertyNoOptions()
       methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
       if (props.disabledFlag) {
         setDisabledAll();
@@ -984,6 +986,27 @@ function dataInit() {
     } else {
       termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
     }
+  }
+}
+
+// 给 Term.nPropertyNo财产险/机损险保单号下拉框赋值
+function setPropertyNoOptions() {
+  const nPropertyNo:any = termFactormap.value.find((item:any) => item.prop === 'Term.nPropertyNo');
+  if (nPropertyNo) {
+    queryCAssPlyNo({}).then((res:any) => {
+      if ('1' === res.code) {
+        if(res.data && res.data.length > 0) {
+          nPropertyNo.loadData = res.data?.map((item:any) => {
+            return {
+              value: item.cPlyNo,
+              label: item.cPlyNo
+            }
+          });
+        }
+      } else {
+        ElMessage.error(res.message);
+      }
+    });
   }
 }
 
