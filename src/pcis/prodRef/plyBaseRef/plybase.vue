@@ -16,7 +16,7 @@ import {
   getChaTypeList,
   getChaSubtypList,
 } from "@/api/code-list-service";
-import { checkCdeptByCdptCde, getNmeByCde } from "@/api/prod/index";
+import { checkCdeptByCdptCde, getNmeByCde, coverageHint } from "@/api/prod/index";
 import moment from "moment";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -59,7 +59,8 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 
 const user = JSON.parse(sessionStorage.getItem("user") || '{}');
 console.log("user", user);
-const subDptCde = ref(); //所属分公司
+const subDptCde = ref(); //所属分公司所属分公司
+let insuranceCoverageFlag = false;
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -89,6 +90,17 @@ onMounted(async () => {
       item.hidden = ['010001','010002','010003'].includes(param.cProdNo) ? false : true;
     }
   })
+  // 保单基本信息累计保额按钮 059015 只在核保页面展示
+  formconfig11.titleBtns?.forEach((item:any) => {
+    if(item.id === "insurance_coverage") {
+      if(param.pageType === "PLY_UW_PROCESS_SCENE" && param?.pageName !== "priceInquiry") {
+        item.hidden = false
+      } else {
+        item.hidden = true
+      }
+    }
+  })
+
   Object.assign(formconfig1, formconfig11);
   nextTick(() => {
     setForSelectFilterable(); //给下拉框设置可搜索
@@ -877,7 +889,24 @@ const method = {
         codeParam: { 'cOperId': val },
       });
     }
-  }
+  },
+  // 累计保额按钮
+  insuranceCoverageFunc:() => {
+    if(!insuranceCoverageFlag) {
+      insuranceCoverageFlag = true
+      coverageHint({cAppNo: param.cAppNo}).then((res:any) => {
+        if(res.code == '1') {
+          ElMessage.warning({ message: res.message, duration: 3000 });
+        } else {
+          ElMessage.error(res.message)
+        }
+        insuranceCoverageFlag = false
+      }).catch((err:any) => {
+        ElMessage.error(err.message)
+        insuranceCoverageFlag = false
+      })
+    }
+  },
 };
 
 // 绑定特殊验证器
