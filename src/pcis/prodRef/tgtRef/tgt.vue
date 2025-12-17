@@ -191,7 +191,7 @@ onMounted(async () => {
 	}
 	// Tgt.cGreenPowerType\Tgt.cGreenPowerOther隐藏
 	const cGreendHideNo = ['040008','040011','040014','040015','041013','110001','110002','110003','110004','110005']// 需要隐藏产品
-	if (cGreendHideNo.includes(params.cProdNo)) {
+	if (cGreendHideNo.includes(params.cProdNo) && params.pageType == "app") {
     setFormItem("Tgt.cGreenPowerType", { hidden: true })
     setFormItem("Tgt.cGreenPowerOther", { hidden: true })
 	}
@@ -1907,8 +1907,10 @@ const method = {
 	},
 	// 是否绿色动力能源
 	cGreenPowerFlagfun: (val: any) => {
-		setValue("Tgt.cGreenPowerType", null);
-		setValue("Tgt.cGreenPowerOther", null);
+		if (!params.initFlag) {
+			setValue("Tgt.cGreenPowerType", null);
+			setValue("Tgt.cGreenPowerOther", null);
+		}
 		if (val === "01") {// 是否绿色动力能源 选择是(01)---展示 绿色动力能源类型选择框
       setFormItem("Tgt.cGreenPowerType", { hidden: false, rules: [getRules("required", {})] })
 		} else {
@@ -1918,7 +1920,9 @@ const method = {
 	},
 	// 绿色动力能源类型
 	cGreenPowerTypefun: (val: any) => {
-		setValue("Tgt.cGreenPowerOther", null);
+		if (!params.initFlag) {
+			setValue("Tgt.cGreenPowerOther", null);
+		}
 		if (val === "05") {// 绿色动力能源类型 选择其他（05）---展示 其他输入框切必填
       setFormItem("Tgt.cGreenPowerOther", { hidden: false, rules: [getRules("required", {})] })
 		} else {
