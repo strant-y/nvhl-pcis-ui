@@ -6527,7 +6527,7 @@ function replacecInquiryNo(res:any) {
 }
 
 // 复制出单和模板出单清空原有的申请单号
-const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo","cCrtCde","cUpdCde"]
+const clearKeyMap = ["cPkId","cAppNo","tUpdTm","cEdrNo","cLatestMrk","nEdrPrjNo","tCrtTm","cPlyNo","cCrtCde","cUpdCde","cUdrCde",'cUdrDptCde', 'tUdrTm', 'cUdrMrk']
 function clearCAppNo(res:any, mapList:any = clearKeyMap) {
   if(res instanceof Array) {
     res.forEach((item:any) => {
