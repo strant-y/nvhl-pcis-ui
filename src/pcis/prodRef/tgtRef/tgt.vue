@@ -90,6 +90,16 @@ onMounted(async () => {
       })
     }
   }
+  // 建设信息工程累计保额按钮 只在核保页面展示
+  formconfig11.titleBtns?.forEach((item:any) => {
+    if(item.id === "insurance_coverage") {
+      if(param.pageType === "PLY_UW_PROCESS_SCENE" && param?.pageName !== "priceInquiry") {
+        item.hidden = false
+      } else {
+        item.hidden = true
+      }
+    }
+  })
   Object.assign(formconfig1, formconfig11);
   if (params.cProdNo === '045001') {
     setFormItem("Tgt.cInsuranceMethod", { typeCode: 'InsuranceMethod045001' });
