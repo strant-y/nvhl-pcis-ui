@@ -14,7 +14,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist, selectDist, checkAppBase, queryNrmbAmt } from "@/api/prod";
+import { syncDist, selectDist, checkAppBase, queryNrmbAmt, getProductTemplate} from "@/api/prod";
 import { productListA, productListB, productListC } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
@@ -1957,6 +1957,24 @@ const method = {
       })
     }
   },
+	// 建设工程信息-保险凭证类别
+	cCertificateTypefun: async (val) => {
+		const cCertificateTypeProd = ["059011", "059012", "059013", "059015", "059016", "059017", "059018", "059019", "059020"]
+		if (cCertificateTypeProd.includes(params.cProdNo)) {
+			try {
+				const res = await getProductTemplate({prodNo:params.cProdNo,isCommon:val});
+				
+				if (res.code !== '200') {
+					ElMessage.error(res.msg || '连接失败！');
+					return;
+				}
+				setValue("Tgt.cCertificateDetailed", res.data)
+			} catch (err) {
+				console.error('查询异常:', err);
+				ElMessage.error('系统异常，请稍后重试');
+			}
+		}
+	},
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
