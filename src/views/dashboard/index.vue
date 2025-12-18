@@ -1833,7 +1833,11 @@ function handleSearch(val: any) {
       JSON.stringify(param)
     );
     searchBtnItem.loading = false;
-    router.push({ path: "/pcis-new-udr-list/PendUdrListQuery" });
+    if(val?.startsWith('1')) {
+      router.push({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
+    } else {
+      router.push({ path: "/pcis-new-udr-list/PendUdrListQuery" });
+    }
   }
 }
 
