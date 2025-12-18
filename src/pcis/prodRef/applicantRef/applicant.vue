@@ -58,6 +58,7 @@ import { getDefaultCompilerOptions } from "typescript";
 import { getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 import { listChrDepts } from "@/api/dept";
+import { coverageHint } from "@/api/prod/index";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -78,6 +79,7 @@ const maindialogVisible = ref(false) // ocr识别弹框打开
 const resetLogo = ref<any>(false);   // 重置标识
 let isOcrEcho = false;   // OCR识别标志
 let firstRealData = true; 
+let insuranceCoverageFlag = false;
 
 onMounted(() => {
   const formconfig11 = formInit(
@@ -85,8 +87,19 @@ onMounted(() => {
     method,
     getRules
   );
+  // 投保人信息累计保额按钮 只在核保页面展示
+  formconfig11.titleBtns?.forEach((item:any) => {
+    if(item.id === "insurance_coverage") {
+      if(param.pageType === "PLY_UW_PROCESS_SCENE" && param?.pageName !== "priceInquiry") {
+        item.hidden = false
+      } else {
+        item.hidden = true
+      }
+    }
+  })
   Object.assign(formconfig1, formconfig11);
   nextTick(async () => {
+    console.log(formconfig1,'formconfig1formconfig1formconfig1formconfig1')
     //是否小微企业，默认非必填、只读
     // setFormItem("Applicant.cIsMicroEntpris", {
     //   rules: null,
@@ -1416,7 +1429,24 @@ const method = {
   // 办理人证件有效止期 小于当前时间
   tOEndTmDisable: (date: any) => {
     return disablePastDates(date);
-  }
+  },
+  // 累计保额按钮
+  insuranceCoverageFunc:() => {
+    if(!insuranceCoverageFlag) {
+      insuranceCoverageFlag = true
+      coverageHint({cAppNo: param.cAppNo}).then((res:any) => {
+        if(res.code == '1') {
+          ElMessage.warning({ message: res.message, duration: 3000 });
+        } else {
+          ElMessage.error(res.message)
+        }
+        insuranceCoverageFlag = false
+      }).catch((err:any) => {
+        ElMessage.error(err.message)
+        insuranceCoverageFlag = false
+      })
+    }
+  },
 };
 
 function setregistAdd() {
