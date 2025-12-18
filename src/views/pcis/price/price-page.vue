@@ -3480,6 +3480,10 @@ const submitToUndrFn = async () => {
 	// 风勘校验
  	if( props.param?.pageName === "priceInquiry" ){
 		// const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+    if(!cInquiryNumber) {
+      ElMessage.warning("请先保存申请单！");
+      return false;
+    }
     const res: any = await getisAllDone({ cInquiryNumber });
     console.log('判断是否可以核保返回的res', res);
     if(res.code == 200){
