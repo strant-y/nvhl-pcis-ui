@@ -929,7 +929,7 @@ onMounted(async () => {
       },
     ],
   });
-  freeEditRef.value?.setFormValue({
+  const param = {
     companyId: user.value.companyId,
     cLoadSub: '0',
     tm1: [
@@ -939,8 +939,39 @@ onMounted(async () => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ],
     udrType: "1",
-  });
-  handleQuery();
+  }
+  if (sessionStorage.getItem("navToOrderUdrListQuery")) {
+    param['udrType'] = JSON.parse(
+      sessionStorage.getItem("navToOrderUdrListQuery") || "{}"
+    )?.udrType
+  }
+  freeEditRef.value?.setFormValue(param);
+
+  //首页跳转过来的逻辑 Start
+  if (sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)) {
+    //首页点击搜索跳转过来的
+    const homeJumpData = JSON.parse(
+      sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)|| '{}'
+    );
+    if (homeJumpData.hasOwnProperty("objId")) {
+      //申请单号
+      freeEditRef.value?.setValue("cInquiryNo", homeJumpData.objId);
+      handleQuery();
+    }
+  } else if(sessionStorage.getItem('navToOrderUdrListQuery')) {
+    // 首页点击更多跳转过来的
+    const homeJumpData = JSON.parse(
+      sessionStorage.getItem('navToOrderUdrListQuery') || '{}'
+    );
+    if(homeJumpData.hasOwnProperty("udrType")) {
+      //申请单号
+      freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
+      handleQuery();
+    }
+  } else {
+    handleQuery();
+  }
+  //首页跳转过来的逻辑 End
 });
 
 onUnmounted(() => {

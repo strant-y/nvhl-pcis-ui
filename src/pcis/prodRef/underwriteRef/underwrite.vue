@@ -236,7 +236,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {disabled: true}
             });
             checkboxDisabledFlag.value = true
-            if (!bzFlag.value && params.initFlag == false) {
+            if (!bzFlag.value && params.initFlag == false && !params.cProdNo?.startsWith('05')) {
               ElMessageBox.confirm(
                 "该业务认定为非水险比例分保合同除外业务，是否查看该险种合同除外责任并进一步确认。",
                 "提示",
