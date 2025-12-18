@@ -473,6 +473,7 @@
         <!-- </template> -->
       </template>
     </div>
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -525,6 +526,8 @@ import { imageMethod } from './imageMethod';
 import { pageMethod } from './pageMethod';
 import { codeListViewStore } from "@/store";
 import { lessThan6Months } from "@/utils/date";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+const dialog = ref<DialogMethod | null>(null);
 
 const codeListStore = codeListViewStore();
 
@@ -550,6 +553,7 @@ import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderE
 import { fa } from 'element-plus/es/locale';
 import { numSubp } from '@/utils/Math';
 import { useValidator } from "@/typings/useValidator";
+import { specialSearchResult } from "@/api/plat";
 const { getRules } = useValidator();
 
 //额度明细弹窗
@@ -2096,6 +2100,10 @@ async function loadAfter() {
           ops.plyBase['Base.cRiFacMrk'] = null
           ops.plyBase['Base.cRiFacOpn'] = null
           ops.plyBase['Base.cRiFacCde'] = null
+          ops.plyBase['Base.cSpecialApprovalCode'] = null // 特批码
+          ops.plyBase['Base.cConfirmSequenceNo'] = null // 核保确认码
+          ops.plyBase['Base.cPreConfirmSequenceNo'] = null // 保单/批单预确认码
+          ops.plyBase['Base.cUwConfirmSequenceNo'] = null // 保单/批单确认码
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){
@@ -2501,7 +2509,41 @@ async function loadAfter() {
       },
     }),
   )
-
+  rightBtnList.value.push(
+    createFreeButtonBase({
+      label: "特批申请",
+      icon: "Message",
+      id: "btn090909",
+      func: async () => {
+        const base = opertaor.getTableRefByKey("plyBase").getFromValue();
+        const base_1 = opertaor.getTableRefByKey("base").getFromValue();
+        const applicant = opertaor.getTableRefByKey("applicant").getFromValue();
+        const namt = base['Base.nAmt'] ? base['Base.nAmt'] : base_1['Base.nAmt'];
+        const nprm = base['Base.nPrm'] ? base['Base.nPrm'] : base_1['Base.nPrm'];
+        const param = {
+          cappNme:applicant['Applicant.cAppNme'],
+          ccertfCde:applicant['Applicant.cCertfCde'],
+          namt:namt,
+          nprm:nprm,
+        }
+        if(base['Base.cAppNo']){
+          dialog.value?.open(
+          "specialApproval",
+          {
+            type: "mypage",
+            appNo: base['Base.cAppNo'],
+            datacheck:param
+          },
+          {
+          },
+          { title: "特批申请", width: 85 }
+          );
+        }else{
+          ElMessage.error("请先保存单据");
+        }
+      },
+    }),
+  )
   if(props.param?.showBtn === false){
     bthList.value = [];
   }
@@ -5139,6 +5181,13 @@ const submitUnderwritingFn = async () => {
             underwrite.value?.setRiskunitDisabled()
             return
           }
+          const queryp = await specialSearchResult(queryparam);
+
+          const {resultCode ,resultMsg} = queryp;
+            if(!(resultCode === "00" || resultCode === "201" || resultCode === "502")){ // 201 不上平台 // 502有结果数据 // 平台正确返回
+              ElMessage.info(resultMsg);
+              return ;
+            }
         }
       } else if(res.cUndrMrk === "B") {// 核保选项为退回给出单员时，如果已经触发自主临分，则提示需要再保确认并阻断，其他则直接提交核保
         // 先查询临分标识
