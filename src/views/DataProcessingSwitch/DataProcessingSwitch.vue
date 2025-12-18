@@ -134,22 +134,22 @@ const tableconfig = reactive<AppTableConfig>(
     showSelection:true,
     tableBtnPosition:'center',
     endBtns: [
-      createFreeButtonBase({
-        id: "score",
-        label: "打开开关",
-        type: "primary",
-        func: function () {
-           openAll();
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        label: "关闭开关",
-        type: "primary",
-        func: function () {
-           closeAll();
-        },
-      }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   label: "打开开关",
+      //   type: "primary",
+      //   func: function () {
+      //      openAll();
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   label: "关闭开关",
+      //   type: "primary",
+      //   func: function () {
+      //      closeAll();
+      //   },
+      // }),
     ],
 
     fromSchema: [
