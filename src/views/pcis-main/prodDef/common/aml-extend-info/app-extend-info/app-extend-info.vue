@@ -375,6 +375,15 @@ const formconfigData3 = {
 		cols: 2
 	},
 	shadow: false,
+	titleBtns: [
+    createFreeButtonBase({
+      type: "primary",
+			label: "同法定代表人",
+      func: () => {
+        hasSameLegalRep('F');
+      },
+    })
+  ],
 	fromSchema: [
 		{
 			prop: 'CCusNme_C',
@@ -437,6 +446,15 @@ const formconfigData4 = {
 		cols: 2
 	},
 	shadow: false,
+	titleBtns: [
+    createFreeButtonBase({
+      type: "primary",
+			label: "同法定代表人",
+      func: () => {
+        hasSameLegalRep('SQ');
+      },
+    })
+  ],
 	fromSchema: [
 		{
 			prop: 'CCusNme_D',
@@ -683,6 +701,24 @@ const getMergedData = () => {
 	return appInfo;
 };
 
+// 按照现有格式，获取数据
+const getdData = () => {
+	let fromData1 = freeEditRef1.value?.getFromValue(); //获取表单数据
+	let fromData2 = freeEditRef2.value?.getFromValue(); //获取表单数据
+	let fromData3 = freeEditRef3.value?.getFromValue(); //获取表单数据
+	let fromData4 = freeEditRef4.value?.getFromValue(); //获取表单数据
+	 
+	// console.log( {...fromData1,...fromData2,...fromData3,...fromData4,})
+
+	let appInfo = {
+		appFreeEdit: { fromData1, fromData2, fromData3, fromData4},
+		appGridEdit: tableRef.value?.getFromValue()
+	}
+ 
+
+	return appInfo;
+};
+
 /* 获取全量表单数据 */
 const getFrom = async () => {
 	const results = await validateForms();
@@ -794,7 +830,40 @@ const idAnalysis = (id: string, data1) => {
 	data1.cCerftSex = sex // 性别
 };
 
-defineExpose({getFrom });
+// 同法定代表人
+const hasSameLegalRep = (val) => {
+	let fromData2 = freeEditRef2.value?.getFromValue(); //获取表单数据
+	let fromData3 = freeEditRef3.value?.getFromValue(); //获取表单数据
+	let fromData4 = freeEditRef4.value?.getFromValue(); //获取表单数据
+	if (val == "F") { // 负责人
+		let data = convertSuffix(fromData2, "B", "C")
+		freeEditRef3.value?.setFormValue(data)
+	} else if (val == "SQ") { // 授权代理人
+		let data = convertSuffix(fromData2, "B", "D")
+		freeEditRef4.value?.setFormValue(data)
+	}
+}
+
+/**
+ * 将 obj 中所有 _from 后缀的字段，同步到 targetObj 中对应的 _to 后缀字段
+ * @param {Object} obj - 源对象（如包含 _B 字段）
+ * @param {string} fromSuffix - 源后缀，如 'B'
+ * @param {string} toSuffix   - 目标后缀，如 'C'
+ */
+const convertSuffix = (obj, fromSuffix = 'B', toSuffix = 'C') => {
+  const result = {};
+  const fromPattern = new RegExp(`_${fromSuffix}$`);
+  const toSuffixStr = `_${toSuffix}`;
+
+  for (const key in obj) {
+    if (fromPattern.test(key)) {
+      const newKey = key.replace(fromPattern, toSuffixStr);
+      result[newKey] = obj[key];
+    }
+  }
+  return result;
+}
+defineExpose({getFrom, getdData });
 </script>
 
 <style scoped></style>
