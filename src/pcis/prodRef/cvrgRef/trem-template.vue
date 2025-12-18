@@ -627,34 +627,6 @@ function initData(data: any) {
       })
       opertaor.getTableRefByKey("tgt")?.setValue("Tgt.nSeatCapacity", num)
     }
-    // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
-    // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
-    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) {
-      // TermRisktgt
-      const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-      let nInsuranceFee:number = 0;
-      cvrgData.forEach((item:any) => {
-        if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
-          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
-          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
-          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
-        }
-        nInsuranceFee += Number(item['Term.nInsuranceFee'])
-      })
-      opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
-      opertaor.getFatherPage().afterCalcPremium()
-    }
-    // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
-    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
-      const nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
-      const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-      const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm'];
-      if(newData['Term.nInsuranceFee'] != nPrm) {
-        opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", newData['Term.nInsuranceFee'])
-        opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", newData['Term.nInsuranceFee'])
-        opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(newData['Term.nInsuranceFee']).sub(new Decimal(nBefEdrPrm)))
-      }
-    }
   });
 }
 
@@ -1096,6 +1068,7 @@ function initMethod(){
             termFactormap.value.forEach((item: any) => {
               if(item.prop === 'Term.nInsuranceFee') {
                 item.disabled = false;
+                item.func = (val:any) => nInsuranceFeeChange(val)
               }
             });
           }
@@ -1112,6 +1085,7 @@ function initMethod(){
             termFactormap.value.forEach((item: any) => {
               if(item.prop === 'Term.nInsuranceFee') {
                 item.disabled = false;
+                item.func = (val:any) => nInsuranceFeeChange(val)
               }
             });
           }
@@ -1663,6 +1637,37 @@ const selectRow = (key: any) => {
     selectedRow.value.data = key;
   }
 };
+const nInsuranceFeeChange = (val:any) => {
+  // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
+  // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
+  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) {
+    // TermRisktgt
+    const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+    let nInsuranceFee:number = 0;
+    cvrgData.forEach((item:any) => {
+      if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
+        const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
+        const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
+        item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+      }
+      nInsuranceFee += Number(item['Term.nInsuranceFee'])
+    })
+    opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
+    opertaor.getFatherPage().afterCalcPremium()
+  }
+  // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
+  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
+    const nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm'];
+    const newData = getDatas();
+    if(newData['Term.nInsuranceFee'] != nPrm) {
+      opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", newData['Term.nInsuranceFee'])
+      opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", newData['Term.nInsuranceFee'])
+      opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(newData['Term.nInsuranceFee']).sub(new Decimal(nBefEdrPrm)))
+    }
+  }
+}
 
 defineExpose({
   dataFlash,
