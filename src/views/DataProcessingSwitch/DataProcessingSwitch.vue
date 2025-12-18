@@ -134,22 +134,22 @@ const tableconfig = reactive<AppTableConfig>(
     showSelection:true,
     tableBtnPosition:'center',
     endBtns: [
-      createFreeButtonBase({
-        id: "score",
-        label: "打开开关",
-        type: "primary",
-        func: function () {
-           openAll();
-        },
-      }),
-      createFreeButtonBase({
-        id: "score",
-        label: "关闭开关",
-        type: "primary",
-        func: function () {
-           closeAll();
-        },
-      }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   label: "打开开关",
+      //   type: "primary",
+      //   func: function () {
+      //      openAll();
+      //   },
+      // }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   label: "关闭开关",
+      //   type: "primary",
+      //   func: function () {
+      //      closeAll();
+      //   },
+      // }),
     ],
 
     fromSchema: [
@@ -169,7 +169,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
-        title: "保险日期",
+        title: "保险起期",
         minWidth: 180,
       },
       {

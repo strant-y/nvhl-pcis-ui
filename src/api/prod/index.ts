@@ -1662,3 +1662,13 @@ export function coverageHint(queryParams: any): AxiosPromise<any> {
   return post(`/custShare/coverageHint`, queryParams);
 }
 
+// 获取累计保额信息-标的信息
+export function queryNrmbAmt(queryParams: any): AxiosPromise<any> {
+  return post(`custShare/queryNrmbAmt`, queryParams);
+}
+
+// 获取保费修改上下限
+export function getPremiumAdjustmentRange(): AxiosPromise<any> {
+  return post(`/policy/getPremiumAdjustmentRange`, {});
+}
+

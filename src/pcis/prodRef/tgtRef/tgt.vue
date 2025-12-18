@@ -14,7 +14,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist, selectDist, checkAppBase } from "@/api/prod";
+import { syncDist, selectDist, checkAppBase, queryNrmbAmt } from "@/api/prod";
 import { productListA, productListB, productListC } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
@@ -50,6 +50,7 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const productStore = useProductStore()
 const dialog = ref<DialogMethod | null>(null);
+let insuranceCoverageFlag = false;
 
 const props = defineProps({
   pageSchema: {
@@ -90,6 +91,16 @@ onMounted(async () => {
       })
     }
   }
+  // 建设信息工程累计保额按钮 只在核保页面展示
+  formconfig11.titleBtns?.forEach((item:any) => {
+    if(item.id === "insurance_coverage") {
+      if(param.pageType === "PLY_UW_PROCESS_SCENE" && param?.pageName !== "priceInquiry") {
+        item.hidden = false
+      } else {
+        item.hidden = true
+      }
+    }
+  })
   Object.assign(formconfig1, formconfig11);
   if (params.cProdNo === '045001') {
     setFormItem("Tgt.cInsuranceMethod", { typeCode: 'InsuranceMethod045001' });
@@ -1929,6 +1940,23 @@ const method = {
       setFormItem("Tgt.cGreenPowerOther", { hidden: true, rules: [] })
     }
 	},
+  // 累计保额按钮
+  insuranceCoverageFunc:() => {
+    if(!insuranceCoverageFlag) {
+      insuranceCoverageFlag = true
+      queryNrmbAmt({cAppNo: param.cAppNo}).then((res:any) => {
+        if(res.code == '1') {
+          ElMessage.warning({ message: res.message, duration: 3000 });
+        } else {
+          ElMessage.error(res.message)
+        }
+        insuranceCoverageFlag = false
+      }).catch((err:any) => {
+        ElMessage.error(err.message)
+        insuranceCoverageFlag = false
+      })
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

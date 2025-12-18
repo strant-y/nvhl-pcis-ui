@@ -890,9 +890,9 @@ function dataInit() {
     groupInfo.value = d.groupInfo;
     term.value = d.term;
     termFactormap.value = getUseData(d.termFactormap);
-    const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+    const cAddrSeq:any = termFactormap.value.find((item:any) => item.prop === 'Term.cDistCodeNo');
     if (cAddrSeq) {
-        cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+        cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
     }
 
     methodLink(termFactormap.value);
