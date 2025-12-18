@@ -169,7 +169,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
-        title: "保险日期",
+        title: "保险起期",
         minWidth: 180,
       },
       {
