@@ -186,67 +186,69 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
         title: "批单生效起期",
-        func: (v:any) => {
+        func: async (v:any) => {
           if(v){
             const cPlyNo = edrbaseEditRef.value?.getValue("EdrBase.cPlyNo");
-            const parameter = {
-                CPlyNo: cPlyNo,
-                COperType: 'EdrBckBgn'
-            };
             if(opertaor.isEditScene()){
-              pcisQueryService.qryTerminationInfo(parameter).then((res:any) => { 
-                const {code,data,msg} = res;
-                if(code === 200){
-                  if(data && data.CAppTyp === 'on'){
-                    return ;
-                  }else{
-                    const parms = {
-                        cPlyNo: cPlyNo,
-                    };
+              const tInsrncBgnTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
+              let deadLineTm = tInsrncBgnTm;
+              let message = "保险起期" + dayjs(tInsrncBgnTm).format('YYYY-MM-DD hh:mm:ss')
+              if(dayjs().startOf('day').isAfter(dayjs(tInsrncBgnTm))) {
+                deadLineTm = dayjs().startOf('day')
+                message = "当前时间"
+              }
+              const res:any = await qryTerminationDataList({ cAppNo: params.cAppNo, cOperType: 'SurBck' })
+              if(res?.code == 200 && res.data?.length > 0) {
+                if(res.data[0]?.cAppTyp === 'on') {
+                  return;
+                } else {
+                  const parms = {
+                    cPlyNo: cPlyNo,
+                  };
+                  // 一般退保校验批改生效时间不早于上一次批改生效时间
+                  if(params.cRsnCde == "s2") {
                     pcisQueryService.getlatestPlyInfo(parms).then((res1:any) => { 
                       const {code: code1,data: data1,msg: msg1} = res1;
                       if(code1 === 200){
                         if (data1['TEdrBgnTm']) {
-                            const edrBgnTm = dayjs(v).format('YYYY-MM-DD 00:00:00');
-                            const latestEdrBgnTm = dayjs(data1['TEdrBgnTm']).format('YYYY-MM-DD HH:mm:ss');
-                            if (dayjs(s).isBefore(latestEdrBgnTm, 'second')) {
-                                ElMessage.warning('本次批改生效时间不允许早于前一次批改生效时间！');
-                                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", null);
-                                return;
-                            }
+                          const edrBgnTm = dayjs(v).format('YYYY-MM-DD 00:00:00');
+                          const latestEdrBgnTm = dayjs(data1['TEdrBgnTm']).format('YYYY-MM-DD HH:mm:ss');
+                          if (dayjs(v).isBefore(latestEdrBgnTm, 'second')) {
+                            ElMessage.warning('本次批改生效时间不允许早于前一次批改生效时间！');
+                            edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", null);
+                            return;
+                          }
                         }
-                      } else {
-                        let message = '查询最新保批单信息异常';
-                        if (!!res['msg']) {
-                            message = res['msg'];
-                        }
-                        ElMessage.warning(message);
                       }
                     });
                   }
                 }
-              });
+              }
+              if(dayjs(v).isBefore(dayjs(deadLineTm))) {
+                ElMessage.warning('本次批改生效时间不允许早于' + message + '！');
+                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", null);
+              }
             }
           }
         },
         disabledDate: (time: Date) => {
           // 批改生效起期应该大于保险起期和当前日期
-          if(opertaor.getTableRefs().insrnc && opertaor.getTableRefs().insrnc?.getFromValue()) {
-            const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
-            const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
-            const currentTm = new Date().getTime();
-            const before30Tm = dayjs().subtract(30, 'day').toDate().getTime(); // 当前日期前30天
-            const before61Tm = dayjs().subtract(61, 'day').toDate().getTime(); // 当前日期前61天
-            if(["040011","040015"].includes(params["cProdNo"])) {// 这俩产品 批改生效起期允许往前选61天
-              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before61Tm ? new Date(beginTm).getTime() : before61Tm)
-            } else {
-              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before30Tm ? new Date(beginTm).getTime() : before30Tm)
-            }
-            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
-            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
-          } else {
-            return false;
-          }
+          // if(opertaor.getTableRefs().insrnc && opertaor.getTableRefs().insrnc?.getFromValue()) {
+          //   const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
+          //   const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
+          //   const currentTm = new Date().getTime();
+          //   // const before30Tm = dayjs().subtract(30, 'day').toDate().getTime(); // 当前日期前30天
+          //   // const before61Tm = dayjs().subtract(61, 'day').toDate().getTime(); // 当前日期前61天
+          //   // if(["040011","040015"].includes(params["cProdNo"])) {// 这俩产品 批改生效起期允许往前选61天
+          //   //   return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before61Tm ? new Date(beginTm).getTime() : before61Tm)
+          //   // } else {
+          //   //   return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before30Tm ? new Date(beginTm).getTime() : before30Tm)
+          //   // }
+          //   // return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
+          //   // return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
+          // } else {
+          //   return false;
+          // }
         },
         // rules: [getRules("required", {})],
         // disabled: params["cEdrType"]=='2'
