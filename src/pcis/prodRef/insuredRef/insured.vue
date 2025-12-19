@@ -937,10 +937,22 @@ const method = {
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
-    if (val == "1") {
-      // setFormItem("Insured.cShareholderNature", {
-      //   rules: [getRules("required", {})],
-      // });
+    if (param.initFlag) {
+      if(val === "0") {
+        codeListStore
+          .queryCodeList({
+            codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+            codeListParam: {},
+          })
+          .then((res) => {
+            setFormItem("Insured.cShareholderCategory", {
+              loadData: res,
+            });
+          });
+      }
+      return;
+    }
+    if (val == "1") {// 个人
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -985,6 +997,7 @@ const method = {
           setFormItem("Insured.cShareholderCategory", {
             loadData: res,
           });
+          setValue("Insured.cShareholderCategory", res[0]?.value)
         });
     }
   },
@@ -1489,7 +1502,33 @@ const method = {
   // 办理人证件有效止期 小于当前时间
   tOEndTmDisable: (date: any) => {
     return disablePastDates(date);
-  }
+  },
+  // 大股东证件类型
+  cShareholderCategoryChange:(val:any) => {
+    if (param.initFlag) return;
+    setValue("Insured.cShareholderCode","")
+    clearValidate('Insured.cShareholderCode'); // 清除报错信息
+    if (val == "111") {
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("idCard", {})],
+      });
+    } else if (val == "01") {
+      // 统一社会信用代码校验
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("socialCode", {})],
+      });
+    } else if (val === '07') {
+      // 护照
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("passPort", {})],
+      });
+    } else if (val == "553") {
+      // 外国人证件号
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("ariCard", {})],
+      });
+    }
+  },
 };
 
 function setregistAdd() {

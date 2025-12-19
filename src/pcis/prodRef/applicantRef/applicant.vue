@@ -997,7 +997,22 @@ const method = {
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
-    if (val == "1") {
+    if (param.initFlag) {
+      if(val === "0") {
+        codeListStore
+          .queryCodeList({
+            codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+            codeListParam: {},
+          })
+          .then((res) => {
+            setFormItem("Applicant.cShareholderCategory", {
+              loadData: res,
+            });
+          });
+      }
+      return;
+    }
+    if (val == "1") {// 个人
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -1042,6 +1057,7 @@ const method = {
           setFormItem("Applicant.cShareholderCategory", {
             loadData: res,
           });
+          setValue("Applicant.cShareholderCategory", res[0]?.value)
         });
     }
   },
@@ -1445,6 +1461,32 @@ const method = {
         ElMessage.error(err.message)
         insuranceCoverageFlag = false
       })
+    }
+  },
+  // 大股东证件类型
+  cShareholderCategoryChange:(val:any) => {
+    if (param.initFlag) return;
+    setValue("Applicant.cShareholderCode","")
+    clearValidate('Applicant.cShareholderCode'); // 清除报错信息
+    if (val == "111") {
+      setFormItem("Applicant.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("idCard", {})],
+      });
+    } else if (val == "01") {
+      // 统一社会信用代码校验
+      setFormItem("Applicant.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("socialCode", {})],
+      });
+    } else if (val === '07') {
+      // 护照
+      setFormItem("Applicant.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("passPort", {})],
+      });
+    } else if (val == "553") {
+      // 外国人证件号
+      setFormItem("Applicant.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("ariCard", {})],
+      });
     }
   },
 };
