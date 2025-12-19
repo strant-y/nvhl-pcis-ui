@@ -589,10 +589,10 @@ Object.keys(tableObj).forEach((i: any) => {
           }
         },
         tableClick: (row) => {
-          const { cAppNo, curtTask } = row;
+          const { cAppNo, curtTask, cInquiryNo } = row;
           const param = {
             taskId: curtTask,
-            appNo: cAppNo,
+            appNo: row.baseType === '询价' ? cInquiryNo : cAppNo,
             user: user,
           };
           withdraw(param)
@@ -600,7 +600,7 @@ Object.keys(tableObj).forEach((i: any) => {
               if (result.code !== 200) {
                 ElMessage.error({ message: result.msg, duration: 3000 });
               } else {
-                if (result.msg === "撤回成功!") {
+                if (result.msg?.includes('成功')) {
                   ElMessage.success({ message: result.msg, duration: 3000 });
                   getIssueTableData();
                 } else {
