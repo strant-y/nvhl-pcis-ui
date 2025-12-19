@@ -305,7 +305,7 @@ onMounted(async () => {
       if(['019003', '010006'].includes(params.cProdNo)) {
         item['rules'] = [getRules("required", {})];
       } else {
-        item['rules'] = [];
+        item['rules'] = item['rules'] ? item['rules'] : [];
       }
     }
     // 019003、080026 生产厂家必填
@@ -321,7 +321,7 @@ onMounted(async () => {
       if(['010006', '019003', '010009'].includes(params.cProdNo)) {
         item['rules'] = [getRules("required", {})];
       } else {
-        item['rules'] = [];
+        item['rules'] = item['rules'] ? item['rules'] : [];
       }
     }
   })
@@ -346,6 +346,15 @@ onMounted(async () => {
       }
       if(item.prop === 'Dist.nApprovedWeight') {
         item.lengthNum = 7
+      }
+    })
+  }
+
+  if(params.cProdNo?.startsWith('01')) {
+    formconfig11.value.fromSchema.forEach((item:any) => {
+      if(item.prop === 'Dist.cZipCde') {
+        item.lengthNum = 6
+        item.lengthIsNumber = true
       }
     })
   }
