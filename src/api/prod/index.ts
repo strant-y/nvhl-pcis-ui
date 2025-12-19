@@ -1672,3 +1672,7 @@ export function getPremiumAdjustmentRange(): AxiosPromise<any> {
   return post(`/policy/getPremiumAdjustmentRange`, {});
 }
 
+// 建设工程信息根据保险凭证类别查询详细
+export function getProductTemplate(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getProductTemplate`, queryParams);
+}
