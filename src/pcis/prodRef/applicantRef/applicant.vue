@@ -1400,7 +1400,59 @@ const method = {
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,
     });
-  },
+		if (param.initFlag) return;
+    // 切换清空
+    if (val) {
+      const fieldsToClear = ["Applicant.cOperaterCertfCde"];
+      // 2. 循环赋值 null + 清除对应字段的校验错误
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
+        // 清除该字段的校验错误 
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
+    }
+	},
+	// 大股东证件类型
+	cShareholderCategoryChange: (val: any) => {
+		console.log('大股东证件类型', val)
+		const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    // 清除报错信息
+    clearValidate('Applicant.cShareholderCode')
+
+    let baseRules: any[] = [];
+    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+    const ruleMap: Record<string, RuleType> = {
+      "110001": "orgCode",
+      "01": "socialCode", // 统一社会信用证代码
+      "111": "idCard", // 居民身份证
+      "07": "passPort", // 护照
+      "553": "ariCard", // 外国人永久居留身份证
+		};
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+    baseRules = [getRules("required", {}), ...baseRules]
+
+    setFormItem("Applicant.cShareholderCode", {
+      rules: baseRules,
+		});
+		if (param.initFlag) return;
+    // 切换清空
+    if (val) {
+      const fieldsToClear = ["Applicant.cShareholderCode"];
+      // 2. 循环赋值 null + 清除对应字段的校验错误
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
+        // 清除该字段的校验错误 
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
+    }
+	},
   // 证件有效起期
   tCertfBgnDateDisable: (date: any) => {
     const fs = applicantEditRef.value?.getFromValue();

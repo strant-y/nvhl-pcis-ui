@@ -406,6 +406,10 @@ onMounted(() => {
     }
     if(item.prop =='Dist.nInsuranceAmount'){
       item['func'] =  nInsuranceAmountChange;
+		}
+		// 证件类型
+		if(item.prop =='Dist.cIdType'){
+      item['func'] =  cIdTypefun;
     }
     // if(item.prop =='Dist.HouseAreaProp'){
     //   item?.groupList.forEach(data => {
@@ -756,7 +760,8 @@ const cEquipmentTypesFunc = ()=>{
 const cDocumentTypeChange = (val: any) => {
   const cIs = opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']; // 是否记名投保
   const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
-
+	setValue('Dist.cIdentificationNumber', null);
+	clearValidate('Dist.cIdentificationNumber')
   const baseRuleMap: Record<string, any[]> = {
     "111": [getRules("idCard", {})], // 身份证
     "01": [getRules("socialCode", {})], // 统一社会信用代码
@@ -775,6 +780,28 @@ const cDocumentTypeChange = (val: any) => {
   setFormItem('Dist.cIdentificationNumber', { rules });
 };
 
+// 05产品-清单信息-证件类型
+const cIdTypefun = (val: any) => {
+	console.log('05产品-清单信息-证件类型', val)
+	// 清除值、报错信息
+	setValue('Dist.cIdNumber', null);
+	clearValidate('Dist.cIdNumber')
+
+	let baseRules: any[] = [];
+	type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+	const ruleMap: Record<string, RuleType> = {
+		"110001": "orgCode",
+		"01": "socialCode", // 统一社会信用证代码
+		"111": "idCard", // 居民身份证
+		"07": "passPort", // 护照
+		"553": "ariCard", // 外国人永久居留身份证
+	};
+	baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+
+	setFormItem("Dist.cIdNumber", {
+		rules: baseRules,
+	});
+}
 
 function getAddressstr(val:any, row: any, pitem: any){
   let getv1 = '';  //集联地址

@@ -1006,6 +1006,30 @@ const method = {
       rules: baseRules,
     });
   },
+	// 大股东证件类型
+	cShareholderCategoryChange: (val: any) => {
+		console.log('大股东证件类型', val)
+    if (!initFlag.value) {
+      return;
+    }
+    // 清除报错信息
+    clearValidate('ECargoApplicant.cShareholderCode')
+
+    let baseRules: any[] = [];
+    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+    const ruleMap: Record<string, RuleType> = {
+      "110001": "orgCode",
+      "01": "socialCode", // 统一社会信用证代码
+      "111": "idCard", // 居民身份证
+      "07": "passPort", // 护照
+      "553": "ariCard", // 外国人永久居留身份证
+		};
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+
+    setFormItem("ECargoApplicant.cShareholderCode", {
+      rules: baseRules,
+		});
+	},
   // 证件有效起期
   tCertfBgnDateDisable: (date: any) => {
     const fs = getFormValue();
