@@ -41,14 +41,14 @@
                 /> -->
                 <el-tooltip
                   effect="dark"
-                  content="批改比较项"
+                  :content="edritemName"
                   placement="right"
                   :disabled="NavigaShow"
                 >
                   <i :class="['icon','iconfont',iconMap['edritem']]"></i>
                 </el-tooltip>
                 <span class="icon-title" v-if="NavigaShow"
-                  >批改比较项</span
+                  >{{ edritemName }}</span
                 >
               </el-anchor-link>
 
@@ -509,7 +509,8 @@ import {
     validShanDong,
 	isUndrClsBlackList,
   queryTermRateLimit,
-	queryEcargoRelevancePolicyDetails
+	queryEcargoRelevancePolicyDetails,
+	enquiryToAppEndorseChange
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -686,6 +687,7 @@ const tempFindBtn: any[] = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
 let edritemFlag = ref(false);
+let edritemName = ref("批改比较项")
 let ciMasterAgreementFlag = ref(false); //
 let ourCompanyCiShareFlag = ref(false); //
 let ciFlag = ref(false); //
@@ -1399,7 +1401,14 @@ const initPage = async () => {
   } else {
     edrbaseFlag.value = false;
     edritemFlag.value = false;
-  }
+	}
+	// 核保-询价转投保 展示批改比较项
+	if (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cPolicySource == '6') {
+		edritemFlag.value = true;
+		edritemName.value = "比较项"
+	} else {
+		edritemName.value = "批改比较项"
+	}
   if (
     (props.param.pageType === "EDR_APP_NEW_SCENE" && (props.param.cEdrType == "3" || props.param.cEdrType == "2")) ||
     (props.param.pageType === "TEMPORARY_DEPOSIT" && (props.param.cEdrType == "3" || props.param.cEdrType == "2"))
@@ -1722,6 +1731,9 @@ async function loadAfter() {
         });
       }
     }
+		if (props.param.cPolicySource == '6') {
+			generateComparisonItems();
+		}
     bthList.value = uwBtn;
     rightBtnList.value = [
       createFreeButtonBase({
@@ -4958,6 +4970,25 @@ const generateEndorse = async () => {
     }
   });
 };
+
+// 询价转投保 比较项生成
+const generateComparisonItems = async () => {
+	const data = opertaor.getDataAll();
+	console.log("生成询价转投保核保比较项",data, props.param);
+
+	data["user"] = user;
+	data["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+	data["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+	enquiryToAppEndorseChange(data).then((res) => {
+		if (res["code"] == "200") {
+			cacheKey.value = res["data"]["data"]["cacheKey"];
+			edritem.value?.handleQuery();
+		} else {
+			ElMessage.error(res.msg);
+		}
+	});
+};
+
 
     /**
      * 验证账户信息表单
