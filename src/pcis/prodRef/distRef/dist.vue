@@ -350,6 +350,15 @@ onMounted(async () => {
     })
   }
 
+  if(params.cProdNo?.startsWith('01')) {
+    formconfig11.value.fromSchema.forEach((item:any) => {
+      if(item.prop === 'Dist.cZipCde') {
+        item.lengthNum = 6
+        item.lengthIsNumber = true
+      }
+    })
+  }
+
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
   cardconfig.value.showMyfromBtm = formconfig1.value.showMyfromBtm;
