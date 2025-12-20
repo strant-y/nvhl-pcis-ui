@@ -286,38 +286,40 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
         rules: [getRules("required", {})],
         clearable: true,
-        func: (v) => {
-          // if ("A" === v) {
-          //   if ("E" === params["cAppTyp"]) {
-          //     setFormItem("cUndrOpnList", {
-          //       loadData: [{ label: "审核通过", value: "6" }],
-          //     });
-          //     setValue("cUndrOpnList", "6");
-          //   } else {
-          //     setFormItem("cUndrOpnList", {
-          //       loadData: [{ label: "审核通过", value: "0" }],
-          //     });
-          //     setValue("cUndrOpnList", "0");
-          //   }
-          // } else if ("R" === v) {
-          //   setFormItem("cUndrOpnList", {
-          //     loadData: [{ label: "提交上级", value: "5" }],
-          //   });
-          //   setValue("cUndrOpnList", "5");
-          // } else {
-          //   setFormItem("cUndrOpnList", {
-          //     loadData: [
-          //       { label: "缺少必要信息", value: "1" },
-          //       { label: "修改承保条件", value: "2" },
-          //       { label: "费用超标", value: "3" },
-          //       { label: "拒绝承保", value: "4" },
-          //       { label: "录入错误", value: "7" },
-          //       { label: "资料不全", value: "8" },
-          //       { label: "其他", value: "9" },
-          //     ],
-          //   });
-          //   setValue("cUndrOpnList", "9");
-          // }
+        func: (v:any) => {
+          if ("A" === v) {
+            setValue("cUndrOpnList", "");
+            if ("E" === params["cAppTyp"]) {
+              setFormItem("cUndrOpnList", {
+                loadData: [{ label: "审核通过", value: "6" }],
+              });
+              setValue("cUndrOpnList", "6");
+            } else {
+              setFormItem("cUndrOpnList", {
+                loadData: [{ label: "审核通过", value: "0" }],
+              });
+              setValue("cUndrOpnList", "0");
+            }
+          } else if ("R" === v) {
+            setValue("cUndrOpnList", "");
+            setFormItem("cUndrOpnList", {
+              loadData: [{ label: "提交上级", value: "5" }],
+            });
+            setValue("cUndrOpnList", "5");
+          } else {
+            setFormItem("cUndrOpnList", {
+              loadData: [
+                { label: "缺少必要信息", value: "1" },
+                { label: "修改承保条件", value: "2" },
+                { label: "费用超标", value: "3" },
+                { label: "拒绝承保", value: "4" },
+                { label: "录入错误", value: "7" },
+                { label: "资料不全", value: "8" },
+                { label: "其他", value: "9" },
+              ],
+            });
+            setValue("cUndrOpnList", "9");
+          }
           if ("T" === v) {
             setValue("cBckOp", "");
             setFormItem("cBckOp", {
@@ -346,23 +348,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrOpnList",
         inputtype: "rtselect",
         title: "核保意见选项",
-        loadData: params.pageName === "priceInquiry" ? [
+        loadData: [
           { label: "审核通过", value: "0" },
           { label: "缺少必要信息", value: "1" },
           { label: "修改承保条件", value: "2" },
           { label: "费用超标", value: "3" },
           { label: "拒绝承保", value: "4" },
-          { label: "提交上级", value: "5" },
-          { label: "录入错误", value: "7" },
-          { label: "资料不全", value: "8" },
-          { label: "其他", value: "9" },
-        ] : [
-          { label: "审核通过", value: params.cAppTyp === "E" ? "6" : "0" },
-          { label: "缺少必要信息", value: "1" },
-          { label: "修改承保条件", value: "2" },
-          { label: "费用超标", value: "3" },
-          { label: "拒绝承保", value: "4" },
-          { label: "提交上级", value: "5" },
+          { label: "其他", value: "5" },
         ],
         rules: [getRules("required", {})],
         itemWidth: 1,
@@ -513,6 +505,9 @@ function getBackClsListUrlFn(prarm) {
       setFormItem("cBckOp", {
         loadData: r["data"],
       });
+      if(r["data"]?.length === 1) {
+        setValue("cBckOp", r["data"][0]["value"]);
+      }
     }
   });
 }

@@ -15,11 +15,13 @@ import {
 } from "@/shared/app-table-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import {
     getedrcmpitembyedrappnoorcachekey
 } from "../../../api/query/index";
-const idxParam = inject('idxParam');
-const params= idxParam?.param
+const idxParam = inject(idxParamKey, useIdxParam());
+const formPage = idxParam?.formPage;
+const params = idxParam.param;
 const edritemEditRef = ref<AppTableMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -87,11 +89,12 @@ function setDisa() {}
 function handleQuery(flag?: boolean) {
   const cacheKey=params?.cacheKey
   const r = edritemEditRef.value?.getPartnerPage(flag); //获取分页数据
-  let param;
+	let param;
+	const cEcAgrAppNo = formPage?.getComponentRefById('AgreementBase')?.getValue('ECargoBase.cEcAgrAppNo');
   if(cacheKey){
       param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,cacheKey:cacheKey}, r);
   }else{
-      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:params.cEcAgrAppNo}, r);
+      param = Object.assign({pageNo:r['pageNum'],CurrentUser:user.opCde,CurrentUserOrg:user.companyId,appNo:cEcAgrAppNo}, r);
   }
   getedrcmpitembyedrappnoorcachekey(param)
       .then((res) => {

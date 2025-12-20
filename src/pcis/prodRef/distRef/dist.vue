@@ -214,6 +214,23 @@ onMounted(async () => {
   //   })
   // }
 
+  if(props.compKey === 'VehicleDist040002') {
+    formconfig11.value.fromSchema.forEach((item:any) => {
+      if(item.prop === 'Dist.cPlanNo') {
+        item.lengthNum = 5
+      }
+      if(item.prop === 'Dist.nInsuredSeats') {
+        item.lengthNum = 8
+      }
+      if(item.prop === 'Dist.nApprovedSeats') {
+        item.lengthNum = 8
+      }
+      if(item.prop === 'Dist.nApprovedWeight') {
+        item.lengthNum = 7
+      }
+    })
+  }
+
 
   Object.assign(formconfig1.value, formconfig11.value);
   cardconfig.value.title = formconfig1.value.title;
@@ -266,7 +283,7 @@ onMounted(async () => {
   });
   tableconfig.value.fromSchema = formconfig1.value.fromSchema.map((item:any) => {
     if(item.prop === "Dist.nSeqNo" || item.title === "序号") {
-      item.width = 60
+      item.lengthNum = 2
     }
     return item;
   });
@@ -329,6 +346,15 @@ onMounted(async () => {
   }
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
+  }
+  // 解决040002变更清单信息批改单暂存单打开时雇员清单职业类别出现不显示问题(是在获取批改项后职业类别显示内容消失，未找到原因所以只能在setUnDisabledByKeyList执行后调用查询方法让职业类别显示)
+  if(route.params.param?.cProdNo === '040002' && (route.params.param?.pageType === "EDR_APP_NEW_SCENE" ||
+      (route.params.param?.pageType == "TEMPORARY_DEPOSIT" && route.params.param?.cAppTyp == "E"))) {
+    eventBus.on('setUnDisabledDone', (val:any) => {
+      if(val) {
+	      handleQuery()
+      }
+    })
   }
 });
 
@@ -1268,6 +1294,66 @@ function getTableData() {
   return pageresult.list
 }
 
+async function getTableDataAll() {
+  const s = cardRef.value?.getFromValue() || {};
+  // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+  for (let k in s) {
+    if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+      s[k] = s[k].replace('undefined', '')
+    }
+  }
+  const param = opertaor.getParam();
+  let app = "";
+  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+  } else if(param.cOrgAppNo){
+    app = param.cOrgAppNo;
+  } else if(param.pageType !== "copy") {
+    app = param.cAppNo
+  }
+  const selData:any = {
+    cAppNo: "",
+    cComponentTable: cComponentTableValue,
+    cClauseCode: route.params.param?.cTermNo, //条款编码  
+    cProdNo: route.params.param?.cProdNo,  //产品号
+    ...formconfig1.value,
+    pageNum: 1,
+    pageSize: 99999
+  };
+  selData.dist = JSON.parse(JSON.stringify(s))
+  if(route.params.param?.pageName === "priceInquiry") {
+    selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    if(!selData['cInquiryNo']){
+      return []
+    }
+  } else {
+    selData['cAppNo'] = app;
+    if(!selData['cAppNo']){
+      return []
+    }
+  }
+  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    selData.voType = "ply"
+  }
+  // 级联地址表格显示问题处理
+  if(Object.keys(mapAddr).includes(props.compKey)) {
+    const addrInput = mapAddr[props.compKey];
+    const keys = Object.keys(addrInput)
+    if(keys && keys.length>0) {
+      const inputGroupKey = keys[0];
+      const addrValueKey = addrInput[inputGroupKey];
+      selData.dist[addrValueKey] = selData.dist[inputGroupKey];
+    }
+  }
+  const res:any = await selectDist(selData);
+  if (res.code === 200) {
+    return res.data.data?.length > 0 ? res.data.data : []
+  } else {
+    ElMessage.error(res.msg)
+    return []
+  }
+}
+
 function setTableData(data: any, total:any) {
   pageresult.list = data.map((item: any, index: any) => {
 		let dataNew:any = {}
@@ -1354,6 +1440,7 @@ defineExpose({
   setTableData,
   getFormConfig,
   setDisabledAll,
+  getTableDataAll,
 });
 </script>
 
