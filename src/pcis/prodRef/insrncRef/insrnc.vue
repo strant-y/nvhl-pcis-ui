@@ -42,6 +42,14 @@ onMounted(() => {
     method,
     exRules
   );
+  // 保证险中保险期限的“签单时间”在页面隐藏。
+  if(route.params.param?.cProdNo?.startsWith('05') && formconfig11.fromSchema?.length > 0) {
+    formconfig11.fromSchema?.forEach((item:any) => {
+      if(item.prop === 'Base.tIssueTm') {
+        item.hidden = true
+      }
+    })
+  }
   Object.assign(formconfig1, formconfig11);
 });
 
