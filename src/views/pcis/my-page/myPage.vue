@@ -5181,6 +5181,9 @@ const submitUnderwritingFn = async () => {
             underwrite.value?.setRiskunitDisabled()
             return
           }
+          const queryparam = {
+            cappNo:props.param?.cAppNo
+          };
           const queryp = await specialSearchResult(queryparam);
 
           const {resultCode ,resultMsg} = queryp;
