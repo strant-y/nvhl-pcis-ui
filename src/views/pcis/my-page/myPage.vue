@@ -2821,6 +2821,15 @@ const loadAppPlyInfo = async (CAppNo) => {
       } else if(Array.isArray(ops.insured) && ops.insured[0]?.['Insured.cCertfCls']) {
         ops.insured[0]['Insured.cCertfCls'] = ops.insured[0]['Insured.cCertfCls'] === '110007' ? '01' : ops.insured[0]['Insured.cCertfCls'];
       }
+      // 投保暂存单进来要把代理经纪人、代理合作协议、代理业务员、代理业务执业证号、代理业务员机构代码、业务员员工号、业务员名称、业务员电话、业务员机构代码、业务员执业证号清空
+      if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '投保') {
+        const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
+        clearList.forEach((item:any) => {
+          if(ops.plyBase?.[item]) {
+            ops.plyBase[item] = null;
+          }
+        })
+      }
     console.log("转换的数据", ops);
     if(ops["payinfo"] && ops["payinfo"].length > 0){
       ops["payinfo"].forEach((item:any, index:number)=>{
