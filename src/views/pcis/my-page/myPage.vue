@@ -3350,6 +3350,7 @@ const checkStudentValidity  =  async() => {
 /**
  * 投保申请核保
  */
+const qryTerminationStatus = ref(false);
 const submitToUndrFn = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
   const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
@@ -3361,7 +3362,15 @@ const submitToUndrFn = async () => {
       return;
     }
   }
-  if (needCalc.value) {
+  qryTerminationStatus.value = false;
+  const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
+  if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+    const list = qryTerminationData.data.filter((item:any) => ['SurPrm', 'AppPrm', 'EdrPrm'].includes(item.cOperType));
+    if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
+      qryTerminationStatus.value = true;
+    }
+  }
+  if (needCalc.value && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -3682,76 +3691,73 @@ const submitToUndrFn = async () => {
           return;
         }
       }
-      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
-      if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
-        const list = qryTerminationData.data.filter((item:any) => ['SurPrm', 'AppPrm', 'EdrPrm'].includes(item.cOperType));
-        if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
-          const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
-          if(btn) {
-            btn.loading = false;
-          }
-          // 三十天校验提示
-          if(undr.repetitionHint) {
-            ElMessage.error(undr.repetitionHint);
-          }
-          // 限额值校验提示
-          if(undr.insuranceHint) {
-            ElMessage.error(undr.insuranceHint);
-          }
-          if (undr["code"] == 200) {
-            if(undr['cDecision'] !== '0'){
-              ElMessage({
-                showClose: true,message:undr.msg,duration:6000,type: 'success'
-              });
-              // 申请核保成功后按钮设置为不可点击
-              const btn = getBtn("btn010103");
-              if(btn) {
-                btn.loading = true;
-              }
-
-              if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
-                tagsViewStore.delView({"name": "my-page",
-                  "title": "申请单录入",
-                  "path": "/pcisapp/myPage",
-                  "fullPath": "/pcisapp/myPage"}).then((res: any) => {
-                  router.replace({ path: "/dashboard" });
-                });
-              }
-
-            }else if(undr["cDecision"] == '0'){
-              ElMessage.error(undr.msg);
-            }else{
-              ElMessage({
-                showClose: true,message:undr.msg,duration:6000,type: 'success'
-              });
-            }
-            //关闭当前tab页面
-            // this.$router.back();
-
-          } else {
-
-            // 关联交易业务 时 股东客户改是  审批单号必填
-            if(undr.msg ==='该笔业务为关联交易业务，请录入【投保人关联交易审批单编号】！'){
-              const appTabref = opertaor.getTableRefs()["applicant"];
-              const insTabref = opertaor.getTableRefs()["insured"];
-
-              appTabref.setValue("Applicant.cStkMrk", '1');
-              appTabref.setFormItem('Applicant.cRelateNo',{
-                rules:  [{ required: true, message: '该项为必填项', trigger: 'blur' }]
-              })
-                            
-              insTabref.setValue("Insured.cStkMrk", '1');
-              insTabref.setFormItem('Insured.cRelateNo',{
-                rules:  [{ required: true, message: '该项为必填项', trigger: 'blur' }]
-              })
-                                
-              ElMessage.error(undr.msg);
-            }else{
-              ElMessage.error(undr.msg);
-            }
-          }
-          return
+      // 如果数据开关打开则不惊醒保费重复计算
+      if(qryTerminationStatus.value) {
+        const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
+        if(btn) {
+          btn.loading = false;
         }
+        // 三十天校验提示
+        if(undr.repetitionHint) {
+          ElMessage.error(undr.repetitionHint);
+        }
+        // 限额值校验提示
+        if(undr.insuranceHint) {
+          ElMessage.error(undr.insuranceHint);
+        }
+        if (undr["code"] == 200) {
+          if(undr['cDecision'] !== '0'){
+            ElMessage({
+              showClose: true,message:undr.msg,duration:6000,type: 'success'
+            });
+            // 申请核保成功后按钮设置为不可点击
+            const btn = getBtn("btn010103");
+            if(btn) {
+              btn.loading = true;
+            }
+
+            if(undr['cDecision'] === '1' || undr['cDecision'] === '2'){
+              tagsViewStore.delView({"name": "my-page",
+                "title": "申请单录入",
+                "path": "/pcisapp/myPage",
+                "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+                router.replace({ path: "/dashboard" });
+              });
+            }
+
+          }else if(undr["cDecision"] == '0'){
+            ElMessage.error(undr.msg);
+          }else{
+            ElMessage({
+              showClose: true,message:undr.msg,duration:6000,type: 'success'
+            });
+          }
+          //关闭当前tab页面
+          // this.$router.back();
+
+        } else {
+
+          // 关联交易业务 时 股东客户改是  审批单号必填
+          if(undr.msg ==='该笔业务为关联交易业务，请录入【投保人关联交易审批单编号】！'){
+            const appTabref = opertaor.getTableRefs()["applicant"];
+            const insTabref = opertaor.getTableRefs()["insured"];
+
+            appTabref.setValue("Applicant.cStkMrk", '1');
+            appTabref.setFormItem('Applicant.cRelateNo',{
+              rules:  [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+            })
+                          
+            insTabref.setValue("Insured.cStkMrk", '1');
+            insTabref.setFormItem('Insured.cRelateNo',{
+              rules:  [{ required: true, message: '该项为必填项', trigger: 'blur' }]
+            })
+                              
+            ElMessage.error(undr.msg);
+          }else{
+            ElMessage.error(undr.msg);
+          }
+        }
+        return
       }
       const calcData: any = opertaor.getDataAll();
       calcData["user"] = user;
@@ -5060,7 +5066,15 @@ const submitEdrToUndrFun = async () => {
   if (!isAcctValid) {
     return; 
   }
-  if (needCalc.value && props.param.cTransMrk !== "1") {
+  qryTerminationStatus.value = false;
+  const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
+  if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+    const list = qryTerminationData.data.filter((item:any) => ['SurPrm', 'AppPrm', 'EdrPrm'].includes(item.cOperType));
+    if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
+      qryTerminationStatus.value = true;
+    }
+  }
+  if (needCalc.value && props.param.cTransMrk !== "1" && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -5166,46 +5180,43 @@ if(props.param.cTransMrk !== "1"){
     res["appNo"] = base["Base.cAppNo"];
     res["plyNo"] = base["Base.cPlyNo"];
     res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
-    const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
-    if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
-      const list = qryTerminationData.data.filter((item:any) => ['SurPrm', 'AppPrm', 'EdrPrm'].includes(item.cOperType));
-      if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
-        submitEdrToUndr(res).then((result:any) => {
-          if(btn) {
-            btn.loading = false;
+
+    if(qryTerminationStatus.value) {
+      submitEdrToUndr(res).then((result:any) => {
+        if(btn) {
+          btn.loading = false;
+        }
+        // 三十天校验提示
+        if(result.repetitionHint) {
+          ElMessage.error(result.repetitionHint);
+        }
+        // 限额值校验提示
+        if(result.insuranceHint) {
+          ElMessage.error(result.insuranceHint);
+        }
+        console.log("批改申请核保", result);
+        // ElMessage.success(res.msg);
+        // history.back();
+        if (result["code"] == "200") {
+          ElMessage.success(result.msg);
+          btn.disabled = true;
+          if(result['cDecision'] === '1' || result['cDecision'] === '2'){
+            tagsViewStore.delView({"name": "my-page",
+              "title": "申请单录入",
+              "path": "/pcisapp/myPage",
+              "fullPath": "/pcisapp/myPage"}).then((res: any) => {
+              router.replace({ path: "/dashboard" });
+            });
           }
-          // 三十天校验提示
-          if(result.repetitionHint) {
-            ElMessage.error(result.repetitionHint);
-          }
-          // 限额值校验提示
-          if(result.insuranceHint) {
-            ElMessage.error(result.insuranceHint);
-          }
-          console.log("批改申请核保", result);
-          // ElMessage.success(res.msg);
-          // history.back();
-          if (result["code"] == "200") {
-            ElMessage.success(result.msg);
-            btn.disabled = true;
-            if(result['cDecision'] === '1' || result['cDecision'] === '2'){
-              tagsViewStore.delView({"name": "my-page",
-                "title": "申请单录入",
-                "path": "/pcisapp/myPage",
-                "fullPath": "/pcisapp/myPage"}).then((res: any) => {
-                router.replace({ path: "/dashboard" });
-              });
-            }
-          } else {
-            ElMessage.error(result.msg);
-          }
-        }).catch(() => {
-          if(btn) {
-            btn.loading = false;
-          }
-        })
-        return
-      }
+        } else {
+          ElMessage.error(result.msg);
+        }
+      }).catch(() => {
+        if(btn) {
+          btn.loading = false;
+        }
+      })
+      return
     }
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
     const calBtn = getBtn("btnCalEdr");
