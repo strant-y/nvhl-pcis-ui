@@ -435,10 +435,10 @@ const method = {
     } catch (err) {
       console.log(err)
     }
-    const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
+    // const param = opertaor.getParam();
+    // if (param.initFlag) {
+    //   return;
+    // }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -457,10 +457,10 @@ const method = {
     if (val && idxParam && idxParam.setcAmtCur) {
       idxParam.setcAmtCur(val)
     }
-    const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
+    // const param = opertaor.getParam();
+    // if (param.initFlag) {
+    //   return;
+    // }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
