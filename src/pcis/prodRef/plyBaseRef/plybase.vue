@@ -224,6 +224,10 @@ const method = {
         });
       }
     }
+    // 从共主联、从共无联保，条款中的保费可以修改
+    if(['2','4'].includes(val)) {
+      opertaor.getTableRefByKey('cvrg')?.showFlush()
+    }
   }
 
     // 录单人联系方式

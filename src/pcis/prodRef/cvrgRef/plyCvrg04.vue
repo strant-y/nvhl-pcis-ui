@@ -914,7 +914,8 @@ defineExpose({
   setUnDisabledByKeyList,
   calcCheck,
   setTermData,
-  getPlanNo
+  getPlanNo,
+  updateTitle,
 });
 </script>
 
