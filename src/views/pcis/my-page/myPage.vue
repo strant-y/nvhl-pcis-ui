@@ -1872,6 +1872,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "解除接收",
         type: "primary",
+				id: "unreceive",
         func: () => {
           handleRemoveReceived();
         },
@@ -5427,9 +5428,13 @@ if(props.param.cTransMrk !== "1"){
 const cProdMap = ["040003","040011","043013","043020","042001","045001","042003","040005","040015","040006","040016","040020","043001","043010","043007","043009","043002","040001","040002","020001","020002","020003","020009","020013","010002"]
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
+  const btnun = getBtn("unreceive");
   if(btn) {
     btn.loading = true;
-  }
+	}
+	if (btnun) {
+		btnun.disabled = true;
+	}
   const res = underwrite.value?.getFromValue();
   res["user"] = user;
   res["user"]["opRelCde"] = user.opCde;
@@ -5479,6 +5484,9 @@ const submitUnderwritingFn = async () => {
           if(btn) {
             btn.loading = false;
           }
+					if(btnun) {
+						btnun.disabled = false;
+					}
           if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
             ElMessage.error(queryFacSts.message);
             return
@@ -5508,6 +5516,9 @@ const submitUnderwritingFn = async () => {
           if(btn) {
             btn.loading = false;
           }
+					if(btnun) {
+						btnun.disabled = false;
+					}
           if(queryRiFacMrk && queryRiFacMrk.code === '0') {
             ElMessage.error(queryRiFacMrk.message);
             underwrite.value?.setRiskunitDisabled()
@@ -5520,6 +5531,9 @@ const submitUnderwritingFn = async () => {
         if(btn) {
           btn.loading = false;
         }
+				if(btnun) {
+					btnun.disabled = false;
+				}
         if(queryCRiFacMrk && queryCRiFacMrk.code === '200') {
           const cRiFacMrk = queryCRiFacMrk.data.cRiFacMrk;
           if(cRiFacMrk === '1' || cRiFacMrk === '2') {// 自主临分或强制临分
@@ -5541,6 +5555,9 @@ const submitUnderwritingFn = async () => {
     if(btn) {
       btn.loading = false;
     }
+		if(btnun) {
+      btnun.disabled = false;
+    }
     if(riskDataCriskLvlCde) {
       return;
     }
@@ -5558,6 +5575,9 @@ const submitUnderwritingFn = async () => {
     console.log("submitUnderwriting-res", res);
     if(btn) {
       btn.loading = false;
+    }
+		if(btnun) {
+      btnun.disabled = false;
     }
     // 三十天校验提示
     if(res.repetitionHint) {
@@ -5591,6 +5611,9 @@ const submitUnderwritingFn = async () => {
   }).catch((err) => {
     if(btn) {
       btn.loading = false;
+    }
+		if(btnun) {
+      btnun.disabled = false;
     }
     ElMessage.error(err.msg || err);
   });
@@ -6746,11 +6769,25 @@ const queryTermRateLimitFun = (calcFun: any) => {
 }
 // 解除接收
 function handleRemoveReceived() {
+	const btn = getBtn("btnUdr");
+  const btnun = getBtn("unreceive");
+  if(btn) {
+    btn.disabled = true;
+	}
+	if (btnun) {
+		btnun.loading = true;
+	}
   const param = {
     taskId: props.param.taskId,
     user: user,
   };
   removeReceived(param).then((result: any) => {
+		if(btn) {
+    	btn.disabled = false;
+		}
+		if (btnun) {
+			btnun.loading = false;
+		}
     if (result.code !== 200) {
       ElMessage.error({ message: result.msg, duration: 3000 });
     } else {
@@ -6761,7 +6798,13 @@ function handleRemoveReceived() {
       }
       tagsViewStore.back()
     }
-  }).catch((error: any) => {
+	}).catch((error: any) => {
+		if(btn) {
+    	btn.disabled = false;
+		}
+		if (btnun) {
+			btnun.loading = false;
+		}
     ElMessage.error({
       message: error.msg,
       duration: 3000,
