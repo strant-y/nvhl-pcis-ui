@@ -1929,6 +1929,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "解除接收",
         type: "primary",
+				id: "unreceive",
         func: () => {
           handleRemoveReceived();
         },
@@ -5135,7 +5136,13 @@ if(props.param.cTransMrk !== "1"){
  */
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
-  btn.loading = true;
+  const btnun = getBtn("unreceive");
+	if(btn) {
+		btn.loading = true;
+	}
+	if (btnun) {
+		btnun.disabled = true;
+	}
   const res = underwrite.value.getFromValue();
   res["user"] = user;
   res["user"]["opRelCde"] = user.opCde;
@@ -5240,7 +5247,12 @@ const submitUnderwritingFn = async () => {
 
   submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);
-    btn.loading = false;
+    if(btn) {
+			btn.loading = false;
+		}
+		if(btnun) {
+			btnun.disabled = false;
+		}
     // 三十天校验提示
     if(res.repetitionHint) {
       ElMessage.error(res.repetitionHint);
@@ -5270,7 +5282,15 @@ const submitUnderwritingFn = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
-  });
+  }).catch((err) => {
+		if(btn) {
+			btn.loading = false;
+		}
+		if(btnun) {
+			btnun.disabled = false;
+		}
+		ElMessage.error(err.msg || err);
+	});
 };
 
 /**
@@ -6140,11 +6160,25 @@ const queryTermRateLimitFun = (calcFun: any) => {
 }
 // 解除接收
 function handleRemoveReceived() {
+	const btn = getBtn("btnUdr");
+	const btnun = getBtn("unreceive");
+	if(btn) {
+		btn.disabled = true;
+	}
+	if (btnun) {
+		btnun.loading = true;
+	}
   const param = {
     taskId: props.param.taskId,
     user: user,
   };
   removeReceived(param).then((result: any) => {
+		if(btn) {
+			btn.disabled = false;
+		}
+		if (btnun) {
+			btnun.loading = false;
+		}
     if (result.code !== 200) {
       ElMessage.error({ message: result.msg, duration: 3000 });
     } else {
@@ -6156,6 +6190,12 @@ function handleRemoveReceived() {
       tagsViewStore.back()
     }
   }).catch((error: any) => {
+		if(btn) {
+			btn.disabled = false;
+		}
+		if (btnun) {
+			btnun.loading = false;
+		}
     ElMessage.error({
       message: error.msg,
       duration: 3000,
