@@ -27,7 +27,7 @@ import {PolicyService} from "@/views/pcis-main/service/my-page/policy.service";
 const productStore = useProductStore();
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-
+import { getDeptOptions } from "@/api/dept";
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
@@ -102,7 +102,7 @@ onMounted(async () => {
   })
 
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async() => {
     setForSelectFilterable(); //给下拉框设置可搜索
     //录单人联系方式  默认操作员的
     if (user.phoneNO !== null && user.phoneNO !== "") {
@@ -115,10 +115,17 @@ onMounted(async () => {
 
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
-    //回显机构部门数据
+		//回显机构部门数据
+		let label = param.cDptCnm
+		 if (!param.cDptCnm) {
+			const response = await getDeptOptions(param.cDptCde);
+			if (response.data.length>0) {
+				label = response.data[0]["label"]
+			}
+		}
     setFormItem("Base.cDptCde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm|| ''}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${label|| ''}` },
       ],
     });
     //禁用不见费出单原因
@@ -126,7 +133,7 @@ onMounted(async () => {
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${label || ''}` },
       ],
     });
 

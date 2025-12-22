@@ -3264,7 +3264,19 @@ const setInsuranceTerm = (ops, productCode) => {
   };
 
 
-  const currentTime = dayjs();
+	let currentTime = dayjs();
+	if (props.param.pageType === "orig" && !!ops["insrnc"]["Base.tInsrncEndTm"]) {
+		const date = dayjs();
+		const tInsrncEndTm = dayjs(ops["insrnc"]["Base.tInsrncEndTm"]);
+
+		if (!tInsrncEndTm.isValid() || tInsrncEndTm.isBefore(date)) {
+			// 如果无效 或 已过期，使用当前时间
+			currentTime = date;
+		} else {
+			// 未过期，使用原始时间
+			currentTime = tInsrncEndTm;
+		}
+	}
   const beginTm = currentTime.add(1, 'day').format("YYYY-MM-DD 00:00:00");
   let endTm;
 
@@ -4127,11 +4139,6 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "orig") && saveDistBatchFlag.value) {
-      // 保存清单
-      const appNo = plyBase["Base.cAppNo"];
-      saveDist(appNo);
-    }
 
     // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
     if(props.param?.pageType === "app" || props.param?.pageType === "template" || props.param?.pageType === "copy" || props.param?.pageType === "inquiryToApp" || props.param.pageType === "orig") {
