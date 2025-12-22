@@ -363,7 +363,16 @@ onBeforeMount(async () => {
 					eventBus.emit('insuredChange', cEcAgrAppNo.value);
 					eventBus.emit('transportChange', cEcAgrAppNo.value);
 				}
-				let dataForm:any ={ ...res.res.composition,AgreementBase:res.res.composition?.AgreementBase[0],AgreementApplicant:res.res.composition?.AgreementApplicant[0],AgreementFeeWarn:res.res.composition?.AgreementBase[0] ,AgreementAcctinfo:res.res.composition?.AgreementAcctinfo[0] }
+				let dataForm: any = { ...res.res.composition, AgreementBase: res.res.composition?.AgreementBase[0], AgreementApplicant: res.res.composition?.AgreementApplicant[0], AgreementFeeWarn: res.res.composition?.AgreementBase[0], AgreementAcctinfo: res.res.composition?.AgreementAcctinfo[0] }
+				if (res.res.composition.AgreementTgtSummary.length > 0) {
+					res.res.composition.AgreementTgtSummary.forEach(item => {
+						const entries = Object.entries(item);
+						Object.keys(item).forEach(k => delete item[k]);
+						for (const [k, v] of entries) {
+							item[k.replace(/^ECargoDistSummary\./, 'DistSummary.')] = v;
+						}
+					});
+				}
 				const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
 				dataForm['AgreementBase']['ECargoBase.cRenewMrk'] = '1'
 				dataForm['AgreementBase']['ECargoBase.cEcAgrNo'] = ''

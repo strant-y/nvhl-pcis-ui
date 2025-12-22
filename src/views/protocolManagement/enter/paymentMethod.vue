@@ -233,6 +233,10 @@ function confirm() {
         if(formData.cPlyNo?.length > 19) {
           ElMessage.error("历史数据的保单, 不允许续保");
           return;
+				}
+				if(Object.keys(renewalComponent.value).length === 0) {
+          ElMessage.error("上年保单号请点击查询！");
+          return;
         }
       	const data = formData.value;
 				getECargoPolicyForRenewal({ cEcAgrNo: formData.cPlyNo, components: [renewalComponent.value] }).then(
@@ -285,7 +289,7 @@ function renewalQuery() {
     return;
   }
 	getECargoPolicyComponent({ cPlyNo: formData.cPlyNo }).then((res: any) => {
-    if(res.res.length > 0) {
+    if(!!res.res && res.res.length > 0) {
       dzmodal
         .open(renewalDialog, { 
           type: "Issuer",

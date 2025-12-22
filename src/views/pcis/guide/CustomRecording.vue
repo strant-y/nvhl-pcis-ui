@@ -660,7 +660,11 @@ function next() {
         return
       }
       const data = formconfig1.value;
-      if (formconfig1.value.cRenewMrk == "1") {
+			if (formconfig1.value.cRenewMrk == "1") {
+				if(Object.keys(renewalComponent.value).length == 0) {
+          ElMessage.error("上年保单号请点击查询！");
+          return;
+        }
         getAppPolicyForRenewal({ cPlyNo: formconfig1.value.cPlyNo, components: [renewalComponent.value] }).then(
             async (res: any) => {
               if (res.code == "200") {
@@ -689,8 +693,10 @@ function next() {
                 query: {
                   param: JSON.stringify({
                     ...handleArray(res.res.composition.plyBase[0]), ...{
-                      pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
-                      cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
+											pageType: "orig",
+											cTermNme: res.res.composition.cvrg[0]?.["Term.cClauseCode"],
+											cTermNo: res.res.composition.cvrg[0]?.["Term.cClauseName"],
+											res: res
                     }
                   }),
                 },
@@ -1155,7 +1161,6 @@ function renewalQuery() {
     return;
   }
   getAppPolicyComponent({ cPlyNo: formconfig1.value.cPlyNo }).then((res:any) => {
-    debugger
     if (res.code == 500){
       ElMessage.error(res.msg)
     }else if(res.res.length > 0) {
