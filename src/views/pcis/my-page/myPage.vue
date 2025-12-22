@@ -552,6 +552,7 @@ import { fa } from 'element-plus/es/locale';
 import { numSubp } from '@/utils/Math';
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
+import Decimal from "decimal.js";
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -3375,14 +3376,10 @@ const submitToUndrFn = async () => {
       return;
     }
   }
-  qryTerminationStatus.value = false;
-  const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
-  if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
-    const list = qryTerminationData.data.filter((item:any) => ['SurPrm', 'AppPrm', 'EdrPrm'].includes(item.cOperType));
-    if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
-      qryTerminationStatus.value = true;
-    }
-  }
+
+  // 从共主联、从共无联保和数据开关校验
+  qryTerminationFunc('0')
+
   if (needCalc.value && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -3704,7 +3701,7 @@ const submitToUndrFn = async () => {
           return;
         }
       }
-      // 如果数据开关打开则不惊醒保费重复计算
+      // 如果数据开关打开则不进行保费重复计算
       if(qryTerminationStatus.value) {
         const undr: any = props.param?.pageName === "priceInquiry" ? await submitInquiry(res) : await submitToUndr(res);
         if(btn) {
@@ -5074,14 +5071,9 @@ const submitEdrToUndrFun = async () => {
   if (!isAcctValid) {
     return; 
   }
-  qryTerminationStatus.value = false;
-  const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
-  if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
-    const list = qryTerminationData.data.filter((item:any) => ['SurPrm', 'AppPrm', 'EdrPrm'].includes(item.cOperType));
-    if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
-      qryTerminationStatus.value = true;
-    }
-  }
+  // 从共主联、从共无联保和数据开关校验
+  qryTerminationFunc('1')
+  
   if (needCalc.value && props.param.cTransMrk !== "1" && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
     return;
@@ -6386,6 +6378,59 @@ const afterCalcPremium = () => {
   }
 }
 
+const afterCalcEdrPremium = () => {
+  const ops: any = opertaor.getDataAll();
+  const edrBaseData = getEdrbaseValue();
+  nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
+
+  const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
+  if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+    opertaor
+      .getTableRefByKey("ciMasterAgreement")
+      .setValue("Base.nCiJntAmt", nAmt.value);
+    opertaor
+      .getTableRefByKey("ciMasterAgreement")
+      .setValue("Base.nCiJntPrm", nPrm.value);
+  }
+
+  const payinfoRef = opertaor.getTableRefs()["payinfo"];
+  if (payinfoRef && payinfoRef.setFormValue) {
+    let currentPayList = [...payinfoRef.getFromValue()]; // 获取当前列表
+    //  缴费期数   + 批改次数
+    let infoLength = ops['base']['Base.nPayNum'] + edrBaseData['EdrBase.nEdrPrjNo'];
+    if(currentPayList.length >=infoLength){
+      currentPayList.pop();
+    }
+    let payInfo = setPayInfoEdr(
+      ops["payinfo"],
+      ops["base"],
+      ops["applicant"],
+      nPrmVar,
+      ops["plyBase"],
+      currentPayList.length+1
+    );
+    payinfoRef.setFormValue(payInfo);
+  }
+}
+
+async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批改申请核保
+  const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  const cOperTypeList = flag === '0' ? ['AppPrm'] : ['SurPrm', 'EdrPrm'];
+  qryTerminationStatus.value = false;
+  
+  if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {// 从共主联、从共无联保
+    qryTerminationStatus.value = true;
+  } else {
+    const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
+    if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+      const list = qryTerminationData.data.filter((item:any) => cOperTypeList.includes(item.cOperType));
+      if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
+        qryTerminationStatus.value = true;
+      }
+    }
+  }
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -6397,10 +6442,13 @@ opertaor.setFatherPage({
   getOldProductResData: getOldProductResData,
   setEdrValue: setEdrValue,
   savePlyInfo: savePagePlyInfo,
+  calcPremium: calcPremium,
+  calcPremiumEdr: calcPremiumEdr,
   afterCalcPremium: afterCalcPremium,
+  afterCalcEdrPremium: afterCalcEdrPremium,
 });
 
-function getEdrbaseValue(key:any) {
+function getEdrbaseValue() {
   return edrbase.value?.getFromValue() || {};
 }
 
