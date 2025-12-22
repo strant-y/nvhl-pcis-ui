@@ -426,6 +426,18 @@ onMounted(() => {
         item['rules'] = [getRules("phoneNo", {})];
     }
 
+		// 邮编
+		if(route.params.param.cProdNo?.startsWith('01')) {
+      if(item.prop === 'Dist.cZipCde') {
+        item.maxlength = 6
+				item['rules'] = [
+					getRules("required", {}),
+        	getRules("signlessInt", {}),
+        	getRules("specifyLength", { len: 6 }),
+     	 	];
+      }
+  	}
+
 
     if(item.prop =='Dist.PropertyLocationProp'){
       item?.groupList.forEach(data => {
