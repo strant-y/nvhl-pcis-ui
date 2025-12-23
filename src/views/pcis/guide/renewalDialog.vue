@@ -13,10 +13,11 @@
         :disabled="reuseType === '1'"
       >
         <el-checkbox
-          v-for="option in props.options"
-          :key="option.value"
-          :label="option.label"
-          :value="option.value"
+            v-for="option in props.options"
+            :key="option.value"
+            :label="option.label"
+            :value="option.value"
+            :disabled=isOptionDisabled(option.value)
         />
       </el-checkbox-group>
     </div>
@@ -73,6 +74,13 @@ const selectedValue:any = ref([])
 onMounted(() => {
   selectedValue.value = props.selected
 });
+// 需要禁用的选项列表
+const disabledOptions = ['plyBase', 'AgreementBase'];
+
+// 检查选项是否应该被禁用
+const isOptionDisabled = (value: string) => {
+  return disabledOptions.includes(value);
+};
 
 function canceled() {
   dialogVisible.value = false
