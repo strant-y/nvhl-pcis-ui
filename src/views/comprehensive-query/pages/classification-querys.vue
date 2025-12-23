@@ -1884,11 +1884,9 @@ const tableObj = {
                     };
                     if (cleanRow) {
                         // 校验出单机构是否复合复制单的机构要求
-                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId, cProdNo: cleanRow.cProdNo }
                         if(cleanRow.cRenewMrk === "1") {
                             queryProdDptCdeParam['cPlyNo'] = cleanRow.cPlyNo
-                        } else {
-                            queryProdDptCdeParam['cProdNo'] = cleanRow.cProdNo
                         }
                         const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
                         if(queryProdDptCde.data !== true) {
