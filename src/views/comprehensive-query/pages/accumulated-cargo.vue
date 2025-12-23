@@ -140,7 +140,7 @@ const pageresult = reactive<Pageresult>({
   /** 数据列表 */
   list: [],
   /** 总数 */
-  total: 2,
+  total: 0,
 });
 
 
