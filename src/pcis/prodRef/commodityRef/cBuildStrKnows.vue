@@ -17,8 +17,16 @@ const tableRef = ref<AppTableMethod | null>(null);
 const dialogVisible = ref(true);
 const pageresult = reactive<Pageresult>({
   result: "",
-  list: [],
-  total: 0,
+  list: [
+			{cPkId: 1,country: "钢混结构", reason: "住宅、办公楼、商场等"},
+			{cPkId: 2,country: "钢、钢筋混凝土结构", reason: "高层地标建筑等"},
+			{cPkId: 3,country: "砖混结构", reason: "老旧小区，老旧楼宇等"},
+			{cPkId: 4,country: "混合结构", reason: "墙体是水泥且屋顶是钢，工业厂房、仓库等"},
+			{cPkId: 5,country: "钢结构", reason: "墙体和屋顶都是钢，工业厂房、仓库等"},
+			{cPkId: 6,country: "砖木结构", reason: "墙体砖墙，屋顶木材"},
+			{cPkId: 7,country: "砖砌结构", reason: "墙体和屋顶都是砖"},
+		],
+  total: 7,
 });
 const tableconfig = reactive<AppTableConfig>(
     createTableEditConfig({
@@ -75,7 +83,7 @@ const handleCancel = () => {
 };
 
 onMounted(() => {
-  refreshData();
+  // refreshData();
 });
 </script>
 
