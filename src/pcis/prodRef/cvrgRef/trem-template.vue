@@ -1067,7 +1067,6 @@ function initMethod(){
       termFactormap.value.forEach((item: any) => {
         if(item.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
-          item.func = (val:any) => nInsuranceFeeChange(val)
         }
       });
     }
@@ -1094,7 +1093,6 @@ function initMethod(){
       extermConf.value.forEach((item: any) => {
         if(item?.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
-          item.func = (val:any) => nInsuranceFeeChange(val)
         }
       });
     }
@@ -1108,7 +1106,6 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
-                  item.func = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1135,7 +1132,6 @@ function initMethod(){
               extermConf.value.forEach((item: any) => {
                 if(item?.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
-                  item.func = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1152,7 +1148,6 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
-                  item.func = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1179,7 +1174,6 @@ function initMethod(){
               extermConf.value.forEach((item: any) => {
                 if(item?.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
-                  item.func = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1686,13 +1680,7 @@ const methodMap = {
     });
   },
   nItemFeeChange:(val:any) => {
-    qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
-      if(res?.code == 200 && res.data?.length > 0) {
-        if(res.data[0]?.cAppTyp === 'on') {
-          nInsuranceFeeChange(val)
-        }
-      }
-    })
+    nInsuranceFeeChange(val)
   },
 };
 
