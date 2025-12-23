@@ -188,7 +188,8 @@
                                   :rules="isrequired(item) ? getRequired() : undefined"
                                   :prop="item.prop"
                                   :label="item.title"
-                                  :label-width ="120">
+                                  :label-width ="120"
+                                  class="extendFormItem">
                                   <from-item
                                     v-model="termdata[item.prop]"
                                     @update:modelValue="termUpdate()"
@@ -1991,5 +1992,9 @@ td {
   img {
     width: 18px;
   }
+}
+
+:deep(.extendFormItem .el-form-item__label){
+  font-size: var(--rt-form-content-font-size);
 }
 </style>

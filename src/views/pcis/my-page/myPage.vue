@@ -3379,7 +3379,7 @@ const submitToUndrFn = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  qryTerminationFunc('0')
+  await qryTerminationFunc('0')
 
   if (needCalc.value && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
@@ -5073,7 +5073,7 @@ const submitEdrToUndrFun = async () => {
     return; 
   }
   // 从共主联、从共无联保和数据开关校验
-  qryTerminationFunc('1')
+  await qryTerminationFunc('1')
   
   if (needCalc.value && props.param.cTransMrk !== "1" && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
