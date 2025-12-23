@@ -268,6 +268,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           } else if(params.cRsnCde == "s2" && !params.initFlag){
             setValue("EdrBase.nPrmVar", new Decimal(0).sub(new Decimal(val)))
             setValue("EdrBase.nPrm", new Decimal(nBefEdrPrm).add(new Decimal(getValue('EdrBase.nPrmVar'))))
+            nextTick(() => {
+              opertaor.getFatherPage().afterCalcSurrenEdr()
+            })
           }
         }
       },

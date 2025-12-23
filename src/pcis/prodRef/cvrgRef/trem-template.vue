@@ -1801,7 +1801,7 @@ async function nInsuranceFeeChange(val:any) {
   if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
     const nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
     const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-    const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm'];
+    const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm']?.replaceAll(',','');
     const newData = getDatas();
     if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {
       const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })

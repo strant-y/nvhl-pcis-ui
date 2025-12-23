@@ -6432,6 +6432,10 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
   }
 }
 
+function afterCalcSurrenEdr() {
+  nPrm.value = edrbase.value?.getValue('EdrBase.nPrm') || 0;
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -6447,6 +6451,7 @@ opertaor.setFatherPage({
   calcPremiumEdr: calcPremiumEdr,
   afterCalcPremium: afterCalcPremium,
   afterCalcEdrPremium: afterCalcEdrPremium,
+  afterCalcSurrenEdr: afterCalcSurrenEdr,
 });
 
 function getEdrbaseValue() {
