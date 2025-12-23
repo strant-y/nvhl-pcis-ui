@@ -239,15 +239,15 @@ const handleQuery = (flag = true) => {
 
 
 //风险累计方式change
-const handleChange = (value: string,data) => {
-	console.log('handleChange', value,data);
+const handleChange = (value: string) => {
+	console.log('handleChange', value);
 	//0船货 1船舶 2货运
   if (value == '1') {
-    title.value = `船舶险累积保额/赔偿限额 ${data.totalCBamt}`
+    title.value = `船舶险累积保额/赔偿限额 ${tableTotal.value}`
   } else if (value == '2') {
-    title.value = `货运险累积保额 ${data.totalHYamt}`
+    title.value = `货运险累积保额 ${tableTotal.value}`
   } else if (value == '0') {
-    title.value = `船货累积保额 ${data.totalAmt}`
+    title.value = `船货累积保额 ${tableTotal.value}`
   }
 }
 
@@ -270,12 +270,21 @@ const refreshData = (flag = true) => {
 	accumulatedCargo.cumulativeRiskList(params).then((res: any) => {
     if (res.code === 200) {
       const pageData = res.data;
-      if (pageData) {
-        tableTotal.value = pageData.result[0]["totalAmt"] //todo 联调时调整
+      if (pageData.result.length > 0) {
         pageresult.total= pageData.total;
 				pageresult.list = pageData.result;
-				handleChange(s.nType, pageData.result[0])
-      }
+				if (s.nType == '1') {
+					tableTotal.value = pageData.result[0].totalCBamt
+				} else if (s.nType == '2') {
+					tableTotal.value = pageData.result[0].totalHYamt
+				} else if (s.nType == '0') {
+					tableTotal.value = pageData.result[0].totalAmt
+				}
+			} else {
+				pageresult.total= pageData.total;
+				pageresult.list = pageData.result;
+			}
+			handleChange(s.nType)
 		} else {
 			ElMessage.error(res.msg || '查询失败');
 		}
