@@ -1676,3 +1676,8 @@ export function getPremiumAdjustmentRange(): AxiosPromise<any> {
 export function getProductTemplate(queryParams: any): AxiosPromise<any> {
   return post(`/policy/getProductTemplate`, queryParams);
 }
+
+// 核保风险累计查询
+export function getCumulativeRisk(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getCumulativeRisk`, queryParams);
+}

@@ -10,9 +10,8 @@ export class AccumulatedCargo {
      * @Description:
      * @params:
      */
-    // 'insurance/list'  胡乱写的
-    qryList(ops) {
-        return request.post('/insurance/list', {source: JSON.stringify(ops)});
+    cumulativeRiskList(ops) {
+      return request.post('/policy/cumulativeRiskList', {source: JSON.stringify(ops)});
     }
 
 }

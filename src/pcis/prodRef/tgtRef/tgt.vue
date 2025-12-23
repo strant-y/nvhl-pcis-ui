@@ -22,6 +22,9 @@ const wagesInfo = defineAsyncComponent(
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
 );
+const cumulative = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/cumulative-risk.vue")
+);
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from "moment";
@@ -209,7 +212,22 @@ onMounted(async () => {
 
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
-  const isNonRequired = cTransportationNames.includes(params.cProdNo);
+	const isNonRequired = cTransportationNames.includes(params.cProdNo);
+
+	// 风险累积按钮核保切是规定产品展示
+	const isAccumulatedRiskProduct = ["110001", "110003", "040008", "040011", "040015",]
+	formconfig11.titleBtns?.forEach((item: any) => {
+		const isInList = isAccumulatedRiskProduct.includes(params.cProdNo);
+    const startsWith02 = params.cProdNo?.substring(0, 2) === "02";
+    const isCorrectPage = params.pageType === "PLY_UW_PROCESS_SCENE";
+
+    // 满足：(在列表中 OR 以02开头) AND 在指定页面 → 展示（hidden = false）
+    if ((isInList || startsWith02) && isCorrectPage) {
+      item.hidden = false;
+    } else {
+      item.hidden = true;
+    }
+	})
 
   setFormItem("Tgt.cTransportationName", {
     rules: isNonRequired ? [] : [getRules("required", { trigger: 'blur' })]
@@ -1997,6 +2015,26 @@ const method = {
 				ElMessage.error('系统异常，请稍后重试');
 			}
 		}
+	},
+	// 风险累积
+	getCumulativeRisk: () => {
+		const isAccumulatedRiskProduct = ["110001", "110003", "040008", "040011", "040015",]
+		let data1 = getFromValue()
+		let data = {}
+		const isInList = isAccumulatedRiskProduct.includes(params.cProdNo);
+		const startsWith02 = params.cProdNo?.substring(0, 2) === "02";
+		if (isInList) { // 船舶
+			data.nType = 1
+			data.cShipName = data1["Tgt.cShipName"] // 船名
+		} else if (startsWith02) { // 货运
+			data.nType = 2
+			data.cShipName = data1["Tgt.cTransportationName"] // 船名
+			data.cTransportVoyage = data1["Tgt.cVoyageNumber"] // 航次
+		}
+		dzmodal.open(cumulative, { type: "departure", data: data }).then((res: any) => {
+			if (res.type === "ok") {
+			};
+		});
 	},
 };
 
