@@ -474,6 +474,10 @@ const method = {
   getcSanctionAreasChange: () => {
     dialog.value?.open('detailsKnows', null,
       null, { width: 45, title: '战争及罢工险核保限制和运输地国家限制' });
+	},
+	getcBuildingStructureChange: () => {
+    dialog.value?.open('cBuildStrKnows', null,
+      null, { width: 45, title: '建筑结构' });
   },
   gettCompletionYearChange: (val: string) => {
     const currentYear = new Date().getFullYear();
@@ -2036,6 +2040,18 @@ const method = {
 			};
 		});
 	},
+	// 占用性质
+	cTargetTypeNaturefun: (val) => {
+		if (val[0] == '13' || val[0] == '12') {
+			setFormItem('Tgt.cDurabilityLevel', {rules: [getRules("required", {})] });
+			setFormItem('Tgt.cResistanceRating', {rules: [getRules("required", {})] });
+			setFormItem('Tgt.cMainClassification', {rules: [getRules("required", {})] });
+		} else {
+			setFormItem('Tgt.cDurabilityLevel', {rules: [] });
+			setFormItem('Tgt.cResistanceRating', {rules: [] });
+			setFormItem('Tgt.cMainClassification', {rules: [] });
+		}
+	}
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
