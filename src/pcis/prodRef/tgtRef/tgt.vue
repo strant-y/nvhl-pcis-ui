@@ -474,6 +474,10 @@ const method = {
   getcSanctionAreasChange: () => {
     dialog.value?.open('detailsKnows', null,
       null, { width: 45, title: '战争及罢工险核保限制和运输地国家限制' });
+	},
+	getcBuildingStructureChange: () => {
+    dialog.value?.open('cBuildStrKnows', null,
+      null, { width: 45, title: '建筑结构' });
   },
   gettCompletionYearChange: (val: string) => {
     const currentYear = new Date().getFullYear();
