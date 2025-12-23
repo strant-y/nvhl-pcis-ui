@@ -2336,6 +2336,7 @@ async function loadAfter() {
           ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
           ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
           ops.plyBase['Base.cRemark'] = "" // 出单员备注
+          ops.plyBase['Base.cDptCde'] = props.param?.cDptCde // 机构部门取申请单录入的出单机构
         }
         
         if(ops['ci'] && ops['ci'].length>0){
