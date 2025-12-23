@@ -2036,6 +2036,18 @@ const method = {
 			};
 		});
 	},
+	// 占用性质
+	cTargetTypeNaturefun: (val) => {
+		if (val[0] == '13' || val[0] == '12') {
+			setFormItem('Tgt.cDurabilityLevel', {rules: [getRules("required", {})] });
+			setFormItem('Tgt.cResistanceRating', {rules: [getRules("required", {})] });
+			setFormItem('Tgt.cMainClassification', {rules: [getRules("required", {})] });
+		} else {
+			setFormItem('Tgt.cDurabilityLevel', {rules: [] });
+			setFormItem('Tgt.cResistanceRating', {rules: [] });
+			setFormItem('Tgt.cMainClassification', {rules: [] });
+		}
+	}
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
