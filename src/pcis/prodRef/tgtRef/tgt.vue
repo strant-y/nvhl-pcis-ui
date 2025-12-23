@@ -232,7 +232,9 @@ onMounted(async () => {
   });
   selectType()
   nextTick(() => {
-    eventBus.on('goodsMxChange', handelGoodsMx);
+    if(params.cProdNo != '020014') {
+      eventBus.on('goodsMxChange', handelGoodsMx);
+    }
     if (!getValue('Tgt.cDispatchDetail')) {
       setFormItem('Tgt.cDispatchDetail', { disabled: true })
     } else {
