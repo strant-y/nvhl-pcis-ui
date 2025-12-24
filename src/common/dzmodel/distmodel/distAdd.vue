@@ -557,13 +557,26 @@ onMounted(() => {
         }
       }
     }
-    // 020018 运输范围省内运输时省份必填
-    if(item.prop === 'Dist.cTransportScope' && params?.cProdNo === '020018') {
-      item.func = (val:any) => {
-        if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
-          setFormItem("Dist.cMunicipalityDirectly", { rules: [getRules("required", {})] })
-        } else {
-          setFormItem("Dist.cMunicipalityDirectly", { rules: [] })
+    // 020018 运输范围省内运输时省份必填 车龄根据初登日期自动算出
+    if(params?.cProdNo === '020018') {
+      if(item.prop === 'Dist.cTransportScope') {
+        item.func = (val:any) => {
+          if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
+            setFormItem("Dist.cMunicipalityDirectly", { rules: [getRules("required", {})] })
+          } else {
+            setFormItem("Dist.cMunicipalityDirectly", { rules: [] })
+          }
+        }
+      }
+      if(item.prop === 'Dist.tRegistrationDate') {
+        item.func = (val:any) => {
+          if(val) {
+            const days = Math.abs(moment(val).diff(moment(), 'days'));
+            const age = (days / 365).toFixed(1);
+            setValue("Dist.cVehicleAge", age)
+          } else {
+            setValue("Dist.cVehicleAge", "")
+          }
         }
       }
     }
