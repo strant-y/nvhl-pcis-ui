@@ -288,6 +288,28 @@
             />
           </el-form-item>
 				</template>
+        <template v-if="formconfig1.cRecordType == '5'">
+          <rt-button
+            :item="{
+              type: 'primary',
+              label: '模板下载',
+              loading: downloadTemplateLoading,
+              func: () => {
+                downloadTemplate();
+              },
+            }"
+          />
+          <rt-button
+            :item="{
+              type: 'primary',
+              label: '导入方案',
+              loading: importTemplateLoading,
+              func: () => {
+                importTemplate();
+              },
+            }"
+          />
+        </template>
 				<template v-if="formconfig1.cRecordType != 9">
 					<el-tooltip placement="top">
 						<template #content>
@@ -445,6 +467,8 @@ import {
   checkRenewalDpt,
   getAppPolicyComponent,
   getAppPolicyForRenewal,
+  downloadPlanTemplate,
+  importPlan,
 } from "./custom-recording.service";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -463,6 +487,7 @@ import {scrollByDomId} from "@/utils/common";
 import {POSITE_PAGE_TYPE_APP} from "@/views/pcis/support/composite.types";
 const policyService = new PolicyService();
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
+import { saveAs } from "file-saver";
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -1182,6 +1207,103 @@ function renewalQuery() {
   }).catch(err => {
     ElMessage.error(err.msg || err)
   })
+}
+
+// 模板下载
+const downloadTemplateLoading = ref(false);
+function downloadTemplate() {
+  if(!formconfig1.value.cProdNo || !formconfig1.value.cTermNo) {
+    ElMessage.warning("请先选择方案！");
+		return false
+  }
+  if(!formconfig1.value.cDptCde) {
+    ElMessage.warning("请先选择承保机构！");
+		return false
+  }
+  downloadTemplateLoading.value = true;
+  const param = {
+    cPlanNo: formconfig1.value.cTermNo,
+    CProdNo: formconfig1.value.cProdNo,
+    CGrpMrk: '0',
+    cDptCde: formconfig1.value.cDptCde,
+  }
+  downloadPlanTemplate(param).then((res:any) => {
+    downloadTemplateLoading.value = false;
+    if (res.size <= 0) {
+      ElMessage.error({ message: "下载出错", duration: 3000 });
+      return;
+    }
+    const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+    const blob = new Blob([res.data], {
+      responseType: res.headers["content-type"]
+      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+    });
+    saveAs(blob, fileName);
+  })
+  .catch(() => {
+    ElMessage.error("模板下载失败");
+    downloadTemplateLoading.value = false;
+  });
+}
+
+// 模板导入
+const importTemplateLoading = ref(false);
+function importTemplate() {
+  if(!formconfig1.value.cProdNo || !formconfig1.value.cTermNo) {
+    ElMessage.warning("请先选择方案！");
+		return false
+  }
+  if(!formconfig1.value.cDptCde) {
+    ElMessage.warning("请先选择承保机构！");
+		return false
+  }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+  input.onchange = () => {
+    if (input.files?.length) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        const base64String = e.target?.result as string;
+
+        // ✅ 此处赋值有效
+        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+
+        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+
+        // 构建参数并请求接口
+        const params = {
+          cPlanNo: formconfig1.value.cTermNo,
+          CProdNo: formconfig1.value.cProdNo,
+          CGrpMrk: '0',
+          cDptCde: formconfig1.cDptCde,
+          file: base64String,
+        }
+        importTemplateLoading.value = true;
+        importPlan(params).then((res:any) => {
+          importTemplateLoading.value = false;
+          if (res.code === 200) {
+            
+          } else {
+            ElMessage.error(res.msg || "导入失败");
+          }
+        }).catch((error) => {
+          ElMessage.error("导入出错，请检查文件格式或内容");
+          console.error("导入错误：", error);
+          importTemplateLoading.value = false;
+        });
+      };
+
+      reader.onerror = (e) => {
+        console.error("文件读取失败", e);
+        ElMessage.error("文件读取失败");
+      };
+      reader.readAsDataURL(file); // 启动读取
+    }
+  };
+  input.click(); // 触发文件选择对话框
 }
 </script>
 
