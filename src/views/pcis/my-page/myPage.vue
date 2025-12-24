@@ -4708,7 +4708,11 @@ const submitEdrToUndrSurrender = async () => {
     ElMessage.error("请填写批改信息中的必填项")
     return
   }
-  if (needCalc.value) {
+
+  // 从共主联、从共无联保和数据开关校验
+  await qryTerminationFunc('2')
+  
+  if (needCalc.value && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -6350,9 +6354,9 @@ const afterCalcEdrPremium = () => {
   }
 }
 
-async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批改申请核保
+async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批改申请核保 2 一般退保
   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-  const cOperTypeList = flag === '0' ? ['AppPrm'] : ['SurPrm', 'EdrPrm'];
+  const cOperTypeList = flag === '0' ? ['AppPrm'] : flag === '2' ? ['SurPrm'] : ['EdrPrm'];
   qryTerminationStatus.value = false;
   
   if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {// 从共主联、从共无联保
