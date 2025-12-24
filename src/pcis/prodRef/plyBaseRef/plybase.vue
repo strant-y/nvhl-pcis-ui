@@ -403,17 +403,17 @@ const method = {
     if (!p.initFlag) {
       setValue("Base.cBrkrCde", "");
       setValue("Base.cBrkSlsCde", "");
-		}
-		// 非个人代理业务，清空业务员信息
-		if (getValue("Base.cBsnsTyp") != '19002' && getValue("Base.cChaType") != '1900201' && val != '1900201001') {
-			setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
-			setFormItem("Base.cIntroSalecde", {loadData: [], btnItems: { disabled: false } });
-			setValue("Base.cSlsId", null); // 业务员员工号
-			setValue("Base.cSlsNme", null); // 业务员名称
-			setValue("Base.cSlsTel", null); // 业务员电话
-			setValue("Base.cSlsDptcde", null); // 业务员机构代码
-			setValue("Base.cSlsCde", null); // 业务员执业证号
-			setValue("Base.cIntroSalecde", null); // 服务机构业务员
+      // 非个人代理业务，清空业务员信息
+      if (getValue("Base.cBsnsTyp") != '19002' && getValue("Base.cChaType") != '1900201' && val != '1900201001') {
+        setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
+        setFormItem("Base.cIntroSalecde", {loadData: [], btnItems: { disabled: false } });
+        setValue("Base.cSlsId", null); // 业务员员工号
+        setValue("Base.cSlsNme", null); // 业务员名称
+        setValue("Base.cSlsTel", null); // 业务员电话
+        setValue("Base.cSlsDptcde", null); // 业务员机构代码
+        setValue("Base.cSlsCde", null); // 业务员执业证号
+        setValue("Base.cIntroSalecde", null); // 服务机构业务员
+      }
 		}
   },
   //代理(经纪)人change事件
