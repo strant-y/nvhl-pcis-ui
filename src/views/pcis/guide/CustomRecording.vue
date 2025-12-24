@@ -721,7 +721,8 @@ function next() {
 											pageType: "orig",
 											cTermNme: res.res.composition.cvrg[0]?.["Term.cClauseCode"],
 											cTermNo: res.res.composition.cvrg[0]?.["Term.cClauseName"],
-											res: res
+											res: res,
+											// renewalComponent: renewalComponent.value,
                     }
                   }),
                 },
