@@ -2031,77 +2031,8 @@ async function loadAfter() {
         // getCAppNoFun();
       }
     // });
-    bthList.value.push(
-      createFreeButtonBase({
-        label: "保存模板",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        svgIcon: "template2",
-        iconSize: "20",
-        func: () => {
-          handleSaveTemplate()
-        },
-      }),
-      createFreeButtonBase({
-        label: "复制出单",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        svgIcon: "copy2",
-        iconSize: "25", // 设置图标大小为25px
-        func: () => {
-          copyPolicyFun();
-        },
-      }),
-      createFreeButtonBase({
-        label: "保费计算",
-        type: "primary",
-        id: "btn010101",
-        func: () => {
-          // calcPremium();
-          queryTermRateLimitFun(calcPremium)
-        },
-      }),
-      createFreeButtonBase({
-        label: "保存",
-        type: "primary",
-        id: "btn010102",
-        func: () => {
-          savePlyInfo();
-        },
-      }),
-      createFreeButtonBase({
-        label: "申请核保",
-        type: "primary",
-        id: "btn010103",
-        func: () => {
-          submitToUndrFn();
-        },
-      }),
-      createFreeButtonBase({
-        label: "发票信息",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          setTaxInfo();
-        },
-      }),
-      createFreeButtonBase({
-        label: "反洗钱扩展信息",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          setCusBenefitInfo();
-        },
-      }),
-      createFreeButtonBase({
-        label: "额度明细",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          openLimit();
-        },
-      })
-    );
+    bthList.value = basicBtn;
+    rightBtnList.value = basicRightBtn.filter(item => !item.hidden)
   } else if (props.param.pageType === "copy") {
     getAppPolicyForCopy({
       cAppNo: props.param.cAppNo,
