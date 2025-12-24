@@ -27,12 +27,15 @@ import edrItemEdit from "./edrItemEdit/edrItemEdit.vue";
 import buttonEdit from "./commonutils/buttonEdit.vue";
 import specialApproval from "./commonutils/specialApproval.vue";
 import addtremComView from "./prodconfig/addtremComView.vue";
+import addriskView from "./prodconfig/addriskView.vue";
 
 /**用于动态弹窗组件的映射生成 */
 const componentMap = {
     comDialog:ComDialog,
     componentView:componentView,
     componentCompare:componentCompare,
+    addriskView:addriskView,
+
     prodCopy:prodCopy,
     componentPageView:componentPageView,
     distFactorMap:DistFactorMap,

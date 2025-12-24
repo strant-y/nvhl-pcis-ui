@@ -157,6 +157,10 @@
 
 <script setup lang="ts">
 const props = defineProps({
+  modelValue: {
+    type: Object,
+    required: false,
+  },
   item: {
     type: Object as () => Record<string, any>,
     required: true,

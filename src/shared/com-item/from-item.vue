@@ -54,7 +54,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
   if(!initFlag.value && !!newModelValue) {
     init(true)
   }
-  props.item.func ? props.item.func(newModelValue, props.row, props.item) : null;
+  props.item.func && typeof props.item.func === "function" ? props.item.func(newModelValue, props.row, props.item) : null;
   compareValueChangeColor(newModelValue);
   emits("updateMethod",props.item);
 });

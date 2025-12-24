@@ -91,6 +91,7 @@ export interface GridFromUiConfig {
   labelWidth?: string | "auto"; //label长度
   labelPosition?: "left" | "right" | "top"; //label位置
   size?: "large" | "default" | "small"; //表单号
+  showTitleBar?: boolean;  // 是否显示标题栏
 }
 export function createGridFromUiConfig(
   config: GridFromUiConfig = {}
@@ -100,5 +101,6 @@ export function createGridFromUiConfig(
     labelWidth: config.labelWidth || "auto",
     labelPosition: config.labelPosition || "right",
     size: config.size || "default",
+    showTitleBar: config.showTitleBar ===null || config.showTitleBar === undefined ? true : config.showTitleBar,
   };
 }

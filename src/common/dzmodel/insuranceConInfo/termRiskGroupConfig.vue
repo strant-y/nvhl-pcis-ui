@@ -130,7 +130,6 @@ function groupSelect(row: any) {
 
 function savegroupinfo() {
   const freetrye = freeEditRef.value?.getFromValue();
-  console.log(freetrye);
   const cRiskType = freetrye['cRiskType'];
   let rowall ;
   if(cRiskType !== 'grid'){
@@ -145,6 +144,11 @@ function savegroupinfo() {
       if (200 === code) {
         ElMessage.success("保存成功");
         selectData();
+          if(cRiskType === 'grid'){
+            getDictFormData(true);
+          }else{
+            selectData();
+          }
       } else {
         ElMessage.error(msg);
       }

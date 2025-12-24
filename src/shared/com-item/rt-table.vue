@@ -141,7 +141,7 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
-            <div class="methodColumn">
+            <div class="methodColumn" :class="{'multiple-items': item.tableBtn && item.tableBtn.length > 1}">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
               <template v-if="item.tableBtnType === 'text'">
                 <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
@@ -263,7 +263,7 @@
                         :style="{ width:
                       (formItems[scope.row._dataId][i.prop].btnWidth
                         ? formItems[scope.row._dataId][i.prop].btnWidth
-                        : 25) + '%', height: '100%', }"
+                        : 25) + '%', }"
                         :item="formItems[scope.row._dataId][i.prop].btnItems"
                     />
                   </template>
@@ -317,7 +317,7 @@
         "
       >
         <template #default="scope">
-              <div class="methodColumn">
+              <div class="methodColumn" :class="{'multiple-items': item.tableBtn && item.tableBtn.length > 1}">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="btn.hidden !== true">
                 <template v-if="item.tableBtnType === 'text'">
@@ -480,12 +480,20 @@ watch([() => props.modelValue], ([newModelValue]) => {
   tableDatas.value = [];
   formItems.value = {};
   tableDatas.value = newModelValue ? newModelValue : [];
-  tableDatas.value?.forEach((data) => {
-    // 初始化行数字Id
-    data._dataId = getuuid();
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
-  });
+  if(tableDatas && tableDatas.value.length > 0){
+    tableDatas.value?.forEach((data) => {
+      // 初始化行数字Id
+      data._dataId = getuuid();
+      formItems.value[data._dataId] = creatItem(schamaconf.value);
+    });
+  }
 });
+
+watch([() => tableDatas.value],([newFormData])=>{
+  emits("update:modelValue", newFormData);
+},{
+  deep:true
+})
 watch(
   () => props.parentFromUi,
   (newFromUi) => {
@@ -1049,6 +1057,9 @@ function isrequired(i: any) {
 }
 .methodColumn {
   display: grid;
+  grid-template-columns: 1ft;
+}
+.methodColumn.multiple-items {  // 如果只有一列,居中显示
   grid-template-columns: repeat(2, 1fr);
 }
 :deep(.methodColumn .el-button+.el-button) {

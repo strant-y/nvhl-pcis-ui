@@ -368,25 +368,31 @@ function addTermData() {
           const se = iss.filter(
             (em) => em["Term.cClauseCode"] === item.cTermNo
           );
-          item.children?.forEach((e: any) => {
+          if(item.cRiskType === 'grid'){
             if (se.length > 0) {
-              const seri = se[0].riskList.filter(
-                (er: { [x: string]: any }) =>
-                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
-              );
-              if (seri.length > 0) {
-                riskList.push(seri[0]);
+              riskList = se[0].riskList;
+            }
+          }else{
+            item.children?.forEach((e: any) => {
+              if (se.length > 0) {
+                const seri = se[0].riskList.filter(
+                  (er: { [x: string]: any }) =>
+                    er["TermRisktgt.cLiabCode"] === e.cRiskNo
+                );
+                if (seri.length > 0) {
+                  riskList.push(seri[0]);
+                } else {
+                  riskList.push({
+                    "TermRisktgt.cLiabCode": e.cRiskNo,
+                  });
+                }
               } else {
                 riskList.push({
                   "TermRisktgt.cLiabCode": e.cRiskNo,
                 });
               }
-            } else {
-              riskList.push({
-                "TermRisktgt.cLiabCode": e.cRiskNo,
-              });
-            }
-          });
+            });
+          }
           let data: { [key: string]: any } = {};
           if (se.length > 0) {
             data = se[0];

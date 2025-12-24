@@ -43,7 +43,7 @@
                   </template>
                 </div>
               </el-col>
-              <el-col :span="6">
+              <el-col :span="5">
                 <template v-for="(item, k) in termFactormap" :key="k">
                   <el-row v-if="item.cPorpShowtitle === '1'" align="center" justify="start">
                     <el-form-item
@@ -61,7 +61,16 @@
                   </el-row>
                 </template>
               </el-col>
-              <el-col :span="2" justify="end">
+              <el-col :span="3" justify="end">
+                <rtButton
+                    v-if="!btnItem.addrisk.hidden"
+                    @click="
+                  () => {
+                    addriskView();
+                  }
+                "
+                    :item="btnItem.addrisk"
+                />
                 <rtButton
                     v-if="!btnItem.delete.hidden"
                     @click="
@@ -214,176 +223,182 @@
               />
             </template>
           </template>
-          <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-            <div style="margin-top: 10px; border: 1px var(--el-border-color-lighter) solid; padding: 3px;">
-              <el-row style="margin-bottom: 3px; background-color: var( --cvrg-sub-header-bg-color); padding: 2px">
-                <el-col :span="22">
-                  <a
-                    style="margin-right: 5px;font-size: 12px;"
-                    @click="ginfo.hidden = !ginfo.hidden"
-                  >
-                    <el-icon v-if="ginfo.hidden" size="11"><ArrowUpBold /></el-icon>
-                    <el-icon v-if="!ginfo.hidden" size="11"><ArrowDownBold /></el-icon>
-                  </a>
-                  <span style="font-size: 13px; font-weight: 450;">
-                    {{ ginfo.cGroupTitle }}
-                  </span>
-                </el-col>
-              </el-row>
-              <el-row v-if="!ginfo.hidden">
-                <div class="table_overflow_x">
-                  <table style="width: 100%">
-                    <thead>
-                      <tr class="table-title">
-                        <th
-                          v-for="col in getColinfo(ginfo.cGroupId)"
-                          :key="col.cColId"
-                          :width="col.cColWidth ? col.cColWidth : null"
-                          :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
-                        >
-                          {{ col.cColTitle }}
-                        </th>
-                        <th v-for="v in extermConf" :key="v.c_pk_id">
-                          {{ v.title }}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <template v-if="groupconf[ginfo.cGroupId]">
-                        <template
-                          v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
-                          :key="k"
-                        >
-                          <template v-if="riskdata.maxNum > 0">
-                            <tr
-                              v-for="n in riskdata.maxNum"
-                              :key="`${ginfo.cGroupId}-${k}-${n}`"
-                              :class="{'selected': isSelected(k)}"
-                              @click="selectRow(k)"
-                            >
-                              <template
-                                v-for="colinfo in riskdata.col"
-                                :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
+          <template v-if="riskShowTyp === 'grid'">
+            <app-grid-edit :gridEditConfig="tiskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+          </template>
+            <template v-if="riskShowTyp !== 'grid'"> 
+              <template v-for="(ginfo, gk) in groupInfo" :key="gk">
+              <div style="margin-top: 10px; border: 1px var(--el-border-color-lighter) solid; padding: 3px;">
+                <el-row style="margin-bottom: 3px; background-color: var( --cvrg-sub-header-bg-color); padding: 2px">
+                  <el-col :span="22">
+                    <a
+                      style="margin-right: 5px;font-size: 12px;"
+                      @click="ginfo.hidden = !ginfo.hidden"
+                    >
+                      <el-icon v-if="ginfo.hidden" size="11"><ArrowUpBold /></el-icon>
+                      <el-icon v-if="!ginfo.hidden" size="11"><ArrowDownBold /></el-icon>
+                    </a>
+                    <span style="font-size: 13px; font-weight: 450;">
+                      {{ ginfo.cGroupTitle }}
+                    </span>
+                  </el-col>
+                </el-row>
+                <el-row v-if="!ginfo.hidden">
+                  <div class="table_overflow_x">
+                    <table style="width: 100%">
+                      <thead>
+                        <tr class="table-title">
+                          <th
+                            v-for="col in getColinfo(ginfo.cGroupId)"
+                            :key="col.cColId"
+                            :width="col.cColWidth ? col.cColWidth : null"
+                            :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
+                          >
+                            {{ col.cColTitle }}
+                          </th>
+                          <th v-for="v in extermConf" :key="v.c_pk_id">
+                            {{ v.title }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template v-if="groupconf[ginfo.cGroupId]">
+                          <template
+                            v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
+                            :key="k"
+                          >
+                            <template v-if="riskdata.maxNum > 0">
+                              <tr
+                                v-for="n in riskdata.maxNum"
+                                :key="`${ginfo.cGroupId}-${k}-${n}`"
+                                :class="{'selected': isSelected(k)}"
+                                @click="selectRow(k)"
                               >
                                 <template
-                                  v-if="
-                                    riskdata.rowConfig[colinfo.cColId] &&
-                                    riskdata.rowConfig[colinfo.cColId][n - 1]
-                                  "
+                                  v-for="colinfo in riskdata.col"
+                                  :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                                 >
-                                  <td
-                                    :rowspan="
+                                  <template
+                                    v-if="
+                                      riskdata.rowConfig[colinfo.cColId] &&
                                       riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        ?.cPorpType === 'rowspan'
-                                        ? riskdata.maxNum
-                                        : null
                                     "
-                                    :class="{
-                                        'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
-                                     }"
-                                     style="white-space: nowrap;"
                                   >
-                                    <template
-                                      v-if="
+                                    <td
+                                      :rowspan="
                                         riskdata.rowConfig[colinfo.cColId][n - 1]
-                                          .cPorpType === 'text'
+                                          ?.cPorpType === 'rowspan'
+                                          ? riskdata.maxNum
+                                          : null
                                       "
+                                      :class="{
+                                          'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
+                                      }"
+                                      style="white-space: nowrap;"
                                     >
-                                      <el-text
+                                      <template
                                         v-if="
-                                          isrequired(
-                                            riskdata.rowConfig[colinfo.cColId][
-                                              n - 1
-                                            ].factorItem
-                                          )
-                                        "
-                                        class="mx-1"
-                                        style="margin-right: 2px"
-                                        type="danger"
-                                        >*</el-text
-                                      >
-                                      <span
-                                        >{{
                                           riskdata.rowConfig[colinfo.cColId][n - 1]
-                                            .factorItem.title
-                                        }}
-                                      </span>
-                                    </template>
-                                    <template v-else>
-                                      <el-form-item
-                                        :error="
-                                          showError(
-                                            riskdata.rowConfig[colinfo.cColId][
-                                              n - 1
-                                            ],
-                                            riskList[
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].cRiskNo
-                                            ][
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].factorItem?.prop
-                                            ]
-                                          )
+                                            .cPorpType === 'text'
                                         "
-                                        :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                      >
+                                        <el-text
+                                          v-if="
+                                            isrequired(
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].factorItem
+                                            )
+                                          "
+                                          class="mx-1"
+                                          style="margin-right: 2px"
+                                          type="danger"
+                                          >*</el-text
+                                        >
+                                        <span
+                                          >{{
+                                            riskdata.rowConfig[colinfo.cColId][n - 1]
+                                              .factorItem.title
+                                          }}
+                                        </span>
+                                      </template>
+                                      <template v-else>
+                                        <el-form-item
+                                          :error="
+                                            showError(
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ],
+                                              riskList[
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].cRiskNo
+                                              ][
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].factorItem?.prop
+                                              ]
+                                            )
+                                          "
+                                          :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                        >
+                                          <from-item
+                                            v-model="
+                                              riskList[
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].cRiskNo
+                                              ][
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].factorItem?.prop
+                                              ]
+                                            "
+                                            @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
+                                            :item="
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].factorItem
+                                            "
+                                          />
+                                        </el-form-item>
+                                      </template>
+                                    </td>
+                                  </template>
+                                </template>
+                                <template v-if="n === 1 && ri === 0">
+                                  <template v-for="v in extermConf" :key="v.c_pk_id">
+                                    <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
+                                      <el-form-item
+                                        :rules="
+                                          isrequired(v) ? getRequired() : undefined
+                                        "
+                                        :prop="v.prop"
                                       >
                                         <from-item
-                                          v-model="
-                                            riskList[
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].cRiskNo
-                                            ][
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].factorItem?.prop
-                                            ]
-                                          "
-                                          @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
-                                          :item="
-                                            riskdata.rowConfig[colinfo.cColId][
-                                              n - 1
-                                            ].factorItem
-                                          "
+                                          v-model="termdata[v.prop]"
+                                          @update:modelValue="termUpdate()"
+                                          :item="v"
                                         />
                                       </el-form-item>
-                                    </template>
-                                  </td>
+                                    </td>
+                                  </template>
                                 </template>
-                              </template>
-                              <template v-if="n === 1 && ri === 0">
-                                <template v-for="v in extermConf" :key="v.c_pk_id">
-                                  <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
-                                    <el-form-item
-                                      :rules="
-                                        isrequired(v) ? getRequired() : undefined
-                                      "
-                                      :prop="v.prop"
-                                    >
-                                      <from-item
-                                        v-model="termdata[v.prop]"
-                                        @update:modelValue="termUpdate()"
-                                        :item="v"
-                                      />
-                                    </el-form-item>
-                                  </td>
-                                </template>
-                              </template>
-                            </tr>
+                              </tr>
+                            </template>
                           </template>
                         </template>
-                      </template>
-                    </tbody>
-                  </table>
-                </div>
-              </el-row>
-            </div>
+                      </tbody>
+                    </table>
+                  </div>
+                </el-row>
+              </div>
+            </template>
           </template>
         </div>
       </el-card>
     </el-form>
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
@@ -405,6 +420,9 @@ import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/def
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import Decimal from "decimal.js";
 import {checkIfTruncated} from "@/utils/common";
+import { AppGridEditMethod, createAppGridEditConfig } from "@/shared/app-grid-edit-config";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 
 const route = useRoute();
 const templateRef = ref();
@@ -453,15 +471,27 @@ const effectiveShowConf = computed(() => {
 const emit = defineEmits(["update:modelValue", "delete"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
+const dialog = ref<DialogMethod | null>(null);
 
 const termdata = ref<{ [key: string]: any }>({});
 const riskList = ref<{ [key: string]: any }>({});
+const riskShowTyp = ref<string>('table');
+const tiskGridConfig = ref(createAppGridEditConfig({
+  editFlag: true,
+}));
+const riskTableRef = ref<AppGridEditMethod | null>(null);
+const risksList = ref([]);
 
 const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
-    size: "small"
+    size: "small",
+  },
+  addrisk: {
+    label: "增加责任",
+    size: "small",
+    type: "warning"
   },
 });
 
@@ -583,7 +613,33 @@ function getDatas(){
     ril.push(riskList.value[k]);
   });
   newData.riskList = ril;
+  if(riskShowTyp.value === 'grid'){
+    const r = riskTableRef.value?.getTableValue();
+    newData.riskList = r;
+  }
   return newData;
+}
+function addriskView(){
+  const param = opertaor.getParam();
+  dialog.value?.open(
+    "addriskView",
+    {
+      type: "show",
+      data: {
+        cTermNo: props.modelValue["Term.cClauseCode"],
+      },
+    },
+    {
+      isOk: (selectdata: any) => {
+        riskTableRef.value?.addRowByData(
+          {
+            "TermRisktgt.cLiabCode":selectdata
+          }
+        );
+      },
+    },
+    { title: "增加责任", width: 50 }
+  );
 }
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
@@ -614,8 +670,11 @@ function initData(data: any) {
       const interval = setInterval(() => {
         if(termRef.value) {
           termRef.value?.setFormValue(termdata.value, true);
-          clearInterval(interval)
+        };
+        if(riskShowTyp.value === 'grid'){
+          riskTableRef.value?.setFormValue(newData.riskList);
         }
+        clearInterval(interval);
       }, 1000)
     }
     // 041010 非营运客运承运人责任险 标的信息 投保座位总数的值取所有险别信息中的投保座位数（座）的和
@@ -844,20 +903,20 @@ function previewTerm() {
 }
 onMounted(async () => {
   initData(props.modelValue);
-  dataInit();
+  dataInit(true);
 });
 
-watch(() => props.modelValue, (newv,oldv)=>{
-  initData(newv);
-  dataInit();
-});
+// watch(() => props.modelValue, (newv,oldv)=>{
+//   initData(newv);
+//   dataInit();
+// });
 
 function dataFlash(){
   initData(props.modelValue);
   dataInit();
 }
 
-function dataInit() {
+function dataInit(initFlag : boolean = false) {
   let queryList: { [k: string]: any }[] = [];
   let queryKey = props.modelValue["Term.cClauseCode"];
   props.modelValue.riskList.forEach((item: any) => {
@@ -884,82 +943,16 @@ function dataInit() {
   const r = terconfig.getConfig(queryKey);
   if (r) {
     const d = JSON.parse(r);
-    collist.value = getUseData(d.collist);
-    factormap.value = d.factormap;
-    colInfo.value = d.colInfo;
-    groupInfo.value = d.groupInfo;
-    term.value = d.term;
-    termFactormap.value = getUseData(d.termFactormap);
-    const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
-    if (cAddrSeq) {
-        cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
-    }
-
-    methodLink(termFactormap.value);
-    riskMethodLink(factormap.value);
-    initshowConfig();
-    const fromc = termFactormap.value?.filter(
-      (v: any) => v.cPorpShowtitle !== "1"
-    );
-    formconfig1.fromSchema = fromc;
-    if (d.termTitleConf?.CCnm) {
-      termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
-    }
-    // 方案配置时条款信息中的保险费是可以编辑的
-    if(route.name === "plan-info") {
-      termFactormap.value.forEach((item:any) => {
-        if(item.prop === "Term.nInsuranceFee") {
-          item.disabled = false
-        }
-      })
-    }
-    methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
-    if (props.disabledFlag) {
-      setDisabledAll();
-    }
-    initMethod();
+    setTermConf(d,initFlag);
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         terconfig.addConfig(queryKey, JSON.stringify(data.data));
-        collist.value = getUseData(data.data.collist);
-        factormap.value = data.data.factormap;
-        colInfo.value = data.data.colInfo;
-        groupInfo.value = data.data.groupInfo;
-        term.value = data.data.term;
-        termFactormap.value = getUseData(data.data.termFactormap);
-        // 给 Term.cDistCodeNo地址编码下拉框赋值
-        const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
-        if (cAddrSeq) {
-            cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
-        }
-        methodLink(termFactormap.value);
-        riskMethodLink(factormap.value);
-        initshowConfig();
-        const fromc = termFactormap.value?.filter(
-          (v: any) => v.cPorpShowtitle !== "1"
-        );
-        formconfig1.fromSchema = fromc;
-        if (data.data.termTitleConf?.CCnm) {
-          termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
-        }
+        setTermConf(data.data,initFlag);
       } else {
         ElMessage.error(msg);
       }
-      // 方案配置时条款信息中的保险费是可以编辑的
-      if(route.name === "plan-info") {
-        termFactormap.value.forEach((item:any) => {
-          if(item.prop === "Term.nInsuranceFee") {
-            item.disabled = false
-          }
-        })
-      }
-      methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
-      if (props.disabledFlag) {
-        setDisabledAll();
-      }
-      initMethod();
     });
   }
   // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
@@ -968,6 +961,87 @@ function dataInit() {
     tgt?.setFormItem("Tgt.cPracticingLicense", {
       rules: []
     });
+  }
+}
+
+// 是否需要数据初始化渲染
+function setTermConf(d: any,initFlag: boolean){
+  collist.value = getUseData(d.collist);
+  factormap.value = d.factormap;
+  colInfo.value = d.colInfo;
+  groupInfo.value = d.groupInfo;
+  term.value = d.term;
+  termFactormap.value = getUseData(d.termFactormap);
+
+  if (d.riskConf?.CCnm) { // 获取条择标，显示样式
+    riskShowTyp.value = d.riskConf.CCnm;
+  }
+  if(riskShowTyp.value === 'grid'){
+    const riskFactormap = getUseData(d.riskFactormap);
+    if(riskFactormap && riskFactormap.length > 0){
+      riskFactormap.forEach((riskfactor: any)=>{
+        if(riskfactor.expand){
+          tiskGridConfig.value.showExpand = true;
+        }
+      })
+    }
+    tiskGridConfig.value.tableBtn = [
+      createFreeButtonBase({
+        type: "danger",
+        link: true,
+        icon: "DeleteFilled",
+        tableClick: (r) => {
+          riskTableRef.value?.delRow(r._dataId);
+        },
+      }),
+    ]
+    tiskGridConfig.value.fromSchema = riskFactormap;
+  }
+  const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+  if (cAddrSeq) {
+      cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+  }
+  methodLink(termFactormap.value);
+  riskMethodLink(factormap.value);
+  initshowConfig();
+  const fromc = termFactormap.value?.filter(
+    (v: any) => v.cPorpShowtitle !== "1"
+  );
+  formconfig1.fromSchema = fromc;
+  if (d.termTitleConf?.CCnm) {
+    termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
+  }
+
+  // 方案配置时条款信息中的保险费是可以编辑的
+  if(route.name === "plan-info") {
+    termFactormap.value.forEach((item:any) => {
+      if(item.prop === "Term.nInsuranceFee") {
+        item.disabled = false
+      }
+    })
+  }
+  methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
+  if (props.disabledFlag) {
+    setDisabledAll();
+  }
+  // 方案配置时条款信息中的保险费是可以编辑的
+  if(route.name === "plan-info") {
+    termFactormap.value.forEach((item:any) => {
+      if(item.prop === "Term.nInsuranceFee") {
+        item.disabled = false
+      }
+    })
+  }
+  methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
+  if (props.disabledFlag) {
+    setDisabledAll();
+  }
+  initMethod();
+
+  if(initFlag){
+    nextTick(()=>{
+      initData(props.modelValue);
+    })
   }
 }
 

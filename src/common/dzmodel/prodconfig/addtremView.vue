@@ -258,6 +258,9 @@ onMounted(async () => {
       data1.value = data;
       expandedKeys.value = data.map(item => item.id);
       data1.value.forEach((item: any) => { 
+        if(item.cRiskType === 'grid'){ // 如果显示类型为risk表格时,不可编辑责任
+          item.children = [];
+        }
         if(tremMap.value[item.cUniqueTermNo]){
           const risks = tremMap.value[item.cUniqueTermNo];
           item.children?.forEach((i: any) => {
