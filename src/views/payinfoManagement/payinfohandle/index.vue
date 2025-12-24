@@ -503,16 +503,25 @@ const tableconfig = reactive<AppTableConfig>(
 							return ;
 						}
                             let CPaySequencesData = false;
+                            let CUniqueNoNotSame = false;
                             multipleSelection.value.forEach((item)=>{
                                 if(!item['cPaySequence']){
                                  
                                     CPaySequencesData = true;
                                    
                                 }
+                                // 批量作废支付号选中的单子的支付号必须相同
+                                if(item['cPaySequence'] !== multipleSelection.value[0]?.['cPaySequence']) {
+                                    CUniqueNoNotSame = true;
+                                }
                             })
                         if(CPaySequencesData){
                                ElMessage.warning('选中单据没有支付号！');
                                return false; 
+                        }
+                        if(CUniqueNoNotSame) {
+                            ElMessage.warning('选中单据的支付号不相同！');
+                            return false;
                         }
 
                         ElMessageBox.confirm("确认要作废支付号吗？", "提示", {
