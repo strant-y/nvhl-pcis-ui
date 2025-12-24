@@ -6314,8 +6314,13 @@ const afterCalcEdrPremium = () => {
   const ops: any = opertaor.getDataAll();
   const edrBaseData = getEdrbaseValue();
   nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
-
-  const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
+  
+  const nBefEdrPrm = edrBaseData['EdrBase.nBefEdrPrm']?.replaceAll(',','');
+  let lastPrm:any = 0;
+  if(new Decimal(nPrm.value).gt(new Decimal(nBefEdrPrm))) {
+    lastPrm = new Decimal(nPrm.value).sub(new Decimal(nBefEdrPrm))
+  }
+  const nPrmVar = lastPrm  || 0;
   if(opertaor.getTableRefByKey("ciMasterAgreement")) {
     opertaor
       .getTableRefByKey("ciMasterAgreement")
