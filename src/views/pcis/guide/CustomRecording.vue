@@ -1278,7 +1278,7 @@ function importTemplate() {
           cPlanNo: formconfig1.value.cTermNo,
           CProdNo: formconfig1.value.cProdNo,
           CGrpMrk: '0',
-          cDptCde: formconfig1.cDptCde,
+          cDptCde: formconfig1.value.cDptCde,
           file: base64String,
         }
         importTemplateLoading.value = true;
