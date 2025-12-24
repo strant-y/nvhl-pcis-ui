@@ -387,6 +387,10 @@ const refreshData = (reset = true) => {
         s.cLoadSub = "1";
   }
   const params = Object.assign(s, r);
+  // 协议状态选已核保 增加cLatestMrk入参
+  if(params.cAppStatus == 4) {
+    params.cLatestMrk = '1'
+  }
   cargoApi.queryEcargoList(params).then((res: any) => {
     if (res.code === 200) {
       const pageData = res.data;
