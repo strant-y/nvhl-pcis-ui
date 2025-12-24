@@ -250,7 +250,9 @@ onMounted(async () => {
   });
   selectType()
   nextTick(() => {
-    if(params.cProdNo != '020014') {
+    // 货物信息回填到标的信息的产品
+    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
+    if(ProdNo.includes(params.cProdNo)) {
       eventBus.on('goodsMxChange', handelGoodsMx);
     }
     if (!getValue('Tgt.cDispatchDetail')) {
