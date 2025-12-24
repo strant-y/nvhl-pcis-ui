@@ -614,7 +614,7 @@ function setFormValue(value: any) {
   // 公共处理单个 item 的函数
   const processItem = (item: any) => {
     const newItem = JSON.parse(JSON.stringify(item)); // 深拷贝
-    newItem.riskList = newItem['Term.riskList'];
+    newItem.riskList = newItem['Term.riskList'] || [];
     terms.push(newItem['Term.cClauseCode']);
     delete newItem['Term.riskList'];
 

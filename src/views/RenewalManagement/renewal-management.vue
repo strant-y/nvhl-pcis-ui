@@ -401,13 +401,13 @@ onMounted(async () => {
     ],
   });
 });
-const handleArray = (obj:any)=>{
+const handleArray = (obj:any,base)=>{
   // 创建一个新的对象，并移除"Base."前缀
   let newObj = {};
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       // 通过字符串操作去掉前缀
-      let newKey = key.replace('Base.', '');
+      let newKey = key.replace(base, '');
       newObj[newKey] = obj[key];
     }
   }
@@ -443,13 +443,17 @@ const getRenewal = (row:any)=>{
 										ElMessage.warning("该保单不允许续保，请重新选择！");
 										return
 									}
+									let cvrg = JSON.parse(JSON.stringify(res.res.composition.cvrg))
+									res.res.composition.cvrg = []
 									router.push({
 										path: "/pcisapp/myPage",
 										query: {
 											param: JSON.stringify({
-												...handleArray(res.res.composition.plyBase[0]), ...{
-													pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
-													cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
+												...handleArray(res.res.composition.plyBase[0],"Base."), ...{
+													pageType: "orig", 
+													cTermNme: cvrg[0]?.["Term.cClauseCode"],
+													cTermNo: cvrg[0]?.["Term.cClauseName"],
+													res: res
 												}
 											}),
 										},
@@ -488,10 +492,17 @@ const getRenewal = (row:any)=>{
 									const renewalComponent = res1.body.component;
 									getECargoPolicyForRenewal({ cEcAgrNo: row.cEcAgrNo, components: [renewalComponent] }).then((res3: any) => {
 										if (res3.code == "200") {
+											// 存一份申请单号，把res的单号清空
+											let AgreementBase = JSON.parse(JSON.stringify(res3.res.composition.AgreementBase[0]))
+											clearCEcAgrAppNoValues(res3.res.composition)
 											router.push({
 												path: "/protocolManagement/enteringDtl",
 												query: {
-													param: JSON.stringify({res:res3,dptCde,cDptCde}),
+													param: JSON.stringify({
+														...handleArray(AgreementBase,"ECargoBase."),
+														res: res3, dptCde, cDptCde,
+														renewalComponent: renewalComponent.value
+													}),
 													type: 'orig',
 													payWay: paymentMethod
 												},
@@ -679,6 +690,29 @@ const copyText = (text: any) => {
     }
   }
 };
+
+/**
+ * 清空所有对象中字段名包含 '.cEcAgrAppNo' 的值（设为空字符串）
+ */
+ function clearCEcAgrAppNoValues(data) {
+  if (Array.isArray(data)) {
+    data.forEach(item => {
+      if (item && typeof item === 'object') {
+        clearCEcAgrAppNoValues(item); // 递归处理数组中的对象
+      }
+    });
+  } else if (data && typeof data === 'object') {
+    for (const key in data) {
+      if (key.endsWith('.cEcAgrAppNo')) {
+        // 清空该字段的值（可选：设为 ""、null、undefined）
+        data[key] = ""; // 或 null，根据业务需求
+      } else if (typeof data[key] === 'object') {
+        // 继续递归嵌套对象（虽然你数据是扁平的，但更健壮）
+        clearCEcAgrAppNoValues(data[key]);
+      }
+    }
+  }
+}
 </script>
 
 <style scoped>
