@@ -557,6 +557,16 @@ onMounted(() => {
         }
       }
     }
+    // 020018 运输范围省内运输时省份必填
+    if(item.prop === 'Dist.cTransportScope' && params?.cProdNo === '020018') {
+      item.func = (val:any) => {
+        if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
+          setFormItem("Dist.cMunicipalityDirectly", { rules: [getRules("required", {})] })
+        } else {
+          setFormItem("Dist.cMunicipalityDirectly", { rules: [] })
+        }
+      }
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
