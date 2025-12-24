@@ -6351,6 +6351,11 @@ const afterCalcEdrPremium = () => {
       currentPayList.length+1
     );
     payinfoRef.setFormValue(payInfo);
+    if(opertaor.getTableRefByKey("ci")) {
+      opertaor
+        .getTableRefByKey("ci")
+        .updateMasterAgreementValues();
+    }
   }
 }
 
