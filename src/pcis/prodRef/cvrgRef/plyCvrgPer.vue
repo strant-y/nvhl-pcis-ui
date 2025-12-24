@@ -232,6 +232,10 @@ onMounted(async () => {
 						if (parparam.cRecordType == '9' && e.cRiskNo != parparam.cRiskNo) {
 							return false
 						}
+						// 010022险别初始化不选择010223_工作人员及第三者责任保险
+						if (parparam.cProdNo == "010022" && e.cRiskNo == "010223") {
+							return false
+						}
             riskList.push({
               "TermRisktgt.cLiabCode": e.cRiskNo,
               "TermRisktgt.cDeductibleMethod": "01",
