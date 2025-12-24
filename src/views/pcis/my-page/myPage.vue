@@ -3281,7 +3281,7 @@ const setInsuranceTerm = (ops, productCode) => {
     // 使用默认1年（保持原有逻辑）
     endTm = currentTime.add(1, 'year').format("YYYY-MM-DD 23:59:59");
   }
-  const appTm = currentTime.format("YYYY-MM-DD HH:mm:ss");
+  const appTm = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
   ops.insrnc["Base.tDepartureDate"] = beginTm;
   ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
