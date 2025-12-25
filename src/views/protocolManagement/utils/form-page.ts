@@ -129,7 +129,7 @@ export class FormPage {
     setFormReadOnlyById(id: string, isDisabled: boolean) {
         nextTick(() => {
             const comp = this.componentRefMap.get(id);
-            if (comp) {
+            if (comp && comp.setDisabledAll) {
                 comp.setDisabledAll(isDisabled);
             }
         });
