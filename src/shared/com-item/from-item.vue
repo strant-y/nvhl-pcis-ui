@@ -1,14 +1,36 @@
 <template>
-  <component
-    ref="itemRef"
-    :is="getcomRef(item.inputtype)"
-    v-model="value"
-    :item="item"
-    :showLabel="showLabel"
-    :parentFromUi="parentFromUi"
-    @value-change="handleChange"
-    :row="row"
-  />
+  <div :class="{'show-right-btn': isBtnTrue()}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }" >
+      <div :style="{
+        width:
+          // 显示组件尾部按钮
+          isBtnTrue() ? ((item.btnWidth ? (100 - item.btnWidth) : 75) + '%') : '100%',
+          display: 'flex',
+          alignItems: 'flex-start',
+      }">
+      <div class="width-100">
+        <component
+          ref="itemRef"
+          :is="getcomRef(item.inputtype)"
+          v-model="value"
+          :item="item"
+          :showLabel="showLabel"
+          :parentFromUi="parentFromUi"
+          @value-change="handleChange"
+          :row="row"
+        />
+      </div>
+      </div>
+      <!---       将尾部按钮,整合至form公共表单中,显示组件尾部按钮       --->
+      <template v-if="isBtnTrue()">
+        <div :style="{width: (item.btnWidth ? item.btnWidth : 25) + '%' }">
+          <rt-button :style = "{width: '100%'}"
+            :item="item.btnItems"
+            :parentItem="item"
+            :row="row"
+        />
+        </div>
+      </template>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -139,6 +161,13 @@ function setChangeInfo(classs: string[], text: any) {
       text: text,
     });
   }
+}
+
+function isBtnTrue(item : any){
+  if(props.item.showExBtn && (props.item.showExBtn === true || props.item.showExBtn === '0') && !props.showLabel){
+    return true;
+  }
+  return false;
 }
 
 defineExpose({

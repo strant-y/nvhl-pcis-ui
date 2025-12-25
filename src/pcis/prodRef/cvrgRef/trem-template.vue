@@ -120,9 +120,9 @@
                                   :prop="item.prop"
                               >
                                 <from-item
-                                    v-model="termdata[item.prop]"
-                                    @update:modelValue="termUpdate()"
-                                    :item="item"
+                                  v-model="termdata[item.prop]"
+                                  @update:modelValue="termUpdate()"
+                                  :item="item"
                                 />
                               </el-form-item>
                             </td>
@@ -177,11 +177,11 @@
                             :rules="isrequired(item) ? getRequired() : undefined"
                             :prop="item.prop"
                           >
-                            <from-item
-                              v-model="termdata[item.prop]"
-                              @update:modelValue="termUpdate()"
-                              :item="item"
-                            />
+                          <from-item
+                            v-model="termdata[item.prop]"
+                            @update:modelValue="termUpdate()"
+                            :item="item"
+                          />
                           </el-form-item>
                         </td>
                       </template>
@@ -985,6 +985,7 @@ function setTermConf(d: any,initFlag: boolean){
         }
       })
     }
+    methodLink(riskFactormap);
     tiskGridConfig.value.tableBtn = [
       createFreeButtonBase({
         type: "danger",
@@ -1007,6 +1008,7 @@ function setTermConf(d: any,initFlag: boolean){
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle !== "1"
   );
+  console.log(fromc);
   formconfig1.fromSchema = fromc;
   if (d.termTitleConf?.CCnm) {
     termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
@@ -1423,6 +1425,9 @@ function methodLink(items: any) {
       if (items[i]["func"] && typeof items[i]["func"] === "string") {
         items[i]["func"] = methodMap[items[i]["func"]];
       }
+      if(items[i]['btnItems'] && items[i]['btnItems']["func"] && typeof items[i]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
+        items[i]['btnItems']["func"] = methodMap[items[i]['btnItems']["func"]];
+      }
     }
   }
 }
@@ -1434,6 +1439,9 @@ function riskMethodLink(items: any) {
     Object.keys(items).forEach((k: any) => {
       if (items[k]["func"] && typeof items[k]["func"] === "string") {
         items[k]["func"] = methodMap[items[k]["func"]];
+      }
+      if(items[k]['btnItems'] && items[k]['btnItems']["func"] && typeof items[k]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
+        items[k]['btnItems']["func"] = methodMap[items[k]['btnItems']["func"]];
       }
     });
   }
@@ -1460,6 +1468,11 @@ function setData(params: any,data:any){
 }
 
 const methodMap = {
+  butTestCheck:(item: any,row: any) => {
+    console.log(item);
+    console.log(row);
+    riskTableRef.value?.setValueByRowKey(item.prop,row._dataId,"111111");
+  },
   excludeLimitChang:(val:any,row:any,item:any) => {
     if (pageparam.cProdNo === "040015") {
       termdata.value['Term.nInsuranceAmount'] = val;

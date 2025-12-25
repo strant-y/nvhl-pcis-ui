@@ -66,52 +66,13 @@
                       "
                       :label-width="calculatedLabelWidth()"
                   >
-                    <div style="display: flex; width: 100%;" :class="{'show-right-btn': formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId}">
-                      <div
-                          :style="{
-                            width:
-                              // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
-                              formItems[props.row._dataId][i.prop].showExBtn &&
-                              formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
-                              editIndex === props.row._dataId
-                                ? (formItems[props.row._dataId][i.prop].btnWidth
-                                    ? 100 -
-                                      formItems[props.row._dataId][i.prop].btnWidth
-                                    : 75) + '%'
-                                : '100%',
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                          }"
-                      >
-                        <from-item
+                    <from-item
                             v-model="props.row[i.prop]"
                             :item="formItems[props.row._dataId][i.prop]"
                             :showLabel=" item.editFlag ? (editIndex !== props.row._dataId ? true : false) : 
                             editIndex !== props.row._dataId ? true : (item.editList && item.editList.length > 0 ? !item.editList?.includes(i.prop) : true) && (editIndex === props.row._dataId) "
                             :row="props.row"
                         />
-                      </div>
-                      
-                      <!---       显示组件尾部按钮       --->
-                      <template
-                          v-if="formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId"
-                      >
-                        <rt-button
-                            v-if="
-                        formItems[props.row._dataId][i.prop].inputtype !==
-                        'rttable'
-                      "
-                            :style="{
-                        width:
-                          (formItems[props.row._dataId][i.prop].btnWidth
-                            ? formItems[props.row._dataId][i.prop].btnWidth
-                            : 25) + '%',
-                        height: '100%',
-                      }"
-                            :item="formItems[props.row._dataId][i.prop].btnItems"
-                        />
-                      </template>
-                    </div>
                   </el-form-item>
                 </el-col>
               </template>
@@ -233,40 +194,12 @@
                   :prop="[scope.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"
                 >
-                  <div :style="{
-                      width:
-                        // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
-                        formItems[scope.row._dataId][i.prop].showExBtn &&
-                        formItems[scope.row._dataId][i.prop].inputtype !== 'rttable' &&
-                        editIndex === scope.row._dataId
-                          ? (formItems[scope.row._dataId][i.prop].btnWidth
-                              ? 100 -
-                                formItems[scope.row._dataId][i.prop].btnWidth
-                              : 75) + '%'
-                          : '100%',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                    }" >
-                    <from-item
+                  <from-item
                       v-model="scope.row[i.prop]"
                       :item="formItems[scope.row._dataId][i.prop]"
                       :showLabel="formItems[scope.row._dataId][i.prop]?.disableColEdit || editIndex !== scope.row._dataId"
                       :row="scope.row"
                   />
-                </div>
-                  <!---       显示组件尾部按钮       --->
-                  <template
-                      v-if="formItems[scope.row._dataId][i.prop].showExBtn && editIndex === scope.row._dataId"
-                  >
-                    <rt-button
-                        v-if=" formItems[scope.row._dataId][i.prop].btnItems "
-                        :style="{ width:
-                      (formItems[scope.row._dataId][i.prop].btnWidth
-                        ? formItems[scope.row._dataId][i.prop].btnWidth
-                        : 25) + '%', }"
-                        :item="formItems[scope.row._dataId][i.prop].btnItems"
-                    />
-                  </template>
                 </el-form-item>
               </template>
               <template v-else-if="i.formatter">
