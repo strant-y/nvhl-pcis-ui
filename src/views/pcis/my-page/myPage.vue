@@ -6379,6 +6379,16 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
 
 function afterCalcSurrenEdr() {
   nPrm.value = edrbase.value?.getValue('EdrBase.nPrm') || 0;
+  if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+    opertaor
+      .getTableRefByKey("ciMasterAgreement")
+      .setValue("Base.nCiJntPrm", nPrm.value);
+  }
+  if(opertaor.getTableRefByKey("ci")) {
+    opertaor
+      .getTableRefByKey("ci")
+      .updateMasterAgreementValues();
+  }
 }
 
 opertaor.setFatherPage({
