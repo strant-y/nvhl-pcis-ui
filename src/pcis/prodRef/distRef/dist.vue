@@ -65,6 +65,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const emit = defineEmits(['savePlyInfo']);  
+const btnDisabled = ref(false);
 
 const props = defineProps({
   pageSchema: {
@@ -1079,7 +1080,7 @@ const method = {
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
             console.error("导入错误：", error);
-          });addCi
+          });
         };
 
         reader.onerror = (e) => {
@@ -1094,6 +1095,7 @@ const method = {
   // 增量导入
   importExcelIncrement: () => {
     let cappNo = '';
+    if(btnDisabled.value === true) return;
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
@@ -1107,7 +1109,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
-    tableconfig.value.formconfig.titleBtns[2].loading = true;
+    btnDisabled.value = true
 
     const input = document.createElement('input');
     input.type = 'file';
@@ -1141,39 +1143,36 @@ const method = {
             const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
             if(!savePlyInfo) return;
           }
-          policyService.importDistIncrement(params).then((res) => {
-            
+          policyService.importDistIncrement(params).then((res:any) => {
+            btnDisabled.value = false
             if (res.code === 200) {
               titleInfo.value = {
                 successes: res.data.successes,
                 fails: res.data.fails,
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
-              tableconfig.value.formconfig.titleBtns[2].loading = false;
               method.handleQuery();
               refreshCvrg()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
-              tableconfig.value.formconfig.titleBtns[2].loading = false;
             }
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
-            tableconfig.value.formconfig.titleBtns[2].loading = false;
             console.error("导入错误：", error);
-            
+            btnDisabled.value = false
           });
         };
 
         reader.onerror = (e) => {
           ElMessage.error("文件读取失败");
-          tableconfig.value.formconfig.titleBtns[2].loading = false;
+          btnDisabled.value = false
         };
 
         reader.readAsDataURL(file); // 启动读取
       }
     };
     input.oncancel = () => {
-      tableconfig.value.formconfig.titleBtns[2].loading = false;
+      btnDisabled.value = false
     };
     input.click(); // 触发文件选择对话框
   },
