@@ -1681,3 +1681,8 @@ export function getProductTemplate(queryParams: any): AxiosPromise<any> {
 export function getCumulativeRisk(queryParams: any): AxiosPromise<any> {
   return post(`/policy/getCumulativeRisk`, queryParams);
 }
+
+// 查询保单最新保险起止期
+export function queryLatestMrk(queryParams: any): AxiosPromise<any> {
+  return post(`/reinsured/queryLatestMrk`, queryParams);
+}
