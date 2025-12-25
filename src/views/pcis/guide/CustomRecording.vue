@@ -669,6 +669,24 @@ function next() {
           },
         });
       } else {
+				if (formconfig1.value.cRecordType == 9) { // 协议出单 校验协议号
+					try {
+						const ECargoPayStrdata: any = await policyService.queryECargoPayString({ cEcAgrNo: data.cEcAgrNo })
+						if (!!ECargoPayStrdata.code && ECargoPayStrdata.code != 200) {
+							ElMessage.error(ECargoPayStrdata.msg || '协议校验服务异常，请稍后再试');
+							return false;
+						}
+						if ((ECargoPayStrdata.rsltCode == "C" && ECargoPayStrdata.rsltStatus == "0") || ECargoPayStrdata.rsltCode == "F") {
+							ElMessage.warning(ECargoPayStrdata.rsltMsg)
+							return false
+						}
+					} catch (error) {
+						// 接口调用失败（网络错误、服务异常等）
+						console.error('queryECargoPayString 接口调用失败:', error);
+						ElMessage.error('协议校验服务异常，请稍后重试');
+						return false; // 阻断跳转
+					}
+				}
         router.push({
           path: "/pcisapp/myPage",
           query: {
