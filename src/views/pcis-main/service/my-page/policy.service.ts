@@ -1679,7 +1679,12 @@ selectTotalSalary(data) {
 // 工资总额-保存
 saveTotalSalary(data) {
     return request.post(`${this.saveTotalSalaryUrl}`, data);
-  }
+	}
+	
+// 协议出单下一步校验协议号
+queryECargoPayString(ops) {
+	return request.post(`/payment/queryECargoPayString`, ops)
+}
 // // 工资总额-
 // selectTotalSalary(data) {
 //     return request.post(`${this.selectTotalSalaryUrl}`, data);

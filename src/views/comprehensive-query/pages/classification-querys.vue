@@ -258,6 +258,7 @@ const allCAppStatus = [
   {label: "核保退回/撤回", value: "3"},
   {label: "已核待缴费", value: "4"},
   {label: "已出单", value: "5"},
+{ label: "已做失效操作", value: "6" },
   {label: "见费出单退回", value: "8"},
 ]
 
@@ -1884,11 +1885,9 @@ const tableObj = {
                     };
                     if (cleanRow) {
                         // 校验出单机构是否复合复制单的机构要求
-                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId, cProdNo: cleanRow.cProdNo }
                         if(cleanRow.cRenewMrk === "1") {
                             queryProdDptCdeParam['cPlyNo'] = cleanRow.cPlyNo
-                        } else {
-                            queryProdDptCdeParam['cProdNo'] = cleanRow.cProdNo
                         }
                         const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
                         if(queryProdDptCde.data !== true) {
