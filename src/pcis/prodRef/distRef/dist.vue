@@ -746,6 +746,15 @@ const method = {
 					if(!!item['Dist.tOpeningTime']){
 						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
 					}
+          // 免赔信息 保险责任级联
+          if(!!item['Dist.cInsuranceDuty'] && !!item['Dist.cSuitScope']) {
+            const key = props.pageSchema.fromSchema?.find((i:any) => i.prop.indexOf('Dist.cSuitScopeGroup') != -1)?.prop;
+            if(key) {
+              data[key] = data[key] || [];
+              data[key][0] = item['Dist.cInsuranceDuty']
+              data[key][1] = item['Dist.cSuitScope']
+            }
+          }
           
             console.log('pageresult.list',pageresult.list);
           return{
