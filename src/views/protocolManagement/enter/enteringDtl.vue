@@ -490,6 +490,7 @@ const submitEdrToUndrFun = async () => {
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
   }
+  await nextTick()
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if(f){
     const btn = getBtn("btnSubmitEdr");
@@ -1345,6 +1346,7 @@ async function  submit() {
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
   }
+  await nextTick()
   const isOk =  await save()
   if(!isOk) return
   const allFromData = formPage.value?.getAllFormData()
