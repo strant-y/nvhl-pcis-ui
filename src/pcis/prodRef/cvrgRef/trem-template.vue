@@ -63,7 +63,7 @@
               </el-col>
               <el-col :span="3" justify="end">
                 <rtButton
-                    v-if="!btnItem.addrisk.hidden"
+                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid'"
                     @click="
                   () => {
                     addriskView();
@@ -988,6 +988,7 @@ function setTermConf(d: any,initFlag: boolean){
     methodLink(riskFactormap);
     tiskGridConfig.value.tableBtn = [
       createFreeButtonBase({
+        id:"deleteRisk",
         type: "danger",
         link: true,
         icon: "DeleteFilled",
@@ -1008,7 +1009,6 @@ function setTermConf(d: any,initFlag: boolean){
   const fromc = termFactormap.value?.filter(
     (v: any) => v.cPorpShowtitle !== "1"
   );
-  console.log(fromc);
   formconfig1.fromSchema = fromc;
   if (d.termTitleConf?.CCnm) {
     termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
@@ -1321,6 +1321,19 @@ function setDisabledAll() {
   ) {
     if (formconfig1.fromSchema && formconfig1.fromSchema.length > 0) {
       formconfig1.fromSchema.forEach((item: any) => {
+        item.disabled = true;
+        if (undis && undis.length > 0) {
+          const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
+          if (t) {
+            item.disabled = false;
+          }
+        }
+      });
+    }
+  }
+  if(riskShowTyp.value === 'grid'){
+    if(tiskGridConfig.value.fromSchema && tiskGridConfig.value.fromSchema.length > 0 ){
+      tiskGridConfig.value.fromSchema.forEach((item: any) => {
         item.disabled = true;
         if (undis && undis.length > 0) {
           const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);

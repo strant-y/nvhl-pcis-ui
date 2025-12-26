@@ -145,7 +145,7 @@ function selectmainMethod(data: any, checked: boolean, indeterminate: boolean) {
     data1.value.forEach((sibling: any) => {
       if ( sibling.id !== selectNodeId.value ) {
         // 取消选中同级节点
-        mainRef.value?.setChecked(sibling.key, false, false);
+        mainRef.value?.setChecked(sibling.id, false, false);
       }
     });
   }

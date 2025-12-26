@@ -226,7 +226,18 @@ const tempBtn = [
     c_factor_prop: "delete_btn",
     c_factor_title: "删除条款",
   },
+  {
+    c_factor_inputtype: "btn",
+    c_factor_prop: "addrisk_btn",
+    c_factor_title: "增加责任",
+  },,
+  {
+    c_factor_inputtype: "btn",
+    c_factor_prop: "delrisk_btn",
+    c_factor_title: "删除责任",
+  },
 ];
+
 
 onMounted(async () => {
   queryEdrConfig();
