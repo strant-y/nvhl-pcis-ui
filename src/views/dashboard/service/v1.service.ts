@@ -35,6 +35,11 @@ export class PcisQueryService {
     getNotifyByReceiver(ops){
         return request.post(`${this.qryNotifyByReceiver}`,ops)
     }
+		
+		// 公告信息 顶部导航喇叭
+    getBulletinByUserAndDpt(ops){
+        return request.post(`bulletin/getBulletinByUserAndDpt`,ops)
+    }
     
     /**
      * 待核保查询-核保岗
