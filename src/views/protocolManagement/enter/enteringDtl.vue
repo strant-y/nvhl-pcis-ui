@@ -363,6 +363,50 @@ onBeforeMount(async () => {
 					eventBus.emit('insuredChange', cEcAgrAppNo.value);
 					eventBus.emit('transportChange', cEcAgrAppNo.value);
 				}
+				const pageInit = () => {
+					//协议费用
+					// const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
+					// AgreementFeeWarn.setItemShow()
+					if (props.type === 'EDR_APP_NEW_SCENE') {        
+						if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
+							const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
+								mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
+								mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
+								props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]);
+							mainRef.value?.getxyedritemValue();
+						}
+						if (props.param.cEdrType != "1") {
+							mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
+								props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+							]);
+						}
+						if (props.param?.cEdrType == "1") {
+							sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
+							const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
+							const cEdrRsnDetail = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'];
+							const newcEdrRsnDetail = cEdrRsnDetail ? cEdrRsnDetail.split(',') : [props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]];
+							if (props.param["cRsnCde"] != "FZ") {
+							//   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
+							//     props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+							//   ]);
+								mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", newcEdrRsnDetail);
+								mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrCtnt", newcEdrCtnt);
+							}
+						}
+						formPage.value?.setPageReadOnly(true, [], {
+							success: (pageData: any) => {
+								getEdrRsnItemFun(
+										"029900",
+										props.param["cDptCde"],
+										props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+										props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
+										props.param["cEdrType"],
+										"0"
+								)
+							}
+						});
+					}
+				}
 				let dataForm: any = { ...res.res.composition, AgreementBase: res.res.composition?.AgreementBase[0], AgreementApplicant: res.res.composition?.AgreementApplicant[0], AgreementFeeWarn: res.res.composition?.AgreementBase[0], AgreementAcctinfo: res.res.composition?.AgreementAcctinfo[0] }
 				if (res.res.composition.AgreementTgtSummary.length > 0) {
 					res.res.composition.AgreementTgtSummary.forEach(item => {
@@ -383,7 +427,12 @@ onBeforeMount(async () => {
 				dataForm['AgreementBase']['ECargoBase.cRiFacMrk'] = null
 				dataForm['AgreementBase']['ECargoBase.cRiFacOpn'] = null
 				dataForm['AgreementBase']['ECargoBase.cRiFacCde'] = null
-				formPage.value?.setAllFormData(dataForm);
+				formPage.value?.setAllFormData( dataForm, {
+					success: (pageData: any) => {
+						pageInit()
+					}
+				});
+				
 				// 暂存数据
 				console.log('缓存的数据',dataForm['AgreementSpecial'])
 				sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
