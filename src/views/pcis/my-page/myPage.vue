@@ -1732,7 +1732,9 @@ async function loadAfter() {
       }
     }
 		if (props.param.cPolicySource == '6') {
-			generateComparisonItems();
+			nextTick(() => {
+				generateComparisonItems();
+			})	
 		}
     bthList.value = uwBtn;
     rightBtnList.value = [
@@ -4972,21 +4974,23 @@ const generateEndorse = async () => {
 };
 
 // 询价转投保 比较项生成
-const generateComparisonItems = async () => {
-	const data = opertaor.getDataAll();
-	console.log("生成询价转投保核保比较项",data, props.param);
+const generateComparisonItems = () => {
+	setTimeout(() => { 
+		const data = opertaor.getDataAll();
+		console.log("生成询价转投保核保比较项",data, props.param);
 
-	data["user"] = user;
-	data["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
-	data["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-	enquiryToAppEndorseChange(data).then((res) => {
-		if (res["code"] == "200") {
-			cacheKey.value = res["data"]["data"]["cacheKey"];
-			edritem.value?.handleQuery();
-		} else {
-			ElMessage.error(res.msg);
-		}
-	});
+		data["user"] = user;
+		data["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+		data["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+		enquiryToAppEndorseChange(data).then((res) => {
+			if (res["code"] == "200") {
+				cacheKey.value = res["data"]["data"]["cacheKey"];
+				edritem.value?.handleQuery();
+			} else {
+				ElMessage.error(res.msg);
+			}
+		});
+	},500)
 };
 
 
