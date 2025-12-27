@@ -671,11 +671,11 @@ function initData(data: any) {
         if(termRef.value) {
           termRef.value?.setFormValue(termdata.value, true);
         };
-        if(riskShowTyp.value === 'grid'){
-          riskTableRef.value?.setFormValue(newData.riskList);
-        }
         clearInterval(interval);
       }, 1000)
+    }
+    if(riskShowTyp.value === 'grid'){
+      riskTableRef.value?.setFormValue(newData.riskList);
     }
     // 041010 非营运客运承运人责任险 标的信息 投保座位总数的值取所有险别信息中的投保座位数（座）的和
     if(pageparam.cProdNo === "041010") {
