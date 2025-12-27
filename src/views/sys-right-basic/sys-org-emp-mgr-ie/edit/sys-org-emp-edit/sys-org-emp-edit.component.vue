@@ -151,10 +151,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: isDisabled,
       },
       {
-        prop: 'cTitleCde',
+        prop: 'cEduCde',
         title: '学历',
         inputtype: "rtselect",
-        typeCode: "EDUCATION_LIST_CACHE",
+        typeCode: "Eduback",
         disabled: isDisabled,
       },
       {
