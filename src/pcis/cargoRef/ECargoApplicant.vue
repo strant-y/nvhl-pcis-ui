@@ -369,7 +369,7 @@ const method = {
       setFormItem("ECargoApplicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
-      if (initFlag.value) {
+      if (!initFlag.value) {
         setFormItem("ECargoApplicant.cWorkDpt", {
           disabled: false,
         });
@@ -526,11 +526,13 @@ const method = {
       });
       setFormItem("ECargoApplicant.cRegisterSuffixAddr", {
         rules: null,
-      });
-      //是否个体工商户
-      setFormItem("ECargoApplicant.cIsIndvduBiz", {
-        disabled: false,
-      });
+			});
+			if (!initFlag.value) {
+      	//是否个体工商户
+				setFormItem("ECargoApplicant.cIsIndvduBiz", {
+					disabled: false,
+				});
+    	}
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
         rules: null,
