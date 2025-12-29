@@ -38,4 +38,12 @@ export class InsuranceLimit {
   getDetail(ops) {
     return request.post('/custShare/getOneCustShar', ops);
   }
+  /**
+    * @Title: 获取新增按钮显示权限
+    * @Description:
+    * @params:
+    */
+  jurisdictionInsert(ops) {
+    return request.post('/custShare/jurisdictionInsert', ops);
+  }
 }

@@ -2055,7 +2055,18 @@ const method = {
 			setFormItem('Tgt.cResistanceRating', {rules: [] });
 			setFormItem('Tgt.cMainClassification', {rules: [] });
 		}
-	}
+	},
+  // 担保金额
+  nGuaranteeAmountChange: (val:any) => {
+    const cProdNos = ['059011','059015','059016','059012','059014','059019',,'059021','059023','059901','059903','059904','059911','059914','059930','059018','059020','059013','059910','059017'];
+    if(cProdNos.includes(params.cProdNo)) {
+      const nAmt = opertaor.getTableRefByKey('base')?.getValue('Base.nAmt') || 0;
+      if(val !== 0 && val !== nAmt) {
+        ElMessage.warning('担保金额只能为0或等于保险金额');
+        setValue('Tgt.nGuaranteeAmount', 0);
+      }
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

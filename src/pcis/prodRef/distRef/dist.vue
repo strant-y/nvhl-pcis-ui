@@ -268,8 +268,8 @@ watch(
           //  emit('savePlyInfo');
         }
         // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
-        const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
-        if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
+        const targetProducts = ['010001', '010002', '010003', '010004', '010020', '070002'];
+        if( route.params.param?.cProdNo?.startsWith('01') || targetProducts.includes(route.params.param?.cProdNo)){
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           cvrgRef?.getAddrSeqOptions()
         }
