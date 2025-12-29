@@ -118,7 +118,7 @@ onMounted(() => {
       cProdNo === "043005" ||
       cProdNo === "043011"
     ) {
-      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+      setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
     }
     if (cProdNo === '130003') {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -596,7 +596,7 @@ const method = {
       }
     }
     if (val === "0") {
-      // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 投保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏,国籍必填可修改
       setFormItem("Applicant.tBirthday", {
         hidden: true,
       });
@@ -607,7 +607,7 @@ const method = {
         hidden: true,
       });
       setFormItem("Applicant.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("Applicant.cOccupTyp", {
         hidden: true,
@@ -752,6 +752,7 @@ const method = {
       // 为法人 国民经济行业必填
       setFormItem("Applicant.cTrdCde", {
         rules: [getRules("required", {})],
+        btnItems: { disabled: false }
       });
       setFormItem("Applicant.cIsMicroEntpris", {
         rules: [getRules("required", {})],
@@ -760,6 +761,9 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [getRules("required", {})],
+      });
+      setFormItem("Applicant.cLegalRepresentative", {
         rules: [getRules("required", {})],
       });
 
@@ -791,7 +795,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Applicant.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("Applicant.cOccupTyp", {
         hidden: false,
@@ -887,11 +891,12 @@ const method = {
         cProdNo === "043005" ||
         cProdNo === "043011"
       ) {
-        setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
+        setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
 
       } else {
         setFormItem("Applicant.cTrdCde", {
           rules: [],
+          btnItems: { disabled: true }
         });
       }
       //实名认证方式
@@ -937,6 +942,9 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
+        rules: [],
+      });
+      setFormItem("Applicant.cLegalRepresentative", {
         rules: [],
       });
 

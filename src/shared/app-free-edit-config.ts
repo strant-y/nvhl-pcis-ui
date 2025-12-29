@@ -38,6 +38,7 @@ export interface AppFreeEditMethod {
   addCodeListMap: (data: any) => void;
   addProvide: <T> (key: InjectionKey<T> | string, value: T) => void;
   validateField: (fields: string | string[]) => Promise<boolean>;
+  getFromSchemaItem: (id: string) => any;
 }
 export function createAppFreeEditConfig(
   config: AppFreeEditConfig = {}

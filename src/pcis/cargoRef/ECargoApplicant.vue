@@ -326,7 +326,7 @@ const method = {
 	//投保人性质(0是法人 1是个人)
   InsureChange: async (val:any) => {
     if (val == "0") {
-      // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 投保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏,国籍必填可修改
       setFormItem("ECargoApplicant.tBirthday", {
         hidden: true,
         rules: null
@@ -340,7 +340,7 @@ const method = {
         rules: null
       });
       setFormItem("ECargoApplicant.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("ECargoApplicant.cOccupTyp", {
         hidden: true,
@@ -483,7 +483,7 @@ const method = {
         hidden: false,
       });
       setFormItem("ECargoApplicant.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("ECargoApplicant.cOccupTyp", {
         hidden: false,

@@ -56,6 +56,9 @@
                       {{item.title}}
                     </el-text>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                    <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                      <rt-icon :item="{ icon:'QuestionFilled' }" />
+                    </el-tooltip>
                   </template>
                   <div class="width-100">
                     <el-row class="show-group__row" v-if="item.groupList.length > 0" style="padding-top: 5px;">
@@ -104,6 +107,9 @@
                       {{item.title}}
                     </el-text>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                    <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                      <rt-icon :item="{ icon:'QuestionFilled' }" />
+                    </el-tooltip>
                   </template>
                   <div :class="{'show-right-btn': item.showExBtn}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                     <div
@@ -204,6 +210,9 @@
                           {{item.title}}
                         </el-text>
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                        <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                          <rt-icon :item="{ icon:'QuestionFilled' }" />
+                        </el-tooltip>
                       </template>
                       <div class="width-100">
                         <el-row class="show-group__row" v-if="item.groupList.length > 0">
@@ -249,6 +258,9 @@
                           {{item.title}}
                         </el-text>
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                        <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                          <rt-icon :item="{ icon:'QuestionFilled' }" />
+                        </el-tooltip>
                       </template>
                       <div :class="{'show-right-btn': item.showExBtn}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
                         <div
