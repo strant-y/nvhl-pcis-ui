@@ -734,6 +734,11 @@ function getRowConfig(groupId: string, riskNo: string) {
         } else {
           cf = colconfig;
         }
+      } else if (pageparam.cProdNo === "070002") {
+        if(colconfig["factorItem"]['prop'] === 'TermRisktgt.cAddrSeq') {
+          colconfig["factorItem"]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+        }
+        cf = colconfig;
       } else {
         cf = colconfig;
       }
@@ -1058,6 +1063,19 @@ function initMethod(){
       const cDeductibleMethod = termFactormap.value.filter((item:any) => item.prop === 'Term.cDeductibleMethod')
       if(cDeductibleMethod.length > 0) {
         cDeductibleMethod[0]['defaultValue'] = "01"
+      }
+      // 保险金额=累计赔偿限额=每次事故赔偿限额
+      const cProdNos = ['059011','059015','059016','059012','059014','059019',,'059021','059023','059901','059903','059904','059911','059914','059930','059018','059020','059013','059910','059017'];
+      if(cProdNos.includes(pageparam.cProdNo)) {
+        const nContractRatio:any = termFactormap.value.filter((item:any) => ['Term.nAccidentLimit','Term.nInsuranceAmount'].includes(item.prop))
+        if(nContractRatio.length > 0) {
+          nContractRatio.forEach((item:any) => {
+            item['func'] = (val: any) => {
+              termdata.value['Term.nAccidentLimit'] = val
+              termdata.value['Term.nInsuranceAmount'] = val
+            }
+          })
+        }
       }
     }
   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();

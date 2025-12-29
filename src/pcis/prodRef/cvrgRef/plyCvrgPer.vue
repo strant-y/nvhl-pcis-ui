@@ -544,7 +544,7 @@ function getAddrSeqOptions() {
     pageSize: 9999,
     cProdNo: parparam.cProdNo,
     cClauseCode: parparam.cTermNo,
-    cComponentTable: "PropertyaddressDist",
+    cComponentTable: parparam.cProdNo === "070002" ? "AddressDist" : "PropertyaddressDist",
   };
   if(pageName.value === "priceInquiry") {
     selData['cInquiryNo'] = cInquiryNo.value;
