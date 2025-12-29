@@ -287,6 +287,17 @@ const tableconfig = reactive<AppTableConfig>(
           deleteData(row.cPkId)
         },
       }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "primary",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          openEdit('view', row.cPkId)
+        },
+      }),
     ],
 
     fromSchema: [

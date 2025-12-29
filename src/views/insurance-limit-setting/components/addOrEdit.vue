@@ -38,7 +38,7 @@ const props = defineProps({
     type: String,
     required: true
   },
-  actionType: { // add 新增； update 修改
+  actionType: { // add 新增； update 修改 view 查看
     type: String,
     required: true
   },
@@ -443,6 +443,12 @@ onMounted(() => {
         })
       }
     })
+    if(props.actionType === 'view') {
+      formconfig1.endBtns = [] //查看时不显示底部按钮
+      nextTick(() => {
+        freeEditRef.value?.setDisabledAll(true)
+      })
+    }
   }
 });
 
