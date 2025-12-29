@@ -1724,66 +1724,6 @@ function getFormConfig() {
   return tableconfig.value;
 }
 
-async function getTableDataAll() {
-  const s = cardRef.value?.getFromValue() || {};
-  // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
-  for (let k in s) {
-    if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
-      s[k] = s[k].replace('undefined', '')
-    }
-  }
-  const param = opertaor.getParam();
-  let app = "";
-  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
-    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
-  } else if(param.cOrgAppNo){
-    app = param.cOrgAppNo;
-  } else if(param.pageType !== "copy") {
-    app = param.cAppNo
-  }
-  const selData:any = {
-    cAppNo: "",
-    cComponentTable: cComponentTableValue,
-    cClauseCode: route.params.param?.cTermNo, //条款编码  
-    cProdNo: route.params.param?.cProdNo,  //产品号
-    ...formconfig1.value,
-    pageNum: 1,
-    pageSize: 99999
-  };
-  selData.dist = JSON.parse(JSON.stringify(s))
-  if(route.params.param?.pageName === "priceInquiry") {
-    selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-    if(!selData['cInquiryNo']){
-      return []
-    }
-  } else {
-    selData['cAppNo'] = app;
-    if(!selData['cAppNo']){
-      return []
-    }
-  }
-  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
-    selData.voType = "ply"
-  }
-  // 级联地址表格显示问题处理
-  if(Object.keys(mapAddr).includes(props.compKey)) {
-    const addrInput = mapAddr[props.compKey];
-    const keys = Object.keys(addrInput)
-    if(keys && keys.length>0) {
-      const inputGroupKey = keys[0];
-      const addrValueKey = addrInput[inputGroupKey];
-      selData.dist[addrValueKey] = selData.dist[inputGroupKey];
-    }
-  }
-  const res:any = await selectDist(selData);
-  if (res.code === 200) {
-    return res.data.data?.length > 0 ? res.data.data : []
-  } else {
-    ElMessage.error(res.msg)
-    return []
-  }
-}
-
 function setDisabledAll() {
   tableconfig.value.formconfig?.endBtns?.forEach((item: any) => {
     item.hidden = true;
