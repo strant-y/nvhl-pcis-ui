@@ -272,6 +272,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           } else if(params.cRsnCde == "s2" && !params.initFlag){
             setValue("EdrBase.nPrmVar", new Decimal(0).sub(new Decimal(val)))
             setValue("EdrBase.nPrm", new Decimal(nBefEdrPrm).add(new Decimal(getValue('EdrBase.nPrmVar'))))
+            opertaor.getTableRefByKey('base').setValue('Base.nPrm',new Decimal(nBefEdrPrm).add(new Decimal(getValue('EdrBase.nPrmVar'))))
+            opertaor.getTableRefByKey('base').setValue('Base.nPrmVar',new Decimal(0).sub(new Decimal(val)))
             nextTick(() => {
               opertaor.getFatherPage().afterCalcSurrenEdr()
             })
