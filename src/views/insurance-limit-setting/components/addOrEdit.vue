@@ -62,6 +62,8 @@ const codeListMap = reactive({
   NV049001: []
 })
 const cProdNoOptions:any = ref([])
+const cTermNoOptions:any = ref([])
+const initFlag = ref(true)
 
 
 if (props.pageType === 'one') {
@@ -81,7 +83,9 @@ if (props.pageType === 'one') {
           loadData: [],
         });
         cProdNoOptions.value = []
-        freeEditRef.value?.setValue("cProdNo", null);
+        if(!initFlag.value) {
+          freeEditRef.value?.setValue("cProdNo", null);
+        }
         if(val) {
           codeListStore
             .queryCodeList({
@@ -114,7 +118,10 @@ if (props.pageType === 'one') {
         setFormItem("clauseCode", {
           loadData: [],
         });
-        freeEditRef.value?.setValue("clauseCode", null);
+        cTermNoOptions.value = [];
+        if(!initFlag.value) {
+          freeEditRef.value?.setValue("clauseCode", null);
+        }
         codeListStore
           .queryCodeList({
             codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
@@ -128,6 +135,7 @@ if (props.pageType === 'one') {
             setFormItem("clauseCode", {
               loadData: res,
             });
+            cTermNoOptions.value = res;
           });
       }
     },
@@ -136,10 +144,10 @@ if (props.pageType === 'one') {
       inputtype: "rtselect",
       title: "条款",
       clearable: true,
-      typeCode: "PROD_LIST",
+      // typeCode: "PROD_LIST",
       params: {},
-      func: (val, option) => {
-        chooseProdName.value = option ? option.label : ''
+      func: (val:any) => {
+        chooseProdName.value = cTermNoOptions.value.find((item: any) => item.value === val)?.label || ''
       },
       rules: [getRules("required", {})]
     },
@@ -307,11 +315,13 @@ const handleNatureChange = (value: string) => {
   } else if (value === '0') {
     setFormItem("customerIdType", { loadData: codeListMap['NV049001'] })
   }
-  freeEditRef.value?.setValue('customerIdType', null) //清空客户证件类型
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('customerIdType', null) //清空客户证件类型
+    freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+    freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
+  }
   freeEditRef.value?.clearValidate('customerIdType')
-  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerIdNumber')
-  freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerName')
 }
 
@@ -322,19 +332,23 @@ const handleNatureChange2 = (value: string) => {
   } else if (value === '0') {
     setFormItem("shareholderIdType", { loadData: codeListMap['NV049001'] })
   }
-  freeEditRef.value?.setValue('shareholderIdType', null) //清空股东证件类型
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('shareholderIdType', null) //清空股东证件类型
+    freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+    freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
+  }
   freeEditRef.value?.clearValidate('shareholderIdType')
-  freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderIdNumber')
-  freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderName')
 }
 
 //证件类型change
 const handleCertificateChange = (value: string) => {
-  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+    freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
+  }
   freeEditRef.value?.clearValidate('customerIdNumber')
-  freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerName')
   console.log('value111', value)
   if (value == '111') { // 身份证号
@@ -356,9 +370,11 @@ const handleCertificateChange = (value: string) => {
 
 //股东证件类型change
 const handleCertificateChange2 = (value: string) => {
-  freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+    freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
+  }
   freeEditRef.value?.clearValidate('shareholderIdNumber')
-  freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderName')
   if (value == '111') { // 身份证号
     CCertfCdeRules2.value = [getRules("required", {}), getRules("idCard", {})]
@@ -423,6 +439,7 @@ onMounted(() => {
           } else {
             item2.loadData = codeListMap['NV049001']
           }
+          initFlag.value = false;
         })
       }
     })
