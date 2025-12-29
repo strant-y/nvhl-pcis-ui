@@ -273,7 +273,7 @@ const method = {
       const timestamp1 = new Date(tDepartureDate).getTime();
       const timestamp2 = new Date(v).getTime();
       let cProdNo = route.params.param?.cProdNo;
-      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018")) {
+      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018" && cProdNo.startsWith('02'))) {
          ElMessage.warning("“起运日期”不能大于保险起期！");
         baseBefore["Base.tDepartureDate"] = ''
       }
