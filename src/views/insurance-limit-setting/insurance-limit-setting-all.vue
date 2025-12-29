@@ -182,6 +182,9 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row: any) => {
+          return row.canEdit === '1' ? false : true
+        },
         tableClick: (row) => {
           openEdit('update', row.cPkId)
         },
@@ -193,8 +196,23 @@ const tableconfig = reactive<AppTableConfig>(
         type: "danger",
         size: "large",
         icon: "Delete",
+        // hideBtns: (row: any) => {
+        //   return row.canDelete === '1' ? false : true
+        // },
+        hidden: true,
         tableClick: (row) => {
           deleteData(row.cPkId)
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "primary",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          openEdit('view', row.cPkId)
         },
       }),
     ],

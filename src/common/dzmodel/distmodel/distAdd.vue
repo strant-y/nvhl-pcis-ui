@@ -226,7 +226,8 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if(!savePlyInfo) return;
             }
             formconfig1.value.titleBtns[0].loading = true
-            saveDist(params).then((res) => {
+            saveDist(params).then((res:any) => {
+              formconfig1.value.titleBtns[0].loading = false
               if (res.code === 200) {
                 // const cvrgRef = opertaor.getTableRefs()['cvrg'];
                 // if(cvrgRef) {
@@ -242,7 +243,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               } else {
                 ElMessage.error(res.msg);
               }
+            }).catch((err:any) => {
               formconfig1.value.titleBtns[0].loading = false
+              ElMessage.error(err.msg);
             });
           }
           // freeEditRef.value?.validate().then(() => {

@@ -706,28 +706,30 @@ const method = {
   getcShippingMethodChange: (val: string) => {
     console.log('val', val)
     // if(val === 'NV591001'){
-    if (val === '11') {
-      tgtIsWaterMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: false,
-        });
-      })
-      tgtOtherMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: true,
-        });
-      })
-    } else {
-      tgtIsWaterMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: true,
-        });
-      })
-      tgtOtherMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: false,
-        });
-      })
+    if(params.cProdNo === '020009') {
+      if (val === '11') {
+        tgtIsWaterMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: false,
+          });
+        })
+        tgtOtherMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: true,
+          });
+        })
+      } else {
+        tgtIsWaterMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: true,
+          });
+        })
+        tgtOtherMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: false,
+          });
+        })
+      }
     }
     // if(val === 'NV591003'){
     if (val === '12') {
