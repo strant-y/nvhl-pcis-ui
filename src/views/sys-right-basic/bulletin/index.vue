@@ -61,7 +61,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          freeEditRef.value?.resetFields();
+					freeEditRef.value?.resetFields();
+					handleQuery();
         },
       }),
     ],
@@ -76,8 +77,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CStatus",
         inputtype: "rtselect",
         title: "发布状态",
-        typeCode: "Comm_Code_LIST",
-        params: { CParCde: 'pub_status' },
+				loadData: [
+					{value: "pub1", label: "暂存"},
+					{value: "pub2", label: "发布"}
+				],
         clearable: true,
       },
       {
@@ -131,7 +134,7 @@ const tableconfig = reactive<AppTableConfig>(
           openEdit(row.cPkId)
         },
         hideBtns: ((row: any) => {
-          if (row.cStatus === 'pub2') return false;
+          if (row.cStatus === 'pub2') return true;
         }),
       }),
       createFreeButtonBase({
@@ -145,7 +148,7 @@ const tableconfig = reactive<AppTableConfig>(
           deleteBulletin(row.cPkId)
         },
         hideBtns: ((row: any) => {
-          if (row.cStatus === 'pub2') return false;
+          if (row.cStatus === 'pub2') return true;
         }),
       }),
     ],
@@ -202,13 +205,12 @@ const refreshData = (reset = false) => {
   const param = Object.assign({}, s, r);
 
   bulletinService.queryBulletinList(param).then((res: any) => {
-    if (res.code === 200) {
-      const pageData = res.data;
-      if (pageData) {
-        pageresult.total = pageData.total;
-        pageresult.list = pageData.result;
-      }
-    }
+		if (res.code === 200) {
+			pageresult.total = res.total;
+			pageresult.list = res.data;
+		} else {
+			ElMessage.error(res.msg);
+		}
   });
 };
 
