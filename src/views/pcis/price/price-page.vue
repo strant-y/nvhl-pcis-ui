@@ -5631,6 +5631,8 @@ const validateShanDong = async () => {
   const cNeedfeeFlag = baseData['Base.cNeedfeeFlag'];
   // 不见费出单原因
   const cCanclfeersnCde = baseData['Base.cCanclfeersnCde'];
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
 
   // 机构是山东分公司
   if (!String(cDptCdeA).startsWith('02370') || String(cDptCdeA).startsWith('023702')) return false;
@@ -5744,7 +5746,7 @@ const validateShanDong = async () => {
     }
     // 分期缴费，分期间隔不得长于已交保费占总保费比例对应的保险期限比例
     if(payinfoRef.length > 1) {
-      for(let i = 1; i < payinfoRef.length; i++) {
+      for(let i = 0; i < payinfoRef.length; i++) {
         const tPayBgnTm = dayjs(payinfoRef[i]['Pay.tPayBgnTm']);// 缴费起期
         const tPayEndTm = dayjs(payinfoRef[i]['Pay.tPayEndTm']).add(1,'second');// 缴费止期
         const intervalDays = tPayEndTm.diff(tPayBgnTm, 'day');// 分期间隔天数

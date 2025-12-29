@@ -31,6 +31,7 @@ export interface AppTableConfig {
   formconfig?: AppGridEditConfig | null;  //表单配置
   maxHeight?: string;
   rowDbClickFun?: (rowData) => void;
+  columnWidthByCalc?: boolean;
 }
 
 export interface AppTableMethod {
@@ -98,6 +99,7 @@ export function createTableEditConfig(
     rowDbClickFun: config.rowDbClickFun || null,
     stripe: config.stripe,
     border: config.border,
+    columnWidthByCalc: config.columnWidthByCalc,
   };
 }
 

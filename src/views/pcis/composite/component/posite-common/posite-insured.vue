@@ -457,6 +457,9 @@ const method = {
       setFormItem("Insured.cSex", {
         rules: null
       });
+      setFormItem("Insured.cNation", {
+        rules: [getRules('required',{})],
+      });
       // setValue("Insured.cCertfCls", "");
       // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -596,6 +599,9 @@ const method = {
       });
       setFormItem("Insured.cSex", {
         rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cNation", {
+        rules: [],
       });
       if (!param.initFlag) {
         setFormItem("Insured.cWorkDpt", {

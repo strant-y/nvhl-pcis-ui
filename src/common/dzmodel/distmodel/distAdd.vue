@@ -275,7 +275,7 @@ const isObjectValid = (obj: any) => {
   const allEmpty = values.every(v => v == null || v === '');
   return !allEmpty;
 };
-onMounted(() => {
+onMounted(async () => {
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value?.plyBase["Base.cAppNo"];
   cGrpMrk.value = route.params.param?.cGrpMrk;
@@ -317,6 +317,7 @@ onMounted(() => {
     // 车牌号校验 vehiclePlate
   if(item.prop =='Dist.cPlateNumber'){
      item['rules'] = [getRules("vehiclePlate", {})];
+     item.iconInfo = "（新车未上牌，请在此录入【新车未上牌】）"
     }
 
     // 车架号校验
@@ -473,15 +474,24 @@ onMounted(() => {
       })
     }
     if (item.prop === 'Dist.cPlanNo') {
-        const termref = opertaor.getTableRefByKey('cvrg');
-        const allPlans = termref.getPlanNo();   // 全部方案
+      const termref = opertaor.getTableRefByKey('cvrg');
+      const allPlans = termref.getPlanNo();   // 全部方案
 
-        // 从父页面表格中获取已添加的方案
-        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
-        const added = distTableRef?.getTableData()?.map(row => row['Dist.cPlanNo']) || [];
-        // 去重
-        const uniqueAdded = [...new Set(added)]; 
-        const nextIdx = uniqueAdded.length;  // 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+      // 从父页面表格中获取已添加的方案
+      const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+      const getTableDataAll = await distTableRef?.getTableDataAll();
+      const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row:any) => row['Dist.cPlanNo']) : [];
+      // 去重
+      const uniqueAdded = [...new Set(added)]; 
+      let nextIdx = 0;
+      for(let j = 1; j < allPlans.length + 1; j++) {
+        const planNo = 'P' + j;
+        // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+        if(!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
+          nextIdx = j;   // 已添加的方案跳过
+          break;
+        }
+      }
 
         item.typeCode = null;
         item.loadData = allPlans.map((p: any, idx: number) => ({
@@ -619,6 +629,10 @@ onMounted(() => {
         setFormItem("Dist.nRmbAmount", { disabled: true });
         setFormItem("Dist.nRmbLimit", { disabled: true });
         setFormItem("Dist.cRemarks", { disabled: true });
+    }
+    // 040001 变更清单信息时 方案号置灰
+    if(props.data.rowData.cProdNo === '040001' && props.data.rowData.cRsnCde === "10"){
+      setFormItem("Dist.cPlanNo", { disabled: true });
     }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);

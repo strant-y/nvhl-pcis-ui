@@ -108,7 +108,7 @@ onMounted(() => {
     cProdNo === "043005" ||
     cProdNo === "043011"
   ) {
-    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
   }
   if (cProdNo === '130003') {
     setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -511,7 +511,7 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-      // 被保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 被保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏，国籍必填可修改
       setFormItem("Insured.tBirthday", {
         hidden: true,
       });
@@ -522,7 +522,7 @@ const method = {
         hidden: true,
       });
       setFormItem("Insured.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("Insured.cOccupTyp", {
         hidden: true,
@@ -628,6 +628,7 @@ const method = {
       // 为法人 国民经济行业必填
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
+        btnItems: { disabled: false }
       });
 
       // 单位性质 --为企业做必填校验
@@ -736,7 +737,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Insured.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("Insured.cOccupTyp", {
         hidden: false,
@@ -856,10 +857,11 @@ const method = {
         cProdNo === "043005" ||
         cProdNo === "043011"
       ) {
-        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
       } else {
         setFormItem("Insured.cTrdCde", {
           rules: null,
+          btnItems: { disabled: true }
         });
       }
 

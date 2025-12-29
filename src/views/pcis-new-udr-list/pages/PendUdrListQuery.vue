@@ -13,24 +13,16 @@
         <span>¥ {{ row.nPrm.toLocaleString() }}</span>
       </template>
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cDptCnm || ''" class="twoLine"></span>
       </template>
       <template #column-cTermNme="{ row, column, index }">
-        <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="row.cTermNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cTermNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNme="{ row, column, index }">
-        <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="row.cAppNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cAppNme || ''" class="twoLine"></span>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNoInfo="{ row, column, index }">
         <div class="policy-info-cell">
