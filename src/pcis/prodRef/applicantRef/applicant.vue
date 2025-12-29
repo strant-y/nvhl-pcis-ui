@@ -655,29 +655,28 @@ const method = {
         rules: [getRules("required", {})],
       });
 
-      setFormItem("Applicant.cWorkDpt", {
-        disabled: false,
-      });
-      setFormItem("Applicant.cIsMicroEntpris", {
-        disabled: false,
-      });
-      setFormItem("Applicant.cIsIndvduBiz", {
-        disabled: true,
-      });
-      // 是否绿色产业客户
-      setFormItem("Applicant.cGreenIndustryCustomers", {
-        disabled: false,
-      });
+			if (!param.initFlag) {
+				setFormItem("Applicant.cWorkDpt", { // 单位性质
+					disabled: false,
+				});
+				setFormItem("Applicant.cIsMicroEntpris", { // 是否小微企业
+					disabled: false,
+				});
+				setFormItem("Applicant.cIsIndvduBiz", {
+					disabled: true,
+				});
+				// 是否绿色产业客户
+				setFormItem("Applicant.cGreenIndustryCustomers", {
+					disabled: false,
+				});
 
-      // 绿色客户 如果为时就放开
-      if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
-        setFormItem("Applicant.cGreenIndustryList", {
-          rules: [getRules("required", {})],
-          disabled: false,
-        });
-      }
-
-      if (!param.initFlag) {
+				// 绿色客户 如果为时就放开
+				if (getValue('Applicant.cGreenIndustryCustomers') == '1') {
+					setFormItem("Applicant.cGreenIndustryList", {
+						rules: [getRules("required", {})],
+						disabled: false,
+					});
+				}
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
       }
@@ -837,10 +836,12 @@ const method = {
       setFormItem("Applicant.cRegisterSuffixAddr", {
         rules: null,
       });
-      //是否个体工商户
-      setFormItem("Applicant.cIsIndvduBiz", {
-        disabled: false,
-      });
+			if (!param.initFlag) {
+				//是否个体工商户
+				setFormItem("Applicant.cIsIndvduBiz", {
+					disabled: false,
+				});
+			}
       // 是否绿色产业客户
       setFormItem("Applicant.cGreenIndustryCustomers", {
         rules: null,
