@@ -299,14 +299,17 @@ async function handleQuery(flag?: boolean) {
       qryTerminationDataList(param)
         .then((res:any) => {
           const { code, data, msg } = res;
+          pageresult.list = [];
           if (200 === code) {
-            pageresult.list = [];
             pageresult.list = data;
           } else {
             ElMessage.error(msg);
           }
         })
-        .finally(() => {});
+        .catch((err:any) => {
+          pageresult.list = [];
+          ElMessage.error(err.msg);
+        });
     }
   }else{
     ElMessage.warning('保单号/申请单号至少录入一个');
