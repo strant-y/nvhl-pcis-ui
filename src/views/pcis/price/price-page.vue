@@ -5611,8 +5611,6 @@ const validateShanDong = async () => {
   const applicantData = opertaor.getTableRefByKey("applicant").getFromValue();
   const insrncData = opertaor.getTableRefByKey("insrnc").getFromValue();
   const baseData = opertaor.getTableRefByKey("base").getFromValue();
-  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
-  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
 
   // 解构并统一命名
   const {
