@@ -169,7 +169,7 @@ const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquir
 const pageName = computed(() => opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
-const exli = ref(['010001','010002','010003','010004','010020']);
+const exli = ref(['010001','010002','010003','010004','010020','070002']);
 
 const props = defineProps({
   pageSchema: {

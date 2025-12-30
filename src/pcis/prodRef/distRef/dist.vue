@@ -272,6 +272,7 @@ watch(
         if( route.params.param?.cProdNo?.startsWith('01') || targetProducts.includes(route.params.param?.cProdNo)){
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           cvrgRef?.getAddrSeqOptions()
+          cvrgRef?.refushCvrgInfo();
         }
         if(route.params.param?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
           eventBus.emit('setMap-EmployeeDist043009', {
@@ -578,13 +579,7 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
-            // 如果是免赔信息则不刷新保障信息
-            if(props.compKey?.includes('DeductibleDist')) return;
-            const cvrgRef = opertaor.getTableRefs()['cvrg'];
-            try {
-              cvrgRef?.refushCvrgInfo();
-            } catch (ignore) {
-            }
+            refreshCvrg()
           },
         },
         { width: "60" }
@@ -639,15 +634,7 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
-          // 如果是免赔信息则不刷新保障信息
-          if(props.compKey?.includes('DeductibleDist')) return;
-          const cvrgRef = opertaor.getTableRefs()['cvrg'];
-          try {
-            if(cvrgRef) {
-              cvrgRef.refushCvrgInfo();
-            }
-          } catch (ignore) {
-          }
+          refreshCvrg()
         } else {
           ElMessage.error(res.msg);
         }
@@ -691,12 +678,7 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
-                // 如果是免赔信息则不刷新保障信息
-                if(props.compKey?.includes('DeductibleDist')) return;
-                const cvrgRef = opertaor.getTableRefs()['cvrg'];
-                try {
-                    cvrgRef?.refushCvrgInfo();
-                } catch (ignore) {}
+                refreshCvrg()
               },
             },
             { width: "60" }
@@ -1110,6 +1092,7 @@ const method = {
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
+              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "全量导入失败");
             }
@@ -1188,6 +1171,7 @@ const method = {
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
+              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
@@ -1335,6 +1319,7 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
+            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1350,6 +1335,7 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
+            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1376,6 +1362,7 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
+            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
