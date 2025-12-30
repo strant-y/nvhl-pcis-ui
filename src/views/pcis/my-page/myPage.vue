@@ -5471,7 +5471,7 @@ const submitUnderwritingFn = async () => {
             cDductDesc: deductibleDist && deductibleDist[0] ? deductibleDist[0]["DeductibleDist.cDeductibleContent"] : "",// 免赔约定
             cDocTyp: props.param?.cAppTyp,// 单证类型 A 保单 E 批单
             cDptCde: props.param?.cDptCde,// 机构代码
-            cInsrntNme: insured['Insured.cInsuredNme'],//被保人名称
+            cInsrntNme: props.param?.cGrpMrk == "0" ? insured['Insured.cInsuredNme'] : applicant['Applicant.cAppNme'],//团单1取投保人名称，个单0取被保人名称
             cPlyNo: props.param?.plyNo || plyBase['Base.cPlyNo'],// 保单号
             cProdNme: props.param?.cTermNme,// 产品名称
             cProdNo: props.param?.cProdNo,//产品编码
