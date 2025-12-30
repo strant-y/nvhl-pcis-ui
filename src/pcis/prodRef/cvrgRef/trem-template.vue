@@ -1089,6 +1089,54 @@ function initMethod(){
           })
         }
       }
+      const cProdNoMap:any = {
+        '059016': 5,
+        '059012': 10,
+        '059018': 30,
+        '059013': 10,
+        '059017': 5,
+      }
+      if(Object.keys(cProdNoMap).includes(pageparam.cProdNo)) {
+        const nInsuredRatio:any = termFactormap.value.filter((item:any) => item.prop === 'Term.nInsuredRatio')
+        if(nInsuredRatio.length > 0) {
+          const max = cProdNoMap[pageparam.cProdNo];
+          nInsuredRatio[0]['func'] = (val: any) => {
+            if(val > max) {
+              ElMessage.warning('保额占比不能超过'+ max +'%')
+              termdata.value['Term.nInsuredRatio'] = max;
+            }
+          }
+        }
+      }
+    }
+    // 059019 保险金额占采购合同金额比例超出20时，提示
+    if(pageparam.cProdNo === '059019' && groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+      for(let i in groupInfo.value) {
+        const ginfo = groupInfo.value[i]
+        const riskListObj = groupconf.value[ginfo.cGroupId].riskList
+        for(let k in riskListObj) {
+          const riskdata = riskListObj[k];
+          if(riskdata.maxNum > 0) {
+            for(let n = 1;n <= riskdata.maxNum;n++) {
+              riskdata.col?.forEach((colinfo:any) => {
+                const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                if(item?.prop === 'TermRisktgt.nContractRatio') {
+                  item.func = (val: any) => {
+                    if(val > 20) {
+                      ElMessage.warning('保险金额占采购合同金额比例不能超过20%')
+                      const r = riskList.value[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]['TermRisktgt.cLiabCode'];
+                      setData({
+                        propkey: 'TermRisktgt.nContractRatio',
+                        riskNo:r,
+                      }, 20);
+                    }
+                  }
+                }
+              })
+            }
+          }
+        }
+      }
     }
   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
   // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
@@ -1765,7 +1813,7 @@ async function nInsuranceFeeChange(val:any) {
   let qryTerminationStatus = false;
   // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
   // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
-  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || pageparam.pageType === 'app') {
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || ['app','template','copy','inquiryToApp'].includes(pageparam.pageType)) {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
     let nInsuranceFee:number = 0;
