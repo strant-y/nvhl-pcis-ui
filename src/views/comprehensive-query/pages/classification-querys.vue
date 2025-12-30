@@ -299,11 +299,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                     cLoadSub: '1',
                     tIssueTm: [
-                        dayjs(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                        dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     tAppTm: [
-                        dayjs(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                        dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
                     cDataTyp:"app",
@@ -1202,7 +1202,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示投保日期
                               // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                              const startDate = moment(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                              const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                               freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
@@ -1225,7 +1225,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示批改申请日期
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
@@ -1243,7 +1243,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示询价日期，询价单号
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
+                            const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                             freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
@@ -2042,12 +2042,12 @@ onMounted(async () => {
     });
     pageresult.list = [];
     freeEditRef.value.setValue("tIssueTm", [
-        dayjs(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+        dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
     // 申请日期默认展示投保日期
     freeEditRef.value.setValue("tAppTm", [
-        dayjs(new Date()).add(1,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+        dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
 
