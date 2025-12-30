@@ -172,7 +172,12 @@ onMounted(async () => {
       setFormItem('Base.cAgriMrk',{
         disabled:  true
       })
-    }
+		}
+		// 080002-家用管道燃气综合险、080003-家庭财产综合保险，基本信息中增加是否普惠型家财险，下拉选框“是”“否”，若选择是，则展示文本框，录单人员需在文本框填写项目名称，文本框为必录；
+    if(param.cProdNo !== '080002' && param.cProdNo !== '080003') {
+      setFormItem('Base.cIsHomeInsurance',{ hidden:  true })
+		}
+		setFormItem('Base.cProjectName',{ hidden:  true })
     // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
     
     // 询价录单 联共保业务暂时固定非共保业务，不允许选择联共保
@@ -917,7 +922,19 @@ const method = {
         insuranceCoverageFlag = false
       })
     }
-  },
+	},
+	// 是否普惠型家财险
+	cIsHomeInsuranceChange: (val) => {
+		const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cProjectName", "");
+    }
+		if (val == "1") {
+			setFormItem('Base.cProjectName',{ hidden: false, rules: [getRules("required", {})] })
+		} else {
+			setFormItem('Base.cProjectName',{ hidden: true })
+		}
+	}
 };
 
 // 绑定特殊验证器
