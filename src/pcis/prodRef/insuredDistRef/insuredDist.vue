@@ -687,7 +687,15 @@ function getFormConfig(){
   return tableconfig.value;
 }
 function getFormBtn() {
-  return distTableRef?.value?.getFormBtn();
+	// return distTableRef?.value?.getFormBtn();
+	const map = ref({});
+	let tableConfig = getFormConfig()
+	tableConfig.formconfig.titleBtns?.forEach((btn: any) => {
+		if(btn.id) {
+			map.value[btn.id] = btn
+		}
+	});
+	return map.value
 }
 function getTableBtn() {
   return distTableRef?.value?.getTableBtn();
