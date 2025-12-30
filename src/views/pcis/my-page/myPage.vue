@@ -1403,7 +1403,7 @@ const initPage = async () => {
     edritemFlag.value = false;
 	}
 	// 核保-询价转投保 展示批改比较项
-	if (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cPolicySource == '6') {
+	if (props.param.pageType == "PLY_UW_PROCESS_SCENE" && props.param.cPolicySource == '6' && props.param?.cAppTyp != "E") {
 		edritemFlag.value = true;
 		edritemName.value = "比较项"
 	} else {
@@ -1731,7 +1731,7 @@ async function loadAfter() {
         });
       }
     }
-		if (props.param.cPolicySource == '6') {
+		if (props.param.cPolicySource == '6' && props.param?.cAppTyp != "E") {
 			nextTick(() => {
 				generateComparisonItems();
 			})	
