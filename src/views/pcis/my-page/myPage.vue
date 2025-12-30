@@ -1924,12 +1924,18 @@ async function loadAfter() {
         });
 			}
  			if (props.param["cRsnCde"] == "83") {
-          // 处理被保人清单
-          let insuredDistInfo = opertaor.getTableRefByKey('insuredDist')
-          if(insuredDistInfo){
-            insuredDistInfo.setDisabledAll(false);  
-          }
-      }     
+				nextTick(() => {
+				// 处理被保人清单和营业场所地址清单
+					let insuredDistInfo = opertaor.getTableRefByKey('insuredDist')
+					let distInfo = opertaor.getTableRefByKey('AddressDist040001')
+					if(insuredDistInfo){
+						insuredDistInfo.setDisabledAll(false);
+					}
+					if(distInfo){
+						distInfo.setDisabledAll1(false);
+					}
+				})
+      }
       bthList.value = edrBtn.filter(item => !item.hidden);
     } else {
       bthList.value = edrSurrenderBtn;
