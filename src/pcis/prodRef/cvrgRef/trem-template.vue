@@ -1711,6 +1711,7 @@ const methodMap = {
     });
   },
   nItemFeeChange:(val:any) => {
+    debugger
     nInsuranceFeeChange(val)
   },
 };
@@ -1765,7 +1766,7 @@ async function nInsuranceFeeChange(val:any) {
   let qryTerminationStatus = false;
   // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
   // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
-  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || pageparam.pageType === 'app') {
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || ['app','template','copy','inquiryToApp'].includes(pageparam.pageType)) {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
     let nInsuranceFee:number = 0;
