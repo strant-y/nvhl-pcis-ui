@@ -1713,38 +1713,6 @@ function setDisabledAll() {
   });
 }
 
-function getTableBtn() {
-	return distTableRef?.value?.getTableBtn();
-}
-function getFormBtn() {
-	// return distTableRef?.value?.getFormBtn();
-	const map = ref({});
-	let tableConfig = getFormConfig()
-	tableConfig.formconfig.titleBtns?.forEach((btn: any) => {
-		if(btn.id) {
-			map.value[btn.id] = btn
-		}
-	});
-	return map.value
-}
-function setDisabledAll1(isDisabled: boolean, noSet: string[] = []) {
-	const tableBtn = getTableBtn();
-	if(tableBtn && Object.keys(tableBtn).length > 0) {
-		Object.keys(tableBtn).forEach((key: any) => {
-			if(!noSet.includes(key)) {
-				tableBtn[key].hidden = isDisabled;
-			}
-		});
-	}
-	// const formBtn = getFormBtn();
-	// if(formBtn && Object.keys(formBtn).length > 0) {
-	// 	Object.keys(formBtn).forEach((key: any) => {
-	// 		if(!noSet.includes(key)) {
-	// 			formBtn[key].hidden = isDisabled;
-	// 		}
-	// 	})
-	// }
-}
 defineExpose({
   getValue,
   setValue,
@@ -1758,7 +1726,6 @@ defineExpose({
   getFormConfig,
   setDisabledAll,
   getTableDataAll,
-	setDisabledAll1,
 });
 </script>
 
