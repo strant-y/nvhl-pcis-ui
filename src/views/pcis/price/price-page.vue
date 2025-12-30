@@ -4045,7 +4045,7 @@ const savePlyInfo = async () => {
             sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
-              path: "/pcis/price-page",
+              path: "/pcisapp/pricePage",
               query: {
                 param: JSON.stringify({
                   ...data,
