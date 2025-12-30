@@ -639,7 +639,7 @@ const method = {
       co = 'UN_NATURAL_CERTIFICATE_CACHE';
     }
 
-    if (initFlag.value) {
+    // if (initFlag.value) {
       codeListStore
         .queryCodeList({
           codeListName: co,
@@ -658,7 +658,7 @@ const method = {
             setValue('ECargoApplicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
-    }
+    // }
 
     checkUser();
   },
@@ -906,9 +906,6 @@ const method = {
   },
   //注册地市是否同上
    isSameChange : (val:any) => {
-    if (!initFlag.value) {
-      return;
-    }
     if (val == "1") {
       const ads = getValue("ECargoApplicant.Prop");
       const a = getValue("ECargoApplicant.cSuffixAddr") || "";
