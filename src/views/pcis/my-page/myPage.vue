@@ -1926,8 +1926,7 @@ async function loadAfter() {
             })
           }
         });
-      }
-      
+			}
       bthList.value = edrBtn.filter(item => !item.hidden);
     } else {
       bthList.value = edrSurrenderBtn;
@@ -4203,8 +4202,8 @@ const getEdrRsnItemFun = (
     CEdrType: cEdrType,
     CGrpMrk: cGrpMrk,
   };
-  const applicant = opertaor.getTableRefByKey("applicant").getFromValue();
-  const insured = opertaor.getTableRefByKey("insured").getFromValue();
+  const applicant = opertaor.getTableRefByKey("applicant")?.getFromValue();
+  const insured = opertaor.getTableRefByKey("insured")?.getFromValue();
   getEdrRsnItem(res).then((res: any) => {
     if (res["code"] == "200") {
       const result = res["data"]["result"];

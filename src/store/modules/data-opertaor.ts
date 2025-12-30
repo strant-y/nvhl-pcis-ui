@@ -237,7 +237,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     Object.keys(tableRefs).forEach(key => {
                         // 批改原因为变更清单、增加清单、减少清单时，清单才能放开，其他批改原因放开时需要区分免赔和清单
                         // 02大类除了020014、020018以外产品，清单放开限制
-                        if(!['10','ZQ','JQ'].includes(cRsnCde) && key.includes('Dist') && !key.includes('DeductibleDist') && (!cProdNo?.startsWith('02') || ['020014','020018'].includes(cProdNo))) return;
+                        if(!['10','ZQ','JQ','83'].includes(cRsnCde) && key.includes('Dist') && !key.includes('DeductibleDist') && (!cProdNo?.startsWith('02') || ['020014','020018'].includes(cProdNo))) return;
                         if (tableRefs[key] && tableRefs[key].getFormconfig) {
                             const conf = tableRefs[key].getFormconfig();
                             if (!item.startsWith('Btn_')) { // 非按钮控制
