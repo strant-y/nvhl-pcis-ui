@@ -1723,7 +1723,7 @@ function changeNamt(nAmtVar: any, flag: any) {
       if(item.cPkId === selectRow1.value.cPkId) {
         item.nAmt = parseFloat(nAmtVar);
         item.nAmtVar = parseFloat(nAmtVar);
-        item.cProportion = nAmtRatio.toString();
+        item.cProportion = nAmtRatio.toFixed(6);
         if(params.cCiMrk !== "0") {
           item.nCiAmt = nCiAmt
           item.nCiAmtVar = nCiAmt
@@ -1732,7 +1732,7 @@ function changeNamt(nAmtVar: any, flag: any) {
     })
     selectRow1.value.nAmt = parseFloat(nAmtVar);
     selectRow1.value.nAmtVar = parseFloat(nAmtVar);
-    selectRow1.value.cProportion = nAmtRatio.toString();
+    selectRow1.value.cProportion = nAmtRatio.toFixed(6);
   }
 }
 
