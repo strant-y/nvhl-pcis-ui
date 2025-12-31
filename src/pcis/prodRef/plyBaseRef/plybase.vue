@@ -267,16 +267,6 @@ const method = {
       );
 
       if(p.cTransMrk !== '1'){
-        //代理业务 服务机构不可选
-        if (val === "19002"){
-          setFormItem("Base.cIntroDptcde", {btnItems: {
-              disabled: true,
-            },});
-        }else {
-          setFormItem("Base.cIntroDptcde", {btnItems: {
-              disabled: false,
-            }});
-        }
         if (val === "19002" || val === "19003" ) {
             const obj = {
               rules: [getRules("required", {})],
