@@ -6388,6 +6388,7 @@ const afterCalcEdrPremium = () => {
       .getTableRefByKey("ciMasterAgreement")
       .setValue("Base.nCiJntPrm", nPrm.value);
   }
+  edrbase.value?.setValue("EdrBase.nPrmVar", nPrmVar)
 
   const payinfoRef = opertaor.getTableRefs()["payinfo"];
   if (payinfoRef && payinfoRef.setFormValue) {
@@ -6446,6 +6447,91 @@ function afterCalcSurrenEdr() {
   }
 }
 
+async function calcFunc() {
+  const params = opertaor.getParam();
+  const calcData: any = opertaor.getDataAll();
+  calcData["user"] = user;
+  calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
+  calcData["plyBase"]["Base.cProdNo"] = params.cProdNo;
+  return await appCalc(calcData)
+}
+
+async function calcEdrFunc() {
+  const calcData = opertaor.getDataAll();
+  const edrbaseData = edrbase.value?.getFromValue();
+  const nInsuranceAmount:any = [];
+  calcData['cvrg'].forEach((item:any) => {
+    if(item['Term.cRdrTyp'] === '0') {// 主险 riskList不为空则取riskList里的nInsuranceAmount累加，否则取Term.nInsuranceAmount
+      // 02系列产品 ? 从责任列表取nInsuranceAmount累加 : 只取条款里的nInsuranceAmount值
+      if(props.param.cProdNo.slice(0,2) === "02") {
+        if(item['Term.riskList'] && item['Term.riskList'].length > 0) {
+          let num = 0;
+          item['Term.riskList'].forEach((i:any) => {
+            // nInsuranceAmount.push(i['TermRisktgt.nInsuranceAmount'] || 0)
+            // 是否条款自带条则，0：否，1：是
+            if(i['TermRisktgt.selfTermRisk'] === true) {
+              num = num + (i['TermRisktgt.nInsuranceAmount'] || 0)
+            }
+          })
+          if(num > 0) {
+            nInsuranceAmount.push(num)
+          } else {
+            nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
+          }
+        } else {
+          nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
+        }
+      } else {
+        nInsuranceAmount.push(item['Term.nInsuranceAmount'] || item['Term.nAccidentLimit'] || 0)
+      }
+    } else if(item['Term.cClaimInclude'] === "1") {// 非主险 是否计入累计赔偿限额值为是则计入否则不计入
+      nInsuranceAmount.push(item['Term.nInsuranceAmount'] || 0)
+    }
+
+    if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+      if(sessionStorage.getItem("getAddrSeqData")) {
+        const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+        item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+          return getAddrSeqData.find((i:any) => i.value === item)?.id
+        })?.join(',')
+      }
+      item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+    }
+  })
+  const totalNum = nInsuranceAmount.reduce((sum, item) => sum + item, 0);
+  let originalnAmt = 0;
+  if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'number') {
+    originalnAmt = edrbaseData['EdrBase.nBefEdrAmt']
+  }
+  if(edrbaseData['EdrBase.nBefEdrAmt'] && typeof edrbaseData['EdrBase.nBefEdrAmt'] === 'string') {
+    originalnAmt = Number(edrbaseData['EdrBase.nBefEdrAmt'].replaceAll(',',''))
+  }
+  //  08 减少  
+  if(props.param?.cRsnCde === '08'  && totalNum > originalnAmt ){
+    ElMessage.warning("批改原因为“减少保额”，累计赔偿限额不能大于原有“保额”！");
+    // 增加保额，
+    return false;
+  }
+  //  07增加 
+  if(props.param?.cRsnCde === '07'  && totalNum < originalnAmt ){
+      ElMessage.warning("批改原因为“增加保额”，累计赔偿限额不能小于原有“保额”！");
+    return false;
+  }
+  calcData["user"] = user;
+  calcData["plyBase"]["Base.cDptCde"] = props.param?.cDptCde;
+  calcData["plyBase"]["Base.cProdNo"] = props.param?.cProdNo;
+  calcData["EdrBase"] = edrbase.value?.getFromValue();
+  if (
+    calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
+    calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
+    Array.isArray(calcData["EdrBase"]["EdrBase.cEdrRsnDetail"])
+  ) {
+    calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] =
+      calcData["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
+  }
+  return await calcEdr(calcData)
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -6462,6 +6548,8 @@ opertaor.setFatherPage({
   afterCalcPremium: afterCalcPremium,
   afterCalcEdrPremium: afterCalcEdrPremium,
   afterCalcSurrenEdr: afterCalcSurrenEdr,
+  calcEdrFunc: calcEdrFunc,
+  calcFunc: calcFunc,
 });
 
 function getEdrbaseValue() {
