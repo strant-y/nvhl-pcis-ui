@@ -6448,13 +6448,24 @@ function afterCalcSurrenEdr() {
   }
 }
 
-async function calcFunc() {
+async function calcFunc() {  
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   const params = opertaor.getParam();
   const calcData: any = opertaor.getDataAll();
   calcData["user"] = user;
   calcData["plyBase"]["Base.cDptCde"] = params.cDptCde;
   calcData["plyBase"]["Base.cProdNo"] = params.cProdNo;
-  return await appCalc(calcData)
+  const caclres = await appCalc(calcData);
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103'].includes(item.id)) {
+      item.loading = false;
+    }
+  });
+  return caclres;
 }
 
 async function calcEdrFunc() {
@@ -6530,7 +6541,18 @@ async function calcEdrFunc() {
     calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       calcData["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   }
-  return await calcEdr(calcData)
+  bthList.value.forEach((item:any) => {
+    if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
+  const caclres =  await calcEdr(calcData);
+  bthList.value.forEach((item:any) => {
+    if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
+      item.loading = false;
+    }
+  });
+  return caclres;
 }
 
 opertaor.setFatherPage({
