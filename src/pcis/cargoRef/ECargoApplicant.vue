@@ -78,8 +78,6 @@ onMounted(() => {
     // 传真校验
     setFormItem("ECargoApplicant.cFax", { rules: [getRules("faxNumber", {})] });
 
-    setFormItem("ECargoApplicant.cGreenIndustryCustomers",{disabled: true});
-    setFormItem("ECargoApplicant.cGreenIndustryList",{disabled: true});
     if(!getValue('ECargoApplicant.cCustRiskRank')){
       setValue('ECargoApplicant.cCustRiskRank','925104')
     }
@@ -538,6 +536,7 @@ const method = {
         rules: null,
         disabled: true,
       });
+      clearValidate('ECargoApplicant.cGreenIndustryCustomers')
       // 是否绿色详情
       setFormItem("ECargoApplicant.cGreenIndustryList", {
         rules: null,
