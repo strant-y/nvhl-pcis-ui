@@ -1897,46 +1897,49 @@ async function nInsuranceFeeChange(val:any) {
     const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm']?.replaceAll(',','');
     const newData = getDatas();
     if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {
-      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })
+      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' })
       if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
         if(qryTerminationData.data[0]?.cAppTyp === 'on') {
           qryTerminationStatus = true;
         }
       }
-      const nPrmRange:any = await getPremiumAdjustmentRange();
-      // 调用保费计算接口获取最新保费计算后的保费数据
-      const calcres = await opertaor.getFatherPage().calcEdrFunc();
-      if(calcres && calcres.code === 200) {
-        const newOp: any = opertaor.convertData(calcres);
-        nPrm = newOp.base["Base.nPrm"];
-        const newAmt = newOp.base["Base.nAmt"];
-        if(newAmt != nAmt) {
-          opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
-        }
+      // 如果打开数据开关，则不需要判断修改后的总保费是否超出阈值，否则需要判断
+      if(qryTerminationStatus === false) {
+        const nPrmRange:any = await getPremiumAdjustmentRange();
+        // 调用保费计算接口获取最新保费计算后的保费数据
+        const calcres = await opertaor.getFatherPage().calcEdrFunc();
+        if(calcres && calcres.code === 200) {
+          const newOp: any = opertaor.convertData(calcres);
+          nPrm = newOp.base["Base.nPrm"];
+          const newAmt = newOp.base["Base.nAmt"];
+          if(newAmt != nAmt) {
+            opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
+          }
 
-        const nInsuranceFee = newData['Term.nInsuranceFee'];
-        let minPrm:any = 0;
-        let maxPrm:any = 0;
-        if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
-          maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
-          minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+          const nInsuranceFee = newData['Term.nInsuranceFee'];
+          let minPrm:any = 0;
+          let maxPrm:any = 0;
+          if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
+            maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
+            minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+          } else {
+            minPrm = new Decimal(nPrm).sub(new Decimal(10))
+            maxPrm = new Decimal(nPrm).add(new Decimal(10))
+          }
+          if(new Decimal(nInsuranceFee).lt(minPrm) || new Decimal(nInsuranceFee).gt(maxPrm)) {
+            ElMessageBox.confirm(`本次手动调整金额（¥${nInsuranceFee}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
+              confirmButtonText: "确定",
+              type: "warning",
+            }).then(() => {
+              opertaor.getFatherPage().calcPremiumEdr()
+            }).catch(() => {
+              opertaor.getFatherPage().calcPremiumEdr()
+            })
+            return;
+          }
         } else {
-          minPrm = new Decimal(nPrm).sub(new Decimal(10))
-          maxPrm = new Decimal(nPrm).add(new Decimal(10))
+          ElMessage.error(calcres.msg)
         }
-        if(new Decimal(nInsuranceFee).lt(minPrm) || new Decimal(nInsuranceFee).gt(maxPrm)) {
-          ElMessageBox.confirm(`本次手动调整金额（¥${nInsuranceFee}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
-            confirmButtonText: "确定",
-            type: "warning",
-          }).then(() => {
-            opertaor.getFatherPage().calcPremiumEdr()
-          }).catch(() => {
-            opertaor.getFatherPage().calcPremiumEdr()
-          })
-          return;
-        }
-      } else {
-        ElMessage.error(calcres.msg)
       }
     }
     if(newData['Term.nInsuranceFee'] != nPrm) {
