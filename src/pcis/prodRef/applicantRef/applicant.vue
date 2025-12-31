@@ -1594,14 +1594,14 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   applicantEditRef?.value?.setFormValue(value); 
-  // if (firstRealData && value?.["Applicant.cClntMrk"] != null) {
-  //   firstRealData = false;
-  //   nextTick(() => {
-  //     setTimeout(() => {
-  //       method.InsureChange(value['Applicant.cClntMrk'])
-  //     }, 10000)
-  //   })
-  // }
+  if (firstRealData && value?.["Applicant.cClntMrk"] != null && param.pageType !== 'readonly') {
+    firstRealData = false;
+    nextTick(() => {
+      setTimeout(() => {
+        method.InsureChange(value['Applicant.cClntMrk'])
+      }, 10000)
+    })
+  }
 }
 
 function validate() {
