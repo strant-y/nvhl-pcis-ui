@@ -594,8 +594,6 @@ onMounted(() => {
       if(btn) {
         btn.hidden = false;
       }
-    } else {
-      ElMessage.error(res.message);
     }
   }).catch((err:any) => {
     ElMessage.error(err.message);
