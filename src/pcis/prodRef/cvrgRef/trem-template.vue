@@ -1775,6 +1775,12 @@ defineExpose({
 }
 .cvrg-body__ {
   margin-top: 10px;
+  :deep(.el-text) {
+    font-weight: 450 !important;
+  }
+  :deep(span) {
+    font-weight: 450 !important;
+  }
 }
 .table-title {
   th {
