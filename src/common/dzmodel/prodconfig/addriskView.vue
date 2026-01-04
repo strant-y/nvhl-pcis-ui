@@ -3,7 +3,7 @@
     <el-row>
       <el-col :span="12">
         <div style="background-color: var(--cvrg-sub-header-bg-color);line-height: 32px;margin: 0px 0 3px 0;">
-          <span style="font-size: 14px; margin-left: 12px">
+          <span class="header-title">
             必须选择至少一项责任
           </span>
         </div>
@@ -30,7 +30,6 @@
         <div style="height: 250px; border: var(--rt-border); overflow-y: auto">
           <el-tree
             ref="mainRef"
-            style="max-width: 600px"
             :props="dataprops"
             node-key="id"
             show-checkbox
@@ -148,6 +147,8 @@ function selectmainMethod(data: any, checked: boolean, indeterminate: boolean) {
         mainRef.value?.setChecked(sibling.id, false, false);
       }
     });
+  }else{
+    selectNodeId.value = '';
   }
 }
 
@@ -157,9 +158,13 @@ const mainfilterNode = (value: string, data: Tree) => {
 };
 
 async function selectOne() {
-  props.method.isOk(selectNodeId.value);
-  // 传递选中的节点数据给父组件
-  emits("handleClose");
+  if(selectNodeId.value){
+    props.method.isOk(selectNodeId.value);
+    // 传递选中的节点数据给父组件
+    emits("handleClose");
+  }else{
+    ElMessage.error("请至少选择一项责任");
+  }
 }
 
 function fail() {
@@ -170,6 +175,13 @@ function fail() {
 <style lang="scss" scoped>
 @import "src/styles/custom-index";
 
+
+.header-title {
+  color: var(--el-text-color);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
 :deep(.search-btn) {
   background: var(--cvrg-sub-header-bg-color);
   .search-btn-item {
@@ -214,5 +226,12 @@ function fail() {
 }
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
+}
+
+:deep(.el-tree-node__content .el-text) {
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0,0,0,0.85);
+  font-weight: 500;
 }
 </style>
