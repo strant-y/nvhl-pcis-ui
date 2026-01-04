@@ -166,7 +166,7 @@
       </el-icon>
       <span v-if="item.prefix" style="vertical-align: top;">{{ item.prefix }}</span>
       <el-text class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
-        {{vInput !== 'undefined' ? vInput : ''}}
+        {{vInput !== 'undefined' && vInput !== 'null' ? vInput : ''}}
       </el-text>
       <!-- 添加复制图标 -->
       <el-icon

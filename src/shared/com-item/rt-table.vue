@@ -404,7 +404,7 @@ watch(
     creatSchama();
     formItems.value = {};
     tableDatas.value?.forEach((data) => {
-      formItems.value[data._dataId] = creatItem(schamaconf.value);
+      formItems.value[data._dataId] = creatItem(data);
     });
   },
   { deep: true }
@@ -417,7 +417,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
     tableDatas.value?.forEach((data) => {
       // 初始化行数字Id
       data._dataId = getuuid();
-      formItems.value[data._dataId] = creatItem(schamaconf.value);
+      formItems.value[data._dataId] = creatItem(data);
     });
   }
 });
@@ -457,19 +457,36 @@ function setFormValue(data: any) {
   tableDatas.value?.forEach((data) => {
     // 初始化行数字Id
     data._dataId = getuuid();
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
+    formItems.value[data._dataId] = creatItem(data);
   });
 }
 
 function creatSchama() {
-  if (props.item.fromSchema && props.item.fromSchema.length > 0) {
-    props.item.fromSchema.forEach((item: any) => {
-      schamaconf.value[item.prop] = item;
+  // if (props.item.fromSchema && props.item.fromSchema.length > 0) {
+  //   props.item.fromSchema.forEach((item: any) => {
+  //     schamaconf.value[item.prop] = item;
+  //   });
+  // }
+  schamaconf.value = getSchama(props.item.fromSchema);
+}
+
+function getSchama(fromSchema: any) {
+  let re  = {};
+  if (fromSchema && fromSchema.length > 0) {
+    fromSchema.forEach((item: any) => {
+      re[item.prop] = item;
     });
   }
+  return re;
 }
-function creatItem(d: any) {
+function creatItem(data: any) {
   let sc: any = JSON.parse(JSON.stringify(schamaconf.value));
+  if(props.item.getExSchema &&  typeof props.item.getExSchema === "function"){  // 个性化配置相关逻辑
+    let key  = props.item.getExSchema(data);
+    if(key && props.item. exfromSchemas && props.item.exfromSchemas[key]){
+      sc =  JSON.parse(JSON.stringify(getSchama(props.item.exfromSchemas[key])));
+    }
+  }
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
     Object.keys(schamaconf.value[k]).forEach((k2: any) => {
@@ -683,7 +700,7 @@ onMounted(() => {
     }
     // 初始化行数字Id
     data._dataId = getuuid();
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
+    formItems.value[data._dataId] = creatItem(data);
   });
   if (props.item.fromSchema) {
     initUI();
@@ -717,8 +734,9 @@ function getValue(row: any, item: any) {
 
 function addRow() {
   const rowId = getuuid();
-  tableDatas.value?.push({ _dataId: rowId });
-  formItems.value[rowId] = creatItem(schamaconf.value);
+  const data = { _dataId: rowId };
+  tableDatas.value?.push(data);
+  formItems.value[rowId] = creatItem(data);
   editIndex.value = rowId;
 }
 
@@ -734,7 +752,7 @@ function delRow(editIndex: any) {
 function addRowByData(data: any) {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId, ...data });
-  formItems.value[rowId] = creatItem(schamaconf.value);
+  formItems.value[rowId] = creatItem(data);
   editIndex.value = rowId;
 }
 
@@ -753,7 +771,7 @@ function spliceTableData(index: number, delCount: number, list: any[]) {
         const rowId = getuuid();
         rowData['_dataId'] = rowId;
         tableDatas.value?.splice(nextIdx, delNum, rowData);
-        formItems.value[rowId] = creatItem(schamaconf.value);
+        formItems.value[rowId] = creatItem(rowData);
       }
     }
   }

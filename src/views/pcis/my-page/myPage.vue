@@ -2847,6 +2847,12 @@ const loadAppPlyInfo = async (CAppNo) => {
                       nd[ks] = null;
                     }else if(ks && ks.endsWith("cRowId")){
                       // RowId上面已经操作了，下面不再进行操作
+                    }else if(ks === 'Term.riskList' && d[ks] && d[ks] instanceof Array){
+                      d[ks].forEach((risk:any)=>{ 
+                        risk['TermRisktgt.cRowId'] = risk['TermRisktgt.cPkId']; // 将条则标的pkId附给rowId
+                        risk['TermRisktgt.cPkId'] = null;
+                      })
+                      nd[ks] = d[ks];
                     }else{
                       nd[ks] = d[ks];
                     }

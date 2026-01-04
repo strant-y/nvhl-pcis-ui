@@ -224,7 +224,7 @@
             </template>
           </template>
           <template v-if="riskShowTyp === 'grid'">
-            <app-grid-edit :gridEditConfig="tiskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+            <app-grid-edit :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
               <template v-for="(ginfo, gk) in groupInfo" :key="gk">
@@ -476,9 +476,17 @@ const dialog = ref<DialogMethod | null>(null);
 const termdata = ref<{ [key: string]: any }>({});
 const riskList = ref<{ [key: string]: any }>({});
 const riskShowTyp = ref<string>('table');
-const tiskGridConfig = ref(createAppGridEditConfig({
+const riskGridConfig = ref(createAppGridEditConfig({
   editFlag: true,
 }));
+
+// 存储risk配置原始配置信息,用于批改显示
+const riskExConfig = ref({
+  'default':createAppGridEditConfig({
+      editFlag: true,
+    })
+});
+
 const riskTableRef = ref<AppGridEditMethod | null>(null);
 const risksList = ref([]);
 
@@ -980,13 +988,19 @@ function setTermConf(d: any,initFlag: boolean){
     const riskFactormap = getUseData(d.riskFactormap);
     if(riskFactormap && riskFactormap.length > 0){
       riskFactormap.forEach((riskfactor: any)=>{
+        if(isrequired(riskfactor)){ 
+          riskfactor['rules'] = [getRequired()]
+        }
+        if(isdisabled(riskfactor)){
+          riskfactor['disabled'] = true;
+        }
         if(riskfactor.expand){
-          tiskGridConfig.value.showExpand = true;
+          riskGridConfig.value.showExpand = true;
         }
       })
     }
     methodLink(riskFactormap);
-    tiskGridConfig.value.tableBtn = [
+    riskGridConfig.value.tableBtn = [
       createFreeButtonBase({
         id:"deleteRisk",
         type: "danger",
@@ -997,7 +1011,15 @@ function setTermConf(d: any,initFlag: boolean){
         },
       }),
     ]
-    tiskGridConfig.value.fromSchema = riskFactormap;
+    riskGridConfig.value.fromSchema = riskFactormap;
+    riskGridConfig.value.getExSchema = (row : any) => {
+      if(!row['TermRisktgt.cRowId']){
+        return 'default';
+      }
+    };
+    riskGridConfig.value.exfromSchemas = {
+      'default': JSON.parse(JSON.stringify(riskFactormap))
+    }; 
   }
   const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
   if (cAddrSeq) {
@@ -1021,10 +1043,6 @@ function setTermConf(d: any,initFlag: boolean){
         item.disabled = false
       }
     })
-  }
-  methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
-  if (props.disabledFlag) {
-    setDisabledAll();
   }
   // 方案配置时条款信息中的保险费是可以编辑的
   if(route.name === "plan-info") {
@@ -1332,8 +1350,8 @@ function setDisabledAll() {
     }
   }
   if(riskShowTyp.value === 'grid'){
-    if(tiskGridConfig.value.fromSchema && tiskGridConfig.value.fromSchema.length > 0 ){
-      tiskGridConfig.value.fromSchema.forEach((item: any) => {
+    if(riskGridConfig.value.fromSchema && riskGridConfig.value.fromSchema.length > 0 ){
+      riskGridConfig.value.fromSchema.forEach((item: any) => {
         item.disabled = true;
         if (undis && undis.length > 0) {
           const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);

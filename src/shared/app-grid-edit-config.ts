@@ -8,6 +8,7 @@ export interface AppGridEditConfig {
   productionTitle?: string; //标题内容
   fromUi?: any | null; // formUi配置
   fromSchema?: any[] | null; // 表单元素列表
+  exfromSchemas?: {} | null; // 扩展元素列表,用于个性化显示个性列样式
   showBtn?: boolean; // 显示按钮 默认true
   shadow?: boolean; // 显示边框阴影 默认true
   showMyfrom?: boolean; //是否隐藏信息
@@ -27,6 +28,7 @@ export interface AppGridEditConfig {
 
   dragFlag?: boolean; // mytable模式下,是否可以拖动
   rowDbClickFun?: (rowData) => void;
+  getExSchema: () => string;  // 如果需要额外扩展配置,可自行设置获取额外配置key的方法,用于获取个性化行扩展配置
 }
 
 export interface AppGridEditMethod {
@@ -68,6 +70,7 @@ export function createAppGridEditConfig(
     production: config.production || false,
     productionTitle: config.productionTitle || "",
     fromSchema: config.fromSchema || [],
+    exfromSchemas: config.exfromSchemas || null,
     titleBtns: config.titleBtns || [],
     endBtns: config.endBtns || [],
     tableBtn: config.tableBtn || [],
@@ -83,6 +86,7 @@ export function createAppGridEditConfig(
     fromUi: createGridFromUiConfig(config.fromUi),
     dragFlag: config.dragFlag || false,
     rowDbClickFun: config.rowDbClickFun || null,
+    getExSchema: config.getExSchema || null,
   };
 }
 
