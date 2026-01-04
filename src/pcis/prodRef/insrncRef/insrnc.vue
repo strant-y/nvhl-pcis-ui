@@ -144,7 +144,7 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
 
     //  接口  开关校验
-    const resOff = await qryTerminationDataList({ cPlyNo: plyNo, CancelM1: 'CancelM1' })
+    const resOff = await qryTerminationDataList({ cPlyNo: plyNo, cOperType: 'CancelM1' })
 
     // 开关关闭：按产品规则拦截
     if (resOff?.data?.[0]?.cAppTyp === 'on') {
