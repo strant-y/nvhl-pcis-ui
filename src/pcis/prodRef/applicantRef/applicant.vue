@@ -187,6 +187,18 @@ onMounted(() => {
       setFormItem("Applicant.cCertfCls", { disabled: false });
       setFormItem("Applicant.cCertfCde", { disabled: false });
     }
+    // 职业下拉选项
+    codeListStore
+      .queryCodeList({
+        codeListName: 'INDUSTRY_INQUIRY_EX',
+        codeListParam: { value: getValue('Applicant.cOccupCde') },
+      })
+      .then((res:any) => {
+        applicantEditRef.value?.addCodeListMap({
+          code: "Applicant.cOccupCde",
+          list: res.length > 0 ? res.map((item:any) => ({ label: `${item.value} ${item.label}`, value: item.value })) : [],
+        })
+      });
   });
 });
 // //给表单下拉项赋值
