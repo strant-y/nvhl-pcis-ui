@@ -999,6 +999,27 @@ function setTermConf(d: any,initFlag: boolean){
         }
       })
     }
+    if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){ // 批改场景,增加退保标识字段
+      riskFactormap[riskFactormap.length] = {
+        prop: "TermRisktgt.cCancelMrk",
+        inputtype: "rttag",
+        nullvalue: "0",
+        title: "退保标识",
+        loadData: [
+          {
+            label: "生效中",
+            value: "0",
+            color: "#14CCCC",
+          },
+          {
+            label: "已退",
+            value: "1",
+            color: "#FF6600",
+          },
+        ],
+      }
+    }
+    
     methodLink(riskFactormap);
     riskGridConfig.value.tableBtn = [
       createFreeButtonBase({
@@ -1007,7 +1028,11 @@ function setTermConf(d: any,initFlag: boolean){
         link: true,
         icon: "DeleteFilled",
         tableClick: (r) => {
-          riskTableRef.value?.delRow(r._dataId);
+          if(r['TermRisktgt.cRowId']){
+            riskTableRef.value?.setValueByRowKey("TermRisktgt.cCancelMrk", r._dataId, "1");
+          }else{
+            riskTableRef.value?.delRow(r._dataId);
+          }
         },
       }),
     ]
@@ -1350,13 +1375,30 @@ function setDisabledAll() {
     }
   }
   if(riskShowTyp.value === 'grid'){
+    let delBtn = true;
+    if (unbut && unbut.length > 0) {
+      const t = unbut.find((un: any) => un["cEdrItem"] === "delrisk_btn");
+      if (t) {
+        delBtn = false;
+      }
+    }
     if(riskGridConfig.value.fromSchema && riskGridConfig.value.fromSchema.length > 0 ){
-      riskGridConfig.value.fromSchema.forEach((item: any) => {
-        item.disabled = true;
+      riskGridConfig.value.fromSchema.forEach((risk: any) => {
+        risk.disabled = true;
+        riskGridConfig.value.tableBtn.forEach((btn: any) => {
+          btn.hideBtns = (row: any) => {  // 如果是新增的责任,则固定显示删除按钮,如果是修改的,则根据配置隐藏删除按钮
+            const isHasRow = !row['TermRisktgt.cRowId'];
+            if(isHasRow){
+              return false;
+            }else{
+              return delBtn;
+            }
+          };
+        });
         if (undis && undis.length > 0) {
-          const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
+          const t = undis.find((un: any) => un["cEdrItem"] === risk["prop"]);
           if (t) {
-            item.disabled = false;
+            risk.disabled = false;
           }
         }
       });
