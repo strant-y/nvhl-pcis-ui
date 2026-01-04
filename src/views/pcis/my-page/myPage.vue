@@ -3353,7 +3353,10 @@ const submitToUndrFn = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  await qryTerminationFunc('0')
+  const qryTerminationStatus = await qryTerminationFunc('0')
+  if(!qryTerminationStatus){
+    return;
+  }
 
   if (needCalc.value && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
@@ -4753,7 +4756,10 @@ const submitEdrToUndrSurrender = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  await qryTerminationFunc('2')
+  const qryTerminationStatus = await qryTerminationFunc('2')
+  if(!qryTerminationStatus){
+    return;
+  }
   
   if (needCalc.value && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
@@ -4924,7 +4930,7 @@ const generateEndorse = async () => {
   //   }
   // }
   // 批改原因和清单相关的需要提示先保存一下
-  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10") && saveEdrState.value === false) {
+  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10" || props.param['cRsnCde'] === "80") && saveEdrState.value === false) {
     ElMessage.error("请先保存申请单")
     return
   }
@@ -5053,7 +5059,10 @@ const submitEdrToUndrFun = async () => {
     return; 
   }
   // 从共主联、从共无联保和数据开关校验
-  await qryTerminationFunc('1')
+  const qryTerminationStatus = await qryTerminationFunc('1')
+  if(!qryTerminationStatus){
+    return;
+  }
   
   if (needCalc.value && props.param.cTransMrk !== "1" && !qryTerminationStatus.value) {
     ElMessage.error("请先进行保费计算!");
@@ -6420,17 +6429,52 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
   const cOperTypeList = flag === '0' ? ['AppPrm'] : flag === '2' ? ['SurPrm'] : ['EdrPrm'];
   qryTerminationStatus.value = false;
   
-  if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {// 从共主联、从共无联保
-    qryTerminationStatus.value = true;
-  } else {
-    const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
-    if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
-      const list = qryTerminationData.data.filter((item:any) => cOperTypeList.includes(item.cOperType));
-      if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
-        qryTerminationStatus.value = true;
-      }
+  const qryTerminationData:any = await qryTerminationDataList({ cAppNo: props.param.cAppNo })
+  if(qryTerminationData && qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+    const list = qryTerminationData.data.filter((item:any) => cOperTypeList.includes(item.cOperType));
+    if(list.filter((item:any) => item.cAppTyp === 'on')?.length > 0) {
+      qryTerminationStatus.value = true;
     }
   }
+  if(qryTerminationStatus.value === false && ['2','4'].includes(plyBase?.['Base.cCiMrk']) && flag !== '2') {// 从共主联、从共无联保
+    const currentPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm");
+    const nPrmRange:any = await getPremiumAdjustmentRange();
+    // 调用保费计算接口获取最新保费计算后的保费数据
+    const calcres:any = flag === '0' ? await calcFunc() : await calcEdrFunc();
+    if(calcres && calcres.code === 200) {
+      const newOp: any = opertaor.convertData(calcres);
+      const nPrm = newOp.base["Base.nPrm"];
+
+      let minPrm:any = 0;
+      let maxPrm:any = 0;
+      if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
+        maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
+        minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+      } else {
+        minPrm = new Decimal(nPrm).sub(new Decimal(10))
+        maxPrm = new Decimal(nPrm).add(new Decimal(10))
+      }
+      if(minPrm < 0) { minPrm = 0 }
+      if(maxPrm < 0) { maxPrm = 0 }
+      if(new Decimal(currentPrm).lt(minPrm) || new Decimal(currentPrm).gt(maxPrm)) {
+        ElMessageBox.confirm(`本次手动调整金额（¥${currentPrm}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
+          confirmButtonText: "确定",
+          type: "warning",
+          showCancelButton: false,
+          showClose: false,
+        }).then(() => {
+        }).catch(() => {
+        })
+        return false;
+      } else {
+        qryTerminationStatus.value = true;
+      }
+    } else {
+      ElMessage.error(calcres.msg)
+      return false;
+    }
+  }
+  return true;
 }
 
 function afterCalcSurrenEdr() {
