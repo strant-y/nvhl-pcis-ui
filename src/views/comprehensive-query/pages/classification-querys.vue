@@ -1202,11 +1202,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tAppTm") {
                               item.hidden = false; // 显示投保日期
-															// 如果有值不需要设置默认值
-															let tAppTmdate = freeEditRef.value.getValue("tAppTm")
-															if (!!tAppTmdate) {
-																return false
-															}
                               // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                               const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
@@ -1229,13 +1224,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       // 批改
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tEdrAppTm") {
-                            item.hidden = false; // 显示批改申请日期
-                            // 如果有值不需要设置默认值
-														let tEdrAppTmdate = freeEditRef.value.getValue("tEdrAppTm")
-														if (!!tEdrAppTmdate) {
-															return false
-														}
-														// 设置默认值为最近3个月
+                              item.hidden = false; // 显示批改申请日期
+                            // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
                             // freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
@@ -1253,11 +1243,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       formconfig1.fromSchema?.forEach((item) => {
                           if (item.prop === "tInquiryTm") {
                               item.hidden = false; // 显示询价日期，询价单号
-                            // 如果有值不需要设置默认值
-														let tInquiryTmdate = freeEditRef.value.getValue("tInquiryTm")
-														if (!!tInquiryTmdate) {
-															return false
-														}
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
@@ -1322,10 +1307,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
-							func: (val:any) => {
-								freeEditRef.value?.setValue("tEdrAppTm", val);
-								freeEditRef.value?.setValue("tInquiryTm", val);
-							}
             //   rules: [getRules("required", {})],
             	func: (val:any) => {
                 if(val) {
@@ -1342,10 +1323,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
-							func: (val:any) => {
-								freeEditRef.value?.setValue("tAppTm", val);
-								freeEditRef.value?.setValue("tInquiryTm", val);
-							}
             //   rules: [getRules("required", {})],
 							func: (val:any) => {
                 if(val) {
@@ -1363,10 +1340,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
               hidden: true,
-							func: (val:any) => {
-								freeEditRef.value?.setValue("tEdrAppTm", val);
-								freeEditRef.value?.setValue("tAppTm", val);
-							}
             //   rules: [getRules("required", {})],
 							func: (val:any) => {
                 if(val) {
