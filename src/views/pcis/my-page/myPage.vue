@@ -4008,9 +4008,11 @@ const savePlyInfo = async () => {
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
-    res["applicant"]["Applicant.cAppNo"] = cAppNo;
-    res["insured"]["Insured.cAppNo"] = cAppNo;
-    delete res["insured"]["Insured.cPkId"];
+		res["applicant"]["Applicant.cAppNo"] = cAppNo;
+		if (!!res["insured"]) {
+			res["insured"]["Insured.cAppNo"] = cAppNo;
+			delete res["insured"]["Insured.cPkId"];
+		}
     res["cvrg"] = res["cvrg"]?.map((item:any) => {
       delete item["Term.cPkId"];
       return {
