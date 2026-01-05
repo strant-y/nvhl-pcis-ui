@@ -1748,7 +1748,7 @@ const normalQueryColumns = [
         slotName: "nEdrPrjNo"
     },
     {
-        prop: "cRsnCde",
+        prop: "cRsnCdeText",
         inputtype: "rtinput",
         title: " 批改原因",
         typeCode: "EDR_RSN_LIST_KIND",
