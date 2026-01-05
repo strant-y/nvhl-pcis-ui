@@ -1769,12 +1769,15 @@ const normalQueryColumns = [
         slotName: "nEdrPrjNo"
     },
     {
-        prop: "cRsnCdeText",
+        prop: "cRsnCde",
         inputtype: "rtinput",
         title: " 批改原因",
         typeCode: "EDR_RSN_LIST_KIND",
         align: 'left',
         lengthNum: 8,
+				formatter: (val:any, row:any) => {
+					return row.cRsnCdeText || "";
+				},
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
