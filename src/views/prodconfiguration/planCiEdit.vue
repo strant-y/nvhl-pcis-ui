@@ -509,7 +509,6 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "cBankCde",
         inputtype: "rtselect",
-
         disabled: true,
         title: "开户银行",
       },
@@ -533,13 +532,13 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
 				title: "联共保业务",
 				loadData: [
-					{ value: '0', label: '非共保业务' },
+					{value: '0', label: '非共保业务' },
 					{value: '1', label: '外部共保我方主共_主联'},
 					{value: '2', label: '外部共保我方从共_主联'},
 					{value: '3', label: '外部共保我方主共_无联保'},
 					{value: '4', label: '外部共保我方从共_无联保'},
 					{value: '5', label: '司内联保_主联'},
-					{ value: '6', label: '司内联保_从联' }
+					{value: '6', label: '司内联保_从联' },
 				],
         defaultValue: '0'
       },
@@ -565,12 +564,18 @@ const handleSave = () => {
   const formData = freeEditRef.value?.getFromValue();
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
-      try {
-        savePlanCiInfo(formData); // 调用保存接口
-        ElMessage.success("保存成功");
-        emits("ok", {formData});
-        dialogVisible.value = false;
-
+			try {
+				console.log('保存数据', formData);
+				formData['cDataSrc'] = "UI"
+				savePlanCiInfo(formData).then((res) => {
+					if (res.data.code == '1') {
+						ElMessage.success("保存成功");
+        		emits("ok", {formData});
+        		dialogVisible.value = false;
+					} else {
+						ElMessage.error(res.data.message || '保存失败');
+					}
+				}); // 调用保存接口
       } catch (error) {
         ElMessage.error("保存失败");
       }
@@ -656,11 +661,25 @@ const ciSubCompOnChangeHandle = (value: string) => {
 // }
 
 onMounted(async () => {
-  if (props.type === "edit" && props.data) {
+	if (props.type === "edit" && props.data) {
+		props.data['cStatus'] = props.data['cStatus'] || '1'
+		props.data['cCiMrk'] = props.data['cCiMrk'] || '0'
+		props.data['cMajorAgrmntMrk'] = props.data['cMajorAgrmntMrk'] || '0'
+		props.data['nPlyFeeRate'] = props.data['nPlyFeeRate'] || 0
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data);
     }, 50);
-  }
+	} else if (props.type === "add") {
+		let data = {
+			cStatus: '1',
+			cCiMrk: '0',
+			cMajorAgrmntMrk: '0',
+			nPlyFeeRate: 0,
+		}
+    setTimeout(() => {
+      freeEditRef.value?.setFormValue(data);
+    }, 50);
+	}
 });
 
 
