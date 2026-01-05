@@ -967,10 +967,10 @@ const cRelatedInsuredChange = () => {
 						let loadData = []
 						let datavalue = []
 						data.value.forEach((item)=>{
-							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
-							// datavalue.push(item['InsuredDist.cInsuredCde'])
-							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
-							datavalue.push(item['InsuredDist.cPkId'])
+							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
+							datavalue.push(item['InsuredDist.cInsuredCde'])
+							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
+							// datavalue.push(item['InsuredDist.cPkId'])
 						})
 						setValue("Dist.cRelatedInsured", datavalue);
 						setFormItem("Dist.cRelatedInsured", { loadData });

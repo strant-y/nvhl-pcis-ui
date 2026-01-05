@@ -838,8 +838,8 @@ const method = {
 					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
 					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
 						label: i['InsuredDist.cInsuredNme'],
-						value: i['InsuredDist.cPkId']
-						// value: i['InsuredDist.cInsuredCde']
+						// value: i['InsuredDist.cPkId']
+						value: i['InsuredDist.cInsuredCde']
 					})) : []
 					eventBus.emit('setMap-AddressDist040001', {
 						code: 'Dist.cRelatedInsured',
@@ -1627,8 +1627,8 @@ function getFatherPageOldProductResData() {
           const list = opertaor.getTableRefByKey('GrpMember')?.getTableData()
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['InsuredDist.cInsuredNme'],
-            value: i['InsuredDist.cPkId']
-            // value: i['InsuredDist.cInsuredCde']
+            // value: i['InsuredDist.cPkId']
+            value: i['InsuredDist.cInsuredCde']
           })) : []
         }
       });

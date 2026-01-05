@@ -292,12 +292,21 @@ const method = {
     );
   },
 	// 新增
-  addmethod: (row: any) => {
-		const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
-    if (cAppNo == '' || cAppNo == undefined) {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+  addmethod: (row: any) => {    
+		let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+		}
+		if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
-    }
+		}
     dialog.value?.open(
         cargoDistAdd,
         {
@@ -317,11 +326,20 @@ const method = {
   },
 	// 编辑
   editmethod: (row: any) => {
-		const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
-    if (cAppNo == '' || cAppNo == undefined) {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+		let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+		}
+		if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
-    }
+		}
     dialog.value?.open(
         cargoDistAdd,
         {
@@ -341,11 +359,20 @@ const method = {
   },
   // 删除
   delmethod: (row: any) => {
-		const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
-    if (cAppNo == '' || cAppNo == undefined) {
-      ElMessage.warning('请先保存投保单'); // 提示用户保存投保单
+		let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+		}
+		if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
-    }
+		}
 		ElMessageBox.confirm(
         "是否确认删除当前数据？",
         "提示",
@@ -374,7 +401,21 @@ const method = {
 		})
   },
 	// 批量删除
-  batchDelete() {
+	batchDelete() {
+		let cappNo = '';
+    // 判断有无批改类型参数，有则是批单
+    if(route.params.param?.cEdrType) {
+    	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+      cappNo = edrbase['EdrBase.cAppNo'];
+    } else if(route.params.param?.pageName === "priceInquiry") {
+      cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+    } else {
+      cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+		}
+		if (cappNo == '' || cappNo == undefined) {
+      ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
+      return;
+		}
     if (selectedRows.value.length === 0) {
       ElMessage.warning("请先选择要删除的数据");
       return;
@@ -573,12 +614,80 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
+function getFormConfig() {
+  return tableconfig.value;
+}
+
+async function getTableDataAll() {
+  const s = cardRef.value?.getFromValue() || {};
+  // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+  for (let k in s) {
+    if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+      s[k] = s[k].replace('undefined', '')
+    }
+  }
+  const param = opertaor.getParam();
+  let app = "";
+  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+  } else if(param.cOrgAppNo){
+    app = param.cOrgAppNo;
+  } else if(param.pageType !== "copy") {
+    app = param.cAppNo
+  }
+  const selData:any = {
+    cAppNo: "",
+    cComponentTable: cComponentTableValue,
+    cClauseCode: route.params.param?.cTermNo, //条款编码  
+    cProdNo: route.params.param?.cProdNo,  //产品号
+    ...formconfig1.value,
+    pageNum: 1,
+    pageSize: 99999
+  };
+  selData.dist = JSON.parse(JSON.stringify(s))
+  if(route.params.param?.pageName === "priceInquiry") {
+    selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    if(!selData['cInquiryNo']){
+      return []
+    }
+  } else {
+    selData['cAppNo'] = app;
+    if(!selData['cAppNo']){
+      return []
+    }
+  }
+  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    selData.voType = "ply"
+  }
+  // 级联地址表格显示问题处理
+  if(Object.keys(mapAddr).includes(props.compKey)) {
+    const addrInput = mapAddr[props.compKey];
+    const keys = Object.keys(addrInput)
+    if(keys && keys.length>0) {
+      const inputGroupKey = keys[0];
+      const addrValueKey = addrInput[inputGroupKey];
+      selData.dist[addrValueKey] = selData.dist[inputGroupKey];
+    }
+  }
+  const res:any = await selectDist(selData);
+  if (res.code === 200) {
+    return res.data.data?.length > 0 ? res.data.data : []
+  } else {
+    ElMessage.error(res.msg)
+    return []
+  }
+}
+
 function setValue(key: string, value: any) {
-  distTableRef?.value?.setValue(key, value);
+  applicantEditRef?.value?.setValue(key, value);
 }
 
 function getValue(key: string) {
-  return distTableRef?.value?.getValue(key);
+  return applicantEditRef?.value?.getValue(key);
+}
+
+function getTableData() {
+  return pageresult.list
 }
 
 function setUnDisabledByKeyList(key: any) {
@@ -643,44 +752,45 @@ function handleQuery(queryParams: any = { pageNum: 1, pageSize: 10 }) {
 }
 
 function setTableData(data: any) {
-  pageresult.list = data.map((item: any, index: any) => {
-    return {
-      ...item,
-      ...{
+	pageresult.list = data.map((item: any, index: any) => {
+		let dataNew:any = {}
+		if(!!item['InsuredDist.cMajorCategories'] || !!item['InsuredDist.cMediumClassification'] || !!item['InsuredDist.cOccupationalSubcategory']){
+			dataNew['InsuredDist.AllOccup'] = [
+					item['InsuredDist.cMajorCategories'], item['InsuredDist.cMediumClassification'], item['InsuredDist.cOccupationalSubcategory']
+			]
+		}
+		if(!!item['InsuredDist.tOpeningTime']){
+			dataNew['tOpeningTime'] = item['InsuredDist.tOpeningTime']? moment(item['InsuredDist.tOpeningTime']).format("YYYY-MM-DD"): null
+		}
+    return{
+      ... item,
+			... dataNew,
+      ... {
         nSeqNo: index + 1,
-        tOpeningTime: item['Dist.tOpeningTime']
-            ? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD")
-            : null,
-        'Dist.AllOccup': [
-          item['Dist.cMajorCategories'], item['Dist.cMediumClassification'], item['Dist.cOccupationalSubcategory']
-        ],
       }
     };
   });
+  pageresult.total = total || 0;
 }
 
 function setAddressStr(key: any, data: any) {
   applicantEditRef?.value?.setValue(key, data);
 }
 
+function getFromValue() {
+  return applicantEditRef?.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  applicantEditRef?.value?.setFormValue(value);
+}
+
 function validate() {
-  return new Promise(resolve => {
-    if(!pageresult.list || pageresult.list.length === 0) {
-      if(idxParam && idxParam.handleAnchorClick) {
-        idxParam.handleAnchorClick(undefined,`#${props.compKey}`)
-      }
-      resolve(false);
-    }
-    resolve(true);
-  })
+  return true;
 }
 
 function getFormValue() {
   return pageresult.list;
-}
-
-function setFormValue(value: any) {
-  setTableData(value);
 }
 
 function getFormconfig() {
@@ -688,29 +798,16 @@ function getFormconfig() {
     fromType: "custom",
   };
 }
-function getFormBtn() {
-	return distTableRef?.value?.getFormBtn();
-}
-function getTableBtn() {
-  return distTableRef?.value?.getTableBtn();
-}
 function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
-  const tableBtn = getTableBtn();
-  if(tableBtn && Object.keys(tableBtn).length > 0) {
-    Object.keys(tableBtn).forEach((key: any) => {
-      if(!noSet.includes(key)) {
-        tableBtn[key].hidden = isDisabled;
-      }
-    });
-  }
-  const formBtn = getFormBtn();
-  if(formBtn && Object.keys(formBtn).length > 0) {
-    Object.keys(formBtn).forEach((key: any) => {
-      if(!noSet.includes(key)) {
-        formBtn[key].hidden = isDisabled;
-      }
-    })
-  }
+  tableconfig.value.formconfig?.endBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  tableconfig.value.formconfig?.titleBtns?.forEach((item: any) => {
+    item.hidden = true;
+  });
+  tableconfig.value.tableBtn?.forEach((item: any) => {
+    item.hidden = true;
+  });
 }
 defineExpose({
   getValue,
@@ -718,13 +815,13 @@ defineExpose({
   getFormValue,
   setFormValue,
   getFormconfig,
-  validate,
   setUnDisabledByKeyList,
-  handleQuery,
+	handleQuery,
+	getTableData,
   setTableData,
-  getFormBtn,
+  getFormConfig,
   setDisabledAll,
-  getTableBtn
+  getTableDataAll,
 });
 </script>
 
