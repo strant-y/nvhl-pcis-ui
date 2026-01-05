@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="" width="80%" @update:model-value="handleVisibleUpdate">
+  <el-dialog v-model="dialogVisible" title="" width="80%">
     <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
     <template #footer>
       <span class="dialog-footer">
@@ -8,6 +8,7 @@
       </span>
     </template>
   </el-dialog>
+	<comDialog ref="dialogRef"></comDialog>
 </template>
 
 <script setup lang="ts">
@@ -21,6 +22,7 @@ import { ref, reactive } from "vue";
 // import { ElMessage } from "element-plus";
 import { savePlanCiInfo } from "@/api/prod"; // api接口
 import { useValidator } from "@/typings/useValidator";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 const props = defineProps<{
@@ -34,6 +36,7 @@ const props = defineProps<{
 //   type: string;
 // }>();
 const dialogVisible = ref(true);
+const dialogRef = ref<DialogMethod | null>(null);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 let para = []; //银行大类 list
@@ -47,14 +50,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cPlanNo",
         inputtype: "rtinput",
         title: "方案编号",
-        rules: [getRules("required", { change: true })],
+        rules: [getRules("required", { change: true }), getRules("maxLength", {len: 20})],
       },
       {
         prop: "nSeqNo",
-        // inputtype: "rtselect",
         inputtype: "rtnumber",
-        title: "序号",
-        rules: [getRules("required", { change: true })],
+				title: "序号",
+				precision: 0,
+				max: 99999999,
+				min: 0,
+				rules: [getRules("required", { change: true })],
       },
       {
         prop: "cCiAgrmntNo",
@@ -66,13 +71,11 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cMajorAgrmntMrk",
         inputtype: "rtselect",
         title: "主从协议标志",
-        // clearable: true,
         readOnly: true,
-        // disabled: true,
         loadData: [
           { value: '0', label: '主协议' }, { value: '1', label: '从协议' }
         ],
-
+        defaultValue: "0",
       },
       {
         prop: "cCoinsurerCde",
@@ -113,9 +116,6 @@ const formconfig = reactive<AppFreeEditConfig>(
             // 【出单机构】设置为 只读
 
           }
-
-
-
         }
         // rules: [getRules("required", { change: true })],   // 处理完这块code  注释解开 必填项这是
       },
@@ -148,17 +148,27 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtnumber",
         precision: 6,
         title: "共保比例",
-
-        rules: [getRules("required", { change: true })],
+				max: 1,
+				min: 0,
+				rules: [getRules("required", { change: true })],
       },
       {
         prop: "nPlyFeeRate",
         inputtype: "rtnumber",
         precision: 6,
-        title: "出单费率",
+				title: "出单费率",
+				max: 1,
+				min: 0,
         // rules: [getRules("required", { change: true })],
       },
-
+			{
+        prop: "cSelfMrk",
+        inputtype: "rtselect",
+        title: "本公司标志",
+				typeCode: 'WEB_SYS_STA_DICT',
+        codeParam: { 'cParCde': 'yes_no' },
+        rules: [getRules("required", { change: true })],
+      },
 
       {
         prop: "cDptCde",
@@ -171,19 +181,178 @@ const formconfig = reactive<AppFreeEditConfig>(
         prop: "cJiMrk",
         inputtype: "rtselect",
         title: "主从联标识",
-
         loadData: [{ value: '1', label: '主联' }, { value: '0', label: '从联' }],
+			},
+      {
+        prop: "nComm",
+        inputtype: "rtnumber",
+        precision: 2,
+				title: "代理经纪费",
+				max: 999999999999,
+				min: 0,
       },
       {
-        // prop: "cRiskNo",
-        // inputtype: "rtselect",
-        // title: "责任选择",
-        // typeCode: "term_risk_list",
+        prop: "nCommVar",
+        inputtype: "rtnumber",
+        precision: 2,
+				title: "代理经纪费变化",
+				max: 999999999999,
+				min: 0,
+      },
+      {
+        prop: "cBrkrCde",
+        inputtype: "rtselect",
+				title: "代理(经纪)人",
+				btnWidth: 10,
+				showExBtn: true,
+				readonly: true,
+				typeCode: "Agent_List",
+				btnItems: {
+					icon: "Search",
+					type: "primary",
+					func: () => {
+						console.log("代理(经纪)人icon事件");
+						if (!!getValue("cDptCde")) {
+							dialogRef.value?.open(
+								"agentPre",
+								{
+									type: "show",
+									data: {
+										CDptCde: getValue("cDptCde"), //机构
+										// CProdNo: sessionData.value?.cProdNo || param.cProdNo, //产品
+										// cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
+										// cChaType: getValue("Base.cChaType"), //业务来源中类
+										// cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类
+									},
+									method: {
+										getSelected: (params) => {
+											setFormItem("cBrkrCde", {
+												loadData: [{ value: params.CChaCde, label:params.CChaCde + params.CChaNme }],
+											});
+											setValue("cBrkrCde", params.CChaCde);
+											setValue("cAgtAgrNo", params.CAgtAgrNo);
+											dialogRef.value?.handleClose();
+										},
+									},
+								},
+								{
+									isOk: (selectdata: any) => {
+										console.log("a", selectdata);
+									},
+								},
+								{ title: "代理查询", width: 85 }
+							);
+						} else {
+							ElMessage.warning("请先选择出单机构！");
+						}
+					},
+				},
+			},
+			{
+        prop: "cBrkSlsCde",
+        inputtype: "rtselect",
+				title: "代理业务员代码",
+				btnWidth: 10,
+				showExBtn: true,
+				readonly: true,
+				btnItems: {
+					icon: "Search",
+					type: "primary",
+					func: () => {
+						console.log("代理业务员icon事件");
+						if (!!getValue("cDptCde")) {
+							dialogRef.value?.open("agentWorker", {
+									type: "show",
+									data: {
+										CDptCde: getValue('cDptCde'), //机构
+										CSlsId: getValue("CSlsId"), //业务员员工号
+										CBrkrCde: getValue("cBrkrCde"), //代理(经纪)人
+										leading: "CBrkSlsCde",
+									},
+									method: {
+										getSelected: (params) => {
+											console.log("代理业务员回显", params);
+											setFormItem("cBrkSlsCde", {
+												loadData: [
+													{
+														value:  params["CSlsCde"],
+														label:params["CSlsCde"] + params['CSlsNme'],
+													},
+												],
+											});
+											setValue("cBrkSlsCde", params.CSlsCde);
+											dialogRef.value?.handleClose();
+										},
+									},
+								},
+								{ title: "业务员", width: 85 }
+							);
+						} else {
+							ElMessage.warning("请先选择出单机构！");
+						}
+					},
+				},
+			},
+			{
+        prop: "cSlsId",
+        inputtype: "rtselect",
+				title: "业务员代码",
+				btnWidth: 10,
+				showExBtn: true,
+				readonly: true,
+				btnItems: {
+					icon: "Search",
+					type: "primary",
+					func: () => {
+						console.log("代理业务员icon事件");
+						if (!!getValue("cDptCde")) {
+							dialogRef.value?.open("agentWorker", {
+									type: "show",
+									data: {
+										CDptCde: getValue('cDptCde'), // 承保机构
+										CSlsId: getValue("cSlsId"), // 业务员员工号
+										CBrkrCde: getValue("cBrkrCde"), // 代理(经纪)人
+										leading: "CSlsId",
+									},
+									method: {
+										getSelected: (params) => {
+											console.log("代理业务员回显", params);
+											setFormItem("cSlsId", {
+												loadData: [
+													{
+														value:  params["CSlsCde"],
+														label:params["CSlsCde"] + params['CSlsNme'],
+													},
+												],
+											});
+											setValue("cSlsId", params.CSlsCde);
+											dialogRef.value?.handleClose();
+										},
+									},
+								},
+								{ title: "业务员", width: 85 }
+							);
+						} else {
+							ElMessage.warning("请先选择出单机构！");
+						}
+					},
+				},
+			},
+			{
+        prop: "cAgtAgrNo",
+        inputtype: "rtinput",
+        title: "代理协议号",
+      },
+      {
         prop: "cAcctNo",
         inputtype: "rtinput",
         title: "账号",
         func: (val: any) => {
-
+					if (!!val) {
+							// this.setBankInfoNotNull();
+					} else {
+							// this.clearBankInfoValidators();
+					}
         }
       },
       {
@@ -191,13 +360,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "账户名",
         func: (val: any) => {
-
+					if (!!val) {
+							// this.setBankInfoNotNull();
+					} else {
+							// this.clearBankInfoValidators();
+					}
         }
       },
       {
         prop: "cBankRelTyp",
         inputtype: "rtselect",
-        // typeCode: "SELECT_CBANKRELTYP",SELECT_CBANKRELTYP
         typeCode: 'CBankRelTypList',
         clearable: true,
         title: "收款银行大类",
@@ -351,21 +523,35 @@ const formconfig = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         title: "CNAPS号",
       },
-      // {
-      //   prop: "CUseDpt",
-      //   inputtype: "rtinput",
-      //   title: "共同代理人",
-      // },
-      // {
-      //   prop: "CUseDpt",
-      //   inputtype: "rtselect",
-      //   title: "联共保业务",
-      // },
+      {
+        prop: "cGroupId",
+        inputtype: "rtinput",
+        title: "共同代理人",
+      },
+      {
+        prop: "cCiMrk",
+        inputtype: "rtselect",
+				title: "联共保业务",
+				loadData: [
+					{ value: '0', label: '非共保业务' },
+					{value: '1', label: '外部共保我方主共_主联'},
+					{value: '2', label: '外部共保我方从共_主联'},
+					{value: '3', label: '外部共保我方主共_无联保'},
+					{value: '4', label: '外部共保我方从共_无联保'},
+					{value: '5', label: '司内联保_主联'},
+					{ value: '6', label: '司内联保_从联' }
+				],
+        defaultValue: '0'
+      },
       {
         prop: "cStatus",
         inputtype: "rtselect",
         title: "状态",
-        loadData: [{ value: '1', label: '有效' }, { value: '0', label: '无效' }]
+				loadData: [
+					{ value: '1', label: '有效' },
+					{ value: '0', label: '无效' },
+				],
+        defaultValue: '1',
       },
     ],
     fromUi: createFromUiConfig({
@@ -382,7 +568,7 @@ const handleSave = () => {
       try {
         savePlanCiInfo(formData); // 调用保存接口
         ElMessage.success("保存成功");
-        emits("ok", {});
+        emits("ok", {formData});
         dialogVisible.value = false;
 
       } catch (error) {
@@ -396,6 +582,7 @@ const handleSave = () => {
 };
 
 const handleCancel = () => {
+	emits("cancel");
   dialogVisible.value = false;
 };
 
@@ -403,7 +590,6 @@ const handleCancel = () => {
 const ciSubCompOnChangeHandle = (value: string) => {
    // 若选择的是我司
   if ('327001' === value) {
-
     //  共保子公司 根据内容查询
     setFormItem("cCiSubComp", {
       typeCode: 'Comm_Code_LIST',
@@ -411,12 +597,8 @@ const ciSubCompOnChangeHandle = (value: string) => {
       // codeParam
       codeParam: { "CParCde": "subdpt", cParCde: "327001" },
     });
-
-
-
     // 【出单机构】设置为 只读
     setFormItem("cDptCde", {
-
       typeCode: '',
       disabled: false,
     })
@@ -439,6 +621,39 @@ const ciSubCompOnChangeHandle = (value: string) => {
   }
 }
 
+// 设置银行账户信息非空
+// const setBankInfoNotNull = () => {
+// 	const CAcctNoControl = getValue('cAcctNo'); // 账号
+// 	const CAcctNmeControl = getValue('cAcctNme'); // 账户名
+// 	const CBankRelTypControl = getValue('cBankRelTyp'); // 收款银行大类
+
+// 	if (!!CAcctNoControl || !!CAcctNmeControl || !!CBankRelTypControl) {
+
+// 				setFormItem("cAcctNo", {
+// 					disabled: false,
+// 					rules: [getRules("required", {}),getRules("bankNum", {})],
+// 				});
+
+// 				setFormItem("cAcctNme", {
+// 					disabled: false,
+// 					rules: [getRules("required", {}),getRules("bankNum", {})],
+// 				});
+
+// 			if (!CAcctNmeControl.isRequired) {
+// 					CAcctNmeControl.readOnly = false;
+// 					CAcctNmeControl.setValidators([Validators.required, BaseCheck.maxCharLength(50)]);
+// 					CAcctNmeControl.markAsDirty();
+// 					CAcctNmeControl.updateValueAndValidity();
+// 			}
+
+// 			if (!CBankRelTypControl.isRequired) {
+// 					CBankRelTypControl.readOnly = false;
+// 					CBankRelTypControl.setValidators([Validators.required, BaseCheck.maxCharLength(50)]);
+// 					CBankRelTypControl.markAsDirty();
+// 					CBankRelTypControl.updateValueAndValidity();
+// 			}
+// 	}
+// }
 
 onMounted(async () => {
   if (props.type === "edit" && props.data) {
