@@ -543,11 +543,12 @@ onMounted(async () => {
         if(val) {
           codeListStore
             .queryCodeList({
-              codeListName: val === '第三者责任' ? 'mianpeileixing2' : 'mianpeileixing',
+              codeListName: val === '02' ? 'mianpeileixing2' : 'mianpeileixing',
               codeListParam:{},
             })
-            .then((res) => {
-              setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res })
+						.then((res) => {
+							setValue('Dist.cItemLiability', null)
+							setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res, multiple: val === '02' ? 0 : 1 })
             });
         }
       }
