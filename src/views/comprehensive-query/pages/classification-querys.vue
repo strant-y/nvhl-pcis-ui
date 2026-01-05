@@ -294,6 +294,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   for (const k in s) {
                       s[k] = null;
                   }
+                  const appTm = [
+                    dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                    moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                  ]
                   freeEditRefs?.setFormValue({
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
@@ -302,13 +306,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
-                    tAppTm: [
-                        dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ],
+                    tAppTm: appTm,
                     cDataTyp:"app",
                     cAppTyp:"A",
                   })
+                  setValue("tEdrAppTm", appTm)
+                  setValue("tInquiryTm", appTm)
               },
           }),
           createFreeButtonBase({
@@ -1203,7 +1206,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               // 设置默认值为最近3个月
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                               const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
-                              freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
+                            //   freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
@@ -1226,7 +1229,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
-                            freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
+                            // freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
@@ -1244,7 +1247,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             // 设置默认值为最近3个月
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
                             const startDate = moment(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00");
-                            freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
+                            // freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo") {
@@ -1306,6 +1309,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
             //   rules: [getRules("required", {})],
+              func: (val:any) => {
+                if(val) {
+                  setValue("tEdrAppTm", val)
+                  setValue("tInquiryTm", val)
+                }
+              }
           },
           {
               prop: "tEdrAppTm",
@@ -1316,6 +1325,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
             //   rules: [getRules("required", {})],
+              func: (val:any) => {
+                if(val) {
+                  setValue("tAppTm", val)
+                  setValue("tInquiryTm", val)
+                }
+              }
           },
           {
               prop: "tInquiryTm",
@@ -1327,6 +1342,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               type: "datetimerange",
               hidden: true,
             //   rules: [getRules("required", {})],
+              func: (val:any) => {
+                if(val) {
+                  setValue("tEdrAppTm", val)
+                  setValue("tAppTm", val)
+                }
+              }
           },
           {
               prop: "tIssueTm",
