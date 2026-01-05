@@ -481,7 +481,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { debounce } from 'lodash-es';
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
-import { getProductPage, distMapCollectCompKey } from "../../../api/prod/index";
+import { getProductPage, distMapCollectCompKey, qryProdRuleList, queryLatestMrk } from "../../../api/prod/index";
 import {
   saveAppPlyInfo,
   generatelSingleNo,
@@ -6473,6 +6473,67 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
     } else {
       ElMessage.error(calcres.msg)
       return false;
+    }
+  }
+  // 校验一般退保倒签
+  if(qryTerminationStatus.value === false && flag === '2') {
+    const cPlyNo = plyBase?.['Base.cPlyNo'];
+    // 查询配置的倒签天数
+    let rebackDay = 0;
+    const param = {
+      cDptCde: props.param.cDptCde,
+      cRuleCde: 'RULE_01',
+      cPrd: null,
+      cProdNo: props.param.cProdNo,
+      pageNum: 1,
+      pageSize: 10,
+    }
+    const nDpdDays:any = await qryProdRuleList(param);
+    if(nDpdDays.code === 200) {
+      if(nDpdDays.data?.code == '1') {
+        if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
+          rebackDay = nDpdDays.data?.result[0]?.cRuleValue || 0;
+        }
+      } else {
+        ElMessage.error(nDpdDays.data?.message)
+        return;
+      }
+    } else {
+      ElMessage.error(nDpdDays.msg)
+      return;
+    }
+    const tEdrBgnTm = dayjs().add(1, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss');//批单生效起期默认为明天0点
+    const newTEdrBgnTm = dayjs(tEdrBgnTm).subtract(rebackDay, 'day').format('YYYY-MM-DD HH:mm:ss');// 根据倒签天数算出可选择的最早的日期
+    
+    // 获取保单最新的保险起期和止期
+    const plyInfo:any = await queryLatestMrk({ cPlyNo: cPlyNo });
+    if(!plyInfo.data?.['tInsrncBgnTm'] || !plyInfo.data?.['tInsrncEndTm']) {
+      ElMessage.error(plyInfo.msg)
+      return
+    }
+    const latestEdrBgnTm = dayjs(plyInfo.data?.['tInsrncBgnTm']).format('YYYY-MM-DD HH:mm:ss');
+    const latestEdrEndTm = dayjs(plyInfo.data?.['tInsrncEndTm']).format('YYYY-MM-DD HH:mm:ss');
+    const v = edrbase.value?.getValue("EdrBase.tEdrBgnTm");// 批单生效起期
+    if(dayjs(v).isBefore(dayjs(latestEdrBgnTm))) {
+      ElMessage.warning('批改生效日期不能早于保险起期'+latestEdrBgnTm)
+      return;
+    } else if(dayjs(v).isAfter(dayjs(latestEdrEndTm))) {
+      ElMessage.warning('批改生效日期不能晚于保险止期'+latestEdrEndTm)
+      return;
+    } else {
+      if(props.param?.cRsnCde == "s2") {// 一般退保 查看数据开关是否打开
+        const res:any = await qryTerminationDataList({ cAppNo: props.param?.cAppNo, cOperType: 'SurBck' })
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            // 开关打开 不校验倒签天数
+            qryTerminationStatus.value = true;
+          }
+        }
+      }
+      if(dayjs(v).isBefore(dayjs(newTEdrBgnTm)) && qryTerminationStatus.value === false) {
+        ElMessage.warning("可倒签天数为"+rebackDay+"天,可倒签日期为"+newTEdrBgnTm)
+        return;
+      }
     }
   }
   return true;
