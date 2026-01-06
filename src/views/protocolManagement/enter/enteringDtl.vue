@@ -353,11 +353,12 @@ onBeforeMount(async () => {
 	}
 	// 协议续保
 	if (props.type === "orig") {
-		nextTick(()=>{
-			const res = props.param.res
+		nextTick(() => {
+			setTimeout(() => {
+				const res = props.param.res
 			// 续保复制
 			if (res) {
-				cEcAgrAppNo.value = res["res"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
+				cEcAgrAppNo.value = props.param.cEcAgrAppNo
 				if(cEcAgrAppNo.value){
 					eventBus.emit('goodsChange', cEcAgrAppNo.value);
 					eventBus.emit('insuredChange', cEcAgrAppNo.value);
@@ -407,7 +408,12 @@ onBeforeMount(async () => {
 						});
 					}
 				}
-				let dataForm: any = { ...res.res.composition, AgreementBase: res.res.composition?.AgreementBase[0], AgreementApplicant: res.res.composition?.AgreementApplicant[0], AgreementFeeWarn: res.res.composition?.AgreementBase[0], AgreementAcctinfo: res.res.composition?.AgreementAcctinfo[0] }
+				let dataForm: any = JSON.parse(JSON.stringify({ ...res.res.composition, AgreementBase: res.res.composition?.AgreementBase[0], AgreementApplicant: res.res.composition?.AgreementApplicant[0], AgreementFeeWarn: res.res.composition?.AgreementBase[0], AgreementAcctinfo: res.res.composition?.AgreementAcctinfo[0] }))
+				delete dataForm.AgreementEdrEcargoBase
+				delete dataForm.AgreementDistGoods
+				delete dataForm.AgreementTgtSummary
+				delete dataForm.AgreementDistInsured
+				delete dataForm.AgreementDistTransport
 				if (res.res.composition.AgreementTgtSummary.length > 0) {
 					res.res.composition.AgreementTgtSummary.forEach(item => {
 						const entries = Object.entries(item);
@@ -421,7 +427,7 @@ onBeforeMount(async () => {
 				dataForm['AgreementBase']['ECargoBase.cRenewMrk'] = '1'
 				dataForm['AgreementBase']['ECargoBase.cEcAgrNo'] = ''
 				dataForm['AgreementBase']['ECargoBase.cOprCde'] = user.userName // 录单人为当前用户
-				dataForm['AgreementBase']['ECargoBase.cOrigPlyNo'] = cEcAgrNo
+				// dataForm['AgreementBase']['ECargoBase.cOrigPlyNo'] = cEcAgrNo
 				dataForm.AgreementBase['ECargoBase.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
 				dataForm['AgreementBase']['ECargoBase.cAppStatus'] = ''
 				dataForm['AgreementBase']['ECargoBase.cRiFacMrk'] = null
@@ -436,7 +442,8 @@ onBeforeMount(async () => {
 				// 暂存数据
 				console.log('缓存的数据',dataForm['AgreementSpecial'])
 				sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
-			}
+				}
+			}, 1000);
 		})
 	}
   bthList.value.push(
