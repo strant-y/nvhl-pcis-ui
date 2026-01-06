@@ -481,7 +481,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { debounce } from 'lodash-es';
 import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
-import { getProductPage, distMapCollectCompKey } from "../../../api/prod/index";
+import { getProductPage, distMapCollectCompKey, qryProdRuleList, queryLatestMrk } from "../../../api/prod/index";
 import {
   saveAppPlyInfo,
   generatelSingleNo,
@@ -513,7 +513,7 @@ import {
 	queryEcargoRelevancePolicyDetails,
 	enquiryToAppEndorseChange
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange, getNewSysDays, checkCdeptByCdptCde } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -526,7 +526,7 @@ import { iconMap } from './iconMap';
 import { imageMethod } from './imageMethod';
 import { pageMethod } from './pageMethod';
 import { codeListViewStore } from "@/store";
-import { lessThan6Months } from "@/utils/date";
+import { lessThan6Months, toDate } from "@/utils/date";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const dialog = ref<DialogMethod | null>(null);
 
@@ -3359,8 +3359,8 @@ const submitToUndrFn = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  const qryTerminationStatus = await qryTerminationFunc('0')
-  if(!qryTerminationStatus){
+  const qryTerminationStatusFunc = await qryTerminationFunc('0')
+  if(!qryTerminationStatusFunc){
     return;
   }
 
@@ -4764,8 +4764,8 @@ const submitEdrToUndrSurrender = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  const qryTerminationStatus = await qryTerminationFunc('2')
-  if(!qryTerminationStatus){
+  const qryTerminationStatusFunc = await qryTerminationFunc('2')
+  if(!qryTerminationStatusFunc){
     return;
   }
   
@@ -5067,8 +5067,8 @@ const submitEdrToUndrFun = async () => {
     return; 
   }
   // 从共主联、从共无联保和数据开关校验
-  const qryTerminationStatus = await qryTerminationFunc('1')
-  if(!qryTerminationStatus){
+  const qryTerminationStatusFunc = await qryTerminationFunc('1')
+  if(!qryTerminationStatusFunc){
     return;
   }
   
@@ -6480,6 +6480,156 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
     } else {
       ElMessage.error(calcres.msg)
       return false;
+    }
+  }
+  // 校验一般退保倒签
+  if(qryTerminationStatus.value === false && flag === '2') {
+    const cPlyNo = plyBase?.['Base.cPlyNo'];
+    // 查询配置的倒签天数
+    let rebackDay = 0;
+    const param = {
+      cDptCde: props.param.cDptCde,
+      cRuleCde: 'RULE_01',
+      cPrd: null,
+      cProdNo: props.param.cProdNo,
+      pageNum: 1,
+      pageSize: 10,
+    }
+    const nDpdDays:any = await qryProdRuleList(param);
+    if(nDpdDays.code === 200) {
+      if(nDpdDays.data?.code == '1') {
+        if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
+          rebackDay = nDpdDays.data?.result[0]?.cRuleValue || 0;
+        }
+      } else {
+        ElMessage.error(nDpdDays.data?.message)
+        return;
+      }
+    } else {
+      ElMessage.error(nDpdDays.msg)
+      return;
+    }
+    const tEdrBgnTm = dayjs().add(1, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss');//批单生效起期默认为明天0点
+    const newTEdrBgnTm = dayjs(tEdrBgnTm).subtract(rebackDay, 'day').format('YYYY-MM-DD HH:mm:ss');// 根据倒签天数算出可选择的最早的日期
+    
+    // 获取保单最新的保险起期和止期
+    const plyInfo:any = await queryLatestMrk({ cPlyNo: cPlyNo });
+    if(!plyInfo.data?.['tInsrncBgnTm'] || !plyInfo.data?.['tInsrncEndTm']) {
+      ElMessage.error(plyInfo.msg)
+      return
+    }
+    const latestEdrBgnTm = dayjs(plyInfo.data?.['tInsrncBgnTm']).format('YYYY-MM-DD HH:mm:ss');
+    const latestEdrEndTm = dayjs(plyInfo.data?.['tInsrncEndTm']).format('YYYY-MM-DD HH:mm:ss');
+    const v = edrbase.value?.getValue("EdrBase.tEdrBgnTm");// 批单生效起期
+    if(dayjs(v).isBefore(dayjs(latestEdrBgnTm))) {
+      ElMessage.warning('批改生效日期不能早于保险起期'+latestEdrBgnTm)
+      return;
+    } else if(dayjs(v).isAfter(dayjs(latestEdrEndTm))) {
+      ElMessage.warning('批改生效日期不能晚于保险止期'+latestEdrEndTm)
+      return;
+    } else {
+      if(props.param?.cRsnCde == "s2") {// 一般退保 查看数据开关是否打开
+        const res:any = await qryTerminationDataList({ cAppNo: props.param?.cAppNo, cOperType: 'SurBck' })
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            // 开关打开 不校验倒签天数
+            qryTerminationStatus.value = true;
+          }
+        }
+      }
+      if(dayjs(v).isBefore(dayjs(newTEdrBgnTm)) && qryTerminationStatus.value === false) {
+        ElMessage.warning("可倒签天数为"+rebackDay+"天,可倒签日期为"+newTEdrBgnTm)
+        return;
+      }
+    }
+  }
+  // 取消免费延期校验
+  if(['M1','M8'].includes(props.param?.cRsnCde)) {
+    try {
+      // 基础参数准备
+      const plyNo = edrbase.value?.getValue('EdrBase.cPlyNo');
+      const cProdNo = edrbase.value?.getValue('EdrBase.cProdNo');
+        const baseRef = opertaor.getTableRefByKey("plyBase");
+      let newSysTmDay = 365, oldSysTmDay = 365;
+      let newInsEndTm = '', oldInsEndTm = '';
+      let newDelayDay = 0;
+
+      //  获取保单时间数据
+      const resDays:any = await getNewSysDays({ cPlyNo: plyNo });
+      if (!resDays || resDays.code !== 200 || !resDays.res) {
+        ElMessage.error("获取保单数据失败，无法进行免费延期");
+        return false; // 拦截后续流程
+      }
+      const [name0, name1, name2, name3, name4] = resDays?.res.split('###');
+      newSysTmDay = name0;
+      newInsEndTm = name1;
+      oldSysTmDay = name2;
+      newDelayDay = name3;//延长天数
+      oldInsEndTm = name4;//原始保单的保险止期
+
+      // 获取表单基础数据
+      const tabref = opertaor.getTableRefs();
+      const baseBefore = tabref?.["insrnc"].getFromValue();
+      console.log('base---', baseBefore)
+      const obj = baseBefore['Base.tInsrncEndTm'];// 保险止期
+      // 时间有效性校验
+      const objDate = toDate(obj);
+      const newInsEndTmDate = toDate(newInsEndTm);
+      if (isNaN(objDate.getTime()) || isNaN(newInsEndTmDate.getTime())) {
+        ElMessage.error("时间格式错误");
+        return false; // 拦截
+      }
+
+      //止期只能延长
+      if (objDate.getTime() < newInsEndTmDate.getTime()) {
+        ElMessage.warning("免费延期只能延长保险止期，不能缩短");
+        return false; // 拦截
+      }
+
+      //  分公司编码获取
+      const cDptCde = edrbase.value?.getValue('EdrBase.cDptCde');
+      const resCheck:any = await checkCdeptByCdptCde({ dptCde: cDptCde });
+      const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
+
+      //  接口  开关校验
+      const resOff = await qryTerminationDataList({ cPlyNo: plyNo, cOperType: 'CancelM1' })
+
+      // 开关关闭：按产品规则拦截
+      if (resOff?.data?.[0]?.cAppTyp === 'on') {
+        qryTerminationStatus.value = true;
+      } else {
+        const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
+        const nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);
+        const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
+        const sxMonths = monthBetween(new Date(toDate(oldInsEndTm).getTime() + 86400000), objDate);
+        const tMonths = monthBetween(new Date(newInsEndTmDate.getTime() + 86400000), objDate);
+
+        // 产品 043009 规则
+        if (cProdNo === '043009') {
+          if (subSidiary === "0261010000000" && sxMonths > 24) {
+            ElMessage.warning("陕西分公司免费延期最长不超过 2 年");
+            return false; // 拦截
+          } else if (subSidiary !== "0261010000000" && tMonths > 6) {
+            ElMessage.warning("免费延期最长不超过 6 个月");
+            return false; // 拦截
+          }
+        }
+        // 其他产品规则
+        else if (cProdNo !== '110002') {
+          if (nowDelayDay > 180 || sumDelayDay > 180) {
+            ElMessage.warning("延期天数超 180 天限制");
+            return false; // 拦截
+          } else if (nowDelayDay > 90) {
+            ElMessage.warning("单次延期不超过 90 天");
+            return false; // 拦截
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error("免费延期校验异常", error);
+      ElMessage.error("免费延期处理失败，请重试");
+      return false; // 异常时拦截
     }
   }
   return true;
