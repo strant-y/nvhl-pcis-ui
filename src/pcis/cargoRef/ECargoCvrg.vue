@@ -297,7 +297,12 @@ const method = {
       del()
     }
   },
-  selecedTgt: () => {
+	selecedTgt: () => {
+		const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
+		if (!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')) { 
+			ElMessage.warning("请先保存申请单!");
+      return;
+		}
     const row = cvrgEditRef?.value?.getSelectRow()
     console.log('row', row)
     if(!row) {

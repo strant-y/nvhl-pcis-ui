@@ -712,16 +712,19 @@ function next() {
               if (res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
                 ElMessage.warning("该保单不允许续保，请重新选择！");
                 return
-              }
+								}
+							let cvrg = JSON.parse(JSON.stringify(res.res.composition.cvrg))
+							res.res.composition.cvrg = []
               router.push({
                 path: "/pcisapp/myPage",
                 query: {
                   param: JSON.stringify({
                     ...handleArray(res.res.composition.plyBase[0]), ...{
 											pageType: "orig",
-											cTermNme: res.res.composition.cvrg[0]?.["Term.cClauseCode"],
-											cTermNo: res.res.composition.cvrg[0]?.["Term.cClauseName"],
-											res: res
+											cTermNme: cvrg[0]?.["Term.cClauseCode"],
+											cTermNo: cvrg[0]?.["Term.cClauseName"],
+											res: res,
+											// renewalComponent: renewalComponent.value,
                     }
                   }),
                 },

@@ -242,15 +242,22 @@ function confirm() {
 				getECargoPolicyForRenewal({ cEcAgrNo: formData.cPlyNo, components: [renewalComponent.value] }).then(
 					async (res: any) => {
 						if (res.code == "200") {
-							closeDialog();
+							// 存一份申请单号，把res的单号清空
+							let AgreementBase = JSON.parse(JSON.stringify(res.res.composition.AgreementBase[0]))
+							clearCEcAgrAppNoValues(res.res.composition)
 							router.push({
 								path: "/protocolManagement/enteringDtl",
 								query: {
-									param: JSON.stringify({res,dptCde,cDptCde,cDptCnm}),
+									param: JSON.stringify({
+										...handleArray(AgreementBase),
+										res, dptCde, cDptCde, cDptCnm,
+										renewalComponent: renewalComponent.value
+									}),
 									type: 'orig',
 									payWay: param
 								},
 							});
+							closeDialog();
 						} else {
 							ElMessage.error(res.msg);
 						}
@@ -322,6 +329,44 @@ function renewalQuery() {
   }).catch(err => {
     ElMessage.error(err.msg || err)
   })
+}
+
+
+// 下一步
+const handleArray = (obj:any)=>{
+  // 创建一个新的对象，并移除"Base."前缀
+  let newObj = {};
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // 通过字符串操作去掉前缀
+      let newKey = key.replace('ECargoBase.', '');
+      newObj[newKey] = obj[key];
+    }
+  }
+  return newObj
+}
+
+/**
+ * 清空所有对象中字段名包含 '.cEcAgrAppNo' 的值（设为空字符串）
+ */
+ function clearCEcAgrAppNoValues(data) {
+  if (Array.isArray(data)) {
+    data.forEach(item => {
+      if (item && typeof item === 'object') {
+        clearCEcAgrAppNoValues(item); // 递归处理数组中的对象
+      }
+    });
+  } else if (data && typeof data === 'object') {
+    for (const key in data) {
+      if (key.endsWith('.cEcAgrAppNo')) {
+        // 清空该字段的值（可选：设为 ""、null、undefined）
+        data[key] = ""; // 或 null，根据业务需求
+      } else if (typeof data[key] === 'object') {
+        // 继续递归嵌套对象（虽然你数据是扁平的，但更健壮）
+        clearCEcAgrAppNoValues(data[key]);
+      }
+    }
+  }
 }
 </script>
 

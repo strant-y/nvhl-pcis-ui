@@ -11,7 +11,7 @@
 		>
 			<!-- policyInfo 列的具名插槽 -->
 			<template #column-policyInfo="{ row, column, index }">
-				<div class="policy-info-cell">
+				<div v-if="cPrnTypedata == '01'" class="policy-info-cell">
 					<div v-if="row.cAppNo" class="policy-number-row">
 						<span>{{ row.cAppNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cAppNo)">
@@ -21,6 +21,20 @@
 					<div v-if="row.cPlyNo" class="policy-number-row">
 						<span>{{ row.cPlyNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+				<div v-if="cPrnTypedata == '02'" class="policy-info-cell">
+					<div v-if="row.cEcAgrNo" class="policy-number-row">
+						<span>{{ row.cEcAgrNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
+						<span>{{ row.cEcAgrAppNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
 							<DocumentCopy />
 						</el-icon>
 					</div>
@@ -387,13 +401,13 @@ onMounted(async () => {
     ],
   });
 });
-const handleArray = (obj:any)=>{
+const handleArray = (obj:any,base)=>{
   // 创建一个新的对象，并移除"Base."前缀
   let newObj = {};
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       // 通过字符串操作去掉前缀
-      let newKey = key.replace('Base.', '');
+      let newKey = key.replace(base, '');
       newObj[newKey] = obj[key];
     }
   }
@@ -429,13 +443,17 @@ const getRenewal = (row:any)=>{
 										ElMessage.warning("该保单不允许续保，请重新选择！");
 										return
 									}
+									let cvrg = JSON.parse(JSON.stringify(res.res.composition.cvrg))
+									res.res.composition.cvrg = []
 									router.push({
 										path: "/pcisapp/myPage",
 										query: {
 											param: JSON.stringify({
-												...handleArray(res.res.composition.plyBase[0]), ...{
-													pageType: "orig", cTermNme: res["res"]["composition"]["plyBase"][0]["Base.xbtm"],
-													cTermNo: res["res"]["composition"]["plyBase"][0]["Base.xbtn"], res: res
+												...handleArray(res.res.composition.plyBase[0],"Base."), ...{
+													pageType: "orig", 
+													cTermNme: cvrg[0]?.["Term.cClauseCode"],
+													cTermNo: cvrg[0]?.["Term.cClauseName"],
+													res: res
 												}
 											}),
 										},
@@ -474,10 +492,17 @@ const getRenewal = (row:any)=>{
 									const renewalComponent = res1.body.component;
 									getECargoPolicyForRenewal({ cEcAgrNo: row.cEcAgrNo, components: [renewalComponent] }).then((res3: any) => {
 										if (res3.code == "200") {
+											// 存一份申请单号，把res的单号清空
+											let AgreementBase = JSON.parse(JSON.stringify(res3.res.composition.AgreementBase[0]))
+											clearCEcAgrAppNoValues(res3.res.composition)
 											router.push({
 												path: "/protocolManagement/enteringDtl",
 												query: {
-													param: JSON.stringify({res:res3,dptCde,cDptCde}),
+													param: JSON.stringify({
+														...handleArray(AgreementBase,"ECargoBase."),
+														res: res3, dptCde, cDptCde,
+														renewalComponent: renewalComponent.value
+													}),
 													type: 'orig',
 													payWay: paymentMethod
 												},
@@ -555,6 +580,7 @@ const handleQuery = (flag = true) => {
 }
 
 /** 查询 */
+let cPrnTypedata = ref('01')
 function refreshData(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -568,21 +594,32 @@ function refreshData(flag?: boolean) {
 	console.log('param)))))))))))))))))))', param)
 	let data
 	if (s.cPrnType == "01") {
+		cPrnTypedata.value = '01'
 		data = findRenewalInsurance(param)
 	} else if (s.cPrnType == "02") {
+		cPrnTypedata.value = '02'
 		data = findECargoRenewalInsurance(param)
 	}
 	data.then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];
-        pageresult.list = data.result;
-				pageresult.list = data.result.map((item) => ({
-					...item,
-					// 创建一个新字段合并两个值
-					policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
-					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-				}))
+				pageresult.list = data.result;
+				if (cPrnTypedata.value == '01') {
+					pageresult.list = data.result.map((item) => ({
+						...item,
+						// 创建一个新字段合并两个值
+						policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+						InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+					}))
+				} else {
+					pageresult.list = data.result.map((item) => ({
+						...item,
+						// 创建一个新字段合并两个值
+						policyInfo: `${item.cEcAgrNo || ''}\n${item.cEcAgrAppNo || ''}`,
+						InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+					}))
+				}
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);
@@ -653,6 +690,29 @@ const copyText = (text: any) => {
     }
   }
 };
+
+/**
+ * 清空所有对象中字段名包含 '.cEcAgrAppNo' 的值（设为空字符串）
+ */
+ function clearCEcAgrAppNoValues(data) {
+  if (Array.isArray(data)) {
+    data.forEach(item => {
+      if (item && typeof item === 'object') {
+        clearCEcAgrAppNoValues(item); // 递归处理数组中的对象
+      }
+    });
+  } else if (data && typeof data === 'object') {
+    for (const key in data) {
+      if (key.endsWith('.cEcAgrAppNo')) {
+        // 清空该字段的值（可选：设为 ""、null、undefined）
+        data[key] = ""; // 或 null，根据业务需求
+      } else if (typeof data[key] === 'object') {
+        // 继续递归嵌套对象（虽然你数据是扁平的，但更健壮）
+        clearCEcAgrAppNoValues(data[key]);
+      }
+    }
+  }
+}
 </script>
 
 <style scoped>

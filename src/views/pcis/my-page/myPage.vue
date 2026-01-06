@@ -2664,7 +2664,14 @@ const saveDist = (appNo:any, cRsnCde?:any) => {
   } else if(props.param?.pageType === "inquiryToApp") {
     params['cInquiryNo'] = props.param?.cInquiryNo;
     params['targetNo'] = appNo;
-  } else {
+	}
+	// else if (props.param?.pageType === "orig") {
+	// 	let data = props.param?.renewalComponent
+	// 	params['cAppNo'] = props.param?.cOrigPlyNo;
+  //   params['targetNo'] = appNo;
+  //   params['cComponentTables'] = data && typeof data === 'object' && !Array.isArray(data)? Object.keys(data).join(',') : '';
+	// }
+	else {
     params['cAppNo'] = props.param?.cAppNo;
     params['targetNo'] = appNo;
   }
@@ -3280,7 +3287,7 @@ const setInsuranceTerm = (ops, productCode) => {
     // 使用默认1年（保持原有逻辑）
     endTm = currentTime.add(1, 'year').format("YYYY-MM-DD 23:59:59");
   }
-  const appTm = currentTime.format("YYYY-MM-DD HH:mm:ss");
+  const appTm = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
   ops.insrnc["Base.tDepartureDate"] = beginTm;
   ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
@@ -4138,6 +4145,12 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
+    // if((props.param?.pageType === "orig") && saveDistBatchFlag.value) {
+    //   // 保存清单
+		// 	debugger
+    //   const appNo = plyBase["Base.cAppNo"];
+    //   saveDist(appNo);
+    // }
 
     // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
     if(props.param?.pageType === "app" || props.param?.pageType === "template" || props.param?.pageType === "copy" || props.param?.pageType === "inquiryToApp" || props.param.pageType === "orig") {
