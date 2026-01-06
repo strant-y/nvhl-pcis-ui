@@ -639,8 +639,10 @@ function getFromValue() {
         }
       }
       const plan = i["Term.cPlanNo"];
+      let risk_index = 1;
       list.forEach((r: any) => {
         r["TermRisktgt.cPlanNo"] = plan;
+        r['TermRisktgt.nSeqNo'] = risk_index++;
       });
       i["Term.riskList"] = list;
       i["Term.nSeqNo"] = seqNo++;
@@ -659,9 +661,11 @@ function getFromValue() {
               if (m["riskList"]) {
                 let l = JSON.parse(JSON.stringify(m["riskList"]));
                 delete m["riskList"];
+                let risk_index = 1;
                 l.forEach((r: any) => {
                   r["TermRisktgt.cPlanNo"] = plan;
                   r["TermRisktgt.cIsCommon"] = '1';
+                  r['TermRisktgt.nSeqNo'] = risk_index++;
                 });
                 m["Term.riskList"] = l;
               }

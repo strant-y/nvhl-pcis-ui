@@ -66,52 +66,13 @@
                       "
                       :label-width="calculatedLabelWidth()"
                   >
-                    <div style="display: flex; width: 100%;" :class="{'show-right-btn': formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId}">
-                      <div
-                          :style="{
-                            width:
-                              // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
-                              formItems[props.row._dataId][i.prop].showExBtn &&
-                              formItems[props.row._dataId][i.prop].inputtype !== 'rttable' &&
-                              editIndex === props.row._dataId
-                                ? (formItems[props.row._dataId][i.prop].btnWidth
-                                    ? 100 -
-                                      formItems[props.row._dataId][i.prop].btnWidth
-                                    : 75) + '%'
-                                : '100%',
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                          }"
-                      >
-                        <from-item
+                    <from-item
                             v-model="props.row[i.prop]"
                             :item="formItems[props.row._dataId][i.prop]"
                             :showLabel=" item.editFlag ? (editIndex !== props.row._dataId ? true : false) : 
                             editIndex !== props.row._dataId ? true : (item.editList && item.editList.length > 0 ? !item.editList?.includes(i.prop) : true) && (editIndex === props.row._dataId) "
                             :row="props.row"
                         />
-                      </div>
-                      
-                      <!---       显示组件尾部按钮       --->
-                      <template
-                          v-if="formItems[props.row._dataId][i.prop].showExBtn && editIndex === props.row._dataId"
-                      >
-                        <rt-button
-                            v-if="
-                        formItems[props.row._dataId][i.prop].inputtype !==
-                        'rttable'
-                      "
-                            :style="{
-                        width:
-                          (formItems[props.row._dataId][i.prop].btnWidth
-                            ? formItems[props.row._dataId][i.prop].btnWidth
-                            : 25) + '%',
-                        height: '100%',
-                      }"
-                            :item="formItems[props.row._dataId][i.prop].btnItems"
-                        />
-                      </template>
-                    </div>
                   </el-form-item>
                 </el-col>
               </template>
@@ -141,7 +102,7 @@
         :align="item.align ? item.align : 'center'"
       >
         <template #default="scope">
-            <div class="methodColumn">
+            <div class="methodColumn" :class="{'multiple-items': item.tableBtn && item.tableBtn.length > 1}">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
               <template v-if="item.tableBtnType === 'text'">
                 <a @click="item.func ? item.tableClick(scope.row) : () => {}">{{
@@ -233,40 +194,12 @@
                   :prop="[scope.$index, i.prop]"
                   :rules="i.rules ? i.rules : undefined"
                 >
-                  <div :style="{
-                      width:
-                        // 显示组件尾部按钮 - table 组件不显示尾部按钮 、 非当前选中行不显示尾部按钮
-                        formItems[scope.row._dataId][i.prop].showExBtn &&
-                        formItems[scope.row._dataId][i.prop].inputtype !== 'rttable' &&
-                        editIndex === scope.row._dataId
-                          ? (formItems[scope.row._dataId][i.prop].btnWidth
-                              ? 100 -
-                                formItems[scope.row._dataId][i.prop].btnWidth
-                              : 75) + '%'
-                          : '100%',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                    }" >
-                    <from-item
+                  <from-item
                       v-model="scope.row[i.prop]"
                       :item="formItems[scope.row._dataId][i.prop]"
                       :showLabel="formItems[scope.row._dataId][i.prop]?.disableColEdit || editIndex !== scope.row._dataId"
                       :row="scope.row"
                   />
-                </div>
-                  <!---       显示组件尾部按钮       --->
-                  <template
-                      v-if="formItems[scope.row._dataId][i.prop].showExBtn && editIndex === scope.row._dataId"
-                  >
-                    <rt-button
-                        v-if=" formItems[scope.row._dataId][i.prop].btnItems "
-                        :style="{ width:
-                      (formItems[scope.row._dataId][i.prop].btnWidth
-                        ? formItems[scope.row._dataId][i.prop].btnWidth
-                        : 25) + '%', height: '100%', }"
-                        :item="formItems[scope.row._dataId][i.prop].btnItems"
-                    />
-                  </template>
                 </el-form-item>
               </template>
               <template v-else-if="i.formatter">
@@ -317,7 +250,7 @@
         "
       >
         <template #default="scope">
-              <div class="methodColumn">
+              <div class="methodColumn" :class="{'multiple-items': item.tableBtn && item.tableBtn.length > 1}">
           <template v-for="(btn, index) in item.tableBtn" :key="index">
             <template v-if="btn.hidden !== true">
                 <template v-if="item.tableBtnType === 'text'">
@@ -471,7 +404,7 @@ watch(
     creatSchama();
     formItems.value = {};
     tableDatas.value?.forEach((data) => {
-      formItems.value[data._dataId] = creatItem(schamaconf.value);
+      formItems.value[data._dataId] = creatItem(data);
     });
   },
   { deep: true }
@@ -480,12 +413,20 @@ watch([() => props.modelValue], ([newModelValue]) => {
   tableDatas.value = [];
   formItems.value = {};
   tableDatas.value = newModelValue ? newModelValue : [];
-  tableDatas.value?.forEach((data) => {
-    // 初始化行数字Id
-    data._dataId = getuuid();
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
-  });
+  if(tableDatas && tableDatas.value.length > 0){
+    tableDatas.value?.forEach((data) => {
+      // 初始化行数字Id
+      data._dataId = getuuid();
+      formItems.value[data._dataId] = creatItem(data);
+    });
+  }
 });
+
+watch([() => tableDatas.value],([newFormData])=>{
+  emits("update:modelValue", newFormData);
+},{
+  deep:true
+})
 watch(
   () => props.parentFromUi,
   (newFromUi) => {
@@ -516,19 +457,36 @@ function setFormValue(data: any) {
   tableDatas.value?.forEach((data) => {
     // 初始化行数字Id
     data._dataId = getuuid();
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
+    formItems.value[data._dataId] = creatItem(data);
   });
 }
 
 function creatSchama() {
-  if (props.item.fromSchema && props.item.fromSchema.length > 0) {
-    props.item.fromSchema.forEach((item: any) => {
-      schamaconf.value[item.prop] = item;
+  // if (props.item.fromSchema && props.item.fromSchema.length > 0) {
+  //   props.item.fromSchema.forEach((item: any) => {
+  //     schamaconf.value[item.prop] = item;
+  //   });
+  // }
+  schamaconf.value = getSchama(props.item.fromSchema);
+}
+
+function getSchama(fromSchema: any) {
+  let re  = {};
+  if (fromSchema && fromSchema.length > 0) {
+    fromSchema.forEach((item: any) => {
+      re[item.prop] = item;
     });
   }
+  return re;
 }
-function creatItem(d: any) {
+function creatItem(data: any) {
   let sc: any = JSON.parse(JSON.stringify(schamaconf.value));
+  if(props.item.getExSchema &&  typeof props.item.getExSchema === "function"){  // 个性化配置相关逻辑
+    let key  = props.item.getExSchema(data);
+    if(key && props.item. exfromSchemas && props.item.exfromSchemas[key]){
+      sc =  JSON.parse(JSON.stringify(getSchama(props.item.exfromSchemas[key])));
+    }
+  }
   // 将方法回填到item中
   Object.keys(schamaconf.value).forEach((k: any) => {
     Object.keys(schamaconf.value[k]).forEach((k2: any) => {
@@ -742,7 +700,7 @@ onMounted(() => {
     }
     // 初始化行数字Id
     data._dataId = getuuid();
-    formItems.value[data._dataId] = creatItem(schamaconf.value);
+    formItems.value[data._dataId] = creatItem(data);
   });
   if (props.item.fromSchema) {
     initUI();
@@ -776,8 +734,9 @@ function getValue(row: any, item: any) {
 
 function addRow() {
   const rowId = getuuid();
-  tableDatas.value?.push({ _dataId: rowId });
-  formItems.value[rowId] = creatItem(schamaconf.value);
+  const data = { _dataId: rowId };
+  tableDatas.value?.push(data);
+  formItems.value[rowId] = creatItem(data);
   editIndex.value = rowId;
 }
 
@@ -793,7 +752,7 @@ function delRow(editIndex: any) {
 function addRowByData(data: any) {
   const rowId = getuuid();
   tableDatas.value?.push({ _dataId: rowId, ...data });
-  formItems.value[rowId] = creatItem(schamaconf.value);
+  formItems.value[rowId] = creatItem(data);
   editIndex.value = rowId;
 }
 
@@ -812,7 +771,7 @@ function spliceTableData(index: number, delCount: number, list: any[]) {
         const rowId = getuuid();
         rowData['_dataId'] = rowId;
         tableDatas.value?.splice(nextIdx, delNum, rowData);
-        formItems.value[rowId] = creatItem(schamaconf.value);
+        formItems.value[rowId] = creatItem(rowData);
       }
     }
   }
@@ -1049,6 +1008,9 @@ function isrequired(i: any) {
 }
 .methodColumn {
   display: grid;
+  grid-template-columns: 1ft;
+}
+.methodColumn.multiple-items {  // 如果只有一列,居中显示
   grid-template-columns: repeat(2, 1fr);
 }
 :deep(.methodColumn .el-button+.el-button) {
