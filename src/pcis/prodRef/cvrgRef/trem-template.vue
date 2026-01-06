@@ -1741,6 +1741,10 @@ function methodLink(items: any) {
       if(items[i]['btnItems'] && items[i]['btnItems']["func"] && typeof items[i]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
         items[i]['btnItems']["func"] = methodMap[items[i]['btnItems']["func"]];
       }
+      // 地址编码下拉选项
+      if(items[i]['prop'] === 'TermRisktgt.cDistCodeNo') {
+        items[i]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
+      }
     }
   }
 }
