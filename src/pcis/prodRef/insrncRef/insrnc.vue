@@ -67,6 +67,11 @@ const nRatioCoefFunc = () => {
         return;
     }
   }
+  // 090001、090002、090003短期费率系数默认1
+  if(['090001','090002','090003'].includes(route.params.param?.cProdNo)) {
+    opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(1).toFixed(6));
+    return;
+  }
 
   const baseBefore = tabref["insrnc"]?.getFromValue();
   const baseBefore2 = tabref["base"]?.getFromValue();
