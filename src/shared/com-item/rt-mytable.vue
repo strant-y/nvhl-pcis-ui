@@ -223,60 +223,28 @@
                               :prop="`${j}.${t.prop}`"
                               :rules="t.rules ? t.rules : undefined"
                             >
-                              <div
-                                :style="{
-                                  width:
-                                    t.showExBtn && t.inputtype !== 'rttable' // 显示组件尾部按钮 table 组件不显示尾部按钮
-                                      ? (t.btnWidth ? 100 - t.btnWidth : 75) + '%'
-                                      : '100%',
-                                }"
-                              >
-                                <from-item
-                                  v-model="i[t.prop]"
-                                  :item="t"
-                                  :row="i"
-                                  :showLabel="
-                                    editIndex !== i._dataId ||
-                                    (appgrideditConfig.editList &&
-                                    appgrideditConfig.editList.length > 0
-                                      ? !appgrideditConfig.editList?.includes(t.prop)
-                                      : false)
-                                  "
-                                  :ref="
-                                    (re) => {
-                                      if (formRefs[i._dataId]) {
-                                        formRefs[i._dataId][t.prop] = re;
-                                      } else {
-                                        formRefs[i._dataId] = {};
-                                        formRefs[i._dataId][t.prop] = re;
-                                      }
-                                    }
-                                  "
-                                />
-                              </div>
-                              <!---       显示组件尾部按钮       --->
-                              <template
-                                v-if="
-                                  t.showExBtn &&
-                                  !(
-                                    editIndex !== i._dataId ||
-                                    (appgrideditConfig.editList &&
-                                    appgrideditConfig.editList.length > 0
-                                      ? !appgrideditConfig.editList?.includes(t.prop)
-                                      : false)
-                                  )
+                              <from-item
+                                v-model="i[t.prop]"
+                                :item="t"
+                                :row="i"
+                                :showLabel="
+                                  editIndex !== i._dataId ||
+                                  (appgrideditConfig.editList &&
+                                  appgrideditConfig.editList.length > 0
+                                    ? !appgrideditConfig.editList?.includes(t.prop)
+                                    : false)
                                 "
-                              >
-                                <rt-button
-                                  v-if="t.inputtype !== 'rttable'"
-                                  :style="{
-                                    width: (t.btnWidth ? t.btnWidth : 25) + '%',
-                                    height: '100%',
-                                  }"
-                                  :item="t.btnItems"
-                                  @closepopover="(rev) => setPopover(rev, i, t)"
-                                />
-                              </template>
+                                :ref="
+                                  (re) => {
+                                    if (formRefs[i._dataId]) {
+                                      formRefs[i._dataId][t.prop] = re;
+                                    } else {
+                                      formRefs[i._dataId] = {};
+                                      formRefs[i._dataId][t.prop] = re;
+                                    }
+                                  }
+                                "
+                              />
                             </el-form-item>
                           </td>
                       </template>

@@ -22,7 +22,7 @@
           >
             <tremTemplate
               v-for="(i, index) in formData['m']"
-              :key="index"
+              :key="formData['m'][index]['&rowId']"
               :rowIndex="index"
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
@@ -61,7 +61,7 @@
             >
               <tremTemplate
                 v-for="(i, index) in formData['a1']"
-                :key="index"
+                :key="formData['a1'][index]['&rowId']"
                 :rowIndex="index"
                 v-model="formData['a1'][index]"
                 :disabled-flag="disAbledFlag"
@@ -97,7 +97,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['a2' + index] = res;
+                  tremTemplateRefs['a2'] = res;
                 }
               "
             />
@@ -120,7 +120,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['a3' + index] = res;
+                  tremTemplateRefs['a3'] = res;
                 }
               "
             />
@@ -391,25 +391,31 @@ function addTermData() {
           const se = iss.filter(
             (em) => em["Term.cClauseCode"] === item.cTermNo
           );
-          item.children?.forEach((e: any) => {
+          if(item.cRiskType === 'grid'){
             if (se.length > 0) {
-              const seri = se[0].riskList.filter(
-                (er: { [x: string]: any }) =>
-                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
-              );
-              if (seri.length > 0) {
-                riskList.push(seri[0]);
+              riskList = se[0].riskList;
+            }
+          }else{
+            item.children?.forEach((e: any) => {
+              if (se.length > 0) {
+                const seri = se[0].riskList.filter(
+                  (er: { [x: string]: any }) =>
+                    er["TermRisktgt.cLiabCode"] === e.cRiskNo
+                );
+                if (seri.length > 0) {
+                  riskList.push(seri[0]);
+                } else {
+                  riskList.push({
+                    "TermRisktgt.cLiabCode": e.cRiskNo,
+                  });
+                }
               } else {
                 riskList.push({
                   "TermRisktgt.cLiabCode": e.cRiskNo,
                 });
               }
-            } else {
-              riskList.push({
-                "TermRisktgt.cLiabCode": e.cRiskNo,
-              });
-            }
-          });
+            });
+          }
           let data: { [key: string]: any } = {};
           if (se.length > 0) {
             data = se[0];
@@ -574,16 +580,17 @@ function refushData(datas: any) {
     if (!pd[key]) {
       pd[key] = [];
     }
+    item['&rowId'] = uuidv4();  // 用作组件id标记,用于刷新组件
     pd[key].push(item);
   });
   // 强制刷新组件,对数据进行更新
   formData.value = {};
-  setTimeout(() => {
+  nextTick(() => {
     formData.value = pd;
-    nextTick(() => {
+    setTimeout(()=>{  
       showFlush();
-    });
-  }, 50);
+    },50);
+  });
 }
 
 function getFromValue() {
@@ -594,8 +601,11 @@ function getFromValue() {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
       i["Term.nSeqNo"] = idex++;
+      delete i["&rowId"]; // 删除标记rowId字符串
       if (i["riskList"]) {
+        let risk_index = 1;
         i["Term.riskList"] = i["riskList"].map((m: any) => {
+          m['TermRisktgt.nSeqNo'] = risk_index++;
           return m;
         });
         delete i["riskList"];
