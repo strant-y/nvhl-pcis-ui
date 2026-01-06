@@ -1149,9 +1149,9 @@ const initQuery = async (cPlyNo, cProdNo, data) => {
         const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
         console.log( 'code--0',cProdNo,' 分公司编码查询结果 ', resCheck, ' 分公司编码 ', subSidiary);
 
-        const resOff = await qryTerminationDataList({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
+        const resOff = await qryTerminationDataList({ cPlyNo: cPlyNo, cOperType: 'CancelM1' });
         console.log(666,resOff)
-        if(!resOff.data || resOff.data?.length < 1){
+        if(resOff?.data?.[0]?.cAppTyp === 'on'){
              return false; 
         }else{
 

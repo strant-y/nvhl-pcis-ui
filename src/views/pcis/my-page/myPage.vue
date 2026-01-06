@@ -3354,8 +3354,8 @@ const submitToUndrFn = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  const qryTerminationStatus = await qryTerminationFunc('0')
-  if(!qryTerminationStatus){
+  const qryTerminationStatusFunc = await qryTerminationFunc('0')
+  if(!qryTerminationStatusFunc){
     return;
   }
 
@@ -4757,8 +4757,8 @@ const submitEdrToUndrSurrender = async () => {
   }
 
   // 从共主联、从共无联保和数据开关校验
-  const qryTerminationStatus = await qryTerminationFunc('2')
-  if(!qryTerminationStatus){
+  const qryTerminationStatusFunc = await qryTerminationFunc('2')
+  if(!qryTerminationStatusFunc){
     return;
   }
   
@@ -5060,8 +5060,8 @@ const submitEdrToUndrFun = async () => {
     return; 
   }
   // 从共主联、从共无联保和数据开关校验
-  const qryTerminationStatus = await qryTerminationFunc('1')
-  if(!qryTerminationStatus){
+  const qryTerminationStatusFunc = await qryTerminationFunc('1')
+  if(!qryTerminationStatusFunc){
     return;
   }
   
