@@ -11,7 +11,7 @@
 		>
 			<!-- policyInfo 列的具名插槽 -->
 			<template #column-policyInfo="{ row, column, index }">
-				<div class="policy-info-cell">
+				<div v-if="cPrnTypedata == '01'" class="policy-info-cell">
 					<div v-if="row.cAppNo" class="policy-number-row">
 						<span>{{ row.cAppNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cAppNo)">
@@ -21,6 +21,20 @@
 					<div v-if="row.cPlyNo" class="policy-number-row">
 						<span>{{ row.cPlyNo }}</span>
 						<el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+				<div v-if="cPrnTypedata == '02'" class="policy-info-cell">
+					<div v-if="row.cEcAgrNo" class="policy-number-row">
+						<span>{{ row.cEcAgrNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+					<div v-if="row.cEcAgrAppNo" class="policy-number-row">
+						<span>{{ row.cEcAgrAppNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrAppNo)">
 							<DocumentCopy />
 						</el-icon>
 					</div>
@@ -555,6 +569,7 @@ const handleQuery = (flag = true) => {
 }
 
 /** 查询 */
+let cPrnTypedata = ref('01')
 function refreshData(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
@@ -568,21 +583,32 @@ function refreshData(flag?: boolean) {
 	console.log('param)))))))))))))))))))', param)
 	let data
 	if (s.cPrnType == "01") {
+		cPrnTypedata.value = '01'
 		data = findRenewalInsurance(param)
 	} else if (s.cPrnType == "02") {
+		cPrnTypedata.value = '02'
 		data = findECargoRenewalInsurance(param)
 	}
 	data.then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         pageresult.list = [];
-        pageresult.list = data.result;
-				pageresult.list = data.result.map((item) => ({
-					...item,
-					// 创建一个新字段合并两个值
-					policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
-					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
-				}))
+				pageresult.list = data.result;
+				if (cPrnTypedata.value == '01') {
+					pageresult.list = data.result.map((item) => ({
+						...item,
+						// 创建一个新字段合并两个值
+						policyInfo: `${item.cAppNo || ''}\n${item.cPlyNo || ''}`,
+						InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+					}))
+				} else {
+					pageresult.list = data.result.map((item) => ({
+						...item,
+						// 创建一个新字段合并两个值
+						policyInfo: `${item.cEcAgrNo || ''}\n${item.cEcAgrAppNo || ''}`,
+						InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+					}))
+				}
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);
