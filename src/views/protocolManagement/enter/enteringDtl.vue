@@ -580,6 +580,7 @@ const submitEdrToUndrFun = async () => {
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
   }
+  await nextTick()
   const f = await saveEdrPlyInfo(); // 提交核保,需要默认执行一次保存操作
   if(f){
     const btn = getBtn("btnSubmitEdr");
@@ -636,15 +637,15 @@ const saveApplicationEdr = async  () => {
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
   res["user"] = user;
-  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
-  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
   if (
-      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != null &&
-      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != "" &&
-      Array.isArray(res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"])
+      res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"] != null &&
+      res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"] != "" &&
+      Array.isArray(res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"])
   ) {
-    res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
-        res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
+    res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"] =
+        res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"].join();
   }
   
   const edrInfo: any = await cargoApi.saveEdrEcargo({
@@ -703,15 +704,15 @@ const saveEdrPlyInfo = async () => {
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
   res["user"] = user;
-  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
-  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
   if (
-      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != null &&
-      res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] != "" &&
-      Array.isArray(res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"])
+      res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"] != null &&
+      res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"] != "" &&
+      Array.isArray(res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"])
   ) {
-    res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"] =
-        res["EdrEcargoBase"]["EdrEcargoBase.cEdrRsnDetail"].join();
+    res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"] =
+        res["EdrECargoBase"]["EdrECargoBase.cEdrRsnDetail"].join();
   }
   const resToSave = cloneDeep(res);
   resToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
@@ -796,9 +797,9 @@ const generateEndorse = () => {
   res["plyBase"] = {'Base.cDptCde':'','Base.cProdNo':''}
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = '029900';
-  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
-  res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
-  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrECargoBase"]['EdrECargoBase.cProdNo'] = '029900';
+  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -825,9 +826,9 @@ const getSurrenderPrecisFun = ()=>{
   res["plyBase"] = {'Base.cDptCde':'','Base.cProdNo':''}
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = '029900';
-  res["EdrEcargoBase"] = mainRef.value?.getxyedrbaseRefValue();
-  res["EdrEcargoBase"]['EdrECargoBase.cProdNo'] = '029900';
-  res["EdrEcargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+  res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
+  res["EdrECargoBase"]['EdrECargoBase.cProdNo'] = '029900';
+  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -882,7 +883,8 @@ function query() {
           if (props.param?.cEdrType == "1") {
             sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
             const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
-            const newcEdrRsnDetail = JSON.parse(res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'] || '{}');
+            const cEdrRsnDetail = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'];
+            const newcEdrRsnDetail = cEdrRsnDetail ? cEdrRsnDetail.split(',') : [props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]];
             if (props.param["cRsnCde"] != "FZ") {
             //   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
             //     props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"],
@@ -1443,6 +1445,7 @@ async function  submit() {
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
   }
+  await nextTick()
   const isOk =  await save()
   if(!isOk) return
   const allFromData = formPage.value?.getAllFormData()
