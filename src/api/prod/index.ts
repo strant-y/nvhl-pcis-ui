@@ -1652,6 +1652,11 @@ export function setEfcManual(queryParams: any): AxiosPromise<any> {
   return post(`/policy/setEfcManual`, queryParams);
 }
 
+// 联供保信息变更批改判断当前数据是否实收
+export function queryPayString(queryParams: any): AxiosPromise<any> {
+  return post(`/payment/queryPayString`, queryParams);
+}
+
 // 获取财产险/机损险保单号下拉选项
 export function queryCAssPlyNo(queryParams: any): AxiosPromise<any> {
   return post(`/underwriting/query/queryCAssPlyNo`, queryParams);
