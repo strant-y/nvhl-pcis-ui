@@ -122,6 +122,12 @@ onMounted(async () => {
         const { code, data, msg } = res;
         if (200 === code) {
           if(data.result && data.result.length > 0){
+            if(data.result.length === 1){
+              selectNodeId.value = data.result[0]['cRiskNo'];
+              ElMessage.success('仅发现一条责任,自动添加!');
+              selectOne();
+              return ;
+            }
             data.result.forEach((item: any) => {
             data1.value.push({
               id: item.cRiskNo,
