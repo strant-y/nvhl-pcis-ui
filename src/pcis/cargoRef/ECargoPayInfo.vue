@@ -213,6 +213,10 @@ function getFromValue() {
   return payinfoEditRef?.value?.getFromValue();
 }
 
+function setDisabledAll(isDisabled: boolean) {
+  payinfoEditRef?.value?.setDisabledAll(isDisabled);
+}
+
 function setFormValue(value: any) {
   payinfoEditRef?.value?.setFormValue(value);
 }
@@ -256,7 +260,8 @@ defineExpose({
   getFormconfig,
   setFormItem,
   // splitnPrm,
-  addProvide
+	addProvide,
+	setDisabledAll,
 });
 </script>
 

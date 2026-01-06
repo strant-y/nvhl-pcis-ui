@@ -44,6 +44,8 @@ const dzmodal = useDzModal();
 import { useUserStore } from "@/store";
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 
 const undrDtyEdit = defineAsyncComponent(() => import("./undrDtyEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
@@ -155,21 +157,43 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // typeCode: "WEB_SYS_STA_DICT",
         typeCode: "KIND_LIST_GRT",
         codeParam: {
-          cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-          cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+          cOperId: JSON.parse(sessionStorage.getItem("user") || '{}').opCde,
+          cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}').companyId,
         },
         clearable: true,
+        func: (val:any) => {
+          setFormItem("CProdNo", {
+            loadData: [],
+          });
+          freeEditRef.value?.setValue("CProdNo", null);
+          if(val) {
+            codeListStore
+              .queryCodeList({
+                codeListName: "PROD_LIST_GRT",
+                codeListParam:{
+                  cParCde: val,
+                  cOperId: JSON.parse(sessionStorage.getItem("user") || '{}').opCde,
+                  cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}').companyId,
+                },
+              })
+              .then((res) => {
+                setFormItem("CProdNo", {
+                  loadData: res,
+                });
+              });
+          }
+        }
       },
       {
         prop: "CProdNo",
         inputtype: "rtselect",
         title: "产品",
-        typeCode: "PROD_LIST_GRT",
-        params: {
-          cParCde: "",
-          cOperId: user.value.opCde,
-          cDptCde: user.value.companyId,
-        },
+        // typeCode: "PROD_LIST_GRT",
+        // params: {
+        //   cParCde: "",
+        //   cOperId: user.value.opCde,
+        //   cDptCde: user.value.companyId,
+        // },
         // loadData: [],
         clearable: true,
       },

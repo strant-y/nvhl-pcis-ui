@@ -108,7 +108,7 @@ onMounted(() => {
     cProdNo === "043005" ||
     cProdNo === "043011"
   ) {
-    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
   }
   if (cProdNo === '130003') {
     setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
@@ -511,7 +511,7 @@ const method = {
     checkUser();
     // val  0法人 1个人
     if (val == "0") {
-      // 被保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 被保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏，国籍必填可修改
       setFormItem("Insured.tBirthday", {
         hidden: true,
       });
@@ -522,7 +522,7 @@ const method = {
         hidden: true,
       });
       setFormItem("Insured.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("Insured.cOccupTyp", {
         hidden: true,
@@ -628,6 +628,7 @@ const method = {
       // 为法人 国民经济行业必填
       setFormItem("Insured.cTrdCde", {
         rules: [getRules("required", {})],
+        btnItems: { disabled: false }
       });
 
       // 单位性质 --为企业做必填校验
@@ -736,7 +737,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Insured.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("Insured.cOccupTyp", {
         hidden: false,
@@ -856,10 +857,11 @@ const method = {
         cProdNo === "043005" ||
         cProdNo === "043011"
       ) {
-        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})], });
+        setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
       } else {
         setFormItem("Insured.cTrdCde", {
           rules: null,
+          btnItems: { disabled: true }
         });
       }
 
@@ -937,10 +939,22 @@ const method = {
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
-    if (val == "1") {
-      // setFormItem("Insured.cShareholderNature", {
-      //   rules: [getRules("required", {})],
-      // });
+    if (param.initFlag) {
+      if(val === "0") {
+        codeListStore
+          .queryCodeList({
+            codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+            codeListParam: {},
+          })
+          .then((res) => {
+            setFormItem("Insured.cShareholderCategory", {
+              loadData: res,
+            });
+          });
+      }
+      return;
+    }
+    if (val == "1") {// 个人
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -985,6 +999,7 @@ const method = {
           setFormItem("Insured.cShareholderCategory", {
             loadData: res,
           });
+          setValue("Insured.cShareholderCategory", res[0]?.value)
         });
     }
   },
@@ -1459,7 +1474,62 @@ const method = {
     setFormItem("Insured.cOperaterCertfCde", {
       rules: baseRules,
     });
-  },
+		if (param.initFlag) return;
+
+    // 切换清空
+    if (val) {
+      const fieldsToClear = ["Insured.cOperaterCertfCde"];
+      // 2. 循环赋值 null + 清除对应字段的校验错误
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
+        // 清除该字段的校验错误 
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
+    }
+	},
+	// 大股东证件类型
+	cShareholderCategoryChange: (val: any) => {
+		console.log('大股东证件类型', val)
+		const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    // 清除报错信息
+    clearValidate('Insured.cShareholderCode')
+
+    let baseRules: any[] = [];
+    type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+    const ruleMap: Record<string, RuleType> = {
+      "110001": "orgCode",
+      "01": "socialCode", // 统一社会信用证代码
+      "111": "idCard", // 居民身份证
+      "07": "passPort", // 护照
+      "553": "ariCard", // 外国人永久居留身份证
+		};
+    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+    baseRules = [getRules("required", {}), ...baseRules]
+
+    setFormItem("Insured.cShareholderCode", {
+      rules: baseRules,
+		});
+		
+		if (param.initFlag) return;
+
+    // 切换清空
+    if (val) {
+      const fieldsToClear = ["Insured.cShareholderCode"];
+      // 2. 循环赋值 null + 清除对应字段的校验错误
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
+        // 清除该字段的校验错误 
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
+    }
+	},
   // 证件有效起期
   tCertfBgnDateDisable: (date: any) => {
     const fs = insuredEditRef?.value?.getFromValue();
@@ -1489,7 +1559,33 @@ const method = {
   // 办理人证件有效止期 小于当前时间
   tOEndTmDisable: (date: any) => {
     return disablePastDates(date);
-  }
+  },
+  // 大股东证件类型
+  cShareholderCategoryChange:(val:any) => {
+    if (param.initFlag) return;
+    setValue("Insured.cShareholderCode","")
+    clearValidate('Insured.cShareholderCode'); // 清除报错信息
+    if (val == "111") {
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("idCard", {})],
+      });
+    } else if (val == "01") {
+      // 统一社会信用代码校验
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("socialCode", {})],
+      });
+    } else if (val === '07') {
+      // 护照
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("passPort", {})],
+      });
+    } else if (val == "553") {
+      // 外国人证件号
+      setFormItem("Insured.cShareholderCode", {
+        rules: [getRules("required", {}), getRules("ariCard", {})],
+      });
+    }
+  },
 };
 
 function setregistAdd() {
@@ -1742,7 +1838,8 @@ function addProvide<T>(key: InjectionKey<T> | string, value: T) {
 }
 // 客户重置
 function resetFn() {
-  if(!param.cAppNo) return;
+  const cAppNo = opertaor.getTableRefByKey('plyBase')?.getFromValue()?.['Base.cAppNo'];
+  if(!param.cAppNo || !cAppNo) return;
   const params = {
     type: param.pageName === "priceInquiry" ? 'I' : 'A',
     param: param.pageName === "priceInquiry" ? param.cInquiryNo : param.cAppNo,

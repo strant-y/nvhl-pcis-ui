@@ -38,7 +38,7 @@ const props = defineProps({
     type: String,
     required: true
   },
-  actionType: { // add 新增； update 修改
+  actionType: { // add 新增； update 修改 view 查看
     type: String,
     required: true
   },
@@ -52,45 +52,102 @@ const dialogVisible = ref(true)
 const user = ref(userStore.user)
 const CCertfClsType = ref('') //客户证件类型字段请求数据字典的type值
 const CCertfClsType2 = ref('') //股东证件类型字段请求数据字典的type值
-const CCertfCdeRules = ref([])
-const CCertfCdeRules2 = ref([])
-const settingOne = ref([])
+const CCertfCdeRules:any = ref([])
+const CCertfCdeRules2:any = ref([])
+const settingOne:any = ref([])
 const chooseProdName = ref('') //选中的条款名称
 const insuranceLimit = new InsuranceLimit();
 const codeListMap = reactive({
   persionType: [],
   NV049001: []
 })
+const cProdNoOptions:any = ref([])
+const cTermNoOptions:any = ref([])
+const initFlag = ref(true)
 
 
 if (props.pageType === 'one') {
   settingOne.value = [
     {
       prop: "productCategories",
-      inputtype: "rtcascader",
+      inputtype: "rtselect",
       title: "产品大类",
       clearable: true,
       typeCode: "KIND_LIST_GRT",
-      params: { cOperId: user.value['opCde'], cDptCde: user.value['companyId'] },
-      func: (val) => {
-        const item = freeEditRef.value.getFromSchemaItem('clauseCode')
-        if(val) { //选择了产品大类作为参数上送
-          item.params = {'cKindNo': val}
-        } else {
-          item.params = {}
+      codeParam: {
+        cOperId: JSON.parse(sessionStorage.getItem("user") || '{}').opCde,
+        cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}').companyId,
+      },
+      func: (val:any) => {
+        setFormItem("cProdNo", {
+          loadData: [],
+        });
+        cProdNoOptions.value = []
+        if(!initFlag.value) {
+          freeEditRef.value?.setValue("cProdNo", null);
+        }
+        if(val) {
+          codeListStore
+            .queryCodeList({
+              codeListName: "PROD_LIST_GRT",
+              codeListParam:{
+                cParCde: val,
+                cOperId: JSON.parse(sessionStorage.getItem("user") || '{}').opCde,
+                cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}').companyId,
+              },
+            })
+            .then((res) => {
+              setFormItem("cProdNo", {
+                loadData: res,
+              });
+              cProdNoOptions.value = res
+            });
         }
       },
       rules: [getRules("required", {})]
     },
     {
+      prop: "cProdNo",
+      inputtype: "rtselect",
+      title: "产品",
+      clearable: true,
+      // typeCode: "PROD_LIST",
+      params: { },
+      rules: [getRules("required", {})],
+      func: (val:any) => {
+        setFormItem("clauseCode", {
+          loadData: [],
+        });
+        cTermNoOptions.value = [];
+        if(!initFlag.value) {
+          freeEditRef.value?.setValue("clauseCode", null);
+        }
+        codeListStore
+          .queryCodeList({
+            codeListName: "TERM_LIST_IN_GUIDE_SEARCH",
+            codeListParam:{
+              value: val,
+              cOperId: JSON.parse(sessionStorage.getItem("user") || '{}').opCde,
+              cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}').companyId,
+            },
+          })
+          .then((res) => {
+            setFormItem("clauseCode", {
+              loadData: res,
+            });
+            cTermNoOptions.value = res;
+          });
+      }
+    },
+    {
       prop: "clauseCode",
-      inputtype: "rtcascader",
+      inputtype: "rtselect",
       title: "条款",
       clearable: true,
-      typeCode: "PROD_LIST",
+      // typeCode: "PROD_LIST",
       params: {},
-      func: (val, option) => {
-        chooseProdName.value = option ? option.label : ''
+      func: (val:any) => {
+        chooseProdName.value = cTermNoOptions.value.find((item: any) => item.value === val)?.label || ''
       },
       rules: [getRules("required", {})]
     },
@@ -232,7 +289,11 @@ const submitForm = () => {
         if (res.code === '1') {
           ElMessage.success(res.message);
           closeDialog()
+        } else {
+          ElMessage.error(res.message);
         }
+      }).catch((err:any) => {
+        ElMessage.error(err.message);
       });
     } else {
       console.log('error submit!!');
@@ -249,43 +310,45 @@ const closeDialog = () => {
 
 //客户性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange = (value: string) => {
-  const item = freeEditRef.value.getFromSchemaItem('customerIdType')
-  item['loadData'] = null
   if (value === '1') {
-    CCertfClsType.value = 'NATURAL_CERTIFICATE_CACHE';
+    setFormItem("customerIdType", { loadData: codeListMap['persionType'] })
   } else if (value === '0') {
-    CCertfClsType.value = 'UN_NATURAL_CERTIFICATE_CACHE';
+    setFormItem("customerIdType", { loadData: codeListMap['NV049001'] })
   }
-  freeEditRef.value?.setValue('customerIdType', null) //清空客户证件类型
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('customerIdType', null) //清空客户证件类型
+    freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+    freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
+  }
   freeEditRef.value?.clearValidate('customerIdType')
-  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerIdNumber')
-  freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerName')
 }
 
 //股东性质  根据个人/法人选择 展示不同的证件类型投标人性质
 const handleNatureChange2 = (value: string) => {
-  const item = freeEditRef.value.getFromSchemaItem('shareholderIdType')
-  item['loadData'] = null
   if (value === '1') {
-    CCertfClsType2.value = 'NATURAL_CERTIFICATE_CACHE';
+    setFormItem("shareholderIdType", { loadData: codeListMap['persionType'] })
   } else if (value === '0') {
-    CCertfClsType2.value = 'UN_NATURAL_CERTIFICATE_CACHE';
+    setFormItem("shareholderIdType", { loadData: codeListMap['NV049001'] })
   }
-  freeEditRef.value?.setValue('shareholderIdType', null) //清空股东证件类型
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('shareholderIdType', null) //清空股东证件类型
+    freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+    freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
+  }
   freeEditRef.value?.clearValidate('shareholderIdType')
-  freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderIdNumber')
-  freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderName')
 }
 
 //证件类型change
 const handleCertificateChange = (value: string) => {
-  freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('customerIdNumber', null) //清空客户证件号码值
+    freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
+  }
   freeEditRef.value?.clearValidate('customerIdNumber')
-  freeEditRef.value?.setValue('customerName', null) //清空客户证件号码值
   freeEditRef.value?.clearValidate('customerName')
   console.log('value111', value)
   if (value == '111') { // 身份证号
@@ -307,9 +370,11 @@ const handleCertificateChange = (value: string) => {
 
 //股东证件类型change
 const handleCertificateChange2 = (value: string) => {
-  freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+  if(!initFlag.value) {
+    freeEditRef.value?.setValue('shareholderIdNumber', null) //清空股东证件号码值
+    freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
+  }
   freeEditRef.value?.clearValidate('shareholderIdNumber')
-  freeEditRef.value?.setValue('shareholderName', null) //清空股东证件号码值
   freeEditRef.value?.clearValidate('shareholderName')
   if (value == '111') { // 身份证号
     CCertfCdeRules2.value = [getRules("required", {}), getRules("idCard", {})]
@@ -330,29 +395,29 @@ const handleCertificateChange2 = (value: string) => {
 
 
 onMounted(() => {
+  // 证件类型 - 个人
+  codeListStore.queryCodeList({
+    codeListName: 'NATURAL_CERTIFICATE_CACHE',
+    codeListParam: { }
+  }, false, true).then(res => {
+    if (res) {
+      codeListMap['persionType'] = res;
+    }
+  }, () => {
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
+  // 证件类型 - 法人
+  codeListStore.queryCodeList({
+    codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
+    codeListParam: { }
+  }, false, true).then(res => {
+    if (res) {
+      codeListMap['NV049001'] = res;
+    }
+  }, () => {
+    ElMessage.error('后台服务异常,请联系管理员');
+  });
   if(props.cPkId) { //编辑时查询详情
-    // 证件类型 - 个人
-    codeListStore.queryCodeList({
-      codeListName: 'NATURAL_CERTIFICATE_CACHE',
-      codeListParam: { }
-    }, false, true).then(res => {
-      if (res) {
-        codeListMap['persionType'] = res;
-      }
-    }, () => {
-      ElMessage.error('后台服务异常,请联系管理员');
-    });
-    // 证件类型 - 法人
-    codeListStore.queryCodeList({
-      codeListName: 'UN_NATURAL_CERTIFICATE_CACHE',
-      codeListParam: { }
-    }, false, true).then(res => {
-      if (res) {
-        codeListMap['NV049001'] = res;
-      }
-    }, () => {
-      ElMessage.error('后台服务异常,请联系管理员');
-    });
     const params = {
       cPkId: props.cPkId
     }
@@ -362,8 +427,8 @@ onMounted(() => {
         freeEditRef.value?.setFormValue(res.data)
         
         nextTick(() => {
-          const item = freeEditRef.value.getFromSchemaItem('customerIdType')
-          const item2 = freeEditRef.value.getFromSchemaItem('shareholderIdType')
+          const item = freeEditRef.value?.getFromSchemaItem('customerIdType')
+          const item2 = freeEditRef.value?.getFromSchemaItem('shareholderIdType')
           if(res.data.customerNature == '1') {
             item.loadData = codeListMap['persionType']
           } else {
@@ -374,11 +439,36 @@ onMounted(() => {
           } else {
             item2.loadData = codeListMap['NV049001']
           }
+          initFlag.value = false;
         })
       }
     })
+    if(props.actionType === 'view') {
+      formconfig1.endBtns = [] //查看时不显示底部按钮
+      nextTick(() => {
+        freeEditRef.value?.setDisabledAll(true)
+      })
+    }
   }
 });
+
+//给表单下拉项赋值
+function setFormItem(key: any, obj: any) {
+  if (obj && Object.keys(obj).length) {
+    formconfig1.fromSchema?.forEach((item) => {
+      if (item.prop === key) {
+        //控制尾部按钮的
+        if (item.btnItems && obj.btnItems) {
+          for (let key in obj.btnItems) {
+            item.btnItems[key] = obj.btnItems[key];
+          }
+        }else{
+          Object.assign(item, obj);
+        }
+      }
+    });
+  }
+}
 
 </script>
 

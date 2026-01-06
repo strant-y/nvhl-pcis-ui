@@ -58,7 +58,7 @@ opertaor.init();
 
 
 const { getRules } = useValidator();
-const emits = defineEmits(["ok", "cancel"]);
+const emits = defineEmits(["ok", "cancel", "hasSameInsured"]);
 import { v4 as uuidv4 } from "uuid";
 const showBtnConfig = ref(false);
 const showView = ref(false);
@@ -371,6 +371,13 @@ const tableconfig = reactive<AppGridEditConfig>(
 		editFlag: true, //是否可以编辑
 		// editList:['cOpgrpCnm','cName'],
 		titleBtns: [
+			createFreeButtonBase({
+				type: "primary",
+				label: "同投保人",
+				func: async () => {
+					emits("hasSameInsured");
+				},
+			}),
 			createFreeButtonBase({
 				type: "primary",
 				label: "新增",
@@ -749,7 +756,16 @@ const idAnalysis = (id: string, data1) => {
 	data1.cCerftBirthday = birthday // 出生日期
 	data1.cCerftSex = sex // 性别
 };
-defineExpose({ getFrom });
+
+// 同投保人回显数据
+const setData = (data,list) => {
+	tableRef.value?.setFormValue(list)
+	freeEditRef1.value?.setFormValue(data.appFreeEdit.fromData1)
+	freeEditRef2.value?.setFormValue(data.appFreeEdit.fromData2)
+	freeEditRef3.value?.setFormValue(data.appFreeEdit.fromData3)
+	freeEditRef4.value?.setFormValue(data.appFreeEdit.fromData4)
+}
+defineExpose({ getFrom, setData });
 </script>
 
 <style scoped></style>

@@ -2,7 +2,7 @@
   <el-dialog :close-on-click-modal="false"  v-model="dialogVisible"  @close="close" width="90%" title="反洗钱扩展信息">
     <el-config-provider :locale="locale">
       <appExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
-      <insExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef"/>
+      <insExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef" @hasSameInsured="hasSameInsured"/>
     </el-config-provider>
 		<div v-if="!saveHidden" style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
@@ -168,6 +168,9 @@ const save = async () => {
         { prop: 'cCusFnme', label: '名' },
         { prop: 'cCerftCls', label: '证件类型' },
         { prop: 'cCerftCde', label: '证件号码' },
+        { prop: 'cCerftSex', label: '性别' },
+        { prop: 'cCerftBirthday', label: '出生日期' },
+        { prop: 'cCerftNation', label: '国籍' },
         { prop: 'tCerftBgnTm', label: '证件有效起期' },
         { prop: 'tCerftEndTm', label: '证件有效止期' },
         { prop: 'cCusAddr', label: '地址' }
@@ -249,6 +252,27 @@ const save = async () => {
             ElMessage.error(msg);
           }
   })
+}
+
+// 同投保人
+const hasSameInsured = () => {
+	let appInfo = appExtendInfoRef?.value?.getdData()
+	const allowedKeys = ["cCusLnme", "cCusFnme", "cCerftCls", "cCerftCde", "cCerftSex", "cCerftBirthday", "cCerftNation", "tCerftBgnTm", "tCerftEndTm", "cCusAddr", "cGrpMrk", "nSeqNo"];
+	// 1. 映射出清理后的新数组（深拷贝每个对象的所需字段）
+  const cleanedArray = appInfo.appGridEdit.map(item => {
+    const cleanedItem = {}
+    for (const key of allowedKeys) {
+      if (key in item) {
+        // 深拷贝：使用 structuredClone（支持嵌套对象/数组）
+        cleanedItem[key] = typeof item[key] === 'object' && item[key] !== null
+          ? structuredClone(item[key])
+          : item[key]
+      }
+    }
+    return cleanedItem
+  })
+	
+	inextendRef?.value?.setData(appInfo, cleanedArray)
 }
 
 /* 获取全量表单数据 */

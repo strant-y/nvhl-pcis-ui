@@ -17,7 +17,7 @@ import { transpileModule } from "typescript";
 import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
-import { getDelayCount, getNewSysDays, checkCdeptByCdptCde, checkCancelM1IsOff } from "@/api/prod/";
+import { getDelayCount, getNewSysDays, checkCdeptByCdptCde, checkCancelM1IsOff, qryTerminationDataList } from "@/api/prod/";
 const route = useRoute();
 const { getRules } = useValidator();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -42,6 +42,14 @@ onMounted(() => {
     method,
     exRules
   );
+  // 保证险中保险期限的“签单时间”在页面隐藏。
+  if(route.params.param?.cProdNo?.startsWith('05') && formconfig11.fromSchema?.length > 0) {
+    formconfig11.fromSchema?.forEach((item:any) => {
+      if(item.prop === 'Base.tIssueTm') {
+        item.hidden = true
+      }
+    })
+  }
   Object.assign(formconfig1, formconfig11);
 });
 
@@ -58,6 +66,11 @@ const nRatioCoefFunc = () => {
         opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(1).toFixed(6));
         return;
     }
+  }
+  // 090001、090002、090003短期费率系数默认1
+  if(['090001','090002','090003'].includes(route.params.param?.cProdNo)) {
+    opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(1).toFixed(6));
+    return;
   }
 
   const baseBefore = tabref["insrnc"]?.getFromValue();
@@ -136,11 +149,12 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
 
     //  接口  开关校验
-    const resOff = await checkCancelM1IsOff({ cPlyNo: plyNo, CancelM1: 'CancelM1' });
+    const resOff = await qryTerminationDataList({ cPlyNo: plyNo, cOperType: 'CancelM1' })
 
     // 开关关闭：按产品规则拦截
+    if (resOff?.data?.[0]?.cAppTyp === 'on') {
 
-    if (!resOff?.res) {
+    } else {
       const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
       const nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);
       const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
@@ -264,7 +278,7 @@ const method = {
       const timestamp1 = new Date(tDepartureDate).getTime();
       const timestamp2 = new Date(v).getTime();
       let cProdNo = route.params.param?.cProdNo;
-      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018")) {
+      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018" && cProdNo.startsWith('02'))) {
          ElMessage.warning("“起运日期”不能大于保险起期！");
         baseBefore["Base.tDepartureDate"] = ''
       }

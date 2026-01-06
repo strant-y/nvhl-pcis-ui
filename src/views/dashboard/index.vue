@@ -589,10 +589,10 @@ Object.keys(tableObj).forEach((i: any) => {
           }
         },
         tableClick: (row) => {
-          const { cAppNo, curtTask } = row;
+          const { cAppNo, curtTask, cInquiryNo } = row;
           const param = {
             taskId: curtTask,
-            appNo: cAppNo,
+            appNo: row.baseType === '询价' ? cInquiryNo : cAppNo,
             user: user,
           };
           withdraw(param)
@@ -600,7 +600,7 @@ Object.keys(tableObj).forEach((i: any) => {
               if (result.code !== 200) {
                 ElMessage.error({ message: result.msg, duration: 3000 });
               } else {
-                if (result.msg === "撤回成功!") {
+                if (result.msg?.includes('成功')) {
                   ElMessage.success({ message: result.msg, duration: 3000 });
                   getIssueTableData();
                 } else {
@@ -1263,11 +1263,12 @@ const getData = (user: any, roles: any = []) => {
       roleCde = roleCde === "" ? res : `${roleCde},${res}`;
     });
   // 核保岗
+  requestId.value = Math.random();// 每次请求时生成一个随机数
   if (isAudit.value) {
-    getAuditTableData();
+    getAuditTableData(requestId.value);
     currentTabName.value = tabs.value[0].name;
   } else {
-    getIssueTableData();
+    getIssueTableData(requestId.value);
     currentTabName.value = tabs.value[0].name;
   }
 };
@@ -1278,7 +1279,9 @@ const toChange = (url: string) => {
 
 //tabs切换
 let clickedTabData = ref({ udrType: "0", refName: "stagingList" });
+const requestId:any = ref(null);
 const handleTabClick = (tab: any) => {
+  requestId.value = Math.random();// 每次请求时生成一个随机数
   pageresult.list = [];
   pageresult.total = 0;
   currentTabName.value = tab.props.label;
@@ -1292,7 +1295,7 @@ const handleTabClick = (tab: any) => {
         rowDbClickFun:(row:any)=> toQuery2(row),
       })
     );
-    getIssueTableData();
+    getIssueTableData(requestId.value);
   }
   if (isAudit.value) {
     tableconfig = reactive<AppTableConfig>(
@@ -1301,7 +1304,7 @@ const handleTabClick = (tab: any) => {
         rowDbClickFun:(row:any)=> toQuery2(row),
       })
     );
-    getAuditTableData();
+    getAuditTableData(requestId.value);
   }
   tabs.value.forEach((item) => {
     if (item.name === tab.props.label) {
@@ -1316,7 +1319,7 @@ const pageData = ref({
   pageNum: 1,
   cDptCde: user.companyId,
 });
-function getAuditTableData() {
+function getAuditTableData(id:any) {
   let getList = null;
   const udrType = clickedTabData.value.udrType;
   if (udrType === "3") {
@@ -1336,6 +1339,7 @@ function getAuditTableData() {
   getList
     .then((res: any) => {
       if (res && res.code === 200) {
+        if(requestId !== id) return;
         pageresult.list = res.data.map((item:any) => {
           tmMap.forEach((i:any) => {
             if(item[i]) {
@@ -1350,21 +1354,23 @@ function getAuditTableData() {
       }
     })
     .catch((error: any) => {
+      if(requestId !== id) return;
       ElMessage.error(error.msg);
     });
 }
 // 待办列表页码点击事件
 function handlePageChange(data: any) {
   pageData.value = {...pageData.value, ...data};
+  requestId.value = Math.random();// 每次请求时生成一个随机数
   if (isAudit.value) {
-    getAuditTableData();
+    getAuditTableData(requestId.value);
   }
   if (isOperate.value) {
-    getIssueTableData();
+    getIssueTableData(requestId.value);
   }
 }
 // 出单岗获取列表数据
-function getIssueTableData() {
+function getIssueTableData(id:any) {
   let getList = null;
   const refNm = clickedTabData.value.refName;
   if (refNm === "stagingList") {
@@ -1381,6 +1387,7 @@ function getIssueTableData() {
   const tmMap = ['tAppTm','tInsrncBgnTm','tInsrncEndTm',]
   getList
     ?.then((res: any) => {
+      if(requestId.value !== id) return;
       if (res && res.code === 200) {
         pageresult.list = res.data.map((item:any) => {
           tmMap.forEach((i:any) => {
@@ -1396,6 +1403,7 @@ function getIssueTableData() {
       }
     })
     .catch((error: any) => {
+      if(requestId.value !== id) return;
       ElMessage.error(error.msg);
     });
 }
@@ -1542,7 +1550,7 @@ const toQuery2 = (data: any) => {
           tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
         };
         getInquiryPolicyList(requestParam).then((res: any) => {
-          if (res.data && res.data.length > 0) {
+          if (res.data?.result && res.data?.result.length > 0) {
             const data = res.data?.result[0];
             showDetails(data, row.baseType);
           }
@@ -1568,28 +1576,60 @@ const toQuery2 = (data: any) => {
         });
       }
     } else if (currentTabName.value === "待修改任务") {
-      const queryParam = {
-        pageSize: 10,
-        pageNum: 1,
-        cLoadSub: "1",
-        cDataTyp: "app",
-        queryType: "1",
-        cAppNo: data.cAppNo,
-      };
-      getAppPolicyList(queryParam).then((res: any) => {
-        if (res.data?.result && res.data?.result.length > 0) {
-          const data = res.data?.result[0];
-          router.push({
-            path: "/pcisapp/myPage",
-            query: {
-              param: JSON.stringify({
-                ...data,
-                ...{ pageType: "TEMPORARY_DEPOSIT" },
-              }),
-            },
-          });
-        }
-      });
+      if (row.baseType === "询价") {
+        const queryParam = {
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+          cInquiryNo: data.cInquiryNo,
+          tAppTmStart: dayjs()
+            .subtract(3, "month")
+            .format("YYYY-MM-DD 00:00:00"),
+          tAppTmEnd: dayjs().format("YYYY-MM-DD 23:59:59"),
+        };
+        getInquiryPolicyList(queryParam).then((res: any) => {
+          if (res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            router.push({
+              path: "/pcisapp/pricePage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{
+                    pageType: "TEMPORARY_DEPOSIT",
+                    pageName: "priceInquiry",
+                  },
+                }),
+              },
+            });
+          }
+        });
+      } else {
+        const queryParam = {
+          pageSize: 10,
+          pageNum: 1,
+          cLoadSub: "1",
+          cDataTyp: "app",
+          queryType: "1",
+          cAppNo: data.cAppNo,
+        };
+        getAppPolicyList(queryParam).then((res: any) => {
+          if (res.data?.result && res.data?.result.length > 0) {
+            const data = res.data?.result[0];
+            router.push({
+              path: "/pcisapp/myPage",
+              query: {
+                param: JSON.stringify({
+                  ...data,
+                  ...{ pageType: "TEMPORARY_DEPOSIT" },
+                }),
+              },
+            });
+          }
+        });
+      }
     } else if (currentTabName.value === "待续保") {
       getPolicy({ cPlyNo: row.cPlyNo, queryTyp: "orig" })
         .then((res: any) => {
@@ -1833,7 +1873,11 @@ function handleSearch(val: any) {
       JSON.stringify(param)
     );
     searchBtnItem.loading = false;
-    router.push({ path: "/pcis-new-udr-list/PendUdrListQuery" });
+    if(val?.startsWith('1')) {
+      router.push({ path: "/pcis-new-udr-list/InquiryUdrListQuery" });
+    } else {
+      router.push({ path: "/pcis-new-udr-list/PendUdrListQuery" });
+    }
   }
 }
 

@@ -104,7 +104,8 @@ const method = {
     // const cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp")
     const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
     const nCiAmt = parseFloat(productStore.nAmt)
-    if (param?.pageType !== "EDR_APP_NEW_SCENE" && nCiAmt == "0") {
+    const nCiPrm = parseFloat(productStore.nPrm)
+    if (param?.pageType !== "EDR_APP_NEW_SCENE" && nCiPrm == 0) {
       ElMessage.warning("请先进行保费计算!");
       return;
     }
@@ -1532,7 +1533,8 @@ defineExpose({
   initProxySales,
   intiAgentBroker,
   valideRequired,
-  addProvide
+  addProvide,
+  updateMasterAgreementValues,
 });
 </script>
 

@@ -1,6 +1,8 @@
 <template>
   <el-dialog :title="props.addOrEdit" v-model="dialogVisible" width="90%">
-    <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+		<el-config-provider :locale="enLocale">
+      	<app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+		</el-config-provider>
   </el-dialog>
 </template>
 
@@ -11,7 +13,9 @@ import { useUserStore } from "@/store/modules/user";
 import { BulletinService } from '../service/bulletin.service';
 import { AppKey } from '@/constants/api';
 import { getListByCode } from '@/api/code-list-service';
-
+// 引入 ConfigProvider 组件
+import { ElConfigProvider } from 'element-plus';
+import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { useValidator } from "@/typings/useValidator";
 import {
   AppFreeEditConfig,
@@ -22,7 +26,7 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
-
+const enLocale = zhCn; // 在 script setup 中直接使用
 
 const props = defineProps({
   pkId: {
@@ -90,8 +94,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "CStatus",
         inputtype: "rtselect",
         title: "发布状态",
-        typeCode: "Comm_Code_LIST",
-        params: { CParCde: 'pub_status' },
+				loadData: [
+					{value: "pub1", label: "暂存"},
+					{value: "pub2", label: "发布"}
+				],
         clearable: true,
         rules: [getRules("required", {})],
       },

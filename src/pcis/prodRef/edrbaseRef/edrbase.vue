@@ -19,6 +19,8 @@ import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { qryTerminationDataList, qryProdRuleList, queryLatestMrk } from "@/api/prod";
+import Decimal from "decimal.js";
 
 const pcisQueryService = new PcisQueryService();
 const codeListStore = codeListViewStore();
@@ -33,7 +35,8 @@ const props = defineProps({
 const params=opertaor.getParam();
 const { getCUndrMrk, getBackClsList } = NewUdrListService();
 const edrbaseEditRef = ref<AppFreeEditMethod | null>(null);
-const user = JSON.parse(sessionStorage.getItem("user"));
+const user = JSON.parse(sessionStorage.getItem("user") || '{}');
+const rebackDay = ref(0);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "批改信息",
@@ -184,70 +187,98 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         format:"YYYY-MM-DD HH:mm:ss",
         type :"datetime",
         title: "批单生效起期",
-        func: (v:any) => {
-          if(v){
+        func: async (v:any) => {
+          if(v && !params.initFlag){
             const cPlyNo = edrbaseEditRef.value?.getValue("EdrBase.cPlyNo");
-            const parameter = {
-                CPlyNo: cPlyNo,
-                COperType: 'EdrBckBgn'
-            };
             if(opertaor.isEditScene()){
-              pcisQueryService.qryTerminationInfo(parameter).then((res:any) => { 
-                const {code,data,msg} = res;
-                if(code === 200){
-                  if(data && data.CAppTyp === 'on'){
-                    return ;
-                  }else{
-                    const parms = {
-                        cPlyNo: cPlyNo,
-                    };
-                    pcisQueryService.getlatestPlyInfo(parms).then((res1:any) => { 
-                      const {code: code1,data: data1,msg: msg1} = res1;
-                      if(code1 === 200){
-                        if (data1['TEdrBgnTm']) {
-                            const edrBgnTm = dayjs(v).format('YYYY-MM-DD 00:00:00');
-                            const latestEdrBgnTm = dayjs(data1['TEdrBgnTm']).format('YYYY-MM-DD HH:mm:ss');
-                            if (dayjs(s).isBefore(latestEdrBgnTm, 'second')) {
-                                ElMessage.warning('本次批改生效时间不允许早于前一次批改生效时间！');
-                                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", null);
-                                return;
-                            }
-                        }
-                      } else {
-                        let message = '查询最新保批单信息异常';
-                        if (!!res['msg']) {
-                            message = res['msg'];
-                        }
-                        ElMessage.warning(message);
-                      }
-                    });
+              // 查询配置的倒签天数
+              rebackDay.value = 0;
+              const param = {
+                cDptCde: params.cDptCde,
+                cRuleCde: 'RULE_01',
+                cPrd: null,
+                cProdNo: params.cProdNo,
+                pageNum: 1,
+                pageSize: 10,
+              }
+              const nDpdDays:any = await qryProdRuleList(param);
+              if(nDpdDays.code === 200) {
+                if(nDpdDays.data?.code == '1') {
+                  if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
+                    rebackDay.value = nDpdDays.data?.result[0]?.cRuleValue || 0;
+                  }
+                } else {
+                  ElMessage.error(nDpdDays.data?.message)
+                  return;
+                }
+              } else {
+                ElMessage.error(nDpdDays.msg)
+                return;
+              }
+              const tEdrBgnTm = dayjs().add(1, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss');//批单生效起期默认为明天0点
+              const newTEdrBgnTm = dayjs(tEdrBgnTm).subtract(rebackDay.value, 'day').format('YYYY-MM-DD HH:mm:ss');// 根据倒签天数算出可选择的最早的日期
+              
+              // 获取保单最新的保险起期和止期
+              const plyInfo:any = await queryLatestMrk({ cPlyNo: cPlyNo });
+              if(!plyInfo.data?.['tInsrncBgnTm'] || !plyInfo.data?.['tInsrncEndTm']) {
+                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", tEdrBgnTm);
+                ElMessage.error(plyInfo.msg)
+                return
+              }
+              const latestEdrBgnTm = dayjs(plyInfo.data?.['tInsrncBgnTm']).format('YYYY-MM-DD HH:mm:ss');
+              const latestEdrEndTm = dayjs(plyInfo.data?.['tInsrncEndTm']).format('YYYY-MM-DD HH:mm:ss');
+              if(dayjs(v).isBefore(dayjs(latestEdrBgnTm))) {
+                ElMessage.warning('批改生效日期不能早于保险起期'+latestEdrBgnTm)
+                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", tEdrBgnTm);
+                return;
+              } else if(dayjs(v).isAfter(dayjs(latestEdrEndTm))) {
+                ElMessage.warning('批改生效日期不能晚于保险止期'+latestEdrEndTm)
+                edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", tEdrBgnTm);
+                return;
+              } else {
+                if(params.cRsnCde == "s2") {// 一般退保 查看数据开关是否打开
+                  const res:any = await qryTerminationDataList({ cAppNo: params.cAppNo, cOperType: 'SurBck' })
+                  if(res?.code == 200 && res.data?.length > 0) {
+                    if(res.data[0]?.cAppTyp === 'on') {
+                      // 开关打开 不校验倒签天数
+                      return;
+                    }
                   }
                 }
-              });
+                if(dayjs(v).isBefore(dayjs(newTEdrBgnTm))) {
+                  ElMessage.warning("可倒签天数为"+rebackDay.value+"天,可倒签日期为"+newTEdrBgnTm)
+                  edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", tEdrBgnTm);
+                  return;
+                }
+              }
             }
-          }
-        },
-        disabledDate: (time: Date) => {
-          // 批改生效起期应该大于保险起期和当前日期
-          if(opertaor.getTableRefs().insrnc && opertaor.getTableRefs().insrnc?.getFromValue()) {
-            const beginTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncBgnTm'];
-            const endTm = opertaor.getTableRefs().insrnc?.getFromValue()['Base.tInsrncEndTm'];
-            const currentTm = new Date().getTime();
-            const before30Tm = dayjs().subtract(30, 'day').toDate().getTime(); // 当前日期前30天
-            const before61Tm = dayjs().subtract(61, 'day').toDate().getTime(); // 当前日期前61天
-            if(["040011","040015"].includes(params["cProdNo"])) {// 这俩产品 批改生效起期允许往前选61天
-              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before61Tm ? new Date(beginTm).getTime() : before61Tm)
-            } else {
-              return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > before30Tm ? new Date(beginTm).getTime() : before30Tm)
-            }
-            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < (new Date(beginTm).getTime() > currentTm ? new Date(beginTm).getTime() : currentTm)
-            // return time.getTime() > new Date(endTm).getTime() || time.getTime() < new Date(beginTm).getTime() // 临时改为批改生效起期应该大于保险起期
-          } else {
-            return false;
           }
         },
         // rules: [getRules("required", {})],
         // disabled: params["cEdrType"]=='2'
+      },
+      {
+        prop: "EdrBase.nRefundPrm",
+        inputtype: "rtinput",
+        title: "退保费",
+        disabled: true,
+        hidden: params.cRsnCde != "s1" && params.cRsnCde != "s2" ,
+        rules: [getRules("required", {})],
+        func: (val:any) => {
+          const nBefEdrPrm = getValue('EdrBase.nBefEdrPrm')?.replaceAll(',','');
+          if(new Decimal(val).gt(new Decimal(nBefEdrPrm))) {
+            ElMessage.warning('退保费不能大于原保费！')
+            setValue("EdrBase.nRefundPrm", nBefEdrPrm)
+          } else if(params.cRsnCde == "s2" && !params.initFlag){
+            setValue("EdrBase.nPrmVar", new Decimal(0).sub(new Decimal(val)))
+            setValue("EdrBase.nPrm", new Decimal(nBefEdrPrm).add(new Decimal(getValue('EdrBase.nPrmVar'))))
+            opertaor.getTableRefByKey('base').setValue('Base.nPrm',new Decimal(nBefEdrPrm).add(new Decimal(getValue('EdrBase.nPrmVar'))))
+            opertaor.getTableRefByKey('base').setValue('Base.nPrmVar',new Decimal(0).sub(new Decimal(val)))
+            nextTick(() => {
+              opertaor.getFatherPage().afterCalcSurrenEdr()
+            })
+          }
+        }
       },
       {
         prop: "EdrBase.nDelayNum",
@@ -558,6 +589,17 @@ onMounted(() => {
           await getLastInsrncEndTm(cPlyNo)
         }
       },500)
+    }
+    
+    // 根据数据控制开关设置条款中的可编辑项
+    if(params.pageType === 'TEMPORARY_DEPOSIT' && params.cEdrType && params.cRsnCde === 's2') {
+      qryTerminationDataList({ cAppNo: params.cAppNo, cOperType: 'SurPrm' }).then((res:any) => {
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            setFormItem("EdrBase.nRefundPrm",{ disabled: false })
+          }
+        }
+      })
     }
   });
 });

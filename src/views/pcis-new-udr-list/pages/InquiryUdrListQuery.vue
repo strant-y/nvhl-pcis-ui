@@ -10,24 +10,16 @@
       @page-change="handleQuery(false)"
     >
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cDptCnm || ''" class="twoLine"></span>
       </template>
       <template #column-cTermNme="{ row, column, index }">
-        <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="row.cTermNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cTermNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNme="{ row, column, index }">
-        <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="row.cAppNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cAppNme || ''" class="twoLine"></span>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
       </template><template #column-cInquiryNo="{ row, column, index }">
         <div>
           <div class="policy-number-row" v-if="row.cAppNo">
@@ -929,7 +921,7 @@ onMounted(async () => {
       },
     ],
   });
-  freeEditRef.value?.setFormValue({
+  const param = {
     companyId: user.value.companyId,
     cLoadSub: '0',
     tm1: [
@@ -939,8 +931,39 @@ onMounted(async () => {
       moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ],
     udrType: "1",
-  });
-  handleQuery();
+  }
+  if (sessionStorage.getItem("navToOrderUdrListQuery")) {
+    param['udrType'] = JSON.parse(
+      sessionStorage.getItem("navToOrderUdrListQuery") || "{}"
+    )?.udrType
+  }
+  freeEditRef.value?.setFormValue(param);
+
+  //首页跳转过来的逻辑 Start
+  if (sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)) {
+    //首页点击搜索跳转过来的
+    const homeJumpData = JSON.parse(
+      sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)|| '{}'
+    );
+    if (homeJumpData.hasOwnProperty("objId")) {
+      //申请单号
+      freeEditRef.value?.setValue("cInquiryNo", homeJumpData.objId);
+      handleQuery();
+    }
+  } else if(sessionStorage.getItem('navToOrderUdrListQuery')) {
+    // 首页点击更多跳转过来的
+    const homeJumpData = JSON.parse(
+      sessionStorage.getItem('navToOrderUdrListQuery') || '{}'
+    );
+    if(homeJumpData.hasOwnProperty("udrType")) {
+      //申请单号
+      freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
+      handleQuery();
+    }
+  } else {
+    handleQuery();
+  }
+  //首页跳转过来的逻辑 End
 });
 
 onUnmounted(() => {

@@ -443,7 +443,7 @@ const vehiclePlate = (options = {}) => {
       // const newEnergyLicenseRegex = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼]{1}[A-Z]{1}(?:[DF][A-HJ-NP-Z0-9]{5}|[A-HJ-NP-Z0-9]{5}[DF])$/;
       
       // 验证逻辑
-      if (normalPattern.test(formattedValue)) {
+      if (normalPattern.test(formattedValue) || formattedValue === '新车未上牌') {
         callback();
       } else if (formattedValue.length === 7 || formattedValue.length === 8) {// 临时修改车牌号校验规则
         callback();
@@ -674,8 +674,8 @@ const bankNum = () => {
  */
 const cAppNme = () => {
   return {
-    pattern: /^[\u4e00-\u9fa5\u00B7,a-zA-Z\s]{2,}$/,
-    message: "客户名称 只允许为 中文和·和,或者 字母和空格，且字母汉字长度至少2个",
+    pattern: /^[\u4e00-\u9fa5\u00B7,a-zA-Z()（）\s]{2,}$/,
+    message: "客户名称 只允许为 中文和·和,或者 字母、空格和括号，且字母汉字长度至少2个",
     trigger: "blur"
   }
 }

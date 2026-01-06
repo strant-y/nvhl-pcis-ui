@@ -22,7 +22,7 @@
           >
             <tremTemplate
               v-for="(i, index) in formData['m']"
-              :key="index"
+              :key="formData['m'][index]['&rowId']"
               :rowIndex="index"
               v-model="formData['m'][index]"
               :disabled-flag="disAbledFlag"
@@ -61,7 +61,7 @@
             >
               <tremTemplate
                 v-for="(i, index) in formData['a1']"
-                :key="index"
+                :key="formData['a1'][index]['&rowId']"
                 :rowIndex="index"
                 v-model="formData['a1'][index]"
                 :disabled-flag="disAbledFlag"
@@ -97,7 +97,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['a2' + index] = res;
+                  tremTemplateRefs['a2'] = res;
                 }
               "
             />
@@ -120,7 +120,7 @@
               "
               :ref="
                 (res) => {
-                  tremTemplateRefs['a3' + index] = res;
+                  tremTemplateRefs['a3'] = res;
                 }
               "
             />
@@ -164,12 +164,12 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
-const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo']);
-const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
+const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || parparam.cAppNo);
+const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || parparam.cInquiryNo);
 const pageName = computed(() => opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
-const exli = ref(['010001','010002','010003','010004','010020']);
+const exli = ref(['010001','010002','010003','010004','010020','070002']);
 
 const props = defineProps({
   pageSchema: {
@@ -197,6 +197,10 @@ onMounted(async () => {
   );
   let deleteId = 0 ;
   if(formconfig11.titleBtns){
+    // 020018不需要选择货物按钮
+    if(parparam.cProdNo === '020018') {
+      formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
+    }
     formconfig11.titleBtns.forEach((item: any,index :number) => {
       if(item.id === 'selectGoods'){
         deleteId = index;
@@ -226,6 +230,10 @@ onMounted(async () => {
           let riskList: { [key: string]: any }[] = [];
 					item.children?.forEach((e: any) => {
 						if (parparam.cRecordType == '9' && e.cRiskNo != parparam.cRiskNo) {
+							return false
+						}
+						// 010022险别初始化不选择010223_工作人员及第三者责任保险
+						if (parparam.cProdNo == "010022" && e.cRiskNo == "010223") {
 							return false
 						}
             riskList.push({
@@ -387,25 +395,31 @@ function addTermData() {
           const se = iss.filter(
             (em) => em["Term.cClauseCode"] === item.cTermNo
           );
-          item.children?.forEach((e: any) => {
+          if(item.cRiskType === 'grid'){
             if (se.length > 0) {
-              const seri = se[0].riskList.filter(
-                (er: { [x: string]: any }) =>
-                  er["TermRisktgt.cLiabCode"] === e.cRiskNo
-              );
-              if (seri.length > 0) {
-                riskList.push(seri[0]);
+              riskList = se[0].riskList;
+            }
+          }else{
+            item.children?.forEach((e: any) => {
+              if (se.length > 0) {
+                const seri = se[0].riskList.filter(
+                  (er: { [x: string]: any }) =>
+                    er["TermRisktgt.cLiabCode"] === e.cRiskNo
+                );
+                if (seri.length > 0) {
+                  riskList.push(seri[0]);
+                } else {
+                  riskList.push({
+                    "TermRisktgt.cLiabCode": e.cRiskNo,
+                  });
+                }
               } else {
                 riskList.push({
                   "TermRisktgt.cLiabCode": e.cRiskNo,
                 });
               }
-            } else {
-              riskList.push({
-                "TermRisktgt.cLiabCode": e.cRiskNo,
-              });
-            }
-          });
+            });
+          }
           let data: { [key: string]: any } = {};
           if (se.length > 0) {
             data = se[0];
@@ -540,7 +554,7 @@ function getAddrSeqOptions() {
     pageSize: 9999,
     cProdNo: parparam.cProdNo,
     cClauseCode: parparam.cTermNo,
-    cComponentTable: "PropertyaddressDist",
+    cComponentTable: parparam.cProdNo === "070002" ? "AddressDist" : "PropertyaddressDist",
   };
   if(pageName.value === "priceInquiry") {
     selData['cInquiryNo'] = cInquiryNo.value;
@@ -570,16 +584,17 @@ function refushData(datas: any) {
     if (!pd[key]) {
       pd[key] = [];
     }
+    item['&rowId'] = uuidv4();  // 用作组件id标记,用于刷新组件
     pd[key].push(item);
   });
   // 强制刷新组件,对数据进行更新
   formData.value = {};
-  setTimeout(() => {
+  nextTick(() => {
     formData.value = pd;
-    nextTick(() => {
+    setTimeout(()=>{  
       showFlush();
-    });
-  }, 50);
+    },50);
+  });
 }
 
 function getFromValue() {
@@ -590,8 +605,11 @@ function getFromValue() {
     formData.value[item].forEach((d: any) => {
       const i = JSON.parse(JSON.stringify(d));
       i["Term.nSeqNo"] = idex++;
+      delete i["&rowId"]; // 删除标记rowId字符串
       if (i["riskList"]) {
+        let risk_index = 1;
         i["Term.riskList"] = i["riskList"].map((m: any) => {
+          m['TermRisktgt.nSeqNo'] = risk_index++;
           return m;
         });
         delete i["riskList"];
@@ -610,7 +628,7 @@ function setFormValue(value: any) {
   // 公共处理单个 item 的函数
   const processItem = (item: any) => {
     const newItem = JSON.parse(JSON.stringify(item)); // 深拷贝
-    newItem.riskList = newItem['Term.riskList'];
+    newItem.riskList = newItem['Term.riskList'] || [];
     terms.push(newItem['Term.cClauseCode']);
     delete newItem['Term.riskList'];
 

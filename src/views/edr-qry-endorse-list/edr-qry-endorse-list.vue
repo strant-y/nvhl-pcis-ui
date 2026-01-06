@@ -38,7 +38,7 @@ import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import { AppKey } from "@/constants/api";
-import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde ,checkCancelM1IsOff, queryPayString} from "@/api/prod/";
+import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde ,checkCancelM1IsOff, queryPayString, qryTerminationDataList} from "@/api/prod/";
 import {
     DEFERRED_CORRECTION,
     SCENE_EDR_APP_NEW,
@@ -1171,9 +1171,9 @@ const initQuery = async (cPlyNo, cProdNo, data) => {
         const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
         console.log( 'code--0',cProdNo,' 分公司编码查询结果 ', resCheck, ' 分公司编码 ', subSidiary);
 
-        const resOff = await checkCancelM1IsOff({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
+        const resOff = await qryTerminationDataList({ cPlyNo: cPlyNo, cOperType: 'CancelM1' });
         console.log(666,resOff)
-        if(resOff.res){
+        if(resOff?.data?.[0]?.cAppTyp === 'on'){
              return false; 
         }else{
 

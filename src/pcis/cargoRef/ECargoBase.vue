@@ -37,6 +37,7 @@ const formconfig1 = reactive(createAppFreeEditConfig({}));
 import { useRoute } from "vue-router";
 import {getBsnsTypList,getChaTypeList,getChaSubtypList,} from "@/api/code-list-service";
 import dayjs from "dayjs";
+import { getDeptOptions } from "@/api/dept";
 const route = useRoute();
 const fileInputRef = ref(null);
 const idxParam = inject<any>('idxParam', {});
@@ -54,23 +55,30 @@ onMounted(() => {
       getRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async() => {
     setFormItem('ECargoBase.cCiOprRel',{ rules: [getRules("contactInformation", {})] })
     // setFormItem('ECargoBase.cCiMrk',{hidden:true})
     initComp();
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
     //回显出单机构
+		let label = param.cDptCnm
+		if (!param.cDptCnm) {
+			const response = await getDeptOptions(param.cDptCde);
+			if (response.data.length>0) {
+				label = response.data[0]["label"]
+			}
+		}
     setFormItem("ECargoBase.cDptCde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${label || ''}` },
       ],
     });
     setValue("ECargoBase.cDptCde", param.cDptCde);
     //回显服务机构数据
     setFormItem("ECargoBase.cIntroDptcde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${label || ''}` },
       ],
     });
   })

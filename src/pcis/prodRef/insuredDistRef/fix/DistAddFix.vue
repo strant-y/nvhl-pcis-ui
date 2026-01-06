@@ -27,6 +27,7 @@ import {useValidator} from "@/typings/useValidator";
 import dayjs from "dayjs";
 import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
 import { rule } from "postcss";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
@@ -49,9 +50,9 @@ const props = defineProps({
   },
 });
 
-const idxParam = inject('idxParam');
-// const formPage: FormPage = idxParam?.formPage;
-// const initFlag = computed(() => formPage.init);
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+const params = opertaor.getParam();
 const codeListStore = codeListViewStore();
 
 const getCComponentTable = () => {
@@ -91,7 +92,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
     ],
   })
 );
-const distContactList:Array<string> = ['Dist.PartProp','Tgt.cSuffixAddr','Dist.Prop','Dist.cSuffixAddr','Dist.JingyingProp','Dist.cDetailedAddress']
+
 const rateDetail = ref({
   cExchCde: '1',
   nAmtExch:[],
@@ -106,11 +107,6 @@ onMounted(async  () => {
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
 
     let item = JSON.parse(JSON.stringify(props.data.fromSchema[i]));
-    if(['Dist.AllOccup'].includes(item.prop)) {
-      item["func"] = getDistoccupType;
-    }else if (props.data.fromSchema[i]["func"]) {
-
-    }
     if (props.data.fromSchema[i]["tableClick"]) {
       item["tableClick"] = props.data.fromSchema[i]["tableClick"];
     }
@@ -119,28 +115,6 @@ onMounted(async  () => {
     }
     if(['InsuredDist.tCertfEndDate'].includes(item.prop)) {
       item["disabledDate"] = tCertfEndDateDisable;
-    }
-    if(['GoodsTgt.cPrmCur'].includes(item.prop)) {
-      item["typeCode"] = ''
-      const result:any =  await cargoApi.getRate({cEcAgrAppNo:props.data.cEcAgrAppNo})
-      if(result?.code == 200){
-        rateDetail.value = {...result.data.data[0].rateDetail}
-        nextTick(()=>{
-          item['loadData'] = rateDetail.value?.cPrmCur
-        })
-      }else{
-        ElMessage.error(result.msg);
-        return
-      }
-      item["func"] = cAmtCurChange;
-    }
-		// 运输信息-币种 添加change事件
-    if(['TransportDist.cCurrency'].includes(item.prop)) {
-      item["func"] = cAmtCurChange1;
-    }
-		// 运输信息-航次运输限额 添加change事件 
-    if(['TransportDist.nTransportLimit'].includes(item.prop)) {
-      item["func"] = nTransportLimitchange
     }
     if(['InsuredDist.cInsuredNme'].includes(item.prop)) {
       item["func"] = funCheckUser;
@@ -194,40 +168,21 @@ onMounted(async  () => {
     }
     if(item.cShowLocation === '1'){
       item["hidden"] = true;
-    }
-
-    // 遍历groupList数组把函数赋值给fromSchema
-    if (props.data.fromSchema[i]["groupList"] && props.data.fromSchema[i]["groupList"].length>0) {
-      props.data.fromSchema[i]["groupList"].forEach((data:any,index:number,arr:any) =>{
-        //  040001经营场所地址 040005 学校地址 040021 经营场所地址 042003 学校地址 043013 标的坐落地址 043020 房屋所在地区 045001工程项目地址
-        if(distContactList.includes(data.prop)){
-          item["groupList"][index]['func'] = function (){
-            return setcDetailedAddress(arr,JSON.parse(JSON.stringify(props.data.fromSchema[i+1])))
-          }
-        }
-      })
+		}
+		if(params.cEdrType === '1' && (props.data.title == "编辑" || props.data.title == "新增")){
+      item.disabled = false;
+      if(item.inputtype === 'rtinputgroup'){
+        item.groupList.forEach(data => {
+          data.disabled = false;
+        })
+      }
     }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
   formconfig1.value.title = props.data.title;
-  if(props.data?.compKey &&  props.data?.compKey === 'AgreementDistInsured'){
-    formconfig1.value.titleBtns?.unshift( createFreeButtonBase({
-      type: "primary",
-      label: "同投保人",
-      func:  () => {
-        funccopyvalue()
-      },
-    }),)
-    formconfig1.value.titleBtns?.unshift( createFreeButtonBase({
-      type: "primary",
-      label: "客户重置",
-      func:  () => {
-        funcreset()
-      },
-    }),)
-  }
-  if (props.data.title == "编辑") {
+	if (props.data.title == "编辑") {
+		setFormItem("InsuredDist.cInsuredCde", { disabled: true });
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
     }, 100);
@@ -242,21 +197,12 @@ onMounted(async  () => {
 		if(!cCustRiskRank){
 			setValue("InsuredDist.cCustRiskRank","925104");
 		}
-	}, 100);
-  setTimeout(() => {
-    let cCustRiskRank = getValue("GoodsTgt.cPrmCur")
-    if(!cCustRiskRank){
-      setValue("GoodsTgt.cPrmCur","CNY");
-    }
-  }, 100);
-  setTimeout(() => {
-    setValue('GoodsTgt.cExchCde',rateDetail.value.cExchCde)
   }, 100);
   console.log(' formconfig1.value', formconfig1.value)
-      nextTick(()=>{
-        setFormItem("InsuredDist.cMobile", { rules: [getRules("phoneNo", {})] })
-        setFormItem("InsuredDist.cTel", { rules: [getRules("phone", {})] });
-      })
+	nextTick(()=>{
+		setFormItem("InsuredDist.cMobile", { rules: [getRules("phoneNo", {})] })
+		setFormItem("InsuredDist.cTel", { rules: [getRules("phone", {})] });
+	})
 });
 
 const funccopyvalue = () => {
@@ -335,21 +281,6 @@ const funcreset = () => {
   // }
   setFormValue(InsuredDistValue);
 }
-const setcDetailedAddress = (prop:any,aftProp:any)=> {
-  const ads = freeEditRef?.value?.getValue(prop[0].prop);
-  const a = freeEditRef?.value?.getValue(prop[1].prop) || "";
-  if (ads) {
-    getAddressStr({ address: ads }).then((res: any) => {
-      const { code, data, msg } = res;
-      if (code === 200) {
-        const b = (data ? data["addStr"] : "") + a;
-        freeEditRef?.value?.setValue(aftProp.prop, b);
-      }
-    });
-  } else {
-    freeEditRef?.value?.setValue(aftProp.prop, a);
-  }
-};
 const tCertMrkChecked = (val:any)=>{
   if (val == "1") {
     setValue(
@@ -815,55 +746,7 @@ function setRegisterAdd() {
     setValue("InsuredDist.cRegisteredcapDre", a);
   }
 }
-//总保额币种下拉事件
-const cAmtCurChange = (val: any)=>{
-  const foundItem:any = rateDetail.value.nAmtExch.find((item:any) => item.label === val);
-  setValue("GoodsTgt.nAmtExch", foundItem.value);
-  setValue('GoodsTgt.nRmbLimit',toFixTwo(Number(getValue('GoodsTgt.nInsuranceAmount'))*getValue('GoodsTgt.nAmtExch')))
-  setValue('GoodsTgt.cExchCde',rateDetail.value.cExchCde)
-  // if (val !== "CNY") {
-  //   codeListStore
-  //       .queryCodeList({
-  //         codeListName: "WEB_BAS_CHGRATE",
-  //         codeListParam: { value: val },
-  //       })
-  //       .then((res) => {
-  //         console.log("0000000", res);
-  //         setValue("GoodsTgt.nAmtExch", res[0].currency_rate);
-  //         setValue('GoodsTgt.nRmbLimit',Number(getValue('GoodsTgt.nInsuranceAmount'))*getValue('GoodsTgt.nAmtExch'))
-  //       });
-  // } else {
-  //   setValue("GoodsTgt.nAmtExch", "1.000000");
-  //   setValue('GoodsTgt.nRmbLimit',Number(getValue('GoodsTgt.nInsuranceAmount')))
-  // }
-}
-// 运输信息币种change事件
-const cAmtCurChange1 = (val: any)=>{
-  if (val !== "CNY") {
-    codeListStore
-        .queryCodeList({
-          codeListName: "WEB_BAS_CHGRATE",
-          codeListParam: { value: val },
-        })
-        .then((res) => {
-          console.log("0000000", res);
-          setValue("TransportDist.nAmtExch", res[0].currency_rate);
-          setValue('TransportDist.nRmbLimit',
-						Number(getValue('TransportDist.nTransportLimit')*getValue('TransportDist.nAmtExch'))
-					)
-        });
-  } else {
-    setValue("TransportDist.nAmtExch", "1.000000");
-    setValue('TransportDist.nRmbLimit', Number(getValue('TransportDist.nTransportLimit')))
-  }
-} 
-// 运输信息航次运输限额change事件
-const nTransportLimitchange = (val:any)=>{
-  const goodsValueData = getValue('TransportDist.nAmtExch')
-  if(goodsValueData){
-    setValue('TransportDist.nRmbLimit',Number(goodsValueData * val))
-  }
-}
+
 // 证件有效起期
 const tCertfBgnDateDisable= (date: any) => {
   const fs = getFromValue();
@@ -980,8 +863,8 @@ const cOccupCdeChange = () => {
 
 // 办理人员止期 禁用处理
 const tOEndTmDisable =(date: any) => {
-    return disablePastDates(date);
-  }
+  return disablePastDates(date);
+}
 
 
 //给表单下拉项赋值

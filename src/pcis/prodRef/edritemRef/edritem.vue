@@ -42,10 +42,11 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+const comName = ref(params.pageType == "PLY_UW_PROCESS_SCENE" && params.cPolicySource == '6' && params.cAppTyp != "E"? "比较项":"批改比较项")
 const user = JSON.parse(sessionStorage.getItem("user"));
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
-    title: "批改比较项",
+    title: comName.value,
     editList: ["cStatus"],
     tableBtnType: "btn",
     tableBtnWidth: 220,

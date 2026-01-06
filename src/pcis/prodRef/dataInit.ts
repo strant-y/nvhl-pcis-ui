@@ -87,6 +87,7 @@ export const getData = (opertaor: any) => {
     dataInit["Base.cIntroDptcde"] = param.cDptCde;
     dataInit["Base.cCiMrk"] = param.cCiMrk || "0";
     dataInit["Base.nPayNum"] = "1"; //缴费期数
+    dataInit["Base.cIsFollowUp"] = "0"; //是否后续出营业中断险
 
     dataInit["Applicant.cStkMrk"] = "0";
     dataInit["Applicant.cCustRiskRank"] = "925104";

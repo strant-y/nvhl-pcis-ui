@@ -236,7 +236,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               btnItems: {disabled: true}
             });
             checkboxDisabledFlag.value = true
-            if (!bzFlag.value && params.initFlag == false) {
+            if (!bzFlag.value && params.initFlag == false && !params.cProdNo?.startsWith('05')) {
               ElMessageBox.confirm(
                 "该业务认定为非水险比例分保合同除外业务，是否查看该险种合同除外责任并进一步确认。",
                 "提示",
@@ -287,12 +287,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
         clearable: true,
         func: (v:any) => {
+          setValue("cUndrOpnList", "");
           if ("A" === v) {
-            setValue("cUndrOpnList", "");
             if ("E" === params["cAppTyp"]) {
               setFormItem("cUndrOpnList", {
                 loadData: [{ label: "审核通过", value: "6" }],
               });
+              setValue("cUndrOpnList", "6");
             } else {
               setFormItem("cUndrOpnList", {
                 loadData: [{ label: "审核通过", value: "0" }],
@@ -300,11 +301,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               setValue("cUndrOpnList", "0");
             }
           } else if ("R" === v) {
-            setValue("cUndrOpnList", "");
             setFormItem("cUndrOpnList", {
               loadData: [{ label: "提交上级", value: "5" }],
             });
             setValue("cUndrOpnList", "5");
+          } else if(!v) {
+            setFormItem("cUndrOpnList", {
+              loadData: [],
+            });
           } else {
             setFormItem("cUndrOpnList", {
               loadData: [

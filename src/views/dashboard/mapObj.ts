@@ -18,7 +18,7 @@ const statusList = [
   { label: "核保通过任务", value: "5" },
 ]
                 
-export const tableObj = {
+export const tableObj:any = {
   // 出单--暂存任务
   notWaitObj: {
     stripe: false,

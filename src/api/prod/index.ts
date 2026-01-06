@@ -1657,3 +1657,37 @@ export function queryPayString(queryParams: any): AxiosPromise<any> {
   return post(`/payment/queryPayString`, queryParams);
 }
 
+// 获取财产险/机损险保单号下拉选项
+export function queryCAssPlyNo(queryParams: any): AxiosPromise<any> {
+  return post(`/underwriting/query/queryCAssPlyNo`, queryParams);
+}
+
+// 获取累计保额信息
+export function coverageHint(queryParams: any): AxiosPromise<any> {
+  return post(`/custShare/coverageHint`, queryParams);
+}
+
+// 获取累计保额信息-标的信息
+export function queryNrmbAmt(queryParams: any): AxiosPromise<any> {
+  return post(`custShare/queryNrmbAmt`, queryParams);
+}
+
+// 获取保费修改上下限
+export function getPremiumAdjustmentRange(): AxiosPromise<any> {
+  return post(`/policy/getPremiumAdjustmentRange`, {});
+}
+
+// 建设工程信息根据保险凭证类别查询详细
+export function getProductTemplate(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getProductTemplate`, queryParams);
+}
+
+// 核保风险累计查询
+export function getCumulativeRisk(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getCumulativeRisk`, queryParams);
+}
+
+// 查询保单最新保险起止期
+export function queryLatestMrk(queryParams: any): AxiosPromise<any> {
+  return post(`/reinsured/queryLatestMrk`, queryParams);
+}

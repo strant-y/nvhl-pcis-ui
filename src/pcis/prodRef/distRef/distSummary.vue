@@ -348,16 +348,31 @@ const query = (param: any) => {
             interface Item {
               nInsuredHeadcount?: number | null | string;
             }
-            const countNumber: number = (pageresult.list as Item[]).reduce((sum, item) => {
-              const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
-              return sum + (isNaN(value) ? 0 : value);
-            }, 0);
-            // console.log('countNumber',countNumber)
-            termref?.setTermData({
-              termNo:'00425000091',
-              planNo:'P1',
-              factorProp: 'Term.nInsuredCount',
-            },countNumber);   
+            // const countNumber: number = (pageresult.list as Item[]).reduce((sum, item) => {
+            //   const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
+            //   return sum + (isNaN(value) ? 0 : value);
+            // }, 0);
+            // // console.log('countNumber',countNumber)
+            // termref?.setTermData({
+            //   termNo:'00425000091',
+            //   planNo:'P1',
+            //   factorProp: 'Term.nInsuredCount',
+            // },countNumber);   
+            const planList = [...new Set(pageresult.list?.map((item:any) => item['DistSummary.cPlanNo']) || [])];
+            planList.forEach((planNo:any) => {
+              const list = pageresult.list?.filter((item:any) => item['DistSummary.cPlanNo'] === planNo) || [];
+              const planCountNumber: number = (list as Item[])
+              .filter((item:any) => item['DistSummary.cPlanNo'] === planNo)
+              .reduce((sum, item:any) => {
+                const value = Number(item['DistSummary.nInsuredHeadcount'] ?? 0);
+                return sum + (isNaN(value) ? 0 : value);
+              }, 0);
+              termref?.setTermData({
+                termNo:'00425000091',
+                planNo:planNo,
+                factorProp: 'Term.nInsuredCount',
+              },planCountNumber);   
+            });
         }
       }
     }

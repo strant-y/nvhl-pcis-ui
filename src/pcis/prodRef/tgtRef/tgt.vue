@@ -14,13 +14,16 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
-import { syncDist, selectDist, checkAppBase } from "@/api/prod";
+import { syncDist, selectDist, checkAppBase, queryNrmbAmt, getProductTemplate} from "@/api/prod";
 import { productListA, productListB, productListC } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
+);
+const cumulative = defineAsyncComponent(
+  () => import("@/views/comprehensive-query/modal/cumulative-risk.vue")
 );
 
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -30,7 +33,7 @@ import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import dayjs from "dayjs";
-import { getAddressStr } from "@/api/query";
+import { getAddressStr, policyRatio } from "@/api/query";
 import { codeListViewStore } from "@/store";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 
@@ -50,6 +53,7 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const productStore = useProductStore()
 const dialog = ref<DialogMethod | null>(null);
+let insuranceCoverageFlag = false;
 
 const props = defineProps({
   pageSchema: {
@@ -90,6 +94,16 @@ onMounted(async () => {
       })
     }
   }
+  // 建设信息工程累计保额按钮 只在核保页面展示
+  formconfig11.titleBtns?.forEach((item:any) => {
+    if(item.id === "insurance_coverage") {
+      if(param.pageType === "PLY_UW_PROCESS_SCENE" && param?.pageName !== "priceInquiry") {
+        item.hidden = false
+      } else {
+        item.hidden = true
+      }
+    }
+  })
   Object.assign(formconfig1, formconfig11);
   if (params.cProdNo === '045001') {
     setFormItem("Tgt.cInsuranceMethod", { typeCode: 'InsuranceMethod045001' });
@@ -191,14 +205,29 @@ onMounted(async () => {
 	}
 	// Tgt.cGreenPowerType\Tgt.cGreenPowerOther隐藏
 	const cGreendHideNo = ['040008','040011','040014','040015','041013','110001','110002','110003','110004','110005']// 需要隐藏产品
-	if (cGreendHideNo.includes(params.cProdNo)) {
+	if (cGreendHideNo.includes(params.cProdNo) && params.pageType == "app") {
     setFormItem("Tgt.cGreenPowerType", { hidden: true })
     setFormItem("Tgt.cGreenPowerOther", { hidden: true })
 	}
 
   //  运输工具名称
   const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
-  const isNonRequired = cTransportationNames.includes(params.cProdNo);
+	const isNonRequired = cTransportationNames.includes(params.cProdNo);
+
+	// 风险累积按钮核保切是规定产品展示
+	const isAccumulatedRiskProduct = ["110001", "110003", "040008", "040011", "040015",]
+	formconfig11.titleBtns?.forEach((item: any) => {
+		const isInList = isAccumulatedRiskProduct.includes(params.cProdNo);
+    const startsWith02 = params.cProdNo?.substring(0, 2) === "02";
+    const isCorrectPage = params.pageType === "PLY_UW_PROCESS_SCENE";
+
+    // 满足：(在列表中 OR 以02开头) AND 在指定页面 → 展示（hidden = false）
+    if ((isInList || startsWith02) && isCorrectPage) {
+      item.hidden = false;
+    } else {
+      item.hidden = true;
+    }
+	})
 
   setFormItem("Tgt.cTransportationName", {
     rules: isNonRequired ? [] : [getRules("required", { trigger: 'blur' })]
@@ -221,7 +250,11 @@ onMounted(async () => {
   });
   selectType()
   nextTick(() => {
-    eventBus.on('goodsMxChange', handelGoodsMx);
+    // 货物信息回填到标的信息的产品
+    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
+    if(ProdNo.includes(params.cProdNo)) {
+      eventBus.on('goodsMxChange', handelGoodsMx);
+    }
     if (!getValue('Tgt.cDispatchDetail')) {
       setFormItem('Tgt.cDispatchDetail', { disabled: true })
     } else {
@@ -443,6 +476,10 @@ const method = {
   getcSanctionAreasChange: () => {
     dialog.value?.open('detailsKnows', null,
       null, { width: 45, title: '战争及罢工险核保限制和运输地国家限制' });
+	},
+	getcBuildingStructureChange: () => {
+    dialog.value?.open('cBuildStrKnows', null,
+      null, { width: 45, title: '建筑结构' });
   },
   gettCompletionYearChange: (val: string) => {
     const currentYear = new Date().getFullYear();
@@ -669,28 +706,30 @@ const method = {
   getcShippingMethodChange: (val: string) => {
     console.log('val', val)
     // if(val === 'NV591001'){
-    if (val === '11') {
-      tgtIsWaterMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: false,
-        });
-      })
-      tgtOtherMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: true,
-        });
-      })
-    } else {
-      tgtIsWaterMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: true,
-        });
-      })
-      tgtOtherMatterList.forEach(item => {
-        setFormItem(item, {
-          hidden: false,
-        });
-      })
+    if(params.cProdNo === '020009') {
+      if (val === '11') {
+        tgtIsWaterMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: false,
+          });
+        })
+        tgtOtherMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: true,
+          });
+        })
+      } else {
+        tgtIsWaterMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: true,
+          });
+        })
+        tgtOtherMatterList.forEach(item => {
+          setFormItem(item, {
+            hidden: false,
+          });
+        })
+      }
     }
     // if(val === 'NV591003'){
     if (val === '12') {
@@ -845,13 +884,34 @@ const method = {
     //把数据存在store，清单信息组件的是否必填根据这个来
     productStore.setCIsSingle(val)
   },
-  funcInsuranceChange: (val) => {
-    
+  funcInsuranceChange: (val:any) => {
+    const param = opertaor.getParam();
+    if (param.initFlag) return
     // 投保方式选择按工程造价投保、按建筑面积投保、按劳务合同价投保，短期费率类型默认按日，短期费率系数固定为1
     const baseRef = opertaor.getTableRefByKey('base'); 
     const disableValue = ['613002', '613003', '613004'].includes(val);
-    baseRef.setValue('Base.cRatioTyp', '2'); 
     baseRef.setFormItem("Base.cRatioTyp", { disabled: disableValue });
+    if(disableValue) {
+      baseRef.setValue('Base.cRatioTyp', '2'); 
+      baseRef.setValue('Base.nRatioCoef', Number(1).toFixed(6));
+    } else {
+      const baseBefore = opertaor.getTableRefByKey("insrnc")?.getFromValue();
+      const baseBefore2 = opertaor.getTableRefByKey("base")?.getFromValue();
+      let prodNo = params.cProdNo;
+
+      let param = {
+        bgnTm: baseBefore["Base.tInsrncBgnTm"],
+        endTm: baseBefore["Base.tInsrncEndTm"],
+        prodNo,
+        ratioType: baseBefore2 ? baseBefore2['Base.cRatioTyp'] : null
+      }
+      policyRatio(param).then((res: any) => {
+        const { code, data, msg } = res;
+        if (code === 200) {
+          baseRef.setValue('Base.nRatioCoef', Number(data).toFixed(6))
+        }
+      });
+    }
 
     groupCheck();
     //根据投保方式得选择对应控制必填项
@@ -1907,8 +1967,10 @@ const method = {
 	},
 	// 是否绿色动力能源
 	cGreenPowerFlagfun: (val: any) => {
-		setValue("Tgt.cGreenPowerType", null);
-		setValue("Tgt.cGreenPowerOther", null);
+		if (!params.initFlag) {
+			setValue("Tgt.cGreenPowerType", null);
+			setValue("Tgt.cGreenPowerOther", null);
+		}
 		if (val === "01") {// 是否绿色动力能源 选择是(01)---展示 绿色动力能源类型选择框
       setFormItem("Tgt.cGreenPowerType", { hidden: false, rules: [getRules("required", {})] })
 		} else {
@@ -1918,13 +1980,93 @@ const method = {
 	},
 	// 绿色动力能源类型
 	cGreenPowerTypefun: (val: any) => {
-		setValue("Tgt.cGreenPowerOther", null);
+		if (!params.initFlag) {
+			setValue("Tgt.cGreenPowerOther", null);
+		}
 		if (val === "05") {// 绿色动力能源类型 选择其他（05）---展示 其他输入框切必填
       setFormItem("Tgt.cGreenPowerOther", { hidden: false, rules: [getRules("required", {})] })
 		} else {
       setFormItem("Tgt.cGreenPowerOther", { hidden: true, rules: [] })
     }
 	},
+  // 累计保额按钮
+  insuranceCoverageFunc:() => {
+    if(!insuranceCoverageFlag) {
+      insuranceCoverageFlag = true
+      queryNrmbAmt({cAppNo: param.cAppNo}).then((res:any) => {
+        if(res.code == '1') {
+          ElMessage.warning({ message: res.message, duration: 3000 });
+        } else {
+          ElMessage.error(res.message)
+        }
+        insuranceCoverageFlag = false
+      }).catch((err:any) => {
+        ElMessage.error(err.message)
+        insuranceCoverageFlag = false
+      })
+    }
+  },
+	// 建设工程信息-保险凭证类别
+	cCertificateTypefun: async (val) => {
+		const cCertificateTypeProd = ["059011", "059012", "059013", "059015", "059016", "059017", "059018", "059019", "059020"]
+		if (cCertificateTypeProd.includes(params.cProdNo)) {
+			try {
+				const res = await getProductTemplate({prodNo:params.cProdNo,isCommon:val});
+				
+				if (res.code !== '200') {
+					ElMessage.error(res.msg || '连接失败！');
+					return;
+				}
+				setValue("Tgt.cCertificateDetailed", res.data)
+			} catch (err) {
+				console.error('查询异常:', err);
+				ElMessage.error('系统异常，请稍后重试');
+			}
+		}
+	},
+	// 风险累积
+	getCumulativeRisk: () => {
+		const isAccumulatedRiskProduct = ["110001", "110003", "040008", "040011", "040015",]
+		let data1 = getFromValue()
+		let data = {}
+		const isInList = isAccumulatedRiskProduct.includes(params.cProdNo);
+		const startsWith02 = params.cProdNo?.substring(0, 2) === "02";
+		if (isInList) { // 船舶
+			data.nType = 1
+			data.cShipName = data1["Tgt.cShipName"] // 船名
+		} else if (startsWith02) { // 货运
+			data.nType = 2
+			data.cShipName = data1["Tgt.cTransportationName"] // 船名
+			data.cTransportVoyage = data1["Tgt.cVoyageNumber"] // 航次
+		}
+		dzmodal.open(cumulative, { type: "departure", data: data }).then((res: any) => {
+			if (res.type === "ok") {
+			};
+		});
+	},
+	// 占用性质
+	cTargetTypeNaturefun: (val) => {
+		if (val[0] == '13' || val[0] == '12') {
+			setFormItem('Tgt.cDurabilityLevel', {rules: [getRules("required", {})] });
+			setFormItem('Tgt.cResistanceRating', {rules: [getRules("required", {})] });
+			setFormItem('Tgt.cMainClassification', {rules: [getRules("required", {})] });
+		} else {
+			setFormItem('Tgt.cDurabilityLevel', {rules: [] });
+			setFormItem('Tgt.cResistanceRating', {rules: [] });
+			setFormItem('Tgt.cMainClassification', {rules: [] });
+		}
+	},
+  // 担保金额
+  nGuaranteeAmountChange: (val:any) => {
+    const cProdNos = ['059011','059015','059016','059012','059014','059019',,'059021','059023','059901','059903','059904','059911','059914','059930','059018','059020','059013','059910','059017'];
+    if(cProdNos.includes(params.cProdNo)) {
+      const nAmt = opertaor.getTableRefByKey('base')?.getValue('Base.nAmt') || 0;
+      if(val !== 0 && val !== nAmt) {
+        ElMessage.warning('担保金额只能为0或等于保险金额');
+        setValue('Tgt.nGuaranteeAmount', 0);
+      }
+    }
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

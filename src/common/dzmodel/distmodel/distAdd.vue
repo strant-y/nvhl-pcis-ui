@@ -226,7 +226,8 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if(!savePlyInfo) return;
             }
             formconfig1.value.titleBtns[0].loading = true
-            saveDist(params).then((res) => {
+            saveDist(params).then((res:any) => {
+              formconfig1.value.titleBtns[0].loading = false
               if (res.code === 200) {
                 // const cvrgRef = opertaor.getTableRefs()['cvrg'];
                 // if(cvrgRef) {
@@ -242,7 +243,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               } else {
                 ElMessage.error(res.msg);
               }
+            }).catch((err:any) => {
               formconfig1.value.titleBtns[0].loading = false
+              ElMessage.error(err.msg);
             });
           }
           // freeEditRef.value?.validate().then(() => {
@@ -275,7 +278,7 @@ const isObjectValid = (obj: any) => {
   const allEmpty = values.every(v => v == null || v === '');
   return !allEmpty;
 };
-onMounted(() => {
+onMounted(async () => {
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value?.plyBase["Base.cAppNo"];
   cGrpMrk.value = route.params.param?.cGrpMrk;
@@ -317,6 +320,7 @@ onMounted(() => {
     // 车牌号校验 vehiclePlate
   if(item.prop =='Dist.cPlateNumber'){
      item['rules'] = [getRules("vehiclePlate", {})];
+     item.iconInfo = "（新车未上牌，请在此录入【新车未上牌】）"
     }
 
     // 车架号校验
@@ -406,6 +410,10 @@ onMounted(() => {
     }
     if(item.prop =='Dist.nInsuranceAmount'){
       item['func'] =  nInsuranceAmountChange;
+		}
+		// 证件类型
+		if(item.prop =='Dist.cIdType'){
+      item['func'] =  cIdTypefun;
     }
     // if(item.prop =='Dist.HouseAreaProp'){
     //   item?.groupList.forEach(data => {
@@ -421,6 +429,18 @@ onMounted(() => {
     if(item.prop =='Dist.cContactInformation'){
         item['rules'] = [getRules("phoneNo", {})];
     }
+
+		// 邮编
+		if(route.params.param.cProdNo?.startsWith('01')) {
+      if(item.prop === 'Dist.cZipCde') {
+        item.maxlength = 6
+				item['rules'] = [
+					getRules("required", {}),
+        	getRules("signlessInt", {}),
+        	getRules("specifyLength", { len: 6 }),
+     	 	];
+      }
+  	}
 
 
     if(item.prop =='Dist.PropertyLocationProp'){
@@ -457,15 +477,24 @@ onMounted(() => {
       })
     }
     if (item.prop === 'Dist.cPlanNo') {
-        const termref = opertaor.getTableRefByKey('cvrg');
-        const allPlans = termref.getPlanNo();   // 全部方案
+      const termref = opertaor.getTableRefByKey('cvrg');
+      const allPlans = termref.getPlanNo();   // 全部方案
 
-        // 从父页面表格中获取已添加的方案
-        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
-        const added = distTableRef?.getTableData()?.map(row => row['Dist.cPlanNo']) || [];
-        // 去重
-        const uniqueAdded = [...new Set(added)]; 
-        const nextIdx = uniqueAdded.length;  // 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+      // 从父页面表格中获取已添加的方案
+      const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+      const getTableDataAll = await distTableRef?.getTableDataAll();
+      const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row:any) => row['Dist.cPlanNo']) : [];
+      // 去重
+      const uniqueAdded = [...new Set(added)]; 
+      let nextIdx = 0;
+      for(let j = 1; j < allPlans.length + 1; j++) {
+        const planNo = 'P' + j;
+        // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+        if(!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
+          nextIdx = j;   // 已添加的方案跳过
+          break;
+        }
+      }
 
         item.typeCode = null;
         item.loadData = allPlans.map((p: any, idx: number) => ({
@@ -514,11 +543,12 @@ onMounted(() => {
         if(val) {
           codeListStore
             .queryCodeList({
-              codeListName: val === '第三者责任' ? 'mianpeileixing2' : 'mianpeileixing',
+              codeListName: val === '02' ? 'mianpeileixing2' : 'mianpeileixing',
               codeListParam:{},
             })
-            .then((res) => {
-              setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res })
+						.then((res) => {
+							setValue('Dist.cItemLiability', null)
+							setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res, multiple: val === '02' ? 0 : 1 })
             });
         }
       }
@@ -538,6 +568,29 @@ onMounted(() => {
           setValue("Dist.cDductDesc", filledString)
         } else {
           setValue("Dist.cDductDesc", "")
+        }
+      }
+    }
+    // 020018 运输范围省内运输时省份必填 车龄根据初登日期自动算出
+    if(params?.cProdNo === '020018') {
+      if(item.prop === 'Dist.cTransportScope') {
+        item.func = (val:any) => {
+          if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
+            setFormItem("Dist.cMunicipalityDirectly", { rules: [getRules("required", {})] })
+          } else {
+            setFormItem("Dist.cMunicipalityDirectly", { rules: [] })
+          }
+        }
+      }
+      if(item.prop === 'Dist.tRegistrationDate') {
+        item.func = (val:any) => {
+          if(val) {
+            const days = Math.abs(moment(val).diff(moment(), 'days'));
+            const age = (days / 365).toFixed(1);
+            setValue("Dist.cVehicleAge", age)
+          } else {
+            setValue("Dist.cVehicleAge", "")
+          }
         }
       }
     }
@@ -580,6 +633,10 @@ onMounted(() => {
         setFormItem("Dist.nRmbAmount", { disabled: true });
         setFormItem("Dist.nRmbLimit", { disabled: true });
         setFormItem("Dist.cRemarks", { disabled: true });
+    }
+    // 040001 变更清单信息时 方案号置灰
+    if(props.data.rowData.cProdNo === '040001' && props.data.rowData.cRsnCde === "10"){
+      setFormItem("Dist.cPlanNo", { disabled: true });
     }
     setTimeout(() => {
       freeEditRef.value?.setFormValue(props.data.rowData);
@@ -756,7 +813,8 @@ const cEquipmentTypesFunc = ()=>{
 const cDocumentTypeChange = (val: any) => {
   const cIs = opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']; // 是否记名投保
   const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
-
+	setValue('Dist.cIdentificationNumber', null);
+	clearValidate('Dist.cIdentificationNumber')
   const baseRuleMap: Record<string, any[]> = {
     "111": [getRules("idCard", {})], // 身份证
     "01": [getRules("socialCode", {})], // 统一社会信用代码
@@ -775,6 +833,28 @@ const cDocumentTypeChange = (val: any) => {
   setFormItem('Dist.cIdentificationNumber', { rules });
 };
 
+// 05产品-清单信息-证件类型
+const cIdTypefun = (val: any) => {
+	console.log('05产品-清单信息-证件类型', val)
+	// 清除值、报错信息
+	setValue('Dist.cIdNumber', null);
+	clearValidate('Dist.cIdNumber')
+
+	let baseRules: any[] = [];
+	type RuleType = "orgCode" | "socialCode" | "idCard" | "passPort" | "ariCard" | "required";
+	const ruleMap: Record<string, RuleType> = {
+		"110001": "orgCode",
+		"01": "socialCode", // 统一社会信用证代码
+		"111": "idCard", // 居民身份证
+		"07": "passPort", // 护照
+		"553": "ariCard", // 外国人永久居留身份证
+	};
+	baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+
+	setFormItem("Dist.cIdNumber", {
+		rules: baseRules,
+	});
+}
 
 function getAddressstr(val:any, row: any, pitem: any){
   let getv1 = '';  //集联地址
@@ -905,10 +985,10 @@ const cRelatedInsuredChange = () => {
 						let loadData = []
 						let datavalue = []
 						data.value.forEach((item)=>{
-							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
-							// datavalue.push(item['InsuredDist.cInsuredCde'])
-							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
-							datavalue.push(item['InsuredDist.cPkId'])
+							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
+							datavalue.push(item['InsuredDist.cInsuredCde'])
+							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
+							// datavalue.push(item['InsuredDist.cPkId'])
 						})
 						setValue("Dist.cRelatedInsured", datavalue);
 						setFormItem("Dist.cRelatedInsured", { loadData });
