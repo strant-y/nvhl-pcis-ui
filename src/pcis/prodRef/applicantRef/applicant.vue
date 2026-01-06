@@ -1445,7 +1445,7 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   applicantEditRef?.value?.setFormValue(value); 
-  if (firstRealData && value?.["Applicant.cClntMrk"] != null) {
+  if (firstRealData && value?.["Applicant.cClntMrk"] != null && param.pageType !== 'readonly') {
     firstRealData = false;
     nextTick(() => {
       setTimeout(() => {
