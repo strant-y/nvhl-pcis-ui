@@ -4002,6 +4002,7 @@ const openLimit = () => {
  * 投保单保存
  * **/
 const savePlyInfo = async () => {
+  debugger
   // if(props.param.cTransMrk !== '1'){
     let saveFlag = false;
     const btn = getBtn("btn010102");
@@ -4078,6 +4079,8 @@ const savePlyInfo = async () => {
         }) : [],
       }
     });
+    // 复制出单保存时增加入参，值为复制保单的保单号或申请单号
+    res["plyBase"]["Base.cAssPlyNo"] = props.param?.cPlyNo || props.param?.cAppNo;
   }
 
   if (res["cvrg"].length == 0) {
