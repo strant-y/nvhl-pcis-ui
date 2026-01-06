@@ -513,7 +513,7 @@ import {
 	queryEcargoRelevancePolicyDetails,
 	enquiryToAppEndorseChange
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange, getNewSysDays, checkCdeptByCdptCde } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -526,7 +526,7 @@ import { iconMap } from './iconMap';
 import { imageMethod } from './imageMethod';
 import { pageMethod } from './pageMethod';
 import { codeListViewStore } from "@/store";
-import { lessThan6Months } from "@/utils/date";
+import { lessThan6Months, toDate } from "@/utils/date";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const dialog = ref<DialogMethod | null>(null);
 
@@ -6534,6 +6534,95 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
         ElMessage.warning("可倒签天数为"+rebackDay+"天,可倒签日期为"+newTEdrBgnTm)
         return;
       }
+    }
+  }
+  // 取消免费延期校验
+  if(['M1','M8'].includes(props.param?.cRsnCde)) {
+    try {
+      // 基础参数准备
+      const plyNo = edrbase.value?.getValue('EdrBase.cPlyNo');
+      const cProdNo = edrbase.value?.getValue('EdrBase.cProdNo');
+        const baseRef = opertaor.getTableRefByKey("plyBase");
+      let newSysTmDay = 365, oldSysTmDay = 365;
+      let newInsEndTm = '', oldInsEndTm = '';
+      let newDelayDay = 0;
+
+      //  获取保单时间数据
+      const resDays:any = await getNewSysDays({ cPlyNo: plyNo });
+      if (!resDays || resDays.code !== 200 || !resDays.res) {
+        ElMessage.error("获取保单数据失败，无法进行免费延期");
+        return false; // 拦截后续流程
+      }
+      const [name0, name1, name2, name3, name4] = resDays?.res.split('###');
+      newSysTmDay = name0;
+      newInsEndTm = name1;
+      oldSysTmDay = name2;
+      newDelayDay = name3;//延长天数
+      oldInsEndTm = name4;//原始保单的保险止期
+
+      // 获取表单基础数据
+      const tabref = opertaor.getTableRefs();
+      const baseBefore = tabref?.["insrnc"].getFromValue();
+      console.log('base---', baseBefore)
+      const obj = baseBefore['Base.tInsrncEndTm'];// 保险止期
+      // 时间有效性校验
+      const objDate = toDate(obj);
+      const newInsEndTmDate = toDate(newInsEndTm);
+      if (isNaN(objDate.getTime()) || isNaN(newInsEndTmDate.getTime())) {
+        ElMessage.error("时间格式错误");
+        return false; // 拦截
+      }
+
+      //止期只能延长
+      if (objDate.getTime() < newInsEndTmDate.getTime()) {
+        ElMessage.warning("免费延期只能延长保险止期，不能缩短");
+        return false; // 拦截
+      }
+
+      //  分公司编码获取
+      const cDptCde = edrbase.value?.getValue('EdrBase.cDptCde');
+      const resCheck:any = await checkCdeptByCdptCde({ dptCde: cDptCde });
+      const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
+
+      //  接口  开关校验
+      const resOff = await qryTerminationDataList({ cPlyNo: plyNo, cOperType: 'CancelM1' })
+
+      // 开关关闭：按产品规则拦截
+      if (resOff?.data?.[0]?.cAppTyp === 'on') {
+        qryTerminationStatus.value = true;
+      } else {
+        const nowTmSysCde = Number(baseBefore["Base.cTmSysCde"]) || 0;
+        const nowDelayDay = parseInt(nowTmSysCde) - parseInt(newSysTmDay);
+        const sumDelayDay = parseInt(nowTmSysCde) - parseInt(oldSysTmDay);
+        const sxMonths = monthBetween(new Date(toDate(oldInsEndTm).getTime() + 86400000), objDate);
+        const tMonths = monthBetween(new Date(newInsEndTmDate.getTime() + 86400000), objDate);
+
+        // 产品 043009 规则
+        if (cProdNo === '043009') {
+          if (subSidiary === "0261010000000" && sxMonths > 24) {
+            ElMessage.warning("陕西分公司免费延期最长不超过 2 年");
+            return false; // 拦截
+          } else if (subSidiary !== "0261010000000" && tMonths > 6) {
+            ElMessage.warning("免费延期最长不超过 6 个月");
+            return false; // 拦截
+          }
+        }
+        // 其他产品规则
+        else if (cProdNo !== '110002') {
+          if (nowDelayDay > 180 || sumDelayDay > 180) {
+            ElMessage.warning("延期天数超 180 天限制");
+            return false; // 拦截
+          } else if (nowDelayDay > 90) {
+            ElMessage.warning("单次延期不超过 90 天");
+            return false; // 拦截
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error("免费延期校验异常", error);
+      ElMessage.error("免费延期处理失败，请重试");
+      return false; // 异常时拦截
     }
   }
   return true;
