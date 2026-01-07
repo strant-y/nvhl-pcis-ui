@@ -17,10 +17,11 @@
       <!-- 消息 -->
       <div ref="buttonRef" class="setting-word"  
         style="position: relative;display: inline-block;">
-        <el-icon style="font-size: 20px; ">
-          <bell />
-        </el-icon>
-        <div class="badge" v-if="total > 0">{{ total }}</div>
+				<el-badge :value="total" :max="99" class="item" :offset="[0, 10]">
+					<el-icon style="font-size: 20px; ">
+						<bell />
+					</el-icon>
+				</el-badge>
       </div>
 
 
@@ -63,6 +64,7 @@
 
             </li>
             <!-- <li v-if="hasMoreItems" @click="loadMore" class="more">查看更多</li> -->
+            <li @click="clear" class="more">清空通知</li>
           </ul>
 
           <div v-else-if="mesList.length == 0" class="no-data">
@@ -322,22 +324,19 @@ const JumpClick = (row: any) => {
       case 'P2': {
         if ('申请核保' === row.title) {
           router.push({
-            path: '/index/new-udr-list/newudrlist',
-            // name: `application-querys`,
-            query: {
-              appNo: row.dataId
+            path: '/pcis-new-udr-list/PendUdrListQuery',
+						query: {
+							param: JSON.stringify({ appNo: row.dataId }),
             }
-          });
-          // this.router.navigate(['/index/new-udr-list/newudrlist'], {queryParams: {appNo: item.dataId}});
-
+					});
         }
         break;
       }
       case 'P4': {
         router.push({
-          path: '/pcis-new-udr-list/PendUdrList',
+          path: '/payinfoManagement/payinfohandle',
           query: {
-            uniqueNo: row.dataId
+						param: JSON.stringify({ cAppNo: row.dataId }),
           }
         });
         // if ('支票缴费提核' === item.title) {
@@ -382,19 +381,45 @@ const JumpClick = (row: any) => {
 // 修改消息状态
 const change = (param: any) => {
   pcisQueryService.changeStatus(param).then((res: any) => {
-  // const notifyData = this.notifyService.changeStatus(param);
-  // notifyData.subscribe((res: any) => {
-      // this.loading = false;
-      
       if (null != res && null != res['code']) {
           if (res['code'] === 200) {
               if (!!res.data) {
                   loadData();
-                  // this.msg.success(`状态变更成功`, { nzDuration: 3000 });
+									ElMessage.success("状态变更成功");
               }
           }
       }
   });
+}
+
+// 清空通知
+const clear = () => {
+	ElMessageBox.confirm("确定做清空通知操作？", "提示", {
+		confirmButtonText: "确定",
+		cancelButtonText: "取消",
+		type: "warning",
+		lockScroll: false,
+	}).then(() => {
+		const param = {
+			CReceiver: user.opCde,
+			CType: '0',
+		};
+		pcisQueryService.deleteNotifyByReceiver(param).then((res: any) => {
+			if (null != res && null != res['code']) {
+				if (res['code'] === 200) {
+					if (!!res.data) {
+						ElMessage.success(res['msg'] || "清空成功！");
+						loadData();
+					}
+				} else {
+					ElMessage.error(res['msg'] || "清空失败！");
+				}
+			}
+		})
+		.catch((err) => {
+			ElMessage.error(err || "清空失败！");
+		})
+	}).catch(() => {});
 }
 
 const changeDpt = () => {
