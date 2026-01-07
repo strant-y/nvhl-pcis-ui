@@ -886,6 +886,28 @@ const method = {
   },
   funcInsuranceChange: (val:any) => {
     const param = opertaor.getParam();
+
+    groupCheck();
+    //根据投保方式得选择对应控制必填项
+    if (val == '613002') {
+      setFormItem("Tgt.nEngineeringCost", {
+        rules: [getRules("required", { blur: true })],
+      });
+      setFormItem("Tgt.nProjectArea", { rules: null });
+      setFormItem("Tgt.nLaborPrice", { rules: null });
+    } else if (val == '613003') {
+      setFormItem("Tgt.nEngineeringCost", { rules: null });
+      setFormItem("Tgt.nProjectArea", {
+        rules: [getRules("required", { blur: true })],
+      });
+      setFormItem("Tgt.nLaborPrice", { rules: null });
+    } else if (val == '613004') {
+      setFormItem("Tgt.nEngineeringCost", { rules: null });
+      setFormItem("Tgt.nProjectArea", { rules: null });
+      setFormItem("Tgt.nLaborPrice", {
+        rules: [getRules("required", { blur: true })],
+      });
+    }
     if (param.initFlag) return
     // 投保方式选择按工程造价投保、按建筑面积投保、按劳务合同价投保，短期费率类型默认按日，短期费率系数固定为1
     const baseRef = opertaor.getTableRefByKey('base'); 
@@ -910,28 +932,6 @@ const method = {
         if (code === 200) {
           baseRef.setValue('Base.nRatioCoef', Number(data).toFixed(6))
         }
-      });
-    }
-
-    groupCheck();
-    //根据投保方式得选择对应控制必填项
-    if (val == '613002') {
-      setFormItem("Tgt.nEngineeringCost", {
-        rules: [getRules("required", { blur: true })],
-      });
-      setFormItem("Tgt.nProjectArea", { rules: null });
-      setFormItem("Tgt.nLaborPrice", { rules: null });
-    } else if (val == '613003') {
-      setFormItem("Tgt.nEngineeringCost", { rules: null });
-      setFormItem("Tgt.nProjectArea", {
-        rules: [getRules("required", { blur: true })],
-      });
-      setFormItem("Tgt.nLaborPrice", { rules: null });
-    } else if (val == '613004') {
-      setFormItem("Tgt.nEngineeringCost", { rules: null });
-      setFormItem("Tgt.nProjectArea", { rules: null });
-      setFormItem("Tgt.nLaborPrice", {
-        rules: [getRules("required", { blur: true })],
       });
     }
     const cvrgref = opertaor.getTableRefByKey("cvrg");
@@ -2144,6 +2144,14 @@ function groupCheck() {
         item.hidden = h;
       }
     });
+    // 按人数投保时清空group2的数据
+    if(h === true) {
+      formconfig1.fromSchema?.forEach((item) => {
+        if (item.group === 'group2') {
+          setValue(item.prop, null);
+        }
+      });
+    }
   }
 }
 
