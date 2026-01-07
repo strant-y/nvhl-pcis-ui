@@ -1298,7 +1298,7 @@ async function save() {
       agreementBaseRef.setValue('ECargoBase.cEcAgrAppNo', resData.value['ECargoBase.cEcAgrAppNo'])
       agreementBaseRef.setValue('ECargoBase.cAppTyp', resData.value['ECargoBase.cAppTyp'] || '')
     	cEcAgrAppNo.value = resData.value['ECargoBase.cEcAgrAppNo']
-    	if(cEcAgrAppNo.value && !saveDistBatchFlag.value && props.isActive === '0'){
+    	if(cEcAgrAppNo.value && !saveDistBatchFlag.value && props.isActive === '0' && props.type === "orig"){
 				const param: any = idxParam.param
 				let data = param?.renewalComponent
 				const val = {
