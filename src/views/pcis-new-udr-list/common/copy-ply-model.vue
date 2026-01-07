@@ -255,6 +255,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tAppTm",
         inputtype: "rtinput",
         title: "投保申请日期",
+        formatter: (val: any) => {
+          return val
+            ? val.replace(/T/g, " ")
+            : "";
+        },
       },
       {
         prop: "cCnm",
