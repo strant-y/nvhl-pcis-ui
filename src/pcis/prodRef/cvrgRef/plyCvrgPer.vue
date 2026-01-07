@@ -157,6 +157,8 @@ import {qryProdRelTermRiskList, selectDist} from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 import { terConfig } from "@/store/modules/term-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -164,9 +166,9 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
-const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || parparam.cAppNo);
-const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || parparam.cInquiryNo);
-const pageName = computed(() => opertaor.getParam()['pageName']);
+const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || route.params?.param?.cAppNo);
+const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || route.params?.param?.cInquiryNo);
+const pageName = computed(() => opertaor.getParam()['pageName'] || route.params?.param?.pageName);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
 const exli = ref(['010001','010002','010003','010004','010020','070002']);
@@ -544,13 +546,14 @@ function refushCvrgInfo() {
   });
 }
 
-function getAddrSeqOptions() {
+function getAddrSeqOptions(compKey:any) {
   const selData: any = {
     pageNum: 1,
     pageSize: 9999,
     cProdNo: parparam.cProdNo,
     cClauseCode: parparam.cTermNo,
-    cComponentTable: parparam.cProdNo === "070002" ? "AddressDist" : "PropertyaddressDist",
+    // cComponentTable: parparam.cProdNo === "070002" ? "AddressDist" : "PropertyaddressDist",
+    cComponentTable: compKey,
   };
   if(pageName.value === "priceInquiry") {
     selData['cInquiryNo'] = cInquiryNo.value;
