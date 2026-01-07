@@ -43,7 +43,8 @@ onMounted(() => {
     exRules
   );
   // 保证险中保险期限的“签单时间”在页面隐藏。
-  if(route.params.param?.cProdNo?.startsWith('05') && formconfig11.fromSchema?.length > 0) {
+  // 询价页面签单日期隐藏
+  if((route.params.param?.cProdNo?.startsWith('05') || route.params.param?.pageName === "priceInquiry") && formconfig11.fromSchema?.length > 0) {
     formconfig11.fromSchema?.forEach((item:any) => {
       if(item.prop === 'Base.tIssueTm') {
         item.hidden = true
