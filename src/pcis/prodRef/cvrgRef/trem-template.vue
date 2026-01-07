@@ -1786,9 +1786,22 @@ function setData(params: any,data:any){
 
 const methodMap = {
   butTestCheck:(item: any,row: any) => {
-    console.log(item);
-    console.log(row);
-    riskTableRef.value?.setValueByRowKey(item.prop,row._dataId,"111111");
+    dialog.value?.open(
+      "chooseProdDialog",
+      {
+        type: "show",
+      },
+      {
+        isOk: (selectdata: any) => {
+          if(termTitleConf.value?.cFactorTabType === 'table') {
+            termdata.value[item.prop] = selectdata.cPlyNo;
+          } else if(riskShowTyp.value === 'grid') {
+            riskTableRef.value?.setValueByRowKey(item.prop,row._dataId, selectdata.cPlyNo);
+          }
+        },
+      },
+      { title: "选择保单号", width: 50 }
+    );
   },
   excludeLimitChang:(val:any,row:any,item:any) => {
     if (pageparam.cProdNo === "040015") {
