@@ -28,6 +28,7 @@ import buttonEdit from "./commonutils/buttonEdit.vue";
 import specialApproval from "./commonutils/specialApproval.vue";
 import addtremComView from "./prodconfig/addtremComView.vue";
 import addriskView from "./prodconfig/addriskView.vue";
+import chooseProdDialog from "./prodconfig/chooseProdDialog.vue";
 
 /**用于动态弹窗组件的映射生成 */
 const componentMap = {
@@ -35,6 +36,7 @@ const componentMap = {
     componentView:componentView,
     componentCompare:componentCompare,
     addriskView:addriskView,
+    chooseProdDialog:chooseProdDialog,
 
     prodCopy:prodCopy,
     componentPageView:componentPageView,
