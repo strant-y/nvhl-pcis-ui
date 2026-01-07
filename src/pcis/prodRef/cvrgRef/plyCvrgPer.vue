@@ -166,7 +166,7 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
-const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || route.params?.param?.cAppNo);
+const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo);
 const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || route.params?.param?.cInquiryNo);
 const pageName = computed(() => opertaor.getParam()['pageName'] || route.params?.param?.pageName);
 const emit = defineEmits(['savePlyInfo']);
