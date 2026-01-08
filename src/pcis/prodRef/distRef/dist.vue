@@ -413,8 +413,8 @@ onMounted(async () => {
     return e;
   });
   tableconfig.value.fromSchema = formconfig1.value.fromSchema.map((item:any) => {
-    if(item.prop === "Dist.nSeqNo" || item.title === "序号") {
-      item.lengthNum = 2
+    if(item.prop === "Dist.nSeqNo" && item.title?.length > 0) {
+      item.lengthNum = item.title?.length
     }
     return item;
   });
