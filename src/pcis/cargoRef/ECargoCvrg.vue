@@ -322,7 +322,7 @@ const method = {
             }
           }
         },
-        {  width: 65 }
+        { title: "选择货物", width: 65 }
     );
 
   },
