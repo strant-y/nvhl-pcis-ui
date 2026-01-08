@@ -6574,7 +6574,7 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
       const tabref = opertaor.getTableRefs();
       const baseBefore = tabref?.["insrnc"].getFromValue();
       console.log('base---', baseBefore)
-      const obj = baseBefore['Base.tInsrncEndTm'];// 保险止期
+      const obj = dayjs(baseBefore['Base.tInsrncEndTm']).format('YYYY-MM-DD HH:mm:ss');// 保险止期
       // 时间有效性校验
       const objDate = toDate(obj);
       const newInsEndTmDate = toDate(newInsEndTm);
@@ -6631,7 +6631,7 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
 
     } catch (error) {
       console.error("免费延期校验异常", error);
-      ElMessage.error("免费延期处理失败，请重试");
+      ElMessage.error("免费延期校验异常", error);
       return false; // 异常时拦截
     }
   }
