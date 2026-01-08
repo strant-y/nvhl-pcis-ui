@@ -1640,6 +1640,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "分公司",
         lengthNum: 3,
+				slotName: "cSecondDptCnm",
         formatter:(val:any)=>{
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -1770,14 +1771,14 @@ const normalQueryColumns = [
     },
     {
         prop: "cRsnCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: " 批改原因",
         typeCode: "EDR_RSN_LIST_KIND",
         align: 'left',
         lengthNum: 8,
-				formatter: (val:any, row:any) => {
-					return row.cRsnCdeText || "";
-				},
+				// formatter: (val:any, row:any) => {
+				// 	return row.cRsnCdeText || "";
+				// },
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
@@ -3248,7 +3249,6 @@ function processExpandParams(formData) {
     }
     return { expandFlag, expandVal };
 }
-
 
 function formatTwoLine(text, num=7) {
   if (!text) return '';
