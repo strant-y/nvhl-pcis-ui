@@ -971,12 +971,19 @@ const method = {
   // 移动电话 切换
   mobileChange: (val) => {
     let cClntMrk =  getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
-        clearValidate('Applicant.cTel')  
+    let cTel =  getValue('Applicant.cTel'); // 固定电话
+    clearValidate('Applicant.cTel')  
     if (cClntMrk &&  val) {
       setFormItem("Applicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
+		}
+		if (cClntMrk =='0' &&  !val && cTel) {
+      setFormItem("Applicant.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("Applicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
 
     setValue('Applicant.cEnterpriseTel',val)
