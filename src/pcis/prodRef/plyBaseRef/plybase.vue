@@ -82,9 +82,6 @@ onMounted(async () => {
     if( item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
       item.hidden = true
     }
-    if(item.prop === "base.cIsFollowUp") {
-      item.hidden = ['010001','010002','010003'].includes(param.cProdNo) ? false : true;
-    }
     // 是否后续出营业中断险
     if(item.prop === "Base.cIsFollowUp") {
       item.hidden = ['010001','010002','010003'].includes(param.cProdNo) ? false : true;

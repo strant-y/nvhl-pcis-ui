@@ -581,7 +581,7 @@ function refushData(datas: any) {
   let pd: { [key: string]: any } = {};
   datas?.forEach((item: any) => {
     let key = "m";
-    if (item["Term.cRdrTyp"] !== "0") {
+    if (item["Term.cRdrTyp"] && item["Term.cRdrTyp"] !== "0") {
       key = "a" + item["Term.cClauseCategory"];
     }
     if (!pd[key]) {
