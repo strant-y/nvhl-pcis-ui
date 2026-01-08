@@ -3945,6 +3945,67 @@ const validateNPrmAmlya = () => {
       ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
       return false;
     }
+  } else {
+    const applicant = opertaor.getDataAll()["applicant"]
+    const insured = opertaor.getDataAll()["insured"]
+    if(applicant) {
+      const applicantRef = opertaor.getTableRefByKey('applicant');
+      if(applicant['Applicant.cClntMrk'] === "1") {
+        applicantRef.setFormItem('Applicant.cNation', {
+          rules: [],
+        });
+        applicantRef.setFormItem('Applicant.cBusinessScope', {
+          rules: [],
+        });
+      }
+      applicantRef.setFormItem('Applicant.cCntrNme', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cOperaterCertfTyp', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cOperaterCertfCde', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.tOperaterCertfEndTm', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cOccupTyp', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cHabitualResidence', {
+        rules: [],
+      });
+    }
+    if(insured) {
+      const insuredRef = opertaor.getTableRefByKey('insured');
+      if(insured['Insured.cClntMrk'] === "1") {
+        insuredRef.setFormItem('Insured.cNation', {
+          rules: [],
+        });
+        insuredRef.setFormItem('Insured.cBusinessScope', {
+          rules: [],
+        });
+      }
+      insuredRef.setFormItem('Insured.cCntrNme', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cOperaterCertfTyp', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cOperaterCertfCde', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.tOperaterCertfEndTm', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cOccupTyp', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cHabitualResidence', {
+        rules: [],
+      });
+    }
   }
   return true;
 }
