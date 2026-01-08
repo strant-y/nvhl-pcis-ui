@@ -555,8 +555,8 @@ import { fa } from 'element-plus/es/locale';
 import { numSubp } from '@/utils/Math';
 import { useValidator } from "@/typings/useValidator";
 import { specialSearchResult } from "@/api/plat";
-const { getRules } = useValidator();
 import Decimal from "decimal.js";
+const { getRules } = useValidator();
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
