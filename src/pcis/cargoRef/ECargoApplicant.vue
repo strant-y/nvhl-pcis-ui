@@ -795,12 +795,19 @@ const method = {
   // 移动电话 切换
   mobileChange: (val:any) => {
     let cClntMrk = getValue('ECargoApplicant.cClntMrk'); // 法人  1个人  0法人
+    let cTel = getValue('ECargoApplicant.cTel'); // 固定电话
     clearValidate('ECargoApplicant.cTel')
     if (cClntMrk && val) {
       setFormItem("ECargoApplicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("ECargoApplicant.cTel", { rules: [getRules("phone", {})] });
+    }
+		if (cClntMrk == '0' && !val && cTel) {
+      setFormItem("ECargoApplicant.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("ECargoApplicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
     setValue('ECargoApplicant.cEnterpriseTel', val)
   },

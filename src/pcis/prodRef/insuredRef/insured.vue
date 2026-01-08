@@ -1128,11 +1128,19 @@ const method = {
   },
   mobileChange: (val) => {
     let cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+    let cTel = getValue('Insured.cTel'); // 固定电话
+		clearValidate('Insured.cTel')
     if (cClntMrk && val) {
       setFormItem("Insured.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+		}
+		if (cClntMrk == '0' && !val && cTel) {
+      setFormItem("Insured.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("Insured.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
     setValue('Insured.cEnterpriseTel', val)
   },
