@@ -1806,7 +1806,8 @@ const methodMap = {
       {
         isOk: (selectdata: any) => {
           if(termTitleConf.value?.cFactorTabType === 'table') {
-            termdata.value[item.prop] = selectdata.cPlyNo;
+            row[item.prop] = selectdata.cPlyNo;
+            // termdata.value[item.prop] = selectdata.cPlyNo;
           } else if(riskShowTyp.value === 'grid') {
             riskTableRef.value?.setValueByRowKey(item.prop,row._dataId, selectdata.cPlyNo);
           }

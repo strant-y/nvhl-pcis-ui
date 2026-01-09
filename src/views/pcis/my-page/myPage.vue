@@ -3952,6 +3952,67 @@ const validateNPrmAmlya = () => {
       ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
       return false;
     }
+  } else {
+    const applicant = opertaor.getDataAll()["applicant"]
+    const insured = opertaor.getDataAll()["insured"]
+    if(applicant) {
+      const applicantRef = opertaor.getTableRefByKey('applicant');
+      if(applicant['Applicant.cClntMrk'] === "1") {
+        applicantRef.setFormItem('Applicant.cNation', {
+          rules: [],
+        });
+        applicantRef.setFormItem('Applicant.cBusinessScope', {
+          rules: [],
+        });
+      }
+      applicantRef.setFormItem('Applicant.cCntrNme', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cOperaterCertfTyp', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cOperaterCertfCde', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.tOperaterCertfEndTm', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cOccupTyp', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.cHabitualResidence', {
+        rules: [],
+      });
+    }
+    if(insured) {
+      const insuredRef = opertaor.getTableRefByKey('insured');
+      if(insured['Insured.cClntMrk'] === "1") {
+        insuredRef.setFormItem('Insured.cNation', {
+          rules: [],
+        });
+        insuredRef.setFormItem('Insured.cBusinessScope', {
+          rules: [],
+        });
+      }
+      insuredRef.setFormItem('Insured.cCntrNme', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cOperaterCertfTyp', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cOperaterCertfCde', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.tOperaterCertfEndTm', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cOccupTyp', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.cHabitualResidence', {
+        rules: [],
+      });
+    }
   }
   return true;
 }
@@ -4009,7 +4070,6 @@ const openLimit = () => {
  * 投保单保存
  * **/
 const savePlyInfo = async () => {
-  debugger
   // if(props.param.cTransMrk !== '1'){
     let saveFlag = false;
     const btn = getBtn("btn010102");
@@ -4064,6 +4124,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["plyBase"]["Base.cGrpMrk"] = props.param.cGrpMrk;
+  res["plyBase"]["Base.tUpdTm"] = new Date().getTime();
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -4852,6 +4913,7 @@ const saveEdrPlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  res["plyBase"]["Base.tUpdTm"] = new Date().getTime();
 
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
