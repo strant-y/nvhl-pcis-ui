@@ -527,7 +527,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                   item.hidden = false;
                               }
                           });
-                      } else if (s["prodCNmeCn"] == "043002") {
+                      } else if (['040002','041010','041015','043002','043003','043007','043016','047003','049034'].includes(s["prodCNmeCn"])) {
                           formconfig1.fromSchema?.forEach((item) => {
                               if (
                                 item.prop === "cVinCode" || 
@@ -3037,7 +3037,7 @@ function processExpandParams(formData) {
         } else if (s["prodCNmeCn"] == "043001" && s["cLicenseNumber"]) {
             expandFlag = 1;
             expandVal = { "cLicenseNumber": s["cLicenseNumber"] };
-        } else if (s["prodCNmeCn"] == "043002" && (s["cVinCode"] || s["cPlateNumber"])) {
+        } else if (['040002','041010','041015','043002','043003','043007','043016','047003','049034'].includes(s["prodCNmeCn"]) && (s["cVinCode"] || s["cPlateNumber"])) {
             expandFlag = 1;
             expandVal = { 
                 "cVinCode": s["cVinCode"],
