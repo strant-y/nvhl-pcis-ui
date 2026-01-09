@@ -1043,24 +1043,23 @@ function setTermConf(d: any,initFlag: boolean){
     }
     
     methodLink(riskFactormap);
-    riskGridConfig.value.tableBtn = [
-      createFreeButtonBase({
-        id:"deleteRisk",
-        type: "danger",
-        link: true,
-        icon: "DeleteFilled",
-        tableClick: (r) => {
-          if(r['TermRisktgt.cRowId']){
-            riskTableRef.value?.setValueByRowKey("TermRisktgt.cCancelMrk", r._dataId, "1");
-          }else{
-            riskTableRef.value?.delRow(r._dataId);
-          }
-        },
-      }),
-    ]
-    riskGridConfig.value.fromSchema = riskFactormap;
 
     if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){
+      riskGridConfig.value.tableBtn = [
+        createFreeButtonBase({
+          id:"deleteRisk",
+          type: "danger",
+          link: true,
+          icon: "DeleteFilled",
+          tableClick: (r) => {
+            if(r['TermRisktgt.cRowId']){
+              riskTableRef.value?.setValueByRowKey("TermRisktgt.cCancelMrk", r._dataId, "1");
+            }else{
+              riskTableRef.value?.delRow(r._dataId);
+            }
+          },
+        }),
+      ]
       riskGridConfig.value.getExSchema = (row : any) => {
         if(!row['TermRisktgt.cRowId']){
           return 'default';
@@ -1070,6 +1069,7 @@ function setTermConf(d: any,initFlag: boolean){
         'default': JSON.parse(JSON.stringify(riskFactormap))
       }; 
     }
+    riskGridConfig.value.fromSchema = riskFactormap;
   }
   const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
   if (cAddrSeq) {
