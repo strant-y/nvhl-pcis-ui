@@ -59,6 +59,7 @@ import { getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 import { listChrDepts } from "@/api/dept";
 import { coverageHint } from "@/api/prod/index";
+import { eventBus } from "@/utils/event-bus";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -1613,12 +1614,15 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   applicantEditRef?.value?.setFormValue(value); 
-  if (firstRealData && value?.["Applicant.cClntMrk"] != null && param.pageType !== 'readonly') {
-    firstRealData = false;
-    nextTick(() => {
-      setTimeout(() => {
-        method.InsureChange(value['Applicant.cClntMrk'])
-      }, 10000)
+  // 一般批改投保人为个人时是否绿色产业客户、绿色产业细分列表不可编辑
+  if(param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cEdrType === '1')) {
+    eventBus.on('setUnDisabledDone', () => {
+      nextTick(() => {
+        const cClntMrk = formconfig1.fromSchema?.find((item:any) => item.prop === 'Applicant.cClntMrk')
+        if(cClntMrk?.disabled !== true) {
+          method.InsureChange(value['Applicant.cClntMrk'])
+        }
+      })
     })
   }
 }
