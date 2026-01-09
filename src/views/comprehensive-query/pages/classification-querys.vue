@@ -281,7 +281,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   const freeEditRefs = freeEditRef.value;
                   freeEditRefs?.validate().then((isValid:boolean) => {
                       if (isValid) {
-                          handleQuery(false);
+                          handleQuery(true);
                       }
                   });
               },
