@@ -84,6 +84,7 @@ import priceComponent from "./commonRef/priceComponent.vue";//询价页面配置
 import epolicyWorker from './commodityRef/EPolicyWorker.vue' //在保证明
 import detailsAccident from "./commodityRef/DetailsAccident.vue" //合同约定的事故预防服务项目详情
 import detailsKnows from "./commodityRef/DetailsKnows.vue" //标的信息知识点提醒详情
+import cBuildStrKnows from "./commodityRef/cBuildStrKnows.vue" //标的信息建筑结构提醒详情
 import reinsuranceTips from "./commodityRef/ReinsuranceTips.vue" //水险再保提示详情
 import navigationAreaTips from "./commodityRef/NavigationAreaTips.vue" //航行区域提示详情
 import  specialCateModal  from "./commodityRef/specialCateModal.vue";
@@ -185,7 +186,8 @@ const componentMap = {
   deductibleFix: deductibleFix,
   epolicyWorker:epolicyWorker,
   detailsAccident:detailsAccident,
-  detailsKnows:detailsKnows,
+	detailsKnows: detailsKnows,
+	cBuildStrKnows: cBuildStrKnows,
   reinsuranceTips:reinsuranceTips,
   navigationAreaTips:navigationAreaTips,
   specialCateModal:specialCateModal,

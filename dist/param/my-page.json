@@ -1,0 +1,369 @@
+[
+  {
+    "groupId":"",
+    "showGroupId":false,
+    "pageInfo": [
+      {
+        "pageKey":"base",
+        "pageTtile":"保单基本信息",
+        "pageSchema":{
+          "title": "保单基本信息",
+          "fromUi": {
+              "cols": 3,
+              "groupBy": [
+                { "id": "group1", "title": "基本信息" },
+                { "id": "group2", "title": "渠道信息" },
+                { "id": "group3", "title": "承保信息" }
+              ]
+          },
+          "fromSchema":[
+              {
+                "prop": "cProdNo",
+                "inputtype": "rtselect",
+                "title": "产品",
+                "itemWidth":1,
+                "rules": [{"type":"required"}],
+                "typeCode":"CProdList",
+                "group": "group1"
+              },
+              {
+                "prop": "cRenewMrk",
+                  "inputtype": "rtselect",
+                  "title": "续保标识",
+                  "typeCode":"IsOrNoCode",
+                  "group": "group1"
+              },
+              {
+                "prop": "cDptCde",
+                  "inputtype": "rtselect",
+                  "title": "承保机构",
+                  "btnWidth": 20,
+                  "itemWidth":1,
+                  "rules": [{"type":"required"}],
+                  "group": "group1",
+                  "loadData": [
+                    {
+                      "label": "营总销售团队1",
+                      "value": "0251010013000"
+                    }
+                  ]
+                },
+              {
+                "prop": "cAppNo",
+                  "inputtype": "rtinput",
+                  "title": "投保单号",
+                  "group": "group1"
+              },
+              {
+                "prop":"cBsnsTyp",
+                  "inputtype": "rtselect",
+                  "title": "业务来源",
+                  "typeCode": "CBsnsTypCode",
+                  "group": "group2"
+              },
+              {
+                "prop": "cSubTyp2",
+                  "inputtype": "rtselect",
+                  "title": "渠道中级分类",
+                  "group": "group2"
+              },
+              {
+                "prop": "cBsnsSubtyp",
+                  "inputtype": "rtselect",
+                  "title": "渠道子类",
+                  "group": "group2"
+              },
+
+              {
+                "prop":"nAmt",
+                "inputtype": "rtnumber",
+                "title": "保险金额",
+                "rules": [{"type":"required"}],
+                "group": "group3"
+              },
+              {
+                "prop":"nAmtRmbExch",
+                  "inputtype": "rtnumber",
+                  "title": "保额汇率",
+                  "rules": [{"type":"required"}],
+                "group": "group3"
+              },
+              {
+                "prop":"nRmbAmt",
+                  "inputtype": "rtnumber",
+                  "title": "人民币保额",
+                  "rules": [{"type":"required"}],
+                "group": "group3"
+              },
+              {
+                "prop":"nPrm",
+                  "inputtype": "rtinput",
+                  "title": "保费合计",
+                  "rules": [{"type":"required"}],
+                "group": "group3"
+              },
+              {
+                "prop":"nPrmRmbExch",
+                  "inputtype": "rtnumber",
+                  "title": "保费汇率",
+                  "rules": [{"type":"required"}],
+                "group": "group3"
+              },
+              {
+                "prop":"nRmbPrm",
+                  "inputtype": "rtnumber",
+                  "title": "人民币保费",
+                  "rules": [{"type":"required"}],
+                "group": "group3"
+              },
+              {
+                "prop":"cUnfixSpc",
+                  "inputtype": "rtinput",
+                  "type": "textarea",
+                  "itemWidth":3,
+                  "title": "特别约定",
+                "group": "group3"
+              }
+            ]
+        }
+      },
+      {
+        "pageKey":"applicant",
+        "pageTtile":"投保人信息",
+        "pageSchema":{
+          "title": "投保人信息",
+          "titleBtns": [
+              {"type": "primary",
+              "label": "查询客户",
+              "func":"func1"
+              },
+              {"type": "primary",
+              "label": "客户确认"
+              },
+              {"type": "primary",
+              "label": "客户充值"
+              },
+              {"type": "primary",
+              "label": "OCR识别",
+              "icon": "Upload"
+              }
+          ],
+          "fromUi": {
+              "cols": 3,
+              "groupBy": [
+                { "id": "group1", "title": "证件信息" },
+                { "id": "group2", "title": "通讯信息" }
+              ]
+          },
+          "fromSchema":[
+              {
+                "prop":"cAppNme",
+                  "inputtype": "rtinput",
+                  "title": "客户名称",
+                  "group": "group1",
+                  "rules": [{"type":"required"}]
+              },
+              {
+                "prop":"cClntMrk",
+                  "inputtype": "rtselect",
+                  "title": "投保人性质",
+                  "group": "group1",
+                  "rules": [{"type":"required"}],
+                  "loadData": [
+                    {
+                      "label": "个人",
+                      "value": "1"
+                    },
+                    {
+                      "label": "法人",
+                      "value": "0"
+                    }
+                  ]
+              },
+              {
+                "prop": "cCertfCls",
+                  "inputtype": "rtselect",
+                  "title": "证件类型",
+                  "typeCode":"allCertificateType",
+                  "group": "group1",
+                  "rules": [{"type":"required"}]
+              },
+              {
+                "prop": "cCertfCde",
+                  "inputtype": "rtinput",
+                  "title": "证件号码",
+                  "group": "group1",
+                  "rules": [{"type":"required"}]
+              },
+              {
+                "prop": "cClntAddr",
+                  "inputtype": "rtinput",
+                  "title": "通讯地址",
+                  "group": "group2",
+                  "itemWidth":2
+              },
+              {
+                "prop":"cMobile",
+                  "inputtype": "rtinput",
+                  "title": "移动电话",
+                  "group": "group2"
+              }
+            ]
+        }
+      },
+      {
+        "pageKey":"tgt",
+        "pageTtile":"标的信息",
+        "pageSchema":{
+          "title": "标的信息",
+          "fromUi": {
+              "cols": 3
+          },
+          "fromSchema":[
+               {
+                "prop":"nTgtNumFld7",
+                  "inputtype": "rtnumber",
+                  "title": "单位人数",
+                  "rules": [{"type":"required"}]
+              },
+              {
+                "prop":"nTgtNumFld8",
+                  "inputtype": "rtnumber",
+                  "title": "投保人数",
+                  "rules": [{"type":"required"}]
+              },
+              {
+                "prop":"nTgtNumFld10",
+                  "inputtype": "rtnumber",
+                  "title": "投保比例",
+                  "rules": [{"type":"required"}]
+              },
+              {
+                "prop":"cTgtTxtFld5",
+                  "inputtype": "rtselect",
+                  "title": "记名投保",
+                  "rules": [{"type":"required"}],
+                  "loadData": [
+                    {
+                      "label": "记名",
+                      "value": "637001"
+                    },
+                    {
+                      "label": "不记名",
+                      "value": "637002"
+                    }
+                  ]
+              },
+              {
+                "prop": "nTgtNumFld19",
+                  "inputtype": "rtinput",
+                  "title": "保单折扣"
+              }
+            ]
+        }
+      },
+      {
+        "pageKey":"cvrg",
+        "pageTtile":"险别信息",
+        "pageSchema":{
+          "title": "险别信息",
+          "editFlag": true, 
+          "tableBtnType": "icon",
+          "tableBtnWidth": "70",
+          "tableBtnPosition": "left",
+          "titleBtns": [
+              {"type": "primary",
+              "label": "新增险别",
+              "func": "func1"
+              },
+              {"type": "primary",
+              "label": "删除所有"
+              }
+          ],
+          "tableBtn": [
+            {
+              "label": "删除",
+              "icon": "Delete",
+              "iconSize": "18",
+              "iconColor": "#ff0011"
+            }
+          ],
+          "fromSchema":[
+            {
+              "prop": "cType",
+              "inputtype": "rttag",
+              "title": "险别类型",
+              "rules": [{"type":"required"}],
+              "loadData": [
+                {
+                  "label": "主险",
+                  "value": "0",
+                  "color": "#FF6600"
+                },
+                {
+                  "label": "附加险",
+                  "value": "1",
+                  "color": "#14CCCC"
+                }
+              ]
+            },
+            {
+              "prop": "cAliasNme",
+              "inputtype": "rtinput",
+              "title": "险别名称"
+            },
+            {
+              "prop": "cResvTxt1",
+              "inputtype": "rtinput",
+              "title": "险别责任"
+            },
+            {
+              "prop": "nPerAmt",
+              "inputtype": "rtnumber",
+              "title": "每人保额"
+            },
+            {
+              "prop": "nTgtNumFld8",
+              "inputtype": "rtnumber",
+              "title": "投保人数"
+            },
+            {
+              "prop": "nPrm",
+              "inputtype": "rtnumber",
+              "title": "保费合计"
+            },
+            {
+              "prop": "nRate",
+              "inputtype": "rtnumber",
+              "title": "费率(%)"
+            },
+            {
+              "prop": "CInput5",
+              "inputtype": "rtselect",
+              "title": "条款类型",
+              "expand": true
+            },
+            {
+              "prop": "CInput6",
+              "inputtype": "rtinput",
+              "title": "条款链接",
+              "expand": true
+            },
+            {
+              "prop": "CInput7",
+              "inputtype": "rtinput",
+              "title": "备案号",
+              "expand": true
+            },
+            {
+              "prop": "CInput8",
+              "inputtype": "rtinput",
+              "title": "注册号",
+              "expand": true
+            }
+          ]
+        }
+      }
+    ]
+    }
+]

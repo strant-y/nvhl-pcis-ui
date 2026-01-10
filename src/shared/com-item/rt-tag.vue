@@ -3,12 +3,12 @@
     <el-tag
       ref="tagRef"
       :size="item.size"
-      :color="getColor()"
+      :color="getColor"
       :effect="item.effect ? item.effect : 'dark'"
-      :type="getType()"
+      :type="getType"
       :round="item.round ? item.round : false"
     >
-      {{ getValueLabel() }}
+      {{ getValueLabel }}
     </el-tag>
   </template>
 </template>
@@ -48,7 +48,13 @@ interface OptionTypeBySelect extends OptionType {
 const options: Ref<OptionTypeBySelect[]> = ref([]); // 字典下拉数据源
 
 watch([() => props.modelValue], ([newModelValue]) => {
-  selectedValue.value = newModelValue;
+  if(newModelValue){
+    selectedValue.value = newModelValue;
+  }else if(props.item.nullvalue){
+    selectedValue.value = props.item.nullvalue;
+  }else{
+    selectedValue.value = newModelValue;
+  }
   getOptions();
 });
 
@@ -83,53 +89,37 @@ function getOptions(){
     }
 }
 
-function getValueLabel() {
+const getValueLabel = computed(() =>{
   const option = options.value.find(
     (item) => item.value === selectedValue.value
   );
   if (option) {
     return option.label;
   }
-}
+});
 
-function getType() {
+const getType = computed(() =>{
   const option = options.value.find(
     (item) => item.value === selectedValue.value
   );
   if (option) {
     return option.type ? option.type : "primary";
   }
-}
+});
 
-function getColor() {
-  const option = options.value.find(
+const getColor = computed(() =>{
+const option = options.value.find(
     (item) => item.value === selectedValue.value
   );
   if (option) {
     return option.color ? option.color : undefined;
   }
-}
+});
 
 onMounted(() => {
-  // 初始化组件数据
-  // if (props.item) {
-  //   if (!props.item.loadData && !!props.item.typeCode) {
-  //     codeListStore.queryCodeList(
-  //         {
-  //           codeListName: props.item.typeCode,
-  //           codeListParam: props.item.codeParam,
-  //         },
-  //         false,
-  //         props.item.cache ? props.item.cache : true
-  //       )
-  //       .then((res) => (options.value = res))
-  //       .catch((err) => {
-  //         console.error(err);
-  //         options.value = [];
-  //       });
-  //   } else {
-  //     options.value = props.item.loadData;
-  //   }
-  // }
+  if(!selectedValue.value && props.item.nullvalue){
+    selectedValue.value = props.item.nullvalue;
+  }
+  getOptions();
 });
 </script>

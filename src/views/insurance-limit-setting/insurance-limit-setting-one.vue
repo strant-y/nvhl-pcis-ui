@@ -246,9 +246,10 @@ const tableconfig = reactive<AppTableConfig>(
     showSelection: false,
     titleBtns: [
       createFreeButtonBase({
-        id: "score",
+        id: "add",
         label: "新增",
         type: "success",
+        hidden: true,
         func: function () {
           openEdit('save')
         },
@@ -285,6 +286,17 @@ const tableconfig = reactive<AppTableConfig>(
         hidden: true,
         tableClick: (row) => {
           deleteData(row.cPkId)
+        },
+      }),
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看",
+        type: "primary",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          openEdit('view', row.cPkId)
         },
       }),
     ],
@@ -575,6 +587,17 @@ onMounted(() => {
 	}, () => {
 		ElMessage.error('后台服务异常,请联系管理员');
 	});
+  // 获取新增按钮显示权限
+  insuranceLimit.jurisdictionInsert({}).then((res: any) => {
+    if (res.code == '1') {
+      const btn = tableconfig.titleBtns?.find(item => item.id === 'add');
+      if(btn) {
+        btn.hidden = false;
+      }
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err.message);
+  });
 });
 
 //给表单下拉项赋值

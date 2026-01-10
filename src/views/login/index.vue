@@ -1129,7 +1129,7 @@ const phoneNumberLogin = () => {
 						verifyFlag.value = true;
 						verifyData.value.serial = serial;
 						verifyData.value.phoneNO = phoneNO
-        		getCaptcha(thirdPartyData.value);
+						getCaptcha({ ...thirdPartyData.value,serial });
 					} else {
 						ElMessage.error(msg || "系统出错");
 					}

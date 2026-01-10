@@ -13,24 +13,16 @@
         <span>¥ {{ row.nPrm.toLocaleString() }}</span>
       </template>
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cDptCnm || ''" class="twoLine"></span>
       </template>
       <template #column-cTermNme="{ row, column, index }">
-        <el-tooltip :content="row.cTermNme" placement="top">
-          <span v-html="row.cTermNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cTermNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNme="{ row, column, index }">
-        <el-tooltip :content="row.cAppNme" placement="top">
-          <span v-html="row.cAppNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cAppNme || ''" class="twoLine"></span>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
-          <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
       </template>
       <template #column-cAppNoInfo="{ row, column, index }">
         <div class="policy-info-cell">
@@ -1004,7 +996,9 @@ onMounted(async () => {
       sessionStorage.getItem("navToOrderUdrListQuery") || "{}"
     )?.udrType
   }
-  freeEditRef.value?.setFormValue(param);
+	freeEditRef.value?.setFormValue(param);
+	// 点击消息跳转过来
+	let params = route.params
 
   //首页跳转过来的逻辑 Start
   if (sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)) {
@@ -1027,6 +1021,9 @@ onMounted(async () => {
       freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
       handleQuery();
     }
+	} else if (!!params && params.param.appNo) {
+		freeEditRef.value?.setValue("cAppNo", params.param.appNo);
+		handleQuery();
   } else {
     handleQuery();
   }

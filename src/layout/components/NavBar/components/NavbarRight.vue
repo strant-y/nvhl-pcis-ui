@@ -17,10 +17,11 @@
       <!-- 消息 -->
       <div ref="buttonRef" class="setting-word"  
         style="position: relative;display: inline-block;">
-        <el-icon style="font-size: 20px; ">
-          <bell />
-        </el-icon>
-        <div class="badge" v-if="total > 0">{{ total }}</div>
+				<el-badge :value="total" :max="99" class="item" :offset="[0, 10]">
+					<el-icon style="font-size: 20px; ">
+						<bell />
+					</el-icon>
+				</el-badge>
       </div>
 
 
@@ -62,7 +63,8 @@
               </div>
 
             </li>
-            <li v-if="hasMoreItems" @click="loadMore" class="more">查看更多</li>
+            <!-- <li v-if="hasMoreItems" @click="loadMore" class="more">查看更多</li> -->
+            <li @click="clear" class="more">清空通知</li>
           </ul>
 
           <div v-else-if="mesList.length == 0" class="no-data">
@@ -71,15 +73,28 @@
           </div>
 
         </div>
-
-        <div v-else-if="currentTab == '公告'" class="mes-box">
-
-          <div class="no-data">
-            暂无公告~
-
-          </div>
-        </div>
-
+				<div v-else-if="currentTab == '公告'" class="mes-box">
+					<div v-if="bulList.length > 0" class="bulletin-list">
+						<div
+							v-for="(item, index) in bulList"
+							:key="index"
+							class="bulletin-item-wrapper"
+						>
+							<div class="bulletin-icon">
+								<el-icon><Notification /></el-icon>
+							</div>
+							<div class="bulletin-content">
+								<div
+									class="bulletin-scroll-track"
+									ref="scrollTrackRefs"
+								>
+									<span class="bulletin-text">{{ item.cContent }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div v-else class="no-data">暂无公告~</div>
+				</div>
       </el-popover>
 
 
@@ -176,7 +191,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { unref } from "vue";
+import { ref, onMounted, nextTick, unref } from "vue";
 import {
   useAppStore,
   useTagsViewStore,
@@ -193,6 +208,8 @@ import { PcisQueryService } from '@/views/dashboard/service/v1.service';
 
 import { useRouter, useRoute } from "vue-router";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
+import { ElIcon } from 'element-plus'
+import { Notification } from '@element-plus/icons-vue'
 const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(
   () => import("@/views/dashboard/components/shortMenuDialog.vue")
@@ -225,8 +242,9 @@ const popoverRef = ref()
 
 
 const mesList = ref([])
+const bulList = ref([])
 // const mesList = ref(arr.value.slice(0, 3))
-const currentIndex = ref(3); // 当前索引，用于加载更多
+const currentIndex = ref(30); // 当前索引，用于加载更多
 let total = ref(0);  // 总条数
 // ref(allItems.value.slice(0, 3));
 const hasMoreItems = computed(() => total.value > mesList.value.length);
@@ -306,22 +324,19 @@ const JumpClick = (row: any) => {
       case 'P2': {
         if ('申请核保' === row.title) {
           router.push({
-            path: '/index/new-udr-list/newudrlist',
-            // name: `application-querys`,
-            query: {
-              appNo: row.dataId
+            path: '/pcis-new-udr-list/PendUdrListQuery',
+						query: {
+							param: JSON.stringify({ appNo: row.dataId }),
             }
-          });
-          // this.router.navigate(['/index/new-udr-list/newudrlist'], {queryParams: {appNo: item.dataId}});
-
+					});
         }
         break;
       }
       case 'P4': {
         router.push({
-          path: '/pcis-new-udr-list/PendUdrList',
+          path: '/payinfoManagement/payinfohandle',
           query: {
-            uniqueNo: row.dataId
+						param: JSON.stringify({ cAppNo: row.dataId }),
           }
         });
         // if ('支票缴费提核' === item.title) {
@@ -366,19 +381,45 @@ const JumpClick = (row: any) => {
 // 修改消息状态
 const change = (param: any) => {
   pcisQueryService.changeStatus(param).then((res: any) => {
-  // const notifyData = this.notifyService.changeStatus(param);
-  // notifyData.subscribe((res: any) => {
-      // this.loading = false;
-      
       if (null != res && null != res['code']) {
           if (res['code'] === 200) {
               if (!!res.data) {
-                  // this.loadData();
-                  // this.msg.success(`状态变更成功`, { nzDuration: 3000 });
+                  loadData();
+									ElMessage.success("状态变更成功");
               }
           }
       }
   });
+}
+
+// 清空通知
+const clear = () => {
+	ElMessageBox.confirm("确定做清空通知操作？", "提示", {
+		confirmButtonText: "确定",
+		cancelButtonText: "取消",
+		type: "warning",
+		lockScroll: false,
+	}).then(() => {
+		const param = {
+			CReceiver: user.opCde,
+			CType: '0',
+		};
+		pcisQueryService.deleteNotifyByReceiver(param).then((res: any) => {
+			if (null != res && null != res['code']) {
+				if (res['code'] === 200) {
+					if (!!res.data) {
+						ElMessage.success(res['msg'] || "清空成功！");
+						loadData();
+					}
+				} else {
+					ElMessage.error(res['msg'] || "清空失败！");
+				}
+			}
+		})
+		.catch((err) => {
+			ElMessage.error(err || "清空失败！");
+		})
+	}).catch(() => {});
 }
 
 const changeDpt = () => {
@@ -482,7 +523,25 @@ function logout() {
 
 // tab切换
 const switchTab = (tab) => {
-  currentTab.value = tab; // 切换当前选中的 Tab
+	currentTab.value = tab; // 切换当前选中的 Tab
+	if (tab == "公告") {
+		let param = {
+			pageNo: 1,
+      pageSize: 999,
+			COperId: user.opCde,
+			CDptCde: selectDpt.value
+		}
+		pcisQueryService.getBulletinByUserAndDpt(param).then((res: any) => {
+			if (res && res.code === 200) {
+				bulList.value = res.data.result;
+				nextTick(() => {
+					initBulletinScroll()
+				})
+			} else {
+				ElMessage.error(res.msg);
+			}
+		})
+	}
 };
 
 const shortcutDataList = ref([])
@@ -504,6 +563,76 @@ function openShortcutEdit() {
         emits("shortMenu")
       }
     });
+}
+
+
+// 存储每条的轨道容器
+const scrollTrackRefs = ref<HTMLDivElement[]>([])
+
+// 存储动画 ID（可选，用于清理）
+const animationIds = ref<number[]>([])
+
+// ✅ 在切换到“公告”Tab 时调用此方法
+const initBulletinScroll = () => {
+  // 清理旧动画
+  animationIds.value.forEach(id => id && cancelAnimationFrame(id))
+  animationIds.value = []
+
+  // 关键：等 DOM 真实渲染完成（popover 已展开）
+  setTimeout(() => {
+    scrollTrackRefs.value.forEach((trackEl, index) => {
+      if (!trackEl || !bulList.value[index]) return
+
+      const content = bulList.value[index].cContent
+
+      // === 第一步：临时设置内容用于测量 ===
+      trackEl.innerHTML = `<span class="bulletin-text">${content}</span>`
+      const textEl = trackEl.firstElementChild as HTMLElement
+
+      // 强制应用样式（确保和最终一致）
+      textEl.style.whiteSpace = 'nowrap'
+      textEl.style.display = 'inline-block'
+      textEl.style.visibility = 'hidden' // 不闪烁
+
+      // 获取容器的真实可用宽度（考虑 padding）
+      const containerRect = trackEl.parentElement?.getBoundingClientRect()
+      const containerWidth = containerRect ? containerRect.width : 300
+
+      // 获取文本实际宽度
+      const textWidth = textEl.scrollWidth
+
+      // === 第二步：根据结果决定是否滚动 ===
+      if (textWidth > containerWidth - 10) { // 留 10px 容错
+        // 构建无缝滚动轨道：内容 + 空白 + 内容
+        trackEl.innerHTML = `
+          <span class="bulletin-text">${content}</span>
+          <span class="bulletin-gap" style="display:inline-block;width:180px;"></span>
+          <span class="bulletin-text">${content}</span>
+        `
+
+        // 启动滚动
+        const totalWidth = trackEl.scrollWidth
+        const duration = 25000 // 20秒一圈
+        let startTime = performance.now()
+
+        const animate = (now: number) => {
+          const elapsed = now - startTime
+          const progress = (elapsed % duration) / duration
+          const offset = -progress * totalWidth
+          trackEl.style.transform = `translateX(${offset}px)`
+          const id = requestAnimationFrame(animate)
+          animationIds.value[index] = id
+        }
+
+        const id = requestAnimationFrame(animate)
+        animationIds.value[index] = id
+      } else {
+        // 不滚动：正常显示
+        trackEl.innerHTML = `<span class="bulletin-text">${content}</span>`
+        trackEl.style.transform = 'none'
+      }
+    })
+  }, 150) // 延迟足够让 Popover 展开
 }
 </script>
 <style lang="scss" scoped>
@@ -642,5 +771,53 @@ function openShortcutEdit() {
     justify-content: center;
     padding-top: 90px;
   }
+}
+
+.bulletin-list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.bulletin-item-wrapper {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 12px;
+  gap: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.bulletin-item-wrapper:last-child {
+  border-bottom: none;
+}
+
+.bulletin-icon {
+  color: #e6a23c;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bulletin-content {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 滚动轨道 */
+.bulletin-scroll-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+.bulletin-text {
+	font-size: 13px;
+  color: #555;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 </style>

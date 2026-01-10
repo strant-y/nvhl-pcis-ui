@@ -27,7 +27,7 @@ import {PolicyService} from "@/views/pcis-main/service/my-page/policy.service";
 const productStore = useProductStore();
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-
+import { getDeptOptions } from "@/api/dept";
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
@@ -82,9 +82,6 @@ onMounted(async () => {
     if( item.prop === "Base.cIsNet" || item.prop === "Base.cManualMrk") {
       item.hidden = true
     }
-    if(item.prop === "base.cIsFollowUp") {
-      item.hidden = ['010001','010002','010003'].includes(param.cProdNo) ? false : true;
-    }
     // 是否后续出营业中断险
     if(item.prop === "Base.cIsFollowUp") {
       item.hidden = ['010001','010002','010003'].includes(param.cProdNo) ? false : true;
@@ -102,7 +99,7 @@ onMounted(async () => {
   })
 
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async() => {
     setForSelectFilterable(); //给下拉框设置可搜索
     //录单人联系方式  默认操作员的
     if (user.phoneNO !== null && user.phoneNO !== "") {
@@ -115,10 +112,17 @@ onMounted(async () => {
 
     // 查询承保机构所属分公司和项目类别大类数据
     getCheckCdeptByCdptCde();
-    //回显机构部门数据
+		//回显机构部门数据
+		let label = param.cDptCnm
+		 if (!param.cDptCnm) {
+			const response = await getDeptOptions(param.cDptCde);
+			if (response.data.length>0) {
+				label = response.data[0]["label"]
+			}
+		}
     setFormItem("Base.cDptCde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm|| ''}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${label|| ''}` },
       ],
     });
     //禁用不见费出单原因
@@ -126,7 +130,7 @@ onMounted(async () => {
     // 服务机构默认值
     setFormItem("Base.cIntroDptcde", {
       loadData: [
-        { value: param.cDptCde, label: `${param.cDptCde} ${param.cDptCnm || ''}` },
+        { value: param.cDptCde, label: `${param.cDptCde} ${label || ''}` },
       ],
     });
 
@@ -165,7 +169,12 @@ onMounted(async () => {
       setFormItem('Base.cAgriMrk',{
         disabled:  true
       })
-    }
+		}
+		// 080002-家用管道燃气综合险、080003-家庭财产综合保险，基本信息中增加是否普惠型家财险，下拉选框“是”“否”，若选择是，则展示文本框，录单人员需在文本框填写项目名称，文本框为必录；
+    if(param.cProdNo !== '080002' && param.cProdNo !== '080003') {
+      setFormItem('Base.cIsHomeInsurance',{ hidden:  true })
+		}
+		setFormItem('Base.cProjectName',{ hidden:  true })
     // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
     
     // 询价录单 联共保业务暂时固定非共保业务，不允许选择联共保
@@ -224,6 +233,10 @@ const method = {
         });
       }
     }
+    // 从共主联、从共无联保，条款中的保费可以修改
+    if(['2','4'].includes(val)) {
+      opertaor.getTableRefByKey('cvrg')?.showFlush()
+    }
   }
 
     // 录单人联系方式
@@ -256,16 +269,6 @@ const method = {
       );
 
       if(p.cTransMrk !== '1'){
-        //代理业务 服务机构不可选
-        if (val === "19002"){
-          setFormItem("Base.cIntroDptcde", {btnItems: {
-              disabled: true,
-            },});
-        }else {
-          setFormItem("Base.cIntroDptcde", {btnItems: {
-              disabled: false,
-            }});
-        }
         if (val === "19002" || val === "19003" ) {
             const obj = {
               rules: [getRules("required", {})],
@@ -392,17 +395,17 @@ const method = {
     if (!p.initFlag) {
       setValue("Base.cBrkrCde", "");
       setValue("Base.cBrkSlsCde", "");
-		}
-		// 非个人代理业务，清空业务员信息
-		if (getValue("Base.cBsnsTyp") != '19002' && getValue("Base.cChaType") != '1900201' && val != '1900201001') {
-			setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
-			setFormItem("Base.cIntroSalecde", {loadData: [], btnItems: { disabled: false } });
-			setValue("Base.cSlsId", null); // 业务员员工号
-			setValue("Base.cSlsNme", null); // 业务员名称
-			setValue("Base.cSlsTel", null); // 业务员电话
-			setValue("Base.cSlsDptcde", null); // 业务员机构代码
-			setValue("Base.cSlsCde", null); // 业务员执业证号
-			setValue("Base.cIntroSalecde", null); // 服务机构业务员
+      // 非个人代理业务，清空业务员信息
+      if (getValue("Base.cBsnsTyp") != '19002' && getValue("Base.cChaType") != '1900201' && val != '1900201001') {
+        setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
+        setFormItem("Base.cIntroSalecde", {loadData: [], btnItems: { disabled: false } });
+        setValue("Base.cSlsId", null); // 业务员员工号
+        setValue("Base.cSlsNme", null); // 业务员名称
+        setValue("Base.cSlsTel", null); // 业务员电话
+        setValue("Base.cSlsDptcde", null); // 业务员机构代码
+        setValue("Base.cSlsCde", null); // 业务员执业证号
+        setValue("Base.cIntroSalecde", null); // 服务机构业务员
+      }
 		}
   },
   //代理(经纪)人change事件
@@ -906,7 +909,19 @@ const method = {
         insuranceCoverageFlag = false
       })
     }
-  },
+	},
+	// 是否普惠型家财险
+	cIsHomeInsuranceChange: (val) => {
+		const p = opertaor.getParam();
+    if (!p.initFlag) {
+      setValue("Base.cProjectName", "");
+    }
+		if (val == "1") {
+			setFormItem('Base.cProjectName',{ hidden: false, rules: [getRules("required", {})] })
+		} else {
+			setFormItem('Base.cProjectName',{ hidden: true })
+		}
+	}
 };
 
 // 绑定特殊验证器

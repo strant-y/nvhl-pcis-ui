@@ -38,7 +38,7 @@ import { getListByCode } from "@/api/code-list-service";
 import { useUserStore } from "@/store/modules/user";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import { AppKey } from "@/constants/api";
-import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde ,checkCancelM1IsOff, qryTerminationDataList} from "@/api/prod/";
+import { getProdEnableList, getDelayCount, getNewSysDays, checkCdeptByCdptCde ,checkCancelM1IsOff, queryPayString, qryTerminationDataList} from "@/api/prod/";
 import {
     DEFERRED_CORRECTION,
     SCENE_EDR_APP_NEW,
@@ -335,13 +335,35 @@ const tableconfig = reactive<AppTableConfig>(
                 size: "large",
                 icon: "Edit",
                 tableClick: (row) => {
-                    if (row.cCiMrk === "5" && row.id[1] === "47") {
-                        ElMessage.warning('出单方式为司内联保时,联共保信息不可批改!');
-                        return;
-                    } else {
-                        openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
-        
+									if (row.id[1] === "47") {
+										if (row.cCiMrk === "5") {
+											ElMessage.warning('出单方式为司内联保时,联共保信息不可批改!');
+											return;
+										}
+										let params = {
+											policyNo: row.cPlyNo, // 保单号
+											endorseNo: row.cEdrNo || '', // 有批单号就传个批单号 没有就为空
+										}
+										// 实收不能批改
+										queryPayString(params).then((res: any) => {
+											if (res.rsltCode !== 'C') {
+												ElMessage.error(res.rsltMsg || '连接失败！');
+												return;
+											}
 
+											if (res.rsltStatus !== '0') {
+												ElMessage.warning(res.rsltMsg+'不能批改！');
+												return;
+											}
+
+											openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
+										})
+										.catch((err) => {
+											console.error(err);
+											ElMessage.error('系统异常，请稍后重试');
+										});
+									} else {
+											openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
                     }
                     // if ("DP" === row.id) {
                     //     ciCoopCorrect(row)
@@ -1149,9 +1171,9 @@ const initQuery = async (cPlyNo, cProdNo, data) => {
         const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
         console.log( 'code--0',cProdNo,' 分公司编码查询结果 ', resCheck, ' 分公司编码 ', subSidiary);
 
-        const resOff = await qryTerminationDataList({ cPlyNo: cPlyNo, CancelM1: 'CancelM1' });
+        const resOff = await qryTerminationDataList({ cPlyNo: cPlyNo, cOperType: 'CancelM1' });
         console.log(666,resOff)
-        if(!resOff.data || resOff.data?.length < 1){
+        if(resOff?.data?.[0]?.cAppTyp === 'on'){
              return false; 
         }else{
 

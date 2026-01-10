@@ -471,7 +471,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     { label: '江苏10条附加险模板', value: '04' },
                     { label: '校车承运人责任险模板', value: '05' },
                     { label: '非营运客车承运人责任险模板', value: '06' },
-                    { label: '货运险不展示保费、费率', value: '07' }
+                    { label: '货运险不展示保费、费率', value: '07' },
+                    { label: '诉责险不打印保险期间', value: '08' }
                 ]
             }
         ]

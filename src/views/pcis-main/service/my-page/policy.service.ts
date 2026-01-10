@@ -1686,6 +1686,11 @@ saveTotalSalary(data) {
 // 个人代理查询业务员信息
 getPrivateSelsList(data) {
 	return request.post(`/policy/getPrivateSelsList`, data);
+	}
+	
+// 协议出单下一步校验协议号
+queryECargoPayString(ops) {
+	return request.post(`/payment/queryECargoPayString`, ops)
 }
 // // 工资总额-
 // selectTotalSalary(data) {

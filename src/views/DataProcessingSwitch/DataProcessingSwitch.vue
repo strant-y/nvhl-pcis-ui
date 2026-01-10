@@ -39,6 +39,7 @@ const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const departmentTree = defineAsyncComponent(
   () => import("@/components/common/DepartmentTree.vue")
 );
+const dealTerminationDataType = ref(true);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     fromUi:{
@@ -190,15 +191,11 @@ const tableconfig = reactive<AppTableConfig>(
         inactiveText: "禁用",
         inlinePrompt: true,
         func: async (val:any,row:any) => {
-          console.log(val);
-          console.log(row);
-
-          let saveType = null;
           const s = freeEditRef.value?.getFromValue(); //获取表单数据
           if(val === 'on'){
             const r = await freeEditRef.value?.validateField("cTitleOa");
-            if(!r){
-              tableRef.value?.setValueByRowKey("cAppTyp", row._dataId, val === 'off');  //如果验证不通过,则不修改状态
+            if(!r) {
+              handleQuery();
               return;
             }
           }
@@ -206,13 +203,14 @@ const tableconfig = reactive<AppTableConfig>(
             forms: Object.assign(s,{cAppTyp:val}),
             list: [row]
           }
-
           dealTerminationData(params).then((res:any) => {
-            if(res.code === 200){
-              handleQuery();
-            }else{
+            if(res.code != 200){
               ElMessage.error(res.msg);
             }
+            handleQuery();
+          }).catch((err:any) => {
+            ElMessage.error(err.msg);
+            handleQuery();
           });
         },
       },
@@ -295,20 +293,23 @@ async function handleQuery(flag?: boolean) {
   } else if(!s.cAppNo && s.cOperType === 'SurPrm') {
     ElMessage.warning('一般退保手动修改退保总保费，请录入申请单号!');
   } else if(s.cPlyNo || s.cAppNo) {
-    const r = await freeEditRef.value?.validateField("cOperType");
+    const r = await freeEditRef.value?.validate();
     if(r){
       const param = Object.assign(s);
       qryTerminationDataList(param)
         .then((res:any) => {
           const { code, data, msg } = res;
+          pageresult.list = [];
           if (200 === code) {
-            pageresult.list = [];
             pageresult.list = data;
           } else {
             ElMessage.error(msg);
           }
         })
-        .finally(() => {});
+        .catch((err:any) => {
+          pageresult.list = [];
+          ElMessage.error(err.msg);
+        });
     }
   }else{
     ElMessage.warning('保单号/申请单号至少录入一个');

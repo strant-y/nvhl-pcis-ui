@@ -457,6 +457,9 @@ const method = {
       setFormItem("Insured.cSex", {
         rules: null
       });
+      setFormItem("Insured.cNation", {
+        rules: [getRules('required',{})],
+      });
       // setValue("Insured.cCertfCls", "");
       // setFormItem("Insured.cCntrNme", { rules: [getRules("required", {})] });
       setFormItem("Insured.cCntrCertfCde", {
@@ -596,6 +599,9 @@ const method = {
       });
       setFormItem("Insured.cSex", {
         rules: [getRules("required", {})],
+      });
+      setFormItem("Insured.cNation", {
+        rules: [],
       });
       if (!param.initFlag) {
         setFormItem("Insured.cWorkDpt", {
@@ -917,14 +923,22 @@ const method = {
     }
   },
   mobileChange: (val) => {
-    let cClntMrk =  getValue('Insured.cClntMrk'); // 法人  1个人  0法人
-    if (cClntMrk &&  val) {
+    let cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+		let cTel = getValue('Insured.cTel'); // 固定电话
+		clearValidate('Insured.cTel')
+    if (cClntMrk && val) {
       setFormItem("Insured.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
     }
-     setValue('Insured.cEnterpriseTel',val)
+		if (cClntMrk == '0' && !val && cTel) {
+      setFormItem("Insured.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("Insured.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
+    }
+		setValue('Insured.cEnterpriseTel',val)
   },
   // 固定电话
   cTelChange: (val) => {

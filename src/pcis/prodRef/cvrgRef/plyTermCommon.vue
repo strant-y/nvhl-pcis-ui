@@ -639,8 +639,10 @@ function getFromValue() {
         }
       }
       const plan = i["Term.cPlanNo"];
+      let risk_index = 1;
       list.forEach((r: any) => {
         r["TermRisktgt.cPlanNo"] = plan;
+        r['TermRisktgt.nSeqNo'] = risk_index++;
       });
       i["Term.riskList"] = list;
       i["Term.nSeqNo"] = seqNo++;
@@ -659,9 +661,11 @@ function getFromValue() {
               if (m["riskList"]) {
                 let l = JSON.parse(JSON.stringify(m["riskList"]));
                 delete m["riskList"];
+                let risk_index = 1;
                 l.forEach((r: any) => {
                   r["TermRisktgt.cPlanNo"] = plan;
                   r["TermRisktgt.cIsCommon"] = '1';
+                  r['TermRisktgt.nSeqNo'] = risk_index++;
                 });
                 m["Term.riskList"] = l;
               }
@@ -846,23 +850,41 @@ function setTermData(param: any, value: any) {
   const prop: string = param.factorProp;
   const termNo: string = param.termNo;
   const riskNo: string = param.riskNo;
-  Object.keys(formData.value).forEach((item) => {
-    formData.value[item].forEach((d: any) => {
-      if (d["Term.cUniqueTermNo"] === termNo) {
-        if (!prop.startsWith("TermRisktgt")) {
-          d[prop] = value;
-        }
-        if (d.riskList && d.riskList.length > 0) {
-          d.riskList.forEach((r: any) => {
-            if (r["TermRisktgt.cLiabCode"] === riskNo) {
-              r[param.factorProp] = value;
+  const interval = setInterval(() => {
+    if(formData.value && Object.keys(formData.value).length > 0) {
+      clearInterval(interval);
+      Object.keys(formData.value).forEach((item) => {
+        formData.value[item].forEach((d: any) => {
+          if(param.planNo) {
+            if(d["Term.cPlanNo"] === param.planNo && d["Term.cUniqueTermNo"] === termNo) {
+              if (!prop.startsWith("TermRisktgt")) {
+                d[prop] = value;
+              }
+              if (d.riskList && d.riskList.length > 0) {
+                d.riskList.forEach((r: any) => {
+                  if (r["TermRisktgt.cLiabCode"] === riskNo) {
+                    r[param.factorProp] = value;
+                  }
+                });
+              }
             }
-          });
-        }
-      }
-    });
-  });
-  showFlush();
+          } else if (d["Term.cUniqueTermNo"] === termNo) {
+            if (!prop.startsWith("TermRisktgt")) {
+              d[prop] = value;
+            }
+            if (d.riskList && d.riskList.length > 0) {
+              d.riskList.forEach((r: any) => {
+                if (r["TermRisktgt.cLiabCode"] === riskNo) {
+                  r[param.factorProp] = value;
+                }
+              });
+            }
+          }
+        });
+      });
+      showFlush();
+    }
+  }, 500)
 }
 const faters = ref({
   getndisAbleConfig: getndisAbleConfig,

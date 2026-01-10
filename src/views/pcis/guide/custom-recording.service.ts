@@ -51,6 +51,16 @@ export function getECargoPolicyPayment(queryParams: any): AxiosPromise<any> {
 	return post(`policy/getECargoPolicyPayment`, queryParams);
 }
 
+export function downloadPlanTemplate(queryParams: any): AxiosPromise<any> {
+	return post(`policyTemplate/downloadPlanTemplate`, queryParams, {
+        responseType: 'blob'
+    });
+}
+
+export function importPlan(queryParams: any): AxiosPromise<any> {
+	return post(`policyTemplate/importPlan`, queryParams);
+}
+
 
 /*
  * 投保	自定义录单

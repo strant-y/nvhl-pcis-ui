@@ -22,6 +22,7 @@ import RtCheckboxGroup from "./com-item/rt-checkbox-group.vue";
 import RtlTable from "./com-item/rt-table.vue";
 import AppTable from "./app-table.vue";
 import RtMytable from "./com-item/rt-mytable.vue";
+import rtUpload from "./com-item/rt-upload.vue";
 
 // 自定义表单声明
 import MyCard from "./mytemplate/card.vue";
@@ -50,6 +51,7 @@ const componentMap = {
   rtcheckboxgroup: RtCheckboxGroup,
   rttable: RtlTable,
   rtMytable: RtMytable,
+  rtUpload:rtUpload,
   
   myCard:MyCard
 };

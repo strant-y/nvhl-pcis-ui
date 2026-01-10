@@ -45,6 +45,8 @@ const props = defineProps({
 const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
@@ -98,7 +100,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         rules: [getRules("required", {})],
       },
-        {
+      {
         prop: "cBankRelTyp",
         inputtype: "rtselect",
         typeCode: 'CBankRelTypList',
@@ -106,61 +108,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "收款银行大类",
         rules: [getRules("required", {})],
         func: (val: any) => {
-
-          if (!val) {
-            return false
-          }
-          para = val.split('_');
-          const bankname = para[1];  	// 银行名称
-          const isdefault = para[2]; 	// 是否默认值
-          const banktype = para[3];  	// 银行大类
-
-          if (val == null || val == undefined) {
-            return
-          }
-          setValue('cBankCde','');
-          // 1直连银行 开户行 省、市、对公对私必填   0是非直联，开户行 省、市、区/县、开户行、对公对私必填
-            if (isdefault === '1') {
-            setFormItem("cBankPro", {
-              disabled: false,
-              rules: [getRules("required", {})],
-            });
-            setFormItem("cBankAreaList", {
-              disabled: true,
-              rules: [getRules("required", {})],
-            });
-
-            setFormItem("cBankCounty", {
-              disabled: true,
-              rules: null,
-            });
-
-
-            setValue('cBankCnaps',null)
-            setValue('cBankAddr',bankname)
-            
-          } else {
-            setFormItem("cBankPro", {
-              rules: [getRules("required", {})],
-            });
-            setFormItem("cBankAreaList", {
-              disabled: true,
-              rules: [getRules("required", {})],
-            });
-
-            setFormItem("cBankCounty", {
-              disabled: true,
-              rules: [getRules("required", {})],
-            });
-
-            // 不为1  清空开户地址和  
-     
-            setValue('cBankAddr',null)
-            
-  
+          if (!!val) {
+            setValue('cBankCde','');
+            setValue('cBankPro','');
+            let bankRelTyp = val;
+            const para = bankRelTyp.split('_');
+            const directcode = para[0]; // 直连编号
+            const bankname = para[1];  // 银行名称
+            const isdefault = para[2]; // 是否默认值
+            const banktype = para[3];  // 银行大类
+            if (isdefault === '0') {    // 非直连银行
+              bankRelTyp = banktype;
+            }
+            changeBank()
           }
         },
-
       },
       {
         prop: "cBankPro",
@@ -169,27 +131,25 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "CBankProList",
         // disabled: true,
         func: (val: any) => {
+          setValue('cBankArea', '');
           setFormItem("cBankArea", {
-            disabled: false,
             typeCode: 'CBankAreaList',
             codeParam: { 'areaprovince': val },
           });
- 
         }
       },
       {
         prop: "cBankArea",
         inputtype: "rtselect",
-        // typeCode: 'CBankAreaList',
+        typeCode: 'CBankAreaList',
         title: "开户行市",
         // disabled: true,
         func: (val: any) => {
           if (val) {
+            setValue('cBankCounty', '');
             setFormItem("cBankCounty", {
               typeCode: 'CBankCountyList',
-              codeParam: { 'areaname': val },
-              disabled: false,
-              // rules: [getRules("required", {})],
+              codeParam: val ? { 'areaprovince': getValue('cBankPro'), 'areaname': val } : { 'areaprovince': '', 'areaname': '' },
             });
           }
 
@@ -203,12 +163,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // disabled: true,
         func: (val: any) => {
           if (val) {
-            setFormItem("cBankCde", {
-              disabled: false,
-              typeCode: 'CBankCdeList',
-              codeParam: { 'banktypecod': para[3], 'areacode': val },
-              // rules: [getRules("required", {})],
-            });
+            setValue('cBankCde', '');
+            let bankRelTyp = getValue('cBankRelTyp');
+            if (!!bankRelTyp) {
+              const para = bankRelTyp.split('_');
+              const directcode = para[0]; // 直连编号
+              const bankname = para[1];  // 银行名称
+              const isdefault = para[2]; // 是否默认值
+              const banktype = para[3];  // 银行大类
+              if (isdefault === '0') {    // 非直连银行
+                bankRelTyp = banktype;
+              }
+              const cParCde = {'banktypecod': bankRelTyp, 'areacode': val};
+              if (!!val) {
+                codeListStore.queryCodeList({
+                  codeListName: "CBankCdeList",
+                  codeListParam: { 'banktypecod': bankRelTyp, 'areacode': val },
+                }).then((res:any) => {
+                  if(res.length > 0 ){
+                    setFormItem('cBankCde', { loadData: res });
+                  }
+                }).catch((err:any) => {
+                  ElMessage.error(err.message)
+                });
+              }
+            }
           }
         }
       },
@@ -218,11 +197,26 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // disabled: true,
         title: "开户银行",
         func: (val:any)=>{
-          let backAddr  = val.split('_');
-            if(val){
-                setValue('cBankCnaps',backAddr[0])
-                setValue('cBankAddr',backAddr[1])
+          if ( val !== null && val !== '' && val !== 'undefined') {
+            const arrayCBankCde = val.split('_');
+            const codeCBankCde = arrayCBankCde[0];
+            const nameCBankCde = arrayCBankCde[1];
+            setValue('cBankAddr',nameCBankCde);
+            setValue('cBankCnaps',codeCBankCde);
+          }else {
+            const bankRelTyp = getValue('cBankRelTyp');
+            if ( bankRelTyp !== null  && bankRelTyp !== '' && bankRelTyp !== 'undefined') {
+              const para = bankRelTyp.split('_');
+              const directcode = para[0]; // 直连编号
+              const bankname = para[1];  // 银行名称
+              const isdefault = para[2]; // 是否默认值
+              const banktype = para[3];  // 银行大类
+              if (isdefault === '0') {    // 非直连银行
+                setValue('cBankAddr','');
+                setValue('cBankCnaps','');
+              }
             }
+          }
         }
       },
    
@@ -421,7 +415,63 @@ function getFrom() {
   }
 }
 
+function changeBank() {
+  const CBankRelTyp = getValue('cBankRelTyp');	// 银行大类
+  const CBankPro = getValue('cBankPro');	// 开户行省
+  const CBankArea = getValue('cBankArea');	// 开户行省
+  const CBankCounty = getValue('cBankCounty');	// 银行县
+  const CBankCde = getValue('cBankCde');	// 开户行
+  const CBankAddr = getValue('cBankAddr');	// 开户地址
+  const CBankCnaps = getValue('cBankCnaps');	// 直连编号
+  if (CBankRelTyp === '') {
+    return;
+  }
+  setValue('cBankCnaps','');
+  const para = CBankRelTyp.split('_');
+  const bankname = para[1];  	// 银行名称
+  const isdefault = para[2]; 	// 是否默认值
+  const banktype = para[3];  	// 银行大类
+  // console.log('changeBank', para[1], para[2], para[3]);
+  if (isdefault === '1') {     // 直连银行
+    setFormItem('cBankPro',{rules: [getRules("required", {})]})
+    setFormItem('cBankArea',{rules: [getRules("required", {})]})
+    setFormItem('cBankCounty',{rules: [], disabled: true})
+    setFormItem('cBankCde',{rules: [], disabled: true})
 
+    setValue('cBankCounty', null)
+    setValue('cBankCde', null)
+    setValue('cBankAddr', bankname)
+
+    setFormItem('cBankCnaps',{disabled: true})
+
+  }else if ( isdefault === '0') {// 非直连银行
+    setFormItem('cBankCounty',{rules: [getRules("required", {})]})
+    setFormItem('cBankCde',{rules: [getRules("required", {})]})  
+    setValue('cBankAddr', null)
+
+    if ( CBankCde !== null && CBankCde !== '' && CBankCde !== 'undefined') {
+      const arrayCBankCde = CBankCde.split('_');
+      const codeCBankCde = arrayCBankCde[0];
+      const nameCBankCde = arrayCBankCde[1];
+      setValue('cBankAddr', nameCBankCde);
+      setValue('cBankCnaps', codeCBankCde);
+    }
+    setFormItem('cBankCounty',{disabled: false})
+    setFormItem('cBankCde',{disabled: false})
+    setFormItem('cBankCnaps',{disabled: true})
+  }
+
+  codeListStore.queryCodeList({
+    codeListName: "CBankCdeList",
+    codeListParam: { 'banktypecod': para[3], 'areacode': CBankRelTyp },
+  }).then((res:any) => {
+    if(res.length > 0 ){
+      setFormItem('cBankCde', { loadData: res });
+    }
+  }).catch((err:any) => {
+    ElMessage.error(err.message)
+  });
+}
 
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {

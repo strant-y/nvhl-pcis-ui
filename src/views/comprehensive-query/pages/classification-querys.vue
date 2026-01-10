@@ -258,6 +258,7 @@ const allCAppStatus = [
   {label: "核保退回/撤回", value: "3"},
   {label: "已核待缴费", value: "4"},
   {label: "已出单", value: "5"},
+{ label: "已做失效操作", value: "6" },
   {label: "见费出单退回", value: "8"},
 ]
 
@@ -280,7 +281,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   const freeEditRefs = freeEditRef.value;
                   freeEditRefs?.validate().then((isValid:boolean) => {
                       if (isValid) {
-                          handleQuery(false);
+                          handleQuery(true);
                       }
                   });
               },
@@ -293,21 +294,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   for (const k in s) {
                       s[k] = null;
                   }
+                  const appTm = [
+                    dayjs(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00"),
+                    moment(new Date()).format("YYYY-MM-DD 23:59:59"),
+                  ]
                   freeEditRefs?.setFormValue({
                     ...s,
                     cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
                     cLoadSub: '1',
                     tIssueTm: [
-                        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+                        dayjs(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00"),
                         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
                     ],
-                    tAppTm: [
-                        dayjs(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00"),
-                        moment(new Date()).format("YYYY-MM-DD 23:59:59"),
-                    ],
+                    tAppTm: appTm,
                     cDataTyp:"app",
                     cAppTyp:"A",
                   })
+                  setValue("tEdrAppTm", appTm)
+                  setValue("tInquiryTm", appTm)
               },
           }),
           createFreeButtonBase({
@@ -523,7 +527,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                                   item.hidden = false;
                               }
                           });
-                      } else if (s["prodCNmeCn"] == "043002") {
+                      } else if (['040002','041010','041015','043002','043003','043007','043016','047003','049034'].includes(s["prodCNmeCn"])) {
                           formconfig1.fromSchema?.forEach((item) => {
                               if (
                                 item.prop === "cVinCode" || 
@@ -1201,8 +1205,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示投保日期
                               // 设置默认值为最近7天
                               const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                              const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
-                              freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
+                              const startDate = moment(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00");
+                            //   freeEditRef.value?.setValue("tAppTm", [startDate, endDate]);
                           } else if (item.prop == "tEdrAppTm" || item.prop == "tInquiryTm") {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
@@ -1224,8 +1228,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示批改申请日期
                             // 设置默认值为最近7天
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
-                            freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
+                            const startDate = moment(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00");
+                            // freeEditRef.value?.setValue("tEdrAppTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tInquiryTm") {
                             item.hidden = true;
                           } else if (item.prop == "cPlyNo" || item.prop == "cDataTyp") {
@@ -1242,8 +1246,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                               item.hidden = false; // 显示询价日期，询价单号
                             // 设置默认值为最近7天
                             const endDate = moment(new Date()).format("YYYY-MM-DD 23:59:59");
-                            const startDate = moment(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00");
-                            freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
+                            const startDate = moment(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00");
+                            // freeEditRef.value?.setValue("tInquiryTm", [startDate, endDate]);
                           } else if (item.prop == "tAppTm" || item.prop == "tEdrAppTm" || item.prop == "cDataTyp" ) {
                               item.hidden = true;
                           } else if (item.prop == "cPlyNo") {
@@ -1304,7 +1308,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
-              rules: [getRules("required", {})],
+            //   rules: [getRules("required", {})],
+              func: (val:any) => {
+                if(val) {
+                  setValue("tEdrAppTm", val)
+                  setValue("tInquiryTm", val)
+                }
+              }
           },
           {
               prop: "tEdrAppTm",
@@ -1314,7 +1324,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               valueFormat: "YYYY-MM-DD HH:mm:ss",
               clearable: true,
               type: "datetimerange",
-              rules: [getRules("required", {})],
+            //   rules: [getRules("required", {})],
+              func: (val:any) => {
+                if(val) {
+                  setValue("tAppTm", val)
+                  setValue("tInquiryTm", val)
+                }
+              }
           },
           {
               prop: "tInquiryTm",
@@ -1325,7 +1341,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               clearable: true,
               type: "datetimerange",
               hidden: true,
-              rules: [getRules("required", {})],
+            //   rules: [getRules("required", {})],
+              func: (val:any) => {
+                if(val) {
+                  setValue("tEdrAppTm", val)
+                  setValue("tAppTm", val)
+                }
+              }
           },
           {
               prop: "tIssueTm",
@@ -1618,6 +1640,7 @@ const normalQueryColumns = [
         inputtype: "rtinput",
         title: "分公司",
         lengthNum: 3,
+				slotName: "cSecondDptCnm",
         formatter:(val:any)=>{
           if(val?.split("分公司").length > 1) {
             return val?.split("分公司")[0]
@@ -1747,12 +1770,15 @@ const normalQueryColumns = [
         slotName: "nEdrPrjNo"
     },
     {
-        prop: "cRsnCdeText",
-        inputtype: "rtinput",
+        prop: "cRsnCde",
+        inputtype: "rtselect",
         title: " 批改原因",
         typeCode: "EDR_RSN_LIST_KIND",
         align: 'left',
         lengthNum: 8,
+				// formatter: (val:any, row:any) => {
+				// 	return row.cRsnCdeText || "";
+				// },
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
@@ -1884,11 +1910,9 @@ const tableObj = {
                     };
                     if (cleanRow) {
                         // 校验出单机构是否复合复制单的机构要求
-                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+                        const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId, cProdNo: cleanRow.cProdNo }
                         if(cleanRow.cRenewMrk === "1") {
                             queryProdDptCdeParam['cPlyNo'] = cleanRow.cPlyNo
-                        } else {
-                            queryProdDptCdeParam['cProdNo'] = cleanRow.cProdNo
                         }
                         const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
                         if(queryProdDptCde.data !== true) {
@@ -2029,10 +2053,10 @@ onMounted(async () => {
             // item.rules = []; // 清除必填规则
         }
     });
-    freeEditRef.value.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
-    freeEditRef.value.setValue("cAppTyp","A") ; // 任务类型默认值 为投保
-    freeEditRef.value.setValue("cLoadSub",'1')
-    freeEditRef.value.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
+    freeEditRef.value?.setValue("cDataTyp","app") ; // 列表类型默认值 为全部保批单
+    freeEditRef.value?.setValue("cAppTyp","A") ; // 任务类型默认值 为投保
+    freeEditRef.value?.setValue("cLoadSub",'1')
+    freeEditRef.value?.setValue("cDptCde", JSON.parse(sessionStorage.getItem("user")).companyId);
     setFormItem("cDptCde", {
         loadData: [
             {
@@ -2042,13 +2066,13 @@ onMounted(async () => {
         ],
     });
     pageresult.list = [];
-    freeEditRef.value.setValue("tIssueTm", [
-        dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00"),
+    freeEditRef.value?.setValue("tIssueTm", [
+        dayjs(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
     // 申请日期默认展示投保日期
-    freeEditRef.value.setValue("tAppTm", [
-        dayjs(new Date()).subtract(6, "day").format("YYYY-MM-DD 00:00:00"),
+    freeEditRef.value?.setValue("tAppTm", [
+        dayjs(new Date()).subtract(6, "days").format("YYYY-MM-DD 00:00:00"),
         moment(new Date()).format("YYYY-MM-DD 23:59:59"),
     ]);
 
@@ -2149,8 +2173,8 @@ async function queryAE( flag?: boolean, isEs = false) {
             ElMessage.warning("签单日期起期不能大于签单日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("签单日期时间范围请控制在两年内");
+        if (end.diff(start, "month", true) > 3) {
+            ElMessage.warning("签单日期时间范围请控制在3个月内");
             return;
         }
     }
@@ -2163,23 +2187,20 @@ async function queryAE( flag?: boolean, isEs = false) {
     ) {
         const startTemp =
             s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[0] : null;
-        if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("申请日期不能为空");
+        const tIssueTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+        if ((null == startTemp || undefined === startTemp) && (null == tIssueTemp || undefined === tIssueTemp)) {
+            ElMessage.warning("申请日期和签单日期至少选择一个");
             return;
         }
         const start = dayjs(startTemp);
         const endTemp = s.tAppTm && s.tAppTm.length > 1 ? s.tAppTm[1] : null;
-        if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("申请日期不能为空");
-            return;
-        }
         const end = dayjs(endTemp);
         if (end.isBefore(start)) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "day", true) > 7) {
-            ElMessage.warning("申请日期时间范围请控制在7天内");
+        if (end.diff(start, "month", true) > 3) {
+            ElMessage.warning("申请日期时间范围请控制在3个月内");
             return;
         }
     }
@@ -2192,23 +2213,20 @@ async function queryAE( flag?: boolean, isEs = false) {
     ) {
         const startTemp =
             s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[0] : null;
-        if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("申请日期不能为空");
+        const tIssueTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+        if ((null == startTemp || undefined === startTemp) && (null == tIssueTemp || undefined === tIssueTemp)) {
+            ElMessage.warning("申请日期和签单日期至少选择一个");
             return;
         }
         const start = dayjs(startTemp);
         const endTemp = s.tEdrAppTm && s.tEdrAppTm.length > 1 ? s.tEdrAppTm[1] : null;
-        if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("申请日期不能为空");
-            return;
-        }
         const end = dayjs(endTemp);
         if (end.isBefore(start)) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "day", true) > 7) {
-            ElMessage.warning("申请日期时间范围请控制在7天内");
+        if (end.diff(start, "month", true) > 3) {
+            ElMessage.warning("申请日期时间范围请控制在3个月内");
             return;
         }
     }
@@ -2350,23 +2368,20 @@ async function queryI(flag?: boolean, isEs = false) {
     ) {
         const startTemp =
             s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
-        if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("申请日期不能为空");
+        const tIssueTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+        if ((null == startTemp || undefined === startTemp) && (null == tIssueTemp || undefined === tIssueTemp)) {
+            ElMessage.warning("申请日期和签单日期至少选择一个");
             return;
         }
         const start = dayjs(startTemp);
         const endTemp = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
-        if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("申请日期不能为空");
-            return;
-        }
         const end = dayjs(endTemp);
         if (end.isBefore(start)) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "day", true) > 7) {
-            ElMessage.warning("申请日期时间范围请控制在7天内");
+        if (end.diff(start, "month", true) > 3) {
+            ElMessage.warning("申请日期时间范围请控制在3个月内");
             return;
         }
     }
@@ -2503,8 +2518,8 @@ async function exportAE( flag?: boolean, isEs) {
             ElMessage.warning("签单日期起期不能大于签单日期止期");
             return;
         }
-        if (end.diff(start, "year", true) > 2) {
-            ElMessage.warning("签单日期时间范围请控制在两年内");
+        if (end.diff(start, "month", true) > 3) {
+            ElMessage.warning("签单日期时间范围请控制在3个月内");
             return;
         }
     }
@@ -2609,23 +2624,20 @@ async function exportI(flag?: boolean, isEs = false) {
     ) {
         const startTemp =
             s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[0] : null;
-        if (null == startTemp || undefined === startTemp) {
-            ElMessage.warning("申请日期不能为空");
+        const tIssueTemp = s.tIssueTm && s.tIssueTm.length > 1 ? s.tIssueTm[0] : null;
+        if ((null == startTemp || undefined === startTemp) && (null == tIssueTemp || undefined === tIssueTemp)) {
+            ElMessage.warning("申请日期和签单日期至少选择一个");
             return;
         }
         const start = dayjs(startTemp);
         const endTemp = s.tInquiryTm && s.tInquiryTm.length > 1 ? s.tInquiryTm[1] : null;
-        if (null == endTemp || undefined === endTemp) {
-            ElMessage.warning("申请日期不能为空");
-            return;
-        }
         const end = dayjs(endTemp);
         if (end.isBefore(start)) {
             ElMessage.warning("申请日期起期不能大于申请日期止期");
             return;
         }
-        if (end.diff(start, "day", true) > 7) {
-            ElMessage.warning("申请日期时间范围请控制在7天内");
+        if (end.diff(start, "month", true) > 3) {
+            ElMessage.warning("申请日期时间范围请控制在3个月内");
             return;
         }
     }
@@ -3026,7 +3038,7 @@ function processExpandParams(formData) {
         } else if (s["prodCNmeCn"] == "043001" && s["cLicenseNumber"]) {
             expandFlag = 1;
             expandVal = { "cLicenseNumber": s["cLicenseNumber"] };
-        } else if (s["prodCNmeCn"] == "043002" && (s["cVinCode"] || s["cPlateNumber"])) {
+        } else if (['040002','041010','041015','043002','043003','043007','043016','047003','049034'].includes(s["prodCNmeCn"]) && (s["cVinCode"] || s["cPlateNumber"])) {
             expandFlag = 1;
             expandVal = { 
                 "cVinCode": s["cVinCode"],
@@ -3237,7 +3249,6 @@ function processExpandParams(formData) {
     }
     return { expandFlag, expandVal };
 }
-
 
 function formatTwoLine(text, num=7) {
   if (!text) return '';

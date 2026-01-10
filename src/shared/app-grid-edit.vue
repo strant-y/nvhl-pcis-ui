@@ -4,7 +4,7 @@
       <el-row :gutter="16">
         <el-col :md="24">
           <el-card shadow="hover" class="card_container">
-            <template #header>
+            <template #header v-if=" gridEditConfig.fromUi.showTitleBar && gridEditConfig.title && gridEditConfig.title.length > 0">
               <el-row justify="space-between">
                 <el-col :span="4" v-if="!gridEditConfig.production">
                   <span class="card-title-style">{{ gridEditConfig.title }}</span>
@@ -88,8 +88,7 @@ defineOptions({
   name: "AppGridEdit",
   inheritAttrs: false,
 });
-const emits = defineEmits([ "rowClick"]); // 父组件监听事件，同步子组件值的变化给父组件
-
+const emits = defineEmits([ "rowClick","updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
 const props = defineProps({
   gridEditConfig: {
     type: Object as () => AppGridEditConfig,
@@ -117,8 +116,13 @@ function getFromValue() {
   return tableDatas.value;
 }
 
+const notFlush = ref(false);
 function setFormValue(data: any) {
+  notFlush.value = true;
   tableDatas.value = data;
+  nextTick(()=>{
+    notFlush.value = false;
+  })
 }
 function validate() {
   return new Promise((resolve) => {
@@ -132,6 +136,13 @@ function validate() {
     });
   });
 }
+watch([() => tableDatas.value],([newFormData])=>{
+  if(!notFlush.value){  // 增加不允许刷新机制,如果从上层下来的数据,不进行数据刷新
+    emits("updateDatas", newFormData);
+  }
+},{
+  deep:true
+})
 
 function handleRowClick(row: any) {
   emits("rowClick", row);

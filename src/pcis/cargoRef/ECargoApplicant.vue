@@ -78,8 +78,6 @@ onMounted(() => {
     // 传真校验
     setFormItem("ECargoApplicant.cFax", { rules: [getRules("faxNumber", {})] });
 
-    setFormItem("ECargoApplicant.cGreenIndustryCustomers",{disabled: true});
-    setFormItem("ECargoApplicant.cGreenIndustryList",{disabled: true});
     if(!getValue('ECargoApplicant.cCustRiskRank')){
       setValue('ECargoApplicant.cCustRiskRank','925104')
     }
@@ -326,7 +324,7 @@ const method = {
 	//投保人性质(0是法人 1是个人)
   InsureChange: async (val:any) => {
     if (val == "0") {
-      // 投保人是法人，出生日期、年龄、性别、国籍、职业类别、经营范围、婚姻状况隐藏
+      // 投保人是法人，出生日期、年龄、性别、职业类别、经营范围、婚姻状况隐藏,国籍必填可修改
       setFormItem("ECargoApplicant.tBirthday", {
         hidden: true,
         rules: null
@@ -340,7 +338,7 @@ const method = {
         rules: null
       });
       setFormItem("ECargoApplicant.cNation", {
-        hidden: true,
+        rules: [getRules('required',{})],
       });
       setFormItem("ECargoApplicant.cOccupTyp", {
         hidden: true,
@@ -369,7 +367,7 @@ const method = {
       setFormItem("ECargoApplicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
-      if (initFlag.value) {
+      if (!initFlag.value) {
         setFormItem("ECargoApplicant.cWorkDpt", {
           disabled: false,
         });
@@ -483,7 +481,7 @@ const method = {
         hidden: false,
       });
       setFormItem("ECargoApplicant.cNation", {
-        hidden: false,
+        rules: [],
       });
       setFormItem("ECargoApplicant.cOccupTyp", {
         hidden: false,
@@ -526,16 +524,19 @@ const method = {
       });
       setFormItem("ECargoApplicant.cRegisterSuffixAddr", {
         rules: null,
-      });
-      //是否个体工商户
-      setFormItem("ECargoApplicant.cIsIndvduBiz", {
-        disabled: false,
-      });
+			});
+			if (!initFlag.value) {
+      	//是否个体工商户
+				setFormItem("ECargoApplicant.cIsIndvduBiz", {
+					disabled: false,
+				});
+    	}
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
         rules: null,
         disabled: true,
       });
+      clearValidate('ECargoApplicant.cGreenIndustryCustomers')
       // 是否绿色详情
       setFormItem("ECargoApplicant.cGreenIndustryList", {
         rules: null,
@@ -637,7 +638,7 @@ const method = {
       co = 'UN_NATURAL_CERTIFICATE_CACHE';
     }
 
-    if (initFlag.value) {
+    // if (initFlag.value) {
       codeListStore
         .queryCodeList({
           codeListName: co,
@@ -656,7 +657,7 @@ const method = {
             setValue('ECargoApplicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
-    }
+    // }
 
     checkUser();
   },
@@ -794,12 +795,19 @@ const method = {
   // 移动电话 切换
   mobileChange: (val:any) => {
     let cClntMrk = getValue('ECargoApplicant.cClntMrk'); // 法人  1个人  0法人
+    let cTel = getValue('ECargoApplicant.cTel'); // 固定电话
     clearValidate('ECargoApplicant.cTel')
     if (cClntMrk && val) {
       setFormItem("ECargoApplicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("ECargoApplicant.cTel", { rules: [getRules("phone", {})] });
+    }
+		if (cClntMrk == '0' && !val && cTel) {
+      setFormItem("ECargoApplicant.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("ECargoApplicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
     setValue('ECargoApplicant.cEnterpriseTel', val)
   },
@@ -904,9 +912,6 @@ const method = {
   },
   //注册地市是否同上
    isSameChange : (val:any) => {
-    if (!initFlag.value) {
-      return;
-    }
     if (val == "1") {
       const ads = getValue("ECargoApplicant.Prop");
       const a = getValue("ECargoApplicant.cSuffixAddr") || "";
