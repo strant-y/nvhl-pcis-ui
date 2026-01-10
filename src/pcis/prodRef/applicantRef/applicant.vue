@@ -1400,7 +1400,7 @@ const method = {
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,
     });
-		if (param.initFlag) return;
+		if (param.initFlag || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.cOperaterCertfCde"];
@@ -1439,7 +1439,7 @@ const method = {
     setFormItem("Applicant.cShareholderCode", {
       rules: baseRules,
 		});
-		if (param.initFlag) return;
+		if (param.initFlag || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.cShareholderCode"];

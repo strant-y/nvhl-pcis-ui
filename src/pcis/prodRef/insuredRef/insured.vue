@@ -1459,7 +1459,7 @@ const method = {
     setFormItem("Insured.cOperaterCertfCde", {
       rules: baseRules,
     });
-		if (param.initFlag) return;
+		if (param.initFlag || isCoypBtn.value || isOcrEcho) return;
 
     // 切换清空
     if (val) {
@@ -1499,9 +1499,8 @@ const method = {
     setFormItem("Insured.cShareholderCode", {
       rules: baseRules,
 		});
-		
-		if (param.initFlag) return;
-
+		// 回显不执行下方操作
+		if (param.initFlag || isCoypBtn.value || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Insured.cShareholderCode"];
