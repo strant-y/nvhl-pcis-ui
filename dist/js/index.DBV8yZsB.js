@@ -1,1 +1,0 @@
-import{co as t}from"./index.CREx5VJb.js";function e(e){return t("/role/getSysRoleList",e)}function n(e){return t("/template/list",e)}function r(e){return t("/template/delete",e)}export{n as a,r as d,e as g};
