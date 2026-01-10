@@ -1567,32 +1567,6 @@ const method = {
   tOEndTmDisable: (date: any) => {
     return disablePastDates(date);
   },
-  // 大股东证件类型
-  cShareholderCategoryChange:(val:any) => {
-    if (param.initFlag) return;
-    setValue("Insured.cShareholderCode","")
-    clearValidate('Insured.cShareholderCode'); // 清除报错信息
-    if (val == "111") {
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("idCard", {})],
-      });
-    } else if (val == "01") {
-      // 统一社会信用代码校验
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("socialCode", {})],
-      });
-    } else if (val === '07') {
-      // 护照
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("passPort", {})],
-      });
-    } else if (val == "553") {
-      // 外国人证件号
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("ariCard", {})],
-      });
-    }
-  },
 };
 
 function setregistAdd() {
