@@ -3,7 +3,7 @@ ARG NGINX_NAME=nginx:alpine
 FROM ${NGINX_NAME}
 LABEL authors="duqian"
 # 将空的默认配置文件复制到容器中，替换原有的默认配置
-COPY default.conf /etc/nginx/conf.d/default.conf
+#COPY default.conf /etc/nginx/conf.d/default.conf
 
 # 定义构建参数，默认为 uat
 ARG ENV=nginx

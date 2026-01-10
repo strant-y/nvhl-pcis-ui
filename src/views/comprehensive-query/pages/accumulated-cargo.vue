@@ -18,8 +18,8 @@
         </div>
       </template>
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
-          <span v-html="row.cDptCnm || ''" class="twoLine"></span>
+        <el-tooltip :content="row.cDptName" placement="top">
+          <span v-html="row.cDptName || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
@@ -86,33 +86,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
     fromSchema: [
       {
-        prop: "CClntMrk",
+        prop: "nType",
         inputtype: "rtselect",
         title: "风险累计方式",
         typeCode: "",
-        loadData: [  //先写死，没有接口
+        loadData: [  //先写死，没有接口 0船货 1船舶 2货运
+          
           {
             label: '船舶险风险累计',
-            value: '1'
+            value: 1
           },
           {
             label: '货运险风险累计',
-            value: '2'
-          },
-          {
+            value: 2
+					},
+					{
             label: '船货风险累计',
-            value: '3'
-          }
+            value: 0
+          },
         ],
         params: {},
         clearable: true,
         rules: [getRules("required", {})],
-        func: (val) => {
-          handleChange(val)
-        }
       },
       {
-        prop: "CCDate",
+        prop: "tSearchTm",
         inputtype: "rtdatepicker",
         title: "查询时间",
         type: "datetime",
@@ -121,13 +119,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", {})],
       },
       {
-        prop: "CAppNme",
+        prop: "cShipName",
         inputtype: "rtinput",
-        title: "船名",
+				title: "船名",
+        rules: [getRules("required", {})],
         clearable: true,
       },
       {
-        prop: "CAppNme",
+        prop: "cTransportVoyage",
         inputtype: "rtinput",
         title: "航次",
         clearable: true,
@@ -141,7 +140,7 @@ const pageresult = reactive<Pageresult>({
   /** 数据列表 */
   list: [],
   /** 总数 */
-  total: 2,
+  total: 0,
 });
 
 
@@ -160,7 +159,7 @@ const tableconfig = reactive<AppTableConfig>(
         slotName: "cPlyNoInfo"
       },
       {
-        prop: "cDptCnm",
+        prop: "cDptName",
         inputtype: 'rtinput',
         title: "出单机构",
         slotName: "cDptCnm",
@@ -176,44 +175,44 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
       },
       {
-        prop: "cProdNmeCn",
+        prop: "tDepartureTime",
         inputtype: 'rtinput',
         title: "起运日期",
         lengthNum: 17,
         lengthIsNumber: true,
       },
       {
-        prop: "nPrm",
+        prop: "cShipName",
         inputtype: 'rtinput',
         title: "船名",
         align: 'left',
       },
       {
-        prop: "cAppNme",
+        prop: "cTransportVoyage",
         inputtype: 'rtinput',
         title: "航次",
       },
       {
-        prop: "tAppTm",
+        prop: "cDispatchDetail",
         inputtype: 'rtinput',
         title: "起运地",
         align: 'left',
       },
       {
-        prop: "cAppStatus",
+        prop: "cDestinationDetail",
         inputtype: 'rtinput',
         title: "目的地",
         align: 'left',
       },
       {
-        prop: "cAppNme",
+        prop: "tInsrncBgnTm",
         inputtype: 'rtinput',
         title: "起保时间",
         lengthNum: 17,
         lengthIsNumber: true,
       },
       {
-        prop: "tAppTm",
+        prop: "tInsrncEndTm",
         inputtype: 'rtinput',
         title: "终保时间",
         lengthNum: 17,
@@ -241,12 +240,13 @@ const handleQuery = (flag = true) => {
 
 //风险累计方式change
 const handleChange = (value: string) => {
-  console.log('value', value);
+	console.log('handleChange', value);
+	//0船货 1船舶 2货运
   if (value == '1') {
     title.value = `船舶险累积保额/赔偿限额 ${tableTotal.value}`
   } else if (value == '2') {
     title.value = `货运险累积保额 ${tableTotal.value}`
-  } else if (value == '3') {
+  } else if (value == '0') {
     title.value = `船货累积保额 ${tableTotal.value}`
   }
 }
@@ -267,16 +267,27 @@ const refreshData = (flag = true) => {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const params = Object.assign(s, r)
   tableTotal.value = 0
-  accumulatedCargo.qryList(params).then((res: any) => {
-    loading.value = false;
+	accumulatedCargo.cumulativeRiskList(params).then((res: any) => {
     if (res.code === 200) {
       const pageData = res.data;
-      if (pageData) {
-        tableTotal.value = 0 //todo 联调时调整
+      if (pageData.result.length > 0) {
         pageresult.total= pageData.total;
-        pageresult.list = pageData.result;
-      }
-    }
+				pageresult.list = pageData.result;
+				if (s.nType == '1') {
+					tableTotal.value = pageData.result[0].totalCBamt
+				} else if (s.nType == '2') {
+					tableTotal.value = pageData.result[0].totalHYamt
+				} else if (s.nType == '0') {
+					tableTotal.value = pageData.result[0].totalAmt
+				}
+			} else {
+				pageresult.total= pageData.total;
+				pageresult.list = pageData.result;
+			}
+			handleChange(s.nType)
+		} else {
+			ElMessage.error(res.msg || '查询失败');
+		}
   });
 };
 
@@ -319,9 +330,7 @@ const copyText = (text: any) => {
 };
 
 
-onMounted(() => {
-  refreshData();
-});
+onMounted(() => {});
 
 </script>
 

@@ -20,9 +20,6 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const planCiEdit = defineAsyncComponent(() => import("./planCiEdit.vue"));
@@ -35,10 +32,8 @@ import { useRoute } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import { pageFindPlanCiSNLBByParams,deletePlanCiInfoById } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
-const route = useRoute();
-const query = ref(route.query);
-const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+import { codeListViewStore } from "@/store";
+const codeListStore = codeListViewStore();
 
 const { getRules } = useValidator();
 
@@ -58,21 +53,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           freeEditRef.value?.validate().then((isValid) => {
             if (isValid) {
               handleQuery();
-
-
-              
-            } else {
-              // ElMessage.error("请填写必填项");
             }
           });
-
-
         },
       }),
       createFreeButtonBase({
         label: "重置",
         icon: "RefreshRight",
-        func: () => {},
+				func: () => {
+					freeEditRef.value?.setFormValue({
+            cPlanNo: "",
+            cBrkrCde: "",
+            cAgtAgrNo: "",
+          });
+				},
       }),
     ],
 
@@ -102,9 +96,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 const pageresult = reactive<Pageresult>({
   result: "",
-  list: [
-   
-  ],
+  list: [],
   total: 0,
 });
 
@@ -117,7 +109,8 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         func: function () {
           dzmodal.open(planCiEdit, { type: "add", data: {} }).then((res) => {
-            if (res.type === "ok") {
+						if (res?.type === "ok") {
+							setValue('cPlanNo',res.body.formData.cPlanNo || '')
               handleQuery();
             }
           });
@@ -137,8 +130,9 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         tableClick: (row) => {
           console.log(row);
-          dzmodal.open(planCiEdit, { type: "edit", data: row }).then((res) => {
-            if (res.type === "ok") { 
+					dzmodal.open(planCiEdit, { type: "edit", data: row }).then((res) => {
+						if (res?.type === "ok") { 
+							setValue('cPlanNo',res.body.formData.cPlanNo || '')
               handleQuery();
             }
           });
@@ -151,57 +145,27 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         tableClick: (row) => {
-
           console.log('删除')
-
           ElMessageBox.confirm("是否要删除此行？", "提示", {
             confirmButtonText: "确定",
             cancelButtonText: "取消",
             type: "warning",
           })
-            .then(() => {
-              // 删除逻辑
-              // const param = {
-              //   id: selData["cPkId"]
-              // };
-
-
-              // policyService.deleteFormulaById(param).then((res: any) => {
-              //   const { code, data, msg } = res;
-              //   console.log('删除', res)
-              //   // if (null != res && null != code) {
-              //   if (code === 200) {
-
-              //     if ('1' === data['code']) { // 删除成功
-              //       ElMessage.success("删除成功");
-              //       handleQuery();
-              //     } else {
-              //       ElMessage.error(msg);
-              //     }
-              //   }
-
-              // })
-
-              
-              
-              deletePlanCiInfoById(row).then((res) => {
-                  const { code, data, msg } = res;
-                  if (200 === code) {
-                    ElMessage.success("删除成功");
-                    handleQuery();
-                  } else {
-                    ElMessage.error(msg);
-                  }
-                })
-                .finally(() => {});
-
-                })
-                .catch(() => {
-                  // 取消删除
-
-                });
-
-
+					.then(() => {
+						deletePlanCiInfoById(row).then((res) => {
+								const { code, data, msg } = res;
+								if (200 === code) {
+									ElMessage.success("删除成功");
+									handleQuery();
+								} else {
+									ElMessage.error(msg);
+								}
+						})
+						.finally(() => {});
+					})
+					.catch(() => {
+						// 取消删除
+					});
         },
       }),
     ],
@@ -217,12 +181,12 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "cCoinsurerCde",
+        prop: "cGroupId",
         title: "共同代理人",
         inputtype: "rtinput",
       },
       {
-        prop: "orgCode",
+        prop: "cBrkrCde",
         title: "代理人",
         inputtype: "rtinput",
       },
@@ -232,24 +196,16 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
       },
       {
-        prop: "effectiveStartDate",
+        prop: "cJiMrk",
         title: "主从联标志",
         inputtype: "rtselect",
+        loadData: [{ value: '1', label: '主联' }, { value: '0', label: '从联' }],
       },
       {
         prop: "cIssueMrk",
         title: "出单标志",
         inputtype: "rtselect",
-        loadData: [
-          {
-            label: "启用",
-            value: "1",
-          },
-          {
-            label: "禁用",
-            value: "0",
-          },
-        ],
+        loadData: [{label: "启用",value: "1"},{label: "禁用",value: "0"}],
       },
       {
         prop: "nCiShare",
@@ -259,42 +215,12 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cStatus",
         title: "状态",
-        inputtype: "rtselect",
+				inputtype: "rtselect",
+        loadData: [{ value: '1', label: '有效' }, { value: '0', label: '无效' }]
       },
     ],
   })
 );
-const showRelatedTermsModal = ref(false);
-const showAddTermModal = ref(false);
-
-const handleRelatedTermsModalConfirm = (selectedRows: any[]) => {
-  console.log("选中的条款:", selectedRows);
-  // 处理选中的条款
-};
-const handleAddTermSave = () => {
-  handleQuery(); // 刷新列表
-};
-
-const handleEdit = (index: number, row: any) => {
-  // 编辑逻辑
-  console.log("编辑", row);
-};
-
-const handleDelete = (index: number, row: any) => {
-  ElMessageBox.confirm("此操作将永久删除该条款, 是否继续?", "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  })
-    .then(() => {
-      // 删除逻辑
-      console.log("删除", row);
-      // 可以在这里调用 API 删除数据
-    })
-    .catch(() => {
-      // 取消删除
-    });
-};
 
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
@@ -316,44 +242,25 @@ function getValue(key: string) {
   return freeEditRef?.value?.getValue(key);
 }
 
-function setDisa() {
-  formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cProdNo" || e.prop === "cKindNo") {
-      e.disabled = true;
-    }
-  });
-}
 /** 查询 */
 function handleQuery(flag?: boolean) {
-
-  
-
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
-
-
   console.log('数据内容',r,s)
-  
   pageFindPlanCiSNLBByParams(param)
     .then((res) => {
-      const { code, data, msg,result } = res;
       console.log(res)
-      console.log(result)
-      if (  code ==='1') {
-        pageresult.list = result;
+      if (res.code === '1') {
+        pageresult.list = res.result;
         pageresult.total = res.total;
       } else {
-        ElMessage.error(msg);
+        ElMessage.error(res.msg);
       }
     })
     .finally(() => {});
 }
-onMounted(() => {
-  if (param.editType === "edit") {
-    setDisa();
-  }
-});
+onMounted(() => {});
 
 defineExpose({
   getFromValue,

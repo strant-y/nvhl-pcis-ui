@@ -43,7 +43,7 @@
                   </template>
                 </div>
               </el-col>
-              <el-col :span="6">
+              <el-col :span="5">
                 <template v-for="(item, k) in termFactormap" :key="k">
                   <el-row v-if="item.cPorpShowtitle === '1'" align="center" justify="start">
                     <el-form-item
@@ -61,7 +61,16 @@
                   </el-row>
                 </template>
               </el-col>
-              <el-col :span="2" justify="end">
+              <el-col :span="3" justify="end">
+                <rtButton
+                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid'"
+                    @click="
+                  () => {
+                    addriskView();
+                  }
+                "
+                    :item="btnItem.addrisk"
+                />
                 <rtButton
                     v-if="!btnItem.delete.hidden"
                     @click="
@@ -111,9 +120,9 @@
                                   :prop="item.prop"
                               >
                                 <from-item
-                                    v-model="termdata[item.prop]"
-                                    @update:modelValue="termUpdate()"
-                                    :item="item"
+                                  v-model="termdata[item.prop]"
+                                  @update:modelValue="termUpdate()"
+                                  :item="item"
                                 />
                               </el-form-item>
                             </td>
@@ -168,11 +177,11 @@
                             :rules="isrequired(item) ? getRequired() : undefined"
                             :prop="item.prop"
                           >
-                            <from-item
-                              v-model="termdata[item.prop]"
-                              @update:modelValue="termUpdate()"
-                              :item="item"
-                            />
+                          <from-item
+                            v-model="termdata[item.prop]"
+                            @update:modelValue="termUpdate()"
+                            :item="item"
+                          />
                           </el-form-item>
                         </td>
                       </template>
@@ -188,7 +197,8 @@
                                   :rules="isrequired(item) ? getRequired() : undefined"
                                   :prop="item.prop"
                                   :label="item.title"
-                                  :label-width ="120">
+                                  :label-width ="120"
+                                  class="extendFormItem">
                                   <from-item
                                     v-model="termdata[item.prop]"
                                     @update:modelValue="termUpdate()"
@@ -214,181 +224,187 @@
               />
             </template>
           </template>
-          <template v-for="(ginfo, gk) in groupInfo" :key="gk">
-            <div style="margin-top: 10px; border: 1px var(--el-border-color-lighter) solid; padding: 3px;">
-              <el-row style="margin-bottom: 3px; background-color: var( --cvrg-sub-header-bg-color); padding: 2px">
-                <el-col :span="22">
-                  <a
-                    style="margin-right: 5px;font-size: 12px;"
-                    @click="ginfo.hidden = !ginfo.hidden"
-                  >
-                    <el-icon v-if="ginfo.hidden" size="11"><ArrowUpBold /></el-icon>
-                    <el-icon v-if="!ginfo.hidden" size="11"><ArrowDownBold /></el-icon>
-                  </a>
-                  <span style="font-size: 13px; font-weight: 450;">
-                    {{ ginfo.cGroupTitle }}
-                  </span>
-                </el-col>
-              </el-row>
-              <el-row v-if="!ginfo.hidden">
-                <div class="table_overflow_x">
-                  <table style="width: 100%">
-                    <thead>
-                      <tr class="table-title">
-                        <th
-                          v-for="col in getColinfo(ginfo.cGroupId)"
-                          :key="col.cColId"
-                          :width="col.cColWidth ? col.cColWidth : null"
-                          :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
-                        >
-                          {{ col.cColTitle }}
-                        </th>
-                        <th v-for="v in extermConf" :key="v.c_pk_id">
-                          {{ v.title }}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <template v-if="groupconf[ginfo.cGroupId]">
-                        <template
-                          v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
-                          :key="k"
-                        >
-                          <template v-if="riskdata.maxNum > 0">
-                            <tr
-                              v-for="n in riskdata.maxNum"
-                              :key="`${ginfo.cGroupId}-${k}-${n}`"
-                              :class="{'selected': isSelected(k)}"
-                              @click="selectRow(k)"
-                            >
-                              <template
-                                v-for="colinfo in riskdata.col"
-                                :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
+          <template v-if="riskShowTyp === 'grid'">
+            <app-grid-edit :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+          </template>
+            <template v-if="riskShowTyp !== 'grid'"> 
+              <template v-for="(ginfo, gk) in groupInfo" :key="gk">
+              <div style="margin-top: 10px; border: 1px var(--el-border-color-lighter) solid; padding: 3px;">
+                <el-row style="margin-bottom: 3px; background-color: var( --cvrg-sub-header-bg-color); padding: 2px">
+                  <el-col :span="22">
+                    <a
+                      style="margin-right: 5px;font-size: 12px;"
+                      @click="ginfo.hidden = !ginfo.hidden"
+                    >
+                      <el-icon v-if="ginfo.hidden" size="11"><ArrowUpBold /></el-icon>
+                      <el-icon v-if="!ginfo.hidden" size="11"><ArrowDownBold /></el-icon>
+                    </a>
+                    <span style="font-size: 13px; font-weight: 450;">
+                      {{ ginfo.cGroupTitle }}
+                    </span>
+                  </el-col>
+                </el-row>
+                <el-row v-if="!ginfo.hidden">
+                  <div class="table_overflow_x">
+                    <table style="width: 100%">
+                      <thead>
+                        <tr class="table-title">
+                          <th
+                            v-for="col in getColinfo(ginfo.cGroupId)"
+                            :key="col.cColId"
+                            :width="col.cColWidth ? col.cColWidth : null"
+                            :style="{'min-width': col.cColTitle === '免赔方式' ? '95px' : col.cColTitle === '限额值' ? '130px' : col.cColTitle === '分项费率' ? '112px' : col.cColTitle === '免赔率' ? '105px' : ''}"
+                          >
+                            {{ col.cColTitle }}
+                          </th>
+                          <th v-for="v in extermConf" :key="v.c_pk_id">
+                            {{ v.title }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template v-if="groupconf[ginfo.cGroupId]">
+                          <template
+                            v-for="(riskdata, k, ri) in groupconf[ginfo.cGroupId].riskList"
+                            :key="k"
+                          >
+                            <template v-if="riskdata.maxNum > 0">
+                              <tr
+                                v-for="n in riskdata.maxNum"
+                                :key="`${ginfo.cGroupId}-${k}-${n}`"
+                                :class="{'selected': isSelected(k)}"
+                                @click="selectRow(k)"
                               >
                                 <template
-                                  v-if="
-                                    riskdata.rowConfig[colinfo.cColId] &&
-                                    riskdata.rowConfig[colinfo.cColId][n - 1]
-                                  "
+                                  v-for="colinfo in riskdata.col"
+                                  :key="`${ginfo.cGroupId}-${k}-${n}-${colinfo.cColId}`"
                                 >
-                                  <td
-                                    :rowspan="
+                                  <template
+                                    v-if="
+                                      riskdata.rowConfig[colinfo.cColId] &&
                                       riskdata.rowConfig[colinfo.cColId][n - 1]
-                                        ?.cPorpType === 'rowspan'
-                                        ? riskdata.maxNum
-                                        : null
                                     "
-                                    :class="{
-                                        'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
-                                     }"
-                                     style="white-space: nowrap;"
                                   >
-                                    <template
-                                      v-if="
+                                    <td
+                                      :rowspan="
                                         riskdata.rowConfig[colinfo.cColId][n - 1]
-                                          .cPorpType === 'text'
+                                          ?.cPorpType === 'rowspan'
+                                          ? riskdata.maxNum
+                                          : null
                                       "
+                                      :class="{
+                                          'custom-indent':riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.cPorpType === 'text' &&  riskdata.rowConfig[colinfo.cColId]?.[n - 1]?.factorItem?.Indent === '1',
+                                      }"
+                                      style="white-space: nowrap;"
                                     >
-                                      <el-text
+                                      <template
                                         v-if="
-                                          isrequired(
-                                            riskdata.rowConfig[colinfo.cColId][
-                                              n - 1
-                                            ].factorItem
-                                          )
-                                        "
-                                        class="mx-1"
-                                        style="margin-right: 2px"
-                                        type="danger"
-                                        >*</el-text
-                                      >
-                                      <span
-                                        >{{
                                           riskdata.rowConfig[colinfo.cColId][n - 1]
-                                            .factorItem.title
-                                        }}
-                                      </span>
-                                    </template>
-                                    <template v-else>
-                                      <el-form-item
-                                        :error="
-                                          showError(
-                                            riskdata.rowConfig[colinfo.cColId][
-                                              n - 1
-                                            ],
-                                            riskList[
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].cRiskNo
-                                            ][
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].factorItem?.prop
-                                            ]
-                                          )
+                                            .cPorpType === 'text'
                                         "
-                                        :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                      >
+                                        <el-text
+                                          v-if="
+                                            isrequired(
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].factorItem
+                                            )
+                                          "
+                                          class="mx-1"
+                                          style="margin-right: 2px"
+                                          type="danger"
+                                          >*</el-text
+                                        >
+                                        <span
+                                          >{{
+                                            riskdata.rowConfig[colinfo.cColId][n - 1]
+                                              .factorItem.title
+                                          }}
+                                        </span>
+                                      </template>
+                                      <template v-else>
+                                        <el-form-item
+                                          :error="
+                                            showError(
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ],
+                                              riskList[
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].cRiskNo
+                                              ][
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].factorItem?.prop
+                                              ]
+                                            )
+                                          "
+                                          :style="{'justify-content': colinfo.cColTitle === '责任名称' ? 'right' : 'center', 'min-width': colinfo.cColTitle === '免赔额' || colinfo.cColTitle === '免赔率' ? '100px' : 'auto'}"
+                                        >
+                                          <from-item
+                                            v-model="
+                                              riskList[
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].cRiskNo
+                                              ][
+                                                riskdata.rowConfig[colinfo.cColId][
+                                                  n - 1
+                                                ].factorItem?.prop
+                                              ]
+                                            "
+                                            @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
+                                            :item="
+                                              riskdata.rowConfig[colinfo.cColId][
+                                                n - 1
+                                              ].factorItem
+                                            "
+                                          />
+                                        </el-form-item>
+                                      </template>
+                                    </td>
+                                  </template>
+                                </template>
+                                <template v-if="n === 1 && ri === 0">
+                                  <template v-for="v in extermConf" :key="v.c_pk_id">
+                                    <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
+                                      <el-form-item
+                                        :rules="
+                                          isrequired(v) ? getRequired() : undefined
+                                        "
+                                        :prop="v.prop"
                                       >
                                         <from-item
-                                          v-model="
-                                            riskList[
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].cRiskNo
-                                            ][
-                                              riskdata.rowConfig[colinfo.cColId][
-                                                n - 1
-                                              ].factorItem?.prop
-                                            ]
-                                          "
-                                          @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
-                                          :item="
-                                            riskdata.rowConfig[colinfo.cColId][
-                                              n - 1
-                                            ].factorItem
-                                          "
+                                          v-model="termdata[v.prop]"
+                                          @update:modelValue="termUpdate()"
+                                          :item="v"
                                         />
                                       </el-form-item>
-                                    </template>
-                                  </td>
+                                    </td>
+                                  </template>
                                 </template>
-                              </template>
-                              <template v-if="n === 1 && ri === 0">
-                                <template v-for="v in extermConf" :key="v.c_pk_id">
-                                  <td :rowspan="groupconf[ginfo.cGroupId].sumMax">
-                                    <el-form-item
-                                      :rules="
-                                        isrequired(v) ? getRequired() : undefined
-                                      "
-                                      :prop="v.prop"
-                                    >
-                                      <from-item
-                                        v-model="termdata[v.prop]"
-                                        @update:modelValue="termUpdate()"
-                                        :item="v"
-                                      />
-                                    </el-form-item>
-                                  </td>
-                                </template>
-                              </template>
-                            </tr>
+                              </tr>
+                            </template>
                           </template>
                         </template>
-                      </template>
-                    </tbody>
-                  </table>
-                </div>
-              </el-row>
-            </div>
+                      </tbody>
+                    </table>
+                  </div>
+                </el-row>
+              </div>
+            </template>
           </template>
         </div>
       </el-card>
     </el-form>
+    <comDialog ref="dialog"></comDialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost, queryCAssPlyNo, qryTerminationDataList } from "@/api/prod";
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost, queryCAssPlyNo, qryTerminationDataList, getPremiumAdjustmentRange } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -405,6 +421,9 @@ import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/def
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import Decimal from "decimal.js";
 import {checkIfTruncated} from "@/utils/common";
+import { AppGridEditMethod, createAppGridEditConfig } from "@/shared/app-grid-edit-config";
+import { createFreeButtonBase } from "@/shared/button-config";
+import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 
 const route = useRoute();
 const templateRef = ref();
@@ -453,15 +472,35 @@ const effectiveShowConf = computed(() => {
 const emit = defineEmits(["update:modelValue", "delete"]);
 const termRef = ref<AppFreeEditMethod | null>(null);
 const groupconf = ref<{ [key: string]: any }>({}); // 渲染数据分离,解决因为数据变更,导致触发重新渲染
+const dialog = ref<DialogMethod | null>(null);
 
 const termdata = ref<{ [key: string]: any }>({});
 const riskList = ref<{ [key: string]: any }>({});
+const riskShowTyp = ref<string>('table');
+const riskGridConfig = ref(createAppGridEditConfig({
+  editFlag: true,
+}));
+
+// 存储risk配置原始配置信息,用于批改显示
+const riskExConfig = ref({
+  'default':createAppGridEditConfig({
+      editFlag: true,
+    })
+});
+
+const riskTableRef = ref<AppGridEditMethod | null>(null);
+const risksList = ref([]);
 
 const pageInit = ref(false);
 const btnItem = ref<{ [key: string]: { [key: string]: any } }>({
   delete: {
     label: "删除",
-    size: "small"
+    size: "small",
+  },
+  addrisk: {
+    label: "增加责任",
+    size: "small",
+    type: "warning"
   },
 });
 
@@ -583,7 +622,33 @@ function getDatas(){
     ril.push(riskList.value[k]);
   });
   newData.riskList = ril;
+  if(riskShowTyp.value === 'grid'){
+    const r = riskTableRef.value?.getTableValue();
+    newData.riskList = r;
+  }
   return newData;
+}
+function addriskView(){
+  const param = opertaor.getParam();
+  dialog.value?.open(
+    "addriskView",
+    {
+      type: "show",
+      data: {
+        cTermNo: props.modelValue["Term.cClauseCode"],
+      },
+    },
+    {
+      isOk: (selectdata: any) => {
+        riskTableRef.value?.addRowByData(
+          {
+            "TermRisktgt.cLiabCode":selectdata
+          }
+        );
+      },
+    },
+    { title: "增加责任", width: 50 }
+  );
 }
 function initData(data: any) {
   const newData = JSON.parse(JSON.stringify(data));
@@ -614,9 +679,12 @@ function initData(data: any) {
       const interval = setInterval(() => {
         if(termRef.value) {
           termRef.value?.setFormValue(termdata.value, true);
-          clearInterval(interval)
-        }
+        };
+        clearInterval(interval);
       }, 1000)
+    }
+    if(riskShowTyp.value === 'grid'){
+      riskTableRef.value?.setFormValue(newData.riskList);
     }
     // 041010 非营运客运承运人责任险 标的信息 投保座位总数的值取所有险别信息中的投保座位数（座）的和
     if(pageparam.cProdNo === "041010") {
@@ -733,6 +801,11 @@ function getRowConfig(groupId: string, riskNo: string) {
         } else {
           cf = colconfig;
         }
+      } else if (pageparam.cProdNo === "070002") {
+        if(colconfig["factorItem"]['prop'] === 'TermRisktgt.cAddrSeq') {
+          colconfig["factorItem"]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+        }
+        cf = colconfig;
       } else {
         cf = colconfig;
       }
@@ -844,20 +917,20 @@ function previewTerm() {
 }
 onMounted(async () => {
   initData(props.modelValue);
-  dataInit();
+  dataInit(true);
 });
 
-watch(() => props.modelValue, (newv,oldv)=>{
-  initData(newv);
-  dataInit();
-});
+// watch(() => props.modelValue, (newv,oldv)=>{
+//   initData(newv);
+//   dataInit();
+// });
 
 function dataFlash(){
   initData(props.modelValue);
   dataInit();
 }
 
-function dataInit() {
+function dataInit(initFlag : boolean = false) {
   let queryList: { [k: string]: any }[] = [];
   let queryKey = props.modelValue["Term.cClauseCode"];
   props.modelValue.riskList.forEach((item: any) => {
@@ -884,84 +957,16 @@ function dataInit() {
   const r = terconfig.getConfig(queryKey);
   if (r) {
     const d = JSON.parse(r);
-    collist.value = getUseData(d.collist);
-    factormap.value = d.factormap;
-    colInfo.value = d.colInfo;
-    groupInfo.value = d.groupInfo;
-    term.value = d.term;
-    termFactormap.value = getUseData(d.termFactormap);
-    const cAddrSeq:any = termFactormap.value.find((item:any) => item.prop === 'Term.cDistCodeNo');
-    if (cAddrSeq) {
-        cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
-    }
-
-    methodLink(termFactormap.value);
-    riskMethodLink(factormap.value);
-    initshowConfig();
-    const fromc = termFactormap.value?.filter(
-      (v: any) => v.cPorpShowtitle !== "1"
-    );
-    formconfig1.fromSchema = fromc;
-    if (d.termTitleConf?.CCnm) {
-      termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
-    }
-    // 方案配置时条款信息中的保险费是可以编辑的
-    if(route.name === "plan-info") {
-      termFactormap.value.forEach((item:any) => {
-        if(item.prop === "Term.nInsuranceFee") {
-          item.disabled = false
-        }
-      })
-    }
-    setPropertyNoOptions()
-    methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
-    if (props.disabledFlag) {
-      setDisabledAll();
-    }
-    initMethod();
+    setTermConf(d,initFlag);
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
         terconfig.addConfig(queryKey, JSON.stringify(data.data));
-        collist.value = getUseData(data.data.collist);
-        factormap.value = data.data.factormap;
-        colInfo.value = data.data.colInfo;
-        groupInfo.value = data.data.groupInfo;
-        term.value = data.data.term;
-        termFactormap.value = getUseData(data.data.termFactormap);
-        // 给 Term.cDistCodeNo地址编码下拉框赋值
-        const cAddrSeq:any = termFactormap.value.find((item:any) => item.prop === 'Term.cDistCodeNo');
-        if (cAddrSeq && pageparam.cProdNo.startsWith("01")) {
-          cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
-        }
-        methodLink(termFactormap.value);
-        riskMethodLink(factormap.value);
-        initshowConfig();
-        const fromc = termFactormap.value?.filter(
-          (v: any) => v.cPorpShowtitle !== "1"
-        );
-        formconfig1.fromSchema = fromc;
-        if (data.data.termTitleConf?.CCnm) {
-          termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
-        }
+        setTermConf(data.data,initFlag);
       } else {
         ElMessage.error(msg);
       }
-      // 方案配置时条款信息中的保险费是可以编辑的
-      if(route.name === "plan-info") {
-        termFactormap.value.forEach((item:any) => {
-          if(item.prop === "Term.nInsuranceFee") {
-            item.disabled = false
-          }
-        })
-      }
-      setPropertyNoOptions()
-      methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
-      if (props.disabledFlag) {
-        setDisabledAll();
-      }
-      initMethod();
     });
   }
   // 0421070701保险经纪人职业责任保险条款-标的信息-执业许可证号设置非必填
@@ -986,6 +991,128 @@ function dataInit() {
     } else {
       termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
     }
+  }
+}
+
+// 是否需要数据初始化渲染
+function setTermConf(d: any,initFlag: boolean){
+  collist.value = getUseData(d.collist);
+  factormap.value = d.factormap;
+  colInfo.value = d.colInfo;
+  groupInfo.value = d.groupInfo;
+  term.value = d.term;
+  termFactormap.value = getUseData(d.termFactormap);
+
+  if (d.riskConf?.CCnm) { // 获取条择标，显示样式
+    riskShowTyp.value = d.riskConf.CCnm;
+  }
+  if(riskShowTyp.value === 'grid'){
+    const riskFactormap = getUseData(d.riskFactormap);
+    if(riskFactormap && riskFactormap.length > 0){
+      riskFactormap.forEach((riskfactor: any)=>{
+        if(isrequired(riskfactor)){ 
+          riskfactor['rules'] = [getRequired()]
+        }
+        if(isdisabled(riskfactor)){
+          riskfactor['disabled'] = true;
+        }
+        if(riskfactor.expand){
+          riskGridConfig.value.showExpand = true;
+        }
+      })
+    }
+    if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){ // 批改场景,增加退保标识字段
+      riskFactormap[riskFactormap.length] = {
+        prop: "TermRisktgt.cCancelMrk",
+        inputtype: "rttag",
+        nullvalue: "0",
+        title: "退保标识",
+        loadData: [
+          {
+            label: "生效中",
+            value: "0",
+            color: "#14CCCC",
+          },
+          {
+            label: "已退",
+            value: "1",
+            color: "#FF6600",
+          },
+        ],
+      }
+    }
+    
+    methodLink(riskFactormap);
+
+    if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){
+      riskGridConfig.value.tableBtn = [
+        createFreeButtonBase({
+          id:"deleteRisk",
+          type: "danger",
+          link: true,
+          icon: "DeleteFilled",
+          tableClick: (r) => {
+            if(r['TermRisktgt.cRowId']){
+              riskTableRef.value?.setValueByRowKey("TermRisktgt.cCancelMrk", r._dataId, "1");
+            }else{
+              riskTableRef.value?.delRow(r._dataId);
+            }
+          },
+        }),
+      ]
+      riskGridConfig.value.getExSchema = (row : any) => {
+        if(!row['TermRisktgt.cRowId']){
+          return 'default';
+        }
+      };
+      riskGridConfig.value.exfromSchemas = {
+        'default': JSON.parse(JSON.stringify(riskFactormap))
+      }; 
+    }
+    riskGridConfig.value.fromSchema = riskFactormap;
+  }
+  const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
+  if (cAddrSeq) {
+      cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
+  }
+  methodLink(termFactormap.value);
+  riskMethodLink(factormap.value);
+  initshowConfig();
+  const fromc = termFactormap.value?.filter(
+    (v: any) => v.cPorpShowtitle !== "1"
+  );
+  formconfig1.fromSchema = fromc;
+  if (d.termTitleConf?.CCnm) {
+    termTitleConf.value = JSON.parse(d.termTitleConf.CCnm);
+  }
+
+  // 方案配置时条款信息中的保险费是可以编辑的
+  if(route.name === "plan-info") {
+    termFactormap.value.forEach((item:any) => {
+      if(item.prop === "Term.nInsuranceFee") {
+        item.disabled = false
+      }
+    })
+  }
+  // 方案配置时条款信息中的保险费是可以编辑的
+  if(route.name === "plan-info") {
+    termFactormap.value.forEach((item:any) => {
+      if(item.prop === "Term.nInsuranceFee") {
+        item.disabled = false
+      }
+    })
+  }
+  setPropertyNoOptions();
+  methodMap.cRateMethodChange(termdata.value['Term.cRateMethod'])
+  if (props.disabledFlag) {
+    setDisabledAll();
+  }
+  initMethod();
+
+  if(initFlag){
+    nextTick(()=>{
+      initData(props.modelValue);
+    })
   }
 }
 
@@ -1058,79 +1185,202 @@ function initMethod(){
       if(cDeductibleMethod.length > 0) {
         cDeductibleMethod[0]['defaultValue'] = "01"
       }
+      // 059020 保险金额占采购合同金额比例超出40时，无提示信息
+      if(pageparam.cProdNo === '059020') {
+        const nContractRatio:any = termFactormap.value.filter((item:any) => item.prop === 'Term.nContractRatio')
+        if(nContractRatio.length > 0) {
+          nContractRatio[0]['func'] = (val: any) => {
+            if(val > 40) {
+              ElMessage.warning('保险金额占采购合同金额比例不能超过40%')
+              termdata.value['Term.nContractRatio'] = 40;
+            }
+          }
+        }
+      }
+      // 保险金额=累计赔偿限额=每次事故赔偿限额
+      const cProdNos = ['059011','059015','059016','059012','059014','059019',,'059021','059023','059901','059903','059904','059911','059914','059930','059018','059020','059013','059910','059017'];
+      if(cProdNos.includes(pageparam.cProdNo)) {
+        const nContractRatio:any = termFactormap.value.filter((item:any) => ['Term.nAccidentLimit','Term.nInsuranceAmount'].includes(item.prop))
+        if(nContractRatio.length > 0) {
+          nContractRatio.forEach((item:any) => {
+            item['func'] = (val: any) => {
+              termdata.value['Term.nAccidentLimit'] = val
+              termdata.value['Term.nInsuranceAmount'] = val
+            }
+          })
+        }
+      }
+      const cProdNoMap:any = {
+        '059016': 5,
+        '059012': 10,
+        '059018': 30,
+        '059013': 10,
+        '059017': 5,
+      }
+      if(Object.keys(cProdNoMap).includes(pageparam.cProdNo)) {
+        const nInsuredRatio:any = termFactormap.value.filter((item:any) => item.prop === 'Term.nInsuredRatio')
+        if(nInsuredRatio.length > 0) {
+          const max = cProdNoMap[pageparam.cProdNo];
+          nInsuredRatio[0]['func'] = (val: any) => {
+            if(val > max) {
+              ElMessage.warning('保额占比不能超过'+ max +'%')
+              termdata.value['Term.nInsuredRatio'] = max;
+            }
+          }
+        }
+      }
     }
-  // 根据数据控制开关设置条款中的可编辑项(投保单)
-  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A') {
-    qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
-      if(res?.code == 200 && res.data?.length > 0) {
-        if(res.data[0]?.cAppTyp === 'on') {
-          if (termFactormap && termFactormap.value.length > 0) {
-            termFactormap.value.forEach((item: any) => {
-              if(item.prop === 'Term.nInsuranceFee') {
-                item.disabled = false;
-                item.func = (val:any) => nInsuranceFeeChange(val)
-              }
-            });
-          }
-          if(Object.keys(groupInfo.value)?.length > 0) {
-            for(let i in groupInfo.value) {
-              const ginfo = groupInfo.value[i]
-              const riskList = groupconf.value[ginfo.cGroupId].riskList
-              for(let k in riskList) {
-                const riskdata = riskList[k];
-                if(riskdata.maxNum > 0) {
-                  for(let n = 1;n <= riskdata.maxNum;n++) {
-                    riskdata.col?.forEach((colinfo:any) => {
-                      const item = riskdata.rowConfig[colinfo.cColId][n - 1].factorItem
-                      if(item?.prop === 'TermRisktgt.nItemFee') {
-                        console.log(item)
-                        item.disabled = false;
-                      }
-                    })
+    // 059019 保险金额占采购合同金额比例超出20时，提示
+    if(pageparam.cProdNo === '059019' && groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+      for(let i in groupInfo.value) {
+        const ginfo = groupInfo.value[i]
+        const riskListObj = groupconf.value[ginfo.cGroupId].riskList
+        for(let k in riskListObj) {
+          const riskdata = riskListObj[k];
+          if(riskdata.maxNum > 0) {
+            for(let n = 1;n <= riskdata.maxNum;n++) {
+              riskdata.col?.forEach((colinfo:any) => {
+                const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                if(item?.prop === 'TermRisktgt.nContractRatio') {
+                  item.func = (val: any) => {
+                    if(val > 20) {
+                      ElMessage.warning('保险金额占采购合同金额比例不能超过20%')
+                      const r = riskList.value[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo]['TermRisktgt.cLiabCode'];
+                      setData({
+                        propkey: 'TermRisktgt.nContractRatio',
+                        riskNo:r,
+                      }, 20);
+                    }
                   }
                 }
-              }
+              })
             }
           }
         }
       }
-    })
-  }
-  // 根据数据控制开关设置条款中的可编辑项(批单)
-  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType) {
-    qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
-      if(res?.code == 200 && res.data?.length > 0) {
-        if(res.data[0]?.cAppTyp === 'on') {
-          if (termFactormap && termFactormap.value.length > 0) {
-            termFactormap.value.forEach((item: any) => {
-              if(item.prop === 'Term.nInsuranceFee') {
-                item.disabled = false;
-                item.func = (val:any) => nInsuranceFeeChange(val)
-              }
-            });
-          }
-          if(Object.keys(groupInfo.value)?.length > 0) {
-            for(let i in groupInfo.value) {
-              const ginfo = groupInfo.value[i]
-              const riskList = groupconf.value[ginfo.cGroupId].riskList
-              for(let k in riskList) {
-                const riskdata = riskList[k];
-                if(riskdata.maxNum > 0) {
-                  for(let n = 1;n <= riskdata.maxNum;n++) {
-                    riskdata.col?.forEach((colinfo:any) => {
-                      const item = riskdata.rowConfig[colinfo.cColId][n - 1].factorItem
-                      if(item?.prop === 'TermRisktgt.nItemFee') {
-                        item.disabled = false;
-                      }
-                    })
-                  }
+    }
+  const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
+  // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
+  if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
+    if (termFactormap && termFactormap.value.length > 0) {
+      termFactormap.value.forEach((item: any) => {
+        if(item.prop === 'Term.nInsuranceFee') {
+          item.disabled = false;
+        }
+      });
+    }
+    if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+      for(let i in groupInfo.value) {
+        const ginfo = groupInfo.value[i]
+        const riskList = groupconf.value[ginfo.cGroupId].riskList
+        for(let k in riskList) {
+          const riskdata = riskList[k];
+          if(riskdata.maxNum > 0) {
+            for(let n = 1;n <= riskdata.maxNum;n++) {
+              riskdata.col?.forEach((colinfo:any) => {
+                const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                if(item?.prop === 'TermRisktgt.nItemFee') {
+                  item.disabled = false;
                 }
-              }
+              })
             }
           }
         }
       }
-    })
+    }
+    if( extermConf.value && extermConf.value.length > 0 ){
+      extermConf.value.forEach((item: any) => {
+        if(item?.prop === 'Term.nInsuranceFee') {
+          item.disabled = false;
+        }
+      });
+    }
+  } else {
+    // 根据数据控制开关设置条款中的可编辑项(投保单)
+    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A') {
+      qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+            if(Object.keys(groupInfo.value)?.length > 0) {
+              for(let i in groupInfo.value) {
+                const ginfo = groupInfo.value[i]
+                const riskList = groupconf.value[ginfo.cGroupId].riskList
+                for(let k in riskList) {
+                  const riskdata = riskList[k];
+                  if(riskdata.maxNum > 0) {
+                    for(let n = 1;n <= riskdata.maxNum;n++) {
+                      riskdata.col?.forEach((colinfo:any) => {
+                        const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                          item.disabled = false;
+                        }
+                      })
+                    }
+                  }
+                }
+              }
+            }
+            if( extermConf.value && extermConf.value.length > 0 ){
+              extermConf.value.forEach((item: any) => {
+                if(item?.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+          }
+        }
+      })
+    }
+    // 根据数据控制开关设置条款中的可编辑项(批单)
+    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType) {
+      qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+            if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+              for(let i in groupInfo.value) {
+                const ginfo = groupInfo.value[i]
+                const riskList = groupconf.value[ginfo.cGroupId].riskList
+                for(let k in riskList) {
+                  const riskdata = riskList[k];
+                  if(riskdata.maxNum > 0) {
+                    for(let n = 1;n <= riskdata.maxNum;n++) {
+                      riskdata.col?.forEach((colinfo:any) => {
+                        const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                          item.disabled = false;
+                        }
+                      })
+                    }
+                  }
+                }
+              }
+            }
+            if( extermConf.value && extermConf.value.length > 0 ){
+              extermConf.value.forEach((item: any) => {
+                if(item?.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+          }
+        }
+      })
+    }
   }
 }
 
@@ -1367,9 +1617,45 @@ function setDisabledAll() {
       });
     }
   }
+  if(riskShowTyp.value === 'grid'){
+    let delBtn = true;
+    if (unbut && unbut.length > 0) {
+      const t = unbut.find((un: any) => un["cEdrItem"] === "delrisk_btn");
+      if (t) {
+        delBtn = false;
+      }
+    }
+    if(riskGridConfig.value.fromSchema && riskGridConfig.value.fromSchema.length > 0 ){
+      riskGridConfig.value.fromSchema.forEach((risk: any) => {
+        risk.disabled = true;
+        if(risk.btnItems){
+          risk.btnItems.disabled = true;
+        }
+        riskGridConfig.value.tableBtn.forEach((btn: any) => {
+          btn.hideBtns = (row: any) => {  // 如果是新增的责任,则固定显示删除按钮,如果是修改的,则根据配置隐藏删除按钮
+            const isHasRow = !row['TermRisktgt.cRowId'];
+            if(isHasRow){
+              return false;
+            }else{
+              return delBtn;
+            }
+          };
+        });
+        if (undis && undis.length > 0) {
+          const t = undis.find((un: any) => un["cEdrItem"] === risk["prop"]);
+          if (t) {
+            risk.disabled = false;
+          }
+        }
+      });
+    }
+  }
   if (termFactormap && termFactormap.value.length > 0) {
     termFactormap.value.forEach((item: any) => {
       item.disabled = true;
+      if(item.btnItems){
+        item.btnItems.disabled = true;
+      }
       if (undis && undis.length > 0) {
         const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
         if (t) {
@@ -1382,6 +1668,9 @@ function setDisabledAll() {
   if (extermConf && extermConf.value.length > 0) {
     extermConf.value.forEach((item: any) => {
       item.disabled = true;
+      if(item.btnItems){
+        item.btnItems.disabled = true;
+      }
       if (undis && undis.length > 0) {
         const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
         if (t) {
@@ -1461,6 +1750,13 @@ function methodLink(items: any) {
       if (items[i]["func"] && typeof items[i]["func"] === "string") {
         items[i]["func"] = methodMap[items[i]["func"]];
       }
+      if(items[i]['btnItems'] && items[i]['btnItems']["func"] && typeof items[i]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
+        items[i]['btnItems']["func"] = methodMap[items[i]['btnItems']["func"]];
+      }
+      // 地址编码下拉选项
+      if(items[i]['prop'] === 'TermRisktgt.cDistCodeNo') {
+        items[i]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
+      }
     }
   }
 }
@@ -1472,6 +1768,9 @@ function riskMethodLink(items: any) {
     Object.keys(items).forEach((k: any) => {
       if (items[k]["func"] && typeof items[k]["func"] === "string") {
         items[k]["func"] = methodMap[items[k]["func"]];
+      }
+      if(items[k]['btnItems'] && items[k]['btnItems']["func"] && typeof items[k]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
+        items[k]['btnItems']["func"] = methodMap[items[k]['btnItems']["func"]];
       }
     });
   }
@@ -1498,6 +1797,25 @@ function setData(params: any,data:any){
 }
 
 const methodMap = {
+  butTestCheck:(item: any,row: any) => {
+    dialog.value?.open(
+      "chooseProdDialog",
+      {
+        type: "show",
+      },
+      {
+        isOk: (selectdata: any) => {
+          if(termTitleConf.value?.cFactorTabType === 'table') {
+            row[item.prop] = selectdata.cPlyNo;
+            // termdata.value[item.prop] = selectdata.cPlyNo;
+          } else if(riskShowTyp.value === 'grid') {
+            riskTableRef.value?.setValueByRowKey(item.prop,row._dataId, selectdata.cPlyNo);
+          }
+        },
+      },
+      { title: "选择保单号", width: 50 }
+    );
+  },
   excludeLimitChang:(val:any,row:any,item:any) => {
     if (pageparam.cProdNo === "040015") {
       termdata.value['Term.nInsuranceAmount'] = val;
@@ -1630,13 +1948,7 @@ const methodMap = {
     });
   },
   nItemFeeChange:(val:any) => {
-    qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
-      if(res?.code == 200 && res.data?.length > 0) {
-        if(res.data[0]?.cAppTyp === 'on') {
-          nInsuranceFeeChange(val)
-        }
-      }
-    })
+    nInsuranceFeeChange(val)
   },
 };
 
@@ -1685,10 +1997,12 @@ const selectRow = (key: any) => {
     selectedRow.value.data = key;
   }
 };
-function nInsuranceFeeChange(val:any) {
+async function nInsuranceFeeChange(val:any) {
+  const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  let qryTerminationStatus = false;
   // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
   // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
-  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) {
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || ['app','template','copy','inquiryToApp'].includes(pageparam.pageType)) {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
     let nInsuranceFee:number = 0;
@@ -1705,19 +2019,128 @@ function nInsuranceFeeChange(val:any) {
       }
       nInsuranceFee += Number(item['Term.nInsuranceFee'])
     })
+    if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {// 从共主联、从共无联保
+      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })
+      if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+        if(qryTerminationData.data[0]?.cAppTyp === 'on') {
+          qryTerminationStatus = true;
+        }
+      }
+      // 如果打开数据开关，则不需要判断修改后的总保费是否超出阈值，否则需要判断
+      if(qryTerminationStatus === false) {
+        let nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm");
+        const nAmt = opertaor.getTableRefByKey("base")?.getValue("Base.nAmt")
+        const nPrmRange:any = await getPremiumAdjustmentRange();
+        // 调用保费计算接口获取最新保费计算后的保费数据
+        const calcres = await opertaor.getFatherPage().calcFunc();
+        if(calcres && calcres.code === 200) {
+          const newOp: any = opertaor.convertData(calcres);
+          nPrm = newOp.base["Base.nPrm"];
+          const newAmt = newOp.base["Base.nAmt"];
+          if(newAmt != nAmt) {
+            opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
+          }
+
+          let minPrm:any = 0;
+          let maxPrm:any = 0;
+          if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
+            maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
+            minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+          } else {
+            minPrm = new Decimal(nPrm).sub(new Decimal(10))
+            maxPrm = new Decimal(nPrm).add(new Decimal(10))
+          }
+          if(minPrm < 0) { minPrm = 0 }
+          if(maxPrm < 0) { maxPrm = 0 }
+          if(new Decimal(nInsuranceFee).lt(minPrm) || new Decimal(nInsuranceFee).gt(maxPrm)) {
+            ElMessageBox.confirm(`本次手动调整金额（¥${nInsuranceFee}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
+              confirmButtonText: "确定",
+              type: "warning",
+              showCancelButton: false,
+              showClose: false,
+            }).then(() => {
+              opertaor.getFatherPage().calcPremium()
+            }).catch(() => {
+              opertaor.getFatherPage().calcPremium()
+            })
+            return;
+          }
+        } else {
+          ElMessage.error(calcres.msg)
+        }
+      }
+    }
     opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
-    opertaor.getFatherPage().afterCalcPremium()
+    if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
+      opertaor.getTableRefByKey("cvrg")?.updateTitle()
+    }
+    nextTick(() => {
+      opertaor.getFatherPage().afterCalcPremium()
+    })
   }
   // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
   if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
-    const nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
+    let nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
+    const nAmt = opertaor.getTableRefByKey("base")?.getValue("Base.nAmt")
     const edrbase = opertaor.getFatherPage().getEdrbaseValue();
-    const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm'];
+    const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm']?.replaceAll(',','');
     const newData = getDatas();
+    if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {
+      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' })
+      if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+        if(qryTerminationData.data[0]?.cAppTyp === 'on') {
+          qryTerminationStatus = true;
+        }
+      }
+      // 如果打开数据开关，则不需要判断修改后的总保费是否超出阈值，否则需要判断
+      if(qryTerminationStatus === false) {
+        const nPrmRange:any = await getPremiumAdjustmentRange();
+        // 调用保费计算接口获取最新保费计算后的保费数据
+        const calcres = await opertaor.getFatherPage().calcEdrFunc();
+        if(calcres && calcres.code === 200) {
+          const newOp: any = opertaor.convertData(calcres);
+          nPrm = newOp.base["Base.nPrm"];
+          const newAmt = newOp.base["Base.nAmt"];
+          if(newAmt != nAmt) {
+            opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
+          }
+
+          const nInsuranceFee = newData['Term.nInsuranceFee'];
+          let minPrm:any = 0;
+          let maxPrm:any = 0;
+          if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
+            maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
+            minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+          } else {
+            minPrm = new Decimal(nPrm).sub(new Decimal(10))
+            maxPrm = new Decimal(nPrm).add(new Decimal(10))
+          }
+          if(new Decimal(nInsuranceFee).lt(minPrm) || new Decimal(nInsuranceFee).gt(maxPrm)) {
+            ElMessageBox.confirm(`本次手动调整金额（¥${nInsuranceFee}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
+              confirmButtonText: "确定",
+              type: "warning",
+            }).then(() => {
+              opertaor.getFatherPage().calcPremiumEdr()
+            }).catch(() => {
+              opertaor.getFatherPage().calcPremiumEdr()
+            })
+            return;
+          }
+        } else {
+          ElMessage.error(calcres.msg)
+        }
+      }
+    }
     if(newData['Term.nInsuranceFee'] != nPrm) {
       opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", newData['Term.nInsuranceFee'])
       opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", newData['Term.nInsuranceFee'])
       opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(newData['Term.nInsuranceFee']).sub(new Decimal(nBefEdrPrm)))
+      if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
+        opertaor.getTableRefByKey("cvrg")?.updateTitle()
+      }
+      nextTick(() => {
+        opertaor.getFatherPage().afterCalcEdrPremium()
+      })
     }
   }
 }
@@ -1791,6 +2214,12 @@ defineExpose({
 }
 .cvrg-body__ {
   margin-top: 10px;
+  :deep(.el-text) {
+    font-weight: 450 !important;
+  }
+  :deep(span) {
+    font-weight: 450 !important;
+  }
 }
 .table-title {
   th {
@@ -1867,5 +2296,9 @@ td {
   img {
     width: 18px;
   }
+}
+
+:deep(.extendFormItem .el-form-item__label){
+  font-size: var(--rt-form-content-font-size);
 }
 </style>

@@ -301,7 +301,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "payRate",
         inputtype: 'rtinput',
-        title: "赔付率",
+        title: "赔付率(%)",
       },
     ],
   })

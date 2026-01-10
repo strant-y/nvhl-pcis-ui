@@ -50,22 +50,41 @@ export function formatDate(datetime, format: string): string {
 * author Yesic 2008-10-23
 */
 export function monthBetween(date1, date2) {
-	var monthDiff = 0;
-    //计算年份差距
-	var year2 = parseFloat(date2.getFullYear());
-	var year1 = parseFloat(date1.getFullYear());
-	if (year2 > year1) {
-		monthDiff = monthDiff + 12 * (year2 - year1);
+	// var monthDiff = 0;
+  //   //计算年份差距
+	// var year2 = parseFloat(date2.getFullYear());
+	// var year1 = parseFloat(date1.getFullYear());
+	// if (year2 > year1) {
+	// 	monthDiff = monthDiff + 12 * (year2 - year1);
+	// }
+
+  //   //计算月份差距
+	// var month2 = parseFloat(date2.getMonth());
+	// var month1 = parseFloat(date1.getMonth());
+	// monthDiff = monthDiff + (month2 - month1);
+
+  //   //计算日期差距
+	// var day2 = parseFloat(date2.getDate());
+	// var day1 = parseFloat(date1.getDate());
+	// if (day2 > (day1 - 1)) {
+	// 	monthDiff = monthDiff + 1;
+	// }
+	// return monthDiff;
+	const year2 = parseFloat(date2.getFullYear());
+	const month2 = parseFloat(date2.getMonth());
+	const day2 = parseFloat(date2.getDate());
+	const year1 = parseFloat(date1.getFullYear());
+	const month1 = parseFloat(date1.getMonth());
+	const day1 = parseFloat(date1.getDate());
+
+	let yearDiff = year2 - year1;
+	let monthDiff = month2 - month1;
+	if(monthDiff < 0) {
+		yearDiff -= 1;
+		monthDiff += 12;
 	}
 
-    //计算月份差距
-	var month2 = parseFloat(date2.getMonth());
-	var month1 = parseFloat(date1.getMonth());
-	monthDiff = monthDiff + (month2 - month1);
-
-    //计算日期差距
-	var day2 = parseFloat(date2.getDate());
-	var day1 = parseFloat(date1.getDate());
+	monthDiff = monthDiff + yearDiff * 12;
 	if (day2 > (day1 - 1)) {
 		monthDiff = monthDiff + 1;
 	}

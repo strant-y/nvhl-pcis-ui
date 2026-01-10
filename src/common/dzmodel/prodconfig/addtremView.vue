@@ -258,6 +258,9 @@ onMounted(async () => {
       data1.value = data;
       expandedKeys.value = data.map(item => item.id);
       data1.value.forEach((item: any) => { 
+        if(item.cRiskType === 'grid'){ // 如果显示类型为risk表格时,不可编辑责任
+          item.children = [];
+        }
         if(tremMap.value[item.cUniqueTermNo]){
           const risks = tremMap.value[item.cUniqueTermNo];
           item.children?.forEach((i: any) => {
@@ -693,7 +696,10 @@ async function selectOne() {
   //   ElMessage.warning(showMsg);
   // } else {
 
-  // }
+	// }
+	if (!validateRiskConflict(data3.value)) {
+    return;
+	}
   if(selfTerm && Object.keys(selfTerm).length > 0){
     Object.keys(selfTerm).forEach((termKey: any) => { 
       const t_r = termKey.split("_");
@@ -712,6 +718,50 @@ async function selectOne() {
   }
   props.method.isOk([...data3.value,...data4.value]);
   emits("handleClose");
+}
+
+/**
+ * 校验冲突（仅当 cProdNo === "010022" 时生效）
+ */
+ function validateRiskConflict(dataList) {
+  // 🔑 仅产品编号为 "010022" 时校验
+  if (props.data?.data?.cProdNo !== '010022') {
+    return true;
+  }
+
+  for (const item of dataList || []) {
+    if (!item.children?.length) continue;
+
+    // 构建 riskNo -> label 的映射
+    const riskLabelMap = {};
+    for (const child of item.children) {
+      if (child.cRiskNo && child.label) {
+        riskLabelMap[child.cRiskNo] = child.label;
+      }
+    }
+
+    const has010223 = '010223' in riskLabelMap;
+    const has010221 = '010221' in riskLabelMap;
+    const has010222 = '010222' in riskLabelMap;
+
+    if (has010223 && (has010221 || has010222)) {
+      const mainLabel = riskLabelMap['010223'];
+
+      // 收集冲突的 label
+      const conflictLabels = [];
+      if (has010221) conflictLabels.push(riskLabelMap['010221']);
+      if (has010222) conflictLabels.push(riskLabelMap['010222']);
+
+      const conflictText = conflictLabels.join('、');
+
+      ElMessage.warning(
+        `险种冲突："${mainLabel}" 与 "${conflictText}" 不能同时选择。`
+      );
+
+      return false; // 阻断
+    }
+  }
+  return true;
 }
 
 function fail() {

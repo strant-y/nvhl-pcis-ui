@@ -1929,6 +1929,7 @@ async function loadAfter() {
       createFreeButtonBase({
         label: "解除接收",
         type: "primary",
+				id: "unreceive",
         func: () => {
           handleRemoveReceived();
         },
@@ -2862,6 +2863,15 @@ const loadAppPlyInfo = async (CAppNo) => {
       //     }
       //   })
       // }
+      // 询价暂存单进来要把代理经纪人、代理合作协议、代理业务员、代理业务执业证号、代理业务员机构代码、业务员员工号、业务员名称、业务员电话、业务员机构代码、业务员执业证号清空
+      if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '询价') {
+        const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
+        clearList.forEach((item:any) => {
+          if(ops.plyBase?.[item]) {
+            ops.plyBase[item] = null;
+          }
+        })
+      }
       opertaor.setDataAll(ops);
       // 获取原申请单号下的清单列表数据
       const distMap = formconfig1[0].pageInfo.filter((item:any) => {
@@ -3935,6 +3945,7 @@ const savePlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  res["plyBase"]["Base.tUpdTm"] = new Date().getTime();
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -4028,14 +4039,14 @@ const savePlyInfo = async () => {
       }
       if(props.param?.pageName === "priceInquiry") {
         queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-        queryParam['tAppTmStart'] = dayjs(new Date()).subtract(3, "month").format("YYYY-MM-DD 00:00:00")
+        queryParam['tAppTmStart'] = dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00")
         queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
         getInquiryPolicyList(queryParam).then((res:any) => {
           if(res.data?.result && res.data?.result.length > 0) {
             sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
             router.replace({
-              path: "/pcis/price-page",
+              path: "/pcisapp/pricePage",
               query: {
                 param: JSON.stringify({
                   ...data,
@@ -5135,7 +5146,13 @@ if(props.param.cTransMrk !== "1"){
  */
 const submitUnderwritingFn = async () => {
   const btn = getBtn("btnUdr");
-  btn.loading = true;
+  const btnun = getBtn("unreceive");
+	if(btn) {
+		btn.loading = true;
+	}
+	if (btnun) {
+		btnun.disabled = true;
+	}
   const res = underwrite.value.getFromValue();
   res["user"] = user;
   res["user"]["opRelCde"] = user.opCde;
@@ -5240,7 +5257,12 @@ const submitUnderwritingFn = async () => {
 
   submitUnder?.then((res:any) => {
     console.log("submitUnderwriting-res", res);
-    btn.loading = false;
+    if(btn) {
+			btn.loading = false;
+		}
+		if(btnun) {
+			btnun.disabled = false;
+		}
     // 三十天校验提示
     if(res.repetitionHint) {
       ElMessage.error(res.repetitionHint);
@@ -5270,7 +5292,15 @@ const submitUnderwritingFn = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
-  });
+  }).catch((err) => {
+		if(btn) {
+			btn.loading = false;
+		}
+		if(btnun) {
+			btnun.disabled = false;
+		}
+		ElMessage.error(err.msg || err);
+	});
 };
 
 /**
@@ -5582,8 +5612,6 @@ const validateShanDong = async () => {
   const applicantData = opertaor.getTableRefByKey("applicant").getFromValue();
   const insrncData = opertaor.getTableRefByKey("insrnc").getFromValue();
   const baseData = opertaor.getTableRefByKey("base").getFromValue();
-  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
-  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
 
   // 解构并统一命名
   const {
@@ -5602,6 +5630,8 @@ const validateShanDong = async () => {
   const cNeedfeeFlag = baseData['Base.cNeedfeeFlag'];
   // 不见费出单原因
   const cCanclfeersnCde = baseData['Base.cCanclfeersnCde'];
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const payinfoRef = opertaor.getTableRefByKey("payinfo").getFromValue();
 
   // 机构是山东分公司
   if (!String(cDptCdeA).startsWith('02370') || String(cDptCdeA).startsWith('023702')) return false;
@@ -5715,7 +5745,7 @@ const validateShanDong = async () => {
     }
     // 分期缴费，分期间隔不得长于已交保费占总保费比例对应的保险期限比例
     if(payinfoRef.length > 1) {
-      for(let i = 1; i < payinfoRef.length; i++) {
+      for(let i = 0; i < payinfoRef.length; i++) {
         const tPayBgnTm = dayjs(payinfoRef[i]['Pay.tPayBgnTm']);// 缴费起期
         const tPayEndTm = dayjs(payinfoRef[i]['Pay.tPayEndTm']).add(1,'second');// 缴费止期
         const intervalDays = tPayEndTm.diff(tPayBgnTm, 'day');// 分期间隔天数
@@ -6140,11 +6170,25 @@ const queryTermRateLimitFun = (calcFun: any) => {
 }
 // 解除接收
 function handleRemoveReceived() {
+	const btn = getBtn("btnUdr");
+	const btnun = getBtn("unreceive");
+	if(btn) {
+		btn.disabled = true;
+	}
+	if (btnun) {
+		btnun.loading = true;
+	}
   const param = {
     taskId: props.param.taskId,
     user: user,
   };
   removeReceived(param).then((result: any) => {
+		if(btn) {
+			btn.disabled = false;
+		}
+		if (btnun) {
+			btnun.loading = false;
+		}
     if (result.code !== 200) {
       ElMessage.error({ message: result.msg, duration: 3000 });
     } else {
@@ -6156,6 +6200,12 @@ function handleRemoveReceived() {
       tagsViewStore.back()
     }
   }).catch((error: any) => {
+		if(btn) {
+			btn.disabled = false;
+		}
+		if (btnun) {
+			btnun.loading = false;
+		}
     ElMessage.error({
       message: error.msg,
       duration: 3000,

@@ -56,6 +56,9 @@
                       {{item.title}}
                     </el-text>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                    <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                      <rt-icon :item="{ icon:'QuestionFilled' }" />
+                    </el-tooltip>
                   </template>
                   <div class="width-100">
                     <el-row class="show-group__row" v-if="item.groupList.length > 0" style="padding-top: 5px;">
@@ -104,36 +107,17 @@
                       {{item.title}}
                     </el-text>
                     <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                    <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                      <rt-icon :item="{ icon:'QuestionFilled' }" />
+                    </el-tooltip>
                   </template>
-                  <div :class="{'show-right-btn': item.showExBtn}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
-                    <div
-                        :style="item.showExBtn && item.inputtype !== 'rttable' ? {flex: 1} : {width: '100%'}"
-                    >
-                      <from-item
-                          ref="fromListRef"
-                          v-model="form[item.prop]"
-                          :item="item"
-                          :parentFromUi="formUi"
-                          @update-method="formsDataUpdate"
-                      />
-                    </div>
-                    <!---       显示组件尾部按钮       --->
-                    <template v-if="item.showExBtn">
-                      <div
-                          v-if="item.inputtype !== 'rttable'"
-                          :style="{
-                        display: 'inline-block',
-                        'min-width': item.btnWidth ? item.btnWidth + '%' : 'auto',
-                      }"
-                      >
-                        <rt-button
-                            :item="item.btnItems"
-                            :style="{ width: item.btnItems?.label ? '100%' : '32px' }"
-                            @closepopover="(rev) => setPopover(rev, item)"
-                        />
-                      </div>
-                    </template>
-                  </div>
+                  <from-item
+                      ref="fromListRef"
+                      v-model="form[item.prop]"
+                      :item="item"
+                      :parentFromUi="formUi"
+                      @update-method="formsDataUpdate"
+                  />
                 </el-form-item>
               </template>
             </el-col>
@@ -204,6 +188,9 @@
                           {{item.title}}
                         </el-text>
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                        <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                          <rt-icon :item="{ icon:'QuestionFilled' }" />
+                        </el-tooltip>
                       </template>
                       <div class="width-100">
                         <el-row class="show-group__row" v-if="item.groupList.length > 0">
@@ -249,36 +236,17 @@
                           {{item.title}}
                         </el-text>
                         <rt-icon v-if="item.notes" :item="{ icon:'QuestionFilled',func:item.notes }" />
+                        <el-tooltip v-if="item.iconInfo" :content="item.iconInfo" placement="top" effect="dark">
+                          <rt-icon :item="{ icon:'QuestionFilled' }" />
+                        </el-tooltip>
                       </template>
-                      <div :class="{'show-right-btn': item.showExBtn}" :style="{width: ( item.propWidth ? item.propWidth : 100) + '%', display: 'flex' }">
-                        <div
-                            :style="item.showExBtn && item.inputtype !== 'rttable' ? {flex: 1} : {width: '100%'}"
-                        >
-                          <from-item
-                              ref="fromListRef"
-                              v-model="form[item.prop]"
-                              :item="item"
-                              :parentFromUi="formUi"
-                              @update-method="formsDataUpdate"
-                          />
-                        </div>
-                        <!---       显示组件尾部按钮       --->
-                        <template v-if="item.showExBtn">
-                          <div
-                              v-if="item.inputtype !== 'rttable'"
-                              :style="{
-                                display: 'inline-block',
-                                'min-width': item.btnWidth ? item.btnWidth + '%' : 'auto',
-                              }"
-                          >
-                            <rt-button
-                                :item="item.btnItems"
-                                :style="{ width: '32px' }"
-                                @closepopover="(rev) => setPopover(rev, item)"
-                            />
-                          </div>
-                        </template>
-                      </div>
+                      <from-item
+                          ref="fromListRef"
+                          v-model="form[item.prop]"
+                          :item="item"
+                          :parentFromUi="formUi"
+                          @update-method="formsDataUpdate"
+                      />
                     </el-form-item>
                   </template>
                 </el-col>

@@ -24,6 +24,7 @@ import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/us
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { lessThan6Months } from "@/utils/date";
+import { getDeptOptions } from "@/api/dept";
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -104,8 +105,27 @@ onMounted(async () => {
       // item.groupList[1].minWidth = "88px"
     }
   })
-  nextTick(() => {
-  // 协议出单-收费方式、付费约定、缴费期数设置不可编辑
+  nextTick(async() => {
+		// 协议出单-收费方式、付费约定、缴费期数设置不可编辑
+		//回显出单机构
+		let label = params.cDptCnm
+		 if (!params.cDptCnm) {
+			const response = await getDeptOptions(params.cDptCde);
+			if (response.data.length>0) {
+				label = response.data[0]["label"]
+			}
+		}
+		setFormItem("Base.cDptCde", {
+      loadData: [
+        { value: params.cDptCde, label: `${params.cDptCde} ${label || ''}` },
+      ],
+    });
+    //回显服务机构数据
+    setFormItem("Base.cIntroDptcde", {
+      loadData: [
+        { value: params.cDptCde, label: `${params.cDptCde} ${label || ''}` },
+      ],
+    });		
   if(params.cRecordType == 9) {
     setFormItem('Base.cFinTyp',{
       disabled:  true
@@ -435,10 +455,10 @@ const method = {
     } catch (err) {
       console.log(err)
     }
-    const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
+    // const param = opertaor.getParam();
+    // if (param.initFlag) {
+    //   return;
+    // }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -457,10 +477,10 @@ const method = {
     if (val && idxParam && idxParam.setcAmtCur) {
       idxParam.setcAmtCur(val)
     }
-    const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
+    // const param = opertaor.getParam();
+    // if (param.initFlag) {
+    //   return;
+    // }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({

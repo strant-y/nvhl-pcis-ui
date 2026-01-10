@@ -255,6 +255,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tAppTm",
         inputtype: "rtinput",
         title: "投保申请日期",
+        formatter: (val: any) => {
+          return val
+            ? val.replace(/T/g, " ")
+            : "";
+        },
       },
       {
         prop: "cCnm",
@@ -465,11 +470,9 @@ const confirm = async () => {
       return;
     }
     // 点击下一步前校验，如果data为true则继续，否则阻断并提示
-    const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId }
+    const queryProdDptCdeParam:any = { cDptCde:  user.value.companyId, cProdNo: selected.value[0].cProdNo }
     if(selected.value[0].cRenewMrk === "1") {
         queryProdDptCdeParam['cPlyNo'] = selected.value[0].cPlyNo
-    } else {
-        queryProdDptCdeParam['cProdNo'] = selected.value[0].cProdNo
     }
     const queryProdDptCde:any = await policyService.queryProdDptCde(queryProdDptCdeParam)
     if(queryProdDptCde.data !== true) {

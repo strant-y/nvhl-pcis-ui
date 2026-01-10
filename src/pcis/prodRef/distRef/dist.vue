@@ -65,6 +65,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const emit = defineEmits(['savePlyInfo']);  
+const btnDisabled = ref(false);
 
 const props = defineProps({
   pageSchema: {
@@ -267,10 +268,13 @@ watch(
           //  emit('savePlyInfo');
         }
         // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
-        const targetProducts = ['010001', '010002', '010003', '010004', '010020'];
-        if( route.params.param?.cProdNo?.startsWith('01') && targetProducts.includes(route.params.param?.cProdNo)){
+        const targetProducts = ['010001', '010002', '010003', '010004', '010020', '070002'];
+        if( route.params.param?.cProdNo?.startsWith('01') || targetProducts.includes(route.params.param?.cProdNo)){
+          if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
-          cvrgRef?.getAddrSeqOptions()
+          const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
+          cvrgRef?.getAddrSeqOptions(cComponentTable)
+          cvrgRef?.refushCvrgInfo();
         }
         if(route.params.param?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
           eventBus.emit('setMap-EmployeeDist043009', {
@@ -409,8 +413,8 @@ onMounted(async () => {
     return e;
   });
   tableconfig.value.fromSchema = formconfig1.value.fromSchema.map((item:any) => {
-    if(item.prop === "Dist.nSeqNo" || item.title === "序号") {
-      item.width = 60
+    if(item.prop === "Dist.nSeqNo" && item.title?.length > 0) {
+      item.lengthNum = item.title?.length
     }
     return item;
   });
@@ -482,6 +486,15 @@ onMounted(async () => {
   }
   if(distTableRef.value) {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
+  }
+  // 解决040002变更清单信息批改单暂存单打开时雇员清单职业类别出现不显示问题(是在获取批改项后职业类别显示内容消失，未找到原因所以只能在setUnDisabledByKeyList执行后调用查询方法让职业类别显示)
+  if(route.params.param?.cProdNo === '040002' && (route.params.param?.pageType === "EDR_APP_NEW_SCENE" ||
+      (route.params.param?.pageType == "TEMPORARY_DEPOSIT" && route.params.param?.cAppTyp == "E"))) {
+    eventBus.on('setUnDisabledDone', (val:any) => {
+      if(val) {
+	      handleQuery()
+      }
+    })
   }
 });
 
@@ -745,6 +758,15 @@ const method = {
 					if(!!item['Dist.tOpeningTime']){
 						data['tOpeningTime'] = item['Dist.tOpeningTime']? moment(item['Dist.tOpeningTime']).format("YYYY-MM-DD"): null
 					}
+          // 免赔信息 保险责任级联
+          if(!!item['Dist.cInsuranceDuty'] && !!item['Dist.cSuitScope']) {
+            const key = props.pageSchema.fromSchema?.find((i:any) => i.prop.indexOf('Dist.cSuitScopeGroup') != -1)?.prop;
+            if(key) {
+              data[key] = data[key] || [];
+              data[key][0] = item['Dist.cInsuranceDuty']
+              data[key][1] = item['Dist.cSuitScope']
+            }
+          }
           
             console.log('pageresult.list',pageresult.list);
           return{
@@ -828,8 +850,8 @@ const method = {
 					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
 					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
 						label: i['InsuredDist.cInsuredNme'],
-						value: i['InsuredDist.cPkId']
-						// value: i['InsuredDist.cInsuredCde']
+						// value: i['InsuredDist.cPkId']
+						value: i['InsuredDist.cInsuredCde']
 					})) : []
 					eventBus.emit('setMap-AddressDist040001', {
 						code: 'Dist.cRelatedInsured',
@@ -1079,7 +1101,7 @@ const method = {
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
             console.error("导入错误：", error);
-          });addCi
+          });
         };
 
         reader.onerror = (e) => {
@@ -1094,6 +1116,7 @@ const method = {
   // 增量导入
   importExcelIncrement: () => {
     let cappNo = '';
+    if(btnDisabled.value === true) return;
     // 判断有无批改类型参数，有则是批单
     if(route.params.param?.cEdrType) {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
@@ -1107,7 +1130,7 @@ const method = {
       ElMessage.warning('请先保存申请单'); // 提示用户保存投保单
       return;
     }
-    tableconfig.value.formconfig.titleBtns[2].loading = true;
+    btnDisabled.value = true
 
     const input = document.createElement('input');
     input.type = 'file';
@@ -1141,39 +1164,36 @@ const method = {
             const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
             if(!savePlyInfo) return;
           }
-          policyService.importDistIncrement(params).then((res) => {
-            
+          policyService.importDistIncrement(params).then((res:any) => {
+            btnDisabled.value = false
             if (res.code === 200) {
               titleInfo.value = {
                 successes: res.data.successes,
                 fails: res.data.fails,
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
-              tableconfig.value.formconfig.titleBtns[2].loading = false;
               method.handleQuery();
               refreshCvrg()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
-              tableconfig.value.formconfig.titleBtns[2].loading = false;
             }
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
-            tableconfig.value.formconfig.titleBtns[2].loading = false;
             console.error("导入错误：", error);
-            
+            btnDisabled.value = false
           });
         };
 
         reader.onerror = (e) => {
           ElMessage.error("文件读取失败");
-          tableconfig.value.formconfig.titleBtns[2].loading = false;
+          btnDisabled.value = false
         };
 
         reader.readAsDataURL(file); // 启动读取
       }
     };
     input.oncancel = () => {
-      tableconfig.value.formconfig.titleBtns[2].loading = false;
+      btnDisabled.value = false
     };
     input.click(); // 触发文件选择对话框
   },
@@ -1484,7 +1504,7 @@ const getSummary = async () => {
       num = res.data.nEstimatedSalesQuantity
     }
   })
-  const sums = route.params.param?.cProdNo === '059002' ? ['','汇总','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`] : ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
+  const sums = ['','汇总','','',`总预计销售额 ${money}元`,`总预计销售量 ${num}件`]
   tableconfig.value.showSummary = true;
   tableconfig.value.summaryMethod = () => sums;
 }
@@ -1496,7 +1516,8 @@ async function refreshCvrg() {
   if(route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) {
     const cvrgRef = opertaor.getTableRefs()['cvrg'];
     try {
-      cvrgRef?.getAddrSeqOptions();
+      const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
+      cvrgRef?.getAddrSeqOptions(cComponentTable);
       cvrgRef?.refushCvrgInfo();
     } catch (ignore) {
     }
@@ -1555,6 +1576,66 @@ function getValue(key: string) {
 
 function getTableData() {
   return pageresult.list
+}
+
+async function getTableDataAll() {
+  const s = cardRef.value?.getFromValue() || {};
+  // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
+  for (let k in s) {
+    if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
+      s[k] = s[k].replace('undefined', '')
+    }
+  }
+  const param = opertaor.getParam();
+  let app = "";
+  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
+    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
+  } else if(param.cOrgAppNo){
+    app = param.cOrgAppNo;
+  } else if(param.pageType !== "copy") {
+    app = param.cAppNo
+  }
+  const selData:any = {
+    cAppNo: "",
+    cComponentTable: cComponentTableValue,
+    cClauseCode: route.params.param?.cTermNo, //条款编码  
+    cProdNo: route.params.param?.cProdNo,  //产品号
+    ...formconfig1.value,
+    pageNum: 1,
+    pageSize: 99999
+  };
+  selData.dist = JSON.parse(JSON.stringify(s))
+  if(route.params.param?.pageName === "priceInquiry") {
+    selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+    if(!selData['cInquiryNo']){
+      return []
+    }
+  } else {
+    selData['cAppNo'] = app;
+    if(!selData['cAppNo']){
+      return []
+    }
+  }
+  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    selData.voType = "ply"
+  }
+  // 级联地址表格显示问题处理
+  if(Object.keys(mapAddr).includes(props.compKey)) {
+    const addrInput = mapAddr[props.compKey];
+    const keys = Object.keys(addrInput)
+    if(keys && keys.length>0) {
+      const inputGroupKey = keys[0];
+      const addrValueKey = addrInput[inputGroupKey];
+      selData.dist[addrValueKey] = selData.dist[inputGroupKey];
+    }
+  }
+  const res:any = await selectDist(selData);
+  if (res.code === 200) {
+    return res.data.data?.length > 0 ? res.data.data : []
+  } else {
+    ElMessage.error(res.msg)
+    return []
+  }
 }
 
 function setTableData(data: any, total:any) {
@@ -1619,8 +1700,8 @@ function getFatherPageOldProductResData() {
           const list = opertaor.getTableRefByKey('GrpMember')?.getTableData()
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['InsuredDist.cInsuredNme'],
-            value: i['InsuredDist.cPkId']
-            // value: i['InsuredDist.cInsuredCde']
+            // value: i['InsuredDist.cPkId']
+            value: i['InsuredDist.cInsuredCde']
           })) : []
         }
       });
@@ -1631,66 +1712,6 @@ function getFatherPageOldProductResData() {
 
 function getFormConfig() {
   return tableconfig.value;
-}
-
-async function getTableDataAll() {
-  const s = cardRef.value?.getFromValue() || {};
-  // 经营地址只选择省市区不输入详细地址获取表单值会带有undefined，这里处理一下
-  for (let k in s) {
-    if(s[k] && typeof s[k] === 'string' && s[k].indexOf('undefined') !== -1) {
-      s[k] = s[k].replace('undefined', '')
-    }
-  }
-  const param = opertaor.getParam();
-  let app = "";
-  if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
-    app = opertaor.getDataAll().plyBase["Base.cAppNo"];
-  } else if(param.cOrgAppNo){
-    app = param.cOrgAppNo;
-  } else if(param.pageType !== "copy") {
-    app = param.cAppNo
-  }
-  const selData:any = {
-    cAppNo: "",
-    cComponentTable: cComponentTableValue,
-    cClauseCode: route.params.param?.cTermNo, //条款编码  
-    cProdNo: route.params.param?.cProdNo,  //产品号
-    ...formconfig1.value,
-    pageNum: 1,
-    pageSize: 99999
-  };
-  selData.dist = JSON.parse(JSON.stringify(s))
-  if(route.params.param?.pageName === "priceInquiry") {
-    selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-    if(!selData['cInquiryNo']){
-      return []
-    }
-  } else {
-    selData['cAppNo'] = app;
-    if(!selData['cAppNo']){
-      return []
-    }
-  }
-  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
-    selData.voType = "ply"
-  }
-  // 级联地址表格显示问题处理
-  if(Object.keys(mapAddr).includes(props.compKey)) {
-    const addrInput = mapAddr[props.compKey];
-    const keys = Object.keys(addrInput)
-    if(keys && keys.length>0) {
-      const inputGroupKey = keys[0];
-      const addrValueKey = addrInput[inputGroupKey];
-      selData.dist[addrValueKey] = selData.dist[inputGroupKey];
-    }
-  }
-  const res:any = await selectDist(selData);
-  if (res.code === 200) {
-    return res.data.data?.length > 0 ? res.data.data : []
-  } else {
-    ElMessage.error(res.msg)
-    return []
-  }
 }
 
 function setDisabledAll() {
@@ -1704,6 +1725,7 @@ function setDisabledAll() {
     item.hidden = true;
   });
 }
+
 defineExpose({
   getValue,
   setValue,

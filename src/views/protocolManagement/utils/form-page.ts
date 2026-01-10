@@ -14,7 +14,7 @@ export class FormPage {
 
     constructor(pageId: string) {
         this.soleKey = pageId;
-        this.initial = true;
+        // this.initial = true;
     }
 
     get config() {
@@ -231,6 +231,7 @@ export class FormPage {
     setAllFormData(AllData: any, callback: any = undefined) {
         try {
             const keys = Object.keys(AllData);
+						this.initial = true;
             for (const key of keys) {
                 const comp = this.componentRefMap.get(key);
                 if (comp) {

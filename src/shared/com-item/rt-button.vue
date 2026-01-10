@@ -157,6 +157,10 @@
 
 <script setup lang="ts">
 const props = defineProps({
+  modelValue: {
+    type: Object,
+    required: false,
+  },
   item: {
     type: Object as () => Record<string, any>,
     required: true,
@@ -174,6 +178,10 @@ const props = defineProps({
     type: Object as () => Record<string, any>,
     required: false,
   },
+  parentItem:{
+    type: Object as () => Record<string, any>,
+    required: false,
+  }
 });
 // console.log(props.row, "props.row");
 const disabled = ref(false);
@@ -188,7 +196,8 @@ function closepopover(value: any) {
 const emits = defineEmits(["click", "closepopover"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange() {
   emits("click");
-  props.item.func ? props.item.func() : null;
+  // 将item和row传递给父组件,证明我是用哪个要素执行的func表格时，额外传递对应行数据，证明我是哪一行的按钮
+  (props.item.func && typeof props.item.func === "function") ? props.item.func(props.parentItem,props.row) : null;  
 }
 
 function getConfig() {

@@ -5,6 +5,7 @@ export class PcisQueryService {
     qryPolicyShortUrl = '/policy/getPolicyShortList';
     qryNotifyByReceiver = '/notify/getNotifyByReceiver';
     changeStatusUrl = 'notify/changeStatus'; 
+    deleteNotifyByReceiverUrl = '/notify/deleteNotifyByReceiver'; 
     qryNewUdrListUrl = 'task/getPendingTask';
     queryBackUdrListUrl = 'underwriting/query/backUdrList';
     qryAppPolicyUrl = 'policy/getAppPolicyList';
@@ -29,11 +30,20 @@ export class PcisQueryService {
     changeStatus(ops) {
         return request.post(`${this.changeStatusUrl}`, ops)
     }
-
+		
+		// 清空已读通知状态
+    deleteNotifyByReceiver(ops) {
+			return request.post(`${this.deleteNotifyByReceiverUrl}`, ops)
+		}
     
     // 消息信息 顶部导航喇叭
     getNotifyByReceiver(ops){
         return request.post(`${this.qryNotifyByReceiver}`,ops)
+    }
+		
+		// 公告信息 顶部导航喇叭
+    getBulletinByUserAndDpt(ops){
+        return request.post(`bulletin/getBulletinByUserAndDpt`,ops)
     }
     
     /**

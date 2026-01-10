@@ -727,7 +727,11 @@ function getFromValue() {
         i["Term.cPlanNo"] = plan;
         i["Term.nSeqNo"] = idex++;
         if (i["riskList"]) {
-          i["Term.riskList"] = i["riskList"];
+          let risk_index = 1;
+          i["Term.riskList"] = i["riskList"].map((m: any) => {
+          m['TermRisktgt.nSeqNo'] = risk_index++;
+          return m;
+        });
           delete i["riskList"];
         }
         redata.push(i);
@@ -914,7 +918,8 @@ defineExpose({
   setUnDisabledByKeyList,
   calcCheck,
   setTermData,
-  getPlanNo
+  getPlanNo,
+  updateTitle,
 });
 </script>
 

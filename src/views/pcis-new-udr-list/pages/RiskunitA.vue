@@ -751,13 +751,13 @@ const tableconfig1 = reactive<AppTableConfig>(
           return val ? val.toFixed(2) : ""
         }
       },
-      {
-        prop: "cRemark",
-        inputtype: "rtinput",
-        type: "textarea",
-        title: "备注",
-        minWidth: 180,
-      },
+      // {
+      //   prop: "cRemark",
+      //   inputtype: "rtinput",
+      //   type: "textarea",
+      //   title: "备注",
+      //   minWidth: 180,
+      // },
     ],
   })
 );
@@ -1374,10 +1374,10 @@ async function tryCountInFoRIs(row: any) {
     ElMessage.error("标的地址不能为空")
     return
   }
-  if(row.cDetailedAddress && !row.cRemark) {
-    ElMessage.error("备注不能为空")
-    return
-  }
+  // if(row.cDetailedAddress && !row.cRemark) {
+  //   ElMessage.error("备注不能为空")
+  //   return
+  // }
   tryCountDisabled.value = true;
   pageresult2.list = [];
   const res = opertaor.getDataAll();
@@ -1465,10 +1465,10 @@ function saveDatas() {
       ElMessage.error("标的地址不能为空")
       return
     }
-    if(row.cDetailedAddress && !row.cRemark) {
-      ElMessage.error("备注不能为空")
-      return
-    }
+    // if(row.cDetailedAddress && !row.cRemark) {
+    //   ElMessage.error("备注不能为空")
+    //   return
+    // }
     const amt = row.nAmt;
     const prm = row.nPrm;
     totalAmt = totalAmt + parseFloat(amt);
@@ -1723,7 +1723,7 @@ function changeNamt(nAmtVar: any, flag: any) {
       if(item.cPkId === selectRow1.value.cPkId) {
         item.nAmt = parseFloat(nAmtVar);
         item.nAmtVar = parseFloat(nAmtVar);
-        item.cProportion = nAmtRatio.toString();
+        item.cProportion = nAmtRatio.toFixed(6);
         if(params.cCiMrk !== "0") {
           item.nCiAmt = nCiAmt
           item.nCiAmtVar = nCiAmt
@@ -1732,7 +1732,7 @@ function changeNamt(nAmtVar: any, flag: any) {
     })
     selectRow1.value.nAmt = parseFloat(nAmtVar);
     selectRow1.value.nAmtVar = parseFloat(nAmtVar);
-    selectRow1.value.cProportion = nAmtRatio.toString();
+    selectRow1.value.cProportion = nAmtRatio.toFixed(6);
   }
 }
 

@@ -398,3 +398,8 @@ export function reset(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/reset`, queryParams);
 }
 
+// 询价转投保-生成比较项
+export function enquiryToAppEndorseChange(queryParams: any): AxiosPromise<any> {
+	return post(`/edr/enquiryToAppEndorseChange`, queryParams);
+}
+

@@ -42,6 +42,15 @@ onMounted(() => {
     method,
     exRules
   );
+  // 保证险中保险期限的“签单时间”在页面隐藏。
+  // 询价页面签单日期隐藏
+  if((route.params.param?.cProdNo?.startsWith('05') || route.params.param?.pageName === "priceInquiry") && formconfig11.fromSchema?.length > 0) {
+    formconfig11.fromSchema?.forEach((item:any) => {
+      if(item.prop === 'Base.tIssueTm') {
+        item.hidden = true
+      }
+    })
+  }
   Object.assign(formconfig1, formconfig11);
 });
 
@@ -58,6 +67,11 @@ const nRatioCoefFunc = () => {
         opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(1).toFixed(6));
         return;
     }
+  }
+  // 090001、090002、090003短期费率系数默认1
+  if(['090001','090002','090003'].includes(route.params.param?.cProdNo)) {
+    opertaor.getTableRefByKey('base').setValue('Base.nRatioCoef', Number(1).toFixed(6));
+    return;
   }
 
   const baseBefore = tabref["insrnc"]?.getFromValue();
@@ -136,7 +150,7 @@ const freeDelay = async (obj: any): Promise<boolean> => {
     const subSidiary = resCheck?.code === 200 ? resCheck.data : '';
 
     //  接口  开关校验
-    const resOff = await qryTerminationDataList({ cPlyNo: plyNo, CancelM1: 'CancelM1' })
+    const resOff = await qryTerminationDataList({ cPlyNo: plyNo, cOperType: 'CancelM1' })
 
     // 开关关闭：按产品规则拦截
     if (resOff?.data?.[0]?.cAppTyp === 'on') {
@@ -265,7 +279,7 @@ const method = {
       const timestamp1 = new Date(tDepartureDate).getTime();
       const timestamp2 = new Date(v).getTime();
       let cProdNo = route.params.param?.cProdNo;
-      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018")) {
+      if ((timestamp1 < timestamp2) && (cProdNo !== "020014" && cProdNo !== "020018" && cProdNo.startsWith('02'))) {
          ElMessage.warning("“起运日期”不能大于保险起期！");
         baseBefore["Base.tDepartureDate"] = ''
       }

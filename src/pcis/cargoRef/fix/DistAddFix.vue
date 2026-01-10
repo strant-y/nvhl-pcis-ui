@@ -937,11 +937,19 @@ const tCertMrkChecked = (val:any)=>{
 // 移动电话
 const mobileChange = (val:any) => {
   let cClntMrk = getValue('ECargoInsuredDist.cClntMrk'); // 法人  1个人  0法人
+	let cTel = getValue('ECargoInsuredDist.cTel'); // 固定电话
+	clearValidate('ECargoInsuredDist.cTel')
   if (cClntMrk && val) {
     setFormItem("ECargoInsuredDist.cMobile", {
       rules: [getRules("required", {}), getRules("phoneNo", {})],
     });
     setFormItem("ECargoInsuredDist.cTel", { rules: [getRules("phone", {})] });
+  }
+	if (cClntMrk == '0' && !val && cTel) {
+    setFormItem("ECargoInsuredDist.cMobile", {
+      rules: [getRules("phoneNo", {})],
+    });
+    setFormItem("ECargoInsuredDist.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
   }
   setValue('ECargoInsuredDist.cEnterpriseTel', val)
 }
