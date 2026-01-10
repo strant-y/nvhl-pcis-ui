@@ -1445,7 +1445,7 @@ const method = {
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,
     });
-		if (param.initFlag) return;
+		if (param.initFlag || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.cOperaterCertfCde"];
@@ -1484,7 +1484,7 @@ const method = {
     setFormItem("Applicant.cShareholderCode", {
       rules: baseRules,
 		});
-		if (param.initFlag) return;
+		if (param.initFlag || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.cShareholderCode"];
@@ -1542,32 +1542,6 @@ const method = {
         ElMessage.error(err.message)
         insuranceCoverageFlag = false
       })
-    }
-  },
-  // 大股东证件类型
-  cShareholderCategoryChange:(val:any) => {
-    if (param.initFlag) return;
-    setValue("Applicant.cShareholderCode","")
-    clearValidate('Applicant.cShareholderCode'); // 清除报错信息
-    if (val == "111") {
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("idCard", {})],
-      });
-    } else if (val == "01") {
-      // 统一社会信用代码校验
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("socialCode", {})],
-      });
-    } else if (val === '07') {
-      // 护照
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("passPort", {})],
-      });
-    } else if (val == "553") {
-      // 外国人证件号
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("ariCard", {})],
-      });
     }
   },
 };
