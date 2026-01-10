@@ -2008,6 +2008,9 @@ const method = {
   },
 	// 建设工程信息-保险凭证类别
 	cCertificateTypefun: async (val) => {
+		if (params.pageType != "app") {
+			return false
+		}
 		const cCertificateTypeProd = ["059011", "059012", "059013", "059015", "059016", "059017", "059018", "059019", "059020"]
 		if (cCertificateTypeProd.includes(params.cProdNo)) {
 			try {
