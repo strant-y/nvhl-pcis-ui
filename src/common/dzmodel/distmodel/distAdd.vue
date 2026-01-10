@@ -59,6 +59,8 @@ const props = defineProps({
   },
 });
 
+const init = ref(true)
+
 const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.replace(/\d+/g, '') : "");
 
 const mapAddr = {
@@ -597,7 +599,10 @@ onMounted(() => {
   nextTick(() => {
     handelnInsuranceAmountList()
     // 同步dist组件中的codeListMap到表单中
-    freeEditRef.value?.setCodeListMap(props.data.codeListMap);
+		freeEditRef.value?.setCodeListMap(props.data.codeListMap);
+		setTimeout(() => {
+			init.value = false
+    }, 500);
   })
 });
 
@@ -760,7 +765,9 @@ const cEquipmentTypesFunc = ()=>{
 const cDocumentTypeChange = (val: any) => {
   const cIs = opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']; // 是否记名投保
   const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
-	setValue('Dist.cIdentificationNumber', null);
+	if (!init.value) {
+		setValue('Dist.cIdentificationNumber', null);
+	}
 	clearValidate('Dist.cIdentificationNumber')
   const baseRuleMap: Record<string, any[]> = {
     "111": [getRules("idCard", {})], // 身份证
