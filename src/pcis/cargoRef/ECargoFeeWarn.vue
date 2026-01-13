@@ -334,8 +334,19 @@ const method = {
   },
   //折人民币协议预收保费
   nRmbReceivedPrmChange:(val:any)=>{
-    if(initFlag.value) return
-    if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01'){
+		if (initFlag.value) return
+		const AgreementBase = formPage?.getFormDataById('AgreementBase');
+		const cCiMrk = AgreementBase?.['ECargoBase.cCiMrk'];  // 是否   联共保
+    if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01' && !!cCiMrk && cCiMrk == "0"){
+			setValue('ECargoBase.nRecRemPrm',val - (getValue('ECargoBase.nWhRmbPrm') || 0))
+    }
+	},
+	// 折人民币我司协议预收保费
+	nCiOwnRmbReceivedPrmChange: (val: any) => {
+		if (initFlag.value) return
+		const AgreementBase = formPage?.getFormDataById('AgreementBase');
+		const cCiMrk = AgreementBase?.['ECargoBase.cCiMrk'];  // 是否   联共保
+    if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01' && !!cCiMrk && cCiMrk != "0"){
        setValue('ECargoBase.nRecRemPrm',val - (getValue('ECargoBase.nWhRmbPrm') || 0))
     }
   },
