@@ -526,6 +526,15 @@ export const NewUdrListService = () => {
     return post(`/task/getInquiryTask`, queryParams);
   }
 
+  /**
+   * 历史单查询
+   *
+   * @param queryParams
+   */
+  const getHistoryList = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/policy/getHistoryList`, queryParams);
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -576,5 +585,6 @@ export const NewUdrListService = () => {
     selectTask,
     getAppTask,
     getInquiryTask,
+    getHistoryList,
   };
 }
