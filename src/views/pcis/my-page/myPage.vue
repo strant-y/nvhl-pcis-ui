@@ -611,6 +611,10 @@ const copyPlyModel = defineAsyncComponent(
 const templateDialog = defineAsyncComponent(
   () => import("./templateDialog.vue")
 );
+// 历史单
+const historyPlyDialog = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/history-ply.vue")
+)
 
 /**
  * 锚点点击事件
@@ -2555,6 +2559,21 @@ async function loadAfter() {
       },
     }),
   )
+  if (props.param.cAppTyp == "E") {
+    rightBtnList.value.push(
+      createFreeButtonBase({
+        label: "历史保单",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+        // svgIcon: "template2",
+        // iconSize: "20",
+        icon: "Memo",
+        func: () => {
+          handleCheckHistoryPly()
+        },
+      })
+    )
+  }
   if(props.param?.showBtn === false){
     bthList.value = [];
   }
@@ -7464,6 +7483,18 @@ const shouldCheckYunnanPaymentRules = () => {
       !props.param.cProdNo.startsWith('12') &&
       props.param.cDptCde.startsWith('0253');
 };
+
+function handleCheckHistoryPly() {
+  dzmodal
+    .open(historyPlyDialog, {
+      type: "Issuer",
+      data: { objId: props.param?.cPlyNo },
+    })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+}
 </script>
 <style lang="scss" scoped>
 @import "@/styles/custom-index";
