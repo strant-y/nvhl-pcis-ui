@@ -2311,6 +2311,19 @@ async function queryAE( flag?: boolean, isEs = false) {
                    newItem[key] = item[key]; // 部分保持原样
                 }
             }
+						// 对es金额类做字符串转数字处理
+						if (!!newItem['nAmt']) {
+							newItem['nAmt'] = newItem['nAmt']*1
+						}
+						if (!!newItem['nPrm']) {
+							newItem['nPrm'] = newItem['nPrm']*1
+						}
+						if (!!newItem['nInsuranceVariation']) {
+							newItem['nInsuranceVariation'] = newItem['nInsuranceVariation']*1
+						}
+						if (!!newItem['nPremiumVariation']) {
+							newItem['nPremiumVariation'] = newItem['nPremiumVariation']*1
+						}
             return newItem;
           })
           pageresult.list = [];
