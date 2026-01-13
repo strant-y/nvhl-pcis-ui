@@ -84,7 +84,7 @@ const close = (type) => {
         }
 
         if(totalSalary.value !== numS){
-            ElMessage.info('数据未保存！');
+            // ElMessage.info('数据未保存！');
         }
 
 };
@@ -102,7 +102,7 @@ const checkAnnualSalaries = (data: any) => {
 
 const tableconfig = reactive<AppGridEditConfig>(
     createAppGridEditConfig({
-        // title: '投保人-客户受益所有人',
+        title: '投保雇员年工资总额',
         // editList:['CSeqNo','CCusLnme','CCusFnme','TCerftBgnTm','CCusAddr'],
         // showSelection: true,  // 是否显示多选框
         editFlag: true, //是否可以编辑
@@ -112,6 +112,8 @@ const tableconfig = reactive<AppGridEditConfig>(
             createFreeButtonBase({
                 type: "primary",
                 label: "新增",
+                id: "add",
+                size: "small",
                 func: async () => {
                     freeEditRef.value?.addRowByData({ cGrpMrk: "0" });
 
@@ -139,6 +141,8 @@ const tableconfig = reactive<AppGridEditConfig>(
             createFreeButtonBase({
                 type: "primary",
                 label: "删除",
+                id: "delete",
+                size: "small",
                 func: async () => {
                     const selData = freeEditRef?.value?.getSelectRow();
                     if (!selData) {
@@ -204,7 +208,7 @@ const tableconfig = reactive<AppGridEditConfig>(
     })
 );
 onMounted(async () => {
-    if (props.data.cRegisteredLogo == 1) {
+    if (props.data?.cRegisteredLogo == 1) {
         tableconfig.titleBtns = []
         setFormItem('DistSummary.cPlanNo', {
             disabled: true,
