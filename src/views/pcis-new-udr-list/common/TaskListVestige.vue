@@ -3,16 +3,26 @@
   <el-dialog
     v-model="dialogVisible"
     title="任务痕迹列表"
-    custom-class="custom-dialog"
     width="70%"
+    style="max-height:80%;display: flex;flex-direction: column;"
+    class="task-list-dialog"
   >
-    <div class="app-container">
+    <el-tabs @tab-click="handleTabClick">
+      <el-tab-pane
+        v-for="tab in tabs"
+        :key="tab.name"
+        :label="tab.name"
+      >
+      </el-tab-pane>
+    </el-tabs>
+    <div class="content">
       <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
         ref="tableRef"
         @selection-change="handleSelectionChange"
         @page-change="handleQuery(false)"
+        v-show="currentTab === '表格'"
       >
         <template #column-preDptName="{ row, column, index }">
           <el-tooltip :content="row.preDptName" placement="top">
@@ -35,6 +45,23 @@
           </el-tooltip>
         </template>
       </app-table>
+      <el-timeline v-show="currentTab === '时间轴'">
+        <el-timeline-item
+          v-for="(activity, index) in pageresult.list"
+          :key="index"
+          type="primary"
+          :hollow="true"
+        >
+          <div>
+            {{ activity.curtTaskName }}
+          </div>
+          <div>{{ activity.curtUserName }}</div>
+          <div>接收时间：{{ activity.acptTm?.replace('T',' ') }}</div>
+          <div>完成时间：{{ activity.cmptTm?.replace('T',' ')}}</div>
+          <div>下一级机构：{{ activity.dptName }}</div>
+          <div>下一级级别：{{ activity.level }}</div>
+        </el-timeline-item>
+      </el-timeline>
     </div>
     <template #footer>
       <span class="dialog-footer">
@@ -79,6 +106,11 @@ const props = defineProps({
 const handleCancel = () => {
   dialogVisible.value = false;
 };
+const tabs = ref([
+  { name: '时间轴' },
+  { name: '表格' }
+])
+const currentTab = ref('时间轴')
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -244,6 +276,10 @@ function handleQuery(flag?: boolean) {
       ElMessage.error(err);
     });
 }
+
+function handleTabClick(tab:any) {
+  currentTab.value = tab.props.label
+}
 </script>
 
 <style scoped>
@@ -262,5 +298,25 @@ function handleQuery(flag?: boolean) {
 }
 :deep(.el-card__body) {
   padding: 15px;
+}
+</style>
+<style lang="scss">
+.task-list-dialog {
+  max-height:80%;
+  display: flex;
+  flex-direction: column;
+  .el-dialog__body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      .el-timeline {
+        padding-left: 5px;
+      }
+    }
+  }
 }
 </style>
