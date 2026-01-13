@@ -217,7 +217,8 @@ const method = {
 
     setFormItem("ECargoApplicant.tCertfBgnDate", { rules: null });
     setFormItem("ECargoApplicant.tCertfEndDate", { rules: null });
-    setFormItem("ECargoApplicant.tEstablishingDate", { rules: null });
+    setFormItem("ECargoApplicant.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('ECargoApplicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("ECargoApplicant.cCertfCde", {
@@ -255,6 +256,7 @@ const method = {
 
       // 为法人  企业成立日期
       setFormItem("ECargoApplicant.tEstablishingDate", {
+				disabled: false,
         rules: [getRules("required", {})],
       });
     } else if (val === '07') {
@@ -277,7 +279,7 @@ const method = {
 
     // 切换清空
     if (val) {
-      const fieldsToClear = ["ECargoApplicant.tBirthday", "ECargoApplicant.nAge", "ECargoApplicant.cCertfCde"];
+      const fieldsToClear = ["ECargoApplicant.tBirthday", "ECargoApplicant.nAge", "ECargoApplicant.cCertfCde", "ECargoApplicant.tEstablishingDate"];
       // 2. 循环赋值 null + 清除对应字段的校验错误
       fieldsToClear.forEach(field => {
         setValue(field, null);
@@ -313,12 +315,25 @@ const method = {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();
       const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();;
       if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
       if (establishingDate > appTm) {
-        ElMessage.error("企业成立时间小于协议投保日期，请关注!");
-      }
+        ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("ECargoApplicant.tEstablishingDate", null);
+				clearValidate('ECargoApplicant.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('ECargoApplicant.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('ECargoApplicant.cWorkDpt')
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("ECargoApplicant.tEstablishingDate", null);
+					clearValidate('ECargoApplicant.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
 	//投保人性质(0是法人 1是个人)
@@ -417,8 +432,13 @@ const method = {
       setFormItem("ECargoApplicant.cLegalRepresentative", {
         rules: isSpecialCase ? requiredRule : []
       });
-      // 企业成立日
+			// 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("ECargoApplicant.tEstablishingDate", null);
+				clearValidate('ECargoApplicant.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("ECargoApplicant.tEstablishingDate", {
+				disabled: !initFlag.value && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
       let cMobile = getValue('ECargoApplicant.cMobile');  // 移动 
@@ -530,6 +550,9 @@ const method = {
 				setFormItem("ECargoApplicant.cIsIndvduBiz", {
 					disabled: false,
 				});
+				// 企业成立日期
+				setValue("ECargoApplicant.tEstablishingDate", null);
+				clearValidate('ECargoApplicant.tEstablishingDate')  // 清除报错信息
     	}
       // 是否绿色产业客户
       setFormItem("ECargoApplicant.cGreenIndustryCustomers", {
@@ -549,6 +572,7 @@ const method = {
       });
       // 为法人  企业成立日期
       setFormItem("ECargoApplicant.tEstablishingDate", {
+				disabled: true,
         rules: null,
       });
       setFormItem("ECargoApplicant.cEnterpriseTel", {
@@ -956,8 +980,13 @@ const method = {
     });
     // 企业成立日
     setFormItem("ECargoApplicant.tEstablishingDate", {
+			disabled: !initFlag.value && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
+		if (!param.initFlag && !isSpecialCase) {
+			setValue("ECargoApplicant.tEstablishingDate", null);
+			clearValidate('ECargoApplicant.tEstablishingDate')  // 清除报错信息
+		}
     if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
       setFormItem("ECargoApplicant.nRegisteredCapital", {
         rules: [getRules("required", {})],

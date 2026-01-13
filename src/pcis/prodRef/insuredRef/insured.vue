@@ -479,12 +479,25 @@ const method = {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();
       const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();
       if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
       if (establishingDate > appTm) {
-        ElMessage.error("企业成立时间小于投保日期，请关注!");
-      }
+        ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('Insured.cWorkDpt')
+			const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("Insured.tEstablishingDate", null);
+					clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
   //被保人性质change事件
@@ -644,7 +657,12 @@ const method = {
         rules: isSpecialCase ? requiredRule : []
       });
       // 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -830,7 +848,12 @@ const method = {
         rules: []
       });
       //企业成立日期
+			if (!param.initFlag) { 
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: true,
         rules: [],
       });
 
@@ -1193,7 +1216,8 @@ const method = {
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
-    setFormItem("Insured.tEstablishingDate", { rules: null });
+    setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("Insured.cCertfCde", {
@@ -1230,6 +1254,11 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("socialCode", {})],
       });
+			// 为法人  企业成立日期
+			setFormItem("Insured.tEstablishingDate", {
+				disabled: false,
+				rules: [getRules("required", {})],
+			});
 
 
 
@@ -1264,7 +1293,7 @@ const method = {
 
     // 切换清空
     if (val) {
-      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde"];
+      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde", "Insured.tEstablishingDate"];
       fieldsToClear.forEach(field => {
         setValue(field, null);
         setTimeout(() => {
@@ -1427,8 +1456,13 @@ const method = {
     });
     // 企业成立日
     setFormItem("Insured.tEstablishingDate", {
+			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
-    });
+		});
+		if (!param.initFlag && !isSpecialCase) {
+			setValue("Insured.tEstablishingDate", null);
+			clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+		}
     if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
       setFormItem("Insured.nRegisteredCapital", {
         rules: [getRules("required", {})],
