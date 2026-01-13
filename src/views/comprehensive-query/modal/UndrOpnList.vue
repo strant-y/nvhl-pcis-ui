@@ -1,20 +1,44 @@
 <!-- 核保信息 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="60%" title="核保信息">
-    <div>
+  <el-dialog v-model="dialogVisible" width="60%" title="核保信息" class="undr-opn-list-dialog">
+    <el-tabs @tab-click="handleTabClick">
+      <el-tab-pane
+        v-for="tab in tabs"
+        :key="tab.name"
+        :label="tab.name"
+      >
+      </el-tab-pane>
+    </el-tabs>
+    <div class="content">
       <app-table
         :tableConfig="tableconfig"
         v-model:pageresult="pageresult"
         ref="tableRef"
         @selection-change="handleSelectionChange"
         @page-change="handleQuery(false)"
+        v-show="currentTab === '表格'"
       >
         <template #column-CUndrOpn="{row}">
           <div>{{ row.CUndrOpn }}</div>
         </template>
       </app-table>
+      <el-timeline v-show="currentTab === '时间轴'">
+        <el-timeline-item
+          v-for="(activity, index) in pageresult.list"
+          :key="index"
+          type="primary"
+          :hollow="true"
+        >
+          <div>
+            {{ activity.CUndrMrk }}
+          </div>
+          <div>{{ activity.CUndrCnm }}</div>
+          <div>核保时间：{{ activity.TUpdTm?.replace('T',' ') }}</div>
+          <div>核保意见：{{ activity.CUndrOpn }}</div>
+        </el-timeline-item>
+      </el-timeline>
     </div>
-    <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
+    <template #footer>
       <rt-button
         :item="{
           type: 'primary',
@@ -24,7 +48,7 @@
           },
         }"
       />
-    </div>
+    </template>
   </el-dialog>
 </template>
 
@@ -62,6 +86,12 @@ const props = defineProps({
     default: "",
   },
 });
+const tabs = ref([
+  { name: '时间轴' },
+  { name: '表格' }
+])
+const currentTab = ref('时间轴')
+
 const pageresult = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
@@ -157,6 +187,29 @@ function handleQuery(flag?: boolean) {
       ElMessage.error(err);
     });
 }
+
+function handleTabClick(tab:any) {
+  currentTab.value = tab.props.label
+}
 </script>
 
-<style scoped></style>
+<style lang="scss">
+.undr-opn-list-dialog {
+  max-height:80%;
+  display: flex;
+  flex-direction: column;
+  .el-dialog__body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      .el-timeline {
+        padding-left: 5px;
+      }
+    }
+  }
+}
+</style>

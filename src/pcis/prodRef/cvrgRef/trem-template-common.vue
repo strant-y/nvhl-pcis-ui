@@ -397,7 +397,7 @@
 
 <script setup lang="ts">
 import { getCurrentInstance } from 'vue'
-import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost } from "@/api/prod";
+import { getTRFactorJson,getPrdTermInfo,viewPdfProposal, viewPdfProposalPost,qryTerminationDataList,getPremiumAdjustmentRange } from "@/api/prod";
 import {
   AppFreeEditMethod,
   createAppFreeEditConfig,
@@ -411,6 +411,7 @@ import { v4 as uuidv4 } from "uuid";
 import {CommonConstants} from "@/constants/CommonConstants";
 import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import Decimal from "decimal.js";
 
 const route = useRoute();
 const templateRef = ref();
@@ -935,6 +936,129 @@ function initMethod(){
         cDeductibleMethod[0]['defaultValue'] = "01"
       }
     }
+  const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
+  // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
+  if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
+    if (termFactormap && termFactormap.value.length > 0) {
+      termFactormap.value.forEach((item: any) => {
+        if(item.prop === 'Term.nInsuranceFee') {
+          item.disabled = false;
+        }
+      });
+    }
+    if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+      for(let i in groupInfo.value) {
+        const ginfo = groupInfo.value[i]
+        const riskList = groupconf.value[ginfo.cGroupId].riskList
+        for(let k in riskList) {
+          const riskdata = riskList[k];
+          if(riskdata.maxNum > 0) {
+            for(let n = 1;n <= riskdata.maxNum;n++) {
+              riskdata.col?.forEach((colinfo:any) => {
+                const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                if(item?.prop === 'TermRisktgt.nItemFee') {
+                  item.disabled = false;
+                }
+              })
+            }
+          }
+        }
+      }
+    }
+    if( extermConf.value && extermConf.value.length > 0 ){
+      extermConf.value.forEach((item: any) => {
+        if(item?.prop === 'Term.nInsuranceFee') {
+          item.disabled = false;
+        }
+      });
+    }
+  } else {
+    // 根据数据控制开关设置条款中的可编辑项(投保单)
+    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A') {
+      qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+            if(Object.keys(groupInfo.value)?.length > 0) {
+              for(let i in groupInfo.value) {
+                const ginfo = groupInfo.value[i]
+                const riskList = groupconf.value[ginfo.cGroupId].riskList
+                for(let k in riskList) {
+                  const riskdata = riskList[k];
+                  if(riskdata.maxNum > 0) {
+                    for(let n = 1;n <= riskdata.maxNum;n++) {
+                      riskdata.col?.forEach((colinfo:any) => {
+                        const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                          item.disabled = false;
+                        }
+                      })
+                    }
+                  }
+                }
+              }
+            }
+            if( extermConf.value && extermConf.value.length > 0 ){
+              extermConf.value.forEach((item: any) => {
+                if(item?.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+          }
+        }
+      })
+    }
+    // 根据数据控制开关设置条款中的可编辑项(批单)
+    if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType) {
+      qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
+        if(res?.code == 200 && res.data?.length > 0) {
+          if(res.data[0]?.cAppTyp === 'on') {
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+            if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+              for(let i in groupInfo.value) {
+                const ginfo = groupInfo.value[i]
+                const riskList = groupconf.value[ginfo.cGroupId].riskList
+                for(let k in riskList) {
+                  const riskdata = riskList[k];
+                  if(riskdata.maxNum > 0) {
+                    for(let n = 1;n <= riskdata.maxNum;n++) {
+                      riskdata.col?.forEach((colinfo:any) => {
+                        const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                          item.disabled = false;
+                        }
+                      })
+                    }
+                  }
+                }
+              }
+            }
+            if( extermConf.value && extermConf.value.length > 0 ){
+              extermConf.value.forEach((item: any) => {
+                if(item?.prop === 'Term.nInsuranceFee') {
+                  item.disabled = false;
+                }
+              });
+            }
+          }
+        }
+      })
+    }
+  }
 }
 
 /**
@@ -1363,7 +1487,10 @@ const methodMap = {
     nextTick(()=>{
       checkData(val,item);
     });
-  }
+  },
+  nItemFeeChange:(val:any) => {
+    nInsuranceFeeChange(val)
+  },
 };
 
 const checkData = (v :any,item:any) => {
@@ -1411,6 +1538,175 @@ const selectRow = (key: any) => {
     selectedRow.value.data = key;
   }
 };
+
+async function nInsuranceFeeChange(val:any) {
+  debugger
+  const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+  let qryTerminationStatus = false;
+  // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
+  // (遍历所有条款的责任列表，TermRisktgt.nItemRate有值则累加责任中的保费，没有值则不加，累加的值要赋值到条款的保费字段上，然后累加所有条款的保费，把总值赋值到保单的总保费上)
+  if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || ['app','template','copy','inquiryToApp'].includes(pageparam.pageType)) {
+    // TermRisktgt
+    const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+    let nInsuranceFee:number = 0;
+    cvrgData.forEach((item:any) => {
+      if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
+        item['Term.riskList'].forEach((i:any) => { i['TermRisktgt.nTotalInsuranceFee'] = i['TermRisktgt.nItemFee'] })
+        if(item['Term.riskList'][0]?.['TermRisktgt.nItemFee']) {
+          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nItemFee'] || 0), 0)
+          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+        } else {
+          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
+          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
+          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+        }
+      }
+      nInsuranceFee += Number(item['Term.nInsuranceFee'])
+    })
+    // opertaor.getTableRefByKey("cvrg")?.setFormValue(cvrgData)
+    if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {// 从共主联、从共无联保
+      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })
+      if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+        if(qryTerminationData.data[0]?.cAppTyp === 'on') {
+          qryTerminationStatus = true;
+        }
+      }
+      // 如果打开数据开关，则不需要判断修改后的总保费是否超出阈值，否则需要判断
+      if(qryTerminationStatus === false) {
+        let nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm");
+        const nAmt = opertaor.getTableRefByKey("base")?.getValue("Base.nAmt")
+        const nPrmRange:any = await getPremiumAdjustmentRange();
+        // 调用保费计算接口获取最新保费计算后的保费数据
+        const calcres = await opertaor.getFatherPage().calcFunc();
+        if(calcres && calcres.code === 200) {
+          const newOp: any = opertaor.convertData(calcres);
+          nPrm = newOp.base["Base.nPrm"];
+          const newAmt = newOp.base["Base.nAmt"];
+          if(newAmt != nAmt) {
+            opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
+          }
+
+          let minPrm:any = 0;
+          let maxPrm:any = 0;
+          if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
+            maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
+            minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+          } else {
+            minPrm = new Decimal(nPrm).sub(new Decimal(10))
+            maxPrm = new Decimal(nPrm).add(new Decimal(10))
+          }
+          if(minPrm < 0) { minPrm = 0 }
+          if(maxPrm < 0) { maxPrm = 0 }
+          if(new Decimal(nInsuranceFee).lt(minPrm) || new Decimal(nInsuranceFee).gt(maxPrm)) {
+            ElMessageBox.confirm(`本次手动调整金额（¥${nInsuranceFee}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
+              confirmButtonText: "确定",
+              type: "warning",
+              showCancelButton: false,
+              showClose: false,
+            }).then(() => {
+              opertaor.getFatherPage().calcPremium()
+            }).catch(() => {
+              opertaor.getFatherPage().calcPremium()
+            })
+            return;
+          }
+        } else {
+          ElMessage.error(calcres.msg)
+        }
+      }
+    }
+    opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
+    if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
+      opertaor.getTableRefByKey("cvrg")?.updateTitle()
+    }
+    nextTick(() => {
+      opertaor.getFatherPage().afterCalcPremium()
+    })
+  }
+  // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
+  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
+    // TermRisktgt
+    const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+    let nInsuranceFee:number = 0;
+    cvrgData.forEach((item:any) => {
+      if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
+        item['Term.riskList'].forEach((i:any) => { i['TermRisktgt.nTotalInsuranceFee'] = i['TermRisktgt.nItemFee'] })
+        if(item['Term.riskList'][0]?.['TermRisktgt.nItemFee']) {
+          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nItemFee'] || 0), 0)
+          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+        } else {
+          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
+          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
+          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+        }
+      }
+      nInsuranceFee += Number(item['Term.nInsuranceFee'])
+    })
+    // opertaor.getTableRefByKey("cvrg")?.setFormValue(cvrgData)
+    let nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
+    const nAmt = opertaor.getTableRefByKey("base")?.getValue("Base.nAmt")
+    const edrbase = opertaor.getFatherPage().getEdrbaseValue();
+    const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm']?.replaceAll(',','');
+    // const newData = getDatas();
+    if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {
+      const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' })
+      if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
+        if(qryTerminationData.data[0]?.cAppTyp === 'on') {
+          qryTerminationStatus = true;
+        }
+      }
+      // 如果打开数据开关，则不需要判断修改后的总保费是否超出阈值，否则需要判断
+      if(qryTerminationStatus === false) {
+        const nPrmRange:any = await getPremiumAdjustmentRange();
+        // 调用保费计算接口获取最新保费计算后的保费数据
+        const calcres = await opertaor.getFatherPage().calcEdrFunc();
+        if(calcres && calcres.code === 200) {
+          const newOp: any = opertaor.convertData(calcres);
+          nPrm = newOp.base["Base.nPrm"];
+          const newAmt = newOp.base["Base.nAmt"];
+          if(newAmt != nAmt) {
+            opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
+          }
+
+          // const nInsuranceFee = newData['Term.nInsuranceFee'];
+          let minPrm:any = 0;
+          let maxPrm:any = 0;
+          if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
+            maxPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.upperLimit))
+            minPrm = new Decimal(nPrm).add(new Decimal(nPrmRange.data?.lowerLimit))
+          } else {
+            minPrm = new Decimal(nPrm).sub(new Decimal(10))
+            maxPrm = new Decimal(nPrm).add(new Decimal(10))
+          }
+          if(new Decimal(nInsuranceFee).lt(minPrm) || new Decimal(nInsuranceFee).gt(maxPrm)) {
+            ElMessageBox.confirm(`本次手动调整金额（¥${nInsuranceFee}）已超出预设阈值范围（¥${minPrm} - ¥${maxPrm}）。根据系统规则，需履行审批程序。请您发起OA流程，完成合规授权后生效。`, {
+              confirmButtonText: "确定",
+              type: "warning",
+            }).then(() => {
+              opertaor.getFatherPage().calcPremiumEdr()
+            }).catch(() => {
+              opertaor.getFatherPage().calcPremiumEdr()
+            })
+            return;
+          }
+        } else {
+          ElMessage.error(calcres.msg)
+        }
+      }
+    }
+    if(nInsuranceFee != nPrm) {
+      opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
+      opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", nInsuranceFee)
+      opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(nInsuranceFee).sub(new Decimal(nBefEdrPrm)))
+      if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
+        opertaor.getTableRefByKey("cvrg")?.updateTitle()
+      }
+      nextTick(() => {
+        opertaor.getFatherPage().afterCalcEdrPremium()
+      })
+    }
+  }
+}
 
 defineExpose({
   dataFlash,

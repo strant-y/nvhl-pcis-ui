@@ -28,7 +28,7 @@ export interface AppGridEditConfig {
 
   dragFlag?: boolean; // mytable模式下,是否可以拖动
   rowDbClickFun?: (rowData) => void;
-  getExSchema: () => string;  // 如果需要额外扩展配置,可自行设置获取额外配置key的方法,用于获取个性化行扩展配置
+  getExSchema?: () => string;  // 如果需要额外扩展配置,可自行设置获取额外配置key的方法,用于获取个性化行扩展配置
 }
 
 export interface AppGridEditMethod {
