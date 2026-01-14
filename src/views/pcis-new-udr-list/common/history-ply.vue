@@ -116,23 +116,23 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "tInsrncBgnTm",
-        inputtype: "input",
+        inputtype: "rtinput",
         title: "保险起期",
       },
       {
         prop: "tInsrncEndTm",
-        inputtype: "input",
+        inputtype: "rtinput",
         title: "保险止期",
       },
       {
         prop: "tEdrBgnTm",
-        inputtype: "input",
+        inputtype: "rtinput",
         title: "批改生效起期",
       },
       {
         prop: "tEdrEndTm",
-        inputtype: "input",
-        title: "批改生效起期",
+        inputtype: "rtinput",
+        title: "批改生效止期",
       },
     ],
   })
