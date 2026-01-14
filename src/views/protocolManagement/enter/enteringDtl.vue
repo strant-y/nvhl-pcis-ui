@@ -1187,9 +1187,9 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
       payList = [...list];
     } else {
-      // 根据批改次数决定缴费计划生成几条（0 总共2条；1 总共3条，以此类推）
+      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
       if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
-        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo'] + 1);
+        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
       }
     }
   }
