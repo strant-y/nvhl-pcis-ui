@@ -451,6 +451,20 @@ onMounted(async () => {
         }
       })
     }
+		// 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
+		if (r['prop'] === 'Dist.cItemLiability') {
+			r.multiple = 1
+			r.typeCode = ''
+			let list = [{label: "财产损失", value: "01"}, {label: "人身意外", value: "02"}]
+			codeListStore.queryCodeList({
+				codeListName: 'mianpeileixing',
+				codeListParam:{},
+			})
+				.then((res) => {
+					list.push(...res)
+					r.loadData = list
+			});
+    }
   });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
