@@ -468,10 +468,10 @@ const method = {
 							}
 							// 个人代理业务获取业务员信息
 							if (getValue("Base.cBsnsTyp") == '19002' && getValue("Base.cChaType") == '1900201' && getValue("Base.cChaSubtype") == '1900201001') {
-								setFormItem("Base.cSlsId", {disabled: true,btnItems: {disabled: true}});
-								setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
 								policyService.getPrivateSelsList({cUserCode: params.CUserCode}).then((res) => {
-									if (res["code"] === 200) {
+									if (res["code"] === 200 && !!res["data"]) {
+										setFormItem("Base.cSlsId", {disabled: true,btnItems: {disabled: true}});
+										setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
 										setValue("Base.cSlsId", res.data.cSlsCde); // 业务员员工号
 										setValue("Base.cSlsNme", res.data.cSlsNme); // 业务员名称
 										setValue("Base.cSlsTel", res.data.cTel); // 业务员电话
@@ -490,6 +490,16 @@ const method = {
 												}
 											}
 										});
+									} else {
+										setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
+										setFormItem("Base.cIntroSalecde", {btnItems: {disabled: false}});
+										setValue("Base.cSlsId", null); // 业务员员工号
+										setValue("Base.cSlsNme", null); // 业务员名称
+										setValue("Base.cSlsTel", null); // 业务员电话
+										setValue("Base.cSlsDptcde", null); // 业务员机构代码
+										setValue("Base.cSlsCde", null); // 业务员执业证号
+										setFormItem("Base.cIntroSalecde", {loadData: []});
+										setValue("Base.cIntroSalecde", null); // 服务机构业务员
 									}
 								})
 								.catch((err) => {
