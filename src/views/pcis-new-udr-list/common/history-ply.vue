@@ -165,11 +165,11 @@ function handleQuery(flag?: boolean) {
   getHistoryList(param)
     .then((res: any) => {
       const { code, data, msg } = res;
-      if (200 === code) {
+      if ('1' == data.code) {
         pageresult.list = data.result || [];
         pageresult.total = data.total || 0;
       } else {
-        ElMessage.error(msg);
+        ElMessage.error(data.message || msg);
       }
     })
     .catch((err) => {
