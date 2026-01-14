@@ -7483,12 +7483,12 @@ const shouldCheckYunnanPaymentRules = () => {
       !props.param.cProdNo.startsWith('12') &&
       props.param.cDptCde.startsWith('0253');
 };
-
+// 历史保单
 function handleCheckHistoryPly() {
   dzmodal
     .open(historyPlyDialog, {
       type: "Issuer",
-      data: { objId: props.param?.cPlyNo },
+      data: { objId: props.param?.cPlyNo ||  opertaor.getTableRefByKey("plyBase")?.getValue("Base.cPlyNo")},
     })
     .then((res: any) => {
       if (res.type === "ok") {
