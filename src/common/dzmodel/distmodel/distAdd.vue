@@ -541,16 +541,17 @@ onMounted(async () => {
     // 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
     if(item.prop === 'Dist.cDeductibleClass' && route.params.param.cProdNo == '090001') {
       item.func = (val:any) => {
-        setFormItem('Dist.cItemLiability', { loadData: [] })
+				if (!init.value) {
+					setValue('Dist.cItemLiability', null)
+				}
         if(val) {
           codeListStore
             .queryCodeList({
-              codeListName: val === '02' ? 'mianpeileixing2' : 'mianpeileixing',
+              codeListName: val == '02' ? 'mianpeileixing2' : 'mianpeileixing',
               codeListParam:{},
             })
 						.then((res) => {
-							setValue('Dist.cItemLiability', null)
-							setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res, multiple: val === '02' ? 0 : 1 })
+							setFormItem('Dist.cItemLiability', { loadData: res, multiple: val == '02' ? 0 : 1})
             });
         }
       }
