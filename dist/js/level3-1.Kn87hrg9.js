@@ -1,0 +1,1 @@
+import{aX as e,c as s,e as t,F as r,br as a}from"./index.UAh212g5.js";const n={style:{padding:"30px"}};const o=e({},[["render",function(e,o){const c=a;return t(),s("div",n,[r(c,{closable:!1,title:"菜单三级-1",type:"error"})])}]]);export{o as default};
