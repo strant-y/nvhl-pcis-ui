@@ -468,8 +468,8 @@ const method = {
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
-    setFormItem("Applicant.tEstablishingDate", { rules: null });
-
+    setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("Applicant.cCertfCde", {
@@ -506,7 +506,8 @@ const method = {
       });
 
       // 为法人  企业成立日期
-      setFormItem("Applicant.tEstablishingDate", {
+			setFormItem("Applicant.tEstablishingDate", {
+				disabled: false,
         rules: [getRules("required", {})],
       });
     } else if (val === '07') {
@@ -531,7 +532,7 @@ const method = {
 
     // 切换清空
     if (val) {
-      const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde"];
+      const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde", "Applicant.tEstablishingDate"];
       // 2. 循环赋值 null + 清除对应字段的校验错误
       fieldsToClear.forEach(field => {
         setValue(field, null);
@@ -577,12 +578,25 @@ const method = {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();
       const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();;
       if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
       if (establishingDate > appTm) {
-        ElMessage.error("企业成立时间小于投保日期，请关注!");
-      }
+				ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('Applicant.cWorkDpt')
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("Applicant.tEstablishingDate", null);
+					clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
   //投保人性质(0是法人 1是个人)
@@ -739,7 +753,12 @@ const method = {
         });
       }
       // 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Applicant.tEstablishingDate", {
+				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -858,6 +877,9 @@ const method = {
 				setFormItem("Applicant.cIsIndvduBiz", {
 					disabled: false,
 				});
+				// 企业成立日期
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 			}
       // 是否绿色产业客户
       setFormItem("Applicant.cGreenIndustryCustomers", {
@@ -876,6 +898,7 @@ const method = {
       });
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
+				disabled: true,
         rules: null,
       });
       setFormItem("Applicant.cEnterpriseTel", {
@@ -1197,12 +1220,19 @@ const method = {
   // 移动电话 切换
   mobileChange: (val) => {
     let cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+    let cTel = getValue('Applicant.cTel'); // 固定电话
     clearValidate('Applicant.cTel')
     if (cClntMrk && val) {
       setFormItem("Applicant.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Applicant.cTel", { rules: [getRules("phone", {})] });
+    }
+		if (cClntMrk == '0' && !val && cTel) {
+      setFormItem("Applicant.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("Applicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
 
     setValue('Applicant.cEnterpriseTel', val)
@@ -1381,8 +1411,13 @@ const method = {
     }
     // 企业成立日
     setFormItem("Applicant.tEstablishingDate", {
+			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
+		if (!param.initFlag && !isSpecialCase) {
+			setValue("Applicant.tEstablishingDate", null);
+			clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+		}
     if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
       setFormItem("Applicant.nRegisteredCapital", {
         rules: [getRules("required", {})],
@@ -1438,7 +1473,7 @@ const method = {
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,
     });
-		if (param.initFlag) return;
+		if (param.initFlag || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.cOperaterCertfCde"];
@@ -1477,7 +1512,7 @@ const method = {
     setFormItem("Applicant.cShareholderCode", {
       rules: baseRules,
 		});
-		if (param.initFlag) return;
+		if (param.initFlag || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Applicant.cShareholderCode"];
@@ -1535,32 +1570,6 @@ const method = {
         ElMessage.error(err.message)
         insuranceCoverageFlag = false
       })
-    }
-  },
-  // 大股东证件类型
-  cShareholderCategoryChange:(val:any) => {
-    if (param.initFlag) return;
-    setValue("Applicant.cShareholderCode","")
-    clearValidate('Applicant.cShareholderCode'); // 清除报错信息
-    if (val == "111") {
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("idCard", {})],
-      });
-    } else if (val == "01") {
-      // 统一社会信用代码校验
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("socialCode", {})],
-      });
-    } else if (val === '07') {
-      // 护照
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("passPort", {})],
-      });
-    } else if (val == "553") {
-      // 外国人证件号
-      setFormItem("Applicant.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("ariCard", {})],
-      });
     }
   },
 };

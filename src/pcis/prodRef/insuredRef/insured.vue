@@ -479,12 +479,25 @@ const method = {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();
       const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();
       if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
       if (establishingDate > appTm) {
-        ElMessage.error("企业成立时间小于投保日期，请关注!");
-      }
+        ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('Insured.cWorkDpt')
+			const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("Insured.tEstablishingDate", null);
+					clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
   //被保人性质change事件
@@ -644,7 +657,12 @@ const method = {
         rules: isSpecialCase ? requiredRule : []
       });
       // 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -830,7 +848,12 @@ const method = {
         rules: []
       });
       //企业成立日期
+			if (!param.initFlag) { 
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: true,
         rules: [],
       });
 
@@ -1128,11 +1151,19 @@ const method = {
   },
   mobileChange: (val) => {
     let cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+    let cTel = getValue('Insured.cTel'); // 固定电话
+		clearValidate('Insured.cTel')
     if (cClntMrk && val) {
       setFormItem("Insured.cMobile", {
         rules: [getRules("required", {}), getRules("phoneNo", {})],
       });
       setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+		}
+		if (cClntMrk == '0' && !val && cTel) {
+      setFormItem("Insured.cMobile", {
+        rules: [getRules("phoneNo", {})],
+      });
+      setFormItem("Insured.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
     setValue('Insured.cEnterpriseTel', val)
   },
@@ -1185,7 +1216,8 @@ const method = {
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
-    setFormItem("Insured.tEstablishingDate", { rules: null });
+    setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("Insured.cCertfCde", {
@@ -1222,6 +1254,11 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("socialCode", {})],
       });
+			// 为法人  企业成立日期
+			setFormItem("Insured.tEstablishingDate", {
+				disabled: false,
+				rules: [getRules("required", {})],
+			});
 
 
 
@@ -1256,7 +1293,7 @@ const method = {
 
     // 切换清空
     if (val) {
-      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde"];
+      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde", "Insured.tEstablishingDate"];
       fieldsToClear.forEach(field => {
         setValue(field, null);
         setTimeout(() => {
@@ -1419,8 +1456,13 @@ const method = {
     });
     // 企业成立日
     setFormItem("Insured.tEstablishingDate", {
+			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
-    });
+		});
+		if (!param.initFlag && !isSpecialCase) {
+			setValue("Insured.tEstablishingDate", null);
+			clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+		}
     if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
       setFormItem("Insured.nRegisteredCapital", {
         rules: [getRules("required", {})],
@@ -1474,7 +1516,7 @@ const method = {
     setFormItem("Insured.cOperaterCertfCde", {
       rules: baseRules,
     });
-		if (param.initFlag) return;
+		if (param.initFlag || isCoypBtn.value || isOcrEcho) return;
 
     // 切换清空
     if (val) {
@@ -1514,9 +1556,8 @@ const method = {
     setFormItem("Insured.cShareholderCode", {
       rules: baseRules,
 		});
-		
-		if (param.initFlag) return;
-
+		// 回显不执行下方操作
+		if (param.initFlag || isCoypBtn.value || isOcrEcho) return;
     // 切换清空
     if (val) {
       const fieldsToClear = ["Insured.cShareholderCode"];
@@ -1559,32 +1600,6 @@ const method = {
   // 办理人证件有效止期 小于当前时间
   tOEndTmDisable: (date: any) => {
     return disablePastDates(date);
-  },
-  // 大股东证件类型
-  cShareholderCategoryChange:(val:any) => {
-    if (param.initFlag) return;
-    setValue("Insured.cShareholderCode","")
-    clearValidate('Insured.cShareholderCode'); // 清除报错信息
-    if (val == "111") {
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("idCard", {})],
-      });
-    } else if (val == "01") {
-      // 统一社会信用代码校验
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("socialCode", {})],
-      });
-    } else if (val === '07') {
-      // 护照
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("passPort", {})],
-      });
-    } else if (val == "553") {
-      // 外国人证件号
-      setFormItem("Insured.cShareholderCode", {
-        rules: [getRules("required", {}), getRules("ariCard", {})],
-      });
-    }
   },
 };
 

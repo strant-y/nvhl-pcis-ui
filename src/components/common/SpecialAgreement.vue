@@ -112,7 +112,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         type: "textarea",
 				title: "特约内容",
-				align: "left"
+				align: "left",
         rows: 2,
         dragFlag: true,
       },

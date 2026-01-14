@@ -10,6 +10,7 @@
       v-model="filterText" 
       style="width: 500px"
       placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
+			@keyup.enter="handleSearch(true)"
      >
           <template #append>
             <el-button icon="Search" @click="handleSearch(true)" />
@@ -19,6 +20,7 @@
       ref="treeRef"
       style="max-width: 500px"
       class="filter-tree"
+			node-key="id"
       :data="_nodes"
       lazy
       :load="loadNode"
@@ -113,6 +115,7 @@ const handleSearch = ()=>{
       }
       if(props.isXY){
         try {
+					_nodes.value = []
           // 调用搜索接口
           const params = {
             SCDptCnm: filterText.value.trim(),
@@ -146,7 +149,13 @@ const handleSearch = ()=>{
                   cSignDptMrk:'1'
                 };
 
-                _nodes.value = [searchResultNode];
+								_nodes.value.push(searchResultNode);
+								nextTick(() => {
+									const tree = treeRef.value;
+									if (tree && tree.store.nodesMap['search']) {
+										tree.store.nodesMap['search'].expand();
+									}
+								});
               });
         } catch (error) {
           ElMessage.error('搜索失败，请稍后再试');
@@ -155,6 +164,7 @@ const handleSearch = ()=>{
         }
       }else {
         try {
+					_nodes.value = []
           // 调用搜索接口
           const params = {
             SCDptCnm: filterText.value.trim(),
@@ -184,7 +194,13 @@ const handleSearch = ()=>{
                   expanded: true // 确保根节点展开
                 };
 
-                _nodes.value = [searchResultNode];
+								_nodes.value.push(searchResultNode);
+								nextTick(() => {
+									const tree = treeRef.value;
+									if (tree && tree.store.nodesMap['search']) {
+										tree.store.nodesMap['search'].expand();
+									}
+								});
               });
         } catch (error) {
           ElMessage.error('搜索失败，请稍后再试');

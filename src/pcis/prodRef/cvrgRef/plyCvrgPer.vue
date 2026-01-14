@@ -234,6 +234,10 @@ onMounted(async () => {
 						if (parparam.cRecordType == '9' && e.cRiskNo != parparam.cRiskNo) {
 							return false
 						}
+						// 010022险别初始化不选择010223_工作人员及第三者责任保险
+						if (parparam.cProdNo == "010022" && e.cRiskNo == "010223") {
+							return false
+						}
             riskList.push({
               "TermRisktgt.cLiabCode": e.cRiskNo,
               "TermRisktgt.cDeductibleMethod": "01",
@@ -627,7 +631,7 @@ function setFormValue(value: any) {
   // 公共处理单个 item 的函数
   const processItem = (item: any) => {
     const newItem = JSON.parse(JSON.stringify(item)); // 深拷贝
-    newItem.riskList = newItem['Term.riskList'];
+    newItem.riskList = newItem['Term.riskList'] || [];
     terms.push(newItem['Term.cClauseCode']);
     delete newItem['Term.riskList'];
 

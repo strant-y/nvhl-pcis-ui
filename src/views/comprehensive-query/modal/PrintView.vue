@@ -432,10 +432,17 @@ function getPrnTypeOptions() {
       CTypeCode: props.data?.taskTyp
     })
     .then((res: any) => {
-      if (res.code === 200) {
-        setFormItem("cPrnType", {
-          loadData: res.data,
-        });
+			if (res.code === 200) {
+				// 打印只有已出单(5)状态展示保单/缴费通知书类型,展示保（批）单号字段
+				if (props.data.cAppStatus == "5") {
+					setFormItem("cPrnType", { loadData: res.data });
+					setFormItem('cPlyNo', { hidden: false})
+				} else {
+					setFormItem('cPlyNo', { hidden: true })
+					let data = res.data.filter(item => item.value != "P" && item.value != "W")
+					setFormItem("cPrnType", { loadData: data });
+				}
+        
       }
     });
 }

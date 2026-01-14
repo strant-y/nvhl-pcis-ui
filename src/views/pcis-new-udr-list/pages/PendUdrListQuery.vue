@@ -996,7 +996,9 @@ onMounted(async () => {
       sessionStorage.getItem("navToOrderUdrListQuery") || "{}"
     )?.udrType
   }
-  freeEditRef.value?.setFormValue(param);
+	freeEditRef.value?.setFormValue(param);
+	// 点击消息跳转过来
+	let params = route.params
 
   //首页跳转过来的逻辑 Start
   if (sessionStorage.getItem(AppKey.query.pcis_query_newudrlist)) {
@@ -1019,6 +1021,9 @@ onMounted(async () => {
       freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
       handleQuery();
     }
+	} else if (!!params && params.param.appNo) {
+		freeEditRef.value?.setValue("cAppNo", params.param.appNo);
+		handleQuery();
   } else {
     handleQuery();
   }

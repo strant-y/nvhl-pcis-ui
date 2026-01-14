@@ -1043,30 +1043,33 @@ function setTermConf(d: any,initFlag: boolean){
     }
     
     methodLink(riskFactormap);
-    riskGridConfig.value.tableBtn = [
-      createFreeButtonBase({
-        id:"deleteRisk",
-        type: "danger",
-        link: true,
-        icon: "DeleteFilled",
-        tableClick: (r) => {
-          if(r['TermRisktgt.cRowId']){
-            riskTableRef.value?.setValueByRowKey("TermRisktgt.cCancelMrk", r._dataId, "1");
-          }else{
-            riskTableRef.value?.delRow(r._dataId);
-          }
-        },
-      }),
-    ]
+
+    if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){
+      riskGridConfig.value.tableBtn = [
+        createFreeButtonBase({
+          id:"deleteRisk",
+          type: "danger",
+          link: true,
+          icon: "DeleteFilled",
+          tableClick: (r) => {
+            if(r['TermRisktgt.cRowId']){
+              riskTableRef.value?.setValueByRowKey("TermRisktgt.cCancelMrk", r._dataId, "1");
+            }else{
+              riskTableRef.value?.delRow(r._dataId);
+            }
+          },
+        }),
+      ]
+      riskGridConfig.value.getExSchema = (row : any) => {
+        if(!row['TermRisktgt.cRowId']){
+          return 'default';
+        }
+      };
+      riskGridConfig.value.exfromSchemas = {
+        'default': JSON.parse(JSON.stringify(riskFactormap))
+      }; 
+    }
     riskGridConfig.value.fromSchema = riskFactormap;
-    riskGridConfig.value.getExSchema = (row : any) => {
-      if(!row['TermRisktgt.cRowId']){
-        return 'default';
-      }
-    };
-    riskGridConfig.value.exfromSchemas = {
-      'default': JSON.parse(JSON.stringify(riskFactormap))
-    }; 
   }
   const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
   if (cAddrSeq) {
@@ -1625,6 +1628,9 @@ function setDisabledAll() {
     if(riskGridConfig.value.fromSchema && riskGridConfig.value.fromSchema.length > 0 ){
       riskGridConfig.value.fromSchema.forEach((risk: any) => {
         risk.disabled = true;
+        if(risk.btnItems){
+          risk.btnItems.disabled = true;
+        }
         riskGridConfig.value.tableBtn.forEach((btn: any) => {
           btn.hideBtns = (row: any) => {  // 如果是新增的责任,则固定显示删除按钮,如果是修改的,则根据配置隐藏删除按钮
             const isHasRow = !row['TermRisktgt.cRowId'];
@@ -1647,6 +1653,9 @@ function setDisabledAll() {
   if (termFactormap && termFactormap.value.length > 0) {
     termFactormap.value.forEach((item: any) => {
       item.disabled = true;
+      if(item.btnItems){
+        item.btnItems.disabled = true;
+      }
       if (undis && undis.length > 0) {
         const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
         if (t) {
@@ -1659,6 +1668,9 @@ function setDisabledAll() {
   if (extermConf && extermConf.value.length > 0) {
     extermConf.value.forEach((item: any) => {
       item.disabled = true;
+      if(item.btnItems){
+        item.btnItems.disabled = true;
+      }
       if (undis && undis.length > 0) {
         const t = undis.find((un: any) => un["cEdrItem"] === item["prop"]);
         if (t) {
