@@ -2559,7 +2559,7 @@ async function loadAfter() {
       },
     }),
   )
-  if (props.param.cAppTyp == "E") {
+  if (props.param.cAppTyp == "E" || props.param.cRsnCde) {
     rightBtnList.value.push(
       createFreeButtonBase({
         label: "历史保单",
