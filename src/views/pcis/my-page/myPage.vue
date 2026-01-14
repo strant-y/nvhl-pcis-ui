@@ -5098,7 +5098,7 @@ const generateComparisonItems = () => {
 				ElMessage.error(res.msg);
 			}
 		});
-	},500)
+	},5000)
 };
 
 

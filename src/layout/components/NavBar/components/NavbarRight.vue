@@ -91,7 +91,7 @@
 					</div>
 					<!-- 统一底部按钮：始终显示在 popover 底部 -->
 					<div
-						v-if="currentTab === '消息'" style="padding-top: 10px; border-top: 1px solid #eee; text-align: center;"
+						v-if="currentTab === '消息' && mesList.length > 0" style="padding-top: 10px; border-top: 1px solid #eee; text-align: center;"
 					>
 						<el-button
 							type="text"
