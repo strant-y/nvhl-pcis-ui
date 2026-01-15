@@ -940,13 +940,6 @@ function initMethod(){
   // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
   // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
   if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
-    if (termFactormap && termFactormap.value.length > 0) {
-      termFactormap.value.forEach((item: any) => {
-        if(item.prop === 'Term.nInsuranceFee') {
-          item.disabled = false;
-        }
-      });
-    }
     if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
       for(let i in groupInfo.value) {
         const ginfo = groupInfo.value[i]
@@ -957,19 +950,29 @@ function initMethod(){
             for(let n = 1;n <= riskdata.maxNum;n++) {
               riskdata.col?.forEach((colinfo:any) => {
                 const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                if(item?.prop === 'TermRisktgt.nItemFee') {
+                if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               })
             }
           }
         }
       }
-    }
-    if( extermConf.value && extermConf.value.length > 0 ){
-      extermConf.value.forEach((item: any) => {
-        if(item?.prop === 'Term.nInsuranceFee') {
+      if( extermConf.value && extermConf.value.length > 0 ){
+        extermConf.value.forEach((item: any) => {
+          if(item?.prop === 'Term.nInsuranceFee') {
+            item.disabled = false;
+            item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+          }
+        });
+      }
+    } else 
+    if (termFactormap && termFactormap.value.length > 0) {
+      termFactormap.value.forEach((item: any) => {
+        if(item.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
+          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
         }
       });
     }
@@ -979,13 +982,6 @@ function initMethod(){
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
-            if (termFactormap && termFactormap.value.length > 0) {
-              termFactormap.value.forEach((item: any) => {
-                if(item.prop === 'Term.nInsuranceFee') {
-                  item.disabled = false;
-                }
-              });
-            }
             if(Object.keys(groupInfo.value)?.length > 0) {
               for(let i in groupInfo.value) {
                 const ginfo = groupInfo.value[i]
@@ -996,19 +992,29 @@ function initMethod(){
                     for(let n = 1;n <= riskdata.maxNum;n++) {
                       riskdata.col?.forEach((colinfo:any) => {
                         const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                        if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                           item.disabled = false;
+                          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                         }
                       })
                     }
                   }
                 }
               }
-            }
-            if( extermConf.value && extermConf.value.length > 0 ){
-              extermConf.value.forEach((item: any) => {
-                if(item?.prop === 'Term.nInsuranceFee') {
+              if( extermConf.value && extermConf.value.length > 0 ){
+                extermConf.value.forEach((item: any) => {
+                  if(item?.prop === 'Term.nInsuranceFee') {
+                    item.disabled = false;
+                    item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                  }
+                });
+              }
+            } else 
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1021,13 +1027,6 @@ function initMethod(){
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
-            if (termFactormap && termFactormap.value.length > 0) {
-              termFactormap.value.forEach((item: any) => {
-                if(item.prop === 'Term.nInsuranceFee') {
-                  item.disabled = false;
-                }
-              });
-            }
             if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
               for(let i in groupInfo.value) {
                 const ginfo = groupInfo.value[i]
@@ -1038,19 +1037,29 @@ function initMethod(){
                     for(let n = 1;n <= riskdata.maxNum;n++) {
                       riskdata.col?.forEach((colinfo:any) => {
                         const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                        if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                           item.disabled = false;
+                          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                         }
                       })
                     }
                   }
                 }
               }
-            }
-            if( extermConf.value && extermConf.value.length > 0 ){
-              extermConf.value.forEach((item: any) => {
-                if(item?.prop === 'Term.nInsuranceFee') {
+              if( extermConf.value && extermConf.value.length > 0 ){
+                extermConf.value.forEach((item: any) => {
+                  if(item?.prop === 'Term.nInsuranceFee') {
+                    item.disabled = false;
+                    item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                  }
+                });
+              }
+            } else 
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1488,9 +1497,9 @@ const methodMap = {
       checkData(val,item);
     });
   },
-  nItemFeeChange:(val:any) => {
-    nInsuranceFeeChange(val)
-  },
+  // nItemFeeChange:(val:any) => {
+  //   nInsuranceFeeChange(val)
+  // },
 };
 
 const checkData = (v :any,item:any) => {
@@ -1540,7 +1549,6 @@ const selectRow = (key: any) => {
 };
 
 async function nInsuranceFeeChange(val:any) {
-  debugger
   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
   let qryTerminationStatus = false;
   // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
@@ -1551,13 +1559,8 @@ async function nInsuranceFeeChange(val:any) {
     let nInsuranceFee:number = 0;
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
-        item['Term.riskList'].forEach((i:any) => { i['TermRisktgt.nTotalInsuranceFee'] = i['TermRisktgt.nItemFee'] })
-        if(item['Term.riskList'][0]?.['TermRisktgt.nItemFee']) {
-          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nItemFee'] || 0), 0)
-          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
-        } else {
-          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
-          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
+        if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
+          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nTotalInsuranceFee'] || 0), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
         }
       }
@@ -1630,13 +1633,8 @@ async function nInsuranceFeeChange(val:any) {
     let nInsuranceFee:number = 0;
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
-        item['Term.riskList'].forEach((i:any) => { i['TermRisktgt.nTotalInsuranceFee'] = i['TermRisktgt.nItemFee'] })
-        if(item['Term.riskList'][0]?.['TermRisktgt.nItemFee']) {
-          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nItemFee'] || 0), 0)
-          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
-        } else {
-          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
-          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
+        if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
+          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nTotalInsuranceFee'] || 0), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
         }
       }

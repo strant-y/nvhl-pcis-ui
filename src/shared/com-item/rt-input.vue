@@ -99,6 +99,7 @@
         "
         v-model="vInput"
         @change="handleChange"
+        @blur="handleBlur(vInput)"
       >
         <template #suffix v-if="item.suffix">
           {{ item.suffix }}
@@ -380,6 +381,12 @@ function fallbackCopyTextToClipboard(text:any) {
   }
 
   document.body.removeChild(textArea);
+}
+
+function handleBlur(val:any) {
+  if(props.item?.funcInput) {
+    props.item.funcBlur(val)
+  }
 }
 defineExpose({
   setCustomClass,
