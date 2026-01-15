@@ -648,10 +648,16 @@ function setFormValue(value: any) {
       if (baseItem['Term.cRdrTyp'] == '0') {
         // 用 value[0] 的 nRateVal 更新
         const rateVal = value[0]?.['Term.nRateVal']; // 或根据索引/匹配逻辑
+        const nItemRate = value[0]['Term.riskList']?.[0]?.['TermRisktgt.nItemRate']; // 或根据索引/匹配逻辑
         if (rateVal != undefined && baseItem['Term.riskList']?.[0]) {
-          baseItem['Term.riskList'][0]['TermRisktgt.nItemRate'] = rateVal;
-        }
-        plandata.push(processItem(baseItem));
+					baseItem['Term.riskList'][0]['TermRisktgt.nItemRate'] = rateVal;
+					plandata.push(processItem(baseItem));
+				} else if (nItemRate != undefined) {
+					// 直接处理 value 中每一项
+					value.forEach((item: any) => {
+						plandata.push(processItem(item));
+					});
+				}
       }
     });
   } else {
