@@ -1235,7 +1235,7 @@ const method = {
       setFormItem("Applicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
 
-    setValue('Applicant.cEnterpriseTel', val)
+    // setValue('Applicant.cEnterpriseTel', val)
   },
   // 固定电话
   cTelChange: (val) => {
@@ -1450,9 +1450,9 @@ const method = {
   cOperaterCertfTypChange: (val: any) => {
     console.log('证件种类', val)
     const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
+    // if (param.initFlag) {
+    //   return;
+    // }
     // 清除报错信息
     clearValidate('Applicant.cOperaterCertfCde')
     let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
