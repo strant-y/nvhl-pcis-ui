@@ -275,9 +275,14 @@ onMounted(async () => {
     } else {
       setFormItem('Tgt.cDestinationPort', { disabled: false })
 		}
-		// 047002 诚信声明没值的时候回填固定值
-		if (!getValue('Tgt.cIntegrityStatement') && params.cProdNo === '047002' && (params.pageType == "app" || params.pageType == "copy" && params.pageType == "template")) {
-      setValue('Tgt.cIntegrityStatement', cIntegrityStatementData.value)
+		// 047002 诚信声明、保函类别没值的时候回填固定值，诚信声明、保函详细根据内容自动调整输入框高度
+		if (params.cProdNo === '047002') {
+			setFormItem('Tgt.cIntegrityStatement', { autosize: true })
+			setFormItem('Tgt.cGuaranteeLetter', { autosize: true }) // 保函详细
+			if (!getValue('Tgt.cIntegrityStatement') && (params.pageType == "app" || params.pageType == "copy" && params.pageType == "template")) {
+				setValue('Tgt.cIntegrityStatement', cIntegrityStatementData.value)
+				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
+			}
 		}
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
