@@ -1187,9 +1187,9 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
       payList = [...list];
     } else {
-      // 根据批改次数决定缴费计划生成几条（0 总共2条；1 总共3条，以此类推）
+      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
       if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
-        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo'] + 1);
+        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
       }
     }
   }
@@ -1212,9 +1212,11 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   }
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
     if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY：应收保费= 预收保费变化 * 预收保费汇率
-      pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
+      // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
+      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
     } else {// AY:应收保费= 预估保费变化 * 预估保费汇率
-      pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nPrmVar'], insrnc["ECargoBase.nPrmRmbExch"]);
+      // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nPrmVar'], insrnc["ECargoBase.nPrmRmbExch"]);
+      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nPrmVar']
     }
     // 我司保费: 应收保费 * 我司比例
     pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : decimalTimes(share, pay["ECargoPay.nPayablePrm"]);
@@ -1222,12 +1224,12 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   } else {
     if(props.payWay == '01') {// 预付
       // 应收保费: 折人名币预收保费
-      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbReceivedPrm"] ? insrnc["ECargoBase.nRmbReceivedPrm"] : 0;
+      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nReceivedPrm"] ? insrnc["ECargoBase.nReceivedPrm"] : 0;
       // 我司保费: 折人民币我司协议剩余预收保费(应收保费 * 我司比例)
       pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : decimalTimes(share, pay["ECargoPay.nPayablePrm"]);
     } else {// 非预付
       // 应收保费: 折人名币预估保费
-      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbPrm"] ? insrnc["ECargoBase.nRmbPrm"] : 0;
+      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nPrm"] ? insrnc["ECargoBase.nPrm"] : 0;
       // 我司保费: 折人民币我司预估保费(应收保费 * 我司比例)
       pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : decimalTimes(share, pay["ECargoPay.nPayablePrm"]);
     }
