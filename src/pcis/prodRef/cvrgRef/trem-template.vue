@@ -1263,6 +1263,21 @@ function initMethod(){
   // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
   // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
   if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
+    if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+      const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
+      let prop = '';
+      if(nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+        prop = 'TermRisktgt.nTotalInsuranceFee'
+      } else {
+        prop = 'TermRisktgt.nItemFee'
+      }
+      riskGridConfig.value.fromSchema?.forEach((item:any) => {
+        if(item?.prop === prop) {
+          item.disabled = false;
+          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+        }
+      })
+    } else 
     if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
       for(let i in groupInfo.value) {
         const ginfo = groupInfo.value[i]
@@ -1305,7 +1320,22 @@ function initMethod(){
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
-            if(Object.keys(groupInfo.value)?.length > 0) {
+            if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+              const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
+              let prop = '';
+              if(nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+                prop = 'TermRisktgt.nTotalInsuranceFee'
+              } else {
+                prop = 'TermRisktgt.nItemFee'
+              }
+              riskGridConfig.value.fromSchema?.forEach((item:any) => {
+                if(item?.prop === prop) {
+                  item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                }
+              })
+            } else 
+            if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
               for(let i in groupInfo.value) {
                 const ginfo = groupInfo.value[i]
                 const riskList = groupconf.value[ginfo.cGroupId].riskList
@@ -1350,6 +1380,21 @@ function initMethod(){
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
+            if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+              const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
+              let prop = '';
+              if(nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+                prop = 'TermRisktgt.nTotalInsuranceFee'
+              } else {
+                prop = 'TermRisktgt.nItemFee'
+              }
+              riskGridConfig.value.fromSchema?.forEach((item:any) => {
+                if(item?.prop === prop) {
+                  item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                }
+              })
+            } else 
             if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
               for(let i in groupInfo.value) {
                 const ginfo = groupInfo.value[i]
