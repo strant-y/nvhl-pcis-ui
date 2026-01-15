@@ -328,6 +328,16 @@ onMounted(async () => {
         item['rules'] = item['rules'] ? item['rules'] : [];
       }
     }
+    // 是否施工联合体选是，施工联合体成员必填
+    if(item['prop'] === 'Dist.cUnionMembers') {
+      eventBus.on('setMap-cUnionMembers', (data: any) => {
+        if(data == '1') {
+          item['rules'] = [getRules("required", {})];
+        } else {
+          item['rules'] = [];
+        }
+      })
+    }
   })
   // if(params.cProdNo === '040003'){
   //   formconfig11.value.fromSchema?.forEach(item=>{

@@ -2124,7 +2124,11 @@ const method = {
 			setValue('Tgt.cGuaranteeInstitution', null) // 保函机构
 			setValue('Tgt.cGuaranteeLetter', null) // 保函详细
 		}
-	}
+	},
+  // 是否施工联合体
+  cIsConsortiumFunc: (val:any) => {
+    eventBus.emit('setMap-cUnionMembers', val)
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

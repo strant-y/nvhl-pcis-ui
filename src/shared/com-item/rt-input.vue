@@ -384,7 +384,7 @@ function fallbackCopyTextToClipboard(text:any) {
 }
 
 function handleBlur(val:any) {
-  if(props.item?.funcInput) {
+  if(props.item?.funcBlur) {
     props.item.funcBlur(val)
   }
 }
