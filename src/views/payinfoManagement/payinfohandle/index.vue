@@ -207,6 +207,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             "CProdNo": CProdNos,
                             "CAppNoMulti": CAppNos,
                             "CPrnType": 'W',
+														"CPrnFmp":"JFTZS",
                              plyNo,
                         };
                         console.log(param)
