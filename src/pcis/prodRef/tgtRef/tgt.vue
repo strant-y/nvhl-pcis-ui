@@ -15,7 +15,7 @@ import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
 import { syncDist, selectDist, checkAppBase, queryNrmbAmt, getProductTemplate} from "@/api/prod";
-import { productListA, productListB, productListC } from "./productList";
+import { productListA, productListB, productListC, cIntegrityStatementData, guaranteeTypeMap } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
@@ -274,7 +274,11 @@ onMounted(async () => {
       setFormItem('Tgt.cDestinationPort', { disabled: true })
     } else {
       setFormItem('Tgt.cDestinationPort', { disabled: false })
-    }
+		}
+		// 047002 诚信声明没值的时候回填固定值
+		if (!getValue('Tgt.cIntegrityStatement') && params.cProdNo === '047002' && (params.pageType == "app" || params.pageType == "copy" && params.pageType == "template")) {
+      setValue('Tgt.cIntegrityStatement', cIntegrityStatementData.value)
+		}
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
         const data = getFromValue();
@@ -2073,6 +2077,49 @@ const method = {
       }
     }
   },
+	// 047002 保函类别
+	cGuaranteeTypeChange: async(val: any) => {
+		if (param.initFlag) return
+		const codes = guaranteeTypeMap[val];
+  
+		if (!codes) {
+			console.warn('未找到匹配的保函类别', val);
+			return;
+		}
+
+		const [code1, code2, code3] = codes;
+
+		try {
+			// 并行调用三个接口
+			const [res1, res2, res3] = await Promise.all([
+				codeListStore.queryCodeList({ codeListName: code1 }),
+				codeListStore.queryCodeList({ codeListName: code2 }),
+				codeListStore.queryCodeList({ codeListName: code3 })
+			]);
+
+			// 根据实际返回结构提取你需要的值
+			// 假设接口返回 { data: [...] }，且你只需要第一个项的 name 字段（请按实际调整！）
+			// 如果返回的是纯数组，直接 res1[0]?.name
+
+			// 示例：假设返回的是 { list: [...] } 或直接是数组
+			const getValue1 = (response) => {
+				// 根据你的实际 API 返回结构调整！
+				const list = Array.isArray(response) ? response : response?.data || response?.list || [];
+				// 假设取第一个的 label 字段，或你可以返回整个 list 让前端选择
+				return list.length > 0 ? list[0].label || list[0].name || '' : '';
+			};
+			setValue('Tgt.cGuaranteeTitle', getValue1(res1)) // 保函标题
+			setValue('Tgt.cGuaranteeInstitution', getValue1(res2)) // 保函机构
+			setValue('Tgt.cGuaranteeLetter', getValue1(res3)) // 保函详细
+			console.log('担保信息已更新:', getFromValue());
+		} catch (error) {
+			console.error('加载担保码表失败:', error);
+			// 可选：重置字段或显示错误
+			setValue('Tgt.cGuaranteeTitle', null) // 保函标题
+			setValue('Tgt.cGuaranteeInstitution', null) // 保函机构
+			setValue('Tgt.cGuaranteeLetter', null) // 保函详细
+		}
+	}
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
