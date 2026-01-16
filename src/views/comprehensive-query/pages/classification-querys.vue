@@ -139,10 +139,10 @@
         </el-tooltip>
       </template>
       <template #column-nAmt="{ row }">
-        <span v-html="row.nAmt.toLocaleString() || ''"></span>
+        <span v-html="formatToThousandsHtml(row.nAmt)"></span>
       </template>
       <template #column-nPrm="{ row }">
-        <span v-html="row.nPrm.toLocaleString() || ''"></span>
+        <span v-html="formatToThousandsHtml(row.nPrm)"></span>
       </template>
       <template #column-cUdrNme="{ row }">
         <span v-html="row.cUdrNme || ''"></span>
@@ -1771,14 +1771,13 @@ const normalQueryColumns = [
     },
     {
         prop: "cRsnCde",
-        inputtype: "rtselect",
-        title: " 批改原因",
-        typeCode: "EDR_RSN_LIST_KIND",
+        inputtype: "rtinput",
+        title: "批改原因",
         align: 'left',
         lengthNum: 8,
-				// formatter: (val:any, row:any) => {
-				// 	return row.cRsnCdeText || "";
-				// },
+				formatter: (val:any, row:any) => {
+					return row.cRsnCdeText || val;
+				},
     }
 ]
 // 扩展列（仅用于变更列弹窗，默认未勾选）
@@ -1798,9 +1797,13 @@ const extendColumns = [
   { prop: 'cPrjCtgTyp', inputtype: "rtinput", title: '项目大类', lengthNum: 12, optional: true, align: 'left', },
   { prop: 'cPrjCtgMidTyp', inputtype: "rtinput", title: '项目中类', lengthNum: 12, optional: true, align: 'left', },
   { prop: 'cPrjCtgSubTyp', inputtype: "rtinput", title: '项目子类', lengthNum: 12, optional: true, align: 'left', },
-  { prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', lengthNum: 14, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
-  { prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', lengthNum: 13, optional: true,align: 'left',formatter:(val:any) => {return val?.toLocaleString()} },
-  { prop: 'CSlsNme', inputtype: "rtinput", title: '录单员', optional: true, align: 'left',lengthNum: 4 },
+	{
+		prop: 'nInsuranceVariation', inputtype: "rtinput", title: '保额变化量', lengthNum: 14, optional: true, align: 'left', formatter: (val: any) => { return formatToThousandsHtml(val) }
+	},
+	{
+		prop: 'nPremiumVariation', inputtype: "rtinput", title: '保费变化量', lengthNum: 13, optional: true, align: 'left', formatter: (val: any) => { return formatToThousandsHtml(val) }
+	},
+  { prop: 'cSlsNme', inputtype: "rtinput", title: '录单员', optional: true, align: 'left',lengthNum: 4 },
   { prop: 'cUdrNme', inputtype: "rtinput", title: '核保人', optional: true, slotName: "cUdrNme", align: 'left',lengthNum: 4},
   { prop: 'cPrnNo', inputtype: "rtinput", title: '保批单印刷号', optional: true, lengthNum: 18, lengthIsNumber: true},
   { prop: 'invoiceNum', inputtype: "rtinput", title: '保费发票号', optional: true,lengthNum: 18, lengthIsNumber: true },
@@ -2310,19 +2313,6 @@ async function queryAE( flag?: boolean, isEs = false) {
                 } else {
                    newItem[key] = item[key]; // 部分保持原样
                 }
-            }
-						// 对es金额类做字符串转数字处理
-						if (!!newItem['nAmt']) {
-							newItem['nAmt'] = newItem['nAmt']*1
-						}
-						if (!!newItem['nPrm']) {
-							newItem['nPrm'] = newItem['nPrm']*1
-						}
-						if (!!newItem['nInsuranceVariation']) {
-							newItem['nInsuranceVariation'] = newItem['nInsuranceVariation']*1
-						}
-						if (!!newItem['nPremiumVariation']) {
-							newItem['nPremiumVariation'] = newItem['nPremiumVariation']*1
 						}
             return newItem;
           })
@@ -3271,6 +3261,59 @@ function formatTwoLine(text, num=7) {
     return `${text.slice(0, num)}<br/>${text.slice(num)}`;
   }
   return `${text.slice(0, num)}<br/>${text.slice(num, maxLen)}…`;
+}
+// 处理保额保费，变化量用千分位
+function formatToThousandsHtml(value) {
+  if (value == null || value === '') {
+    return '';
+  }
+
+  let isHtml = false;
+  let tagName = 'span';
+  let attributes = '';
+  let content = '';
+
+  // 判断是否为 HTML 字符串（包含标签）
+  if (typeof value === 'string' && /<[^>]+>/.test(value)) {
+    isHtml = true;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(value, 'text/html');
+    const el = doc.body.firstElementChild;
+
+    if (el) {
+      tagName = el.tagName.toLowerCase();
+      attributes = Array.from(el.attributes)
+        .map(attr => `${attr.name}="${attr.value}"`)
+        .join(' ');
+      content = el.textContent || '';
+    } else {
+      // 解析失败，降级为纯文本
+      content = value;
+      isHtml = false;
+    }
+  } else {
+    // 纯数字或普通字符串
+    content = String(value);
+  }
+
+  // 尝试转为数字并格式化为千分位
+  const num = parseFloat(content.trim());
+  let finalContent = content; // 默认原内容
+
+  if (!isNaN(num) && isFinite(num)) {
+    // 千分位格式（如 250000 → "250,000"）
+    finalContent = num.toLocaleString(); // 或 'zh-CN' 得到 250,000（中文也用逗号）
+    // 注意：toLocaleString 不会保留小数，除非有小数部分
+    // 如果需要固定小数位：num.toLocaleString('en-US', { minimumFractionDigits: 2 })
+  }
+
+  // 重建输出
+  if (isHtml) {
+    const attrStr = attributes ? ` ${attributes}` : '';
+    return `<${tagName}${attrStr}>${finalContent}</${tagName}>`;
+  } else {
+    return finalContent; // 纯文本千分位
+  }
 }
 
 function setValue(key: string, value: any) {
