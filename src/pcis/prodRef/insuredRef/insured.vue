@@ -114,17 +114,6 @@ onMounted(() => {
     setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
     setFormItem("Insured.cGreenIndustryList", { hidden: true, rules: null });
   }
-  if (!cProdNo?.startsWith("05")) {
-    setFormItem("Insured.cShareholderNature", { hidden: true, rules: null });
-    setFormItem("Insured.cShareholderCode", { hidden: true, rules: null });
-    setFormItem("Insured.cShareholderName", { hidden: true, rules: null });
-    setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
-  } else {
-    setFormItem("Insured.cShareholderNature", { rules: [getRules("required", {})] });
-    setFormItem("Insured.cShareholderCode", { rules: [getRules("required", {})] });
-    setFormItem("Insured.cShareholderName", { rules: [getRules("required", {})] });
-    setFormItem("Insured.cShareholderCategory", { rules: [getRules("required", {})] });
-  }
 
   setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
   setFormItem("Insured.cCreditRating", { hidden: true });

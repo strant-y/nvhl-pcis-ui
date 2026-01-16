@@ -117,23 +117,6 @@ onMounted(() => {
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
       
     }
-    if (!cProdNo.startsWith("05")) {
-      setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderNature", {
-        hidden: true,
-        rules: null,
-      });
-      setFormItem("Applicant.cShareholderCategory", {
-        hidden: true,
-        rules: null,
-      });
-    }else{
-      setFormItem("Applicant.cShareholderName", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderCode", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderNature", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderCategory", { rules: [getRules("required", {})] });
-    }
 
     // 处理邮编
     setFormItem("Applicant.cZipCde", {
