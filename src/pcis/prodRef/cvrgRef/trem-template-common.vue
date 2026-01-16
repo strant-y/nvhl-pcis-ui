@@ -1562,6 +1562,9 @@ async function nInsuranceFeeChange(val:any) {
         if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
           const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nTotalInsuranceFee'] || 0), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+          if(termRef.value?.setValue) {
+            termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
+          }
         }
       }
       nInsuranceFee += Number(item['Term.nInsuranceFee'])
@@ -1636,6 +1639,9 @@ async function nInsuranceFeeChange(val:any) {
         if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
           const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nTotalInsuranceFee'] || 0), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+          if(termRef.value?.setValue) {
+            termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
+          }
         }
       }
       nInsuranceFee += Number(item['Term.nInsuranceFee'])

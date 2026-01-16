@@ -99,6 +99,7 @@
         "
         v-model="vInput"
         @change="handleChange"
+        @input="handleInput"
         @blur="handleBlur(vInput)"
       >
         <template #suffix v-if="item.suffix">
@@ -291,6 +292,9 @@ function handleChange(val?: string | undefined | null) {
     emits("update:modelValue", val);
   }
   // props.item.func ? props.item.func(val) : null;
+  if(handleInputFlag.value === true && props.item?.funcBlur) {
+    props.item.funcBlur(val)
+  }
 }
 
 onMounted(() => {
@@ -386,6 +390,12 @@ function fallbackCopyTextToClipboard(text:any) {
 function handleBlur(val:any) {
   if(props.item?.funcBlur) {
     props.item.funcBlur(val)
+  }
+}
+const handleInputFlag = ref(false);
+function handleInput() {
+  if(props.item?.funcBlur) {
+    handleInputFlag.value = true;
   }
 }
 defineExpose({
