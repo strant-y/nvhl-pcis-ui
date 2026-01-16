@@ -106,6 +106,9 @@ export const FIELD_MAP = {
   c_edr_rsn_detail: 'cEdrRsnDetail',
   c_prj_ctg_mid_typ: 'cPrjCtgMidTyp',
   c_prj_ctg_sub_typ: 'cPrjCtgSubTyp',
-  c_prj_ctg_typ: 'cPrjCtgTyp'
-
+	c_prj_ctg_typ: 'cPrjCtgTyp',
+	n_insurance_variation: 'nInsuranceVariation',
+	n_premium_variation: 'nPremiumVariation',
+	invoice_num: 'invoiceNum',
+	c_rsn_cde_text: 'cRsnCdeText',
 } as const;
