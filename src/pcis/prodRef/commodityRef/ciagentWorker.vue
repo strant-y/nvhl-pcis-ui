@@ -191,6 +191,7 @@ onMounted(() => {
     nextTick(() => {
         // setValue('CDptCde', props.data.data.CDptCde)
         setValue('CDptCnm',props.data.data.rowData['Ci.cDptCde'])
+        handleQuery();
     })
 });
 

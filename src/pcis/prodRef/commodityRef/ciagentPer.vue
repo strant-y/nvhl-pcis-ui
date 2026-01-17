@@ -434,6 +434,9 @@ onMounted(() => {
             };
             setFormItem("CBsnsTyp", obj);
             setValue("CBsnsTyp", props.data.data.cBsnsTyp);
+            nextTick(() => {
+              handleQuery();
+            })
           }
         }
       });
