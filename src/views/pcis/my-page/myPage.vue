@@ -341,7 +341,15 @@
             v-if="underwriteFlag"
             style="margin-bottom: 10px"
           >
-            <underwriteRef ref="underwrite" :pageData="pageData"></underwriteRef>
+            <underwriteRef
+                :pageData="pageData"
+                :ref="(res: any) => {
+                  if(res && res.addProvide){
+                    res.addProvide('domId', 'underwriteurl');
+                  }
+                  underwrite = res
+               }"
+            ></underwriteRef>
           </div>
           <el-backtop :target="'.main-content'" :right="100" :bottom="150" />
         </div>
