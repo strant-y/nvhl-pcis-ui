@@ -139,7 +139,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           dzmodal
-            .open(AddAssoCorrPreCalculFormulaModal, { type: "edit", data: row })
+            .open(AddAssoCorrPreCalculFormulaModal, { type: "edit", data: row, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();
