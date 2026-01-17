@@ -2873,6 +2873,11 @@ function setFormItem(key: any, obj: any) {
 
 // 添加 copyText 方法
 const copyText = (text: any) => {
+  if(isESBool.value && text.indexOf('>') > 0) {
+    const start = text.indexOf('>') + 1;
+    const end = text.indexOf('</');
+    text = text.slice(start, end)
+  }
   if (!text) {
     ElMessage.warning('没有可复制的内容');
     return;
