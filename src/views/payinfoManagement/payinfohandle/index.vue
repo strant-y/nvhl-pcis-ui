@@ -197,10 +197,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                         let CAppNos = ''; // 所选项的流水号组合
                         let CProdNos = ''; // 所选项的流水号组合
                         let plyNo =''; //保单号
+                        let CAppNo =''; //保单号
                         multipleSelection.value.forEach(item => {
                             CAppNos = CAppNos === '' ? item['cAppNo'] : CAppNos + ',' + item['cAppNo'];
                             CProdNos = CProdNos === '' ? item['cProdNo'] : CProdNos + ',' + item['cProdNo'];
-                            plyNo = item['cPlyNo'] ? item['cPlyNo'] : item['cAppNo']
+													plyNo = item['cPlyNo'] ? item['cPlyNo'] : item['cAppNo'];
+														CAppNo = item['cAppNo'];
                         });
                         const param = {
                             "CLanguage": 'C',
@@ -208,7 +210,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             "CAppNoMulti": CAppNos,
                             "CPrnType": 'W',
 														"CPrnFmp":"JFTZS",
-                             plyNo,
+														plyNo,
+														CAppNo,
                         };
                         console.log(param)
                         pcisQueryService.smartbipreview(param)

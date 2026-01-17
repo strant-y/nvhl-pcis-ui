@@ -2017,6 +2017,7 @@ const method = {
   },
 	// 建设工程信息-保险凭证类别
 	cCertificateTypefun: async (val) => {
+		setFormItem('Tgt.cCertificateDetailed', { autosize: true })
 		if (params.initFlag) {
 			return false
 		}
