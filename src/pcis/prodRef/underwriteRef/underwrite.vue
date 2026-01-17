@@ -667,7 +667,8 @@ function loadUwTabData() {
 }
 
 async function queryRiskCodelistFn() {
-  const queryRiskCodelistInfo:any = params.pageName === "priceInquiry" ? await queryRiskCodelistXJ({ cProdNo: params.cProdNo }) : await queryRiskCodelist({ cAppNo: params.cAppNo })
+  if(params.pageName === "priceInquiry") return;
+  const queryRiskCodelistInfo:any = await queryRiskCodelist({ cAppNo: params.cAppNo })
   if(queryRiskCodelistInfo && queryRiskCodelistInfo.code === "1") {
     contRiskInfo.value = queryRiskCodelistInfo.data?.cResv1 || null;
     setFormItem("cIsExcluding", { disabled: queryRiskCodelistInfo.data?.cReadOnly === "1" ? false : true })
@@ -681,8 +682,9 @@ async function queryRiskCodelistFn() {
 
 // 获取风险单位划分列表数据是否多险位
 const getRiskDataIsMultiple = async () => {
+  if(params.pageName === "priceInquiry") return;
   let flag = false;
-  const riskQueryInfo = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  const riskQueryInfo:any = await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
     if(riskQueryInfo.data && riskQueryInfo.data.length > 1) {
       flag = true
@@ -694,7 +696,7 @@ const getRiskDataIsMultiple = async () => {
 // 判断风险单位划分列表中的CRiskLvlCde值是否为null
 const getRiskDataCriskLvlCde = async () => {
   let flag = false;
-  const riskQueryInfo:any = params.pageName === "priceInquiry" ? await riskQueryDataXJ({ cAppNo: params.cAppNo }) : await riskQueryData({ cAppNo: params.cAppNo })
+  const riskQueryInfo:any = await riskQueryData({ cAppNo: params.cAppNo })
   if(riskQueryInfo && riskQueryInfo.code === "200") {
     if(riskQueryInfo.data && !riskQueryInfo.data[0]?.cRiskLvlCde) {
       ElMessage.warning('请先进行险位划分!')

@@ -1284,16 +1284,25 @@ function initMethod(){
         const riskList = groupconf.value[ginfo.cGroupId].riskList
         for(let k in riskList) {
           const riskdata = riskList[k];
-          if(riskdata.maxNum > 0) {
+          const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+          if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
             for(let n = 1;n <= riskdata.maxNum;n++) {
               riskdata.col?.forEach((colinfo:any) => {
                 const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                if(item?.prop === 'TermRisktgt.nItemFee') {
+                if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                   item.disabled = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               })
             }
+          } else 
+          if (termFactormap && termFactormap.value.length > 0) {
+            termFactormap.value.forEach((item: any) => {
+              if(item.prop === 'Term.nInsuranceFee') {
+                item.disabled = false;
+                item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+              }
+            });
           }
         }
       }
@@ -1341,16 +1350,25 @@ function initMethod(){
                 const riskList = groupconf.value[ginfo.cGroupId].riskList
                 for(let k in riskList) {
                   const riskdata = riskList[k];
-                  if(riskdata.maxNum > 0) {
+                  const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+                  if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
                     for(let n = 1;n <= riskdata.maxNum;n++) {
                       riskdata.col?.forEach((colinfo:any) => {
                         const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                        if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                           item.disabled = false;
                           item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                         }
                       })
                     }
+                  } else 
+                  if (termFactormap && termFactormap.value.length > 0) {
+                    termFactormap.value.forEach((item: any) => {
+                      if(item.prop === 'Term.nInsuranceFee') {
+                        item.disabled = false;
+                        item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                      }
+                    });
                   }
                 }
               }
@@ -1401,16 +1419,25 @@ function initMethod(){
                 const riskList = groupconf.value[ginfo.cGroupId].riskList
                 for(let k in riskList) {
                   const riskdata = riskList[k];
-                  if(riskdata.maxNum > 0) {
+                  const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+                  if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
                     for(let n = 1;n <= riskdata.maxNum;n++) {
                       riskdata.col?.forEach((colinfo:any) => {
                         const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                        if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                           item.disabled = false;
                           item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                         }
                       })
                     }
+                  } else 
+                  if (termFactormap && termFactormap.value.length > 0) {
+                    termFactormap.value.forEach((item: any) => {
+                      if(item.prop === 'Term.nInsuranceFee') {
+                        item.disabled = false;
+                        item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                      }
+                    });
                   }
                 }
               }
@@ -2063,8 +2090,14 @@ async function nInsuranceFeeChange(val:any) {
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
         if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
-          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nTotalInsuranceFee'] || 0), 0)
+          const totalFee = item['Term.riskList'].reduce((sum, num) => new Decimal(sum).add(new Decimal(num['TermRisktgt.nTotalInsuranceFee'] || 0)), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+          if(term.value?.cRdrTyp === '0') {
+            termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
+          }
+          if(termRef.value?.setValue) {
+            termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
+          }
         }
       }
       nInsuranceFee += Number(item['Term.nInsuranceFee'])
@@ -2136,8 +2169,14 @@ async function nInsuranceFeeChange(val:any) {
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
         if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
-          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nTotalInsuranceFee'] || 0), 0)
+          const totalFee = item['Term.riskList'].reduce((sum, num) => new Decimal(sum).add(new Decimal(num['TermRisktgt.nTotalInsuranceFee'] || 0)), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+          if(term.value?.cRdrTyp === '0') {
+            termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
+          }
+          if(termRef.value?.setValue) {
+            termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
+          }
         }
       }
       nInsuranceFee += Number(item['Term.nInsuranceFee'])
