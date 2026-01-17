@@ -716,7 +716,9 @@ function setRiskunitDisabled() {
   // 是否临分复选框置灰
   checkboxDisabledFlag.value = true
 }
-
+function addProvide<T>(key: InjectionKey<T> | string, value: T) {
+  underwriteEditRef?.value?.addProvide(key, value);
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -725,6 +727,7 @@ defineExpose({
   getValue,
   setRiskunitDisabled,
   getRiskDataCriskLvlCde,
+  addProvide
 });
 </script>
 <style lang="scss" scoped>

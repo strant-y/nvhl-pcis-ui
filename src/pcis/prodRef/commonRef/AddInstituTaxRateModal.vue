@@ -53,7 +53,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "条款代码及名称",
         rules: [getRules("required", { change: "条款代码及名称不能为空" })],
         typeCode: "Cvrg_LIST",
-        codeParam: { cProdNo: tabref.getFromValue().cProdNo },
+        codeParam: { cProdNo: tabref?.getFromValue()?.cProdNo },
         // loadData: [
         //   {
         //     label: "060615航空旅客意外伤害保险",

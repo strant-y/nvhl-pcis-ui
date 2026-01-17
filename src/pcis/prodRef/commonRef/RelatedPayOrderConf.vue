@@ -131,7 +131,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           dzmodal
-            .open(AddRelatedPayOrderConfModal, { type: "edit", data: row })
+            .open(AddRelatedPayOrderConfModal, { type: "edit", data: row, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();

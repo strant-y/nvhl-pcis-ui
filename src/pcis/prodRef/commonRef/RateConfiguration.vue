@@ -188,7 +188,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           dzmodal
-            .open(AddRateConfModal, { type: "edit", data: row })
+            .open(AddRateConfModal, { type: "edit", data: row, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();
