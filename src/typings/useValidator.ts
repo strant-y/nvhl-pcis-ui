@@ -674,8 +674,9 @@ const bankNum = () => {
  */
 const cAppNme = () => {
   return {
-    pattern: /^[\u4e00-\u9fa5\u00B7,a-zA-Z()（）\s]{2,}$/,
-    message: "客户名称 只允许为 中文和·和,或者 字母、空格和括号，且字母汉字长度至少2个",
+    pattern: /^[\u4e00-\u9fa5\u00B7,a-zA-Z()（）\s\.]{2,}$/,
+    // pattern: /^[\u4e00-\u9fa5\u00B7,a-zA-Z()（）\s\d,#&'@+=\/\\[\]\u00a0-\u00ff.-]{2,200}$/iu,
+    message: "客户名称 只允许为 中文和·和,和.或者 字母、空格和括号，且字母汉字长度至少2个",
     trigger: "blur"
   }
 }
