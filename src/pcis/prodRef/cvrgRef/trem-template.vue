@@ -1044,7 +1044,8 @@ function setTermConf(d: any,initFlag: boolean){
     
     methodLink(riskFactormap);
 
-    if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){
+    if(!(props.param.pageType === "PLY_UW_PROCESS_SCENE" || props.param?.pageType === "readonly" ||
+        (props.param?.pageType === "EDR_APP_NEW_SCENE" && props.param.cRsnCde === "99"))){  // 排除核保,只读,数据补全场景,其他场景需要添加删除按钮
       riskGridConfig.value.tableBtn = [
         createFreeButtonBase({
           id:"deleteRisk",
