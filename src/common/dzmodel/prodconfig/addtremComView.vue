@@ -180,6 +180,7 @@ onMounted(async () => {
   const param = props.data.data;
   //添加条款只能查询一条主条款
   param["cTermNo"] = param["mainTerm"];
+  param["cDptCde"] = JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId;
   let res = null;
   if (param.showType === "main") {
     res = await qryProdRelTermRiskList(param);

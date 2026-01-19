@@ -224,6 +224,7 @@ onMounted(async () => {
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
+      cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId
 		};
 		if (parparam.cRecordType == '9') {
 			param.riskList = [parparam.cRiskNo] 

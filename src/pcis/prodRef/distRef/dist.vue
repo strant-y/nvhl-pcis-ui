@@ -231,7 +231,8 @@ watch(
 					eventBus.emit('goodsMxChange', newVal);
 				}
 				// 协议
-				if (props.pageSchema.title === '货物明细信息') {
+        const prods = ['020001','020002','020003','020004','020005','020006','020007','020009','020011','020013','020015','020016','020017']
+				if (props.pageSchema.title === '货物明细信息' && prods.includes(route.params.param.cProdNo)) {
 						let tgtRef = opertaor.getTableRefByKey('cvrg');
             if(newVal.length>0){
 							const paramA = {
