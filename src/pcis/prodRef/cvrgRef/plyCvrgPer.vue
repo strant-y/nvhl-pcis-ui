@@ -166,9 +166,9 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
-const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo);
-const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || route.params?.param?.cInquiryNo);
-const pageName = computed(() => opertaor.getParam()['pageName'] || route.params?.param?.pageName);
+const cAppNo = computed(() => (route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo) || opertaor.getDataAll()['plyBase']['Base.cAppNo']);
+const cInquiryNo = computed(() => route.params?.param?.cInquiryNo || opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
+const pageName = computed(() => route.params?.param?.pageName || opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
 const exli = ref(['010001','010002','010003','010004','010020','070002']);
@@ -550,7 +550,7 @@ function refushCvrgInfo() {
   });
 }
 
-function getAddrSeqOptions(compKey:any) {
+async function getAddrSeqOptions(compKey:any) {
   const selData: any = {
     pageNum: 1,
     pageSize: 9999,
@@ -564,7 +564,7 @@ function getAddrSeqOptions(compKey:any) {
   }else {
     selData['cAppNo'] = cAppNo.value;
   }
-  selectDist(selData).then((addrRes: any) => {
+  await selectDist(selData).then((addrRes: any) => {
     if (addrRes.code === 200) {
         const addrList = addrRes.data.data || [];
         addrSeqArray.value  = addrList.map(item => ({

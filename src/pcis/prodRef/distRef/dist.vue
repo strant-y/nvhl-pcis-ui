@@ -176,7 +176,7 @@ const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', 
 
 watch(
     () => pageresult.list,
-    (newVal: any) => {
+    async (newVal: any) => {
       if (newVal) {
         console.log('发生变化了。。。',newVal)
 				// 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
@@ -273,7 +273,7 @@ watch(
           if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
-          cvrgRef?.getAddrSeqOptions(cComponentTable)
+          await cvrgRef?.getAddrSeqOptions(cComponentTable)
           cvrgRef?.refushCvrgInfo();
         }
         if(route.params.param?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
@@ -605,7 +605,6 @@ const method = {
             }
             const queryParams = distTableRef.value?.getPartnerPage(false);
             handleQuery: method.handleQuery(queryParams);
-            refreshCvrg()
           },
         },
         { width: "60" }
@@ -660,7 +659,6 @@ const method = {
           ElMessage.success("删除成功");
           const queryParams = distTableRef.value?.getPartnerPage(false);
           method.handleQuery(queryParams, true);
-          refreshCvrg()
         } else {
           ElMessage.error(res.msg);
         }
@@ -704,7 +702,6 @@ const method = {
                 }
                 const queryParams = distTableRef.value?.getPartnerPage(false);
                 handleQuery: method.handleQuery(queryParams, true);
-                refreshCvrg()
               },
             },
             { width: "60" }
@@ -1118,7 +1115,6 @@ const method = {
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
-              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "全量导入失败");
             }
@@ -1197,7 +1193,6 @@ const method = {
               };
               ElMessage.success(`导入完成：${res.data.msg}`);
               method.handleQuery();
-              refreshCvrg()
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
@@ -1345,7 +1340,6 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
-            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1361,7 +1355,6 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
-            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1388,7 +1381,6 @@ const method = {
             ElMessage.success("删除成功");
             const queryParams = distTableRef.value?.getPartnerPage(false);
             method.handleQuery(queryParams, true);
-            refreshCvrg()
           } else {
             ElMessage.error(res.msg);
           }
@@ -1541,7 +1533,7 @@ async function refreshCvrg() {
     const cvrgRef = opertaor.getTableRefs()['cvrg'];
     try {
       const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
-      cvrgRef?.getAddrSeqOptions(cComponentTable);
+      await cvrgRef?.getAddrSeqOptions(cComponentTable);
       cvrgRef?.refushCvrgInfo();
     } catch (ignore) {
     }
