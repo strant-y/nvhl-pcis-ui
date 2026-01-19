@@ -370,7 +370,7 @@ onMounted(async () => {
 					const sexCode = parseInt(val.substring(16, 17), 10);
 					const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           const age = calculateAgeFromIdCard(val);
-					if (route.params.param.cProdNo === '040019') { 
+					if (route.params.param.cProdNo === '040019' || route.params.param.cProdNo === '047002') { 
 						setValue("Dist.tBirthday", birthday);
 						setValue("Dist.cGender", sex);
 					}
@@ -878,6 +878,18 @@ const cDocumentTypeChange = (val: any) => {
     : [...baseRules, getRules("required", {})]; // 必填：基础规则+required
 
   setFormItem('Dist.cIdentificationNumber', { rules });
+  // 047002证件类型选
+  if(productNo === '047002') {
+    if(val === '111') {
+      setFormItem("Dist.tBirthday", { disabled: true });
+      setFormItem("Dist.cGender", { disabled: true });
+      setFormItem('Dist.nAge', { disabled: true });
+    } else {
+      setFormItem("Dist.tBirthday", { disabled: false });
+      setFormItem("Dist.cGender", { disabled: false });
+      setFormItem('Dist.nAge', { disabled: false });
+    }
+  }
 };
 
 // 05产品-清单信息-证件类型
