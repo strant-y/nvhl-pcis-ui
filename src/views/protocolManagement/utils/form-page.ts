@@ -365,5 +365,92 @@ export class FormPage {
             }
         }
     }
-
+		
+		/**
+		 * @Title: 转换数据
+		 */
+		convertData(result){
+			const res = {};
+			const data = result['data']['composition'];
+			const res1 = {};  //临时存放抽离数据
+			const pageInfo = this.formConfig[0]['pageInfo'];
+			const schema = {};
+			pageInfo.forEach((k) => {
+				let pageKey = k['pageKey'];
+					if (pageKey == 'SpecialAgreement') pageKey = 'ECargoSpecialAgreement'
+					if (pageKey == 'ECargoPayinfo') pageKey = 'ECargoPay'
+					if (pageKey == 'ECargoInsured') pageKey = 'ECargoInsuredDist'
+					if (pageKey == 'ECargoTgtSummary') pageKey = 'ECargoDistSummary'
+					if (!data[pageKey]) {
+							res1[pageKey] = {};
+							schema[pageKey] = k['pageSchema'];
+					}
+			});
+			Object.keys(res1)?.forEach(k => {
+					const sc = schema[k];
+					if (sc['fromSchema'] && sc['fromSchema'].length > 0) {
+							const fromSchema = sc['fromSchema'];
+							fromSchema.forEach(f => {
+									if (f.inputtype === 'rtinputgroup') {
+											const grouplist = f.groupList;
+											if (grouplist && grouplist.length > 0) {
+													grouplist.forEach(g => {
+															const gprop = g['prop']; // 抽离需要的数据
+															const gd = this.getDataByKey(gprop, data);
+															if (gd == 0 || gd) {
+																	res1[k][gprop] = gd;
+															}
+													})
+											}
+									} else {
+											const prop = f['prop']; // 抽离需要的数据
+											const d = this.getDataByKey(prop, data);
+											if (d == 0 || d) {
+													res1[k][prop] = d;
+											}
+									}
+							});
+					}
+			});
+			pageInfo.forEach((k) => {
+					const tab = k['pageType']; // 根据key获取tab 然后判断是否是GridEdit或FreeEdit
+					let voNme = k['pageKey'];
+					const voCde = k['pageCode'];
+					let da = {};
+					if (voNme == 'SpecialAgreement') voNme = 'ECargoSpecialAgreement'
+					if (voNme == 'ECargoPayinfo') voNme = 'ECargoPay'
+					if (voNme == 'ECargoInsured') voNme = 'ECargoInsuredDist'
+					if (voNme == 'ECargoTgtSummary') voNme = 'ECargoDistSummary'
+					if (res1[voNme]) {
+							da = res1[voNme];
+					} else {
+							if (!!tab && 'free' === tab) {
+									// da = (data[voNme] instanceof Array && data[voNme].length > 0) ? data[voNme][0] : data[voNme];
+									da = data[voNme];
+							} else
+									if (!!tab && 'grid' === tab) {
+											da = data[voNme];
+									} else
+											if (!!tab && 'custom' === tab) {
+													da = data[voNme];
+											}
+					}
+					res[voCde] = da;
+			});
+			return res;
+		}
+		getDataByKey(key: string, data: any){
+			let r = null;
+			Object.keys(data).forEach((k) => {
+					if (data[k] && data[k].length > 0) {
+							Object.keys(data[k][0]).forEach((d) => {
+									if (d === key) {
+											r = data[k][0][d];
+											delete data[k][0][d];
+									}
+							});
+					}
+			});
+			return r;
+		}
 }
