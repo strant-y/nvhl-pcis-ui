@@ -2085,6 +2085,7 @@ const method = {
   },
 	// 047002 保函类别
 	cGuaranteeTypeChange: async(val: any) => {
+		const param = opertaor.getParam();
 		if (param.initFlag) return
 		const codes = guaranteeTypeMap[val];
   
