@@ -318,7 +318,7 @@ onBeforeMount(async () => {
   if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type || props.param?.type)){
     nextTick(async ()=>{
       const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
-        AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+        AgreementFeeWarn?.setFormItem("ECargoBase.cPayWay",  {
         typeCode: 'ECargo_Pay_Ways',
         codeParam: { payway: 'all' }
       })
@@ -356,7 +356,7 @@ onBeforeMount(async () => {
 		nextTick(() => {
 			setTimeout(() => {
 				props.param.res.res.composition = formPage.value?.convertData(props.param.res)
-				console.log('query-ops',ops)
+				console.log('query-ops',props.param.res)
 				const res = props.param.res
 			// 续保复制
 			if (res) {
@@ -878,7 +878,9 @@ function query() {
         //协议费用
         // const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
         // AgreementFeeWarn.setItemShow()
-        if (props.type === 'EDR_APP_NEW_SCENE') {        
+				// audit，E-协议审核批单展示批改信息和批改比较项，不能修改
+        if (props.type === 'EDR_APP_NEW_SCENE' || (props.type === "audit" && props.param.cAppTyp == 'E')) {        
+					// if (props.type === 'EDR_APP_NEW_SCENE') {        
           if (ops["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = ops["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
@@ -906,6 +908,8 @@ function query() {
           }
           formPage.value?.setPageReadOnly(true, [], {
             success: (pageData: any) => {
+							// audit，E-协议审核批单展示批改信息和批改比较项，不能修改
+							if (props.type === "audit" && props.param.cAppTyp == 'E') return
               getEdrRsnItemFun(
                   "029900",
                   props.param["cDptCde"],

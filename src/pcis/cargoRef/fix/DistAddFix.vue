@@ -30,6 +30,7 @@ import { rule } from "postcss";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
+let isCoypBtn = ref<any>(false);    // 用来处理 同步被保人 清空问题
 const props = defineProps({ 
   data: {
     type: Object,
@@ -345,46 +346,54 @@ onMounted(async  () => {
 });
 
 const funccopyvalue = () => {
-  const applicantValue = formPage.getFormDataById('AgreementApplicant')
-  let insuredValue: any = {};
+	isCoypBtn.value = true; // 存储令牌
+	try {
+		const applicantValue = formPage.getFormDataById('AgreementApplicant')
+		let insuredValue: any = {};
 
-  // 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
-  setFormItem('ECargoInsuredDist.cInsuredNme',{
-    disabled:true
-  })
-  setFormItem('ECargoInsuredDist.cClntMrk',{
-    disabled:true
-  })
-  setFormItem('ECargoInsuredDist.cCertfCde',{
-    disabled:true
-  })
-  setFormItem('ECargoInsuredDist.cCertfCls',{
-    disabled:true
-  })
-  setFormItem('ECargoInsuredDist.tCertfBgnDate',{
-    disabled:true
-  })
-  setFormItem('ECargoInsuredDist.tCertfEndDate',{
-    disabled:true
-  })
-  setFormItem('ECargoInsuredDist.cLongendTyp',{
-    disabled:true
-  })
-  for (const k in applicantValue) {
-    if (k === "ECargoApplicant.cCertfCls") {
-      setTimeout(() => {
-        setValue("ECargoInsuredDist.cCertfCls", applicantValue[k]);
-      }, 0);
-    } else if (k === "ECargoApplicant.cAppCde") {
-      insuredValue["ECargoInsuredDist.cInsuredCde"] = applicantValue[k];
-    } else if (k === "ECargoApplicant.cAppNme") {
-      insuredValue["ECargoInsuredDist.cInsuredNme"] = applicantValue[k];
-    } else if (k.startsWith("ECargoApplicant")) {
-      const nk = k.replace("ECargoApplicant", "ECargoInsuredDist");
-      insuredValue[nk] = applicantValue[k];
-    }
-  }
-  setFormValue(insuredValue);
+		// 同投保人时 客户信息需要禁用   客户名称 被保人性质 证件类型 证件号码  证件有效起 止期
+		setFormItem('ECargoInsuredDist.cInsuredNme',{
+			disabled:true
+		})
+		setFormItem('ECargoInsuredDist.cClntMrk',{
+			disabled:true
+		})
+		setFormItem('ECargoInsuredDist.cCertfCde',{
+			disabled:true
+		})
+		setFormItem('ECargoInsuredDist.cCertfCls',{
+			disabled:true
+		})
+		setFormItem('ECargoInsuredDist.tCertfBgnDate',{
+			disabled:true
+		})
+		setFormItem('ECargoInsuredDist.tCertfEndDate',{
+			disabled:true
+		})
+		setFormItem('ECargoInsuredDist.cLongendTyp',{
+			disabled:true
+		})
+		for (const k in applicantValue) {
+			if (k === "ECargoApplicant.cCertfCls") {
+				setTimeout(() => {
+					setValue("ECargoInsuredDist.cCertfCls", applicantValue[k]);
+				}, 0);
+			} else if (k === "ECargoApplicant.cAppCde") {
+				insuredValue["ECargoInsuredDist.cInsuredCde"] = applicantValue[k];
+			} else if (k === "ECargoApplicant.cAppNme") {
+				insuredValue["ECargoInsuredDist.cInsuredNme"] = applicantValue[k];
+			} else if (k.startsWith("ECargoApplicant")) {
+				const nk = k.replace("ECargoApplicant", "ECargoInsuredDist");
+				insuredValue[nk] = applicantValue[k];
+			}
+		}
+		setFormValue(insuredValue);
+	}
+	finally {
+		setTimeout(() => {
+			isCoypBtn.value = false;
+		}, 1000)
+	}
 }
 // 客户名称
 const funCheckUser = (val:any)=>{
@@ -1056,7 +1065,7 @@ const InsuredCCertfCls =(val:any) => {
     });
   }
   // 回显不执行下方操作
-  if (initFlag && props.data.title !== '新增') return;
+  if (initFlag || isCoypBtn.value || props.data.title !== '新增') return;
   // 切换清空
   if (val) {
     const fieldsToClear = ["ECargoInsuredDist.tBirthday", "ECargoInsuredDist.nAge", "ECargoInsuredDist.cCertfCde", "ECargoInsuredDist.tEstablishingDate"];
