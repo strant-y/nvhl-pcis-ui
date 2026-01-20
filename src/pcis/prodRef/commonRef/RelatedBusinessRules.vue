@@ -133,7 +133,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
         tableClick: (row) => {
           dzmodal
-            .open(AddBusinessRulesModal, { type: "edit", data: row })
+            .open(AddBusinessRulesModal, { type: "edit", data: row, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();

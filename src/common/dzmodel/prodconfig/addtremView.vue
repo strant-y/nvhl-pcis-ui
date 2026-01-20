@@ -248,6 +248,7 @@ if (!value) return true
 
 onMounted(async () => {
   const param = props.data.data;
+  param["cDptCde"] = JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId;
   //添加条款只能查询一条主条款
   if (param.isselectData && param.isselectData.length > 0) {
     param['cTermNo'] = param.isselectData[0]["Term.cClauseCode"];
@@ -424,7 +425,7 @@ function selectMainTerm(isselect = true) {
   });
   if (isselect) {
     let additionStr = selectmainterm.join("@&");
-    qryRelTermList({ cTermNo: additionStr }).then((res: any) => {
+    qryRelTermList({ cTermNo: additionStr, cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId }).then((res: any) => {
       const { code, data, msg } = res;
       const cClauseCategoryMap = {
         "1": "扩展类",

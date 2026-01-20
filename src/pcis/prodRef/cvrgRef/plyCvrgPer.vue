@@ -166,9 +166,9 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
-const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo);
-const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || route.params?.param?.cInquiryNo);
-const pageName = computed(() => opertaor.getParam()['pageName'] || route.params?.param?.pageName);
+const cAppNo = computed(() => (route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo) || opertaor.getDataAll()['plyBase']['Base.cAppNo']);
+const cInquiryNo = computed(() => route.params?.param?.cInquiryNo || opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
+const pageName = computed(() => route.params?.param?.pageName || opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
 const exli = ref(['010001','010002','010003','010004','010020','070002']);
@@ -200,9 +200,13 @@ onMounted(async () => {
   let deleteId = 0 ;
   if(formconfig11.titleBtns){
     // 020018不需要选择货物按钮
-    if(parparam.cProdNo === '020018') {
+    const tableRefs = opertaor.getTableRefs();
+    if(tableRefs && Object.keys(tableRefs)?.filter((item:any) => item.indexOf('CargoDist') > 0)?.length < 1) {
       formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
     }
+    // if(parparam.cProdNo === '020018') {
+    //   formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
+    // }
     formconfig11.titleBtns.forEach((item: any,index :number) => {
       if(item.id === 'selectGoods'){
         deleteId = index;
@@ -220,6 +224,7 @@ onMounted(async () => {
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
+      cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId
 		};
 		if (parparam.cRecordType == '9') {
 			param.riskList = [parparam.cRiskNo] 
@@ -550,7 +555,7 @@ function refushCvrgInfo() {
   });
 }
 
-function getAddrSeqOptions(compKey:any) {
+async function getAddrSeqOptions(compKey:any) {
   const selData: any = {
     pageNum: 1,
     pageSize: 9999,
@@ -564,7 +569,7 @@ function getAddrSeqOptions(compKey:any) {
   }else {
     selData['cAppNo'] = cAppNo.value;
   }
-  selectDist(selData).then((addrRes: any) => {
+  await selectDist(selData).then((addrRes: any) => {
     if (addrRes.code === 200) {
         const addrList = addrRes.data.data || [];
         addrSeqArray.value  = addrList.map(item => ({

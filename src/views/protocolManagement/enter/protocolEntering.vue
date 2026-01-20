@@ -208,7 +208,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val: string) => {
           codeListStore
             .queryCodeList({
-                codeListName: "TERM_LIST_IN_GUIDE_NEW",
+                codeListName: "TERM_LIST_IN_GUIDE_NEW1",
                 codeListParam:{
                 cParCde: val,
                 cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,

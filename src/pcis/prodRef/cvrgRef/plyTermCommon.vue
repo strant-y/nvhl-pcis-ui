@@ -178,6 +178,7 @@ onMounted(async () => {
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
+      cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId
     };
     qryProdRelTermRiskList(param).then((res: any) => {
       const { code, data, msg } = res;
