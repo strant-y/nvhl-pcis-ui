@@ -371,7 +371,7 @@ export class FormPage {
 		 */
 		convertData(result){
 			const res = {};
-			const data = result['data']['composition'];
+			const data = result['data']?.['composition'] || result['res']?.['composition'];
 			const res1 = {};  //临时存放抽离数据
 			const pageInfo = this.formConfig[0]['pageInfo'];
 			const schema = {};
@@ -437,6 +437,10 @@ export class FormPage {
 					}
 					res[voCde] = da;
 			});
+			// 单独处理批改信息组件
+			if (!!data['EdrECargoBase'] && data['EdrECargoBase'].length > 0) {
+				res['AgreementEdrEcargoBase'] = data['EdrECargoBase']
+			}
 			return res;
 		}
 		getDataByKey(key: string, data: any){

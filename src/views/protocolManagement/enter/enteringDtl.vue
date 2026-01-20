@@ -356,7 +356,7 @@ onBeforeMount(async () => {
 		nextTick(() => {
 			setTimeout(() => {
 				props.param.res.res.composition = formPage.value?.convertData(props.param.res)
-				console.log('query-ops',ops)
+				console.log('query-ops',props.param.res)
 				const res = props.param.res
 			// 续保复制
 			if (res) {
