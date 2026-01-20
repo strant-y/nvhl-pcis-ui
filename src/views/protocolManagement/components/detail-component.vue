@@ -260,9 +260,15 @@ onMounted(()=>{
     ) {
       edritemFlag.value = false;
     }
-  }else {
-    edrbaseFlag.value =false
-    edritemFlag.value =false
+	} else {
+		// 协议审核批单展示批改信息和批改比较项，不能修改
+		if (props.pageType === "audit" && idxParam.param.cAppTyp == 'E') {
+			edrbaseFlag.value =true
+    	edritemFlag.value =true
+		} else {
+			edrbaseFlag.value =false
+			edritemFlag.value =false
+		}
   }
 
 })
