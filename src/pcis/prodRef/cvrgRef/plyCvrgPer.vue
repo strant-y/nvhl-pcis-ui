@@ -201,7 +201,7 @@ onMounted(async () => {
   if(formconfig11.titleBtns){
     // 020018不需要选择货物按钮
     const tableRefs = opertaor.getTableRefs();
-    if(tableRefs && Object.keys(tableRefs)?.filter((item:any) => item.indexOf('CargoDist') > 0)?.length < 1) {
+    if(tableRefs && Object.keys(tableRefs)?.filter((item:any) => item.indexOf('CargoDist') !== -1)?.length < 1) {
       formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
     }
     // if(parparam.cProdNo === '020018') {
