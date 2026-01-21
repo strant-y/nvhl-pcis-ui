@@ -2,7 +2,7 @@
   <el-dialog :close-on-click-modal="false"  v-model="dialogVisible"  @close="close" width="90%" title="反洗钱扩展信息">
     <el-config-provider :locale="locale">
       <appExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='1' || controlFlag == 3" ref="appExtendInfoRef"/>
-      <insExtendInfo  :idxParam="idxParam" :data="data" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef" @hasSameInsured="hasSameInsured"/>
+      <insExtendInfo  :idxParam="idxParam" :data="data" :controlFlag="controlFlag" v-if="controlFlag=='2' || controlFlag == 3" ref="inextendRef" @hasSameInsured="hasSameInsured"/>
     </el-config-provider>
 		<div v-if="!saveHidden" style="margin-top: 20px" :style="{ textAlign: 'right' }">
         <rt-button
