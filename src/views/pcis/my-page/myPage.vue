@@ -6520,9 +6520,9 @@ const afterCalcEdrPremium = () => {
   
   const nBefEdrPrm = edrBaseData['EdrBase.nBefEdrPrm']?.replaceAll(',','');
   let lastPrm:any = 0;
-  if(new Decimal(nPrm.value).gt(new Decimal(nBefEdrPrm))) {
+  // if(new Decimal(nPrm.value).gt(new Decimal(nBefEdrPrm))) {
     lastPrm = new Decimal(nPrm.value).sub(new Decimal(nBefEdrPrm))
-  }
+  // }
   const nPrmVar = lastPrm  || 0;
   if(opertaor.getTableRefByKey("ciMasterAgreement")) {
     opertaor
