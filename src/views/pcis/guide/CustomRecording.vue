@@ -481,7 +481,7 @@ import {
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { getListByCode } from "@/api/code-list-service";
 import {useUserStore} from "@/store";
-import { listChrDepts } from "@/api/dept";
+import { listChrDepts, getDeptOptions } from "@/api/dept";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import {scrollByDomId} from "@/utils/common";
 import {POSITE_PAGE_TYPE_APP} from "@/views/pcis/support/composite.types";
@@ -706,7 +706,10 @@ function next() {
                   }
                 });
                 if (!same) {
-                  ElMessage.warning("续保保单的承保机构编码【" + res.res.composition.plyBase[0]?.['Base.cDptCde'] + "】与当前选择的承保机构不在同一【二级机构】下，请重新选择！");
+									getDeptOptions(res.res.composition.plyBase[0]?.['Base.cDptCde']).then((res) => {
+										const msg = res.data[0].label || res.res.composition.plyBase[0]?.['Base.cDptCde'];
+                  	ElMessage.warning("续保保单的承保机构【" + msg + "】与当前选择的承保机构不在同一【二级机构】下，请重新选择！");
+									})
                   return
                 }
               if (res.res.composition.plyBase[0]?.['Base.cTransMrk'] === '1') {
