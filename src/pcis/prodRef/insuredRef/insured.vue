@@ -1495,9 +1495,6 @@ const method = {
       "553": "ariCard",
     };
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    if (cClntMrk == '0') {
-      baseRules = [getRules("required", {}), ...baseRules]
-    }
 
     setFormItem("Insured.cOperaterCertfCde", {
       rules: baseRules,

@@ -623,6 +623,10 @@ const templateDialog = defineAsyncComponent(
 const historyPlyDialog = defineAsyncComponent(
   () => import("@/views/pcis-new-udr-list/common/history-ply.vue")
 )
+// 险位信息
+const riskListDialog = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/risk-list.vue")
+)
 
 /**
  * 锚点点击事件
@@ -2578,6 +2582,21 @@ async function loadAfter() {
         icon: "Memo",
         func: () => {
           handleCheckHistoryPly()
+        },
+      })
+    )
+  }
+  if (props.param?.pageType === "readonly") {
+    rightBtnList.value.push(
+      createFreeButtonBase({
+        label: "险位信息",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+        // svgIcon: "template2",
+        // iconSize: "20",
+        icon: "Memo",
+        func: () => {
+          handleCheckRiskList()
         },
       })
     )
@@ -6501,9 +6520,9 @@ const afterCalcEdrPremium = () => {
   
   const nBefEdrPrm = edrBaseData['EdrBase.nBefEdrPrm']?.replaceAll(',','');
   let lastPrm:any = 0;
-  if(new Decimal(nPrm.value).gt(new Decimal(nBefEdrPrm))) {
+  // if(new Decimal(nPrm.value).gt(new Decimal(nBefEdrPrm))) {
     lastPrm = new Decimal(nPrm.value).sub(new Decimal(nBefEdrPrm))
-  }
+  // }
   const nPrmVar = lastPrm  || 0;
   if(opertaor.getTableRefByKey("ciMasterAgreement")) {
     opertaor
@@ -7500,6 +7519,18 @@ function handleCheckHistoryPly() {
     .open(historyPlyDialog, {
       type: "Issuer",
       data: { objId: props.param?.cPlyNo ||  opertaor.getTableRefByKey("plyBase")?.getValue("Base.cPlyNo")},
+    })
+    .then((res: any) => {
+      if (res.type === "ok") {
+      }
+    });
+}
+// 险位信息
+function handleCheckRiskList() {
+  dzmodal
+    .open(riskListDialog, {
+      type: "Issuer",
+      data: { objId: props.param?.cAppNo ||  opertaor.getTableRefByKey("plyBase")?.getValue("Base.cAppNo")},
     })
     .then((res: any) => {
       if (res.type === "ok") {
