@@ -461,7 +461,7 @@ function getParam() {
   if (props.item.disabled || props.showLabel) {
     if (!p) {
       p = { value: selectedValue.value };
-    } else {
+    } else if(!Array.isArray(selectedValue.value)) {
       p.value = selectedValue.value;
     }
   }
