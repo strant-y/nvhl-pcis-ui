@@ -243,7 +243,7 @@ function confirm() {
 					async (res: any) => {
 						if (res.code == "200") {
 							// 存一份申请单号，把res的单号清空
-							let AgreementBase = JSON.parse(JSON.stringify(res.res.composition.AgreementBase[0]))
+							let AgreementBase = JSON.parse(JSON.stringify(res.res.composition.ECargoBase[0]))
 							clearCEcAgrAppNoValues(res.res.composition)
 							router.push({
 								path: "/protocolManagement/enteringDtl",
