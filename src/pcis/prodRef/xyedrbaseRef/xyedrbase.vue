@@ -396,7 +396,7 @@ onMounted(() => {
         }
         codeListStore
             .queryCodeList({
-                codeListName: "EDR_RSN_LIST_FZ",
+                codeListName: "EDR_RSN_LIST_ECARGO_FZ",
                 codeListParam: param,
             })
             .then((res) => {
