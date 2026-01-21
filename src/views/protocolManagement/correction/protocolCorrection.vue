@@ -36,6 +36,11 @@
           <span v-html="row.cDptCnm || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
+      <template #column-cSubDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cSubDptCnm" placement="top">
+          <span v-html="row.cSubDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
 		</app-table>
   </div>
 </template>
@@ -415,7 +420,7 @@ const tableconfig = reactive<AppTableConfig>(
 				{
 					prop: "policyInfo",
 					inputtype: "rtinput",
-					title: "协议号",
+					title: "申请单号/协议号",
           lengthNum: 22,
           lengthIsNumber: true,
 					slotName: "policyInfo"
@@ -438,7 +443,7 @@ const tableconfig = reactive<AppTableConfig>(
           prop: "cAppId",
           inputtype: "rtinput",
           title: "客户编号",
-          lengthNum: 12,
+          lengthNum: 14,
           lengthIsNumber: true,
         },
         {
@@ -447,7 +452,7 @@ const tableconfig = reactive<AppTableConfig>(
           title: "客户名称",
           slotName: "cAppNme",
           align: 'left',
-          lengthNum: 9,
+          // lengthNum: 12,
         },
         {
           prop: "cDptCnm",
@@ -455,27 +460,35 @@ const tableconfig = reactive<AppTableConfig>(
           title: "出单机构",
           slotName: "cDptCnm",
           align: 'left',
-          lengthNum: 12,
+          // lengthNum: 12,
         },
 				{
-					prop: "InsurancePeriod",
+					prop: "cSubDptCnm",
 					inputtype: "rtinput",
-					title: "协议期间",
-          lengthNum: 36,
-          lengthIsNumber: true,
+					title: "分公司",
+					slotName: "cSubDptCnm",
+					align: 'left',
+					// lengthNum: 12,
 				},
-        // {
-        //   prop: "tInsrncBgnTm",
-        //   inputtype: "rtinput",
-        //   title: "协议起期",
-        //   minWidth: 120,
-        // },
-        // {
-        //   prop: "tInsrncEndTm",
-        //   inputtype: "rtinput",
-        //   title: "协议止期",
-        //   minWidth: 120,
-        // },
+				// {
+				// 	prop: "InsurancePeriod",
+				// 	inputtype: "rtinput",
+				// 	title: "协议期间",
+        //   lengthNum: 36,
+        //   lengthIsNumber: true,
+				// },
+        {
+          prop: "tInsrncBgnTm",
+          inputtype: "rtinput",
+          title: "协议起期",
+          minWidth: 120,
+        },
+        {
+          prop: "tInsrncEndTm",
+          inputtype: "rtinput",
+          title: "协议止期",
+          minWidth: 120,
+        },
         {
           prop: "cAppStatus",
           inputtype: "rtselect",
@@ -487,8 +500,8 @@ const tableconfig = reactive<AppTableConfig>(
         {
           prop: "cPlySts",
           inputtype: "rtselect",
-          title: "有效",
-          lengthNum: 2,
+          title: "是否有效",
+          lengthNum: 4,
           loadData: [
             { label: '有效', value: 'I' },
             { label: '无效', value: 'T' }
@@ -500,6 +513,9 @@ const tableconfig = reactive<AppTableConfig>(
           title: "缴费余额",
           lengthNum: 12,
           lengthIsNumber: true,
+					formatter: (val: any) => {
+							return val.toLocaleString()
+					}
         },
         {
           prop: "id",
@@ -586,7 +602,7 @@ function handleQuery(flag?: boolean) {
 							...item,
 							// 创建一个新字段合并两个值
 							policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
-							InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+							// InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
 						}))
             pageresult.total = pageData.total;
             nextTick(()=>{
