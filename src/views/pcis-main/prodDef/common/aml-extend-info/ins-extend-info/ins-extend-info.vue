@@ -47,6 +47,10 @@ import { qryCustomer } from "@/api/query";
 import { validateIdCard } from "@/typings/method-public";
 
 const props = defineProps({
+	controlFlag:{
+    type:String,
+    required: true, 
+  },
 	data: Object,
 	type: String,
 	idxParam:Object,
@@ -374,6 +378,7 @@ const tableconfig = reactive<AppGridEditConfig>(
 			createFreeButtonBase({
 				type: "primary",
 				label: "同投保人",
+				hidden: props.controlFlag=='1' || props.controlFlag == '3'? false : true,
 				func: async () => {
 					emits("hasSameInsured");
 				},

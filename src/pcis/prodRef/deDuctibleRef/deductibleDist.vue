@@ -207,7 +207,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rttag",
         title: "是否可选",
         effect: "light",
-        width: 62,
+        width: 80,
         loadData: [
           {
             label: "可选",
