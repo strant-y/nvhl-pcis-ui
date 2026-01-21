@@ -1583,7 +1583,7 @@ async function nInsuranceFeeChange(val:any) {
   if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || ['app','template','copy','inquiryToApp'].includes(pageparam.pageType)) {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-    let nInsuranceFee:number = 0;
+    let nInsuranceFee:any = 0;
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
         if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
@@ -1597,9 +1597,8 @@ async function nInsuranceFeeChange(val:any) {
           }
         }
       }
-      nInsuranceFee += Number(item['Term.nInsuranceFee'])
+      nInsuranceFee = new Decimal(nInsuranceFee).add(new Decimal(item['Term.nInsuranceFee'] || 0)).toNumber()
     })
-    // opertaor.getTableRefByKey("cvrg")?.setFormValue(cvrgData)
     if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {// 从共主联、从共无联保
       const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })
       if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
@@ -1663,7 +1662,7 @@ async function nInsuranceFeeChange(val:any) {
   if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-    let nInsuranceFee:number = 0;
+    let nInsuranceFee:any = 0;
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
         if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
@@ -1677,14 +1676,12 @@ async function nInsuranceFeeChange(val:any) {
           }
         }
       }
-      nInsuranceFee += Number(item['Term.nInsuranceFee'])
+      nInsuranceFee = new Decimal(nInsuranceFee).add(new Decimal(item['Term.nInsuranceFee'] || 0)).toNumber()
     })
-    // opertaor.getTableRefByKey("cvrg")?.setFormValue(cvrgData)
     let nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
     const nAmt = opertaor.getTableRefByKey("base")?.getValue("Base.nAmt")
     const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm']?.replaceAll(',','');
-    // const newData = getDatas();
     if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {
       const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' })
       if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
@@ -1705,7 +1702,6 @@ async function nInsuranceFeeChange(val:any) {
             opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
           }
 
-          // const nInsuranceFee = newData['Term.nInsuranceFee'];
           let minPrm:any = 0;
           let maxPrm:any = 0;
           if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
@@ -1731,17 +1727,15 @@ async function nInsuranceFeeChange(val:any) {
         }
       }
     }
-    if(nInsuranceFee != nPrm) {
-      opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
-      opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", nInsuranceFee)
-      opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(nInsuranceFee).sub(new Decimal(nBefEdrPrm)))
-      if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
-        opertaor.getTableRefByKey("cvrg")?.updateTitle()
-      }
-      nextTick(() => {
-        opertaor.getFatherPage().afterCalcEdrPremium()
-      })
+    opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
+    opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", nInsuranceFee)
+    opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(nInsuranceFee).sub(new Decimal(nBefEdrPrm)))
+    if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
+      opertaor.getTableRefByKey("cvrg")?.updateTitle()
     }
+    nextTick(() => {
+      opertaor.getFatherPage().afterCalcEdrPremium()
+    })
   }
 }
 
