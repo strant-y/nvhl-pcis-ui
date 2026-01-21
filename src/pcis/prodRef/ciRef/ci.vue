@@ -75,11 +75,16 @@ onMounted(async () => {
     valideRequired();
     // handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
     if(param.pageType === "inquiryToApp"){
-      const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
-      // 调用联共保信息初始化方法
-      initCiInfo({
-        cCiMrk: plyBaseData["Base.cCiMrk"]
-      });
+      const interval = setInterval(() => {
+        const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+        if(plyBaseData["Base.cCiMrk"]) {
+          clearInterval(interval);
+          // 调用联共保信息初始化方法
+          initCiInfo({
+            cCiMrk: plyBaseData["Base.cCiMrk"]
+          });
+        }
+      }, 500)
     }
   }, 3000);
   formconfig1.fromSchema?.forEach((item: any) => {

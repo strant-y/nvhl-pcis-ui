@@ -535,6 +535,15 @@ export const NewUdrListService = () => {
     return post(`/policy/getHistoryList`, queryParams);
   }
 
+  /**
+   * 险位信息查询
+   *
+   * @param queryParams
+   */
+  const riskQueryDataPage = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/reinsured/riskQueryDataPage`, queryParams);
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -586,5 +595,6 @@ export const NewUdrListService = () => {
     getAppTask,
     getInquiryTask,
     getHistoryList,
+    riskQueryDataPage,
   };
 }

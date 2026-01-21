@@ -561,17 +561,17 @@ const method = {
       });
  
       productStore.setcClntMrk(val);
-      // 办理人
+      // 办理人(0928需求法人时办理人人员姓名、证件类型、证件号码必填、有效止期非必填)
       // setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.tOperaterCertfEndTm", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Applicant.cOperaterCertfTyp", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Applicant.cOperaterCertfCde", {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem("Applicant.tOperaterCertfEndTm", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Applicant.cOperaterCertfTyp", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Applicant.cOperaterCertfCde", {
+      //   rules: [getRules("required", {})],
+      // });
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
@@ -1242,9 +1242,6 @@ cWorkDptChange:(val: any) => {
         "553": "ariCard",
       };
       baseRules = ruleMap[val] ? [getRules(ruleMap[val],{})] : [];
-      if (cClntMrk == '0') {
-        baseRules = [getRules("required", {}), ...baseRules]
-      }
       
       setFormItem("Applicant.cOperaterCertfCde", {
         rules:baseRules,
