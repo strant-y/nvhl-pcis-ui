@@ -1,0 +1,1 @@
+import{co as r}from"./index.D_bZqjh5.js";function e(e){return r("/proddef/getProdEnableList",e)}function n(e){return r("/userTerm/qryUserCommonTerm",e)}function o(e){return r("/userTerm/userUnionTerm",e)}function u(e){return r("/userTerm/unUserUnUntionTerm",e)}export{o as a,e as g,n as q,u};
