@@ -61,8 +61,8 @@ export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
  * es查询
  * @param queryParams
  */
-export function queryInsuredList(queryParams: any): AxiosPromise<any> {
-    return post(`/policy/queryInsuredList`, queryParams);
+export function queryInsuredList(queryParams: any, config = {}): AxiosPromise<any> {
+    return post(`/policy/queryInsuredList`, queryParams, config);
 }
 
 /**
@@ -365,8 +365,8 @@ export function CustomUserList(queryParams: any): AxiosPromise<any> {
 * 查询（汇总）
  * @param queryParams
  */
-export function qryPolicyNewList(queryParams: any): AxiosPromise<any> {
-	return post(`/policy/qryPolicyNewList`, queryParams);
+export function qryPolicyNewList(queryParams: any, config = {}): AxiosPromise<any> {
+	return post(`/policy/qryPolicyNewList`, queryParams, config);
 }
 
 /**
