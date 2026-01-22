@@ -2296,9 +2296,16 @@ async function queryAE( flag?: boolean, isEs = false) {
     } else {
         formconfig1.endBtns[0].loading = true
     }
+		// 超出5秒，取消请求
+		const controller = new AbortController()
+		const timeoutId = setTimeout(() => {
+			controller.abort()
+		}, 5000)
     if (isESBool.value) {
-      queryInsuredList(param)
+      queryInsuredList(param,{ signal: controller.signal })
       .then((res) => {
+				// 成功回调
+    		clearTimeout(timeoutId); // 清除定时器，避免内存泄漏
         setFormItem('cQueryStr',{btnItems: {loading: false}})
         const { code, data, msg } = res;
         if (200 === code) {
@@ -2323,9 +2330,14 @@ async function queryAE( flag?: boolean, isEs = false) {
           ElMessage.error(msg);
         }
       })
+			.catch((error) => {
+				setFormItem('cQueryStr', { btnItems: { loading: false } });
+			});
     }else{
-        qryPolicyNewList(param)
+        qryPolicyNewList(param, { signal: controller.signal })
         .then((res:any) => {
+						// 成功回调
+    				clearTimeout(timeoutId); // 清除定时器，避免内存泄漏
             formconfig1.endBtns[0].loading = false
             const { code, data, msg } = res;
             if (200 === code) {
@@ -2339,6 +2351,9 @@ async function queryAE( flag?: boolean, isEs = false) {
                 ElMessage.error(msg);
             }
         })
+				.catch((error) => {
+					formconfig1.endBtns[0].loading = false
+				});
     }
 }
 
@@ -2424,10 +2439,16 @@ async function queryI(flag?: boolean, isEs = false) {
     } else {
         formconfig1.endBtns[0].loading = true
     }
-
+		// 超出5秒，取消请求
+		const controller = new AbortController()
+		const timeoutId = setTimeout(() => {
+			controller.abort()
+		}, 5000)
     if (isESBool.value) {
-     queryInsuredList(param)
+     queryInsuredList(param,{ signal: controller.signal })
       .then((res) => {
+				// 成功回调
+    		clearTimeout(timeoutId); // 清除定时器，避免内存泄漏
         setFormItem('cQueryStr',{btnItems: {loading: false}})
         const { code, data, msg } = res;
         if (200 === code) {
@@ -2452,9 +2473,14 @@ async function queryI(flag?: boolean, isEs = false) {
           ElMessage.error(msg);
         }
       })
+			.catch((error) => {
+				setFormItem('cQueryStr', { btnItems: { loading: false } });
+			});
     }else{
-      qryPolicyNewList(param)
+      qryPolicyNewList(param,{ signal: controller.signal })
         .then((res:any) => {
+						// 成功回调
+						clearTimeout(timeoutId); // 清除定时器，避免内存泄漏
             formconfig1.endBtns[0].loading = false
             const { code, data, msg } = res;
             if (200 === code) {
@@ -2468,6 +2494,9 @@ async function queryI(flag?: boolean, isEs = false) {
                 ElMessage.error(msg);
             }
         })
+				.catch((error) => {
+					formconfig1.endBtns[0].loading = false
+				});
     }
 }
 
