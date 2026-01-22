@@ -274,7 +274,7 @@
                   ? k.pageCode
                   : k.pageKey
               "
-              v-show="checkShow(k)"
+              v-show="checkTabShow(k)"
             >
           <!-- {{ k.pageKey }} || {{ k.pageCode }} -->
               <component
@@ -3369,6 +3369,22 @@ function checkShow(k:any){
         r = isCiJiMrk.value;
     }else if (k.pageKey === 'distSummary' && props.param?.cProdNo !== '110006') {  //隐藏全部汇总清单组件 110006产品需要展示清单汇总
       r = false;
+    }else if(k.pageKey === 'payinfo' && props.param?.pageName === "priceInquiry") {// 询价隐藏缴费计划
+      r = false;
+    }else{
+      r = acctinfoFlag.value;
+    }
+  }
+  return r;
+}
+
+function checkTabShow(k:any){
+  let r = true;
+  if(k.pageKey !== 'acctinfo'){
+    if(['ciMasterAgreement',
+        'ci','ourCompanyCiShare',
+       ].includes(k.pageKey)){  // 联共保组件,通过isCiJiMrk 控制
+        r = isCiJiMrk.value;
     }else if(k.pageKey === 'payinfo' && props.param?.pageName === "priceInquiry") {// 询价隐藏缴费计划
       r = false;
     }else{

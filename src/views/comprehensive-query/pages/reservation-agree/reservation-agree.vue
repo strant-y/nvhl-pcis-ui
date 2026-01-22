@@ -209,18 +209,10 @@ const tableconfig = reactive<AppTableConfig>(
       }),
 		],
     fromSchema: [
-      {
-        prop: "nSeqNo",
-        inputtype: "rtinput",
-        title: "序号",
-        showIndex: true,
-        fixed: "left",
-        lengthNum: 2,
-      },
 			{
 				prop: "policyInfo",
 				inputtype: "rtinput",
-				title: "协议号",
+				title: "申请单号/协议号",
         fixed: "left",
         lengthNum: 22,
         lengthIsNumber: true,
@@ -229,7 +221,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cEcAgrEdrNo",
         inputtype: "rtinput",
-        lengthNum: 21,
+        lengthNum: 22,
         lengthIsNumber: true,
         title: "批单号",
         slotName: "cEcAgrEdrNo"
@@ -264,70 +256,90 @@ const tableconfig = reactive<AppTableConfig>(
         align: "left",
         lengthNum: 12,
       },
-			{
-				prop: "InsurancePeriod",
-				inputtype: "rtinput",
-				title: "协议期间",
-        lengthNum: 36,
-        lengthIsNumber: true,
-			},
-      // {
-      //   prop: "tInsrncBgnTm",
-      //   inputtype: "rtinput",
-      //   title: "协议起期",
-      // },
-      // {
-      //   prop: "tInsrncEndTm",
-      //   inputtype: "rtinput",
-      //   title: "协议止期",
-      // },
+			// {
+			// 	prop: "InsurancePeriod",
+			// 	inputtype: "rtinput",
+			// 	title: "协议期间",
+      //   lengthNum: 36,
+      //   lengthIsNumber: true,
+			// },
+      {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "协议起期",
+        minWidth: 120,
+      },
+      {
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
+        title: "协议止期",
+        minWidth: 120,
+      },
       {
         prop: "nRmbPrm",
         inputtype: "rtinput",
         title: "预估总保费",
-        lengthNum: 12,
+        lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbAmt",
         inputtype: "rtinput",
         title: "预估总保额",
-        lengthNum: 13,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nLowPrm",
         inputtype: "rtinput",
         title: "最低保费",
-        lengthNum: 12,
+        lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nWhRmbAmt",
         inputtype: "rtinput",
         title: "预扣保额",
-        lengthNum: 13,
+        lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRecRemEstAmt",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保额",
-        lengthNum: 13,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbReceivedPrm",
         inputtype: "rtinput",
         title: "预收保费",
-        lengthNum: 12,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nWhRmbPrm",
@@ -336,14 +348,20 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRecRemPrm",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保费",
-        lengthNum: 12,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "cAppStatus",
@@ -358,7 +376,7 @@ const tableconfig = reactive<AppTableConfig>(
 					{ label: "见费出单退回", value: "8" },
 					{ label: "已拒保", value: "9" },
 				],
-        lengthNum: 6,
+        lengthNum: 7,
         align: "left"
       },
     ],
@@ -403,7 +421,7 @@ const refreshData = (reset = true) => {
 					...item,
 					// 创建一个新字段合并两个值
 					policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
-					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+					// InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
 				}))
         pageresult.total = pageData.total;
       }

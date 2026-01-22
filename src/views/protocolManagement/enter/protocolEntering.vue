@@ -36,6 +36,11 @@
           <span v-html="row.cDptCnm || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
+      <template #column-cSubDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cSubDptCnm" placement="top">
+          <span v-html="row.cSubDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
 		</app-table>
   </div>
 </template>
@@ -350,9 +355,9 @@ const tableconfig = reactive<AppTableConfig>(
 			{
 				prop: "policyInfo",
 				inputtype: "rtinput",
-				title: "协议号",
+				title: "申请单号/协议号",
         lengthNum: 22,
-        // lengthIsNumber: true,
+        lengthIsNumber: true,
 				slotName: "policyInfo"
 			},
       {
@@ -373,8 +378,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppId",
         inputtype: "rtinput",
         title: "客户编号",
-        // lengthNum: 12,
-        // lengthIsNumber: true,
+        lengthNum: 14,
+        lengthIsNumber: true,
       },
       {
         prop: "cAppNme",
@@ -382,7 +387,7 @@ const tableconfig = reactive<AppTableConfig>(
         title: "客户名称",
         slotName: "cAppNme",
         align: 'left',
-        // lengthNum: 9,
+        // lengthNum: 12,
       },
       {
         prop: "cDptCnm",
@@ -392,31 +397,32 @@ const tableconfig = reactive<AppTableConfig>(
         align: 'left',
         // lengthNum: 12,
       },
-			{
-				prop: "InsurancePeriod",
-				inputtype: "rtinput",
-				title: "协议期间",
-        // lengthNum: 36,
-        // lengthIsNumber: true,
-			},
-      // {
-      //   prop: "tInsrncBgnTm",
-      //   inputtype: "rtinput",
-      //   title: "协议起期",
-      //   minWidth: 120,
-      // },
-      // {
-      //   prop: "tInsrncEndTm",
-      //   inputtype: "rtinput",
-      //   title: "协议止期",
-      //   minWidth: 120,
-      // },
+      {
+        prop: "cSubDptCnm",
+        inputtype: "rtinput",
+        title: "分公司",
+        slotName: "cSubDptCnm",
+        align: 'left',
+        // lengthNum: 12,
+      },
+      {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "协议起期",
+        minWidth: 120,
+      },
+      {
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
+        title: "协议止期",
+        minWidth: 120,
+      },
       {
         prop: "cAppStatus",
         inputtype: "rtselect",
         title: "协议状态",
-        // lengthNum: 7,
-        // align: "left",
+        lengthNum: 7,
+        align: "left",
         loadData: appStatusOptions.value
       },
       // {
@@ -545,7 +551,6 @@ function handleQuery(flag?: boolean) {
 								...item,
 								// 创建一个新字段合并两个值
 								policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
-								InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
 							}))
               pageresult.total = pageData.total;
             }
