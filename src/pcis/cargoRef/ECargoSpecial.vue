@@ -374,9 +374,9 @@ const method = {
     let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem('AgreementSpecial'));
     console.log(sessionSpecialAgreement)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    if (!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')) {
-      return ElMessage.warning('请先保存投保单');
-    }
+    // if (!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')) {
+    //   return ElMessage.warning('请先保存投保单');
+    // }
     dialog.value?.open(
       "prdFixSpec",
       {
