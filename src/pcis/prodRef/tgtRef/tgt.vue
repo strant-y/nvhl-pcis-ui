@@ -40,6 +40,7 @@ import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/us
 const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
 import { eventBus } from "@/utils/event-bus";
+import {codelistQuery} from "@/api/dict";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -2071,6 +2072,18 @@ const method = {
 			setFormItem('Tgt.cResistanceRating', {rules: [] });
 			setFormItem('Tgt.cMainClassification', {rules: [] });
 		}
+    if(val) {
+      codelistQuery({ codeListName: 'Subject_Type', codeListParam: { cParCde: val } }).then((res:any) => {
+        if(res.code === 200 && res.data?.length > 0) {
+          setFormItem('Tgt.cTargetType', { loadData: res.data });
+        }
+      });
+    } else {
+      setFormItem('Tgt.cTargetType', { loadData: [] });
+    }
+		if (!param.initFlag) {
+      setValue('Tgt.cTargetType', "");// 标的类型
+    }
 	},
   // 担保金额
   nGuaranteeAmountChange: (val:any) => {

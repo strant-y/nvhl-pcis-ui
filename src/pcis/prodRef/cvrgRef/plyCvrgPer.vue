@@ -50,7 +50,7 @@
         <template v-if="formData['a1'] && formData['a1'].length > 0">
           <myCard
             :cardConfig="{
-              title: '扩展类附加条款信息',
+              title: `${parparam.cProdNo?.startsWith('01') ? '' : '扩展类'}附加条款信息`,
               showInTitle: true,
             }"
           >
@@ -83,7 +83,7 @@
         <template v-if="formData['a2'] && formData['a2'].length > 0">
           <myCard
             :cardConfig="{
-              title: '限制类附加条款信息',
+              title: `${parparam.cProdNo?.startsWith('01') ? '' : '限制类'}附加条款信息`,
               showInTitle: true,
             }"
           >
@@ -106,7 +106,7 @@
         <template v-if="formData['a3'] && formData['a3'].length > 0">
           <myCard
             :cardConfig="{
-              title: '规范类附加条款信息',
+              title: `${parparam.cProdNo?.startsWith('01') ? '' : '规范类'}附加条款信息`,
               showInTitle: true,
             }"
           >
