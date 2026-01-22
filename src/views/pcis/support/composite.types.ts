@@ -388,6 +388,11 @@ export class CompositePageView {
         if(!sessionInfo) {
             const productPage = await getProductPage(param);
             const data = JSON.parse(productPage.data);
+            if(!data) {
+                console.log('productPage', productPage)
+                ElMessage.error(`页面配置信息获取失败-${CProdNo + '_' + CGrpMrk}`);
+                throw new Error('页面配置信息获取失败 -> ', data)
+            }
             result[param.CProdNo] = data[0].pageInfo;
             // 存入当前会话session 下一次获取优先从session里拿
             sessionStorage.setItem(CProdNo + '_' + CGrpMrk, JSON.stringify(data[0].pageInfo));

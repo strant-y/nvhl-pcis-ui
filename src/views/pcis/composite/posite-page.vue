@@ -203,6 +203,7 @@ onBeforeMount(() => {
       return {
         cKindNo: item.cProdNo.substring(0, 2),
         cProdNo: item.cProdNo,
+        cGrpMrk: props.param.cGrpMrk
       }
     });
     // 存储路由参数

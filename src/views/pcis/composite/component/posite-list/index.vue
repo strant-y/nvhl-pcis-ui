@@ -28,7 +28,7 @@ const formconfig = ref(createAppGridEditConfig({
       type: "primary",
       label: "新增",
       func: () => {
-        gridEditRef.value?.addRow();
+        gridEditRef.value?.addRowByData({cGrpMrk: '1'});
       },
     }),
     createFreeButtonBase({
@@ -40,8 +40,10 @@ const formconfig = ref(createAppGridEditConfig({
         if(selRow) {
           gridEditRef.value?.delRow(selRow['_dataId']);
           if(!!selRow['cProdNo'] && selRow['cProdNo'] !== '') {
-            emit('update:prodList', gridEditRef.value?.getFromValue())
-            emit('prodListChange', gridEditRef.value?.getFromValue())
+            const list = gridEditRef.value?.getFromValue()
+            console.log('<-prodListChange-list', list)
+            emit('update:prodList', list)
+            emit('prodListChange', list)
           }
         }
       },
@@ -70,12 +72,31 @@ const formconfig = ref(createAppGridEditConfig({
       width: 100
     },
     {
+      prop: "cGrpMrk",
+      inputtype: "rtselect",
+      title: "团个单标识",
+      width: 80,
+      loadData: [
+        {
+          label: "个单",
+          value: "1",
+        },
+        {
+          label: "团单",
+          value: "0",
+        },
+        // {
+        //   label: "家庭单",
+        //   value: "0",
+        // },
+      ],
+    },
+    {
       prop: "cKindNo",
       inputtype: "rtselect",
       title: "产品大类",
       typeCode: "Query_Kind_List",
       codeParam: {},
-      width: 80,
       func: async (value: string, rowData: any) => {
         const list = await codeListStore.queryCodeList({
           codeListName: 'PROD_LIST',
@@ -114,26 +135,6 @@ const formconfig = ref(createAppGridEditConfig({
         setProdNme(rowData, value);
       },
     },
-    {
-      prop: "cGrpMrk",
-      inputtype: "rtselect",
-      title: "团个单标识",
-      loadData: [
-        {
-          label: "个单",
-          value: "1",
-        },
-        {
-          label: "团单",
-          value: "0",
-        },
-        {
-          label: "家庭单",
-          value: "0",
-        },
-      ],
-      defaultValue: "1",
-    },
   ]
 }));
 
@@ -152,6 +153,7 @@ const setProdNme = async (rowData: any, cProdNo: string) => {
 };
 
 onMounted(() => {
+  console.log('props.prodList', props.prodList)
   if(props.prodList) {
     gridEditRef.value?.setFormValue([]);
     gridEditRef.value?.setFormValue(props.prodList);
