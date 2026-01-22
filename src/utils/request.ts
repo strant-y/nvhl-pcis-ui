@@ -102,7 +102,13 @@ service.interceptors.response.use( (response: AxiosResponse) => {
         ElMessage.error(msg || "系统出错");
       }
     }else {
-      ElMessage.error(error)
+			const isCanceled = error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED';
+			if (isCanceled) {
+				// 请求被取消（超时）
+				ElMessage.warning('请求超时，请稍后重试');
+			} else {
+				ElMessage.error(error)
+			}
     }
     return Promise.reject(error.message);
   }
