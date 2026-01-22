@@ -424,6 +424,7 @@ import {checkIfTruncated} from "@/utils/common";
 import { AppGridEditMethod, createAppGridEditConfig } from "@/shared/app-grid-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import {codelistQuery} from "@/api/dict";
 
 const route = useRoute();
 const templateRef = ref();
@@ -685,6 +686,14 @@ function initData(data: any) {
     }
     if(riskShowTyp.value === 'grid'){
       riskTableRef.value?.setFormValue(newData.riskList);
+      // 标的类别回显
+      if(pageparam.cProdNo?.startsWith('01')) {
+        nextTick(() => {
+          riskTableRef.value?.getFromValue()?.forEach((item:any) => {
+            methodMap.cTargetTypeChange(item['TermRisktgt.cTargetType'], item, true)
+          })
+        })
+      }
     }
     // 041010 非营运客运承运人责任险 标的信息 投保座位总数的值取所有险别信息中的投保座位数（座）的和
     if(pageparam.cProdNo === "041010") {
@@ -2032,6 +2041,19 @@ const methodMap = {
   // nItemFeeChange:(val:any) => {
   //   nInsuranceFeeChange(val)
   // },
+  // 标的类型
+  cTargetTypeChange: (val:any, row:any, flag:any) => {
+    codelistQuery({
+      codeListName: 'tgtTyp_List',
+      codeListParam:{cRemark: val},
+    }).then((res:any) => {
+      // 标的类别
+      if(flag !== true) {
+        row['TermRisktgt.cTargetClass'] = ""
+      }
+      riskTableRef.value?.setFormSchema(row._dataId,'TermRisktgt.cTargetClass','loadData',res.data || [])
+    });
+  },
 };
 
 const checkData = (v :any,item:any) => {
