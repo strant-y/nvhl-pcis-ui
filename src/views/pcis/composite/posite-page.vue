@@ -7,7 +7,7 @@
     </div>
     <div class="center_content">
       <div id="positeList" style="margin-bottom: 7px;">
-        <posite-list v-show="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
+        <posite-list v-if="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
       </div>
       <template v-if="pageView.pageConfig[0]">
         <group-common
@@ -95,15 +95,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import anchorCollapse from './component/anchor/anchor.vue';
-import type { AnchorItem } from './component';
+import type {AnchorItem, GroupForm} from './component';
 import {useDzModal} from "@/common/dzmodel/DzModalService";
 import {
+  CompositePageConfigType,
   CompositePageView,
   POSITE_PAGE_TYPE_APP,
-  POSITE_PAGE_TYPE_EDR,
   POSITE_PAGE_TYPE_READ,
   POSITE_PAGE_TYPE_SAVE,
-  POSITE_PAGE_TYPE_UNDR,
 } from "@/views/pcis/support/composite.types";
 import positeList from "@/views/pcis/composite/component/posite-list/index.vue";
 import groupForm from "@/views/pcis/composite/component/group-form/group-form.vue";
@@ -111,6 +110,7 @@ import groupCommon from "@/views/pcis/composite/component/group-form/group-commo
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import positeApi from "@/api/posite";
+import {clearDataOpertaorByPageKey, useUserStore} from "@/store";
 
 const props:any = defineProps({
   param: {
@@ -118,6 +118,7 @@ const props:any = defineProps({
   },
 });
 
+const userStore = useUserStore();
 const router = useRouter();
 const dzmodal = useDzModal();
 const pageView = ref<CompositePageView>(new CompositePageView());
@@ -134,6 +135,7 @@ const bthList = ref<FreeButtonBase[]>([
     type: "primary",
     id: "btn010101",
     func: () => {
+      calcPremium()
     },
   }),
   createFreeButtonBase({
@@ -141,11 +143,7 @@ const bthList = ref<FreeButtonBase[]>([
     type: "primary",
     id: "btn010102",
     func: () => {
-      const allData = pageView.value.getPageAllData();
-      console.log('allData', allData);
-      positeApi.savePositeInfo({param: props.param, data: allData}).then((res: any) => {
-        console.log('savePositeInfo-res', res);
-      });
+      saveOpt()
     },
   }),
   createFreeButtonBase({
@@ -153,10 +151,47 @@ const bthList = ref<FreeButtonBase[]>([
     type: "primary",
     id: "btn010103",
     func: () => {
+      submitToUndrFn();
     },
   }),
 ]);
 
+/**
+ * 页面结构数据组装完之后 组件开始加载之前执行
+ * @param config
+ */
+pageView.value.beforeCreation = function(config: CompositePageConfigType) {
+  return new Promise((resolve) => {
+    const {anchorConfig, pageConfig} = config;
+    const pageType = props.param.pageType;
+    if (pageType === POSITE_PAGE_TYPE_SAVE) {
+
+    } else if (pageType === POSITE_PAGE_TYPE_READ) {
+
+    }
+    console.error('### info anchorConfig', anchorConfig);
+    console.error('### info pageConfig', pageConfig);
+
+    // 隐藏 申请单号
+    pageConfig.forEach((item: GroupForm) => {
+      if(item.groupId.includes('000000')) {
+        item.pageInfo.forEach(comp => {
+          comp
+              .pageSchema
+              .fromSchema.forEach((ys: any) => {
+            if(ys.prop.includes('cAppNo')) {
+              ys.hidden = true;
+            }
+          })
+        })
+      }
+    })
+    resolve({
+      anchorConfig: anchorConfig,
+      pageConfig: pageConfig,
+    });
+  })
+}
 
 onBeforeMount(() => {
   console.log('props.param', props.param);
@@ -173,7 +208,7 @@ onBeforeMount(() => {
     // 存储路由参数
     pageView.value.setPageParams(props.param);
     // 初始化页面结构
-    pageView.value.buildPage(props.param.cProdDtlList, pageBuildAfter).then((result: any) => {
+    pageView.value.buildPage(props.param.cProdDtlList).then((result: any) => {
       console.log('onBeforeMount - pageView.buildPage result: ', result);
       nextTick(() => {
         // 页面加载完后再显示产品列表组件
@@ -185,19 +220,15 @@ onBeforeMount(() => {
         }else {
           // 暂存、 批改、核保、查看 查询
           positeApi.queryPositeInfo({...props.param, ...{queryType: pageType}}).then((res: any) => {
-            if (res && res.code === 200) {
+            if (res.code === 200) {
               const resultData = res.data;
               if(pageType === POSITE_PAGE_TYPE_SAVE) {
                 saveInit(resultData)
-              }else if(pageType === POSITE_PAGE_TYPE_UNDR) {
-                undrInit(resultData)
-              }else if(pageType === POSITE_PAGE_TYPE_EDR) {
-                edrInit(resultData)
               }else if(pageType === POSITE_PAGE_TYPE_READ) {
                 readInit(resultData)
               }
             } else {
-              ElMessage.error(res ? res.msg : "初始化请求异常");
+              ElMessage.error(res.msg ? res.msg : "初始化请求异常");
             }
           }).catch((err) => {
             ElMessage.error(err);
@@ -210,53 +241,25 @@ onBeforeMount(() => {
   }
 });
 
-/**
- * 页面结构数据组装完之后 组件开始加载之前执行
- * @param config
- */
-const pageBuildAfter = (config: any) => {
-  if(!config) return {};
-  const {anchorConfig, pageConfig} = config;
-  const pageType = props.param.pageType;
-  if (pageType === POSITE_PAGE_TYPE_SAVE) {
-
-  } else if (pageType === POSITE_PAGE_TYPE_UNDR) {
-
-  } else if (pageType === POSITE_PAGE_TYPE_EDR) {
-
-  } else if (pageType === POSITE_PAGE_TYPE_READ) {
-
-  }
-  console.error('### info anchorConfig', anchorConfig);
-  console.error('### info pageConfig', pageConfig);
-  return {
-    anchorConfig: anchorConfig,
-    pageConfig: pageConfig,
-  }
-};
-
 function appInit() {
+  pageView.value.initPageData();
   console.log('appInit');
 }
 function saveInit(pageData: any) {
-  pageView.value.setPageAllData(pageData);
-  console.log('saveInit', pageData);
-}
-function edrInit(pageData: any) {
-  pageView.value.setPageAllData(pageData);
-  pageView.value.setPageDisabledAll();
-  pageView.value.setPageUnDisabledByKeyList([]);
-  console.log('edrInit', pageData);
-}
-function undrInit(pageData: any) {
-  pageView.value.setPageAllData(pageData);
-  pageView.value.setPageDisabledAll();
-  console.log('undrInit', pageData);
+  const data = trimPageData(pageData);
+  pageView.value.setPageAllData(data);
+  console.log('saveInit', data);
 }
 function readInit(pageData: any) {
-  pageView.value.setPageAllData(pageData);
+  const data = trimPageData(pageData);
+  pageView.value.setPageAllData(data);
   pageView.value.setPageDisabledAll();
-  console.log('readInit', pageData);
+  bthList.value.forEach(item => {
+    if(item && ['btn010102', 'btn010103'].includes(item.id)) {
+      item.hidden = true;
+    }
+  })
+  console.log('readInit', data);
 }
 
 const prodListChange = (list: any[]) => {
@@ -272,11 +275,15 @@ const prodListChange = (list: any[]) => {
     },
   }).then(() => {
     console.log('replace props.param', props.param);
-  });
-  pageView.value.buildPage(list, pageBuildAfter).then((result: any) => {
-    console.log('prodListChange - pageView.buildPage result: ', result);
-  }).finally(() => {
-    loading.value = false;
+    // 更新大页面工具中的公共参数
+    pageView.value.setPageParams(props.param);
+    pageView.value.buildPage(list).then((result: any) => {
+      console.log('prodListChange - pageView.buildPage result: ', result);
+    }).finally(() => {
+      loading.value = false;
+    });
+  }).catch((err) => {
+    console.error('prodListChange error ! ', err);
   });
 };
 
@@ -288,10 +295,138 @@ const activeGroup = ref<AnchorItem[]>([
   }
 ]);
 
+
 // 处理锚点数据更新
 const activeChange = (activeItems: AnchorItem[]) => {
   activeGroup.value[0] = activeItems[0];
 };
+
+/**
+ * 保存
+ */
+const saveOpt = () => {
+  const allData = pageView.value.getPageAllData();
+  const params = {param: props.param, data: allData, user: userStore.user}
+  console.log('saveOpt-params', params);
+  positeApi.savePositeInfo(params).then((res: any) => {
+    console.log('savePositeInfo-res', res);
+    if(res.code === 200) {
+      const pageData = trimPageData({...res.data});
+      const cCombinationNo = productList.value[0]['cCombinationNo']
+      const newParams = getNewParams({
+        pageType: POSITE_PAGE_TYPE_SAVE,
+        cCombinationNo: cCombinationNo,
+        cProdDtlList: productList.value,
+      });
+      router.replace({
+        path: "/pcisapp/posite-page",
+        query: {
+          param: JSON.stringify({...newParams}),
+        },
+      }).then(() => {
+        console.log('replace props.param', props.param);
+        // 刷新页面
+        pageView.value.setPageAllData(pageData);
+        // 刷新页面参数
+        pageView.value.updatePageParams(props.param, productList.value);
+
+        console.log('pageView.value.pageConfig', pageView.value.pageConfig)
+      });
+    }
+  });
+}
+
+const calcPremium = () => {
+  const allData = pageView.value.getPageAllData();
+  const params = {param: props.param, data: allData, user: userStore.user}
+  console.log('calcPremium-params', params);
+  positeApi.appCombinationCalc(params).then((res: any) => {
+    console.log('calcPremium-res', res);
+    if(res.code === 200) {
+      const pageData = trimPageData({...res.data});
+      pageView.value.setPageAllData(pageData);
+    }else {
+      ElMessage.error(res.msg)
+    }
+  })
+}
+
+const submitToUndrFn = () => {
+  const allData = pageView.value.getPageAllData();
+  const params = {param: props.param, data: allData, user: userStore.user}
+  console.log('submitToUndrFn-params', params);
+  positeApi.submitCombination(params).then((res: any) => {
+    console.log('submitCombination-res', res);
+    if(res.code === 200) {
+      // const pageData = trimPageData({...res.data});
+      const newParams = getNewParams({
+        pageType: POSITE_PAGE_TYPE_READ,
+      });
+      router.replace({
+        path: "/pcisapp/posite-page",
+        query: {
+          param: JSON.stringify({...newParams}),
+        },
+      }).then(() => {
+        console.log('replace props.param', props.param);
+        pageView.value.updatePageParams(props.param, productList.value);
+        pageView.value.setPageDisabledAll();
+        bthList.value.forEach(item => {
+          if(item && ['btn010102', 'btn010103'].includes(item.id)) {
+            item.disabled = true;
+          }
+        })
+      });
+    }else {
+      ElMessage.error(res.msg)
+    }
+  })
+}
+
+
+/**
+ * 整理页面数据
+ * @param pageData
+ */
+const trimPageData = (pageData: any) => {
+  if(!pageData) return;
+  const resultMap: any = {};
+  const dataKeys = Object.keys(pageData);
+  const prodList = productList.value.map((item: any) =>  {return{...item}});
+  for(const key of dataKeys) {
+    if(!pageData[key]) return;
+    const prodData = {...pageData[key]};
+    console.log('trimPageData', key, prodData);
+    if(key === '000000') {
+      // 删除公共组件中的申请单号
+      if(prodData['plyBase']) {
+        delete prodData['plyBase']['Base.cAppNo']
+      }
+      if(prodData['base']) {
+        delete prodData['base']['Base.cAppNo']
+      }
+      if(prodData['applicant']) {
+        delete prodData['applicant']['Applicant.cAppNo']
+      }
+      if(prodData['insured']) {
+        delete prodData['insured']['Insured.cAppNo']
+      }
+    }else if(prodData['plyBase']) {
+      // 回填产品组件数据
+      const plyBase = prodData['plyBase'][0];
+      const idx = prodList.findIndex(prodInfo => prodInfo.cProdNo === key);
+      if(idx != -1) {
+        prodList[idx]['cAppNo'] = plyBase['Base.cAppNo']
+        prodList[idx]['cPlyNo'] = plyBase['Base.cPlyNo']
+        prodList[idx]['cCombinationNo'] = plyBase['Base.cCombinationNo']
+      }
+    }
+    const opertaor = pageView.value.getDataOpertaorByProdNo(key);
+    resultMap[key] = opertaor.convertData({res: {composition: prodData}})
+  }
+  productList.value = prodList;
+  return resultMap
+}
 
 const getNewParams = (param: any) => {
   return {
@@ -299,6 +434,13 @@ const getNewParams = (param: any) => {
     ...param
   };
 }
+
+onUnmounted(() => {
+  console.log('unmounted');
+  pageView.value.pageConfig.forEach((item: GroupForm) => {
+    clearDataOpertaorByPageKey(item.groupId);
+  })
+})
 </script>
 
 <style lang="scss" scoped>

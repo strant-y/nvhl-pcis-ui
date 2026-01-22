@@ -2,6 +2,7 @@ import {getProductPage} from "@/api/prod";
 import {AnchorItem, GroupForm} from "@/views/pcis/composite/component";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {dataOpertaor} from "@/store";
+import {getData} from "@/pcis/prodRef/dataInit";
 
 /**
  * 公共分组ID
@@ -35,25 +36,68 @@ export const POSITE_PAGE_TYPE_READ =  "positeRead";
  * 公共组件映射
  */
 export const CommonComponentMap = new Map<string, string>();
-CommonComponentMap.set("base", 'positeBase');
+// CommonComponentMap.set("base", 'positeBase');
 CommonComponentMap.set('applicant', 'positeApplicant');
 CommonComponentMap.set('insured', 'positeInsured');
-CommonComponentMap.set('plybase', 'positePlybase');
-CommonComponentMap.set('ci', 'positeCi');
+CommonComponentMap.set('plyBase', 'positePlybase');
+// CommonComponentMap.set('ci', 'positeCi');
+
+export interface CompositePageConfigType {
+    pageConfig: GroupForm[],
+    anchorConfig: AnchorItem[]
+}
 
 /**
  * 组合产品出单页面视图工具
  */
 export class CompositePageView {
-    public anchorConfig = new Array<AnchorItem>();
-    public pageConfig = new Array<GroupForm>();
+    public anchorConfig = reactive<AnchorItem[]>(new Array<AnchorItem>());
+    public pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
     public pageParams = reactive<any>({});
+    // 页面创建之前调用
+    public beforeCreation?: (config: CompositePageConfigType) => Promise<CompositePageConfigType>;
 
     constructor() {
-        this.anchorConfig = new Array<AnchorItem>();
-        this.pageConfig = new Array<any>();
+        this.anchorConfig = reactive<AnchorItem[]>(new Array<AnchorItem>());
+        this.pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
+        this.allDataFormat = this.allDataFormat.bind(this);
     }
 
+    /**
+     * 数据格式化处理
+     * @param id
+     * @param res
+     */
+    allDataFormat = (id: string, res: any): any => {
+        if(!id || !res || !this.pageConfig) return undefined;
+        const data = {...res}
+        const config: GroupForm | undefined = this.pageConfig.find((f: GroupForm) => f.groupId === id)
+        if (config) {
+            if(data) {
+                const item = config.params
+                const props = ['cAppNo', 'cPlyNo', 'cCombinationNo'];
+                const formatList: any[] = [
+                    {key: 'plyBase', pr: 'Base'},
+                    {key: 'base', pr: 'Base'},
+                    {key: 'applicant', pr: 'Applicant'},
+                    {key: 'insured', pr: 'Insured'},
+                ];
+                formatList.forEach(format => {
+                    if(data[format.key]) {
+                        props.forEach(prop => {
+                            data[format.key][format.pr + '.' + prop] = item[prop]
+                        })
+                    }
+                })
+            }
+        }
+        return data
+    }
+
+    /**
+     * 设置路由参数
+     * @param params
+     */
     setPageParams(params: any) {
         Object.assign(this.pageParams, params);
     }
@@ -61,9 +105,8 @@ export class CompositePageView {
     /**
      * 页面构造方法
      * @param list
-     * @param modifCallBack 页面结构赋值前的回调 可修改结构后再返回
      */
-    buildPage(list: any[], modifCallBack: Function = () => {}) {
+    buildPage(list: any[]) {
         console.log('### buildPage-list', list);
         return new Promise((resolve, reject) => {
             const params: any[] = list.map((item: any) => {
@@ -84,21 +127,24 @@ export class CompositePageView {
                     productSchemasMap[key] = value as Array<any>;
                     compList.push(productSchemasMap[key]);
                 });
-                const commonList = this.mergeViews(compList);
-                // 替换公共组件 pageCode
-                commonList.forEach((common: any) => {
-                    const pageKey = common['pageKey'];
-                    if(CommonComponentMap.has(pageKey)) {
-                        common['pageCode'] = CommonComponentMap.get(pageKey);
-                    }
-                    common['id'] = `_${['dist', 'distSummary'].includes(common.pageKey)  ? common.pageCode : common.pageKey}-000000`
-                });
+                console.log('compList', compList)
+                const commonList = this.mergeViews(compList)
+                    .filter((item: any) => CommonComponentMap.has(item['pageKey']))
+                    .map((common: any) => { // 替换公共组件 pageCode
+                        const pageKey = common['pageKey'];
+                        if(CommonComponentMap.has(pageKey)) {
+                            common['pageCode'] = CommonComponentMap.get(pageKey);
+                        }
+                        common['id'] = `_${['dist', 'distSummary'].includes(common.pageKey)  ? common.pageCode : common.pageKey}-000000`
+                        return common;
+                    });
+                console.log('commonList', commonList)
                 const config = this.structureConfig(productSchemasMap, list, commonList);
                 console.log('### buildPage-config ', config);
                 // 加载前的回调
-                if(modifCallBack && typeof modifCallBack === CommonConstants.TYPE_OF_FUNCTION) {
-                    const modifConfig = await modifCallBack({...config});
-                    console.log('modifCallBack result: ', modifConfig);
+                if(this.beforeCreation) {
+                    const modifConfig = await this.beforeCreation({...config});
+                    console.log('beforeCreation result: ', modifConfig);
                     Object.assign(config, modifConfig);
                 }
                 // 新增或替换组
@@ -163,7 +209,7 @@ export class CompositePageView {
         });
     }
 
-    private structureConfig(data: any, list: any[], commonList: any[]) {
+    private structureConfig(data: any, list: any[], commonList: any[]): CompositePageConfigType {
         const structure: GroupForm[] = [];
         const anchorList: AnchorItem[] = [];
 
@@ -233,6 +279,10 @@ export class CompositePageView {
             const pageInfo = pageComponents.filter((item: any) => {
                 if(CommonComponentMap.has(item.pageKey)) {
                     return !commonCodes.includes(CommonComponentMap.get(item.pageKey));
+                }
+                // 暂时屏蔽联共保组件
+                if(['ci', 'ciMasterAgreement', 'ourCompanyCiShare'].includes(item.pageKey)) {
+                    return false
                 }
                 return !commonCodes.includes(item.pageCode)
             });
@@ -319,7 +369,6 @@ export class CompositePageView {
                 }
             }
         }
-
         return Array.from(pageCodeData.entries()).map(([pageCode, data]) => ({
             ...data.baseViewProp,
             pageCode,
@@ -353,8 +402,48 @@ export class CompositePageView {
      */
     private installDataOpertaor() {
         for(const group of this.pageConfig) {
-            dataOpertaor({id: group.groupId, type: OpertaorPosit});
+            try {
+                const opertaor = this.getDataOpertaorByGroupId(group.groupId);
+                opertaor.init();
+                opertaor.setParam({sysDist: 'PCIS', ...group.params});
+            } catch (e) {
+                console.warn(`page group ${group.groupId} init error: `, e);
+            }
         }
+    }
+
+    initPageData() {
+        for(const group of this.pageConfig) {
+            try {
+                const opertaor = this.getDataOpertaorByGroupId(group.groupId);
+                nextTick(() => {
+                    const idata = getData(opertaor);
+                    const initData = opertaor.mapSetData(idata);
+                    opertaor.setDataAll(initData);
+                });
+            } catch (e) {
+                console.warn(`initPageData group ${group.groupId} init error: `, e);
+            }
+        }
+    }
+
+    /**
+     * 更新页面参数
+     */
+    updatePageParams(param: any, list: any[]) {
+        list.forEach((prod: any) => {
+            if(prod.cProdNo !== '000000') {
+                const config: GroupForm | undefined = this.pageConfig.find((f: GroupForm) => f.groupId === `group-${prod.cProdNo}`)
+                if (config) {
+                    config.params = {
+                        ...param,
+                        cPlyNo: prod.cPlyNo,
+                        cAppNo: prod.cAppNo,
+                        cCombinationNo: prod.cCombinationNo,
+                    }
+                }
+            }
+        })
     }
 
     /**
@@ -367,13 +456,42 @@ export class CompositePageView {
         if(fun && typeof fun === CommonConstants.TYPE_OF_FUNCTION) {
             for(const group of this.pageConfig) {
                 if(!exclude || !exclude.includes(group.groupId)) {
-                    const opertaor = dataOpertaor({id: group.groupId});
+                    const opertaor = this.getDataOpertaorByGroupId(group.groupId);
                     fun(opertaor, group);
                 }
             }
         }else {
             console.warn('！！！ linkedOperation方法参数异常');
         }
+    }
+
+    getDataOpertaorByProdNo(prodNo: string, params: any = {}) {
+        return dataOpertaor({id: `group-${prodNo}`, type: OpertaorPosit, allDataFormat: this.allDataFormat, ...params});
+    }
+    getDataOpertaorByGroupId(groupId: string, params: any = {}) {
+        return dataOpertaor({id: groupId, type: OpertaorPosit, allDataFormat: this.allDataFormat, ...params});
+    }
+
+    /**
+     * 校验所有组件
+     */
+    validateAll(): Promise<{validate: boolean, result: Record<string, any>}> {
+        return new Promise(async (resolve, reject) => {
+            let validate = true;
+            const result: Record<string, any> = {};
+            for(const group of this.pageConfig) {
+                const groupId = group.groupId;
+                const oertaor = this.getDataOpertaorByGroupId(groupId);
+                if(oertaor) {
+                    const vald = await oertaor.validateAll(false);
+                    result[groupId] = vald;
+                    if(!vald) {
+                        validate = false;
+                    }
+                }
+            }
+            resolve({validate, result});
+        })
     }
 
     /**
@@ -385,7 +503,7 @@ export class CompositePageView {
             const groupId = group.groupId;
             const groupArr = groupId.split('-');
             const cProdNo = groupArr[1];
-            const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
+            const oertaor = this.getDataOpertaorByGroupId(groupId);
             if(oertaor) {
                 result[cProdNo] = oertaor.getDataAll();
             }
@@ -397,13 +515,17 @@ export class CompositePageView {
      * set所有产品表单的数据
      */
     setPageAllData(data: any) {
-        const keys = Object.keys(data);
-        for(const key of keys) {
-            const groupId = `group-${data[key]}`;
-            const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
-            if(oertaor && data[key]) {
-                oertaor.setDataAll(data[key]);
+        if(data) {
+            for (const group of this.pageConfig) {
+                const groupId = group.groupId;
+                const key = groupId.replace('group-', '');
+                const oertaor = this.getDataOpertaorByGroupId(groupId);
+                if (oertaor && data[key]) {
+                    oertaor.setDataAll(data[key] ? data[key] : {});
+                }
             }
+        }else {
+            console.error('setPageAllData(data: any) param wrong !!!');
         }
     }
 
@@ -412,8 +534,7 @@ export class CompositePageView {
      */
     setPageDisabledAll() {
         for(const group of this.pageConfig) {
-            const groupId = group.groupId;
-            const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
+            const oertaor = this.getDataOpertaorByGroupId(group.groupId);
             if(oertaor) {
                 oertaor.setDisabledAll();
             }
@@ -425,8 +546,7 @@ export class CompositePageView {
     setPageUnDisabledByKeyList(list: any[]) {
         if(list && list.length > 0) {
             for(const group of this.pageConfig) {
-                const groupId = group.groupId;
-                const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
+                const oertaor = this.getDataOpertaorByGroupId(group.groupId);
                 if(oertaor) {
                     oertaor.setUnDisabledByKeyList(list);
                 }

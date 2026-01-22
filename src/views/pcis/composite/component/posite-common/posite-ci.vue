@@ -892,7 +892,9 @@ const initCiInfo = (data: any) => {
     setFormValue([]);
   }
   nextTick(() => {
-    const plyBase = opertaor.getDataAll()['plyBase'];
+    const allTab = opertaor.getDataAll()
+    console.log('allTab', allTab)
+    const plyBase = allTab['plyBase'];
     const cSlsId = plyBase['Base.cSlsId'];
     const cBrkSlsCde = plyBase['Base.cBrkSlsCde'];
     const cBrkrCde = plyBase['Base.cBrkrCde'];

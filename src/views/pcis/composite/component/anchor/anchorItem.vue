@@ -61,6 +61,10 @@ const handleClick = () => {
   width: 200px;
   height: 30px;
   padding-left: 20px;
+
+  &:hover{
+    background-color: var(--menu-active-text);
+  }
 }
 
 .anchor-header:hover {
@@ -85,20 +89,20 @@ const handleClick = () => {
   }
 }
 ._title:hover {
-  color: #409eff;
+  color: var(--el-color-primary);
   cursor: pointer;
 }
 .anchor-link:hover {
-  color: #409eff;
+  color: var(--el-color-primary);
   cursor: pointer;
 }
 
 /* 激活状态样式 */
 .anchor-link.active-link {
-  color: #409eff;
+  color: var(--el-color-primary);
   font-weight: 500;
   ._title{
-    color: #409eff;
+    color: var(--el-color-primary);
     font-weight: 500;
   }
 }
