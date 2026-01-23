@@ -544,6 +544,37 @@ export const NewUdrListService = () => {
     return post(`/reinsured/riskQueryDataPage`, queryParams);
   }
 
+  /**
+   * 风险单位下载模板
+   *
+   * @param queryParams
+   */
+  const downloadDistTemplate = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/policy/downloadDistTemplate`, queryParams, {
+      responseType: 'blob'
+    });
+  }
+
+  /**
+   * 风险单位导入
+   *
+   * @param queryParams
+   */
+  const importUnit = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/reinsured/importUnit`, queryParams);
+  }
+
+  /**
+   * 风险单位导出
+   *
+   * @param queryParams
+   */
+  const exportUnit = async (queryParams: any): AxiosPromise<any> => {
+    return post(`/reinsured/exportUnit`, queryParams, {
+      responseType: 'blob'
+    });
+  }
+
   return {
     getNewUdrList,
     getBackUdrList,
@@ -596,5 +627,8 @@ export const NewUdrListService = () => {
     getInquiryTask,
     getHistoryList,
     riskQueryDataPage,
+    downloadDistTemplate,
+    importUnit,
+    exportUnit,
   };
 }

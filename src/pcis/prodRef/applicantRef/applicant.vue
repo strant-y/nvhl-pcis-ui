@@ -451,7 +451,7 @@ const method = {
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
-    setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
+    // setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
 		clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -489,10 +489,10 @@ const method = {
       });
 
       // 为法人  企业成立日期
-			setFormItem("Applicant.tEstablishingDate", {
-				disabled: false,
-        rules: [getRules("required", {})],
-      });
+			// setFormItem("Applicant.tEstablishingDate", {
+			// 	disabled: false,
+      //   rules: [getRules("required", {})],
+      // });
     } else if (val === '07') {
       // 护照
       setFormItem("Applicant.cCertfCde", {
@@ -778,9 +778,6 @@ const method = {
       setFormItem("Applicant.cFirmscaleTyp", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.cLegalRepresentative", {
-        rules: [getRules("required", {})],
-      });
 
       // 性别 、年龄、生日个人必填
       setFormItem("Applicant.tBirthday", {
@@ -961,9 +958,6 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
-        rules: [],
-      });
-      setFormItem("Applicant.cLegalRepresentative", {
         rules: [],
       });
 

@@ -293,14 +293,13 @@ const method = {
     const baseBefore = tabref["insrnc"].getFromValue();
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    if (route.params.param?.cRsnCde != "46") {
+    if (route.params.param?.cRsnCde == "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm = moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
       baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
       opertaor.getFatherPage().setTmDay(tm)
       setFormValue(baseBefore);
     }
-    nRatioCoefFunc()
     // 059010 借款止期的值和保险止期一致
     if(route.params.param?.cProdNo === '059010') {
       setValue('Base.tRunEndTm', v)
@@ -314,6 +313,7 @@ const method = {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
     if (isInit) return;
+    nRatioCoefFunc()
     const isFreeDelayPass = await freeDelay(v);
     // 核心拦截逻辑：不满足免费延期条件，直接终止后续流程
     console.log('保险止期', getValue('Base.tInsrncEndTm'))
@@ -576,21 +576,69 @@ const method = {
       setValue('Base.cTmLoanTrm', '')
     }
   },
+  // 保证期起期
+  tGuaranteeBgnTmChange: (val:any) => {
+    if (opertaor.getParam()?.initFlag) return;
+    const bgnTm = val
+    const endTm = getValue('Base.tGuaranteeEndTm')
+    if(bgnTm && endTm && dayjs(bgnTm).isAfter(dayjs(endTm))) {
+      ElMessage.warning('保证期起期不能大于保证期止期')
+      setValue('Base.tGuaranteeBgnTm', "")
+    }
+  },
+  // 保证期止期
+  tGuaranteeEndTmChange: (val:any) => {
+    if (opertaor.getParam()?.initFlag) return;
+    const bgnTm = getValue('Base.tGuaranteeBgnTm')
+    const endTm = val
+    if(bgnTm && endTm && dayjs(bgnTm).isAfter(dayjs(endTm))) {
+      ElMessage.warning('保证期止期不能小于保证期起期')
+      setValue('Base.tGuaranteeEndTm', "")
+    }
+  },
   // 试车期起期
-  tTrialBgnTmChange: (v:any) => {
+  tTrialBgnTmChange: (val:any) => {
+    if (opertaor.getParam()?.initFlag) return;
+    const bgnTm = val
     const endTm = getValue('Base.tTrialEndTm')
-    if(v && endTm && dayjs(endTm).isBefore(dayjs(v))) {
-      setValue('Base.tTrialBgnTm', '')
-      ElMessage.warning("试车期起期不能大于试车期止期")
+    if(bgnTm && endTm && dayjs(bgnTm).isAfter(dayjs(endTm))) {
+      ElMessage.warning('试车期起期不能大于试车期止期')
+      setValue('Base.tTrialBgnTm', "")
     }
   },
   // 试车期止期
-  tTrialEndTmChange: (v:any) => {
+  tTrialEndTmChange: (val:any) => {
+    if (opertaor.getParam()?.initFlag) return;
     const bgnTm = getValue('Base.tTrialBgnTm')
-    if(v && bgnTm && dayjs(bgnTm).isAfter(dayjs(v))) {
-      setValue('Base.tTrialEndTm', '')
-      ElMessage.warning("试车期止期不能小于试车期起期")
+    const endTm = val
+    if(bgnTm && endTm && dayjs(bgnTm).isAfter(dayjs(endTm))) {
+      ElMessage.warning('试车期止期不能小于试车期起期')
+      setValue('Base.tTrialEndTm', "")
     }
+  },
+  // 工程起期
+  tProjectBgnTmChange: (val:any) => {
+    if (opertaor.getParam()?.initFlag) return;
+    const bgnTm = val
+    const endTm = getValue('Base.tProjectEndTm')
+    if(bgnTm && endTm && dayjs(bgnTm).isAfter(dayjs(endTm))) {
+      ElMessage.warning('工程起期不能大于工程止期')
+      setValue('Base.tProjectBgnTm', "")
+    }
+  },
+  // 工程止期
+  tProjectEndTmChange: (val:any) => {
+    if (opertaor.getParam()?.initFlag) return;
+    const bgnTm = getValue('Base.tProjectBgnTm')
+    const endTm = val
+    if(bgnTm && endTm && dayjs(bgnTm).isAfter(dayjs(endTm))) {
+      ElMessage.warning('工程止期不能小于工程起期')
+      setValue('Base.tProjectEndTm', "")
+    }
+  },
+  // 保险期限
+  cTmSysCdeChange: (val:any) => {
+    opertaor.getFatherPage().setTmDay(val || 0)
   },
 };
 
@@ -654,6 +702,7 @@ defineExpose({
   getFormconfig,
   addProvide,
   clearValidate,
+  setFormItem,
 });
 </script>
 

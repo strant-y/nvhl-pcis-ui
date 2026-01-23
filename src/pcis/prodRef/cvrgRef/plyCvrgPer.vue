@@ -159,6 +159,8 @@ import { terConfig } from "@/store/modules/term-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useRoute } from "vue-router";
 const route = useRoute();
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 
 const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -522,6 +524,7 @@ function deleteTermByNo(t: any) {
       }
     }
   });
+  updateInsrnc()
 }
 
 function refushCvrgInfo() {
@@ -599,6 +602,7 @@ function refushData(datas: any) {
   formData.value = {};
   nextTick(() => {
     formData.value = pd;
+    updateInsrnc()
     setTimeout(()=>{  
       showFlush();
     },50);
@@ -839,6 +843,18 @@ function getPlanNo() {
     });
   }
   return plans;
+}
+
+function updateInsrnc() {
+  if(parparam.cProdNo.startsWith("09")) {
+    if(formData.value['a1']?.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [getRules("required", {})] })
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [getRules("required", {})] })
+    } else {
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [] })
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [] })
+    }
+  }
 }
 
 onActivated(() => {

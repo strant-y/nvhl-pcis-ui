@@ -169,7 +169,7 @@ const oldPageSchema = ref<any>({});
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 const addedPlans = ref<string[]>([]);
 const isQuery = ref(false)
-const cProdNos = ['010001','010002','010003','010004','010020'];
+const cProdNos = ['010001','010002','010003','010004','010020','070002'];
 
 // 货物信息回填到标的信息的产品
 const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017'])
@@ -267,10 +267,11 @@ watch(
         if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
            method.getTgtDetailFn();
           //  emit('savePlyInfo');
+          updateCvrgnInsuranceAmount()
         }
         // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
         const targetProducts = ['010001', '010002', '010003', '010004', '010020', '070002'];
-        if( route.params.param?.cProdNo?.startsWith('01') || targetProducts.includes(route.params.param?.cProdNo)){
+        if(targetProducts.includes(route.params.param?.cProdNo)){
           if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
@@ -1741,6 +1742,26 @@ function setDisabledAll() {
   tableconfig.value.tableBtn?.forEach((item: any) => {
     item.hidden = true;
   });
+}
+
+async function updateCvrgnInsuranceAmount() {
+  const termref = opertaor.getTableRefByKey("cvrg");
+  const cvrgData = termref?.getFromValue();
+  const mainTermData = cvrgData.find((item:any) => item['Term.cRdrTyp'] === '0');
+  const riskList = mainTermData?.['Term.riskList'];
+  if(riskList?.length > 0) {
+    const distDataAll = await getTableDataAll();
+    riskList.forEach((item:any) => {
+      const cDistCodeNo = item['TermRisktgt.cDistCodeNo']
+      const nInsuranceAmount = distDataAll.find((i:any) => i['Dist.cCodeNo'] == cDistCodeNo)?.['Dist.nInsuranceAmount'];
+      termref?.setTermData({
+        termNo:mainTermData['Term.cUniqueTermNo'],
+        planNo:mainTermData['Term.cPlanNo'],
+        factorProp: 'TermRisktgt.nInsuranceAmount',
+        riskNo: item['TermRisktgt.cLiabCode']
+      },nInsuranceAmount);  
+    })
+  }
 }
 
 defineExpose({

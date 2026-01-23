@@ -43,6 +43,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { validateIdCard } from "@/typings/method-public";
 import { calculateAgeFromIdCard } from "@/utils/common";
 import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
+import { listChrDepts } from "@/api/dept";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -90,45 +91,64 @@ onMounted(() => {
     getRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async () => {
     //是否小微企业，默认非必填、只读
     // setFormItem("Insured.cIsMicroEntpris", {
     //   rules: null,
     //   disabled: true,
     // });
-  });
-  setValue("Insured.cNation", "CHN"); // 国籍默认中国
-  setFormItem("Insured.cAppNme", { rules: [getRules("required", {}), getRules("cAppNme", {})], });
-  //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-  const cProdNo = opertaor.getParam()?.cProdNo;
-  if (
-    cProdNo === "040001" ||
-    cProdNo === "042002" ||
-    cProdNo === "043004" ||
-    cProdNo === "043005" ||
-    cProdNo === "043011"
-  ) {
-    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
-  }
-  if (cProdNo === '130003') {
-    setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
-    setFormItem("Insured.cGreenIndustryList", { hidden: true, rules: null });
-  }
+    
+    setValue("Insured.cNation", "CHN"); // 国籍默认中国
+    setFormItem("Insured.cAppNme", { rules: [getRules("required", {}), getRules("cAppNme", {})], });
+    //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
+    const cProdNo = opertaor.getParam()?.cProdNo;
+    if (
+      cProdNo === "040001" ||
+      cProdNo === "042002" ||
+      cProdNo === "043004" ||
+      cProdNo === "043005" ||
+      cProdNo === "043011"
+    ) {
+      setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
+    }
+    if (cProdNo === '130003') {
+      setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
+      setFormItem("Insured.cGreenIndustryList", { hidden: true, rules: null });
+    }
 
-  setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
-  setFormItem("Insured.cCreditRating", { hidden: true });
-  setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: true });
-  // 处理邮编
-  setFormItem("Insured.cZipCde", {
-    'maxlength': 6,
-    rules: [getRules("signlessInt", {}), getRules("specifyLength", { len: 6 })],
+    setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
+    setFormItem("Insured.cCreditRating", { hidden: true });
+    setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: true });
+    // 处理邮编
+    setFormItem("Insured.cZipCde", {
+      'maxlength': 6,
+      rules: [getRules("signlessInt", {}), getRules("specifyLength", { len: 6 })],
+    });
+    // 移动电话
+    setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+    // 固话
+    setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+    // 传真校验
+    setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
+
+    if (param.cProdNo === '043009') {
+      setFormItem("Insured.cAgencyReason", { hidden: true });
+      setFormItem("Insured.cEnterpriseTel", { hidden: true });
+      // 福建分公司下的机构 法定代表人、经营范围必填
+      await getDptCdeList();
+      if(isFujianBranch.value) {
+        setFormItem("Insured.cLegalRepresentative", { hidden: false, rules: [getRules("required", {})] });
+        setFormItem("Insured.cBusinessScope", { hidden: false, rules: [getRules("required", {})] });
+      } else {
+        setFormItem("Insured.cLegalRepresentative", { hidden: false });
+        setFormItem("Insured.cBusinessScope", { hidden: false });
+      }
+    }else{
+      setFormItem("Insured.cAgencyReason", { hidden: false });
+      setFormItem("Insured.cLegalRepresentative", { hidden: false });
+      setFormItem("Insured.cEnterpriseTel", { hidden: false });
+    }
   });
-  // 移动电话
-  setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
-  // 固话
-  setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
-  // 传真校验
-  setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
   // 法人身份证
   // setFormItem("Insured.cLegalCertfCde", { rules: [getRules("idCard", {})] });
   setFormItem("Insured.cGcidCode", {
@@ -638,13 +658,21 @@ const method = {
       const isSpecialCase = cWorkDptList.includes(cWorkDpt);
       const requiredRule = [getRules("required", {})];
       //实名认证方式
-      setFormItem("Insured.cRealnameAuthType", {
-        rules: isSpecialCase ? requiredRule : []
-      });
+      // setFormItem("Insured.cRealnameAuthType", {
+      //   rules: isSpecialCase ? requiredRule : []
+      // });
       // 法定代表人/责任人
-      setFormItem("Insured.cLegalRepresentative", {
-        rules: isSpecialCase ? requiredRule : []
-      });
+      if(param.cProdNo === '043009' && isFujianBranch.value) {
+        setFormItem("Insured.cLegalRepresentative", { rules: [getRules("required", {})] });
+        setFormItem("Insured.cBusinessScope", { rules: [getRules("required", {})] });
+      } else {
+        setFormItem("Insured.cLegalRepresentative", {
+          rules: isSpecialCase ? requiredRule : []
+        });
+        setFormItem("Insured.cBusinessScope", {
+          hidden: true,
+        });
+      }
       // 企业成立日
 			if (!param.initFlag && !isSpecialCase) {
 				setValue("Insured.tEstablishingDate", null);
@@ -1205,7 +1233,7 @@ const method = {
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
-    setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
+    // setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
 		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -1440,9 +1468,13 @@ const method = {
     //   rules: isSpecialCase ? requiredRule : []
     // });
     // 法定代表人/责任人
-    setFormItem("Insured.cLegalRepresentative", {
-      rules: isSpecialCase ? requiredRule : []
-    });
+    if(param.cProdNo === '043009' && isFujianBranch.value) {
+      setFormItem("Insured.cLegalRepresentative", { rules: [getRules("required", {})] });
+    } else {
+      setFormItem("Insured.cLegalRepresentative", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+    }
     // 企业成立日
     setFormItem("Insured.tEstablishingDate", {
 			disabled: !param.initFlag && isSpecialCase ? false : true,
@@ -1847,6 +1879,17 @@ function resetFn() {
   }).catch((err:any) => {
     console.log(err)
   })
+}
+// 查询分公司机构
+const isFujianBranch = ref(false);
+async function getDptCdeList() {
+  const res = await listChrDepts({cDptCde: '0235010000000', cDptCls: '2'})
+  if(res.data?.length > 0) {
+    const cDptCdeList = res.data.map((item:any) => { return item.cDptCde})
+    if(cDptCdeList.includes(param.cDptCde)) {
+      isFujianBranch.value = true;
+    }
+  }
 }
 
 defineExpose({
