@@ -293,14 +293,13 @@ const method = {
     const baseBefore = tabref["insrnc"].getFromValue();
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    if (route.params.param?.cRsnCde != "46") {
+    if (route.params.param?.cRsnCde == "46") {
       // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
       const tm = moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
       baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
       opertaor.getFatherPage().setTmDay(tm)
       setFormValue(baseBefore);
     }
-    nRatioCoefFunc()
     // 059010 借款止期的值和保险止期一致
     if(route.params.param?.cProdNo === '059010') {
       setValue('Base.tRunEndTm', v)
@@ -314,6 +313,7 @@ const method = {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
     if (isInit) return;
+    nRatioCoefFunc()
     const isFreeDelayPass = await freeDelay(v);
     // 核心拦截逻辑：不满足免费延期条件，直接终止后续流程
     console.log('保险止期', getValue('Base.tInsrncEndTm'))
@@ -591,6 +591,10 @@ const method = {
       setValue('Base.tTrialEndTm', '')
       ElMessage.warning("试车期止期不能小于试车期起期")
     }
+  },
+  // 保险期限
+  cTmSysCdeChange: (val:any) => {
+    opertaor.getFatherPage().setTmDay(val || 0)
   },
 };
 
