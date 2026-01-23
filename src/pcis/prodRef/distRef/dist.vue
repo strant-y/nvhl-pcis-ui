@@ -169,7 +169,7 @@ const oldPageSchema = ref<any>({});
 const hiddenPage = ref<Array>(['VehicleDist040002']); //初始化需要隐藏的组件
 const addedPlans = ref<string[]>([]);
 const isQuery = ref(false)
-const cProdNos = ['010001','010002','010003','010004','010020'];
+const cProdNos = ['010001','010002','010003','010004','010020','070002'];
 
 // 货物信息回填到标的信息的产品
 const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017'])
