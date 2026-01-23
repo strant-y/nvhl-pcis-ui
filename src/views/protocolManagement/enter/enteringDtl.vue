@@ -799,6 +799,12 @@ const saveEdrPlyInfo = async () => {
  * 生成批文
  * **/
 const generateEndorse = () => {
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const cEcAgrAppNo = agreementBaseRef['ECargoBase.cEcAgrAppNo']
+	if (!cEcAgrAppNo && props.param["cRsnCde"] == 'Y01') {
+		ElMessage.error("请先保存申请单!");
+		return false
+	}
   const btn = getBtn("btnCompare");
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
@@ -808,7 +814,13 @@ const generateEndorse = () => {
   res["plyBase"]["Base.cProdNo"] = '029900';
   res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
   res["EdrECargoBase"]['EdrECargoBase.cProdNo'] = '029900';
-  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	// 协议批改获取批文不需要传被保人清单，运输信息，标的信息，标的信息汇总
+	'AgreementDistInsured' in res && delete res['AgreementDistInsured'];
+	'AgreementDistTransport' in res && delete res['AgreementDistTransport'];
+	'AgreementDistGoods' in res && delete res['AgreementDistGoods'];
+	'AgreementTgtSummary' in res && delete res['AgreementTgtSummary'];
+	
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -827,7 +839,13 @@ const generateEndorse = () => {
     }
   });
 };
-const getSurrenderPrecisFun = ()=>{
+const getSurrenderPrecisFun = () => {
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const cEcAgrAppNo = agreementBaseRef['ECargoBase.cEcAgrAppNo']
+	if (!cEcAgrAppNo && props.param["cRsnCde"] == 'Y01') {
+		ElMessage.error("请先保存申请单!");
+		return false
+	}
   const btn = getBtn("btnCompare");
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
@@ -837,7 +855,12 @@ const getSurrenderPrecisFun = ()=>{
   res["plyBase"]["Base.cProdNo"] = '029900';
   res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
   res["EdrECargoBase"]['EdrECargoBase.cProdNo'] = '029900';
-  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	// 协议批改获取批文不需要传被保人清单，运输信息，标的信息，标的信息汇总
+	'AgreementDistInsured' in res && delete res['AgreementDistInsured'];
+	'AgreementDistTransport' in res && delete res['AgreementDistTransport'];
+	'AgreementDistGoods' in res && delete res['AgreementDistGoods'];
+	'AgreementTgtSummary' in res && delete res['AgreementTgtSummary'];
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
