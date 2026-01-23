@@ -2144,6 +2144,26 @@ const method = {
   cIsConsortiumFunc: (val:any) => {
     eventBus.emit('setMap-cUnionMembers', val)
   },
+	// 是否出具蓝卡
+	cBlueCardChange: async (val: any) => {
+		const param = opertaor.getParam();
+		if (param.initFlag) return
+		setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+		if (val == '1') {
+			try {
+				const [res1] = await Promise.all([
+					codeListStore.queryCodeList({ codeListName: 'MS040008' }),
+				]);
+				const getValue1 = (response) => {
+					const list = Array.isArray(response) ? response : response?.data || response?.list || [];
+					return list.length > 0 ? list[0].label || list[0].name || '' : '';
+				};
+				setValue('Tgt.cMaritimeAdministration', getValue1(res1)) // 海事局名称
+			} catch (error) {
+				setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+			}
+		}
+	}
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
