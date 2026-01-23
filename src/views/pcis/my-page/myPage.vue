@@ -3440,6 +3440,9 @@ const submitToUndrFn = async () => {
   // if (await validateShanDong()) {
   //   return;
   // }
+  if (validateGuaranteeBgnTm()) {
+    return;
+  }
  /**
    * 联共保判断
    */
@@ -5271,6 +5274,9 @@ const submitEdrToUndrFun = async () => {
 
   // 反洗钱校验
   if (!validateNPrmAmlya()) {
+    return;
+  }
+  if (validateGuaranteeBgnTm()) {
     return;
   }
 if(props.param.cTransMrk !== "1"){
@@ -7527,6 +7533,20 @@ const shouldCheckYunnanPaymentRules = () => {
       !props.param.cProdNo.startsWith('12') &&
       props.param.cDptCde.startsWith('0253');
 };
+/**
+ * 09大类提核校验附加条款保证期，保险期限中的保证期起止期必填
+ */
+const validateGuaranteeBgnTm = () => {
+  const cvrgData = opertaor.getTableRefByKey('cvrg')?.getFromValue();
+  const insrncData = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  if(['090001', '090002'].includes(props.param.cProdNo)) {
+    if(insrncData['Base.tGuaranteeEndTm'] && insrncData['Base.tGuaranteeBgnTm'] && !cvrgData.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
+      ElMessage.warning('请录入保证期附加险条款')
+      return true;
+    }
+  }
+  return false;
+}
 // 历史保单
 function handleCheckHistoryPly() {
   dzmodal
