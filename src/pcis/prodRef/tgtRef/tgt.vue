@@ -2019,22 +2019,19 @@ const method = {
 	// 建设工程信息-保险凭证类别
 	cCertificateTypefun: async (val) => {
 		setFormItem('Tgt.cCertificateDetailed', { autosize: true })
-		if (params.initFlag) {
-			return false
-		}
-		if (params.pageType != "app" && params.pageType != "copy" && params.pageType != "template" ) {
-			return false
-		}
+		const param = opertaor.getParam();
+		if (param.initFlag) return
 		const cCertificateTypeProd = ["059011", "059012", "059013", "059015", "059016", "059017", "059018", "059019", "059020"]
 		if (cCertificateTypeProd.includes(params.cProdNo)) {
 			try {
 				const res = await getProductTemplate({prodNo:params.cProdNo,isCommon:val});
-				
 				if (res.code !== '200') {
 					ElMessage.error(res.msg || '连接失败！');
 					return;
 				}
-				setValue("Tgt.cCertificateDetailed", res.data)
+				setValue("Tgt.cCertificateTitle", res.data.cCertificateTitle) // 保险凭证标题
+				setValue("Tgt.cCertificateInstitution", res.data.cInsuranceCompany) // 保险凭证机构
+				setValue("Tgt.cCertificateDetailed", res.data.textTemplate) // 保险凭证详细
 			} catch (err) {
 				console.error('查询异常:', err);
 				ElMessage.error('系统异常，请稍后重试');
@@ -2144,6 +2141,26 @@ const method = {
   cIsConsortiumFunc: (val:any) => {
     eventBus.emit('setMap-cUnionMembers', val)
   },
+	// 是否出具蓝卡
+	cBlueCardChange: async (val: any) => {
+		const param = opertaor.getParam();
+		if (param.initFlag) return
+		setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+		if (val == '1') {
+			try {
+				const [res1] = await Promise.all([
+					codeListStore.queryCodeList({ codeListName: 'MS040008' }),
+				]);
+				const getValue1 = (response) => {
+					const list = Array.isArray(response) ? response : response?.data || response?.list || [];
+					return list.length > 0 ? list[0].label || list[0].name || '' : '';
+				};
+				setValue('Tgt.cMaritimeAdministration', getValue1(res1)) // 海事局名称
+			} catch (error) {
+				setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+			}
+		}
+	}
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
