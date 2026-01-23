@@ -55,9 +55,9 @@
             <span v-html="row.cAppNme || ''" class="twoLine"></span>
           </el-tooltip>
         </template>
-        <template #column-cInsuredNme="{ row, column, index }">
-          <el-tooltip :content="row.cInsuredNme" placement="top">
-            <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
+        <template #column-insuredNme="{ row, column, index }">
+          <el-tooltip :content="row.insuredNme" placement="top">
+            <span v-html="row.insuredNme || ''" class="twoLine"></span>
           </el-tooltip>
         </template>
 	</app-table>
@@ -264,7 +264,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
-        title: "二级机构",
+        title: "分公司",
         slotName: "cSecondDptCnm",
         align: 'left',
         lengthNum: 12,
@@ -272,7 +272,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
-        title: "三级机构",
+        title: "出单机构",
         slotName: "cDptCnm",
         align: 'left',
         lengthNum: 12,
@@ -296,7 +296,7 @@ const tableconfig = reactive<AppTableConfig>(
 	  	{
         prop: "cAppNme",
         inputtype: "rtinput",
-        title: "投保人",
+        title: "投保人名称",
         slotName: "cAppNme",
         align: "left",
         lengthNum: 12,
@@ -304,7 +304,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "insuredNme",
         inputtype: "rtinput",
-        title: "被保人",
+        title: "被保人名称",
         slotName: "insuredNme",
         align: "left",
         lengthNum: 12,
@@ -323,12 +323,6 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 17,
         lengthIsNumber: true,
       },
-	  	{
-        prop: "cUdrNme",
-        inputtype: "rtinput",
-        title: "操作员",
-        lengthNum: 4,
-	  	},
       // {
       //   prop: "InsurancePeriod",
       //   inputtype: "rtinput",
@@ -344,6 +338,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbAmt",
@@ -436,7 +433,13 @@ const tableconfig = reactive<AppTableConfig>(
         ],
         lengthNum: 7,
         align: "left"
-      },
+			},
+			{
+        prop: "cUdrNme",
+        inputtype: "rtinput",
+        title: "操作员",
+        lengthNum: 4,
+	  	},
     ],
   })
 );
