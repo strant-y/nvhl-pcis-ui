@@ -83,11 +83,15 @@ const {
   queryComponentCodeListXJ,
   riskUnitQueryXJ,
   saveDataXJ,
+  downloadDistTemplate,
+  importUnit,
+  exportUnit,
 } = NewUdrListService();
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
 const codeListStore = codeListViewStore();
+import { saveAs } from "file-saver";
 const dzmodal = useDzModal();
 const route = useRoute();
 const params = route.query.param
@@ -673,6 +677,30 @@ const tableconfig1 = reactive<AppTableConfig>(
         disabled: true,
         func: () => {},
       }),
+      createFreeButtonBase({
+        id: "downloadBtn",
+        label: "下载模板",
+        type: "success",
+        func: () => {
+          downLoadTemplate()
+        },
+      }),
+      createFreeButtonBase({
+        id: "importBtn",
+        label: "导入",
+        type: "success",
+        func: () => {
+          importTemplate()
+        },
+      }),
+      createFreeButtonBase({
+        id: "exportBtn",
+        label: "导出",
+        type: "success",
+        func: () => {
+          exportTemplate()
+        },
+      }),
     ],
     fromSchema: [
       {
@@ -748,7 +776,7 @@ const tableconfig1 = reactive<AppTableConfig>(
         minWidth: 180,
         readOnly: false,
         formatter:(val:any) => {
-          return val ? val.toFixed(2) : ""
+          return val ? Number(val).toFixed(2) : ""
         }
       },
       // {
@@ -2037,6 +2065,114 @@ const financial = (num:any, digit = 2)=> {
   }
   num = parseFloat(num);
   return (Math.round((num + Number.EPSILON) * Math.pow(10, digit)) / Math.pow(10, digit)).toFixed(digit);
+}
+// 下载模板
+const downloadBtn:any = tableconfig1.titleBtns?.find((item:any) => item.id === 'downloadBtn')
+function downLoadTemplate() {
+  const param = {
+    fromSchema: [
+      { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
+      { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtinput' },
+      { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
+      { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
+      { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },
+    ],
+    title: '风险单位划分'
+  }
+  downloadBtn.loading = true;
+  downloadDistTemplate(param).then((res:any) => {
+    downloadBtn.loading = false;
+    if (res.size <= 0) {
+      ElMessage.error({ message: "下载出错", duration: 3000 });
+      return;
+    }
+    const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+    const blob = new Blob([res.data], {
+      responseType:res.headers["content-type"]
+      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+    });
+    saveAs(blob, fileName);
+  }).catch((err:any) => {
+    downloadBtn.loading = false;
+    ElMessage.error(err.message || err)
+  })
+}
+// 导入
+const importBtn:any = tableconfig1.titleBtns?.find((item:any) => item.id === 'importBtn')
+function importTemplate() {
+  importBtn.loading = true
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
+  input.onchange = () => {
+    ElMessage.warning('正在导入中，请稍候…')
+    if (input.files?.length) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        const base64String = e.target?.result as string;
+
+        // ✅ 此处赋值有效
+        // fileBase = base64String.split(',')[1]; // 去掉 data:image/type;base64, 前缀
+
+        // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
+
+        // 构建参数并请求接口
+        const param:any = {
+          file: base64String, // ✅ 正确传入
+          cAppNo: params.cAppNo,
+        };
+        importUnit(param).then((res:any) => {
+          importBtn.loading = false
+          if (res.code === 200) {
+            ElMessage.success(`导入完成：${res.data.msg}`);
+            pageresult1.list = res.data.successList.map((item:any, index:any) => ({...item, nSeqNo: index + 1}))
+          } else {
+            ElMessage.error(res.msg || "导入失败");
+          }
+        }).catch((error) => {
+          ElMessage.error("导入出错，请检查文件格式或内容");
+          console.error("导入错误：", error);
+          importBtn.loading = false
+        });
+      };
+
+      reader.onerror = (e) => {
+        ElMessage.error("文件读取失败");
+        importBtn.loading = false
+      };
+
+      reader.readAsDataURL(file); // 启动读取
+    }
+  };
+  input.oncancel = () => {
+    importBtn.loading = false
+  };
+  input.click(); // 触发文件选择对话框
+}
+// 导出
+const exportBtn:any = tableconfig1.titleBtns?.find((item:any) => item.id === 'exportBtn')
+function exportTemplate() {
+  exportBtn.loading = true;
+  exportUnit({cAppNo: params.cAppNo}).then((res:any) => {
+    exportBtn.loading = false;
+    if (res.size <= 0) {
+      ElMessage.error({ message: "导出出错", duration: 3000 });
+      return;
+    }
+    const fileName = decodeURIComponent(res.headers['content-disposition'].split('filename=')[1]);
+    const blob = new Blob([res.data], {
+      responseType:res.headers["content-type"]
+      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+    });
+    saveAs(blob, fileName);
+  }).catch((err:any) => {
+    exportBtn.loading = false;
+    ElMessage.error(err.message || err)
+  })
 }
 </script>
 

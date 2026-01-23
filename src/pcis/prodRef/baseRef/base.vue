@@ -140,6 +140,20 @@ onMounted(async () => {
       }
     })
   }
+    eventBus.on('setUnDisabledDone', () => {
+      nextTick(() => {
+        if(['10','ZQ','JQ','07','08','80'].includes(params.cRsnCde)) {
+          // 【是否修改累计赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【修改后的累计赔偿限额】可以放开编辑
+          if(getValue('Base.cCumulativeLimitManual') == '0') {
+            setFormItem("Base.nAmt", { disabled: false });
+          }
+          // 【是否修改每次事故赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【每次事故赔偿限额】【修改后的每次事故赔偿限额】可以放开编辑
+          if(getValue('Base.cAccidentLimitManual') == '0') {
+            setFormItem("Base.nModifiedAccidentLimit", { disabled: false });
+          }
+        }
+      })
+    })
   })
 });
 

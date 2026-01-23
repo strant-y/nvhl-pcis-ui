@@ -91,6 +91,9 @@ onMounted(async () => {
     if (item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 240
     }
+    if(item.prop === 'Ci.nSeqNo') {
+      item.lengthNum = 4
+    }
   })
   // 获取页面初始化的时候获取的组件配置信息
   if (opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {

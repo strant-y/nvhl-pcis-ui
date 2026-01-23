@@ -2078,9 +2078,9 @@ const method = {
     } else {
       setFormItem('Tgt.cTargetType', { loadData: [] });
     }
-		if (!param.initFlag) {
-      setValue('Tgt.cTargetType', "");// 标的类型
-    }
+    const param = opertaor.getParam();
+    if (param.initFlag) return
+		setValue('Tgt.cTargetType', "");// 标的类型
 	},
   // 担保金额
   nGuaranteeAmountChange: (val:any) => {
