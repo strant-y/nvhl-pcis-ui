@@ -1315,10 +1315,10 @@ async function queryAddress() {
       }))
       tableconfig1.fromSchema[1].loadData = addressOptions.value
     } else {
-      ElMessage.info(queryComponentCodeInfo.message)
+      // ElMessage.info(queryComponentCodeInfo.message)
     }
   } else {
-    ElMessage.error(queryComponentCodeInfo.message)
+    // ElMessage.error(queryComponentCodeInfo.message)
   }
 }
 
