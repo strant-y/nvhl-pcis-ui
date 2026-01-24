@@ -194,6 +194,7 @@ const method = {
     const { value, rowData, config, itemRef } = data;
     if (!rowData || !config || !itemRef) return;
     ciJiDptOptionsQuery(value, rowData);
+    if (initFlag.value) return 
     updateMasterAgreementValues()
   },
   // 共保公司改变事件
