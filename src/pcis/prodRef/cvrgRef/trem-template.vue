@@ -1845,7 +1845,7 @@ function methodLink(items: any) {
         items[i]['btnItems']["func"] = methodMap[items[i]['btnItems']["func"]];
       }
       // 地址编码下拉选项
-      if(items[i]['prop'] === 'TermRisktgt.cDistCodeNo') {
+      if(['TermRisktgt.cDistCodeNo','TermRisktgt.cAddrSeq'].includes(items[i]['prop'])) {
         items[i]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
       }
     }
@@ -1862,6 +1862,10 @@ function riskMethodLink(items: any) {
       }
       if(items[k]['btnItems'] && items[k]['btnItems']["func"] && typeof items[k]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
         items[k]['btnItems']["func"] = methodMap[items[k]['btnItems']["func"]];
+      }
+      // 地址编码下拉选项
+      if(['TermRisktgt.cDistCodeNo','TermRisktgt.cAddrSeq'].includes(items[k]['prop'])) {
+        items[k]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
       }
     });
   }
