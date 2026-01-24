@@ -182,11 +182,13 @@ onMounted(async () => {
   if(params.cProdNo === '089030') {
     setFormItem("Tgt.cBuildingStructure", { rules: [] })
   }
-  // 010021 承保区域必填 其他非必填
-  if(params.cProdNo === '010021') {
-    setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
-  } else {
-    setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+  // 010021 承保区域必填 其他非必填，010023不走这个逻辑
+	if (params.cProdNo !== '010023') { 
+		if(params.cProdNo === '010021') {
+			setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
+		} else {
+				setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+		}
   }
   // 040014、110001、110003、110004 船舶种类必填
   if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110004') {
