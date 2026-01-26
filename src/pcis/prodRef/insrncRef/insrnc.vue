@@ -244,7 +244,11 @@ const method = {
       return true;
     }
   },
-
+  /* 关于保险期限的问题：
+    1、录入起期，自动带出止期，期限按照365；
+    2、如先录入非1年期，再修改起期，则按照既有的期限填入保险止期；
+    3、如修改止期，则不直接带出起期，起期需要手动修改。天数还是自动填充。
+  */
   bgnTmFn: (v: any) => {
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
@@ -293,13 +297,6 @@ const method = {
     const baseBefore = tabref["insrnc"].getFromValue();
     const param = opertaor.getParam();
     const isInit = param.initFlag; // 是否是初始化状态
-    if (route.params.param?.cRsnCde == "46") {
-      // 如果批改原因是报停展期，保险止期延长报停起止期计算出的差值，保险期限维持不变
-      const tm = moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
-      baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
-      opertaor.getFatherPage().setTmDay(tm)
-      setFormValue(baseBefore);
-    }
     // 059010 借款止期的值和保险止期一致
     if(route.params.param?.cProdNo === '059010') {
       setValue('Base.tRunEndTm', v)
@@ -313,6 +310,11 @@ const method = {
       tInsrncEndTm.value = baseBefore["Base.tInsrncEndTm"]
     }
     if (isInit) return;
+    // 根据保险起止期计算出保险期限共多少天
+    const tm = moment(v).add(1, 'second').diff(moment(baseBefore["Base.tInsrncBgnTm"]), "days");
+    baseBefore["Base.cTmSysCde"] = tm;   // 列表里面的 保险
+    opertaor.getFatherPage().setTmDay(tm)
+    setFormValue(baseBefore);
     nRatioCoefFunc()
     const isFreeDelayPass = await freeDelay(v);
     // 核心拦截逻辑：不满足免费延期条件，直接终止后续流程
