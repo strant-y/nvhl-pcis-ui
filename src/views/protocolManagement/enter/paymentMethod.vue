@@ -360,7 +360,7 @@ const handleArray = (obj:any)=>{
     for (const key in data) {
       if (key.endsWith('.cEcAgrAppNo')) {
         // 清空该字段的值（可选：设为 ""、null、undefined）
-        data[key] = ""; // 或 null，根据业务需求
+        delete data[key] // 或 null，根据业务需求
       } else if (typeof data[key] === 'object') {
         // 继续递归嵌套对象（虽然你数据是扁平的，但更健壮）
         clearCEcAgrAppNoValues(data[key]);

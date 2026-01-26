@@ -425,7 +425,7 @@ onBeforeMount(async () => {
 						}
 					});
 				}
-				const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
+				// const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
 				dataForm['AgreementBase']['ECargoBase.cRenewMrk'] = '1'
 				dataForm['AgreementBase']['ECargoBase.cEcAgrNo'] = ''
 				dataForm['AgreementBase']['ECargoBase.cOprCde'] = user.userName // 录单人为当前用户
