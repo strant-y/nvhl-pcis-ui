@@ -1315,17 +1315,19 @@ async function save() {
   if(tAppTm1 && tAppTm2 && new Date(tAppTm1).getTime() !== new Date(tAppTm2).getTime()) {
     dataToSave.AgreementFeeWarn['ECargoBase.tAppTm'] = tAppTm1
   }
-  dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
-  const res = await cargoApi.save({
+	dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
+	let params = {
     ...dataToSave,
     AgreementDistGoods:null,
-   AgreementTgtSummary:null,
-   AgreementDistInsured:null,
-   AgreementDistTransport:null,
+   	AgreementTgtSummary:null,
+   	AgreementDistInsured:null,
+   	AgreementDistTransport:null,
     ...{},
     ...{user},
     sence:'save'
-  })
+	}
+	console.log('paramsparamsparamsparams',params)
+  const res = await cargoApi.save(params)
     if(res.code === 200) {
       isOk = true
       ElMessage.success(res.msg)

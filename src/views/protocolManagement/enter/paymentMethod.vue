@@ -240,11 +240,12 @@ function confirm() {
         }
       	const data = formData.value;
 				getECargoPolicyForRenewal({ cEcAgrNo: formData.cPlyNo, components: [renewalComponent.value] }).then(
-					async (res: any) => {
-						if (res.code == "200") {
+					async (res1: any) => {
+						if (res1.code == "200") {
 							// 存一份申请单号，把res的单号清空
-							let AgreementBase = JSON.parse(JSON.stringify(res.res.composition.ECargoBase[0]))
-							clearCEcAgrAppNoValues(res.res.composition)
+							let AgreementBase = JSON.parse(JSON.stringify(res1.res.composition.ECargoBase[0]))
+							let res = JSON.parse(JSON.stringify(res1))
+							clearCEcAgrAppNoValues(res)
 							router.push({
 								path: "/protocolManagement/enteringDtl",
 								query: {
@@ -259,7 +260,7 @@ function confirm() {
 							});
 							closeDialog();
 						} else {
-							ElMessage.error(res.msg);
+							ElMessage.error(res1.msg);
 						}
 					}
 				);
