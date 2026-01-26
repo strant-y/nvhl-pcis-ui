@@ -2309,14 +2309,15 @@ async function loadAfter() {
         }
         
         if(ops['ci'] && ops['ci'].length>0){
-          ops['ci'].forEach((item:any)=>{
-            item['Ci.cBrkrCde'] = "" // 代理经纪人
-            item['Ci.cBrkSlsCde'] = "" // 代理代理业务员
-            item['Ci.cCoinsurerCde'] = "" // 共保公司
-            item['Ci.cDptCde'] = "" // 出单机构
-            item['Ci.cSlsId'] = ""
-            item['Ci.cSlsNme'] = ""
-          })
+          // ops['ci'].forEach((item:any)=>{
+          //   item['Ci.cBrkrCde'] = "" // 代理经纪人
+          //   item['Ci.cBrkSlsCde'] = "" // 代理代理业务员
+          //   item['Ci.cCoinsurerCde'] = "" // 共保公司
+          //   item['Ci.cDptCde'] = "" // 出单机构
+          //   item['Ci.cSlsId'] = ""
+          //   item['Ci.cSlsNme'] = ""
+          // })
+          ops['ci'] = []
         }
         opertaor.setDataAll(ops);
         // 获取原申请单号下的清单列表数据
@@ -2328,6 +2329,15 @@ async function loadAfter() {
         // });
         //获取单号
         // getCAppNoFun();
+        nextTick(() => {
+          const cCiMrk = ops['plyBase']?.['Base.cCiMrk']
+          const ciRef = opertaor.getTableRefs()['ci'];
+          if (!!ciRef) {
+            ciRef.initCiInfo({
+              cCiMrk: cCiMrk
+            });
+          }
+        })
       }
     }).catch((err:any) => {
       ElMessage.error(err);
