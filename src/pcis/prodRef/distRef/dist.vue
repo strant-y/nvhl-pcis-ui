@@ -1223,6 +1223,12 @@ const method = {
     const param = {
       ...getFatherPageOldProductResData(),
     }
+    formconfig11.value?.fromSchema?.forEach((item:any) => {
+      const it = param.fromSchema.find((i:any) => i.prop === item.prop)
+      if(item.rules && it) {
+        it.rules = item.rules
+      }
+    })
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {

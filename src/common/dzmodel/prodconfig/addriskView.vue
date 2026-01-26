@@ -143,9 +143,10 @@ onMounted(async () => {
 });
 
 function selectmainMethod(data: any, checked: boolean, indeterminate: boolean) {
-  selectNodeId.value = data.id;
+  // selectNodeId.value = data.id;
   
   if (checked) {
+    selectNodeId.value = data.id;
     // 获取当前节点的父节点
     data1.value.forEach((sibling: any) => {
       if ( sibling.id !== selectNodeId.value ) {
@@ -153,7 +154,7 @@ function selectmainMethod(data: any, checked: boolean, indeterminate: boolean) {
         mainRef.value?.setChecked(sibling.id, false, false);
       }
     });
-  }else{
+  }else if(selectNodeId.value === data.id){
     selectNodeId.value = '';
   }
 }

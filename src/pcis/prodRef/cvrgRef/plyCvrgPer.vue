@@ -862,6 +862,7 @@ onActivated(() => {
 });
 onDeactivated(() => {
   console.log('keep-alive -> onDeactivated')
+  sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');
 });
 onUnmounted(() => {
   sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');
