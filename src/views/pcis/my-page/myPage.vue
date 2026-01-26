@@ -4598,26 +4598,18 @@ const calcPremiumEdr = async () => {
         // currentPayList = currentPayList.filter(item => {
         //   return item['Pay.cAppNo'] && item.hasOwnProperty('Pay.cAppNo');
         // });
-        
+        nextTick(() => {
           let payInfo = setPayInfoEdr(
-                ops["payinfo"],
-                ops["base"],
-                ops["applicant"],
-                nPrmVar,
-                ops["plyBase"],
-                currentPayList.length+1
-              );
-
-            // for (const i in payInfo) {
-                    // const pay = payInfo[i];
-                    // currentPayList.push(pay)
-                   payinfoRef.setFormValue(payInfo);
-            // }
-
-
-            // currentPayList.push(payInfo); // 插入新条目
-            // payinfoRef.setFormValue(currentPayList); // 更新表单数据
-          }
+            ops["payinfo"],
+            ops["base"],
+            ops["applicant"],
+            nPrmVar,
+            ops["plyBase"],
+            currentPayList.length+1
+          );
+          payinfoRef.setFormValue(payInfo);
+        })
+      }
       needCalc.value = false;
     } else {
       ElMessage.error(res.msg);
@@ -6574,15 +6566,17 @@ const afterCalcEdrPremium = () => {
     if(currentPayList.length >=infoLength){
       currentPayList.pop();
     }
-    let payInfo = setPayInfoEdr(
-      ops["payinfo"],
-      ops["base"],
-      ops["applicant"],
-      nPrmVar,
-      ops["plyBase"],
-      currentPayList.length+1
-    );
-    payinfoRef.setFormValue(payInfo);
+    nextTick(() => {
+      let payInfo = setPayInfoEdr(
+        ops["payinfo"],
+        ops["base"],
+        ops["applicant"],
+        nPrmVar,
+        ops["plyBase"],
+        currentPayList.length+1
+      );
+      payinfoRef.setFormValue(payInfo);
+    })
     if(opertaor.getTableRefByKey("ci")) {
       opertaor
         .getTableRefByKey("ci")
