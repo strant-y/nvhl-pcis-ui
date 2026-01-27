@@ -51,7 +51,14 @@ onMounted(() => {
       }
     })
   }
-  Object.assign(formconfig1, formconfig11);
+	Object.assign(formconfig1, formconfig11);
+	nextTick(() => {
+		// 047002 索赔基础名称、有无报告/追溯没值的时候回填固定值
+		if (route.params.param.cProdNo === '047002' && (route.params.param.pageType == "app" || route.params.param.pageType == "copy" && route.params.param.pageType == "template")) {
+			if(!getValue('Base.cClaimName'))  setValue('Base.cClaimName', '1')
+			if(!getValue('Base.cIsRetroSpect'))  setValue('Base.cIsRetroSpect', '0')
+		}
+  })
 });
 
 // 根据时间更改 短期费率系数 接口
