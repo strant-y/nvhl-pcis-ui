@@ -2080,6 +2080,14 @@ async function loadAfter() {
               })
             }
           })
+        } else if(ops.cvrg?.length < 1) {
+          ElMessageBox.confirm("原保单条款已经下架，请重新选择条款！", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+            lockScroll: false,
+            showCancelButton: false,
+          })
         }
         // 承包基本信息中的保额和保费也初始化为0
         if(ops.base) {
@@ -2444,6 +2452,14 @@ async function loadAfter() {
                 delete i['Term.cPkId']
               })
             }
+          })
+        } else if(ops.cvrg && ops.cvrg.length > 0) {
+          ElMessageBox.confirm("原保单条款已经下架，请重新选择条款！", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+            lockScroll: false,
+            showCancelButton: false,
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
@@ -2874,7 +2890,8 @@ const loadAppPlyInfo = async (CAppNo) => {
         ops.insured[0]['Insured.cCertfCls'] = ops.insured[0]['Insured.cCertfCls'] === '110007' ? '01' : ops.insured[0]['Insured.cCertfCls'];
       }
       // 投保暂存单进来要把代理经纪人、代理合作协议、代理业务员、代理业务执业证号、代理业务员机构代码、业务员员工号、业务员名称、业务员电话、业务员机构代码、业务员执业证号清空
-      if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '投保') {
+      // 协议小保单除外，因为协议不能编辑如果清空后无法输入
+      if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '投保' && props.param.cRecordType !== '9') {
         const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
         clearList.forEach((item:any) => {
           if(ops.plyBase?.[item]) {

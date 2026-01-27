@@ -203,7 +203,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               if(nDpdDays.code === 200) {
                 if(nDpdDays.data?.code == '1') {
                   if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
-                    rebackDay.value = nDpdDays.data?.result[0]?.cRuleValue || 0;
+                    const cRuleValue = nDpdDays.data?.result[0]?.cRuleValue || 0;
+                    rebackDay.value = cRuleValue > 0 ? cRuleValue : 0;
                   }
                 } else {
                   ElMessage.error(nDpdDays.data?.message)
@@ -244,7 +245,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   }
                 }
                 if(dayjs(v).isBefore(dayjs(newTEdrBgnTm))) {
-                  ElMessage.warning("可倒签天数为"+rebackDay.value+"天,可倒签日期为"+newTEdrBgnTm)
+                  if(rebackDay.value > 0) {
+                    ElMessage.warning("可倒签天数为"+rebackDay.value+"天,可倒签日期为"+newTEdrBgnTm)
+                  } else {
+                    ElMessage.warning("不允许倒签！")
+                  }
                   edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", tEdrBgnTm);
                   return;
                 }
