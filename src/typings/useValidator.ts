@@ -681,6 +681,23 @@ const cAppNme = () => {
   }
 }
 
+/**
+ * 不允许包含 *
+ */
+const NoAsterisk = (sym) => {
+	return {
+		validator: (rule, value, callback) => {
+			if (value && value.includes(sym)) {
+				callback(new Error(`内容不能包含 "${sym}" 字符`))
+			} else {
+				callback()
+			}
+		},
+
+		trigger: 'blur'
+	};
+}
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -783,6 +800,9 @@ const cAppNme = () => {
     }
     if(type == 'cAppNme') {
       return cAppNme()
+    }
+    if(type == 'NoAsterisk') {
+      return NoAsterisk(param.sym)
     }
   };
   const validorMap = {

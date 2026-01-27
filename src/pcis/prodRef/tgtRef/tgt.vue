@@ -292,8 +292,9 @@ onMounted(async () => {
 		}
 		// 047002 诚信声明、保函类别没值的时候回填固定值，诚信声明、保函详细根据内容自动调整输入框高度
 		if (params.cProdNo === '047002') {
-			setFormItem('Tgt.cIntegrityStatement', { autosize: true })
-			setFormItem('Tgt.cGuaranteeLetter', { autosize: true }) // 保函详细
+			setFormItem('Tgt.cIntegrityStatement', { autosize: true,rules: [getRules("NoAsterisk", {sym: "*"})] })
+			setFormItem('Tgt.cGuaranteeLetter', { autosize: true,rules: [getRules("NoAsterisk", {sym: "*"})] }) // 保函详细
+			setFormItem('Tgt.cGuaranteeInstitution', { rules: [getRules("NoAsterisk", {sym: "x"})] }) // 保函详细
 			if (!getValue('Tgt.cIntegrityStatement') && (params.pageType == "app" || params.pageType == "copy" && params.pageType == "template")) {
 				setValue('Tgt.cIntegrityStatement', cIntegrityStatementData.value)
 				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
