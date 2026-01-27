@@ -2080,6 +2080,14 @@ async function loadAfter() {
               })
             }
           })
+        } else if(ops.cvrg?.length < 1) {
+          ElMessageBox.confirm("原保单条款已经下架，请重新选择条款！", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+            lockScroll: false,
+            showCancelButton: false,
+          })
         }
         // 承包基本信息中的保额和保费也初始化为0
         if(ops.base) {
@@ -2444,6 +2452,14 @@ async function loadAfter() {
                 delete i['Term.cPkId']
               })
             }
+          })
+        } else if(ops.cvrg && ops.cvrg.length > 0) {
+          ElMessageBox.confirm("原保单条款已经下架，请重新选择条款！", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+            lockScroll: false,
+            showCancelButton: false,
           })
         }
         // 承包基本信息中的保额和保费也初始化为0
