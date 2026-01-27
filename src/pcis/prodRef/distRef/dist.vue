@@ -1423,12 +1423,29 @@ watch(
     // 041014 特种设备责任险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总 标的信息中：特种设备数量与清单数量一致
     if(route.params.param?.cProdNo === '043022' || route.params.param?.cProdNo === '041014') {
       const num = totalList.length || 0;
-      opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
-        planNo:'P1',
-        factorProp: 'Term.nEquipmentCount',
-      },num);
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nDevicesNumber',num);
+      const interval = setInterval(() => {
+        const cvrgData = opertaor.getTableRefs()['cvrg']?.getFromValue();
+        if(cvrgData && cvrgData.length > 0) {
+          clearInterval(interval)
+          const nEquipmentCount:any = {};
+          totalList.forEach((i:any) => {
+            if(nEquipmentCount[i['Dist.cPlanNo']]) {
+              nEquipmentCount[i['Dist.cPlanNo']] += 1
+            } else {
+              nEquipmentCount[i['Dist.cPlanNo']] = 1
+            }
+          })
+          Object.keys(nEquipmentCount).forEach((item:any) => {
+            const cTermNo = cvrgData.find((n:any) => n['Term.cPlanNo'] === item)?.['Term.cUniqueTermNo']
+            opertaor.getTableRefs()['cvrg']?.setTermData({
+              termNo:cTermNo,
+              planNo:item,
+              factorProp: 'Term.nEquipmentCount',
+            },nEquipmentCount[item]);
+          })
+        }
+      }, 500)
     }
     // 047003 非机动车第三者责任保险 标的信息中：“投保总座位数（座）”要素，由清单中“投保座位数”汇总；“投保总车辆数（个）”要素，由清单中总车辆汇总；
     if(route.params.param?.cProdNo === '047003') {
@@ -1444,20 +1461,46 @@ watch(
     // 041011 食品安全责任险 条款中的关联地址数量根据清单进行汇总
     const nAddressCountProdNoMap = ['049001','043005','043004','043011','041011'];
     if(nAddressCountProdNoMap.includes(route.params.param?.cProdNo)) {
-      const num = totalList.length || 0;
-      opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
-        planNo:'P1',
-        factorProp: 'Term.nAddressCount',
-      },num);
-      if(route.params.param?.cProdNo === '043005') {
-        const parkingNum = totalList?.map(item => Number(item["Dist.nParkingNumber"]) || 0).reduce((total, value) => total + value, 0)
-        opertaor.getTableRefs()['cvrg']?.setTermData({
-          termNo:route.params.param?.cTermNo,
-          planNo:'P1',
-          factorProp: 'Term.nParkingTotal',
-        },parkingNum);
-      }
+      const interval = setInterval(() => {
+        const cvrgData = opertaor.getTableRefs()['cvrg']?.getFromValue();
+        if(cvrgData && cvrgData.length > 0) {
+          clearInterval(interval)
+          const planNoNum:any = {};
+          totalList.forEach((i:any) => {
+            if(planNoNum[i['Dist.cPlanNo']]) {
+              planNoNum[i['Dist.cPlanNo']] += 1
+            } else {
+              planNoNum[i['Dist.cPlanNo']] = 1
+            }
+          })
+          Object.keys(planNoNum).forEach((item:any) => {
+            const cTermNo = cvrgData.find((n:any) => n['Term.cPlanNo'] === item)?.['Term.cUniqueTermNo']
+            opertaor.getTableRefs()['cvrg']?.setTermData({
+              termNo:cTermNo,
+              planNo:item,
+              factorProp: 'Term.nAddressCount',
+            },planNoNum[item]);
+          })
+          if(route.params.param?.cProdNo === '043005') {
+            const parkingNum:any = {};
+            totalList.forEach((i:any) => {
+              if(parkingNum[i['Dist.cPlanNo']]) {
+                parkingNum[i['Dist.cPlanNo']] += Number(i["Dist.nParkingNumber"]) || 0
+              } else {
+                parkingNum[i['Dist.cPlanNo']] = Number(i["Dist.nParkingNumber"]) || 0
+              }
+            })
+            Object.keys(parkingNum).forEach((item:any) => {
+              const cTermNo = cvrgData.find((n:any) => n['Term.cPlanNo'] === item)?.['Term.cUniqueTermNo']
+              opertaor.getTableRefs()['cvrg']?.setTermData({
+                termNo:cTermNo,
+                planNo:item,
+                factorProp: 'Term.nParkingTotal',
+              },parkingNum[item]);
+            })
+          }
+        }
+      }, 500)
     }
 
     // 041007 条款中的关联被保险人数量由清单中的关联监护人进行汇总;被监护人数量由清单中的被监护人姓名汇总
