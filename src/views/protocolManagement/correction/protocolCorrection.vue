@@ -95,6 +95,7 @@ const appStatusOptions = ref([
   { label: "已提交未接收", value: "7" },
   { label: "见费出单退回", value: "8" },
 ])
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
@@ -103,6 +104,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         createFreeButtonBase({
           type: "primary",
           label: "查询",
+					loading: queryLoading,
           func: async () => {
             handleQuery();
           },
@@ -504,7 +506,8 @@ const tableconfig = reactive<AppTableConfig>(
           lengthNum: 4,
           loadData: [
             { label: '有效', value: 'I' },
-            { label: '无效', value: 'T' }
+            { label: '终止', value: 'T' },
+            { label: '满期', value: 'M' },
           ]
         },
         {
@@ -581,6 +584,7 @@ function setRowFieldProp(rowId: string, field: string, prop: string, value: any)
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
+			queryLoading.value = true;
       const tm = freeEditRef.value?.getFromValue().Tm;
       const param = {
         sence: "3",// 1 协议录入 2 协议审核 3 协议批改
@@ -593,6 +597,7 @@ function handleQuery(flag?: boolean) {
       }
       delete param.Tm
       cargoApi.queryEcargoList(param).then((res: any) => {
+				queryLoading.value = false;
         if (res && res.code === 200) {
           const pageData = res.data;
           if (pageData) {
@@ -648,6 +653,7 @@ function handleQuery(flag?: boolean) {
           ElMessage.error(res.msg);
         }
       }).catch((err: any) => {
+				queryLoading.value = false;
         ElMessage.error(err.msg);
       });
     }

@@ -85,6 +85,7 @@ const route = useRoute();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -92,6 +93,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery(true);
         },
@@ -460,6 +462,7 @@ const submitForm = (flag: boolean) => {
 };
 
 const refreshData = (reset = true) => {
+	queryLoading.value = true;
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
 	if (s.cLoadSub == null || s.cLoadSub == undefined) {
@@ -467,17 +470,21 @@ const refreshData = (reset = true) => {
   }
   const params = Object.assign(s, r);
   cargoApi.queryRelevancePolicy(params).then((res: any) => {
+		queryLoading.value = false;
     if (res.code === 200) {
       const pageData = res.data;
       if (pageData) {
-		pageData.data.forEach((item: any, index: number) => {
+				pageData.data.forEach((item: any, index: number) => {
           item.nSeqNo = index + 1;
         });
         pageresult.list = pageData.data;
         pageresult.total = pageData.total;
       }
     }
-  });
+  }).catch((err: any) => {
+		queryLoading.value = false;
+		ElMessage.error(err.msg);
+	});
 };
 
 onMounted(() => {

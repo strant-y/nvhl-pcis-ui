@@ -101,6 +101,7 @@ const appStatusOptions = ref([
 const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
 const paymentDialog = defineAsyncComponent(() => import("./paymentMethod.vue"));
 
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -108,6 +109,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery();
         },
@@ -529,6 +531,7 @@ function toDtl(row: any, type: string, payWay: string ) {
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
+			queryLoading.value = true;
       const tm = freeEditRef.value?.getFromValue().Tm;
       const param = {
         sence: "1",// 1 协议录入 2 协议审核 3 协议批改
@@ -542,6 +545,7 @@ function handleQuery(flag?: boolean) {
       delete param.Tm
       cargoApi.queryEcargoList(param)
         .then((res: any) => {
+					queryLoading.value = false;
           if (res && res.code === 200) {
             const pageData = res.data;
             if (pageData) {
@@ -559,6 +563,7 @@ function handleQuery(flag?: boolean) {
           }
         })
         .catch((err: any) => {
+					queryLoading.value = false;
           ElMessage.error(err.msg);
         });
     }
