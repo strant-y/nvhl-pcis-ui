@@ -287,6 +287,16 @@ const method = {
       setValue("ECargoBase.cCiMrk","")
       return false;
     }
+		// 两个从共---联共保主协议信息单证打印方式-默认值-按共保比例打印（602002）
+    if (!!val && !initFlag.value) {
+			setTimeout(() => {
+				if (val == '2' || val == '4') {
+					formPage.getComponentRefById("AgreementCiTcp")?.setValue("ECargoBase.cCiPriTyp", '602002')
+				} else {
+					formPage.getComponentRefById("AgreementCiTcp")?.setValue("ECargoBase.cCiPriTyp", null)
+				}
+			}, 2000);
+		}
     // idxParam.ciJiMrk = val;
     // const ciAgreementECargo = formPage.getComponentRefById('AgreementCiTcp');
     // if(ciAgreementECargo) {
