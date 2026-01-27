@@ -252,6 +252,18 @@ onMounted(async () => {
     rules: [getRules("phoneNo", {})],
   });
   selectType()
+  // 020019、020020、020021三款产品标的信息全部非必填
+  if(['020019','020020','020021'].includes(params.cProdNo)) {
+    formconfig11.fromSchema?.forEach((item:any) => {
+      if(item.rules?.length > 0) {
+        item.rules.forEach((i:any, index:any) => {
+          if(i.required === true) {
+            item.rules.splice(index, 1)
+          }
+        })
+      }
+    })
+  }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
     const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
@@ -300,6 +312,18 @@ onMounted(async () => {
         }
       }
     })
+    for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+        if (distContactList.includes(data.prop)) {
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
+          }
+        }
+      })
+    }
+  }
   })
 });
 function hasEnglish(str: any) {
