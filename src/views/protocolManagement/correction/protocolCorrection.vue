@@ -504,7 +504,8 @@ const tableconfig = reactive<AppTableConfig>(
           lengthNum: 4,
           loadData: [
             { label: '有效', value: 'I' },
-            { label: '无效', value: 'T' }
+            { label: '终止', value: 'T' },
+            { label: '满期', value: 'M' },
           ]
         },
         {
