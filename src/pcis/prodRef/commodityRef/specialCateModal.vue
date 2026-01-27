@@ -82,8 +82,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           codeParam: { cParCde: "teshushebeibianma" },
           func: (val) => {
             setValue("cClassGroup", "");
-            setValue("cSubclassType", "");
+            // setValue("cSubclassType", "");
             if (val) {
+							setFormItem("cClassGroup", { rules: [getRules("required", {})], });
               codeListStore
                   .queryCodeList({
                     codeListName: "Equipment_Type_Level_Two",
@@ -95,7 +96,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     };
                     setFormItem("cClassGroup", objData);
                   });
-            }
+						} else {
+							setFormItem("cClassGroup", { rules: [] });
+						}
           },
         },
         {
@@ -107,19 +110,19 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           clearable:true,
           func: (val) => {
             // setValue("cSubclassType", "");
-            if (val) {
-              codeListStore
-                  .queryCodeList({
-                    codeListName: "Equipment_Type_Level_Three",
-                    codeListParam: { cParCde: val },
-                  })
-                  .then((res) => {
-                    const objDate = {
-                      loadData: res,
-                    };
+            // if (val) {
+              // codeListStore
+                  // .queryCodeList({
+                  //   codeListName: "Equipment_Type_Level_Three",
+                  //   codeListParam: { cParCde: val },
+                  // })
+                  // .then((res) => {
+                  //   const objDate = {
+                  //     loadData: res,
+                  //   };
                     // setFormItem("cSubclassType", objDate);
-                  });
-            }
+                  // });
+            // }
           },
         },
         // {
