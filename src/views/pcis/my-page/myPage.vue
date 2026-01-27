@@ -4216,7 +4216,6 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["plyBase"]["Base.cGrpMrk"] = props.param.cGrpMrk;
-  res["plyBase"]["Base.tUpdTm"] = new Date().getTime();
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -5003,7 +5002,6 @@ const saveEdrPlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-  res["plyBase"]["Base.tUpdTm"] = new Date().getTime();
 
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
