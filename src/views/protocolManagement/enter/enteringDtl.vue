@@ -1169,7 +1169,7 @@ const premiumCalculation = ()=>{
             ElMessage.error('一般退保预收保费必须大于0！')
             return
           }
-          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] >= pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nReceivedPrm'] > pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
             ElMessage.error('一般退保预收保费不能大于原预收保费！')
             return
           }
@@ -1215,6 +1215,7 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   let payList: any[] = [];
   const pay: any = {};
   const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
+  const agreementFeeWarnData = formPage.value?.getComponentRefById('AgreementFeeWarn')?.getFormValue();
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
     // 退保和注销保费计算完只显示一条
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
@@ -1246,7 +1247,12 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
     if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY：应收保费= 预收保费变化 * 预收保费汇率
       // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
-      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
+      // 退保和注销(修改前预收保费 - 修改后折人民币协议预收保费 - 折人民币预扣保费)
+      if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
+        pay["ECargoPay.nPayablePrm"] = decimalMinus(decimalMinus(edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2),agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)),agreementFeeWarnData['ECargoBase.nWhRmbPrm'].toFixed(2))
+      } else {
+        pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
+      }
     } else {// AY:应收保费= 预估保费变化 * 预估保费汇率
       // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nPrmVar'], insrnc["ECargoBase.nPrmRmbExch"]);
       pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nPrmVar']
