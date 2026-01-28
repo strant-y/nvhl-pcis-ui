@@ -1,1 +1,0 @@
-import{aX as s,c as t,e as a,F as e,br as n}from"./index.CNY2dfKf.js";const r={style:{padding:"30px"}};const o=s({},[["render",function(s,o){const i=n;return a(),t("div",r,[e(i,{closable:!1,title:"菜单三级-2",type:"warning"})])}]]);export{o as default};
