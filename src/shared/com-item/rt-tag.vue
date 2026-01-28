@@ -1,15 +1,17 @@
 <template>
   <template v-if="selectedValue">
-    <el-tag
-      ref="tagRef"
-      :size="item.size"
-      :color="getColor"
-      :effect="item.effect ? item.effect : 'dark'"
-      :type="getType"
-      :round="item.round ? item.round : false"
-    >
-      {{ getValueLabel }}
-    </el-tag>
+    <el-tooltip effect="dark" :content="getValueLabel" placement="top">
+      <el-tag
+        ref="tagRef"
+        :size="item.size"
+        :color="getColor"
+        :effect="item.effect ? item.effect : 'dark'"
+        :type="getType"
+        :round="item.round ? item.round : false"
+      >
+        {{ getValueLabel }}
+      </el-tag>
+    </el-tooltip>
   </template>
 </template>
 
