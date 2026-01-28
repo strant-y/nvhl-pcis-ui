@@ -1398,7 +1398,7 @@ const imageUploadManage = () => {
       if (cEdrType === "2" || cEdrType === "3") {
         // 批改类型 2 注销 3 退保
         const baseTab = allFromData['AgreementBase'];
-        const edrBaseTab = allFromData['AgreementEdrEcargoBase'];
+        const edrBaseTab = allFromData['AgreementEdrEcargoBase'] || mainRef.value?.getxyedrbaseRefValue();
         bussNo = baseTab["ECargoBase.cEcAgrAppNo"];
         plyNo = edrBaseTab["EdrECargoBase.cPlyNo"];
         appTyp = edrBaseTab["EdrECargoBase.cAppTyp"];
@@ -1490,7 +1490,7 @@ function showImagSys(viewType: string) {
     }
   } else {
     if (CEdrType === "2" || CEdrType === "3") {
-      const edrBaseTab = allFromData['AgreementEdrEcargoBase'];
+      const edrBaseTab = allFromData['AgreementEdrEcargoBase'] || mainRef.value?.getxyedrbaseRefValue();
       ParamNo = edrBaseTab["ECargoBase.cEcAgrAppNo"];
     } else {
       ParamNo = base["ECargoBase.cEcAgrAppNo"];
