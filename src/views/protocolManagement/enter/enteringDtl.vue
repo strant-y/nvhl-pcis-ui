@@ -1216,9 +1216,9 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   const pay: any = {};
   const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
-    // 退保和注销直接在原有的条数上新增1条
+    // 退保和注销保费计算完只显示一条
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
-      payList = [...list];
+      payList = [];
     } else {
       // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
       if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
