@@ -1691,3 +1691,8 @@ export function getCumulativeRisk(queryParams: any): AxiosPromise<any> {
 export function queryLatestMrk(queryParams: any): AxiosPromise<any> {
   return post(`/reinsured/queryLatestMrk`, queryParams);
 }
+
+// 报停展期批改获取新的保险止期和保险天数
+export function checkPlyChange(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/checkPlyChange`, queryParams);
+}

@@ -1,6 +1,6 @@
-<!-- 核保任务查询 历次批单 -->
+<!-- 历史保批单 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" title="历次批单">
+  <el-dialog v-model="dialogVisible" width="90%" title="历史保批单">
     <div>
       <app-table
         :tableConfig="tableconfig"
@@ -8,13 +8,19 @@
         ref="tableRef"
         @selection-change="handleSelectionChange"
         @page-change="handleQuery(false)"
-      />
+      >
+        <template #column-cAppNo="{ row, column, index }">
+          <span @click="turnToDetail(row.cAppNo)" class="primaryColor">{{ row.cAppNo }}</span>
+        </template>
+      </app-table>
     </div>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
           type: 'primary',
           label: '导出',
+          disabled: pageresult.list?.length < 1,
+          loading: exportLoading,
           func: () => {
             handleExport();
           },
@@ -56,7 +62,9 @@ import { getBasicKindList } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { PcisEdrQueryService } from '@/views/edr-qry-endorse-list/service/pcis-edr-query-service';
-// import { saveAs } from 'file-saver';
+import { getAppPolicyList } from "@/api/query";
+import {encryptRouterParam} from "@/router";
+import { saveAs } from 'file-saver';
 const policyService = new PolicyService();
 const pcisEdrQueryService = new PcisEdrQueryService();
 const dzmodal = useDzModal();
@@ -95,76 +103,79 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     tableBtnFixed: "right",
-    tableBtn: [
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "查看",
-        type: "success",
-        size: "large",
-        icon: "View",
-        tableClick: (row) => {
-          showDetails(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
-        },
-      }),
-    ],
+    tableBtn: [],
     fromSchema: [
+      {
+        prop: "cAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
+        fixed: 'left',
+        slotName: "cAppNo"
+      },
       {
         prop: "cPlyNo",
         inputtype: "rtinput",
         title: "保单号",
-        minWidth: 180,
-        fixed: 'left',
       },
       {
         prop: "cEdrNo",
         inputtype: "rtinput",
         title: "批单号",
-        minWidth: 180,
       },
       {
         prop: "cEdrRsnBundleCde",
         inputtype: "rtinput",
         title: "批改原因",
-        minWidth: 180,
+      },
+      {
+        prop: "nEdrPrjNo",
+        inputtype: "rtinput",
+        title: "批单序号",
+        lengthNum: 4,
       },
       {
         prop: "nPrmVar",
         inputtype: "rtinput",
         title: "保费变化",
-        minWidth: 180,
       },
       {
         prop: "cAppNme",
         inputtype: "rtinput",
         title: "投保人",
-        minWidth: 180,
       },
       {
-        prop: "tNextEdrBgnTm",
-        inputtype: "rtdatepicker",
-        title: "批改生效日期",
-        minWidth: 180,
+        prop: "tUdrTm",
+        inputtype: "rtinput",
+        title: "核保日期",
+      },
+      {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "保险起期",
+      },
+      {
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
+        title: "保险止期",
+      },
+      {
+        prop: "tEdrBgnTm",
+        inputtype: "rtinput",
+        title: "批改生效起期",
+      },
+      {
+        prop: "tEdrEndTm",
+        inputtype: "rtinput",
+        title: "批改生效止期",
       },
     ],
   })
 );
 
 onMounted(async () => {
-  pageresult.list = [
-    {
-      cPlyNo: "保单号",
-      cEdrNo: "批单号",
-      cEdrRsnBundleCde: "批改原因",
-      nPrmVar: "保费变化",
-      cAppNme: "投保人",
-      tNextEdrBgnTm: "批改生效日期",
-    }
-  ];
-  pageresult.total = 1;
-  console.log('pageresult.list',pageresult.list)
-
-  handleQuery(true)
+  if(props.objId) {
+    handleQuery(true)
+  }
 });
 
 // 绑定方法
@@ -205,11 +216,13 @@ function handleQuery(flag?: boolean) {
 }
 
 // 导出
+const exportLoading = ref(false);
 function handleExport() {
+  exportLoading.value = true
   const params = {
     pageNo: 1,
     pageSize: 1000,
-    CPlyNo: props.objId,
+    cPlyNo: props.objId,
     CDataTyp: 'claim',
     CAppTyp: 'E',
     prodNo: props.prodNo,
@@ -218,13 +231,19 @@ function handleExport() {
     CType: 'edrHistory',
   };
   policyService.excelDown(params).then((res: any) => {
+    exportLoading.value = false
     if (res.size <= 0) {
       ElMessage.error({ message: '下载出错', duration: 3000 });
       return;
     }
     const fileName = `${props.objId}历次批单.xls`;
-    // saveAs(res, decodeURI(fileName));
+    const blob = new Blob([res.data], {
+      responseType:res.headers["content-type"]
+      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
+    });
+    saveAs(blob, fileName);
   }).catch((err: any) => {
+    exportLoading.value = false
     ElMessage.error({ message: err, duration: 3000 });
   });
 }
@@ -256,6 +275,55 @@ function showDetails(cAppNo, cPlyNo, cProdNo, cKindNo, data) {
       }
     });
 };
+function turnToDetail(cAppNo:any) {
+  if(cAppNo) {
+    getAppPolicyList({
+      cAppNo: cAppNo,
+      pageSize: 10,
+      pageNum: 1,
+      cLoadSub: "1",
+      queryType: "1",
+      cDataTyp: "app",
+    }).then((res: any) => {
+      if (res.data?.result && res.data?.result.length > 0) {
+        const data = res.data?.result[0];
+        const params: any = {
+          query: {
+            param:  JSON.stringify({
+              cAppNo: data.cAppNo,
+              cAppTyp: data.cAppTyp,
+              cCiMrk: data.cCiMrk,
+              cProdNo: data.cProdNo,
+              cGrpMrk: data.cGrpMrk,
+              cDptCde: data.cDptCde,
+              cTermNo: data.cTermNo,
+              cTermNme: data.cTermNme,
+              cPolicySource:data.cPolicySource,
+              pageType: "readonly",
+              showBtn: false,
+            })
+          }
+        };
+        encryptRouterParam(params);
+        const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
+        window.open(url, "_blank");
+      }
+    });
+  }
+}
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.primaryColor {
+  color: var(--el-color-primary);
+  cursor: pointer;
+}
+:deep(.el-table td.el-table__cell div) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  span {
+    margin-top: 0!important;
+  }
+}
+</style>
