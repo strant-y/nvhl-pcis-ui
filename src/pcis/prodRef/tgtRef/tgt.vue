@@ -497,7 +497,8 @@ const method = {
       if (item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')) {
         item.disabled = false;
       } else if (item.prop == "Tgt.cPayCur") {
-        item.disabled = true;
+				item.disabled = true;
+				opertaor.getTableRefs()['AgentTgt']?.setValue('Tgt.cPayCur', 'CNY')
       }
     });
   },

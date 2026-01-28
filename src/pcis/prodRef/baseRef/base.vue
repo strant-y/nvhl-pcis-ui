@@ -465,7 +465,13 @@ const method = {
     }
     try {
       const getFormconfig = opertaor.getTableRefs()['AgentTgt']
-      getFormconfig?.setValue('Tgt.cPayCur', val)
+			const cDestinationCountry = opertaor.getTableRefs()['tgt']?.getValue('Tgt.cDestinationCountry')
+			if (!!cDestinationCountry && cDestinationCountry != 'CHINA' && cDestinationCountry != '中国') {
+				getFormconfig?.setValue('Tgt.cPayCur', 'CNY')
+			} else { 
+				getFormconfig?.setValue('Tgt.cPayCur', val)
+			}
+
     } catch (err) {
       console.log(err)
     }
