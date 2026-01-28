@@ -1,0 +1,1 @@
+import{aV as e,c as s,e as t,F as a,bp as r}from"./index.DBFvsayL.js";const n={style:{padding:"30px"}};const o=e({},[["render",function(e,o){const c=r;return t(),s("div",n,[a(c,{closable:!1,title:"菜单三级-1",type:"error"})])}]]);export{o as default};
