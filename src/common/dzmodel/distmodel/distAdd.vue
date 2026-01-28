@@ -615,6 +615,11 @@ onMounted(async () => {
         }
       }
     }
+    if(item.prop === 'Dist.cInsuranceDuty') {
+      item.func = (val:any) => {
+        cInsuranceDutyChange(val)
+      }
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
@@ -913,6 +918,16 @@ const cIdTypefun = (val: any) => {
 	setFormItem("Dist.cIdNumber", {
 		rules: baseRules,
 	});
+}
+
+// 保险责任一级
+function cInsuranceDutyChange(val:any){
+  if(val === '02') {
+    setFormItem('Dist.cSuitScope', { rules: [getRules("required", {})], disabled: false });
+  } else {
+    setFormItem('Dist.cSuitScope', { rules: [], disabled: true });
+    setValue('Dist.cSuitScope', null);
+  }
 }
 
 function getAddressstr(val:any, row: any, pitem: any){
