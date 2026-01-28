@@ -1689,38 +1689,7 @@ async function loadAfter() {
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "A") {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
 			if(props.param?.pageName === "priceInquiry") {
 				bthList.value.push(
 					createFreeButtonBase({
@@ -1750,12 +1719,10 @@ async function loadAfter() {
 						}),
 					)
 				}
+			} else {
+				rightBtnList.value = basicRightBtn;
 			}
     }
-
-
-
-
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
