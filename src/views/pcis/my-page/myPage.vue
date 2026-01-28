@@ -1866,29 +1866,29 @@ async function loadAfter() {
 		}
     if (props.param.cAppTyp == "E") {
       rightBtnList.value.push(
-        createFreeButtonBase({
-          label: "历次批单",
-          type: "primary",
-          id: "preOrder",
-          icon: "Document",
-          func: () => {
-            if (props.param?.cAppTyp === "A") {
-              ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
-              return;
-            }
-            const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
-            dzmodal
-              .open(PreviousdrOpnList, {
-                type: "Issuer",
-                objId: props.param?.plyNo || plyBase['Base.cPlyNo'],
-                prodNo: props.param?.cProdNo,
-              })
-              .then((res: any) => {
-                if (res.type === "ok") {
-                }
-              });
-          },
-        })
+        // createFreeButtonBase({
+        //   label: "历次批单",
+        //   type: "primary",
+        //   id: "preOrder",
+        //   icon: "Document",
+        //   func: () => {
+        //     if (props.param?.cAppTyp === "A") {
+        //       ElMessage.warning("这是一张承保申请单，无法查看【本保单历次批单】");
+        //       return;
+        //     }
+        //     const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+        //     dzmodal
+        //       .open(PreviousdrOpnList, {
+        //         type: "Issuer",
+        //         objId: props.param?.plyNo || plyBase['Base.cPlyNo'],
+        //         prodNo: props.param?.cProdNo,
+        //       })
+        //       .then((res: any) => {
+        //         if (res.type === "ok") {
+        //         }
+        //       });
+        //   },
+        // })
       )
     }
     bthList.value.push(
@@ -2597,17 +2597,36 @@ async function loadAfter() {
       },
     }),
   )
-  if (props.param.cAppTyp == "E" || props.param.cRsnCde) {
+  if (props.param.cAppTyp == "E" || props.param.cRsnCde || props.param.pageType === "UW_READ_SCENE" || props.param?.pageType === "readonly") {
     rightBtnList.value.push(
+      // createFreeButtonBase({
+      //   label: "历史保单",
+      //   type: "primary",
+      //   buttonColor: bottomBtnColor1,
+      //   // svgIcon: "template2",
+      //   // iconSize: "20",
+      //   icon: "Memo",
+      //   func: () => {
+      //     handleCheckHistoryPly()
+      //   },
+      // })
       createFreeButtonBase({
-        label: "历史保单",
+        label: "历史保批单",
         type: "primary",
-        buttonColor: bottomBtnColor1,
-        // svgIcon: "template2",
-        // iconSize: "20",
-        icon: "Memo",
+        id: "preOrder",
+        icon: "Document",
         func: () => {
-          handleCheckHistoryPly()
+          const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
+          dzmodal
+            .open(PreviousdrOpnList, {
+              type: "Issuer",
+              objId: props.param?.plyNo || plyBase['Base.cPlyNo'],
+              prodNo: props.param?.cProdNo,
+            })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
         },
       })
     )
