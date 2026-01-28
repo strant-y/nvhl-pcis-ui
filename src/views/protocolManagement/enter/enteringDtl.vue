@@ -954,7 +954,7 @@ function query() {
       if(props.type === 'EDR_APP_NEW_SCENE' && props.param.cAppStatus !== '1'){
         // 初始化时，将cPkId赋值给cRowId
         Object.keys(dataForm).forEach((key) => {
-          if(key === 'AgreementSpecial' || key === 'AgreementCvrg'){
+          if(key === 'AgreementSpecial' || key === 'AgreementCvrg' || key === 'AgreementPay'){
             const v = dataForm[key];
             const ls = [];
             if(v && v instanceof Array){
@@ -1221,10 +1221,16 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
       payList = [];
     } else {
-      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
-      if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
-        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
+      for (const i in list) {
+        if (!!list[i]["ECargoPay.cRowId"]) {
+          list[i]['ECargoPay.nPrmVar'] = 0;
+          payList.push(list[i]);
+        }
       }
+      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
+      // if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
+      //   payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
+      // }
     }
   }
   pay["ECargoPay.nTms"] = payList.length + 1;
