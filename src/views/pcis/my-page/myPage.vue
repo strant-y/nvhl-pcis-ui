@@ -4544,10 +4544,11 @@ const calcPremiumEdr = async () => {
     return false;
   }
 
-  const btn = getBtn("btnCalEdr");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
 
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
@@ -4570,9 +4571,11 @@ const calcPremiumEdr = async () => {
   // }
 
   calcEdr(res).then((res) => {
-    if(btn) {
-      btn.loading = false;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
     console.log("批改计算", res);
     if (res["code"] == "200") {
       let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
@@ -4651,6 +4654,12 @@ const calcPremiumEdr = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  }).catch(() => {
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
   });
 };
 
@@ -4720,10 +4729,11 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
  * 批改:注销退保保费计算
  */
 const calcPremiumEdrSurrender = () => {
-  const btn = getBtn("btn010101");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
@@ -4751,9 +4761,11 @@ const calcPremiumEdrSurrender = () => {
   }
 
   calcSurrenEdr(res).then((res: any) => {
-    if(btn) {
-      btn.loading = false;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
     console.log("批改计算", res);
     if (res["code"] == "200") {
       ElMessage.success(
@@ -4793,6 +4805,12 @@ const calcPremiumEdrSurrender = () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  }).catch(() => {
+    bthList.value.forEach((item:any) => {
+      if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
   });
 };
 /**
@@ -4800,10 +4818,11 @@ const calcPremiumEdrSurrender = () => {
  * **/
 const saveApplicationEdr = async () => {
   let saveFlag = false;
-  const btn = getBtn("btn010102");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   const res:any = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4834,9 +4853,11 @@ const saveApplicationEdr = async () => {
   // 点击保存之前的申请单号
   const beforeSaveCappNo = res["data"]["EdrBase"]["EdrBase.cAppNo"];
   const resInfo = await saveSurrenEdr(res)
-  if(btn) {
-    btn.loading = false;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+      item.loading = false;
+    }
+  });
   console.log("退保保存", resInfo);
   if (resInfo["code"] == "200") {
     const ops = opertaor.convertData(resInfo);
@@ -4904,18 +4925,22 @@ const saveApplicationEdr = async () => {
  * **/
 const getSurrenderPrecisFun = () => {
   const btn = getBtn("btnCompare");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   getSurrenderPrecis(res).then((result:any) => {
-    if(btn) {
-      btn.loading = false;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
     if (result["code"] == "200") {
       const cEdrCtnt = result["data"]["data"]["cEdrCtnt"]; //批文
       edrbase.value?.setValue("EdrBase.cEdrCtnt", cEdrCtnt);
@@ -4923,6 +4948,12 @@ const getSurrenderPrecisFun = () => {
     } else {
       ElMessage.error(result.msg);
     }
+  }).catch(() => {
+    bthList.value.forEach((item:any) => {
+      if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
   });
 };
 
@@ -4968,10 +4999,11 @@ const submitEdrToUndrSurrender = async () => {
   // if(!s) return;
   const f = await saveApplicationEdr();// 提交核保,需要默认执行一次保存操作
   if(f === false) return;
-  const btn = getBtn("btn010103");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   const res:any = {};
   res["user"] = user;
   res["appNo"] = edrbase.value?.getFromValue()["EdrBase.cAppNo"]
@@ -4985,9 +5017,11 @@ const submitEdrToUndrSurrender = async () => {
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   
   submitEdrSurrender(res).then((result) => {
-    if(btn) {
-      btn.loading = false;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btn010101','btn010102','btn010103','btnCalEdr','btnCompare'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
     console.log("申请核保(退保、注销)", result);
     if (result["code"] == "200") {
       ElMessage.success(result.msg);
@@ -5004,6 +5038,12 @@ const submitEdrToUndrSurrender = async () => {
     }
     // ElMessage.success(res.msg);
     // history.back();
+  }).catch(() => {
+    bthList.value.forEach((item:any) => {
+      if(['btn010101','btn010102','btn010103','btnCompare'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
   });
 };
 /**
@@ -5012,10 +5052,11 @@ const submitEdrToUndrSurrender = async () => {
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
   let saveEdrFlag = false;
-  const btn = getBtn("saveEdr");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   const res = opertaor.getDataAll();
   const dataALl = opertaor.getDataAll();
   res["user"] = user;
@@ -5048,9 +5089,11 @@ const saveEdrPlyInfo = async () => {
   
   const beforeSaveCappNo = res["EdrBase"]?.["EdrBase.cAppNo"];
   const edrInfo: any = await saveEdrAppPlyInfo(res)
-  if(btn) {
-    btn.loading = false;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+      item.loading = false;
+    }
+  });
   if(edrInfo["code"] == "200") {
     const ops = opertaor.convertData(edrInfo);
     console.log("转换的数据", ops);
@@ -5127,10 +5170,11 @@ const generateEndorse = async () => {
     ElMessage.error("请先保存申请单")
     return
   }
-  const btn = getBtn("btnCompare");
-  if(btn) {
-    btn.loading = true;
-  }
+  bthList.value.forEach((item:any) => {
+    if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+      item.loading = true;
+    }
+  });
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
@@ -5151,9 +5195,11 @@ const generateEndorse = async () => {
   //   })
   // }
   getEndorseChange(res).then((res) => {
-    if(btn) {
-      btn.loading = false;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
     if (res["code"] == "200") {
       const cEdrCtnt = res["data"]["data"]["cEdrCtnt"]; //批文
       const edrRsn = res["data"]["data"]["edrRsn"]; //批文
@@ -5166,6 +5212,12 @@ const generateEndorse = async () => {
     } else {
       ElMessage.error(res.msg);
     }
+  }).catch(() => {
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = false;
+      }
+    });
   });
 };
 
@@ -5356,10 +5408,11 @@ if(props.param.cTransMrk !== "1"){
     }
     // const s = await saveDataInfo()
     // if(!s) return;
-    const btn = getBtn("btnSubmitEdr");
-    if(btn) {
-      btn.loading = true;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = true;
+      }
+    });
     const res = {};
     const base = opertaor.getTableRefByKey("plyBase").getFromValue();
     res["user"] = user;
@@ -5369,9 +5422,11 @@ if(props.param.cTransMrk !== "1"){
 
     if(qryTerminationStatus.value) {
       submitEdrToUndr(res).then((result:any) => {
-        if(btn) {
-          btn.loading = false;
-        }
+        bthList.value.forEach((item:any) => {
+          if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+            item.loading = false;
+          }
+        });
         // 三十天校验提示
         if(result.repetitionHint) {
           ElMessage.error(result.repetitionHint);
@@ -5398,17 +5453,20 @@ if(props.param.cTransMrk !== "1"){
           ElMessage.error(result.msg);
         }
       }).catch(() => {
-        if(btn) {
-          btn.loading = false;
-        }
+        bthList.value.forEach((item:any) => {
+          if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+            item.loading = false;
+          }
+        });
       })
       return
     }
     //进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
-    const calBtn = getBtn("btnCalEdr");
-    if(calBtn) {
-      calBtn.loading = true;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = true;
+      }
+    });
     setTimeout(async () => {
       try {
         const calcData = opertaor.getDataAll();
@@ -5500,9 +5558,11 @@ if(props.param.cTransMrk !== "1"){
           const oldAmt = calcData.base["Base.nAmt"];
           if (newPrm === oldPrm && newAmt === oldAmt) {
             submitEdrToUndr(res).then((result:any) => {
-              if(btn) {
-                btn.loading = false;
-              }
+              bthList.value.forEach((item:any) => {
+                if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+                  item.loading = false;
+                }
+              });
               // 三十天校验提示
               if(result.repetitionHint) {
                 ElMessage.error(result.repetitionHint);
@@ -5528,11 +5588,19 @@ if(props.param.cTransMrk !== "1"){
               } else {
                 ElMessage.error(result.msg);
               }
+            }).catch(() => {
+              bthList.value.forEach((item:any) => {
+                if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+                  item.loading = false;
+                }
+              });
             });
           } else {
-            if(btn) {
-              btn.loading = false;
-            }
+            bthList.value.forEach((item:any) => {
+              if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+                item.loading = false;
+              }
+            });
             needCalc.value = true;
             ElMessage.error("保额或保费发生变化,请重新进行保费计算!");
           }
@@ -5540,20 +5608,20 @@ if(props.param.cTransMrk !== "1"){
       } catch (err) {
         console.log("保费计算失败!" + err);
       } finally {
-        if(btn) {
-          btn.loading = false;
-        }
-        if(calBtn) {
-          calBtn.loading = false;
-        }
+        bthList.value.forEach((item:any) => {
+          if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+            item.loading = false;
+          }
+        });
       }
     },500)
   }
 }else {
-    const btn = getBtn("btnSubmitEdr");
-    if(btn) {
-      btn.loading = true;
-    }
+    bthList.value.forEach((item:any) => {
+      if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+        item.loading = true;
+      }
+    });
     const res:any = {};
     const base = opertaor.getTableRefByKey("plyBase").getFromValue();
     res["user"] = user;
@@ -5562,9 +5630,11 @@ if(props.param.cTransMrk !== "1"){
     res["cTransMrk"] = props.param.cTransMrk;
     res["taskId"] = props.param.taskId ? props.param.taskId.toString() : null;
     submitEdrToUndr(res).then((result:any) => {
-      if(btn) {
-        btn.loading = false;
-      }
+      bthList.value.forEach((item:any) => {
+        if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+          item.loading = false;
+        }
+      });
       console.log("批改申请核保", result);
       // ElMessage.success(res.msg);
       // history.back();
@@ -5593,9 +5663,11 @@ if(props.param.cTransMrk !== "1"){
         ElMessage.error(result.msg);
       }
     }).catch(err => {
-      if(btn) {
-        btn.disabled = false;
-      }
+      bthList.value.forEach((item:any) => {
+        if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
+          item.loading = false;
+        }
+      });
       ElMessage.error(err.msg);
     });
   }
