@@ -543,14 +543,14 @@ function handleQuery(flag?: boolean) {
         param.tInsrncEndTm = tm[1]
       }
       delete param.Tm
+			pageresult.list = []
       cargoApi.queryEcargoList(param)
         .then((res: any) => {
 					queryLoading.value = false;
           if (res && res.code === 200) {
             const pageData = res.data;
             if (pageData) {
-              pageresult.list = []
-              pageresult.list = pageData.data;
+              // pageresult.list = pageData.data;
 							pageresult.list = pageData.data.map((item) => ({
 								...item,
 								// 创建一个新字段合并两个值

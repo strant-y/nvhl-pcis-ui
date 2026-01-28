@@ -463,6 +463,7 @@ const submitForm = (flag: boolean) => {
 
 const refreshData = (reset = true) => {
 	queryLoading.value = true;
+	pageresult.list = []
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
 	if (s.cLoadSub == null || s.cLoadSub == undefined) {
@@ -474,9 +475,9 @@ const refreshData = (reset = true) => {
     if (res.code === 200) {
       const pageData = res.data;
       if (pageData) {
-				pageData.data.forEach((item: any, index: number) => {
-          item.nSeqNo = index + 1;
-        });
+				// pageData.data.forEach((item: any, index: number) => {
+        //   item.nSeqNo = index + 1;
+        // });
         pageresult.list = pageData.data;
         pageresult.total = pageData.total;
       }
