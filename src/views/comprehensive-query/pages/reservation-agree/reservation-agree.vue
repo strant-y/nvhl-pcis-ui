@@ -402,6 +402,7 @@ const submitForm = (flag: boolean) => {
 
 const refreshData = (reset = true) => {
 	queryLoading.value = true;
+	pageresult.list = []
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
 	if (s.cLoadSub == null) {
@@ -417,10 +418,10 @@ const refreshData = (reset = true) => {
     if (res.code === 200) {
       const pageData = res.data;
       if (pageData) {
-				pageData.data.forEach((item: any, index: number) => {
-          item.nSeqNo = index + 1;
-        });
-        pageresult.list = pageData.data;
+				// pageData.data.forEach((item: any, index: number) => {
+        //   item.nSeqNo = index + 1;
+        // });
+        // pageresult.list = pageData.data;
 				pageresult.list = pageData.data.map((item) => ({
 					...item,
 					// 创建一个新字段合并两个值
