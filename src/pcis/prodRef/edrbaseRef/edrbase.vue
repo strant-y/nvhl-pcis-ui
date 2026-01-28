@@ -19,7 +19,7 @@ import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-import { qryTerminationDataList, qryProdRuleList, queryLatestMrk } from "@/api/prod";
+import { qryTerminationDataList, qryProdRuleList, queryLatestMrk, checkPlyChange } from "@/api/prod";
 import Decimal from "decimal.js";
 
 const pcisQueryService = new PcisQueryService();
@@ -316,8 +316,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             setValue("EdrBase.tRepStopExtBgnTm", null)
           } else if(v && tRepStopExtEndTm && lastInsrncEndTm.value) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
-            const time = dayjs(tRepStopExtEndTm).diff(dayjs(v), 'day') + 1;
-            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(lastInsrncEndTm.value).add(time, 'day'))
+            getInsrncEndTm(v,tRepStopExtEndTm,tInsrncBgnTm,tInsrncEndTm)
           }
         },
       },
@@ -346,8 +345,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             setValue("EdrBase.tRepStopExtEndTm", null)
           } else if(v && tRepStopExtBgnTm && lastInsrncEndTm.value) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
-            const time = dayjs(v).diff(dayjs(tRepStopExtBgnTm), 'day') + 1;
-            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(lastInsrncEndTm.value).add(time, 'day'))
+            getInsrncEndTm(tRepStopExtBgnTm,v,tInsrncBgnTm,tInsrncEndTm)
           }
         },
       },
@@ -629,6 +627,27 @@ async function getLastInsrncEndTm (cPlyNo:any) {
       ElMessage.error(res.msg)
     }
   }).catch(err => {
+    ElMessage.error(err.msg)
+  })
+}
+
+function getInsrncEndTm(tRepStopExtBgnTm:any,tRepStopExtEndTm:any,tInsrncBgnTm:any,tInsrncEndTm:any) {
+  const param = {
+    CEdrRsnBundleCde: params["cRsnCde"],//批改原因
+    tRepstopextBgnTm: tRepStopExtBgnTm,//报停起期
+    tRepStopExtEndTm: tRepStopExtEndTm,//报停止期
+    cPlyNo: params["cPlyNo"] || edrbaseEditRef.value?.getValue("EdrBase.cPlyNo"),//保单号
+    tEdrBgnTm: getValue('EdrBase.tEdrBgnTm'),//批单生效起期
+    tInsrncBgnTm: tInsrncBgnTm,//保险起期
+    tInsrncEndTm: tInsrncEndTm,//保险止期
+  }
+  checkPlyChange(param).then((res:any) => {
+    if(res.code === 200 && res.res?.tInsrncEndTm) {
+      opertaor.getTableRefByKey('insrnc')?.setValue('Base.tInsrncEndTm', res.res?.tInsrncEndTm)
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch((err:any) => {
     ElMessage.error(err.msg)
   })
 }

@@ -936,7 +936,7 @@ const method = {
 const updateMasterAgreementValues = () => {
   // 一般批改如果保费变化量和保额变化量为0或批改原因为变更联共保信息，则不需要重新进行联共保保费的计算
   const edrBaseData = opertaor.getFatherPage().getEdrbaseValue();
-  if(param.cRsnCde !== '47' && new Decimal(edrBaseData?.['EdrBase.nPrmVar']?.replaceAll(',','') || 0).toNumber() === 0 && new Decimal(edrBaseData?.['EdrBase.nAmtVar']?.replaceAll(',','') || 0).toNumber() === 0) return;
+  if(param.cAppTyp === 'E' && param.cRsnCde !== '47' && new Decimal(edrBaseData?.['EdrBase.nPrmVar']?.replaceAll(',','') || 0).toNumber() === 0 && new Decimal(edrBaseData?.['EdrBase.nAmtVar']?.replaceAll(',','') || 0).toNumber() === 0) return;
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
@@ -1096,8 +1096,8 @@ const initCiInfo = (data: any) => {
 
 //个性化校验封装方法
 const valideRequired = () => {
-  const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
-  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+  const cBsnsTyp = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cBsnsTyp')
+  const cCiMrkValue = opertaor.getTableRefByKey("plyBase")?.getValue("Base.cCiMrk");
   nextTick(() => {
     setTimeout(() => {
       const rowItems = getFromValue()
