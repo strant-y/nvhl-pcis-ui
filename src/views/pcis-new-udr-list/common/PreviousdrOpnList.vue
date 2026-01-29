@@ -236,7 +236,7 @@ function handleExport() {
       ElMessage.error({ message: '下载出错', duration: 3000 });
       return;
     }
-    const fileName = `${props.objId}历次批单.xls`;
+    const fileName = `${props.objId}历史保批单.xls`;
     const blob = new Blob([res.data], {
       responseType:res.headers["content-type"]
       // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
