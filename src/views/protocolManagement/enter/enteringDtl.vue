@@ -904,7 +904,7 @@ function query() {
         // const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
         // AgreementFeeWarn.setItemShow()
 				// audit，E-协议审核批单展示批改信息和批改比较项，不能修改
-        if (props.type === 'EDR_APP_NEW_SCENE' || (props.type === "audit" && props.param.cAppTyp == 'E')) {        
+        if (props.type === 'EDR_APP_NEW_SCENE' || ((props.type === "audit" || props.type === "view") && props.param.cAppTyp == 'E')) {        
 					// if (props.type === 'EDR_APP_NEW_SCENE') {        
           if (ops["AgreementEdrEcargoBase"]) {
             const EdrECargoBase = ops["AgreementEdrEcargoBase"][0];
@@ -934,7 +934,7 @@ function query() {
           formPage.value?.setPageReadOnly(true, [], {
             success: (pageData: any) => {
 							// audit，E-协议审核批单展示批改信息和批改比较项，不能修改
-							if (props.type === "audit" && props.param.cAppTyp == 'E') return
+							if ((props.type === "audit" || props.type === "view") && props.param.cAppTyp == 'E') return
               getEdrRsnItemFun(
                   "029900",
                   props.param["cDptCde"],
