@@ -22,6 +22,8 @@ import plyCvrg04Ref from "./cvrgRef/plyCvrg04.vue";
 import plyCvrgPer from "./cvrgRef/plyCvrgPer.vue";
 import plyCvrgCross from "./cvrgRef/plyCvrgCross.vue";
 import plyCvrgPlanCross from "./cvrgRef/plyCvrgPlanCross.vue";
+import term047005 from "./cvrgRef/term-047005.vue";
+
 import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
@@ -114,6 +116,7 @@ const componentMap = {
   webPlyTermCommon:PlyTermCommonRef,
   plyCvrgCross:plyCvrgCross,
   plyCvrgPlanCross:plyCvrgPlanCross,
+  term047005:term047005,
   plyBaseRef: plybaseRef,
   insuredRef: insuredRef,
   tgtobjRef: tgtobjRef,

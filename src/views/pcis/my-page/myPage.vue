@@ -1443,6 +1443,8 @@ const initPage = async () => {
   // }
   // 页面初始化
   const formconfig11 = JSON.parse(getProductRes.data);
+
+  develop(formconfig11);  // 开发模式,自定义开发组件配置
   oldProductResData.value = JSON.parse(getProductRes.data);
   // 初始化全页面下拉选一次性获取,解决页面响应效率
   const codeinit = getAllcodelist(formconfig11);
@@ -1496,6 +1498,11 @@ async function getInitParam(codeparam){
       codeListStore.setOptionsToCacheMap(res.data[i]['key'],res.data[i]['data']);
     }
   }
+}
+
+function develop(formconfig11: any){
+  // for(const page in formconfig11[0].pageInfo){
+  // }
 }
 
 const exlist = ['acctinfo','ci','ourCompanyCiShare'];
@@ -2607,7 +2614,7 @@ async function loadAfter() {
       },
     }),
   )
-  if (props.param.cAppTyp == "E" || props.param.cRsnCde || props.param.pageType === "UW_READ_SCENE" || props.param?.pageType === "readonly") {
+  if (props.param.cAppTyp == "E" || props.param.cRsnCde || props.param.pageType === "UW_READ_SCENE" || props.param?.pageType === "readonly" || props.param?.pageType === "PLY_UW_PROCESS_SCENE") {
     rightBtnList.value.push(
       // createFreeButtonBase({
       //   label: "历史保单",
