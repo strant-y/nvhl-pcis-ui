@@ -326,7 +326,7 @@ function setFormItem(key: any, obj: any) {
 onMounted(() => {
 	nextTick(() => {
 		// 协议审核批单展示批改信息和批改比较项，不能修改
-		if (params.type === "audit" && params.cAppTyp == 'E') {
+		if ((params.type === "audit" || params.type === "view") && params.cAppTyp == 'E') {
 			setFormItem("EdrECargoBase.cEdrMrk", { hidden: true })
 			setFormItem("EdrECargoBase.tEdrBgnTm", { disabled: true })
 			setFormItem("EdrECargoBase.cEdrCtnt", { disabled: true })
