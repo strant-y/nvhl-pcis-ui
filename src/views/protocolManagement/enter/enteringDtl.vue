@@ -956,7 +956,7 @@ function query() {
       if(props.type === 'EDR_APP_NEW_SCENE' && props.param.cAppStatus !== '1'){
         // 初始化时，将cPkId赋值给cRowId
         Object.keys(dataForm).forEach((key) => {
-          if(key === 'AgreementSpecial' || key === 'AgreementCvrg'){
+          if(key === 'AgreementSpecial' || key === 'AgreementCvrg' || key === 'AgreementPay'){
             const v = dataForm[key];
             const ls = [];
             if(v && v instanceof Array){
@@ -1171,7 +1171,7 @@ const premiumCalculation = ()=>{
             ElMessage.error('一般退保预收保费必须大于0！')
             return
           }
-          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] >= pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nReceivedPrm'] > pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
             ElMessage.error('一般退保预收保费不能大于原预收保费！')
             return
           }
@@ -1217,15 +1217,22 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   let payList: any[] = [];
   const pay: any = {};
   const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
+  const agreementFeeWarnData = formPage.value?.getComponentRefById('AgreementFeeWarn')?.getFormValue();
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
     // 退保和注销保费计算完只显示一条
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
       payList = [];
     } else {
-      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
-      if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
-        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
+      for (const i in list) {
+        if (!!list[i]["ECargoPay.cRowId"]) {
+          list[i]['ECargoPay.nPrmVar'] = 0;
+          payList.push(list[i]);
+        }
       }
+      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
+      // if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
+      //   payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
+      // }
     }
   }
   pay["ECargoPay.nTms"] = payList.length + 1;
@@ -1248,7 +1255,12 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
     if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY：应收保费= 预收保费变化 * 预收保费汇率
       // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
-      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
+      // 退保和注销(修改前预收保费 - 修改后折人民币协议预收保费 - 折人民币预扣保费)
+      if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
+        pay["ECargoPay.nPayablePrm"] = decimalMinus(decimalMinus(edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2),agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)),agreementFeeWarnData['ECargoBase.nWhRmbPrm'].toFixed(2))
+      } else {
+        pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
+      }
     } else {// AY:应收保费= 预估保费变化 * 预估保费汇率
       // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nPrmVar'], insrnc["ECargoBase.nPrmRmbExch"]);
       pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nPrmVar']

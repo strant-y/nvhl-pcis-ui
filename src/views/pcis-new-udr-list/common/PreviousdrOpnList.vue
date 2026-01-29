@@ -236,7 +236,7 @@ function handleExport() {
       ElMessage.error({ message: '下载出错', duration: 3000 });
       return;
     }
-    const fileName = `${props.objId}历次批单.xls`;
+    const fileName = `${props.objId}历史保批单.xls`;
     const blob = new Blob([res.data], {
       responseType:res.headers["content-type"]
       // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8",
@@ -305,7 +305,7 @@ function turnToDetail(cAppNo:any) {
           }
         };
         encryptRouterParam(params);
-        const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
+        const url = window.location.origin + "/#/pcisapp/pcisappView?param=" + params.query.param;
         window.open(url, "_blank");
       }
     });
