@@ -3294,7 +3294,7 @@ const calcPremium = () => {
       const baseRef = opertaor.getTableRefByKey("base");
       if(shanDongFlag){
          baseRef.shanDongFun();
-      } else{
+      } else if(Number(base['Base.nPayNum']) > 1){
          baseRef.nPayNumberFun();
       }
     } else {
@@ -3321,6 +3321,9 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
     "YYYY-MM-DD HH:mm:ss"
   );
+  if(Number(tmDay.value) < 30) {
+    pay["Pay.tPayEndTm"] = insrnc["Base.tInsrncEndTm"]
+  }
   pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
@@ -6661,7 +6664,7 @@ const afterCalcPremium = () => {
   const baseRef = opertaor.getTableRefByKey("base");
   if(shanDongFlag){
     baseRef.shanDongFun();
-  } else{
+  } else if(Number(base['Base.nPayNum']) > 1){
     baseRef.nPayNumberFun();
   }
   if(opertaor.getTableRefByKey("ci")) {
