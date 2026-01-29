@@ -2535,7 +2535,17 @@ async function loadAfter() {
       },
     }),
   )
-  
+
+  if (props.param?.cProdNo && props.param.cProdNo.startsWith('040002')) {
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "雇主反欺诈风险态势",
+        type: "primary",
+        buttonColor: bottomBtnColor1,
+      }),
+    )
+  }
+
   if(user.roles?.length > 0 && !user.roles.find((item:any) => item.cOpgrpCde === "ROLE_00000173")) {
     bthList.value.push(
       // {isdivider: true},  //间隔符
