@@ -2614,7 +2614,7 @@ async function loadAfter() {
       },
     }),
   )
-  if (props.param.cAppTyp == "E" || props.param.cRsnCde || props.param.pageType === "UW_READ_SCENE" || props.param?.pageType === "readonly") {
+  if (props.param.cAppTyp == "E" || props.param.cRsnCde || props.param.pageType === "UW_READ_SCENE" || props.param?.pageType === "readonly" || props.param?.pageType === "PLY_UW_PROCESS_SCENE") {
     rightBtnList.value.push(
       // createFreeButtonBase({
       //   label: "历史保单",
