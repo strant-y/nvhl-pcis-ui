@@ -408,6 +408,7 @@ function getFormValue() {
 }
 
 function setFormValue(value: any) {
+	delete value['ECargoBase.tInsrncEndTm']
   applicantEditRef?.value?.setFormValue(value);
 }
 
