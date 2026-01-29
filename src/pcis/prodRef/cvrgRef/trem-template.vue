@@ -63,7 +63,7 @@
               </el-col>
               <el-col :span="3" justify="end">
                 <rtButton
-                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid'"
+                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid' && pageparam.cProdNo !== '047005' "
                     @click="
                   () => {
                     addriskView();
@@ -225,7 +225,8 @@
             </template>
           </template>
           <template v-if="riskShowTyp === 'grid'">
-            <app-grid-edit :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+            <term047005 v-if="pageparam.cProdNo === '047005' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()" /> 
+            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
               <template v-for="(ginfo, gk) in groupInfo" :key="gk">
@@ -1118,7 +1119,6 @@ function setTermConf(d: any,initFlag: boolean){
     setDisabledAll();
   }
   initMethod();
-
   if(initFlag){
     nextTick(()=>{
       initData(props.modelValue);
@@ -1891,7 +1891,21 @@ function setData(params: any,data:any){
   }
 }
 
+
 const methodMap = {
+  excessLayerChange(val: any,row: any){
+    termdata.value['Term.cExcessLayer'] = val;
+    const r = riskTableRef.value?.getTableValue();
+    let exdata = JSON.parse(JSON.stringify(r[r.length-1]));
+    if(exdata){
+      Object.keys(exdata).forEach(ex=>{
+        if(ex === 'TermRisktgt.cExcessLayer' || ex ===  'TermRisktgt.nInsuranceAmount'){
+          delete exdata[ex];
+        }
+      })
+    }
+    riskTableRef.value?.setRiskData(val,exdata,r);
+  },
   butTestCheck:(item: any,row: any) => {
     dialog.value?.open(
       "chooseProdDialog",
@@ -2061,22 +2075,25 @@ const methodMap = {
 };
 
 const checkData = (v :any,item:any) => {
-    const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
-    if(cf){
-      const fk = item.prop
-      cf.forEach((c)=>{
-        if(c.cFatherKey === fk){
-          c.factorItem.max = v;
-          
-          if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
-            if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
-              riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
-            }
+  if(!groupconf.value[item.cGroupId]){
+    return ;
+  }
+  const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
+  if(cf){
+    const fk = item.prop
+    cf.forEach((c)=>{
+      if(c.cFatherKey === fk){
+        c.factorItem.max = v;
+        
+        if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
+          if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
+            riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
           }
         }
-      });
-      update();
-    }
+      }
+    });
+    update();
+  }
 }
 
 const copyMaps = ['Term.nAccidentLimit','Term.nInsuranceAmount','Term.nLegalAccident','Term.nLegalTotal','Term.nRateVal',

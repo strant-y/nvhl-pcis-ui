@@ -24,6 +24,16 @@
 					</div>
 				</div>
 			</template>
+			<template #column-cEcAgrEdrNo="{ row, column, index }">
+				<div class="policy-info-cell">
+					<div v-if="row.cEcAgrEdrNo" class="policy-number-row">
+						<span style="width: calc(100% - 1em - 5px)">{{ row.cEcAgrEdrNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrEdrNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+			</template>
       <template #column-cAppNme="{ row, column, index }">
         <el-tooltip :content="row.cAppNme" placement="top">
           <span v-html="row.cAppNme || ''" class="twoLine"></span>
@@ -223,7 +233,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cEcAgrEdrNo",
         inputtype: "rtinput",
-        lengthNum: 22,
+        lengthNum: 27,
         lengthIsNumber: true,
         title: "批单号",
         slotName: "cEcAgrEdrNo"
