@@ -261,6 +261,12 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          if(parparam.cProdNo === '047005'){
+            data["Term.cExcessLayer"] = "01";
+            riskList.forEach((item:any) => {
+              item['TermRisktgt.cExcessLayer'] = '01';
+            })
+          }
           // 080011 费率默认1000
           if (parparam.cProdNo === '080011') {
             riskList.forEach((item:any) => {
