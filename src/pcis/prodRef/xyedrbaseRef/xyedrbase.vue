@@ -390,11 +390,8 @@ onMounted(() => {
             FZ: "FZ",
         };
         if(params.cRsnCde=='FZ' || params.cEdrRsnBundleCde =='FZ'){
-            param["calcMrk"] = '0'
-        }else{
-          param["calcMrk"] = '1'
-        }
-        codeListStore
+					param["calcMrk"] = '0'
+					codeListStore
             .queryCodeList({
                 codeListName: "EDR_RSN_LIST_ECARGO_FZ",
                 codeListParam: param,
@@ -402,6 +399,17 @@ onMounted(() => {
             .then((res) => {
                 setFormItem("EdrECargoBase.cEdrRsnDetail", { loadData: res });
             });
+        }else{
+					param["calcMrk"] = '1'
+					codeListStore
+            .queryCodeList({
+                codeListName: "EDR_RSN_LIST_FZ",
+                codeListParam: param,
+            })
+            .then((res) => {
+                setFormItem("EdrECargoBase.cEdrRsnDetail", { loadData: res });
+            });
+        }
     }
   });
 });
