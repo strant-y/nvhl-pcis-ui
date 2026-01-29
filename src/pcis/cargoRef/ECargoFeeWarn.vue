@@ -198,10 +198,10 @@ const method = {
     if(initFlag.value) return
      const nReceivedPrm =  sessionStorage.getItem("nReceivedPrm") ? JSON.parse(sessionStorage.getItem("nReceivedPrm") || '') : ''
     // props.type === 'EDR_APP_NEW_SCENE'
-    if(nReceivedPrm['ECargoBase.nReceivedPrm'] && param?.cEdrType && param?.cEdrType == '1'){
-     if(nReceivedPrm['ECargoBase.nReceivedPrm'] > val){
-       ElMessage.error("预收保费不能小于原保费!");
-       setValue('ECargoBase.nReceivedPrm',nReceivedPrm['ECargoBase.nReceivedPrm'])
+    if(nReceivedPrm['ECargoBase.nBefEdrReceivedPrm'] && param?.cEdrType && param?.cEdrType == '1'){
+     if(nReceivedPrm['ECargoBase.nBefEdrReceivedPrm'] > val){
+       ElMessage.error("预收保费不能小于原预收保费!");
+       setValue('ECargoBase.nReceivedPrm',nReceivedPrm['ECargoBase.nBefEdrReceivedPrm'])
        return
      }
     }

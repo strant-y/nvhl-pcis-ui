@@ -4719,10 +4719,13 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
     }
   }
   // 判断新生成的我司保费是不是等于联共保协议中我司份额保费减去其他缴费计划的我司保费的和，如果不相等，则取差值，保证缴费计划的我司保费和与联供协议中的我司份额保费一致
-  const nOwnPrmLast = payListNew.reduce((sum, num) => new Decimal(sum).add(new Decimal(num['Pay.nOwnPrm'] || 0)), 0)
-  const nCiOwnPrmNm = opertaor.getTableRefByKey("ciMasterAgreement").getValue("Base.nCiOwnPrm") || 0;
-  if(new Decimal(nCiOwnPrmNm).sub(new Decimal(nOwnPrmLast)).equals(new Decimal(pay["Pay.nOwnPrm"])) !== true) {
-    pay["Pay.nOwnPrm"] = new Decimal(nCiOwnPrmNm).sub(new Decimal(nOwnPrmLast))
+  const ciMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk');
+  if(ciMrk && ciMrk != '0') {
+    const nOwnPrmLast = payListNew.reduce((sum, num) => new Decimal(sum).add(new Decimal(num['Pay.nOwnPrm'] || 0)), 0)
+    const nCiOwnPrmNm = opertaor.getTableRefByKey("ciMasterAgreement").getValue("Base.nCiOwnPrm") || 0;
+    if(new Decimal(nCiOwnPrmNm).sub(new Decimal(nOwnPrmLast)).equals(new Decimal(pay["Pay.nOwnPrm"])) !== true) {
+      pay["Pay.nOwnPrm"] = new Decimal(nCiOwnPrmNm).sub(new Decimal(nOwnPrmLast))
+    }
   }
   
   pay["Pay.nTms"] = nTms ||plyBase.length+1 ;
