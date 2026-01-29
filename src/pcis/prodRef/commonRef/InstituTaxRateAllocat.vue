@@ -122,7 +122,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "新增",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cProdNo == null) {
+          if (tabref?.getFromValue()?.cProdNo == null) {
             ElMessage.error("产品编码为空！请保存后操作");
             return;
           } else {
@@ -141,7 +141,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "全量删除",
         type: "success",
         func: function () {
-          deleteProdTaxRateByProdNo({ cProdNo: tabref.getFromValue().cProdNo })
+          deleteProdTaxRateByProdNo({ cProdNo: tabref?.getFromValue()?.cProdNo })
             .then((res) => {
               const { code, data, msg } = res;
               if (200 === code) {
@@ -167,7 +167,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           dzmodal
-            .open(AddInstituTaxRateModal, { type: "edit", data: row })
+            .open(AddInstituTaxRateModal, { type: "edit", data: row, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();

@@ -232,7 +232,7 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cIfMust",
         inputtype: "rttag",
         title: "Tag",
-        width: 45,
+        width: 80,
         loadData: [
           {
             label: "可选",
@@ -374,9 +374,9 @@ const method = {
     let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem('AgreementSpecial'));
     console.log(sessionSpecialAgreement)
     const agreementBaseRef = formPage?.getComponentRefById('AgreementBase')
-    if (!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')) {
-      return ElMessage.warning('请先保存');
-    }
+    // if (!agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')) {
+    //   return ElMessage.warning('请先保存投保单');
+    // }
     dialog.value?.open(
       "prdFixSpec",
       {

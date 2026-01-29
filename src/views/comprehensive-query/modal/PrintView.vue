@@ -439,7 +439,7 @@ function getPrnTypeOptions() {
 					setFormItem('cPlyNo', { hidden: false})
 				} else {
 					setFormItem('cPlyNo', { hidden: true })
-					let data = res.data.filter(item => item.value != "P" && item.value != "W")
+					let data = res.data.filter(item => item.value != "P")
 					setFormItem("cPrnType", { loadData: data });
 				}
         

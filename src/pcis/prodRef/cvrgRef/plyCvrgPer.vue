@@ -50,7 +50,7 @@
         <template v-if="formData['a1'] && formData['a1'].length > 0">
           <myCard
             :cardConfig="{
-              title: '扩展类附加条款信息',
+              title: `${parparam.cProdNo?.startsWith('01') ? '' : '扩展类'}附加条款信息`,
               showInTitle: true,
             }"
           >
@@ -83,7 +83,7 @@
         <template v-if="formData['a2'] && formData['a2'].length > 0">
           <myCard
             :cardConfig="{
-              title: '限制类附加条款信息',
+              title: `${parparam.cProdNo?.startsWith('01') ? '' : '限制类'}附加条款信息`,
               showInTitle: true,
             }"
           >
@@ -106,7 +106,7 @@
         <template v-if="formData['a3'] && formData['a3'].length > 0">
           <myCard
             :cardConfig="{
-              title: '规范类附加条款信息',
+              title: `${parparam.cProdNo?.startsWith('01') ? '' : '规范类'}附加条款信息`,
               showInTitle: true,
             }"
           >
@@ -159,6 +159,8 @@ import { terConfig } from "@/store/modules/term-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useRoute } from "vue-router";
 const route = useRoute();
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 
 const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -166,9 +168,9 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);
-const cAppNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cAppNo'] || route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo);
-const cInquiryNo = computed(() => opertaor.getDataAll()['plyBase']['Base.cInquiryNo'] || route.params?.param?.cInquiryNo);
-const pageName = computed(() => opertaor.getParam()['pageName'] || route.params?.param?.pageName);
+const cAppNo = computed(() => (route.params?.param?.pageType === 'EDR_APP_NEW_SCENE' ? route.params?.param?.cOrgAppNo : route.params?.param?.cAppNo) || opertaor.getDataAll()['plyBase']['Base.cAppNo']);
+const cInquiryNo = computed(() => route.params?.param?.cInquiryNo || opertaor.getDataAll()['plyBase']['Base.cInquiryNo']);
+const pageName = computed(() => route.params?.param?.pageName || opertaor.getParam()['pageName']);
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
 const exli = ref(['010001','010002','010003','010004','010020','070002']);
@@ -200,9 +202,13 @@ onMounted(async () => {
   let deleteId = 0 ;
   if(formconfig11.titleBtns){
     // 020018不需要选择货物按钮
-    if(parparam.cProdNo === '020018') {
+    const tableRefs = opertaor.getTableRefs();
+    if(tableRefs && Object.keys(tableRefs)?.filter((item:any) => item.indexOf('CargoDist') !== -1)?.length < 1) {
       formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
     }
+    // if(parparam.cProdNo === '020018') {
+    //   formconfig11.titleBtns = formconfig11.titleBtns.filter((item:any) => item.id !== 'selectGoods')
+    // }
     formconfig11.titleBtns.forEach((item: any,index :number) => {
       if(item.id === 'selectGoods'){
         deleteId = index;
@@ -220,6 +226,7 @@ onMounted(async () => {
     const param = {
       cProdNo: parparam.cProdNo,
       cTermNo: parparam.cTermNo,
+      cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId
 		};
 		if (parparam.cRecordType == '9') {
 			param.riskList = [parparam.cRiskNo] 
@@ -253,6 +260,12 @@ onMounted(async () => {
           };
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
+          }
+          if(parparam.cProdNo === '047005'){
+            data["Term.cExcessLayer"] = "01";
+            riskList.forEach((item:any) => {
+              item['TermRisktgt.cExcessLayer'] = '01';
+            })
           }
           // 080011 费率默认1000
           if (parparam.cProdNo === '080011') {
@@ -517,6 +530,7 @@ function deleteTermByNo(t: any) {
       }
     }
   });
+  updateInsrnc()
 }
 
 function refushCvrgInfo() {
@@ -550,7 +564,7 @@ function refushCvrgInfo() {
   });
 }
 
-function getAddrSeqOptions(compKey:any) {
+async function getAddrSeqOptions(compKey:any) {
   const selData: any = {
     pageNum: 1,
     pageSize: 9999,
@@ -564,7 +578,7 @@ function getAddrSeqOptions(compKey:any) {
   }else {
     selData['cAppNo'] = cAppNo.value;
   }
-  selectDist(selData).then((addrRes: any) => {
+  await selectDist(selData).then((addrRes: any) => {
     if (addrRes.code === 200) {
         const addrList = addrRes.data.data || [];
         addrSeqArray.value  = addrList.map(item => ({
@@ -594,6 +608,7 @@ function refushData(datas: any) {
   formData.value = {};
   nextTick(() => {
     formData.value = pd;
+    updateInsrnc()
     setTimeout(()=>{  
       showFlush();
     },50);
@@ -648,10 +663,16 @@ function setFormValue(value: any) {
       if (baseItem['Term.cRdrTyp'] == '0') {
         // 用 value[0] 的 nRateVal 更新
         const rateVal = value[0]?.['Term.nRateVal']; // 或根据索引/匹配逻辑
+        const nItemRate = value[0]['Term.riskList']?.[0]?.['TermRisktgt.nItemRate']; // 或根据索引/匹配逻辑
         if (rateVal != undefined && baseItem['Term.riskList']?.[0]) {
-          baseItem['Term.riskList'][0]['TermRisktgt.nItemRate'] = rateVal;
-        }
-        plandata.push(processItem(baseItem));
+					baseItem['Term.riskList'][0]['TermRisktgt.nItemRate'] = rateVal;
+					plandata.push(processItem(baseItem));
+				} else if (nItemRate != undefined) {
+					// 直接处理 value 中每一项
+					value.forEach((item: any) => {
+						plandata.push(processItem(item));
+					});
+				}
       }
     });
   } else {
@@ -830,11 +851,24 @@ function getPlanNo() {
   return plans;
 }
 
+function updateInsrnc() {
+  if(parparam.cProdNo.startsWith("09")) {
+    if(formData.value['a1']?.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [getRules("required", {})] })
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [getRules("required", {})] })
+    } else {
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [] })
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [] })
+    }
+  }
+}
+
 onActivated(() => {
   console.log('keep-alive -> onActivated')
 });
 onDeactivated(() => {
   console.log('keep-alive -> onDeactivated')
+  sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');
 });
 onUnmounted(() => {
   sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');

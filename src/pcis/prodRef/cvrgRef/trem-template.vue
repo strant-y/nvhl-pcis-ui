@@ -63,7 +63,7 @@
               </el-col>
               <el-col :span="3" justify="end">
                 <rtButton
-                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid'"
+                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid' && pageparam.cProdNo !== '047005' "
                     @click="
                   () => {
                     addriskView();
@@ -225,7 +225,8 @@
             </template>
           </template>
           <template v-if="riskShowTyp === 'grid'">
-            <app-grid-edit :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+            <term047005 v-if="pageparam.cProdNo === '047005' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()" /> 
+            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
               <template v-for="(ginfo, gk) in groupInfo" :key="gk">
@@ -424,6 +425,7 @@ import {checkIfTruncated} from "@/utils/common";
 import { AppGridEditMethod, createAppGridEditConfig } from "@/shared/app-grid-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import {codelistQuery} from "@/api/dict";
 
 const route = useRoute();
 const templateRef = ref();
@@ -685,6 +687,14 @@ function initData(data: any) {
     }
     if(riskShowTyp.value === 'grid'){
       riskTableRef.value?.setFormValue(newData.riskList);
+      // 标的类别回显
+      if(pageparam.cProdNo?.startsWith('01')) {
+        nextTick(() => {
+          riskTableRef.value?.getFromValue()?.forEach((item:any) => {
+            methodMap.cTargetTypeChange(item['TermRisktgt.cTargetType'], item, true)
+          })
+        })
+      }
     }
     // 041010 非营运客运承运人责任险 标的信息 投保座位总数的值取所有险别信息中的投保座位数（座）的和
     if(pageparam.cProdNo === "041010") {
@@ -1044,7 +1054,8 @@ function setTermConf(d: any,initFlag: boolean){
     
     methodLink(riskFactormap);
 
-    if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){
+    if(!(pageparam.pageType === "PLY_UW_PROCESS_SCENE" || pageparam?.pageType === "readonly" ||
+        (pageparam?.pageType === "EDR_APP_NEW_SCENE" && pageparam.cRsnCde === "99"))){  // 排除核保,只读,数据补全场景,其他场景需要添加删除按钮
       riskGridConfig.value.tableBtn = [
         createFreeButtonBase({
           id:"deleteRisk",
@@ -1108,7 +1119,6 @@ function setTermConf(d: any,initFlag: boolean){
     setDisabledAll();
   }
   initMethod();
-
   if(initFlag){
     nextTick(()=>{
       initData(props.modelValue);
@@ -1263,36 +1273,63 @@ function initMethod(){
   // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
   // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
   if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
-    if (termFactormap && termFactormap.value.length > 0) {
-      termFactormap.value.forEach((item: any) => {
-        if(item.prop === 'Term.nInsuranceFee') {
+    if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+      const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
+      let prop = '';
+      if(nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+        prop = 'TermRisktgt.nTotalInsuranceFee'
+      } else {
+        prop = 'TermRisktgt.nItemFee'
+      }
+      riskGridConfig.value.fromSchema?.forEach((item:any) => {
+        if(item?.prop === prop) {
           item.disabled = false;
+          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
         }
-      });
-    }
+      })
+    } else 
     if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
       for(let i in groupInfo.value) {
         const ginfo = groupInfo.value[i]
         const riskList = groupconf.value[ginfo.cGroupId].riskList
         for(let k in riskList) {
           const riskdata = riskList[k];
-          if(riskdata.maxNum > 0) {
+          const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+          if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
             for(let n = 1;n <= riskdata.maxNum;n++) {
               riskdata.col?.forEach((colinfo:any) => {
                 const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                if(item?.prop === 'TermRisktgt.nItemFee') {
+                if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               })
             }
+          } else 
+          if (termFactormap && termFactormap.value.length > 0) {
+            termFactormap.value.forEach((item: any) => {
+              if(item.prop === 'Term.nInsuranceFee') {
+                item.disabled = false;
+                item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+              }
+            });
           }
         }
       }
-    }
-    if( extermConf.value && extermConf.value.length > 0 ){
-      extermConf.value.forEach((item: any) => {
-        if(item?.prop === 'Term.nInsuranceFee') {
+      if( extermConf.value && extermConf.value.length > 0 ){
+        extermConf.value.forEach((item: any) => {
+          if(item?.prop === 'Term.nInsuranceFee') {
+            item.disabled = false;
+            item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+          }
+        });
+      }
+    } else 
+    if (termFactormap && termFactormap.value.length > 0) {
+      termFactormap.value.forEach((item: any) => {
+        if(item.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
+          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
         }
       });
     }
@@ -1302,36 +1339,63 @@ function initMethod(){
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
-            if (termFactormap && termFactormap.value.length > 0) {
-              termFactormap.value.forEach((item: any) => {
-                if(item.prop === 'Term.nInsuranceFee') {
+            if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+              const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
+              let prop = '';
+              if(nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+                prop = 'TermRisktgt.nTotalInsuranceFee'
+              } else {
+                prop = 'TermRisktgt.nItemFee'
+              }
+              riskGridConfig.value.fromSchema?.forEach((item:any) => {
+                if(item?.prop === prop) {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
-              });
-            }
-            if(Object.keys(groupInfo.value)?.length > 0) {
+              })
+            } else 
+            if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
               for(let i in groupInfo.value) {
                 const ginfo = groupInfo.value[i]
                 const riskList = groupconf.value[ginfo.cGroupId].riskList
                 for(let k in riskList) {
                   const riskdata = riskList[k];
-                  if(riskdata.maxNum > 0) {
+                  const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+                  if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
                     for(let n = 1;n <= riskdata.maxNum;n++) {
                       riskdata.col?.forEach((colinfo:any) => {
                         const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                        if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                           item.disabled = false;
+                          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                         }
                       })
                     }
+                  } else 
+                  if (termFactormap && termFactormap.value.length > 0) {
+                    termFactormap.value.forEach((item: any) => {
+                      if(item.prop === 'Term.nInsuranceFee') {
+                        item.disabled = false;
+                        item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                      }
+                    });
                   }
                 }
               }
-            }
-            if( extermConf.value && extermConf.value.length > 0 ){
-              extermConf.value.forEach((item: any) => {
-                if(item?.prop === 'Term.nInsuranceFee') {
+              if( extermConf.value && extermConf.value.length > 0 ){
+                extermConf.value.forEach((item: any) => {
+                  if(item?.prop === 'Term.nInsuranceFee') {
+                    item.disabled = false;
+                    item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                  }
+                });
+              }
+            } else 
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1344,36 +1408,63 @@ function initMethod(){
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
-            if (termFactormap && termFactormap.value.length > 0) {
-              termFactormap.value.forEach((item: any) => {
-                if(item.prop === 'Term.nInsuranceFee') {
+            if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+              const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
+              let prop = '';
+              if(nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+                prop = 'TermRisktgt.nTotalInsuranceFee'
+              } else {
+                prop = 'TermRisktgt.nItemFee'
+              }
+              riskGridConfig.value.fromSchema?.forEach((item:any) => {
+                if(item?.prop === prop) {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
-              });
-            }
+              })
+            } else 
             if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
               for(let i in groupInfo.value) {
                 const ginfo = groupInfo.value[i]
                 const riskList = groupconf.value[ginfo.cGroupId].riskList
                 for(let k in riskList) {
                   const riskdata = riskList[k];
-                  if(riskdata.maxNum > 0) {
+                  const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+                  if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
                     for(let n = 1;n <= riskdata.maxNum;n++) {
                       riskdata.col?.forEach((colinfo:any) => {
                         const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
-                        if(item?.prop === 'TermRisktgt.nItemFee') {
+                        if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
                           item.disabled = false;
+                          item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                         }
                       })
                     }
+                  } else 
+                  if (termFactormap && termFactormap.value.length > 0) {
+                    termFactormap.value.forEach((item: any) => {
+                      if(item.prop === 'Term.nInsuranceFee') {
+                        item.disabled = false;
+                        item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                      }
+                    });
                   }
                 }
               }
-            }
-            if( extermConf.value && extermConf.value.length > 0 ){
-              extermConf.value.forEach((item: any) => {
-                if(item?.prop === 'Term.nInsuranceFee') {
+              if( extermConf.value && extermConf.value.length > 0 ){
+                extermConf.value.forEach((item: any) => {
+                  if(item?.prop === 'Term.nInsuranceFee') {
+                    item.disabled = false;
+                    item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                  }
+                });
+              }
+            } else 
+            if (termFactormap && termFactormap.value.length > 0) {
+              termFactormap.value.forEach((item: any) => {
+                if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
             }
@@ -1754,7 +1845,7 @@ function methodLink(items: any) {
         items[i]['btnItems']["func"] = methodMap[items[i]['btnItems']["func"]];
       }
       // 地址编码下拉选项
-      if(items[i]['prop'] === 'TermRisktgt.cDistCodeNo') {
+      if(['TermRisktgt.cDistCodeNo','TermRisktgt.cAddrSeq'].includes(items[i]['prop'])) {
         items[i]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
       }
     }
@@ -1771,6 +1862,10 @@ function riskMethodLink(items: any) {
       }
       if(items[k]['btnItems'] && items[k]['btnItems']["func"] && typeof items[k]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
         items[k]['btnItems']["func"] = methodMap[items[k]['btnItems']["func"]];
+      }
+      // 地址编码下拉选项
+      if(['TermRisktgt.cDistCodeNo','TermRisktgt.cAddrSeq'].includes(items[k]['prop'])) {
+        items[k]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
       }
     });
   }
@@ -1796,7 +1891,21 @@ function setData(params: any,data:any){
   }
 }
 
+
 const methodMap = {
+  excessLayerChange(val: any,row: any){
+    termdata.value['Term.cExcessLayer'] = val;
+    const r = riskTableRef.value?.getTableValue();
+    let exdata = JSON.parse(JSON.stringify(r[r.length-1]));
+    if(exdata){
+      Object.keys(exdata).forEach(ex=>{
+        if(ex === 'TermRisktgt.cExcessLayer' || ex ===  'TermRisktgt.nInsuranceAmount'){
+          delete exdata[ex];
+        }
+      })
+    }
+    riskTableRef.value?.setRiskData(val,exdata,r);
+  },
   butTestCheck:(item: any,row: any) => {
     dialog.value?.open(
       "chooseProdDialog",
@@ -1947,28 +2056,44 @@ const methodMap = {
       }
     });
   },
-  nItemFeeChange:(val:any) => {
-    nInsuranceFeeChange(val)
+  // nItemFeeChange:(val:any) => {
+  //   nInsuranceFeeChange(val)
+  // },
+  // 标的类型
+  cTargetTypeChange: (val:any, row:any, flag:any) => {
+    codelistQuery({
+      codeListName: 'tgtTyp_List',
+      codeListParam:{cRemark: val},
+    }).then((res:any) => {
+      // 标的类别
+      if(flag !== true) {
+        row['TermRisktgt.cTargetClass'] = ""
+      }
+      riskTableRef.value?.setFormSchema(row._dataId,'TermRisktgt.cTargetClass','loadData',res.data || [])
+    });
   },
 };
 
 const checkData = (v :any,item:any) => {
-    const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
-    if(cf){
-      const fk = item.prop
-      cf.forEach((c)=>{
-        if(c.cFatherKey === fk){
-          c.factorItem.max = v;
-          
-          if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
-            if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
-              riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
-            }
+  if(!groupconf.value[item.cGroupId]){
+    return ;
+  }
+  const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
+  if(cf){
+    const fk = item.prop
+    cf.forEach((c)=>{
+      if(c.cFatherKey === fk){
+        c.factorItem.max = v;
+        
+        if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
+          if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
+            riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
           }
         }
-      });
-      update();
-    }
+      }
+    });
+    update();
+  }
 }
 
 const copyMaps = ['Term.nAccidentLimit','Term.nInsuranceAmount','Term.nLegalAccident','Term.nLegalTotal','Term.nRateVal',
@@ -2005,19 +2130,21 @@ async function nInsuranceFeeChange(val:any) {
   if((pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A' && !pageparam.initFlag) || ['app','template','copy','inquiryToApp'].includes(pageparam.pageType)) {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
-    let nInsuranceFee:number = 0;
+    let nInsuranceFee:any = 0;
     cvrgData.forEach((item:any) => {
       if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
-        if(item['Term.riskList'][0]?.['TermRisktgt.nItemFee']) {
-          const totalFee = item['Term.riskList'].reduce((sum, num) => sum + Number(num['TermRisktgt.nItemFee'] || 0), 0)
+        if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
+          const totalFee = item['Term.riskList'].reduce((sum, num) => new Decimal(sum).add(new Decimal(num['TermRisktgt.nTotalInsuranceFee'] || 0)), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
-        } else {
-          const TermRisktgtFeeList = item['Term.riskList'].filter((i:any) => i['TermRisktgt.nItemRate']).map((i:any) => { return i['TermRisktgt.nInsuranceFee'] || 0 });
-          const totalFee = TermRisktgtFeeList.reduce((sum, num) => sum + Number(num), 0)
-          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+          if(term.value?.cRdrTyp === '0') {
+            termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
+          }
+          if(termRef.value?.setValue) {
+            termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
+          }
         }
       }
-      nInsuranceFee += Number(item['Term.nInsuranceFee'])
+      nInsuranceFee = new Decimal(nInsuranceFee).add(new Decimal(item['Term.nInsuranceFee'] || 0)).toNumber()
     })
     if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {// 从共主联、从共无联保
       const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })
@@ -2080,11 +2207,28 @@ async function nInsuranceFeeChange(val:any) {
   }
   // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
   if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
+    // TermRisktgt
+    const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
+    let nInsuranceFee:any = 0;
+    cvrgData.forEach((item:any) => {
+      if(Array.isArray(item['Term.riskList']) && item['Term.riskList']?.length > 0) {
+        if(item['Term.riskList'].filter((item:any) => item['TermRisktgt.nItemRate'])?.length > 0) {
+          const totalFee = item['Term.riskList'].reduce((sum, num) => new Decimal(sum).add(new Decimal(num['TermRisktgt.nTotalInsuranceFee'] || 0)), 0)
+          item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
+          if(term.value?.cRdrTyp === '0') {
+            termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
+          }
+          if(termRef.value?.setValue) {
+            termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
+          }
+        }
+      }
+      nInsuranceFee = new Decimal(nInsuranceFee).add(new Decimal(item['Term.nInsuranceFee'] || 0)).toNumber()
+    })
     let nPrm = opertaor.getTableRefByKey("base")?.getValue("Base.nPrm")
     const nAmt = opertaor.getTableRefByKey("base")?.getValue("Base.nAmt")
     const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     const nBefEdrPrm = edrbase['EdrBase.nBefEdrPrm']?.replaceAll(',','');
-    const newData = getDatas();
     if(['2','4'].includes(plyBase?.['Base.cCiMrk'])) {
       const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' })
       if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
@@ -2105,7 +2249,6 @@ async function nInsuranceFeeChange(val:any) {
             opertaor.getTableRefByKey("base")?.setValue("Base.nAmt", newAmt)
           }
 
-          const nInsuranceFee = newData['Term.nInsuranceFee'];
           let minPrm:any = 0;
           let maxPrm:any = 0;
           if(nPrmRange.code == 200 && nPrmRange.data?.upperLimit && nPrmRange.data?.lowerLimit) {
@@ -2131,17 +2274,15 @@ async function nInsuranceFeeChange(val:any) {
         }
       }
     }
-    if(newData['Term.nInsuranceFee'] != nPrm) {
-      opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", newData['Term.nInsuranceFee'])
-      opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", newData['Term.nInsuranceFee'])
-      opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(newData['Term.nInsuranceFee']).sub(new Decimal(nBefEdrPrm)))
-      if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
-        opertaor.getTableRefByKey("cvrg")?.updateTitle()
-      }
-      nextTick(() => {
-        opertaor.getFatherPage().afterCalcEdrPremium()
-      })
+    opertaor.getTableRefByKey("base")?.setValue("Base.nPrm", nInsuranceFee)
+    opertaor.getFatherPage().setEdrValue("EdrBase.nPrm", nInsuranceFee)
+    opertaor.getFatherPage().setEdrValue("EdrBase.nPrmVar", new Decimal(nInsuranceFee).sub(new Decimal(nBefEdrPrm)))
+    if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
+      opertaor.getTableRefByKey("cvrg")?.updateTitle()
     }
+    nextTick(() => {
+      opertaor.getFatherPage().afterCalcEdrPremium()
+    })
   }
 }
 

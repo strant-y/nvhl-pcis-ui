@@ -27,73 +27,81 @@
 
 
       <el-popover ref="popoverRef" :virtual-ref="buttonRef" trigger="click" virtual-triggering :width="350">
-
-        <div class="tab-box">
-          <div v-for="(tab, index) in tabs" :key="index" class="tab-btn" :class="{ active: currentTab === tab }"
-            @click="switchTab(tab)">
-            {{ tab }}
-          </div>
-        </div>
-        <div style="border-bottom: 1px solid #cccccc;"></div>
-
-
-        <div style="max-height: 500px; overflow: auto;" v-if="currentTab == '消息'" class="mes-box">
-          <ul v-if="mesList.length > 0">
-            <li v-for="item in mesList" :key="item">
-              <div style="  padding: 0 5px;">
-                <img src="@/assets/icons/letter.svg" width="30px" alt="My Icon"
-                  style="padding: 5px; border-radius: 50%; background: #f8fdb4; display: flex; align-items: center; justify-content: center;" />
-              </div>
-              <div>
-                <div style="font-weight: 600; cursor: pointer;" @click="JumpClick(item)">【{{ item.title }}】</div>
-                <div style="font-size: 12px; padding-top: 5px;">{{ item.description }}
-
-                  <span v-if="item.dataId">【申请单号：{{ item.dataId }}】</span>
-                  <span v-if="item.cEdrNo">【批单号：{{ item.cEdrNo }}】</span>
-                  <span v-if="item.cplyNo">【保单号：{{ item.cplyNo }}】</span>
-
-
-                </div>
-                <div
-                  style="font-size: 12px; display: flex; align-items: center; justify-content: space-between; padding-top: 5px;">
-                  <span v-if="item.operId">提交人：{{ item.operId }}</span>
-                  <span>{{ item.datetime }}</span>
-                </div>
-
-              </div>
-
-            </li>
-            <!-- <li v-if="hasMoreItems" @click="loadMore" class="more">查看更多</li> -->
-            <li @click="clear" class="more">清空通知</li>
-          </ul>
-
-          <div v-else-if="mesList.length == 0" class="no-data">
-            暂无消息~
-
-          </div>
-
-        </div>
-				<div v-else-if="currentTab == '公告'" class="mes-box">
-					<div v-if="bulList.length > 0" class="bulletin-list">
-						<div
-							v-for="(item, index) in bulList"
-							:key="index"
-							class="bulletin-item-wrapper"
-						>
-							<div class="bulletin-icon">
-								<el-icon><Notification /></el-icon>
-							</div>
-							<div class="bulletin-content">
-								<div
-									class="bulletin-scroll-track"
-									ref="scrollTrackRefs"
-								>
-									<span class="bulletin-text">{{ item.cContent }}</span>
-								</div>
-							</div>
+				<!-- 外层容器：启用 flex 纵向布局 -->
+				<div style="display: flex; flex-direction: column; height: 100%; max-height: 500px;">
+					<div class="tab-box">
+						<div v-for="(tab, index) in tabs" :key="index" class="tab-btn" :class="{ active: currentTab === tab }"
+							@click="switchTab(tab)">
+							{{ tab }}
 						</div>
 					</div>
-					<div v-else class="no-data">暂无公告~</div>
+					<div style="border-bottom: 1px solid #cccccc;"></div>
+
+					<!-- 中间：可滚动内容区 -->
+					<div style="flex: 1; overflow-y: auto;">
+						<div v-if="currentTab == '消息'" class="mes-box">
+							<ul v-if="mesList.length > 0">
+								<li v-for="item in mesList" :key="item">
+									<div style="  padding: 0 5px;">
+										<img src="@/assets/icons/letter.svg" width="30px" alt="My Icon"
+											style="padding: 5px; border-radius: 50%; background: #f8fdb4; display: flex; align-items: center; justify-content: center;" />
+									</div>
+									<div>
+										<div style="font-weight: 600; cursor: pointer;" @click="JumpClick(item)">【{{ item.title }}】</div>
+										<div style="font-size: 12px; padding-top: 5px;">{{ item.description }}
+											<span v-if="item.dataId">【申请单号：{{ item.dataId }}】</span>
+											<span v-if="item.cEdrNo">【批单号：{{ item.cEdrNo }}】</span>
+											<span v-if="item.cplyNo">【保单号：{{ item.cplyNo }}】</span>
+										</div>
+										<div
+											style="font-size: 12px; display: flex; align-items: center; justify-content: space-between; padding-top: 5px;">
+											<span v-if="item.operId">提交人：{{ item.operId }}</span>
+											<span>{{ item.datetime }}</span>
+										</div>
+									</div>
+								</li>
+								<!-- <li v-if="hasMoreItems" @click="loadMore" class="more">查看更多</li> -->
+							</ul>
+							<div v-else-if="mesList.length == 0" class="no-data">
+								暂无消息~
+							</div>
+						</div>
+						<div v-else-if="currentTab == '公告'" class="mes-box">
+							<div v-if="bulList.length > 0" class="bulletin-list">
+								<div
+									v-for="(item, index) in bulList"
+									:key="index"
+									class="bulletin-item-wrapper"
+								>
+									<div class="bulletin-icon">
+										<el-icon><Notification /></el-icon>
+									</div>
+									<div class="bulletin-content">
+										<div
+											class="bulletin-scroll-track"
+											ref="scrollTrackRefs"
+										>
+											<span class="bulletin-text">{{ item.cContent }}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div v-else class="no-data">暂无公告~</div>
+						</div>
+					</div>
+					<!-- 统一底部按钮：始终显示在 popover 底部 -->
+					<div
+						v-if="currentTab === '消息' && mesList.length > 0" style="padding-top: 10px; border-top: 1px solid #eee; text-align: center;"
+					>
+						<el-button
+							type="text"
+							size="small"
+							style="color: #f56c6c; font-size: 13px;"
+							@click="clear"
+						>
+							清空通知
+						</el-button>
+					</div>
 				</div>
       </el-popover>
 
@@ -720,7 +728,7 @@ const initBulletinScroll = () => {
 
 .tab-box {
   display: flex;
-  justify-self: center;
+  justify-content: center;
   font-size: 12px;
 
   .tab-btn {

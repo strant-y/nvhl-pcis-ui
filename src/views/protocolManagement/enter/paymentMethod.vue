@@ -240,11 +240,12 @@ function confirm() {
         }
       	const data = formData.value;
 				getECargoPolicyForRenewal({ cEcAgrNo: formData.cPlyNo, components: [renewalComponent.value] }).then(
-					async (res: any) => {
-						if (res.code == "200") {
+					async (res1: any) => {
+						if (res1.code == "200") {
 							// 存一份申请单号，把res的单号清空
-							let AgreementBase = JSON.parse(JSON.stringify(res.res.composition.AgreementBase[0]))
-							clearCEcAgrAppNoValues(res.res.composition)
+							let AgreementBase = JSON.parse(JSON.stringify(res1.res.composition.ECargoBase[0]))
+							let res = JSON.parse(JSON.stringify(res1))
+							clearCEcAgrAppNoValues(res)
 							router.push({
 								path: "/protocolManagement/enteringDtl",
 								query: {
@@ -259,7 +260,7 @@ function confirm() {
 							});
 							closeDialog();
 						} else {
-							ElMessage.error(res.msg);
+							ElMessage.error(res1.msg);
 						}
 					}
 				);
@@ -360,7 +361,7 @@ const handleArray = (obj:any)=>{
     for (const key in data) {
       if (key.endsWith('.cEcAgrAppNo')) {
         // 清空该字段的值（可选：设为 ""、null、undefined）
-        data[key] = ""; // 或 null，根据业务需求
+        delete data[key] // 或 null，根据业务需求
       } else if (typeof data[key] === 'object') {
         // 继续递归嵌套对象（虽然你数据是扁平的，但更健壮）
         clearCEcAgrAppNoValues(data[key]);

@@ -172,35 +172,35 @@
           />
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
-        <el-affix position="bottom">
-          <div class="bottom-items">
-            <!--          新增的申请单号显示和复制按钮-->
-            <div style="margin-right: 5px; width: 100%; display: flex; justify-content: space-between; align-items: center;">
-              <div style="padding-left: 10px;display: flex; align-items: center; background: var(--rt-bg-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
-                预约协议申请单号:
-                <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;color: var(--el-color-primary);">
-                {{ getNo }}
-                </span>
-                <el-tooltip :content="`点击复制预约协议申请单号`" placement="top">
-                  <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
-                    <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
-                  </el-button>
-                </el-tooltip>
-              </div>
-            </div>
-            <rt-button
-                v-for="(bth, idx) in props.bthList"
-                :item="bth"
-                :key="idx"
-                :loading="bth.loading"
-                :ref="(res: any) => {
-                  formPage.setButtonRef(bth?.id as string, res);
-                }"
-            />
-          </div>
-        </el-affix>
       </el-main>
     </el-container>
+		<el-affix position="bottom">
+			<div class="bottom-items">
+				<!--          新增的申请单号显示和复制按钮-->
+				<div style="margin-right: 5px; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+					<div style="padding-left: 10px;display: flex; align-items: center; background: var(--rt-bg-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap;">
+						预约协议申请单号:
+						<span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;color: var(--el-color-primary);">
+						{{ getNo }}
+						</span>
+						<el-tooltip :content="`点击复制预约协议申请单号`" placement="top">
+							<el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">
+								<rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />
+							</el-button>
+						</el-tooltip>
+					</div>
+				</div>
+				<rt-button
+						v-for="(bth, idx) in props.bthList"
+						:item="bth"
+						:key="idx"
+						:loading="bth.loading"
+						:ref="(res: any) => {
+							formPage.setButtonRef(bth?.id as string, res);
+						}"
+				/>
+			</div>
+		</el-affix>
   </div>
 </template>
 
@@ -260,9 +260,15 @@ onMounted(()=>{
     ) {
       edritemFlag.value = false;
     }
-  }else {
-    edrbaseFlag.value =false
-    edritemFlag.value =false
+	} else {
+		// 协议审核批单展示批改信息和批改比较项，不能修改
+		if ((props.pageType === "audit" || props.pageType === "view") && idxParam.param.cAppTyp == 'E') {
+			edrbaseFlag.value =true
+    	edritemFlag.value =true
+		} else {
+			edrbaseFlag.value =false
+			edritemFlag.value =false
+		}
   }
 
 })

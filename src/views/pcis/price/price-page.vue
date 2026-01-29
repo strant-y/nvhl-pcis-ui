@@ -1689,38 +1689,7 @@ async function loadAfter() {
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "A") {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       bthList.value = basicBtn;
-      rightBtnList.value = basicRightBtn;
 			if(props.param?.pageName === "priceInquiry") {
 				bthList.value.push(
 					createFreeButtonBase({
@@ -1750,12 +1719,10 @@ async function loadAfter() {
 						}),
 					)
 				}
+			} else {
+				rightBtnList.value = basicRightBtn;
 			}
     }
-
-
-
-
   } else if (props.param.pageType === "PLY_APP_MODIFY_BOUNCED_SCENE") {
     // 投保单核保退回
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
@@ -3430,6 +3397,9 @@ const submitToUndrFn = async () => {
   if (await validateShanDong()) {
       return;
   }
+  if (validateGuaranteeBgnTm()) {
+    return;
+  }
  /**
    * 联共保判断
    */
@@ -3945,7 +3915,6 @@ const savePlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
-  res["plyBase"]["Base.tUpdTm"] = new Date().getTime();
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -5778,7 +5747,9 @@ const validateTgt = () => {
   // 计划开工日期、计划完工日期和工期两者二选一必填
   if(['059011','059012','059013','059016','059018','059017'].includes(props.param?.cProdNo)) {
     if(!(tgtData['Tgt.tConstructionPeriod'] || (tgtData['Tgt.tCommencementDate'] && tgtData['Tgt.tCompletionDate']))) {
-      ElMessage.warning("标的信息中计划开工日期、计划完工日期和工期两者必填一个！")
+      const title = props.param?.cProdNo === '059013' ? '标的信息' : '建设工程信息';
+      const key = ['059017','059931'].includes(props.param?.cProdNo) ? '开工日期、完工日期' : '计划开工日期、计划完工日期';
+      ElMessage.warning(title + "中" + key + "和工期两者必填一个！")
       return false;
     }
   }
@@ -6394,6 +6365,20 @@ const shouldCheckYunnanPaymentRules = () => {
       !props.param.cProdNo.startsWith('12') &&
       props.param.cDptCde.startsWith('0253');
 };
+/**
+ * 09大类提核校验附加条款保证期，保险期限中的保证期起止期必填
+ */
+const validateGuaranteeBgnTm = () => {
+  const cvrgData = opertaor.getTableRefByKey('cvrg')?.getFromValue();
+  const insrncData = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  if(['090001', '090002'].includes(props.param.cProdNo)) {
+    if(insrncData['Base.tGuaranteeEndTm'] && insrncData['Base.tGuaranteeBgnTm'] && !cvrgData.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
+      ElMessage.warning('请录入保证期附加险条款')
+      return true;
+    }
+  }
+  return false;
+}
 </script>
 <style lang="scss" scoped>
 @import "@/styles/custom-index";

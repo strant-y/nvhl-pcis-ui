@@ -318,7 +318,7 @@ onBeforeMount(async () => {
   if(['view','edit','audit','EDR_APP_NEW_SCENE'].includes(props.type || props.param?.type)){
     nextTick(async ()=>{
       const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn')
-        AgreementFeeWarn.setFormItem("ECargoBase.cPayWay",  {
+        AgreementFeeWarn?.setFormItem("ECargoBase.cPayWay",  {
         typeCode: 'ECargo_Pay_Ways',
         codeParam: { payway: 'all' }
       })
@@ -355,6 +355,8 @@ onBeforeMount(async () => {
 	if (props.type === "orig") {
 		nextTick(() => {
 			setTimeout(() => {
+				props.param.res.res.composition = formPage.value?.convertData(props.param.res)
+				console.log('query-ops',props.param.res)
 				const res = props.param.res
 			// 续保复制
 			if (res) {
@@ -369,8 +371,8 @@ onBeforeMount(async () => {
 					// const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
 					// AgreementFeeWarn.setItemShow()
 					if (props.type === 'EDR_APP_NEW_SCENE') {        
-						if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
-							const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
+						if (res["res"]["composition"]["AgreementEdrEcargoBase"]) {
+							const EdrECargoBase = res["res"]["composition"]["AgreementEdrEcargoBase"][0];
 								mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
 								mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
 								props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]);
@@ -382,9 +384,9 @@ onBeforeMount(async () => {
 							]);
 						}
 						if (props.param?.cEdrType == "1") {
-							sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
-							const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
-							const cEdrRsnDetail = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'];
+							sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["res"]["composition"]["AgreementBase"][0]));
+							const newcEdrCtnt = res["res"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
+							const cEdrRsnDetail = res["res"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'];
 							const newcEdrRsnDetail = cEdrRsnDetail ? cEdrRsnDetail.split(',') : [props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]];
 							if (props.param["cRsnCde"] != "FZ") {
 							//   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
@@ -423,7 +425,7 @@ onBeforeMount(async () => {
 						}
 					});
 				}
-				const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
+				// const cEcAgrNo = res.res.composition.AgreementBase[0]['ECargoBase.cEcAgrNo']
 				dataForm['AgreementBase']['ECargoBase.cRenewMrk'] = '1'
 				dataForm['AgreementBase']['ECargoBase.cEcAgrNo'] = ''
 				dataForm['AgreementBase']['ECargoBase.cOprCde'] = user.userName // 录单人为当前用户
@@ -684,9 +686,9 @@ const saveApplicationEdr = async  () => {
           cEcAgrAppNo:cEcAgrAppNo.value,
           ...{}
         })
-        if(dataRes.code === 200) {
-          console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["AgreementCvrg"])
-          formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["AgreementCvrg"])
+				if (dataRes.code === 200) {
+          console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["ECargoTerm"])
+          formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["ECargoTerm"])
         }
         eventBus.emit('goodsChange', cEcAgrAppNo.value);
         eventBus.emit('insuredChange', cEcAgrAppNo.value);
@@ -776,8 +778,8 @@ const saveEdrPlyInfo = async () => {
           ...{}
         })
           if(dataRes.code === 200) {
-            console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["AgreementCvrg"])
-            formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["AgreementCvrg"])
+            console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["ECargoTerm"])
+            formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["ECargoTerm"])
           }
         eventBus.emit('goodsChange', cEcAgrAppNo.value);
         eventBus.emit('insuredChange', cEcAgrAppNo.value);
@@ -797,6 +799,13 @@ const saveEdrPlyInfo = async () => {
  * 生成批文
  * **/
 const generateEndorse = () => {
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const cEcAgrAppNo = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')
+	const cRsnCdedata = props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]
+	if (!cEcAgrAppNo && cRsnCdedata == 'Y01') {
+		ElMessage.error("请先保存申请单!");
+		return false
+	}
   const btn = getBtn("btnCompare");
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
@@ -806,7 +815,13 @@ const generateEndorse = () => {
   res["plyBase"]["Base.cProdNo"] = '029900';
   res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
   res["EdrECargoBase"]['EdrECargoBase.cProdNo'] = '029900';
-  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	// 协议批改获取批文不需要传被保人清单，运输信息，标的信息，标的信息汇总
+	'AgreementDistInsured' in res && delete res['AgreementDistInsured'];
+	'AgreementDistTransport' in res && delete res['AgreementDistTransport'];
+	'AgreementDistGoods' in res && delete res['AgreementDistGoods'];
+	'AgreementTgtSummary' in res && delete res['AgreementTgtSummary'];
+	
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -825,7 +840,14 @@ const generateEndorse = () => {
     }
   });
 };
-const getSurrenderPrecisFun = ()=>{
+const getSurrenderPrecisFun = () => {
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const cEcAgrAppNo = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')
+	const cRsnCdedata = props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]
+	if (!cEcAgrAppNo && cRsnCdedata == 'Y01') {
+		ElMessage.error("请先保存申请单!");
+		return false
+	}
   const btn = getBtn("btnCompare");
   btn.loading = true;
   const res = formPage.value?.getAllFormData();
@@ -835,7 +857,12 @@ const getSurrenderPrecisFun = ()=>{
   res["plyBase"]["Base.cProdNo"] = '029900';
   res["EdrECargoBase"] = mainRef.value?.getxyedrbaseRefValue();
   res["EdrECargoBase"]['EdrECargoBase.cProdNo'] = '029900';
-  res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	res["EdrECargoBase"]['EdrECargoBase.cEdrType'] = props.param?.cEdrType
+	// 协议批改获取批文不需要传被保人清单，运输信息，标的信息，标的信息汇总
+	'AgreementDistInsured' in res && delete res['AgreementDistInsured'];
+	'AgreementDistTransport' in res && delete res['AgreementDistTransport'];
+	'AgreementDistGoods' in res && delete res['AgreementDistGoods'];
+	'AgreementTgtSummary' in res && delete res['AgreementTgtSummary'];
   cargoApi.getEcargoEndorseChange(res).then((res) => {
     btn.loading = false;
     if (res["code"] == "200") {
@@ -861,10 +888,12 @@ function query() {
     ...idxParam.param,
     ...{}
   }).then((res: any) => {
-    if(res.code === 200) {
+		if (res.code === 200) {
+			const ops: any = formPage.value?.convertData(res)
+      console.log('query-ops',ops)
       console.log('query-res',res)
       ElMessage.success('查询成功');
-      cEcAgrAppNo.value = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
+      cEcAgrAppNo.value = ops["AgreementBase"][0]['ECargoBase.cEcAgrAppNo'] || ''
       if(cEcAgrAppNo.value){
         eventBus.emit('goodsChange', cEcAgrAppNo.value);
         eventBus.emit('insuredChange', cEcAgrAppNo.value);
@@ -874,9 +903,11 @@ function query() {
         //协议费用
         // const AgreementFeeWarn = formPage.value?.getComponentRefById('AgreementFeeWarn');
         // AgreementFeeWarn.setItemShow()
-        if (props.type === 'EDR_APP_NEW_SCENE') {        
-          if (res["data"]["composition"]["AgreementEdrEcargoBase"]) {
-            const EdrECargoBase = res["data"]["composition"]["AgreementEdrEcargoBase"][0];
+				// audit，E-协议审核批单展示批改信息和批改比较项，不能修改
+        if (props.type === 'EDR_APP_NEW_SCENE' || ((props.type === "audit" || props.type === "view") && props.param.cAppTyp == 'E')) {        
+					// if (props.type === 'EDR_APP_NEW_SCENE') {        
+          if (ops["AgreementEdrEcargoBase"]) {
+            const EdrECargoBase = ops["AgreementEdrEcargoBase"][0];
               mainRef.value?.setxyedrbaseRefData({...EdrECargoBase,'EdrECargoBase.cEdrType':props.param?.cEdrType})
               mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnBundleCde",
               props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]);
@@ -888,9 +919,9 @@ function query() {
             ]);
           }
           if (props.param?.cEdrType == "1") {
-            sessionStorage.setItem("nReceivedPrm", JSON.stringify(res["data"]["composition"]["AgreementBase"][0]));
-            const newcEdrCtnt = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
-            const cEdrRsnDetail = res["data"]["composition"]["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'];
+            sessionStorage.setItem("nReceivedPrm", JSON.stringify(ops["AgreementBase"][0]));
+            const newcEdrCtnt = ops["AgreementBase"][0]['ECargoBase.cCorrectContent']; //批文
+            const cEdrRsnDetail = ops["AgreementBase"][0]['ECargoBase.cEdrRsnDetail'];
             const newcEdrRsnDetail = cEdrRsnDetail ? cEdrRsnDetail.split(',') : [props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]];
             if (props.param["cRsnCde"] != "FZ") {
             //   mainRef.value?.setxyedrbaseRefValue("EdrECargoBase.cEdrRsnDetail", [
@@ -902,6 +933,8 @@ function query() {
           }
           formPage.value?.setPageReadOnly(true, [], {
             success: (pageData: any) => {
+							// audit，E-协议审核批单展示批改信息和批改比较项，不能修改
+							if ((props.type === "audit" || props.type === "view") && props.param.cAppTyp == 'E') return
               getEdrRsnItemFun(
                   "029900",
                   props.param["cDptCde"],
@@ -914,16 +947,16 @@ function query() {
           });
         }
       }
-      let dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0] ,AgreementAcctinfo:res.data.composition?.AgreementAcctinfo[0]  }
+      let dataForm:any ={...ops,AgreementBase:ops?.AgreementBase[0],AgreementApplicant:ops?.AgreementApplicant[0],AgreementFeeWarn:ops?.AgreementBase[0] ,AgreementAcctinfo:ops?.AgreementAcctinfo[0]  }
       delete dataForm.AgreementEdrEcargoBase
       delete dataForm.AgreementDistGoods
       delete dataForm.AgreementTgtSummary
       delete dataForm.AgreementDistInsured
       delete dataForm.AgreementDistTransport
-      if(props.type === 'EDR_APP_NEW_SCENE' && props.param.cAppStatus !== '1'){
+      if(props.type === 'EDR_APP_NEW_SCENE' && !['1','3','8'].includes(props.param?.cAppStatus)){
         // 初始化时，将cPkId赋值给cRowId
         Object.keys(dataForm).forEach((key) => {
-          if(key === 'AgreementSpecial' || key === 'AgreementCvrg'){
+          if(key === 'AgreementSpecial' || key === 'AgreementCvrg' || key === 'AgreementPay'){
             const v = dataForm[key];
             const ls = [];
             if(v && v instanceof Array){
@@ -992,8 +1025,10 @@ function lastDataQuery() {
     cargoApi.queryEcargoDetailsLast({
       ...idxParam.param,
     }).then((res: any) => {
-      if(res.code === 200) {
-        const dataForm:any ={...res.data.composition,AgreementBase:res.data.composition?.AgreementBase[0],AgreementApplicant:res.data.composition?.AgreementApplicant[0],AgreementFeeWarn:res.data.composition?.AgreementBase[0]}
+			if (res.code === 200) {
+				const ops: any = formPage.value?.convertData(res)
+      	console.log('query-ops',ops)
+        const dataForm:any ={...ops,AgreementBase:ops?.AgreementBase[0],AgreementApplicant:ops?.AgreementApplicant[0],AgreementFeeWarn:ops?.AgreementBase[0]}
         formPage.value?.setAllCompPrimevalData(dataForm)
       }
     });
@@ -1136,7 +1171,7 @@ const premiumCalculation = ()=>{
             ElMessage.error('一般退保预收保费必须大于0！')
             return
           }
-          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] >= pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nReceivedPrm'] > pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
             ElMessage.error('一般退保预收保费不能大于原预收保费！')
             return
           }
@@ -1182,15 +1217,22 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   let payList: any[] = [];
   const pay: any = {};
   const edrbaseData = mainRef.value?.getxyedrbaseRefValue();
+  const agreementFeeWarnData = formPage.value?.getComponentRefById('AgreementFeeWarn')?.getFormValue();
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
-    // 退保和注销直接在原有的条数上新增1条
+    // 退保和注销保费计算完只显示一条
     if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
-      payList = [...list];
+      payList = [];
     } else {
-      // 根据批改次数决定缴费计划生成几条（0 总共2条；1 总共3条，以此类推）
-      if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
-        payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo'] + 1);
+      for (const i in list) {
+        if (!!list[i]["ECargoPay.cRowId"]) {
+          list[i]['ECargoPay.nPrmVar'] = 0;
+          payList.push(list[i]);
+        }
       }
+      // 根据批改次数决定缴费计划生成几条（0 总共1条；1 总共2条，以此类推）
+      // if(edrbaseData && edrbaseData['EdrECargoBase.nEdrPrjNo'] >= 0 && list.length > 0) {
+      //   payList = list.slice(0, edrbaseData['EdrECargoBase.nEdrPrjNo']);
+      // }
     }
   }
   pay["ECargoPay.nTms"] = payList.length + 1;
@@ -1212,9 +1254,16 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   }
   if(props.type === 'EDR_APP_NEW_SCENE') {// 批改
     if(props.payWay == '01' || props.param?.cEdrFlag === "YY") {// YY：应收保费= 预收保费变化 * 预收保费汇率
-      pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
+      // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
+      // 退保和注销(修改前预收保费 - 修改后折人民币协议预收保费 - 折人民币预扣保费)
+      if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
+        pay["ECargoPay.nPayablePrm"] = decimalMinus(decimalMinus(edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2),agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)),agreementFeeWarnData['ECargoBase.nWhRmbPrm'].toFixed(2))
+      } else {
+        pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
+      }
     } else {// AY:应收保费= 预估保费变化 * 预估保费汇率
-      pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nPrmVar'], insrnc["ECargoBase.nPrmRmbExch"]);
+      // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nPrmVar'], insrnc["ECargoBase.nPrmRmbExch"]);
+      pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nPrmVar']
     }
     // 我司保费: 应收保费 * 我司比例
     pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : decimalTimes(share, pay["ECargoPay.nPayablePrm"]);
@@ -1222,12 +1271,12 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
   } else {
     if(props.payWay == '01') {// 预付
       // 应收保费: 折人名币预收保费
-      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbReceivedPrm"] ? insrnc["ECargoBase.nRmbReceivedPrm"] : 0;
+      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nReceivedPrm"] ? insrnc["ECargoBase.nReceivedPrm"] : 0;
       // 我司保费: 折人民币我司协议剩余预收保费(应收保费 * 我司比例)
       pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : decimalTimes(share, pay["ECargoPay.nPayablePrm"]);
     } else {// 非预付
       // 应收保费: 折人名币预估保费
-      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nRmbPrm"] ? insrnc["ECargoBase.nRmbPrm"] : 0;
+      pay["ECargoPay.nPayablePrm"] = insrnc["ECargoBase.nPrm"] ? insrnc["ECargoBase.nPrm"] : 0;
       // 我司保费: 折人民币我司预估保费(应收保费 * 我司比例)
       pay["ECargoPay.nOwnPrm"] = base["ECargoBase.cCiMrk"] == "0" ? pay["ECargoPay.nPayablePrm"] : decimalTimes(share, pay["ECargoPay.nPayablePrm"]);
     }
@@ -1280,17 +1329,19 @@ async function save() {
   if(tAppTm1 && tAppTm2 && new Date(tAppTm1).getTime() !== new Date(tAppTm2).getTime()) {
     dataToSave.AgreementFeeWarn['ECargoBase.tAppTm'] = tAppTm1
   }
-  dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
-  const res = await cargoApi.save({
+	dataToSave.AgreementBase['ECargoBase.cOprCde'] = user.opCde;
+	let params = {
     ...dataToSave,
     AgreementDistGoods:null,
-   AgreementTgtSummary:null,
-   AgreementDistInsured:null,
-   AgreementDistTransport:null,
+   	AgreementTgtSummary:null,
+   	AgreementDistInsured:null,
+   	AgreementDistTransport:null,
     ...{},
     ...{user},
     sence:'save'
-  })
+	}
+	console.log('paramsparamsparamsparams',params)
+  const res = await cargoApi.save(params)
     if(res.code === 200) {
       isOk = true
       ElMessage.success(res.msg)
@@ -1318,8 +1369,8 @@ async function save() {
           	...{}
         	})
 					if(dataRes.code === 200) {
-						console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["AgreementCvrg"])
-						formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["AgreementCvrg"])
+						console.log('dataRes["data"]["composition"]["AgreementCvrg"]',dataRes["data"]["composition"]["ECargoTerm"])
+						formPage.value?.setFormDataById('AgreementCvrg',dataRes["data"]["composition"]["ECargoTerm"])
 					}
 					eventBus.emit('goodsChange', cEcAgrAppNo.value);
 					eventBus.emit('insuredChange', cEcAgrAppNo.value);
@@ -1361,7 +1412,7 @@ const imageUploadManage = () => {
       if (cEdrType === "2" || cEdrType === "3") {
         // 批改类型 2 注销 3 退保
         const baseTab = allFromData['AgreementBase'];
-        const edrBaseTab = allFromData['AgreementEdrEcargoBase'];
+        const edrBaseTab = allFromData['AgreementEdrEcargoBase'] || mainRef.value?.getxyedrbaseRefValue();
         bussNo = baseTab["ECargoBase.cEcAgrAppNo"];
         plyNo = edrBaseTab["EdrECargoBase.cPlyNo"];
         appTyp = edrBaseTab["EdrECargoBase.cAppTyp"];
@@ -1453,7 +1504,7 @@ function showImagSys(viewType: string) {
     }
   } else {
     if (CEdrType === "2" || CEdrType === "3") {
-      const edrBaseTab = allFromData['AgreementEdrEcargoBase'];
+      const edrBaseTab = allFromData['AgreementEdrEcargoBase'] || mainRef.value?.getxyedrbaseRefValue();
       ParamNo = edrBaseTab["ECargoBase.cEcAgrAppNo"];
     } else {
       ParamNo = base["ECargoBase.cEcAgrAppNo"];

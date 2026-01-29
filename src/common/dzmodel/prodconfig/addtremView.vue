@@ -147,6 +147,8 @@ import { qryProdRelTermRiskList, qryRelTermList } from "@/api/prod";
 import { useValidator } from "@/typings/useValidator";
 import { tremMap } from "@/pcis/prodRef/cvrgRef/trem-map-config.ts"
 import { mutualExclusionClause } from "@/pcis/prodRef/cvrgRef/mutualExclusionClause.ts";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const { getRules } = useValidator();
 const emits = defineEmits(["handleClose"]);
@@ -229,6 +231,7 @@ const data3 = ref<any>([
 ]);
 
 const data4 = ref<any>({});
+const lastMainSelectd = ref<any>({});
 
 // 绑定方法
 const method = {};
@@ -248,6 +251,7 @@ if (!value) return true
 
 onMounted(async () => {
   const param = props.data.data;
+  param["cDptCde"] = JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId;
   //添加条款只能查询一条主条款
   if (param.isselectData && param.isselectData.length > 0) {
     param['cTermNo'] = param.isselectData[0]["Term.cClauseCode"];
@@ -323,6 +327,7 @@ function setNode() {
 let ignoreCheckChange = false;
 
 function selectmainMethod(a: any, b: any, c: any) {
+  lastMainSelectd.value = a
   const param = props.data.data;
   let mc = null;
   if(b){  // 先判断选中的责任,是否挂在互斥条款下
@@ -424,7 +429,7 @@ function selectMainTerm(isselect = true) {
   });
   if (isselect) {
     let additionStr = selectmainterm.join("@&");
-    qryRelTermList({ cTermNo: additionStr }).then((res: any) => {
+    qryRelTermList({ cTermNo: additionStr, cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}')?.companyId }).then((res: any) => {
       const { code, data, msg } = res;
       const cClauseCategoryMap = {
         "1": "扩展类",
@@ -674,6 +679,30 @@ function flushSelectData() {
 
   data3.value = selectNode;
   data4.value = selectNode1;
+
+  nextTick(() => {
+    // 复制出单、询价转投保如果条款下架选择主条款时只能选一条
+    if(['copy','inquiryToApp'].includes(route.params?.param?.pageType) && props.data?.data?.cvrgData?.length < 1) {
+      const selected:any = mainRef.value?.getCheckedNodes(false, true);
+      if(selected && selected.filter((i:any) => i.cRdrTyp === '0').length > 1) {
+        if(lastMainSelectd.value?.cRiskNo) {
+          const addkey = selected.filter((item:any) => {
+            if(item.children?.length > 0) {
+              return item.children?.filter((i:any) => i.cRiskNo === lastMainSelectd.value?.cRiskNo)?.length > 0;
+            } else {
+              return item.cRiskNo === lastMainSelectd.value?.cRiskNo
+            }
+          })?.map((it:any) => it.id);
+          mainRef.value?.setCheckedKeys(addkey, false);
+        } else {
+          const children = selected.find((i:any) => i.id === lastMainSelectd.value?.id)?.children;
+          const key = children.filter((item:any) => selected.map((i:any) => { return i.cRiskNo}).includes(item.cRiskNo))?.map((i:any) => { return i.id})
+          const addkey = lastMainSelectd.value?.id;
+          mainRef.value?.setCheckedKeys([...key,addkey], false);
+        }
+      }
+    }
+  })
 }
 
 async function selectOne() {

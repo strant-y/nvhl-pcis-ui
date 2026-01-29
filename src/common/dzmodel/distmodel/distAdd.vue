@@ -32,6 +32,7 @@ import {calculateAgeFromIdCard} from "@/utils/common";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import moment from "moment";
 import { deductibleTemple,deductibleKey, fillTemplate } from "@/pcis/prodRef/cvrgRef/titleTemple";
+import { validateIdCard } from "@/typings/method-public";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const param = ref({});
@@ -358,8 +359,21 @@ onMounted(async () => {
           setValue('Dist.nAge', age);
 
         }
-        if(val && val.length === 18 && getValue('Dist.cDocumentType') === '111') {
+				if (val && val.length === 18) {
+					 if (!validateIdCard(val) || getValue("Dist.cDocumentType") !== '111') {
+						return false
+					}
+					const birthYear = parseInt(val.substring(6, 10), 10);
+					const birthMonth = parseInt(val.substring(10, 12), 10);
+					const birthDay = parseInt(val.substring(12, 14), 10);
+					const birthday = `${birthYear}-${birthMonth.toString().padStart(2, "0")}-${birthDay.toString().padStart(2, "0")}`;
+					const sexCode = parseInt(val.substring(16, 17), 10);
+					const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           const age = calculateAgeFromIdCard(val);
+					if (route.params.param.cProdNo === '040019' || route.params.param.cProdNo === '047002') { 
+						setValue("Dist.tBirthday", birthday);
+						setValue("Dist.cGender", sex);
+					}
           setValue('Dist.nAge', age);
         }
       }
@@ -386,6 +400,10 @@ onMounted(async () => {
         // 身份证类型自动回填年龄
     if(item.prop =='Dist.cDocumentType'){
       item['func'] =  cDocumentTypeChange;
+    }
+		// 040019 保全被申请人信息 身份证
+		if (item.prop == 'Dist.cCertfCls') {
+      item['func'] =  cCertfClsChange;
     }
     if(item.prop == 'Dist.cInvoiceCur'){
         const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
@@ -541,16 +559,17 @@ onMounted(async () => {
     // 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
     if(item.prop === 'Dist.cDeductibleClass' && route.params.param.cProdNo == '090001') {
       item.func = (val:any) => {
-        setFormItem('Dist.cItemLiability', { loadData: [] })
+				if (!init.value) {
+					setValue('Dist.cItemLiability', null)
+				}
         if(val) {
           codeListStore
             .queryCodeList({
-              codeListName: val === '02' ? 'mianpeileixing2' : 'mianpeileixing',
+              codeListName: val == '02' ? 'mianpeileixing2' : 'mianpeileixing',
               codeListParam:{},
             })
 						.then((res) => {
-							setValue('Dist.cItemLiability', null)
-							setFormItem('Dist.cItemLiability', { typeCode: '', loadData: res, multiple: val === '02' ? 0 : 1 })
+							setFormItem('Dist.cItemLiability', { loadData: res, multiple: val == '02' ? 0 : 1})
             });
         }
       }
@@ -594,6 +613,11 @@ onMounted(async () => {
             setValue("Dist.cVehicleAge", "")
           }
         }
+      }
+    }
+    if(item.prop === 'Dist.cInsuranceDuty') {
+      item.func = (val:any) => {
+        cInsuranceDutyChange(val)
       }
     }
     newSchema.push(item);
@@ -813,6 +837,24 @@ const cEquipmentTypesFunc = ()=>{
       {  width: 85 }
   );
 }
+// 040019 保全被申请人信息 身份证
+const cCertfClsChange = (val: any) => {
+  const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
+	if (!init.value) {
+		setValue('Dist.cCertfCde', null);
+	}
+	clearValidate('Dist.cCertfCde')
+  const baseRuleMap: Record<string, any[]> = {
+    "111": [getRules("idCard", {})], // 身份证
+    "01": [getRules("socialCode", {})], // 统一社会信用代码
+    "553": [getRules("ariCard", {})], // 外国人证件号
+    "110001": [getRules("orgCode", {})], // 组织机构编码
+    default: [] // 默认无规则
+  };
+  const baseRules = baseRuleMap[val] || baseRuleMap.default;
+  const rules = baseRules // 非必填：仅基础规则
+	setFormItem('Dist.cCertfCde', { rules });
+};
 
 // 证件类型change
 const cDocumentTypeChange = (val: any) => {
@@ -820,6 +862,9 @@ const cDocumentTypeChange = (val: any) => {
   const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
 	if (!init.value) {
 		setValue('Dist.cIdentificationNumber', null);
+		setValue('Dist.cGender', null);
+		setValue('Dist.nAge', null);
+		setValue('Dist.tBirthday', null);
 	}
 	clearValidate('Dist.cIdentificationNumber')
   const baseRuleMap: Record<string, any[]> = {
@@ -838,6 +883,18 @@ const cDocumentTypeChange = (val: any) => {
     : [...baseRules, getRules("required", {})]; // 必填：基础规则+required
 
   setFormItem('Dist.cIdentificationNumber', { rules });
+  // 047002证件类型选
+  if(productNo === '047002') {
+    if(val === '111') {
+      setFormItem("Dist.tBirthday", { disabled: true });
+      setFormItem("Dist.cGender", { disabled: true });
+      setFormItem('Dist.nAge', { disabled: true });
+    } else {
+      setFormItem("Dist.tBirthday", { disabled: false });
+      setFormItem("Dist.cGender", { disabled: false });
+      setFormItem('Dist.nAge', { disabled: false });
+    }
+  }
 };
 
 // 05产品-清单信息-证件类型
@@ -861,6 +918,16 @@ const cIdTypefun = (val: any) => {
 	setFormItem("Dist.cIdNumber", {
 		rules: baseRules,
 	});
+}
+
+// 保险责任一级
+function cInsuranceDutyChange(val:any){
+  if(val === '02') {
+    setFormItem('Dist.cSuitScope', { rules: [getRules("required", {})], disabled: false });
+  } else {
+    setFormItem('Dist.cSuitScope', { rules: [], disabled: true });
+    setValue('Dist.cSuitScope', null);
+  }
 }
 
 function getAddressstr(val:any, row: any, pitem: any){

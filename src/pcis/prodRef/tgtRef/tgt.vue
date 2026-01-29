@@ -15,7 +15,7 @@ import { useProductStore } from "@/store/modules/prod";
 import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
 import { syncDist, selectDist, checkAppBase, queryNrmbAmt, getProductTemplate} from "@/api/prod";
-import { productListA, productListB, productListC } from "./productList";
+import { productListA, productListB, productListC, cIntegrityStatementData, guaranteeTypeMap } from "./productList";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
@@ -40,6 +40,7 @@ import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/us
 const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
 import { eventBus } from "@/utils/event-bus";
+import {codelistQuery} from "@/api/dict";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -168,11 +169,7 @@ onMounted(async () => {
       rules: []
     });
   }
-
-  // 090003产品 工程名称非必填
-  if (params.cProdNo === '090003') {
-    setFormItem("Tgt.cProjectName", { rules: [] })
-  }
+  
   // 041007 被监护人数必填
   if(params.cProdNo === '041007') {
     setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
@@ -181,11 +178,13 @@ onMounted(async () => {
   if(params.cProdNo === '089030') {
     setFormItem("Tgt.cBuildingStructure", { rules: [] })
   }
-  // 010021 承保区域必填 其他非必填
-  if(params.cProdNo === '010021') {
-    setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
-  } else {
-    setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+  // 010021 承保区域必填 其他非必填，010023不走这个逻辑
+	if (params.cProdNo !== '010023') { 
+		if(params.cProdNo === '010021') {
+			setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
+		} else {
+				setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+		}
   }
   // 040014、110001、110003、110004 船舶种类必填
   if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110004') {
@@ -249,6 +248,18 @@ onMounted(async () => {
     rules: [getRules("phoneNo", {})],
   });
   selectType()
+  // 020019、020020、020021三款产品标的信息全部非必填
+  if(['020019','020020','020021'].includes(params.cProdNo)) {
+    formconfig11.fromSchema?.forEach((item:any) => {
+      if(item.rules?.length > 0) {
+        item.rules.forEach((i:any, index:any) => {
+          if(i.required === true) {
+            item.rules.splice(index, 1)
+          }
+        })
+      }
+    })
+  }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
     const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
@@ -274,7 +285,17 @@ onMounted(async () => {
       setFormItem('Tgt.cDestinationPort', { disabled: true })
     } else {
       setFormItem('Tgt.cDestinationPort', { disabled: false })
-    }
+		}
+		// 047002 诚信声明、保函类别没值的时候回填固定值，诚信声明、保函详细根据内容自动调整输入框高度
+		if (params.cProdNo === '047002') {
+			setFormItem('Tgt.cIntegrityStatement', { autosize: true,rules: [getRules("NoAsterisk", {sym: "*"})] })
+			setFormItem('Tgt.cGuaranteeLetter', { autosize: true,rules: [getRules("NoAsterisk", {sym: "*"})] }) // 保函详细
+			setFormItem('Tgt.cGuaranteeInstitution', { rules: [getRules("NoAsterisk", {sym: "x"})] }) // 保函详细
+			if (!getValue('Tgt.cIntegrityStatement') && (params.pageType == "app" || params.pageType == "copy" && params.pageType == "template")) {
+				setValue('Tgt.cIntegrityStatement', cIntegrityStatementData.value)
+				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
+			}
+		}
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
         const data = getFromValue();
@@ -288,6 +309,18 @@ onMounted(async () => {
         }
       }
     })
+    for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+        if (distContactList.includes(data.prop)) {
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
+          }
+        }
+      })
+    }
+  }
   })
 });
 function hasEnglish(str: any) {
@@ -460,7 +493,8 @@ const method = {
       if (item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')) {
         item.disabled = false;
       } else if (item.prop == "Tgt.cPayCur") {
-        item.disabled = true;
+				item.disabled = true;
+				opertaor.getTableRefs()['AgentTgt']?.setValue('Tgt.cPayCur', 'CNY')
       }
     });
   },
@@ -2008,19 +2042,20 @@ const method = {
   },
 	// 建设工程信息-保险凭证类别
 	cCertificateTypefun: async (val) => {
-		if (params.pageType != "app") {
-			return false
-		}
+		setFormItem('Tgt.cCertificateDetailed', { autosize: true })
+		const param = opertaor.getParam();
+		if (param.initFlag) return
 		const cCertificateTypeProd = ["059011", "059012", "059013", "059015", "059016", "059017", "059018", "059019", "059020"]
 		if (cCertificateTypeProd.includes(params.cProdNo)) {
 			try {
 				const res = await getProductTemplate({prodNo:params.cProdNo,isCommon:val});
-				
 				if (res.code !== '200') {
 					ElMessage.error(res.msg || '连接失败！');
 					return;
 				}
-				setValue("Tgt.cCertificateDetailed", res.data)
+				setValue("Tgt.cCertificateTitle", res.data.cCertificateTitle) // 保险凭证标题
+				setValue("Tgt.cCertificateInstitution", res.data.cInsuranceCompany) // 保险凭证机构
+				setValue("Tgt.cCertificateDetailed", res.data.textTemplate) // 保险凭证详细
 			} catch (err) {
 				console.error('查询异常:', err);
 				ElMessage.error('系统异常，请稍后重试');
@@ -2058,6 +2093,18 @@ const method = {
 			setFormItem('Tgt.cResistanceRating', {rules: [] });
 			setFormItem('Tgt.cMainClassification', {rules: [] });
 		}
+    if(val) {
+      codelistQuery({ codeListName: 'Subject_Type', codeListParam: { cParCde: val } }).then((res:any) => {
+        if(res.code === 200 && res.data?.length > 0) {
+          setFormItem('Tgt.cTargetType', { loadData: res.data });
+        }
+      });
+    } else {
+      setFormItem('Tgt.cTargetType', { loadData: [] });
+    }
+    const param = opertaor.getParam();
+    if (param.initFlag) return
+		setValue('Tgt.cTargetType', "");// 标的类型
 	},
   // 担保金额
   nGuaranteeAmountChange: (val:any) => {
@@ -2070,6 +2117,74 @@ const method = {
       }
     }
   },
+	// 047002 保函类别
+	cGuaranteeTypeChange: async(val: any) => {
+		const param = opertaor.getParam();
+		if (param.initFlag) return
+		const codes = guaranteeTypeMap[val];
+  
+		if (!codes) {
+			console.warn('未找到匹配的保函类别', val);
+			return;
+		}
+
+		const [code1, code2, code3] = codes;
+
+		try {
+			// 并行调用三个接口
+			const [res1, res2, res3] = await Promise.all([
+				codeListStore.queryCodeList({ codeListName: code1 }),
+				codeListStore.queryCodeList({ codeListName: code2 }),
+				codeListStore.queryCodeList({ codeListName: code3 })
+			]);
+
+			// 根据实际返回结构提取你需要的值
+			// 假设接口返回 { data: [...] }，且你只需要第一个项的 name 字段（请按实际调整！）
+			// 如果返回的是纯数组，直接 res1[0]?.name
+
+			// 示例：假设返回的是 { list: [...] } 或直接是数组
+			const getValue1 = (response) => {
+				// 根据你的实际 API 返回结构调整！
+				const list = Array.isArray(response) ? response : response?.data || response?.list || [];
+				// 假设取第一个的 label 字段，或你可以返回整个 list 让前端选择
+				return list.length > 0 ? list[0].label || list[0].name || '' : '';
+			};
+			setValue('Tgt.cGuaranteeTitle', getValue1(res1)) // 保函标题
+			setValue('Tgt.cGuaranteeInstitution', getValue1(res2)) // 保函机构
+			setValue('Tgt.cGuaranteeLetter', getValue1(res3)) // 保函详细
+			console.log('担保信息已更新:', getFromValue());
+		} catch (error) {
+			console.error('加载担保码表失败:', error);
+			// 可选：重置字段或显示错误
+			setValue('Tgt.cGuaranteeTitle', null) // 保函标题
+			setValue('Tgt.cGuaranteeInstitution', null) // 保函机构
+			setValue('Tgt.cGuaranteeLetter', null) // 保函详细
+		}
+	},
+  // 是否施工联合体
+  cIsConsortiumFunc: (val:any) => {
+    eventBus.emit('setMap-cUnionMembers', val)
+  },
+	// 是否出具蓝卡
+	cBlueCardChange: async (val: any) => {
+		const param = opertaor.getParam();
+		if (param.initFlag) return
+		setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+		if (val == '1') {
+			try {
+				const [res1] = await Promise.all([
+					codeListStore.queryCodeList({ codeListName: 'MS040008' }),
+				]);
+				const getValue1 = (response) => {
+					const list = Array.isArray(response) ? response : response?.data || response?.list || [];
+					return list.length > 0 ? list[0].label || list[0].name || '' : '';
+				};
+				setValue('Tgt.cMaritimeAdministration', getValue1(res1)) // 海事局名称
+			} catch (error) {
+				setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+			}
+		}
+	}
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

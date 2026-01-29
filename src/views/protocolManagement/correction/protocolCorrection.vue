@@ -36,6 +36,11 @@
           <span v-html="row.cDptCnm || ''" class="twoLine"></span>
         </el-tooltip>
       </template>
+      <template #column-cSubDptCnm="{ row, column, index }">
+        <el-tooltip :content="row.cSubDptCnm" placement="top">
+          <span v-html="row.cSubDptCnm || ''" class="twoLine"></span>
+        </el-tooltip>
+      </template>
 		</app-table>
   </div>
 </template>
@@ -90,6 +95,7 @@ const appStatusOptions = ref([
   { label: "已提交未接收", value: "7" },
   { label: "见费出单退回", value: "8" },
 ])
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
@@ -98,6 +104,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         createFreeButtonBase({
           type: "primary",
           label: "查询",
+					loading: queryLoading,
           func: async () => {
             handleQuery();
           },
@@ -415,7 +422,7 @@ const tableconfig = reactive<AppTableConfig>(
 				{
 					prop: "policyInfo",
 					inputtype: "rtinput",
-					title: "协议号",
+					title: "申请单号/协议号",
           lengthNum: 22,
           lengthIsNumber: true,
 					slotName: "policyInfo"
@@ -434,48 +441,56 @@ const tableconfig = reactive<AppTableConfig>(
           minWidth: 180,
         	isShow: false
         },
-        {
-          prop: "cAppId",
-          inputtype: "rtinput",
-          title: "客户编号",
-          lengthNum: 12,
-          lengthIsNumber: true,
-        },
-        {
-          prop: "cAppNme",
-          inputtype: "rtinput",
-          title: "客户名称",
-          slotName: "cAppNme",
-          align: 'left',
-          lengthNum: 9,
-        },
+				{
+					prop: "cSubDptCnm",
+					inputtype: "rtinput",
+					title: "分公司",
+					slotName: "cSubDptCnm",
+					align: 'left',
+					// lengthNum: 12,
+				},
         {
           prop: "cDptCnm",
           inputtype: "rtinput",
           title: "出单机构",
           slotName: "cDptCnm",
           align: 'left',
-          lengthNum: 12,
-        },
-				{
-					prop: "InsurancePeriod",
-					inputtype: "rtinput",
-					title: "协议期间",
-          lengthNum: 36,
-          lengthIsNumber: true,
+          // lengthNum: 12,
 				},
-        // {
-        //   prop: "tInsrncBgnTm",
-        //   inputtype: "rtinput",
-        //   title: "协议起期",
-        //   minWidth: 120,
-        // },
-        // {
-        //   prop: "tInsrncEndTm",
-        //   inputtype: "rtinput",
-        //   title: "协议止期",
-        //   minWidth: 120,
-        // },
+				{
+          prop: "cAppId",
+          inputtype: "rtinput",
+          title: "投保人编号",
+          lengthNum: 14,
+          lengthIsNumber: true,
+        },
+        {
+          prop: "cAppNme",
+          inputtype: "rtinput",
+          title: "投保人名称",
+          slotName: "cAppNme",
+          align: 'left',
+          // lengthNum: 12,
+				},
+				// {
+				// 	prop: "InsurancePeriod",
+				// 	inputtype: "rtinput",
+				// 	title: "协议期间",
+        //   lengthNum: 36,
+        //   lengthIsNumber: true,
+				// },
+        {
+          prop: "tInsrncBgnTm",
+          inputtype: "rtinput",
+          title: "协议起期",
+          minWidth: 120,
+        },
+        {
+          prop: "tInsrncEndTm",
+          inputtype: "rtinput",
+          title: "协议止期",
+          minWidth: 120,
+        },
         {
           prop: "cAppStatus",
           inputtype: "rtselect",
@@ -487,11 +502,12 @@ const tableconfig = reactive<AppTableConfig>(
         {
           prop: "cPlySts",
           inputtype: "rtselect",
-          title: "有效",
-          lengthNum: 2,
+          title: "是否有效",
+          lengthNum: 4,
           loadData: [
             { label: '有效', value: 'I' },
-            { label: '无效', value: 'T' }
+            { label: '终止', value: 'T' },
+            { label: '满期', value: 'M' },
           ]
         },
         {
@@ -500,6 +516,9 @@ const tableconfig = reactive<AppTableConfig>(
           title: "缴费余额",
           lengthNum: 12,
           lengthIsNumber: true,
+					formatter: (val: any) => {
+							return val.toLocaleString()
+					}
         },
         {
           prop: "id",
@@ -565,6 +584,7 @@ function setRowFieldProp(rowId: string, field: string, prop: string, value: any)
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
+			queryLoading.value = true;
       const tm = freeEditRef.value?.getFromValue().Tm;
       const param = {
         sence: "3",// 1 协议录入 2 协议审核 3 协议批改
@@ -576,17 +596,18 @@ function handleQuery(flag?: boolean) {
         param.tInsrncEndTm = tm[1]
       }
       delete param.Tm
+			pageresult.list = []
       cargoApi.queryEcargoList(param).then((res: any) => {
+				queryLoading.value = false;
         if (res && res.code === 200) {
           const pageData = res.data;
           if (pageData) {
-            pageresult.list = []
-            pageresult.list = pageData.data;
+            // pageresult.list = pageData.data;
 						pageresult.list = pageData.data.map((item) => ({
 							...item,
 							// 创建一个新字段合并两个值
 							policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
-							InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+							// InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
 						}))
             pageresult.total = pageData.total;
             nextTick(()=>{
@@ -632,6 +653,7 @@ function handleQuery(flag?: boolean) {
           ElMessage.error(res.msg);
         }
       }).catch((err: any) => {
+				queryLoading.value = false;
         ElMessage.error(err.msg);
       });
     }

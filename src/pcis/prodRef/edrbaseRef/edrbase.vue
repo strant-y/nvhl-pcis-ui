@@ -19,7 +19,7 @@ import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-import { qryTerminationDataList, qryProdRuleList, queryLatestMrk } from "@/api/prod";
+import { qryTerminationDataList, qryProdRuleList, queryLatestMrk, checkPlyChange } from "@/api/prod";
 import Decimal from "decimal.js";
 
 const pcisQueryService = new PcisQueryService();
@@ -198,14 +198,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 cRuleCde: 'RULE_01',
                 cPrd: null,
                 cProdNo: params.cProdNo,
-                pageNum: 1,
-                pageSize: 10,
               }
               const nDpdDays:any = await qryProdRuleList(param);
               if(nDpdDays.code === 200) {
                 if(nDpdDays.data?.code == '1') {
                   if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
-                    rebackDay.value = nDpdDays.data?.result[0]?.cRuleValue || 0;
+                    const cRuleValue = nDpdDays.data?.result[0]?.cRuleValue || 0;
+                    rebackDay.value = cRuleValue > 0 ? cRuleValue : 0;
                   }
                 } else {
                   ElMessage.error(nDpdDays.data?.message)
@@ -246,7 +245,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   }
                 }
                 if(dayjs(v).isBefore(dayjs(newTEdrBgnTm))) {
-                  ElMessage.warning("可倒签天数为"+rebackDay.value+"天,可倒签日期为"+newTEdrBgnTm)
+                  if(rebackDay.value > 0) {
+                    ElMessage.warning("可倒签天数为"+rebackDay.value+"天,可倒签日期为"+newTEdrBgnTm)
+                  } else {
+                    ElMessage.warning("不允许倒签！")
+                  }
                   edrbaseEditRef.value?.setValue("EdrBase.tEdrBgnTm", tEdrBgnTm);
                   return;
                 }
@@ -300,15 +303,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   const tInsrncBgnTm = params.tInsrncBgnTm;
         //   return time.getTime() < new Date(tInsrncBgnTm).getTime()
         // },
+        format:"YYYY-MM-DD 00:00:00",
         func: (v) => {
           const tRepStopExtEndTm = getValue("EdrBase.tRepStopExtEndTm")
+          const tInsrncBgnTm = opertaor.getTableRefByKey('insrnc')?.getValue('Base.tInsrncBgnTm')
+          const tInsrncEndTm = opertaor.getTableRefByKey('insrnc')?.getValue('Base.tInsrncEndTm')
           if(v && tRepStopExtEndTm && new Date(v).getTime() > new Date(tRepStopExtEndTm).getTime()) {
             ElMessage.warning("报停起期不能晚于报停止期")
             setValue("EdrBase.tRepStopExtBgnTm", null)
+          } else if(dayjs(v).isBefore(dayjs(tInsrncBgnTm)) || dayjs(v).isAfter(dayjs(tInsrncEndTm))) {
+            ElMessage.warning("报停起期应该在保险起止期范围内")
+            setValue("EdrBase.tRepStopExtBgnTm", null)
           } else if(v && tRepStopExtEndTm && lastInsrncEndTm.value) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
-            const time = dayjs(tRepStopExtEndTm).diff(dayjs(v))
-            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(lastInsrncEndTm.value).add(time))
+            getInsrncEndTm(v,tRepStopExtEndTm,tInsrncBgnTm,tInsrncEndTm)
           }
         },
       },
@@ -324,15 +332,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   const tInsrncEndTm = params.tInsrncEndTm;
         //   return time.getTime() > new Date(tInsrncEndTm).getTime()
         // },
+        format:"YYYY-MM-DD 23:59:59",
         func: (v) => {
           const tRepStopExtBgnTm = getValue("EdrBase.tRepStopExtBgnTm")
+          const tInsrncBgnTm = opertaor.getTableRefByKey('insrnc')?.getValue('Base.tInsrncBgnTm')
+          const tInsrncEndTm = opertaor.getTableRefByKey('insrnc')?.getValue('Base.tInsrncEndTm')
           if(v && tRepStopExtBgnTm && new Date(v).getTime() < new Date(tRepStopExtBgnTm).getTime()) {
             ElMessage.warning("报停止期不能早于报停起期")
             setValue("EdrBase.tRepStopExtEndTm", null)
+          } else if(dayjs(v).isBefore(dayjs(tInsrncBgnTm)) || dayjs(v).isAfter(dayjs(tInsrncEndTm))) {
+            ElMessage.warning("报停止期应该在保险起止期范围内")
+            setValue("EdrBase.tRepStopExtEndTm", null)
           } else if(v && tRepStopExtBgnTm && lastInsrncEndTm.value) {
             // 根据报停起期和止期计算相差天数，然后延长保险止期相应天数
-            const time = dayjs(v).diff(dayjs(tRepStopExtBgnTm))
-            opertaor.getTableRefs().insrnc.setValue("Base.tInsrncEndTm", dayjs(lastInsrncEndTm.value).add(time))
+            getInsrncEndTm(tRepStopExtBgnTm,v,tInsrncBgnTm,tInsrncEndTm)
           }
         },
       },
@@ -614,6 +627,27 @@ async function getLastInsrncEndTm (cPlyNo:any) {
       ElMessage.error(res.msg)
     }
   }).catch(err => {
+    ElMessage.error(err.msg)
+  })
+}
+
+function getInsrncEndTm(tRepStopExtBgnTm:any,tRepStopExtEndTm:any,tInsrncBgnTm:any,tInsrncEndTm:any) {
+  const param = {
+    CEdrRsnBundleCde: params["cRsnCde"],//批改原因
+    tRepstopextBgnTm: tRepStopExtBgnTm,//报停起期
+    tRepStopExtEndTm: tRepStopExtEndTm,//报停止期
+    cPlyNo: params["cPlyNo"] || edrbaseEditRef.value?.getValue("EdrBase.cPlyNo"),//保单号
+    tEdrBgnTm: getValue('EdrBase.tEdrBgnTm'),//批单生效起期
+    tInsrncBgnTm: tInsrncBgnTm,//保险起期
+    tInsrncEndTm: tInsrncEndTm,//保险止期
+  }
+  checkPlyChange(param).then((res:any) => {
+    if(res.code === 200 && res.res?.tInsrncEndTm) {
+      opertaor.getTableRefByKey('insrnc')?.setValue('Base.tInsrncEndTm', res.res?.tInsrncEndTm)
+    } else {
+      ElMessage.error(res.msg)
+    }
+  }).catch((err:any) => {
     ElMessage.error(err.msg)
   })
 }

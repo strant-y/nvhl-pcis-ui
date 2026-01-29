@@ -43,6 +43,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { validateIdCard } from "@/typings/method-public";
 import { calculateAgeFromIdCard } from "@/utils/common";
 import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
+import { listChrDepts } from "@/api/dept";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -90,56 +91,64 @@ onMounted(() => {
     getRules
   );
   Object.assign(formconfig1, formconfig11);
-  nextTick(() => {
+  nextTick(async () => {
     //是否小微企业，默认非必填、只读
     // setFormItem("Insured.cIsMicroEntpris", {
     //   rules: null,
     //   disabled: true,
     // });
-  });
-  setValue("Insured.cNation", "CHN"); // 国籍默认中国
-  setFormItem("Insured.cAppNme", { rules: [getRules("required", {}), getRules("cAppNme", {})], });
-  //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
-  const cProdNo = opertaor.getParam()?.cProdNo;
-  if (
-    cProdNo === "040001" ||
-    cProdNo === "042002" ||
-    cProdNo === "043004" ||
-    cProdNo === "043005" ||
-    cProdNo === "043011"
-  ) {
-    setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
-  }
-  if (cProdNo === '130003') {
-    setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
-    setFormItem("Insured.cGreenIndustryList", { hidden: true, rules: null });
-  }
-  if (!cProdNo?.startsWith("05")) {
-    setFormItem("Insured.cShareholderNature", { hidden: true, rules: null });
-    setFormItem("Insured.cShareholderCode", { hidden: true, rules: null });
-    setFormItem("Insured.cShareholderName", { hidden: true, rules: null });
-    setFormItem("Insured.cShareholderCategory", { hidden: true, rules: null });
-  } else {
-    setFormItem("Insured.cShareholderNature", { rules: [getRules("required", {})] });
-    setFormItem("Insured.cShareholderCode", { rules: [getRules("required", {})] });
-    setFormItem("Insured.cShareholderName", { rules: [getRules("required", {})] });
-    setFormItem("Insured.cShareholderCategory", { rules: [getRules("required", {})] });
-  }
+    
+    setValue("Insured.cNation", "CHN"); // 国籍默认中国
+    setFormItem("Insured.cAppNme", { rules: [getRules("required", {}), getRules("cAppNme", {})], });
+    //【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
+    const cProdNo = opertaor.getParam()?.cProdNo;
+    if (
+      cProdNo === "040001" ||
+      cProdNo === "042002" ||
+      cProdNo === "043004" ||
+      cProdNo === "043005" ||
+      cProdNo === "043011"
+    ) {
+      setFormItem("Insured.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
+    }
+    if (cProdNo === '130003') {
+      setFormItem("Insured.cGreenIndustryCustomers", { hidden: true, rules: null });
+      setFormItem("Insured.cGreenIndustryList", { hidden: true, rules: null });
+    }
 
-  setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
-  setFormItem("Insured.cCreditRating", { hidden: true });
-  setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: true });
-  // 处理邮编
-  setFormItem("Insured.cZipCde", {
-    'maxlength': 6,
-    rules: [getRules("signlessInt", {}), getRules("specifyLength", { len: 6 })],
+    setFormItem("Insured.cSafetyStandardizationLevel", { hidden: true });
+    setFormItem("Insured.cCreditRating", { hidden: true });
+    setFormItem("Insured.cIsLargeMediumEnterprise", { hidden: true });
+    // 处理邮编
+    setFormItem("Insured.cZipCde", {
+      'maxlength': 6,
+      rules: [getRules("signlessInt", {}), getRules("specifyLength", { len: 6 })],
+    });
+    // 移动电话
+    setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
+    // 固话
+    setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
+    // 传真校验
+    setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
+
+    if (param.cProdNo === '043009') {
+      setFormItem("Insured.cAgencyReason", { hidden: true });
+      setFormItem("Insured.cEnterpriseTel", { hidden: true });
+      // 福建分公司下的机构 法定代表人、经营范围必填
+      await getDptCdeList();
+      if(isFujianBranch.value) {
+        setFormItem("Insured.cLegalRepresentative", { hidden: false, rules: [getRules("required", {})] });
+        setFormItem("Insured.cBusinessScope", { hidden: false, rules: [getRules("required", {})] });
+      } else {
+        setFormItem("Insured.cLegalRepresentative", { hidden: false });
+        setFormItem("Insured.cBusinessScope", { hidden: false });
+      }
+    }else{
+      setFormItem("Insured.cAgencyReason", { hidden: false });
+      setFormItem("Insured.cLegalRepresentative", { hidden: false });
+      setFormItem("Insured.cEnterpriseTel", { hidden: false });
+    }
   });
-  // 移动电话
-  setFormItem("Insured.cMobile", { rules: [getRules("phoneNo", {})] });
-  // 固话
-  setFormItem("Insured.cTel", { rules: [getRules("phone", {})] });
-  // 传真校验
-  setFormItem("Insured.cFax", { rules: [getRules("faxNumber", {})] });
   // 法人身份证
   // setFormItem("Insured.cLegalCertfCde", { rules: [getRules("idCard", {})] });
   setFormItem("Insured.cGcidCode", {
@@ -479,12 +488,25 @@ const method = {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();
       const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();
       if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
       if (establishingDate > appTm) {
-        ElMessage.error("企业成立时间小于投保日期，请关注!");
-      }
+        ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('Insured.cWorkDpt')
+			const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("Insured.tEstablishingDate", null);
+					clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
   //被保人性质change事件
@@ -636,15 +658,28 @@ const method = {
       const isSpecialCase = cWorkDptList.includes(cWorkDpt);
       const requiredRule = [getRules("required", {})];
       //实名认证方式
-      setFormItem("Insured.cRealnameAuthType", {
-        rules: isSpecialCase ? requiredRule : []
-      });
+      // setFormItem("Insured.cRealnameAuthType", {
+      //   rules: isSpecialCase ? requiredRule : []
+      // });
       // 法定代表人/责任人
-      setFormItem("Insured.cLegalRepresentative", {
-        rules: isSpecialCase ? requiredRule : []
-      });
+      if(param.cProdNo === '043009' && isFujianBranch.value) {
+        setFormItem("Insured.cLegalRepresentative", { rules: [getRules("required", {})] });
+        setFormItem("Insured.cBusinessScope", { rules: [getRules("required", {})] });
+      } else {
+        setFormItem("Insured.cLegalRepresentative", {
+          rules: isSpecialCase ? requiredRule : []
+        });
+        setFormItem("Insured.cBusinessScope", {
+          hidden: true,
+        });
+      }
       // 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -830,7 +865,12 @@ const method = {
         rules: []
       });
       //企业成立日期
+			if (!param.initFlag) { 
+				setValue("Insured.tEstablishingDate", null);
+				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: true,
         rules: [],
       });
 
@@ -1142,7 +1182,7 @@ const method = {
       });
       setFormItem("Insured.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
-    setValue('Insured.cEnterpriseTel', val)
+    // setValue('Insured.cEnterpriseTel', val)
   },
   // 固定电话
   cTelChange: (val) => {
@@ -1193,7 +1233,8 @@ const method = {
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
-    setFormItem("Insured.tEstablishingDate", { rules: null });
+    // setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("Insured.cCertfCde", {
@@ -1230,6 +1271,11 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}), getRules("socialCode", {})],
       });
+			// 为法人  企业成立日期
+			setFormItem("Insured.tEstablishingDate", {
+				disabled: false,
+				rules: [getRules("required", {})],
+			});
 
 
 
@@ -1264,7 +1310,7 @@ const method = {
 
     // 切换清空
     if (val) {
-      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde"];
+      const fieldsToClear = ["Insured.tBirthday", "Insured.nAge", "Insured.cCertfCde", "Insured.tEstablishingDate"];
       fieldsToClear.forEach(field => {
         setValue(field, null);
         setTimeout(() => {
@@ -1422,13 +1468,22 @@ const method = {
     //   rules: isSpecialCase ? requiredRule : []
     // });
     // 法定代表人/责任人
-    setFormItem("Insured.cLegalRepresentative", {
-      rules: isSpecialCase ? requiredRule : []
-    });
+    if(param.cProdNo === '043009' && isFujianBranch.value) {
+      setFormItem("Insured.cLegalRepresentative", { rules: [getRules("required", {})] });
+    } else {
+      setFormItem("Insured.cLegalRepresentative", {
+        rules: isSpecialCase ? requiredRule : []
+      });
+    }
     // 企业成立日
     setFormItem("Insured.tEstablishingDate", {
+			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
-    });
+		});
+		if (!param.initFlag && !isSpecialCase) {
+			setValue("Insured.tEstablishingDate", null);
+			clearValidate('Insured.tEstablishingDate')  // 清除报错信息
+		}
     if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
       setFormItem("Insured.nRegisteredCapital", {
         rules: [getRules("required", {})],
@@ -1459,9 +1514,6 @@ const method = {
 
   // 办理人员证件种类
   cOperaterCertfTypChange: (val: any) => {
-    if (param.initFlag) {
-      return;
-    }
     // 清除报错信息
     clearValidate('Insured.cOperaterCertfCde')
     let cClntMrk = getValue('Insured.cClntMrk');  // 投保人性质 
@@ -1475,9 +1527,6 @@ const method = {
       "553": "ariCard",
     };
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    if (cClntMrk == '0') {
-      baseRules = [getRules("required", {}), ...baseRules]
-    }
 
     setFormItem("Insured.cOperaterCertfCde", {
       rules: baseRules,
@@ -1830,6 +1879,17 @@ function resetFn() {
   }).catch((err:any) => {
     console.log(err)
   })
+}
+// 查询分公司机构
+const isFujianBranch = ref(false);
+async function getDptCdeList() {
+  const res = await listChrDepts({cDptCde: '0235010000000', cDptCls: '2'})
+  if(res.data?.length > 0) {
+    const cDptCdeList = res.data.map((item:any) => { return item.cDptCde})
+    if(cDptCdeList.includes(param.cDptCde)) {
+      isFujianBranch.value = true;
+    }
+  }
 }
 
 defineExpose({

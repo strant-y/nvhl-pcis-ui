@@ -156,6 +156,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onBeforeMount } from "vue";
+import request from "@/utils/request";
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -196,8 +198,25 @@ function closepopover(value: any) {
 const emits = defineEmits(["click", "closepopover"]); // 父组件监听事件，同步子组件值的变化给父组件
 function handleChange() {
   emits("click");
+
+  if (props.item?.label === "雇主反欺诈风险态势") {
+    request
+      .post("/jumpFraud/jumpEmployList", {})
+      .then((res: any) => {
+        if (res?.code === 200 && res?.data) {
+          window.open(res.data, "_blank");
+        } else {
+          ElMessage.error(res?.msg || "雇主反欺诈风险态势查询失败");
+        }
+      })
+      .catch((err: any) => {
+        ElMessage.error(err?.message || "雇主反欺诈风险态势查询失败");
+      });
+    return;
+  }
+
   // 将item和row传递给父组件,证明我是用哪个要素执行的func表格时，额外传递对应行数据，证明我是哪一行的按钮
-  (props.item.func && typeof props.item.func === "function") ? props.item.func(props.parentItem,props.row) : null;  
+  (props.item.func && typeof props.item.func === "function") ? props.item.func(props.parentItem,props.row) : null;
 }
 
 function getConfig() {

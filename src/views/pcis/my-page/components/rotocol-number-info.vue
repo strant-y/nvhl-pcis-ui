@@ -50,6 +50,7 @@ const pageresult = reactive<Pageresult>({
   /** 总数 */
   total: 0,
 });
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -57,6 +58,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery();
         },
@@ -111,6 +113,11 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cAppNme",
         inputtype: 'rtinput',
         title: "投保人客户名称",
+      },
+      {
+        prop: "cInsuredNme",
+        inputtype: 'rtinput',
+        title: "被保险人名称",
       }
     ],
 		rowDbClickFun:(row: any)=>{
@@ -133,22 +140,25 @@ onMounted(() => {
 
 // 查询协议号
 const handleQuery = (flag?: boolean) => {
+	queryLoading.value = true;
 	const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const params = Object.assign(s,r);
+	pageresult.list = [];
   pcisQueryService.queryEcargoRelevancePolicy(params).then((res: any) => {
 		const { code, data, msg } = res;
     if (200 === code) {
 				data.data.forEach((item: any, index: number) => {
           item.nSeqNo = index + 1;
         });
-        pageresult.list = [];
         pageresult.list = data.data;
         pageresult.total = data.total;
       } else {
         ElMessage.error(msg);
       }
-  }).finally(() => {});
+	}).finally(() => {
+		queryLoading.value = false;
+	});
 }
 
 // 关闭弹窗

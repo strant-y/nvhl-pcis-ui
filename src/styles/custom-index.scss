@@ -299,6 +299,10 @@
       }
 
       @extend .rt-custom-item__error;
+
+      span.el-tag__content {
+        margin-top: 0;
+      }
     }
   }
 

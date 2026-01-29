@@ -24,6 +24,23 @@
         </div>
       </template>
     </app-table>
+		<app-table
+        :tableConfig="tableconfig2"
+        v-model:pageresult="pageresult2"
+        ref="tableRef2"
+    >
+      <template #column-cChgVal="{ row, column, index }">
+        <div style="display: flex; align-items: center;">
+          <span>{{ row.cChgVal }}</span>
+          <el-icon v-if="row.cChgVal && parseFloat(row.cChgVal) > 0" style="margin-left: 5px; color: #ef4747;">
+            <Top />
+          </el-icon>
+          <el-icon v-else-if="row.cChgVal && parseFloat(row.cChgVal) < 0" style="margin-left: 5px; color: #00b19d;">
+            <Bottom />
+          </el-icon>
+        </div>
+      </template>
+    </app-table>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
@@ -84,6 +101,7 @@ import {
   gettypflag,
   compareAppFeeInfo,
   getDpt,
+	getCompareAppFeeInfo,
 } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
@@ -93,6 +111,7 @@ import { number } from "echarts";
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const tableRef1 = ref<AppTableMethod | null>(null);
+const tableRef2 = ref<AppTableMethod | null>(null);
 const isDisabled = ref(true); //判断表单是否可编辑
 const dialogVisible = ref(true);
 const props = defineProps({
@@ -239,6 +258,15 @@ const pageresult1 = reactive<Pageresult>({
   total: 0,
 });
 
+//上次更改比较表格数据参数
+const pageresult2 = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
+
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "费用信息",
@@ -342,12 +370,71 @@ const tableconfig1 = reactive<AppTableConfig>(
   })
 );
 
+//上次更改比较表格项
+const tableconfig2 = reactive<AppTableConfig>(
+  createTableEditConfig({
+    title: "上次更改比较",
+    editFlag: true,
+    isPage: false,
+    fromSchema: [
+      {
+        prop: "nSeqNo",
+        inputtype: "rtinput",
+        title: "序号",
+        minWidth: 20,
+      },
+      {
+        prop: "cFldNme",
+        inputtype: "rtinput",
+        title: "批改对象",
+        minWidth: 100,
+      },
+      {
+        prop: "cRelTableNme",
+        inputtype: "rtinput",
+        title: "批改项目",
+        minWidth: 100,
+      },
+      {
+        prop: "cRelFldNme",
+        inputtype: "rtinput",
+        title: "类型",
+        minWidth: 80,
+      },
+      {
+        prop: "cOldVal",
+        inputtype: "rtinput",
+        title: "原值",
+        clearable: true,
+        minWidth: 60,
+      },
+      {
+        prop: "cNewVal",
+        inputtype: "rtinput",
+        title: "新值",
+        clearable: true,
+        minWidth: 60,
+      },
+      {
+        prop: "cChgVal",
+        inputtype: "rtinput",
+        title: "变化值",
+        clearable: true,
+        minWidth: 60,
+        slotName: "cChgVal"
+      }
+    ],
+  })
+);
+
 onMounted(async () => {
   handleQuery();
   findFeeBetween(); // 承包 查询 手续费 区间信息
   findIlogC1(); // 查询ilog原始C1值
-  checktype();
-  
+	checktype();
+	setTimeout(() => {
+		getCompareAppFeeInfoquery()
+	}, 2000);
 });
 let param = {
       pagePos: '',
@@ -621,6 +708,7 @@ function readOnlyAB() {
 }
 //比较接口
 async function compareAppFee(saveFlag:any) {
+	tableRef1.value?.setPartnerPage({ pageNum: 1, pageSize: 50 });
   let requstFlag = false;
   const paramStr = {
     appNo: params['appNo'],//保单号
@@ -958,6 +1046,29 @@ function changeUpdValue(value:string){
       return ;
     }
   })
+}
+
+/**
+ * 查询上次比较数据
+ */
+function getCompareAppFeeInfoquery(flag?: boolean) {
+	tableRef2.value?.setPartnerPage({ pageNum: 1, pageSize: 50 });
+	pageresult2.list = [];
+  const param = {cAppNo:params.appNo}
+  //费用信息接口调用
+  getCompareAppFeeInfo(param)
+    .then((res:any) => {
+      if (res.code == 200) {
+        pageresult2.list = res.data;
+				pageresult2.total = res.data.length;
+				pageresult2.list.forEach((item, index) => {
+          item.nSeqNo = index + 1;
+        });
+      } else {
+        ElMessage.error(res.msg);
+      }
+    })
+    .finally(() => { });
 }
 </script>
 

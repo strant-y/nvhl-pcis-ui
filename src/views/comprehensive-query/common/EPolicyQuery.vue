@@ -700,11 +700,16 @@ function handleQuery(flag?: boolean) {
                     return
                 }
             }
+            let CAppTyp = plyTyp === 'EDR' ? 'E' : 'A'
+            const CTyp = freeEditRef.value?.getValue('CTyp')
+            if (plyTyp === 'BL' && !!CTyp) {
+               CAppTyp = CTyp
+            }
             const param = Object.assign(
                 {
                     CurrentUser: user.value.opCde,
                     CurrentUserOrg: user.value.companyId,
-                    CAppTyp: plyTyp === 'EDR' ? 'E' : 'A'
+                    CAppTyp: CAppTyp
                 },
                 s,
                 r

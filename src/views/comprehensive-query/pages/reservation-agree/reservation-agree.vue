@@ -24,6 +24,16 @@
 					</div>
 				</div>
 			</template>
+			<template #column-cEcAgrEdrNo="{ row, column, index }">
+				<div class="policy-info-cell">
+					<div v-if="row.cEcAgrEdrNo" class="policy-number-row">
+						<span style="width: calc(100% - 1em - 5px)">{{ row.cEcAgrEdrNo }}</span>
+						<el-icon class="copy-icon" @click="copyText(row.cEcAgrEdrNo)">
+							<DocumentCopy />
+						</el-icon>
+					</div>
+				</div>
+			</template>
       <template #column-cAppNme="{ row, column, index }">
         <el-tooltip :content="row.cAppNme" placement="top">
           <span v-html="row.cAppNme || ''" class="twoLine"></span>
@@ -59,6 +69,7 @@ const route = useRoute();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -66,6 +77,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery(true);
         },
@@ -209,18 +221,10 @@ const tableconfig = reactive<AppTableConfig>(
       }),
 		],
     fromSchema: [
-      {
-        prop: "nSeqNo",
-        inputtype: "rtinput",
-        title: "序号",
-        showIndex: true,
-        fixed: "left",
-        lengthNum: 2,
-      },
 			{
 				prop: "policyInfo",
 				inputtype: "rtinput",
-				title: "协议号",
+				title: "申请单号/协议号",
         fixed: "left",
         lengthNum: 22,
         lengthIsNumber: true,
@@ -229,7 +233,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "cEcAgrEdrNo",
         inputtype: "rtinput",
-        lengthNum: 21,
+        lengthNum: 27,
         lengthIsNumber: true,
         title: "批单号",
         slotName: "cEcAgrEdrNo"
@@ -264,70 +268,90 @@ const tableconfig = reactive<AppTableConfig>(
         align: "left",
         lengthNum: 12,
       },
-			{
-				prop: "InsurancePeriod",
-				inputtype: "rtinput",
-				title: "协议期间",
-        lengthNum: 36,
-        lengthIsNumber: true,
-			},
-      // {
-      //   prop: "tInsrncBgnTm",
-      //   inputtype: "rtinput",
-      //   title: "协议起期",
-      // },
-      // {
-      //   prop: "tInsrncEndTm",
-      //   inputtype: "rtinput",
-      //   title: "协议止期",
-      // },
+			// {
+			// 	prop: "InsurancePeriod",
+			// 	inputtype: "rtinput",
+			// 	title: "协议期间",
+      //   lengthNum: 36,
+      //   lengthIsNumber: true,
+			// },
+      {
+        prop: "tInsrncBgnTm",
+        inputtype: "rtinput",
+        title: "协议起期",
+        minWidth: 120,
+      },
+      {
+        prop: "tInsrncEndTm",
+        inputtype: "rtinput",
+        title: "协议止期",
+        minWidth: 120,
+      },
       {
         prop: "nRmbPrm",
         inputtype: "rtinput",
         title: "预估总保费",
-        lengthNum: 12,
+        lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbAmt",
         inputtype: "rtinput",
         title: "预估总保额",
-        lengthNum: 13,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nLowPrm",
         inputtype: "rtinput",
         title: "最低保费",
-        lengthNum: 12,
+        lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nWhRmbAmt",
         inputtype: "rtinput",
         title: "预扣保额",
-        lengthNum: 13,
+        lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRecRemEstAmt",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保额",
-        lengthNum: 13,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbReceivedPrm",
         inputtype: "rtinput",
         title: "预收保费",
-        lengthNum: 12,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nWhRmbPrm",
@@ -336,14 +360,20 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRecRemPrm",
         inputtype: "rtinput",
         title: "协议剩余实收(预估)保费",
-        lengthNum: 12,
+        lengthNum: 14,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "cAppStatus",
@@ -358,7 +388,7 @@ const tableconfig = reactive<AppTableConfig>(
 					{ label: "见费出单退回", value: "8" },
 					{ label: "已拒保", value: "9" },
 				],
-        lengthNum: 6,
+        lengthNum: 7,
         align: "left"
       },
     ],
@@ -381,6 +411,8 @@ const submitForm = (flag: boolean) => {
 };
 
 const refreshData = (reset = true) => {
+	queryLoading.value = true;
+	pageresult.list = []
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
 	if (s.cLoadSub == null) {
@@ -392,23 +424,27 @@ const refreshData = (reset = true) => {
     params.cLatestMrk = '1'
   }
   cargoApi.queryEcargoList(params).then((res: any) => {
+		queryLoading.value = false;
     if (res.code === 200) {
       const pageData = res.data;
       if (pageData) {
-				pageData.data.forEach((item: any, index: number) => {
-          item.nSeqNo = index + 1;
-        });
-        pageresult.list = pageData.data;
+				// pageData.data.forEach((item: any, index: number) => {
+        //   item.nSeqNo = index + 1;
+        // });
+        // pageresult.list = pageData.data;
 				pageresult.list = pageData.data.map((item) => ({
 					...item,
 					// 创建一个新字段合并两个值
 					policyInfo: `${item.cEcAgrAppNo || ''}\n${item.cEcAgrNo || ''}`,
-					InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
+					// InsurancePeriod: `${item.tInsrncBgnTm || ''}\n${item.tInsrncEndTm || ''}`,
 				}))
         pageresult.total = pageData.total;
       }
     }
-  });
+  }).catch((err: any) => {
+		queryLoading.value = false;
+		ElMessage.error(err.msg);
+	});
 };
 
 onMounted(() => {

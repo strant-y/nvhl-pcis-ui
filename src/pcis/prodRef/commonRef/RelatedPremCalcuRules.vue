@@ -130,7 +130,7 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         tableClick: (row) => {
           dzmodal
-            .open(AddPremCalcuRulesModal, { type: "edit", data: row })
+            .open(AddPremCalcuRulesModal, { type: "edit", data: row, idxParam: idxParam })
             .then((res) => {
               if (res.type === "ok") {
                 handleQuery();

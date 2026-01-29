@@ -232,7 +232,7 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rttag",
         title: "Tag",
         effect: "light",
-        width: 45,
+        width: 80,
         loadData: [
           {
             label: "可选",
@@ -280,7 +280,7 @@ const addData =()=>{
         addIndex: 1,
         cIfEdit: "0",
         cIfFix: "1",
-        cIfMust: "1",
+        cIfMust: "0",
         cSpecialCode: "fenqi01",
         isAdd:true,
         cSpecialContent: "各期保费应在约定的缴费止期前缴纳，超过约定止期未支付当期保费的，在未支付保费的期间发生保险事故的，本公司按照已缴纳保费及未到缴费期应交保费之和占总保费的比例进行赔偿。",

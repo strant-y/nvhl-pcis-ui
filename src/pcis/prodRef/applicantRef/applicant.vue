@@ -125,23 +125,6 @@ onMounted(() => {
       setFormItem("Applicant.cGreenIndustryCustomers", { hidden: true, rules: null });
       setFormItem("Applicant.cGreenIndustryList", { hidden: true, rules: null });
     }
-    if (!cProdNo?.startsWith("05")) {
-      setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderNature", {
-        hidden: true,
-        rules: null,
-      });
-      setFormItem("Applicant.cShareholderCategory", {
-        hidden: true,
-        rules: null,
-      });
-    } else {
-      setFormItem("Applicant.cShareholderName", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderCode", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderNature", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderCategory", { rules: [getRules("required", {})] });
-    }
 
     // 处理邮编
     setFormItem("Applicant.cZipCde", {
@@ -468,8 +451,8 @@ const method = {
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
-    setFormItem("Applicant.tEstablishingDate", { rules: null });
-
+    // setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("Applicant.cCertfCde", {
@@ -506,9 +489,10 @@ const method = {
       });
 
       // 为法人  企业成立日期
-      setFormItem("Applicant.tEstablishingDate", {
-        rules: [getRules("required", {})],
-      });
+			// setFormItem("Applicant.tEstablishingDate", {
+			// 	disabled: false,
+      //   rules: [getRules("required", {})],
+      // });
     } else if (val === '07') {
       // 护照
       setFormItem("Applicant.cCertfCde", {
@@ -531,7 +515,7 @@ const method = {
 
     // 切换清空
     if (val) {
-      const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde"];
+      const fieldsToClear = ["Applicant.tBirthday", "Applicant.nAge", "Applicant.cCertfCde", "Applicant.tEstablishingDate"];
       // 2. 循环赋值 null + 清除对应字段的校验错误
       fieldsToClear.forEach(field => {
         setValue(field, null);
@@ -577,12 +561,25 @@ const method = {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();
       const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();;
       if (establishingDate > issueTm) {
         ElMessage.error("企业成立时间小于保单签单时间，请关注!");
       }
       if (establishingDate > appTm) {
-        ElMessage.error("企业成立时间小于投保日期，请关注!");
-      }
+				ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('Applicant.cWorkDpt')
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("Applicant.tEstablishingDate", null);
+					clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
   //投保人性质(0是法人 1是个人)
@@ -739,7 +736,12 @@ const method = {
         });
       }
       // 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Applicant.tEstablishingDate", {
+				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -774,9 +776,6 @@ const method = {
         rules: [getRules("required", {})],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Applicant.cLegalRepresentative", {
         rules: [getRules("required", {})],
       });
 
@@ -858,6 +857,9 @@ const method = {
 				setFormItem("Applicant.cIsIndvduBiz", {
 					disabled: false,
 				});
+				// 企业成立日期
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 			}
       // 是否绿色产业客户
       setFormItem("Applicant.cGreenIndustryCustomers", {
@@ -876,6 +878,7 @@ const method = {
       });
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
+				disabled: true,
         rules: null,
       });
       setFormItem("Applicant.cEnterpriseTel", {
@@ -955,9 +958,6 @@ const method = {
         rules: [],
       });
       setFormItem("Applicant.cFirmscaleTyp", {
-        rules: [],
-      });
-      setFormItem("Applicant.cLegalRepresentative", {
         rules: [],
       });
 
@@ -1212,7 +1212,7 @@ const method = {
       setFormItem("Applicant.cTel", { rules: [getRules("required", {}), getRules("phone", {})] });
     }
 
-    setValue('Applicant.cEnterpriseTel', val)
+    // setValue('Applicant.cEnterpriseTel', val)
   },
   // 固定电话
   cTelChange: (val) => {
@@ -1388,8 +1388,13 @@ const method = {
     }
     // 企业成立日
     setFormItem("Applicant.tEstablishingDate", {
+			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
+		if (!param.initFlag && !isSpecialCase) {
+			setValue("Applicant.tEstablishingDate", null);
+			clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+		}
     if (val =='310' || val =='320' || val =='330' || val =='340' || val =='350'|| val =='360') { 
       setFormItem("Applicant.nRegisteredCapital", {
         rules: [getRules("required", {})],
@@ -1422,9 +1427,9 @@ const method = {
   cOperaterCertfTypChange: (val: any) => {
     console.log('证件种类', val)
     const param = opertaor.getParam();
-    if (param.initFlag) {
-      return;
-    }
+    // if (param.initFlag) {
+    //   return;
+    // }
     // 清除报错信息
     clearValidate('Applicant.cOperaterCertfCde')
     let cClntMrk = getValue('Applicant.cClntMrk');  // 投保人性质 
@@ -1438,9 +1443,6 @@ const method = {
       "553": "ariCard",
     };
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    if (cClntMrk == '0') {
-      baseRules = [getRules("required", {}), ...baseRules]
-    }
 
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,

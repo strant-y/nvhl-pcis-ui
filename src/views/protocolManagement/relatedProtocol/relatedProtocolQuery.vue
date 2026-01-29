@@ -24,13 +24,19 @@
                 </div>
             </div>
         </template>
-        <template #column-InsurancePeriod="{ row, column, index }">
+				<template #column-policyInfoTB="{ row, column, index }">
             <div class="policy-info-cell">
-                <div v-if="row.tInsrncBgnTm" class="policy-number-row">
-                    <span>{{ row.tInsrncBgnTm }}</span>
+                <div v-if="row.cAppNo" class="policy-number-row">
+                    <span style="width: calc(100% - 1em - 5px)">{{ row.cAppNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
+                        <DocumentCopy />
+                    </el-icon>
                 </div>
-                <div v-if="row.tInsrncEndTm" class="policy-number-row">
-                    <span>{{ row.tInsrncEndTm }}</span>
+                <div v-if="row.cPlyNo" class="policy-number-row">
+                    <span style="width: calc(100% - 1em - 5px)">{{ row.cPlyNo }}</span>
+                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
+                        <DocumentCopy />
+                    </el-icon>
                 </div>
             </div>
         </template>
@@ -44,34 +50,14 @@
             <span v-html="row.cSecondDptCnm || ''" class="twoLine"></span>
           </el-tooltip>
         </template>
-        <template #column-cAppNo="{ row, column, index }">
-            <div class="policy-info-cell">
-                <div v-if="row.cAppNo" class="policy-number-row">
-                    <span>{{ row.cAppNo }}</span>
-                    <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
-                        <DocumentCopy />
-                    </el-icon>
-                </div>
-            </div>
-        </template>
-        <template #column-cPlyNo="{ row, column, index }">
-            <div class="policy-info-cell">
-                <div v-if="row.cPlyNo" class="policy-number-row">
-                    <span>{{ row.cPlyNo }}</span>
-                    <el-icon class="copy-icon" @click="copyText(row.cPlyNo)">
-                        <DocumentCopy />
-                    </el-icon>
-                </div>
-            </div>
-        </template>
         <template #column-cAppNme="{ row, column, index }">
           <el-tooltip :content="row.cAppNme" placement="top">
             <span v-html="row.cAppNme || ''" class="twoLine"></span>
           </el-tooltip>
         </template>
-        <template #column-cInsuredNme="{ row, column, index }">
-          <el-tooltip :content="row.cInsuredNme" placement="top">
-            <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
+        <template #column-insuredNme="{ row, column, index }">
+          <el-tooltip :content="row.insuredNme" placement="top">
+            <span v-html="row.insuredNme || ''" class="twoLine"></span>
           </el-tooltip>
         </template>
 	</app-table>
@@ -99,6 +85,7 @@ const route = useRoute();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -106,6 +93,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery(true);
         },
@@ -114,51 +102,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "重置",
         func: () => {
           freeEditRef.value?.resetFields();
-			reset()
+					reset()
         },
       }),
     ],
-    fromSchema: [
-      {
-        prop: "cEcAgrNo",
-        inputtype: "rtinput",
-        title: "预约协议号",
-        clearable: true,
-      },
-      {
-        prop: "cAppNme",
-        inputtype: "rtinput",
-        title: "投保人名称",
-        clearable: true,
-      },
-	  {
-        prop: "insuredNme",
-        inputtype: "rtinput",
-        title: "被保人名称",
-        clearable: true,
-      },
-      {
-        prop: "cAppStatus",
-        inputtype: "rtselect",
-        title: "任务状态",
-        minWidth: 180,
-        clearable: true,
-        loadData: [
-            {label: "暂存", value: 1},
-            {label: "已提核", value: 2},
-            {label: "核保退回/撤回", value: 3},
-            {label: "已核待缴费", value: 4},
-            {label: "已出单", value: 5},
-            {label: "见费出单退回", value: 8},
-        ]
-      },
-      {
-        prop: "cUdrNme",
-        inputtype: "rtinput",
-        title: "操作员名称",
-        clearable: true,
-      },
-	  {
+		fromSchema: [
+			{
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "归属机构名称",
@@ -185,9 +134,59 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     }
                 });
             },
-		},
+				},
+			},
+      {
+        prop: "cLoadSub",
+        inputtype: "rtcheckbox",
+        title: "是否包含下级",
+        defaultValue: 1,
+        keymap: {
+          y: 1,
+          n: 0,
+        },
+        itemWidth: 1,
       },
-	  {
+      {
+        prop: "cEcAgrNo",
+        inputtype: "rtinput",
+        title: "预约协议号",
+        clearable: true,
+      },
+      {
+        prop: "cAppNme",
+        inputtype: "rtinput",
+        title: "投保人名称",
+        clearable: true,
+      },
+	  	{
+        prop: "insuredNme",
+        inputtype: "rtinput",
+        title: "被保人名称",
+        clearable: true,
+      },
+      {
+        prop: "cAppStatus",
+        inputtype: "rtselect",
+        title: "任务状态",
+        minWidth: 180,
+        clearable: true,
+        loadData: [
+            {label: "暂存", value: 1},
+            {label: "已提核", value: 2},
+            {label: "核保退回/撤回", value: 3},
+            {label: "已核待缴费", value: 4},
+            {label: "已出单", value: 5},
+            {label: "见费出单退回", value: 8},
+        ]
+      },
+      {
+        prop: "cUdrNme",
+        inputtype: "rtinput",
+        title: "操作员名称",
+        clearable: true,
+      },
+	  	{
         prop: "tInsrncTm",
         inputtype: "rtdatepicker",
         title: "生效日期",
@@ -198,14 +197,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val:any) => {
             handleDateChange(val, "1");
         },
-	  },
+	  	},
       {
         prop: "cInsuredCde",
         inputtype: "rtinput",
         title: "代理人代码",
         clearable: true,
       },
-	  {
+	  	{
         prop: "tAppTm",
         inputtype: "rtdatepicker",
         title: "录入日期",
@@ -216,7 +215,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         func: (val:any) => {
             handleDateChange(val, "2");
         },
-	  },
+	  	},
     ],
   })
 );
@@ -247,45 +246,46 @@ const tableconfig = reactive<AppTableConfig>(
     })],
     fromSchema: [
       {
-        prop: "nSeqNo",
-        inputtype: "rtinput",
-        title: "序号",
-        showIndex: true,
-        fixed: "left",
-        lengthNum: 2,
-      },
-      {
         prop: "policyInfo",
         inputtype: "rtinput",
-        title: "协议号",
+        title: "申请单号/协议号",
         fixed: "left",
         lengthNum: 22,
         lengthIsNumber: true,
 		    slotName: "policyInfo"
-	  },
+			},
+			{
+        prop: "policyInfoTB",
+        inputtype: "rtinput",
+        title: "投保单号/保单号",
+        lengthNum: 21,
+        lengthIsNumber: true,
+        fixed: "left",
+        slotName: "policyInfoTB"
+    	},
       {
         prop: "cSecondDptCnm",
         inputtype: "rtinput",
-        title: "二级机构",
+        title: "分公司",
         slotName: "cSecondDptCnm",
         align: 'left',
         lengthNum: 12,
-	  },
+	  	},
       {
         prop: "cDptCnm",
         inputtype: "rtinput",
-        title: "三级机构",
+        title: "出单机构",
         slotName: "cDptCnm",
         align: 'left',
         lengthNum: 12,
-	  },
+	  	},
       {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "投保单号",
         lengthNum: 21,
         lengthIsNumber: true,
-        slotName: "cAppNo"
+        isShow: false
       },
       {
         prop: "cPlyNo",
@@ -293,12 +293,12 @@ const tableconfig = reactive<AppTableConfig>(
         title: "保单号",
         lengthNum: 21,
         lengthIsNumber: true,
-        slotName: "cPlyNo"
+        isShow: false
       },
-	  {
+	  	{
         prop: "cAppNme",
         inputtype: "rtinput",
-        title: "投保人",
+        title: "投保人名称",
         slotName: "cAppNme",
         align: "left",
         lengthNum: 12,
@@ -306,7 +306,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "insuredNme",
         inputtype: "rtinput",
-        title: "被保人",
+        title: "被保人名称",
         slotName: "insuredNme",
         align: "left",
         lengthNum: 12,
@@ -325,20 +325,14 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 17,
         lengthIsNumber: true,
       },
-	  {
-        prop: "cUdrNme",
-        inputtype: "rtinput",
-        title: "操作员",
-        lengthNum: 4,
-	  },
-      {
-        prop: "InsurancePeriod",
-        inputtype: "rtinput",
-        title: "输入日期",
-        lengthNum: 17,
-        lengthIsNumber: true,
-        slotName: "InsurancePeriod"
-	  },
+      // {
+      //   prop: "InsurancePeriod",
+      //   inputtype: "rtinput",
+      //   title: "输入日期",
+      //   lengthNum: 17,
+      //   lengthIsNumber: true,
+      //   slotName: "InsurancePeriod"
+	  	// },
       {
         prop: "nRmbPrm",
         inputtype: "rtinput",
@@ -346,6 +340,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbAmt",
@@ -354,6 +351,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nLowPrm",
@@ -362,6 +362,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nWhRmbAmt",
@@ -370,6 +373,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRecRemEstAmt",
@@ -378,6 +384,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 13,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRmbReceivedPrm",
@@ -386,6 +395,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nWhRmbPrm",
@@ -394,6 +406,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "nRecRemPrm",
@@ -402,6 +417,9 @@ const tableconfig = reactive<AppTableConfig>(
         lengthNum: 12,
         lengthIsNumber: true,
         align: "left",
+				formatter: (val: any) => {
+						return val.toLocaleString()
+				}
       },
       {
         prop: "cAppStatus",
@@ -417,7 +435,13 @@ const tableconfig = reactive<AppTableConfig>(
         ],
         lengthNum: 7,
         align: "left"
-      },
+			},
+			{
+        prop: "cUdrNme",
+        inputtype: "rtinput",
+        title: "操作员",
+        lengthNum: 4,
+	  	},
     ],
   })
 );
@@ -438,6 +462,8 @@ const submitForm = (flag: boolean) => {
 };
 
 const refreshData = (reset = true) => {
+	queryLoading.value = true;
+	pageresult.list = []
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue();
 	if (s.cLoadSub == null || s.cLoadSub == undefined) {
@@ -445,17 +471,21 @@ const refreshData = (reset = true) => {
   }
   const params = Object.assign(s, r);
   cargoApi.queryRelevancePolicy(params).then((res: any) => {
+		queryLoading.value = false;
     if (res.code === 200) {
       const pageData = res.data;
       if (pageData) {
-		pageData.data.forEach((item: any, index: number) => {
-          item.nSeqNo = index + 1;
-        });
+				// pageData.data.forEach((item: any, index: number) => {
+        //   item.nSeqNo = index + 1;
+        // });
         pageresult.list = pageData.data;
         pageresult.total = pageData.total;
       }
     }
-  });
+  }).catch((err: any) => {
+		queryLoading.value = false;
+		ElMessage.error(err.msg);
+	});
 };
 
 onMounted(() => {

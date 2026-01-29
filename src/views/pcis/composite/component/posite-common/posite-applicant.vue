@@ -117,23 +117,6 @@ onMounted(() => {
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})], });
       
     }
-    if (!cProdNo.startsWith("05")) {
-      setFormItem("Applicant.cShareholderName", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderCode", { hidden: true, rules: null });
-      setFormItem("Applicant.cShareholderNature", {
-        hidden: true,
-        rules: null,
-      });
-      setFormItem("Applicant.cShareholderCategory", {
-        hidden: true,
-        rules: null,
-      });
-    }else{
-      setFormItem("Applicant.cShareholderName", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderCode", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderNature", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.cShareholderCategory", { rules: [getRules("required", {})] });
-    }
 
     // 处理邮编
     setFormItem("Applicant.cZipCde", {
@@ -436,7 +419,9 @@ const method = {
       setFormItem("Applicant.cSex", {
         disabled: false,
       });
-    }
+		}
+		setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
+		clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
       setFormItem("Applicant.cCertfCde", {
@@ -493,6 +478,7 @@ const method = {
 
             // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
+				disabled: false,
         rules: [getRules("required", {})],
       });
     } else if(val == "553"){
@@ -510,6 +496,50 @@ const method = {
       // setFormItem("Applicant.cParticiinsocTyp", {
       //   rules: null,
       // });
+		}
+		if (param.initFlag) return;
+
+    // 切换清空
+    if (val) {
+      const fieldsToClear = ["Applicant.tEstablishingDate"];
+      // 2. 循环赋值 null + 清除对应字段的校验错误
+      fieldsToClear.forEach(field => {
+        setValue(field, null);
+        // 清除该字段的校验错误 
+        setTimeout(() => {
+          clearValidate(field);
+        }, 10);
+      });
+    }
+	},
+	//企业成立时间事件改变
+  tEstablishingDateChange: (val) => {
+    const tableParam = opertaor.getTableRefs();
+    const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
+    const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
+    if (val && tAppTm && tIssueTm) {
+      const establishingDate = new Date(val).getTime();
+      const appTm = new Date(tAppTm).getTime();
+			const issueTm = new Date(tIssueTm).getTime();
+			const foundingDay = new Date('1949-10-01').getTime();;
+      if (establishingDate > issueTm) {
+        ElMessage.error("企业成立时间小于保单签单时间，请关注!");
+      }
+      if (establishingDate > appTm) {
+				ElMessage.error("企业成立时间小于投保日期，请重新填写!");
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
+			const cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+			const cWorkDpt = getValue('Applicant.cWorkDpt')
+      const isSpecialCase = cWorkDptList.includes(cWorkDpt);
+			if (cClntMrk == '0' && !!isSpecialCase) {
+				if (establishingDate < foundingDay) {
+					ElMessage.error("企业成立时间大于1949-10-01，请重新填写!");
+					setValue("Applicant.tEstablishingDate", null);
+					clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+				}
+			}
     }
   },
   //投保人性质(0是法人 1是个人)
@@ -531,17 +561,17 @@ const method = {
       });
  
       productStore.setcClntMrk(val);
-      // 办理人
+      // 办理人(0928需求法人时办理人人员姓名、证件类型、证件号码必填、有效止期非必填)
       // setFormItem("Applicant.cCntrNme", { rules: [getRules("required", {})] });
-      setFormItem("Applicant.tOperaterCertfEndTm", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Applicant.cOperaterCertfTyp", {
-        rules: [getRules("required", {})],
-      });
-      setFormItem("Applicant.cOperaterCertfCde", {
-        rules: [getRules("required", {})],
-      });
+      // setFormItem("Applicant.tOperaterCertfEndTm", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Applicant.cOperaterCertfTyp", {
+      //   rules: [getRules("required", {})],
+      // });
+      // setFormItem("Applicant.cOperaterCertfCde", {
+      //   rules: [getRules("required", {})],
+      // });
       setFormItem("Applicant.cCntrCertfCde", {
         rules: [getRules("required", {})],
       });
@@ -613,8 +643,13 @@ const method = {
         });
       }
       // 企业成立日
+			if (!param.initFlag && !isSpecialCase) {
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
       setFormItem("Applicant.tEstablishingDate", {
-         rules: isSpecialCase ? requiredRule : []
+				disabled: !param.initFlag && isSpecialCase ? false : true,
+        rules: isSpecialCase ? requiredRule : []
       });
 
  
@@ -711,9 +746,16 @@ const method = {
       setFormItem("Applicant.cGreenIndustryList", {
         rules: null,
         disabled: true,
-      });
+			});
+			
+			if (!param.initFlag) {
+				// 企业成立日期
+				setValue("Applicant.tEstablishingDate", null);
+				clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+			}
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
+				disabled: true,
         rules: null,
       });
  
@@ -1163,9 +1205,13 @@ cWorkDptChange:(val: any) => {
   }
   // 企业成立日
   setFormItem("Applicant.tEstablishingDate", {
+		disabled: !param.initFlag && isSpecialCase ? false : true,
     rules: isSpecialCase ? requiredRule : []
   });
- 
+	if (!param.initFlag && !isSpecialCase) {
+		setValue("Applicant.tEstablishingDate", null);
+		clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
+	}
 
   const leiCodeRule = [getRules("leiCode", {})];
   if (val === '350') {
@@ -1196,9 +1242,6 @@ cWorkDptChange:(val: any) => {
         "553": "ariCard",
       };
       baseRules = ruleMap[val] ? [getRules(ruleMap[val],{})] : [];
-      if (cClntMrk == '0') {
-        baseRules = [getRules("required", {}), ...baseRules]
-      }
       
       setFormItem("Applicant.cOperaterCertfCde", {
         rules:baseRules,
