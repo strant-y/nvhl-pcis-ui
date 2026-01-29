@@ -3609,20 +3609,26 @@ const submitToUndrFn = async () => {
 
   // 判断应收保费是否同保费相同
   let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
-   if(payList && payList.length>0){
-      let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
-      const toCent = (amount:any) => {
-        return Math.round(Number(amount) * 100); // 转为分并四舍五入
-      };
-      let totalCent = 0;
-      payList.forEach((item:any) => {
-        totalCent += toCent(item['Pay.nPayablePrm']);
-      });
-       const basePrmCent = toCent(nPrm);
-       if(totalCent !== basePrmCent){
-         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-        return false;
-      }
+  if(payList && payList.length>0){
+    let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
+    const toCent = (amount:any) => {
+      return Math.round(Number(amount) * 100); // 转为分并四舍五入
+    };
+    let totalCent = 0;
+    payList.forEach((item:any) => {
+      totalCent += toCent(item['Pay.nPayablePrm']);
+    });
+    const basePrmCent = toCent(nPrm);
+    if(totalCent !== basePrmCent){
+        ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
+      return false;
+    }
+    const lastName = payList[payList.length - 1]?.['Pay.cPayorNme'];
+    const applicantName = opertaor.getTableRefByKey("applicant").getValue('Applicant.cAppNme');
+    if(lastName != applicantName) {
+      ElMessage.warning('缴费计划中最后一条付款人名称应与投保人名称一致！');
+      return false;
+    }
   }
 
   // 缴费计划 付款人代码 名称为空处理
@@ -5366,6 +5372,15 @@ const submitEdrToUndrFun = async () => {
   }
   if (validateGuaranteeBgnTm()) {
     return;
+  }
+  let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
+  if(payList && payList.length>0){
+    const lastName = payList[payList.length - 1]?.['Pay.cPayorNme'];
+    const applicantName = opertaor.getTableRefByKey("applicant").getValue('Applicant.cAppNme');
+    if(lastName != applicantName) {
+      ElMessage.warning('缴费计划中最后一条付款人名称应与投保人名称一致！');
+      return;
+    }
   }
 if(props.param.cTransMrk !== "1"){
     adjustCiPremiumDifference();
