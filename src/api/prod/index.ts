@@ -1696,3 +1696,8 @@ export function queryLatestMrk(queryParams: any): AxiosPromise<any> {
 export function checkPlyChange(queryParams: any): AxiosPromise<any> {
   return post(`/policy/checkPlyChange`, queryParams);
 }
+
+// 核保获取上次比较数据
+export function getCompareAppFeeInfo(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getCompareAppFeeInfo`, queryParams);
+}
