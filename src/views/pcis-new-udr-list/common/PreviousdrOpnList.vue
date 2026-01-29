@@ -305,7 +305,7 @@ function turnToDetail(cAppNo:any) {
           }
         };
         encryptRouterParam(params);
-        const url = window.location.origin + "/#/pcis/my-page?param=" + params.query.param;
+        const url = window.location.origin + "/#/pcisapp/pcisappView?param=" + params.query.param;
         window.open(url, "_blank");
       }
     });
