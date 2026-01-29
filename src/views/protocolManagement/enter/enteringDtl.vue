@@ -800,8 +800,9 @@ const saveEdrPlyInfo = async () => {
  * **/
 const generateEndorse = () => {
 	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
-	const cEcAgrAppNo = agreementBaseRef['ECargoBase.cEcAgrAppNo']
-	if (!cEcAgrAppNo && props.param["cRsnCde"] == 'Y01') {
+	const cEcAgrAppNo = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')
+	const cRsnCdedata = props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]
+	if (!cEcAgrAppNo && cRsnCdedata == 'Y01') {
 		ElMessage.error("请先保存申请单!");
 		return false
 	}
@@ -841,8 +842,9 @@ const generateEndorse = () => {
 };
 const getSurrenderPrecisFun = () => {
 	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
-	const cEcAgrAppNo = agreementBaseRef['ECargoBase.cEcAgrAppNo']
-	if (!cEcAgrAppNo && props.param["cRsnCde"] == 'Y01') {
+	const cEcAgrAppNo = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo')
+	const cRsnCdedata = props.param["cRsnCde"] || props.param["cEdrRsnBundleCde"]
+	if (!cEcAgrAppNo && cRsnCdedata == 'Y01') {
 		ElMessage.error("请先保存申请单!");
 		return false
 	}
