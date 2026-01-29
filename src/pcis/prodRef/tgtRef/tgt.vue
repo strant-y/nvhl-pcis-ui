@@ -169,11 +169,7 @@ onMounted(async () => {
       rules: []
     });
   }
-
-  // 090003产品 工程名称非必填
-  if (params.cProdNo === '090003') {
-    setFormItem("Tgt.cProjectName", { rules: [] })
-  }
+  
   // 041007 被监护人数必填
   if(params.cProdNo === '041007') {
     setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
