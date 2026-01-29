@@ -953,7 +953,7 @@ function query() {
       delete dataForm.AgreementTgtSummary
       delete dataForm.AgreementDistInsured
       delete dataForm.AgreementDistTransport
-      if(props.type === 'EDR_APP_NEW_SCENE' && props.param.cAppStatus !== '1'){
+      if(props.type === 'EDR_APP_NEW_SCENE' && !['1','3','8'].includes(props.param?.cAppStatus)){
         // 初始化时，将cPkId赋值给cRowId
         Object.keys(dataForm).forEach((key) => {
           if(key === 'AgreementSpecial' || key === 'AgreementCvrg' || key === 'AgreementPay'){
