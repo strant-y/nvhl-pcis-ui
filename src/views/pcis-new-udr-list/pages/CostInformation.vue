@@ -778,6 +778,7 @@ async function saveFeeInfo() {
                   if (null != res1 && null != res1['code']) {
                     if (res1['code'] === 200) {
                       ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+											dialogVisible.value = false;
                     } else {
                       ElMessage.error('iLog费用信息同步失败');
                     }
@@ -816,6 +817,7 @@ async function saveFeeInfo() {
                   if (null != res1 && null != res1['code']) {
                     if (res1['code'] === 200) {
                       ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+											dialogVisible.value = false;
                     } else {
                       ElMessage.error('iLog费用信息同步失败');
                     }
