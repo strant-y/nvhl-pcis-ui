@@ -3301,7 +3301,7 @@ const calcPremium = () => {
       const baseRef = opertaor.getTableRefByKey("base");
       if(shanDongFlag){
          baseRef.shanDongFun();
-      } else if(Number(base['Base.nPayNum']) > 1){
+      } else {
          baseRef.nPayNumberFun();
       }
     } else {
@@ -6671,7 +6671,7 @@ const afterCalcPremium = () => {
   const baseRef = opertaor.getTableRefByKey("base");
   if(shanDongFlag){
     baseRef.shanDongFun();
-  } else if(Number(base['Base.nPayNum']) > 1){
+  } else {
     baseRef.nPayNumberFun();
   }
   if(opertaor.getTableRefByKey("ci")) {
