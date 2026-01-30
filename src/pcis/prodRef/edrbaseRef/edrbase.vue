@@ -644,6 +644,9 @@ function getInsrncEndTm(tRepStopExtBgnTm:any,tRepStopExtEndTm:any,tInsrncBgnTm:a
   checkPlyChange(param).then((res:any) => {
     if(res.code === 200 && res.res?.tInsrncEndTm) {
       opertaor.getTableRefByKey('insrnc')?.setValue('Base.tInsrncEndTm', res.res?.tInsrncEndTm)
+      nextTick(() => {
+        opertaor.getTableRefByKey('insrnc')?.setValue('Base.cTmSysCde', res.res?.cTmSysCde)
+      })
     } else {
       ElMessage.error(res.msg)
     }
