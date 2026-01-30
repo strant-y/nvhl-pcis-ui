@@ -28,10 +28,9 @@ const props = defineProps({
   },
 });
 
-const codeListStore = codeListViewStore();
 const dialog = ref<DialogMethod | null>(null);
-
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 
@@ -42,6 +41,7 @@ const cClntAddr = ref<any>(null);
 const fileInputRef = ref(null);
 const fileInputType = ref();
 import { readFile } from "@/api/file";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const tCertfDate = ref<any[]>([]);
 const initFlag = computed(() => param?.type ==='add' ? false : formPage.init && mountedFlag.value === false);
 const mountedFlag = ref(false);

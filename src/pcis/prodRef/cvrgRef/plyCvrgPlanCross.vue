@@ -67,10 +67,10 @@ import { prodTemple } from "./titleTemple";
 import { codeListViewStore } from "@/store";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
-
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化
 

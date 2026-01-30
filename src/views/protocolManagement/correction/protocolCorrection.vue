@@ -76,9 +76,10 @@ const tableRef = ref<AppTableMethod | null>(null);
 import cargoApi from '@/api/cargo'
 import {PcisEdrQueryService} from "@/views/edr-qry-endorse-list/service/pcis-edr-query-service";
 import { DocumentCopy } from "@element-plus/icons-vue";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
-
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const params = route.query.data ? JSON.parse(route.query.data) : {};
 const dataSet = ref<any>([]); // 数据集合
 const planSet = ref<any>([]); //结果集

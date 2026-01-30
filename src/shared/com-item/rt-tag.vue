@@ -15,7 +15,11 @@
 
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const props = defineProps({
   modelValue: {
     type: [String],

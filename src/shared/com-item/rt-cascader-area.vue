@@ -72,8 +72,8 @@
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
 import { isArray } from "lodash-es";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
 const props = defineProps({
   modelValue: {
     type: [String, Number, Array<any>],
@@ -100,6 +100,9 @@ interface OptionTypeBySelect extends OptionType {
   color?: string;
   disabled?: boolean;
 }
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const options: Ref<OptionTypeBySelect[]> = ref([]); // 字典下拉数据源
 

@@ -74,9 +74,9 @@ import {
 } from "@/views/pcis/support/useIdxParam";
 import { createFreeButtonBase } from "@/shared/button-config.js";
 
-const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const { selectedRow } = storeToRefs(termConfig);

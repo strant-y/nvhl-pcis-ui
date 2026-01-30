@@ -27,6 +27,7 @@ import {useValidator} from "@/typings/useValidator";
 import dayjs from "dayjs";
 import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
 import { rule } from "postcss";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const cWorkDptList = ['310', '320', '330', '340', '350', '360']  // 单位性质带企业的ID
@@ -50,10 +51,10 @@ const props = defineProps({
   },
 });
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage: FormPage = idxParam?.formPage;
 const initFlag = computed(() => formPage.init);
-const codeListStore = codeListViewStore();
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const getCComponentTable = () => {
     return 'InsuredDist';

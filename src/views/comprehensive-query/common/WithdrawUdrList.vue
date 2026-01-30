@@ -28,7 +28,6 @@ import { useUserStore } from "@/store";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -49,6 +48,10 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from 'moment';
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 import { DocumentCopy } from "@element-plus/icons-vue";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const { withdraw, getBackUdrList, getReturnUdrList, getWithdrawUdrList, getNewUdrList } = NewUdrListService();
 const userStore = useUserStore() || ref({});
 const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })

@@ -487,7 +487,7 @@ const tableconfig = reactive<AppTableConfig>(
               },
             });
           } else if ((row.cCombinationNo && row.cCombinationNo !== '') || row.baseType === "组合单") {
-              skipPositePage({...row,...{ pageType: POSITE_PAGE_TYPE_SAVE }});
+              skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_SAVE, pageTye: 'app' }});
           } else {
             const data = row;
             if (row["cEdrRsnBundleCde"]) {

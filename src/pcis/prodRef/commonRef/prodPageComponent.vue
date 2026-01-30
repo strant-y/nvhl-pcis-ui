@@ -26,12 +26,14 @@ import {
 } from "@/shared/app-table-config";
 import { createFreeButtonBase } from "@/shared/button-config";
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const emits = defineEmits(["ok", "cancel"]);
 const props = defineProps({
   data: Object,
   component: String,
 });
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 let dataList = ref<any[]>([]);
 let componentTable = ref();
 interface MyTableMethod {

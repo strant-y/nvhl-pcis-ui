@@ -53,6 +53,7 @@ const routeParam = JSON.parse(query.value?.param ? descryptParameter(query.value
 const productStore = useProductStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -64,7 +65,6 @@ const props = defineProps({
   },
 });
 const { getRules } = useValidator();
-const codeListStore = codeListViewStore();
 const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 // import { useRoute } from "vue-router";

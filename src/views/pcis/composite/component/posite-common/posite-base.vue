@@ -10,7 +10,6 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { formatDate } from "@/utils/date";
@@ -22,9 +21,10 @@ import { eventBus } from '@/utils/event-bus'
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
-
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const dialogRef = ref<DialogMethod | null>(null);
 const params = opertaor.getParam();
 const props = defineProps({

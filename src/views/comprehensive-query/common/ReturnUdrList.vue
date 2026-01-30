@@ -33,7 +33,8 @@ import {
 } from "@/shared/app-free-edit-config";
 
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -51,6 +52,7 @@ import {
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from 'moment';
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { hasReceived, getBaseInfoByAppNo, delTmpPolicy, getBackUdrList, getReturnUdrList, getWithdrawUdrList, getNewUdrList } = NewUdrListService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId:'', opCde:'' })

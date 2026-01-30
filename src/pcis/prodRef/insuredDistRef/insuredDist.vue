@@ -31,7 +31,6 @@ import moment from "moment";
 import {formInit} from "@/shared/from-init";
 import {codeListViewStore} from "@/store";
 
-const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {useRoute} from "vue-router";
 import {AppFreeEditMethod, createAppFreeEditConfig} from "@/shared/app-free-edit-config";
@@ -50,7 +49,6 @@ const cargoDistAdd = defineAsyncComponent(
 const { getRules } = useValidator();
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
-
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -62,7 +60,9 @@ const props = defineProps({
 });
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const pageresult = reactive<Pageresult>({
   result: "",

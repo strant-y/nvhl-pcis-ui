@@ -16,7 +16,6 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { useProductStore } from "@/store/modules/prod";
@@ -48,6 +47,7 @@ const formPage = idxParam?.formPage;
 const param = idxParam.param;
 const initFlag = computed(() => formPage.init);
 const cWorkDptList =['310','320','330','340','350','360']  // 单位性质带企业的ID
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 onMounted(() => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),

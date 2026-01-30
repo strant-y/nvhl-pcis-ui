@@ -161,7 +161,6 @@ const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
@@ -187,6 +186,9 @@ import {
 } from "@/constants/tab-constants";
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import dayjs from "dayjs";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -234,6 +236,7 @@ import { FIELD_MAP } from '@/constants/fieldMaps';
 import {saveAs} from "file-saver";
 const cPard = ref(null);
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 // 核保信息
 const UndrOpnList = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/UndrOpnList.vue")

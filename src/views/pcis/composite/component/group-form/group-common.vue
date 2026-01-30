@@ -14,7 +14,7 @@
             : k.pageKey;
         opertaor.addTableRef(pageK, res);
         // 差异化组件关联上公共组件
-        pageView.linkedOperation((operation: any, config: any) => {
+        pageView.linkedOperation().executeForEach((operation, group) => {
           operation.addTableRef(pageK, res)
         });
         if(res && res.addProvide){
@@ -63,8 +63,11 @@ const idxParam: IdxParamProps = {
   opertaorProps: {
     id: props.groupId,
     type: OpertaorPosit,
-    allDataFormat: pageView.value.allDataFormat
+    allDataFormat: pageView.value.allDataFormat,
   },
+  cdeListViewProps: {
+    id: props.groupId,
+  }
   // handleAnchorClick: handleAnchorClick,
 };
 provide(idxParamKey, idxParam);

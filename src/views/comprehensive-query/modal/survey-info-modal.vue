@@ -41,7 +41,11 @@ import {
 import { ref, reactive } from "vue";
 import { useValidator } from "@/typings/useValidator";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const { getRules } = useValidator();
 const props = defineProps<{
   visible: boolean;

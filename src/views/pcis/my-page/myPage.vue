@@ -538,18 +538,17 @@ import { lessThan6Months, toDate } from "@/utils/date";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 const dialog = ref<DialogMethod | null>(null);
 
-const codeListStore = codeListViewStore();
-
 const policyService = new PolicyService();
+
 const productStore = useProductStore();
 const { isCiJiMrk } = storeToRefs(productStore);
-
 const route = useRoute();
+
 const router = useRouter();
 const tagsViewStore = useTagsViewStore();
 const pageLoaded = ref(false);
-
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+
 const { saveData, removeReceived } = NewUdrListService();
 import { initMultiCodeList } from "@/api/code-list-service";
 import { getAppPolicyList, getInquiryPolicyList} from "@/api/query";
@@ -660,13 +659,14 @@ const getcPrmCur = (val:any) => {
 }
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
   handleAnchorClick: handleAnchorClick,
   setcAmtCur,
   getcPrmCur
 };
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
-
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);

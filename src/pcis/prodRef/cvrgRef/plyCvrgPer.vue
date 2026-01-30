@@ -160,9 +160,9 @@ import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useI
 import { useRoute } from "vue-router";
 const route = useRoute();
 
-const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const parparam = opertaor.getParam();
 const termConfig = terConfig();
 const {selectedRow} = storeToRefs(termConfig);

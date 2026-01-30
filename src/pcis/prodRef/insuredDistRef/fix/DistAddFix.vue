@@ -53,7 +53,7 @@ const props = defineProps({
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
-const codeListStore = codeListViewStore();
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const getCComponentTable = () => {
     return 'InsuredDist';

@@ -7,14 +7,15 @@ import {createFreeButtonBase} from "@/shared/button-config";
 import {CompositePageView} from "@/views/pcis/support/composite.types";
 import {codeListViewStore} from "@/store";
 import {ref} from "vue";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   prodList: {
     type: Array,
   }
 });
-
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const emit = defineEmits(['update:prodList', 'prodListChange']);
 const gridEditRef = ref<AppGridEditMethod | null>();
 const pageView = inject("pageView", ref(new CompositePageView()));
@@ -27,6 +28,7 @@ const formconfig = ref(createAppGridEditConfig({
       id: 'add',
       type: "primary",
       label: "新增",
+      size: 'small',
       func: () => {
         gridEditRef.value?.addRowByData({cGrpMrk: '1'});
       },
@@ -35,6 +37,7 @@ const formconfig = ref(createAppGridEditConfig({
       id: 'del',
       type: "primary",
       label: "删除",
+      size: 'small',
       func: () => {
         const selRow = gridEditRef.value?.getSelectRow();
         if(selRow) {
@@ -153,18 +156,23 @@ const setProdNme = async (rowData: any, cProdNo: string) => {
 };
 
 onMounted(() => {
-  console.log('props.prodList', props.prodList)
+  console.log('---- props.prodList', props.prodList)
   if(props.prodList) {
-    gridEditRef.value?.setFormValue([]);
-    gridEditRef.value?.setFormValue(props.prodList);
+    nextTick(() => {
+      gridEditRef.value?.setFormValue([]);
+      gridEditRef.value?.setFormValue(props.prodList);
+    })
   }
 });
+
 
 watch(() => props.prodList, (newVal) => {
   if(newVal) {
     gridEditRef.value?.setFormValue([]);
     gridEditRef.value?.setFormValue(newVal);
   }
+}, {
+  immediate: true
 });
 </script>
 <style scoped>

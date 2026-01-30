@@ -8,6 +8,7 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -15,7 +16,7 @@ const props = defineProps({
   },
 });
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 

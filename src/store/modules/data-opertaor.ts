@@ -92,7 +92,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
-            console.log('############## -> getDataAll()')
+            console.log(`############## ${id} -> getDataAll()`)
             // 组合出单场景
             if(type === OpertaorPosit) {
                 if(allDataFormat && typeof allDataFormat === 'function') {
@@ -517,7 +517,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
         }
         /** 判断场景是否只读 */
         const isReadOnlyScene = () => {
-            const param = opertaor.getParam();
+            const param = getParam();
             if(param.pageType === "readonly" || param.pageType === "UW_READ_SCENE"){
                 return true;
             }else{

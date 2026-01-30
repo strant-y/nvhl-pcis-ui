@@ -31,13 +31,15 @@ import { SysOpMgrService } from '@/views/sys-right-basic/service/sys-op-mgr.serv
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { codeListViewStore } from "@/store";
 import { cloneDeep } from "lodash-es";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const props = defineProps({
 	getDptCde: {
 		type: String,
 		required: true
 	}
 })
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const emits = defineEmits(['cleanCheck', 'refreshTree'])
 const sysOpMgrService = new SysOpMgrService();
 const dzmodal = useDzModal();

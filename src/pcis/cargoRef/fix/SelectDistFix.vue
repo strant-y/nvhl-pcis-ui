@@ -31,7 +31,6 @@ import moment from "moment";
 import {formInit} from "@/shared/from-init";
 import {codeListViewStore} from "@/store";
 
-const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {useRoute} from "vue-router";
 import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
@@ -40,17 +39,18 @@ import {saveAs} from "file-saver";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {fa} from "element-plus/es/locale";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const policyService = new PolicyService();
 const cargoDistAdd = defineAsyncComponent(
     () => import("@/pcis/cargoRef/fix/DistAddFix.vue")
 );
-
 const route = useRoute();
 
+const idxParam = inject(idxParamKey, useIdxParam());
 
 
-const idxParam = inject('idxParam');
 const formPage = idxParam?.formPage;
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const pageresult = reactive<Pageresult>({
   result: "",

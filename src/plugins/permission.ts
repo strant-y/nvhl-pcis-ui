@@ -2,7 +2,7 @@ import router from "@/router";
 import { useUserStore } from "@/store/modules/user";
 import { usePermissionStore } from "@/store/modules/permission";
 import NProgress from "@/utils/nprogress";
-import {clearDataOpertaorByPageKey, codeListViewStore, useTagsViewStore} from "@/store";
+import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, codeListViewStore, useTagsViewStore} from "@/store";
 import { descryptParameterToQuery } from '@/utils/common'
 
 export function setupPermission() {
@@ -38,6 +38,7 @@ export function setupPermission() {
             const switchType = sessionStorage.getItem('switchType');
             if(!switchType || switchType === 'push') {
               clearDataOpertaorByPageKey(to.name);
+              clearCodeListViewByPageKey(to.name);
             }
             next();
           }
@@ -50,7 +51,7 @@ export function setupPermission() {
               router.addRoute(route);
             });
             // 初始化需要查询codeList
-            codeListViewStore().queryOnce();
+            codeListViewStore({id: 'default'}).queryOnce();
             next({ ...to, replace: true });
           } catch (error) {
             // 移除 token 并跳转登录页

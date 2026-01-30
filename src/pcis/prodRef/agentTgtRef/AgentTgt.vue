@@ -11,14 +11,14 @@ import {useValidator} from "@/typings/useValidator";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const dzmodal = useDzModal();
 const surveyInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/survey-info-modal.vue")
 );
-
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const { getRules } = useValidator();
 const productStore = useProductStore();
 const props = defineProps({

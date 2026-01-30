@@ -1,8 +1,9 @@
 import {getProductPage} from "@/api/prod";
 import {AnchorItem, GroupForm} from "@/views/pcis/composite/component";
 import {CommonConstants} from "@/constants/CommonConstants";
-import {dataOpertaor} from "@/store";
+import {codeListViewStore, dataOpertaor} from "@/store";
 import {getData} from "@/pcis/prodRef/dataInit";
+import {initMultiCodeList} from "@/api/code-list-service";
 
 /**
  * 公共分组ID
@@ -48,16 +49,37 @@ export interface CompositePageConfigType {
 }
 
 /**
+ * @param callback(param1, parma2) 需要操作的逻辑方法; param1: dataOpertaor(group.groupId)，parma2：pageConfig forEach item
+ */
+export type LinkedCallbackType = (callback: (operator: any, group: GroupForm) => void) => void;
+export interface LinkedOperationReturnType {
+    /**
+     * 执行遍历回调
+     * @type LinkedCallbackType
+     */
+    executeForEach: LinkedCallbackType
+
+    /**
+     * 执行第一条
+     * @type LinkedCallbackType
+     */
+    executeFirst: LinkedCallbackType
+}
+
+/**
  * 组合产品出单页面视图工具
  */
 export class CompositePageView {
+    public autoAssignTabKeys = reactive<string[]>([])
+    public activeAnchorId = reactive({value: ''})
     public anchorConfig = reactive<AnchorItem[]>(new Array<AnchorItem>());
-    public pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
     public pageParams = reactive<any>({});
+    public pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
     // 页面创建之前调用
     public beforeCreation?: (config: CompositePageConfigType) => Promise<CompositePageConfigType>;
 
     constructor() {
+        this.activeAnchorId = reactive({value: ''})
         this.anchorConfig = reactive<AnchorItem[]>(new Array<AnchorItem>());
         this.pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
         this.allDataFormat = this.allDataFormat.bind(this);
@@ -181,6 +203,7 @@ export class CompositePageView {
                     });
                 }
                 this.installDataOpertaor();
+                await this.installCodeListViewAndInit();
                 resolve({
                     code: 200,
                     config: {
@@ -239,6 +262,7 @@ export class CompositePageView {
                 title: '产品信息',
                 href: '#positeList',
                 expanded: true,
+                componentKey: 'positeList',
                 children: []
             }]
         });
@@ -254,6 +278,7 @@ export class CompositePageView {
                         title: index !== 0 ? `${config.params.cProdNo}-${item.pageTtile}` : item.pageTtile,
                         icon: item.icon,
                         expanded: true,
+                        tabKey: item.pageKey === 'dist' || item.pageKey === 'distSummary' ? item.pageCode : item.pageKey,
                         href: `#${id}`,
                         children: []
                     };
@@ -314,6 +339,8 @@ export class CompositePageView {
                 if (!existingProp.has(item.prop)) {
                     existingProp.add(item.prop);
                     merged.push(item);
+                }else if(item.rules && item.rules.length > 0) { // 有任意产品必填的 就需必填
+                    merged.splice(merged.findIndex((f: any) => item.prop === f.prop), 1, item);
                 }
             }
         }
@@ -330,10 +357,15 @@ export class CompositePageView {
         return result;
     }
 
-    private mergeViews(viewsArrays: any[][]): any[] {
+    private mergeViews(viewsLis: any[][]): any[] {
+
+        const viewsArrays: any[][] = viewsLis.map((item: any[]) => {
+            return item.filter(i => CommonComponentMap.has(i.pageKey));
+        });
         const pageCodeSets = viewsArrays.map(views => {
+            // console.log('views', views)
             const codes = new Set<string>();
-            views.forEach(view => codes.add(view.pageCode));
+            views.forEach(view => codes.add(view.pageKey));
             return codes;
         });
         const intersection = pageCodeSets.reduce((prev, current) => {
@@ -345,7 +377,7 @@ export class CompositePageView {
             basePageSchemaProp: Partial<any>
         }>();
         intersection.forEach(code => {
-            const baseView = viewsArrays.flat().find(view => view.pageCode === code);
+            const baseView = viewsArrays.flat().find(view => view.pageKey === code);
             if (baseView) {
                 pageCodeData.set(code, {
                     fromSchemas: [],
@@ -356,8 +388,8 @@ export class CompositePageView {
         });
         for (const views of viewsArrays) {
             for (const view of views) {
-                if (intersection.has(view.pageCode)) {
-                    const data = pageCodeData.get(view.pageCode);
+                if (intersection.has(view.pageKey)) {
+                    const data = pageCodeData.get(view.pageKey);
                     if (data) {
                         // 验证fromSchema是否为数组
                         if (!Array.isArray(view.pageSchema.fromSchema)) {
@@ -417,6 +449,68 @@ export class CompositePageView {
         }
     }
 
+    /**
+     * 初始化所有产品的codelist
+     * @private
+     */
+    private async installCodeListViewAndInit() {
+        const setAllCodeList = (groupForm: GroupForm) => {
+            const codeListStore = codeListViewStore({id: groupForm.groupId});
+            const isDisabled = (v: any) => {
+                if (
+                    v === true ||
+                    v === 1 ||
+                    v === "1"
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            const codeList: any = {};
+            const pageInfo = groupForm.pageInfo
+            if(pageInfo){
+                for(let i = 0; i < pageInfo.length; i++){
+                    if(['acctinfo','ci','ourCompanyCiShare'].includes(pageInfo[i]['pageKey'])){
+                        continue;
+                    }
+                    const schema = pageInfo[i].pageSchema;
+                    if(schema && schema.fromSchema && schema.fromSchema.length>0){
+                        for(let j = 0; j < schema.fromSchema.length; j++){
+                            const sc = schema.fromSchema[j];
+                            if((sc.inputtype === 'rtSelectV2' || sc.inputtype === 'rtselect') && !isDisabled(sc.disabled) && sc.typeCode){
+                                const k = sc.typeCode + (sc.codeParam?sc.codeParam:'');
+                                const m = {codeListName:sc.typeCode,codeListParam:sc.codeParam,source:k};
+                                codeList[k] = m;
+                            }
+                        }
+                    }
+                }
+            }
+            const codeparam: any[] = [];
+            Object.keys(codeList).forEach(res =>{
+                if(res !== "Occupt_ZYLB") {
+                    codeparam.push(codeList[res]);
+                }
+            });
+            return new Promise((resolve, reject) => {
+                initMultiCodeList(codeparam).then((result: any) => {
+                    if(result.code === 200) {
+                        for(let i = 0; i < result.data.length ; i++){
+                            codeListStore.setOptionsToCacheMap(result.data[i]['key'],result.data[i]['data']);
+                        }
+                    }
+                    resolve(true)
+                })
+            })
+        }
+
+        const initList: any[] = [];
+        this.pageConfig.forEach(group => initList.push(setAllCodeList(group)));
+        const list = await Promise.all(initList);
+        console.log('installCodeListViewAndInit-list', list)
+    }
+
     initPageData() {
         for(const group of this.pageConfig) {
             try {
@@ -453,28 +547,45 @@ export class CompositePageView {
 
     /**
      * 在公共组件里 操作其它产品dataOpertaor的方法
-     * @param fun
      * @param exclude 需要排除的groupId
-     * fun(param1, parma2) 需要操作的逻辑方法; param1: dataOpertaor(group.groupId)，parma2：pageConfig forEach item
+     * @return LinkedOperationReturnType
      */
-    linkedOperation(fun: Function, exclude: string[] = [CommonGroupId]) {
-        if(fun && typeof fun === CommonConstants.TYPE_OF_FUNCTION) {
-            for(const group of this.pageConfig) {
-                if(!exclude || !exclude.includes(group.groupId)) {
-                    const opertaor = this.getDataOpertaorByGroupId(group.groupId);
-                    fun(opertaor, group);
+    linkedOperation(exclude: string[] = [CommonGroupId]): LinkedOperationReturnType {
+        const groupList = this.pageConfig.filter(f => !exclude || !exclude.includes(f.groupId))
+        return {
+            executeForEach: (callback: (operator: any, group: GroupForm) => void) => {
+                groupList.forEach(item => {
+                    const opertaor = this.getDataOpertaorByGroupId(item.groupId);
+                    callback(opertaor, item);
+                })
+            },
+            executeFirst: (callback: (operator: any, group: GroupForm) => void) => {
+                const findLastGroup = groupList[0]
+                if(findLastGroup) {
+                    const opertaor = this.getDataOpertaorByGroupId(findLastGroup.groupId);
+                    callback(opertaor, findLastGroup);
+                } else {
+                    console.warn('first group not found');
                 }
             }
-        }else {
-            console.warn('！！！ linkedOperation方法参数异常');
-        }
+        } as LinkedOperationReturnType;
     }
 
     getDataOpertaorByProdNo(prodNo: string, params: any = {}) {
-        return dataOpertaor({id: `group-${prodNo}`, type: OpertaorPosit, allDataFormat: this.allDataFormat, ...params});
+        return dataOpertaor({
+            id: `group-${prodNo}`,
+            type: OpertaorPosit,
+            allDataFormat: this.allDataFormat,
+            ...params
+        });
     }
     getDataOpertaorByGroupId(groupId: string, params: any = {}) {
-        return dataOpertaor({id: groupId, type: OpertaorPosit, allDataFormat: this.allDataFormat, ...params});
+        return dataOpertaor({
+            id: groupId,
+            type: OpertaorPosit,
+            allDataFormat: this.allDataFormat,
+            ...params
+        });
     }
 
     /**

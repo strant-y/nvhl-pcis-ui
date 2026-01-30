@@ -17,7 +17,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 import { useRoute } from "vue-router";
 const route = useRoute();
 const param = route.params.param;

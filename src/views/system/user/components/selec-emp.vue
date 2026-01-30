@@ -3,6 +3,7 @@ import { ref, defineProps } from 'vue'
 import { getEmpList } from "@/api/dict/index";
 import { UserQuery } from '@/api/user/types';
 import { codeListViewStore } from '@/store';
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const emits = defineEmits(['ok','cancel'])
 const props = defineProps({
@@ -43,7 +44,9 @@ const queryParams = reactive<UserQuery>({
   subordinate: '1',
   companyId : user.companyId
 });
-const codeListStore =  codeListViewStore();
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 onMounted(()=>{
     codeListStore.queryCodeListByCode('allCertificateType',false,true)

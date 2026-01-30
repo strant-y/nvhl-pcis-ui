@@ -8,6 +8,7 @@ import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import {FormPage} from "@/views/protocolManagement/utils/form-page";
 import detailComponent from "../components/detail-component.vue";
 import {ReviewCompList} from "@/views/protocolManagement/utils/types";
+import {idxParamKey} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   param: {
@@ -26,7 +27,7 @@ const idxParam = reactive({
   ciJiMrk: '0',
   readonly: computed(() => ['view'].includes(props.type)),
 });
-provide('idxParam', idxParam);
+provide(idxParamKey, idxParam);
 
 
 const bthList = ref<FreeButtonBase[]>([

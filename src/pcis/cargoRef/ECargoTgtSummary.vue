@@ -29,7 +29,6 @@ import moment from "moment";
 import {formInit} from "@/shared/from-init";
 import {codeListViewStore} from "@/store";
 
-const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {useRoute} from "vue-router";
 import {AppFreeEditMethod} from "@/shared/app-free-edit-config";
@@ -37,6 +36,7 @@ import cargoApi from "@/api/cargo";
 import {saveAs} from "file-saver";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import {eventBus} from "@/utils/event-bus";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const policyService = new PolicyService();
 const cargoDistAdd = defineAsyncComponent(
     () => import("@/pcis/cargoRef/fix/DistAddFix.vue")
@@ -44,10 +44,9 @@ const cargoDistAdd = defineAsyncComponent(
 const GoodsSelectFix = defineAsyncComponent(
     () => import("@/pcis/cargoRef/fix/GoodsSelectFix.vue")
 );
-
 const route = useRoute();
-const dialog = ref<DialogMethod | null>(null);
 
+const dialog = ref<DialogMethod | null>(null);
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -58,8 +57,10 @@ const props = defineProps({
   }
 });
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
+
 const formPage = idxParam?.formPage;
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const pageresult = reactive<Pageresult>({
   result: "",

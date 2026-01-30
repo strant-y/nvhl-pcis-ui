@@ -9,14 +9,13 @@ import {
   AppGridEditMethod,
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
-import { getProFactoryList } from "@/api/prod";
 import {ref} from "vue";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {eventBus} from "@/utils/event-bus";
 import cargoApi from "@/api/cargo";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const eCargoSelectTgtFix = defineAsyncComponent(
     () => import("./fix/SelectDistFix.vue")
 );
@@ -28,7 +27,7 @@ const props = defineProps({
   },
 });
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 
 const dialog = ref<DialogMethod | null>(null);
@@ -36,6 +35,7 @@ const cvrgEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
 const cRdrTyp = ref('');
 const eCargoTermNo = ref('');
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 function isAllAValuesSame(arr:any,key:any) {
   // 检查是否有null或undefined和空的key

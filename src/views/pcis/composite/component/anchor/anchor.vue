@@ -25,6 +25,7 @@
             v-for="(child, idx) in anchor.children"
             :anchorItem="child"
             :activeId="activeId"
+            :parentActive="parentActiveId.includes(anchor.id)"
             @item-click="handleItemClick"
           />
         </div>
@@ -34,10 +35,11 @@
 </template>
 <script setup lang="ts">
 import anchorChild from './anchorItem.vue'
-import {defineProps} from "vue";
+import {defineProps, ref} from "vue";
 import type {AnchorItem} from "@/views/pcis/composite/component";
 import { throttle } from 'lodash-es';
 import {checkIfTruncated, scrollByDomId} from "@/utils/common";
+import {CompositePageView} from "@/views/pcis/support/composite.types";
 const props = defineProps({
   anchorList: {
     type: Array<AnchorItem>,
@@ -57,9 +59,8 @@ const props = defineProps({
 });
 const emit = defineEmits<{
   (e: 'collapse-change', item: AnchorItem[]): void;
-  (e: 'update:activeValue', active: any): void;
 }>();
-
+const pageView = inject("pageView", ref(new CompositePageView()));
 const list = ref<AnchorItem[]>([]);
 const isClickScroll = ref<boolean>(false);
 const allItemsLength = ref<number>(0);
@@ -171,6 +172,7 @@ watch(
   () => activeId.value,
   (newId) => {
     if (newId) {
+      pageView.value.activeAnchorId.value = newId;
       const arr = newId.split('-');
       if(arr) {
         collapseRef.value.setActiveNames(arr[arr.length - 1]);
@@ -193,7 +195,7 @@ onUnmounted(() => {
 </script>
 <style lang="scss" scoped>
 .app-anchor{
-  width: 250px;
+  width: 235px;
   //border: #e1e4ea solid 1px;
 }
 .anchor_title{
@@ -202,7 +204,7 @@ onUnmounted(() => {
   align-items: center;
   ._title_text{
     margin-left: 10px;
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 .item-collapse{
@@ -212,6 +214,7 @@ onUnmounted(() => {
 ::v-deep .el-collapse-item__header {
   background-color: #f0f7ff; /* 淡蓝色背景 */
   border-bottom: 1px solid #e6f4ff;
+  height: 35px;
 }
 
 /* 展开状 */

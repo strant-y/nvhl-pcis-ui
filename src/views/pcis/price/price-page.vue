@@ -568,20 +568,7 @@ import { imageMethod } from '../my-page/imageMethod';
 import { pageMethod } from '../my-page/pageMethod';
 import { codeListViewStore } from "@/store";
 import { lessThan6Months } from "@/utils/date";
-
-const codeListStore = codeListViewStore();
-
-const policyService = new PolicyService();
-const productStore = useProductStore();
-const { isCiJiMrk } = storeToRefs(productStore);
-
-const route = useRoute();
-const router = useRouter();
-const tagsViewStore = useTagsViewStore();
-const pageLoaded = ref(false);
-
 import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
-const { saveData, removeReceived } = NewUdrListService();
 
 
 import { initMultiCodeList } from "@/api/code-list-service";
@@ -596,6 +583,27 @@ import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import { checkPayPlanValidity,validateSchoolPersonWithApi } from '@/utils/orderEntryValidator';
 import { fa } from 'element-plus/es/locale';
 
+const policyService = new PolicyService();
+const productStore = useProductStore();
+const { isCiJiMrk } = storeToRefs(productStore);
+
+const route = useRoute();
+const router = useRouter();
+const tagsViewStore = useTagsViewStore();
+const pageLoaded = ref(false);
+
+const { saveData, removeReceived } = NewUdrListService();
+
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
+  handleAnchorClick: handleAnchorClick,
+  setcAmtCur,
+  getcPrmCur
+};
+provide(idxParamKey, idxParam);
+
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 
 //额度明细弹窗
@@ -684,13 +692,7 @@ const getcPrmCur = (val:any) => {
   //Base.cPrmCur 保费
   cPrmCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
 }
-const idxParam: IdxParamProps = {
-  opertaorProps: { id: route.name },
-  handleAnchorClick: handleAnchorClick,
-  setcAmtCur,
-  getcPrmCur
-};
-provide(idxParamKey, idxParam);
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 
 opertaor.init();

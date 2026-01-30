@@ -659,7 +659,7 @@ function next() {
         router.push({
           path: "/pcisapp/posite-page",
           query: {
-            param: JSON.stringify({ ...formconfig1.value, ...{ pageType: POSITE_PAGE_TYPE_APP } }),
+            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' } }),
           },
         });
         return;

@@ -1,95 +1,100 @@
 <template>
-  <div class="main-content" v-loading="loading">
-    <div class="left_content">
-      <div class="_anchor" style="overflow: auto">
-        <anchor-collapse :anchor-list="pageView.anchorConfig" @collapse-change="activeChange"/>
-      </div>
-    </div>
-    <div class="center_content">
-      <div id="positeList" style="margin-bottom: 7px;">
-        <posite-list v-if="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
-      </div>
-      <template v-if="pageView.pageConfig[0]">
-        <group-common
-            :group-id="pageView.pageConfig[0].groupId"
-            :group-config="pageView.pageConfig[0]"
-            :index="0"
-        />
-      </template>
-      <template v-for="(group, idx) in pageView.pageConfig" :key="idx">
-        <group-form
-            v-if="idx > 0"
-            :group-id="group.groupId"
-            :group-config="group"
-            :index="idx"
-        />
-      </template>
-      <div class="fixed bottom-0 right-0 bottom-items">
-        <!--新增的申请单号显示和复制按钮-->
-        <!--      <div style="margin-right: auto; display: flex; align-items: center;">-->
-        <!--        <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">-->
-        <!--          组合单号   -->
-        <!--          <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">-->
-        <!--              {{ getNo }}-->
-        <!--              </span>-->
-        <!--          <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">-->
-        <!--            <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">-->
-        <!--              <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />-->
-        <!--            </el-button>-->
-        <!--          </el-tooltip>-->
-        <!--        </div>-->
-        <!--      </div>-->
-        <template v-for="(bth, idx) in bthList"
-                  :key="idx">
-          <template v-if="bth.isdivider">
-            <el-divider direction="vertical" />
-          </template>
-          <template v-else>
-            <rt-button
-                :item="bth"
-                :loading="bth.loading"
-            />
-          </template>
-        </template>
-      </div>
-    </div>
-    <div class="right-sidebar-trigger">
-      <el-popover
-          placement="left"
-          trigger="click"
-          :width="120"
-          popper-class="action-menu-popper"
-      >
-        <template #reference>
-          <el-button
-              circle
-              class="menu-trigger"
-          >
-            <img src="@/assets/icons/ExpandLeft.svg" alt="Expand Left" width="30" height="30" />
-          </el-button>
-        </template>
-        <div class="btns-content">
-          <el-button
-              v-for="(btn, idx) in rightBtnList"
-              :key="idx"
-              :icon="btn.icon"
-              @click="btn.func"
-              style="margin-bottom: 1px;"
-              class="flex-center"
-          >
-            <svg-icon
-                v-if="btn.svgIcon"
-                :icon-class="btn.svgIcon"
-
-                :size="(btn.iconSize || '16') + 'px'"
-                style="margin-right: 8px; transition: all 0.3s"
-            />
-            <span>{{ btn.label }}</span>
-          </el-button>
+  <div class="main-content"
+       v-loading.fullscreen.lock="pageLoading"
+       :element-loading-text="loadingText"
+       element-loading-background="rgba(0, 0, 0, 0.6)"
+  >
+      <div class="left_content">
+        <div class="_anchor" style="overflow: auto">
+          <anchor-collapse :anchor-list="pageView.anchorConfig" @collapse-change="activeChange"/>
         </div>
-      </el-popover>
+      </div>
+      <div class="center_content">
+        <div id="positeList" style="margin-bottom: 7px;">
+          <posite-list v-show="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
+        </div>
+        <template v-if="pageView.pageConfig[0]">
+          <group-common
+              :group-id="pageView.pageConfig[0].groupId"
+              :group-config="pageView.pageConfig[0]"
+              :index="0"
+          />
+        </template>
+        <template v-for="(group, idx) in pageView.pageConfig" :key="idx">
+          <group-form
+              v-if="idx > 0"
+              :group-id="group.groupId"
+              :group-config="group"
+              :index="idx"
+          />
+        </template>
+        <div class="fixed bottom-0 right-0 bottom-items">
+          <!--新增的申请单号显示和复制按钮-->
+          <!--      <div style="margin-right: auto; display: flex; align-items: center;">-->
+          <!--        <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);white-space: nowrap; padding: 5px 10px;">-->
+          <!--          组合单号   -->
+          <!--          <span id="policyNumber" style="margin-left: 5px; margin-right: 5px; font-weight: bold;">-->
+          <!--              {{ getNo }}-->
+          <!--              </span>-->
+          <!--          <el-tooltip :content="`点击复制${props.param?.pageName === 'priceInquiry' ? '询价单号' : '申请单号'}`" placement="top">-->
+          <!--            <el-button @click="copyPolicyNumber" circle size="small" style="color: red;margin-right: 0;">-->
+          <!--              <rt-icon :item="{ icon: 'DocumentCopy' }" style="font-size: 22px;" />-->
+          <!--            </el-button>-->
+          <!--          </el-tooltip>-->
+          <!--        </div>-->
+          <!--      </div>-->
+          <template v-for="(bth, idx) in bthList"
+                    :key="idx">
+            <template v-if="bth.isdivider">
+              <el-divider direction="vertical" />
+            </template>
+            <template v-else>
+              <rt-button
+                  :item="bth"
+                  :loading="bth.loading"
+              />
+            </template>
+          </template>
+        </div>
+      </div>
+<!--    右侧悬浮按钮-->
+<!--      <div class="right-sidebar-trigger">-->
+<!--        <el-popover-->
+<!--            placement="left"-->
+<!--            trigger="click"-->
+<!--            :width="120"-->
+<!--            popper-class="action-menu-popper"-->
+<!--        >-->
+<!--          <template #reference>-->
+<!--            <el-button-->
+<!--                circle-->
+<!--                class="menu-trigger"-->
+<!--            >-->
+<!--              <img src="@/assets/icons/ExpandLeft.svg" alt="Expand Left" width="30" height="30" />-->
+<!--            </el-button>-->
+<!--          </template>-->
+<!--          <div class="btns-content">-->
+<!--            <el-button-->
+<!--                v-for="(btn, idx) in rightBtnList"-->
+<!--                :key="idx"-->
+<!--                :icon="btn.icon"-->
+<!--                @click="btn.func"-->
+<!--                style="margin-bottom: 1px;"-->
+<!--                class="flex-center"-->
+<!--            >-->
+<!--              <svg-icon-->
+<!--                  v-if="btn.svgIcon"-->
+<!--                  :icon-class="btn.svgIcon"-->
+
+<!--                  :size="(btn.iconSize || '16') + 'px'"-->
+<!--                  style="margin-right: 8px; transition: all 0.3s"-->
+<!--              />-->
+<!--              <span>{{ btn.label }}</span>-->
+<!--            </el-button>-->
+<!--          </div>-->
+<!--        </el-popover>-->
+<!--      </div>-->
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -107,10 +112,9 @@ import {
 import positeList from "@/views/pcis/composite/component/posite-list/index.vue";
 import groupForm from "@/views/pcis/composite/component/group-form/group-form.vue";
 import groupCommon from "@/views/pcis/composite/component/group-form/group-common.vue";
-import SvgIcon from "@/components/SvgIcon/index.vue";
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import positeApi from "@/api/posite";
-import {clearDataOpertaorByPageKey, useUserStore} from "@/store";
+import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, useUserStore} from "@/store";
 
 const props:any = defineProps({
   param: {
@@ -122,11 +126,12 @@ const userStore = useUserStore();
 const router = useRouter();
 const dzmodal = useDzModal();
 const pageView = ref<CompositePageView>(new CompositePageView());
+pageView.value.autoAssignTabKeys.push(...['plyBase', 'insured', 'AgentTgt', 'base', 'tgt', 'applicant'])
 provide("pageView", pageView);
 const positeListShow = ref<boolean>(false);
 const productList = ref<any[]>([]);
-const loading = ref(false);
-
+const pageLoading = ref<boolean>(false);
+const loadingText = ref<string>('加载中...');
 const rightBtnList = ref<FreeButtonBase[]>();
 
 const bthList = ref<FreeButtonBase[]>([
@@ -163,19 +168,26 @@ const bthList = ref<FreeButtonBase[]>([
 pageView.value.beforeCreation = function(config: CompositePageConfigType) {
   return new Promise((resolve) => {
     const {anchorConfig, pageConfig} = config;
-    const pageType = props.param.pageType;
-    if (pageType === POSITE_PAGE_TYPE_SAVE) {
+    const initType = props.param.initType;
 
-    } else if (pageType === POSITE_PAGE_TYPE_READ) {
+    if(initType === POSITE_PAGE_TYPE_APP) {
+
+    } else if (initType === POSITE_PAGE_TYPE_SAVE) {
+
+    } else if (initType === POSITE_PAGE_TYPE_READ) {
 
     }
-    console.error('### info anchorConfig', anchorConfig);
-    console.error('### info pageConfig', pageConfig);
 
-    // 隐藏 申请单号
+    anchorConfig.forEach((anchor: AnchorItem) => {
+      // 删除账户信息锚点
+      const acctinfoIdx = anchor.children.findIndex(f => f.tabKey === "acctinfo")
+      acctinfoIdx != -1 && anchor.children.splice(acctinfoIdx, 1);
+    })
+
     pageConfig.forEach((item: GroupForm) => {
       if(item.groupId.includes('000000')) {
         item.pageInfo.forEach(comp => {
+          // 隐藏 申请单号
           comp
               .pageSchema
               .fromSchema.forEach((ys: any) => {
@@ -184,8 +196,15 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
             }
           })
         })
+      }else {
+        // 删除账户信息组件
+        const acctinfoIdx = item.pageInfo.findIndex(f => f.pageKey === "acctinfo")
+        acctinfoIdx != -1 && item.pageInfo.splice(acctinfoIdx, 1);
       }
     })
+
+    console.info('### info anchorConfig', anchorConfig);
+    console.info('### info pageConfig', pageConfig);
     resolve({
       anchorConfig: anchorConfig,
       pageConfig: pageConfig,
@@ -196,8 +215,8 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
 onBeforeMount(() => {
   console.log('props.param', props.param);
   if(props.param) {
-    const pageType = props.param.pageType;
-    loading.value = true;
+    const initType = props.param.initType;
+    const loading = openPageLoading();
     // 初始化产品信息
     productList.value = props.param.cProdDtlList.map((item: any) => {
       return {
@@ -214,31 +233,31 @@ onBeforeMount(() => {
       nextTick(() => {
         // 页面加载完后再显示产品列表组件
         positeListShow.value = true;
-        if(pageType === POSITE_PAGE_TYPE_APP) {
+        if(initType === POSITE_PAGE_TYPE_APP) {
           // 申请
           appInit();
-          loading.value = false;
+          loading.close();
         }else {
           // 暂存、 批改、核保、查看 查询
-          positeApi.queryPositeInfo({...props.param, ...{queryType: pageType}}).then((res: any) => {
+          positeApi.queryPositeInfo({...props.param, ...{queryType: initType}}).then((res: any) => {
             if (res.code === 200) {
               const resultData = res.data;
-              if(pageType === POSITE_PAGE_TYPE_SAVE) {
+              if(initType === POSITE_PAGE_TYPE_SAVE) {
                 saveInit(resultData)
-              }else if(pageType === POSITE_PAGE_TYPE_READ) {
+              }else if(initType === POSITE_PAGE_TYPE_READ) {
                 readInit(resultData)
               }
             } else {
               ElMessage.error(res.msg ? res.msg : "初始化请求异常");
             }
+            loading.close();
           }).catch((err) => {
             ElMessage.error(err);
-          }).finally(() => {
-            loading.value = false;
-          });
+            loading.close();
+          })
         }
       });
-    });
+    })
   }
 });
 
@@ -264,7 +283,8 @@ function readInit(pageData: any) {
 }
 
 const prodListChange = (list: any[]) => {
-  loading.value = true;
+  console.log('prodListChange', prodListChange)
+  const loading = openPageLoading();
   const newParams = getNewParams({
     cProdDtlList: list,
     cProdList: list.map((item: any) => item['cProdNo'])
@@ -280,12 +300,11 @@ const prodListChange = (list: any[]) => {
     pageView.value.setPageParams(props.param);
     pageView.value.buildPage(list).then((result: any) => {
       console.log('prodListChange - pageView.buildPage result: ', result);
-    }).finally(() => {
-      loading.value = false;
-    });
+      loading.close();
+    })
   }).catch((err) => {
     console.error('prodListChange error ! ', err);
-  });
+  })
 };
 
 const activeGroup = ref<AnchorItem[]>([
@@ -306,6 +325,8 @@ const activeChange = (activeItems: AnchorItem[]) => {
  * 保存
  */
 const saveOpt = () => {
+  const btn = getBtn('btn010102')
+  btn.loading = true;
   const allData = pageView.value.getPageAllData();
   const params = {param: props.param, data: allData, user: userStore.user}
   console.log('saveOpt-params', params);
@@ -315,7 +336,7 @@ const saveOpt = () => {
       const pageData = trimPageData({...res.data});
       const cCombinationNo = productList.value[0]['cCombinationNo']
       const newParams = getNewParams({
-        pageType: POSITE_PAGE_TYPE_SAVE,
+        initType: POSITE_PAGE_TYPE_SAVE,
         cCombinationNo: cCombinationNo,
         cProdDtlList: productList.value,
       });
@@ -331,13 +352,18 @@ const saveOpt = () => {
         // 刷新页面参数
         pageView.value.updatePageParams(props.param, productList.value);
 
+        ElMessage.success('保存成功')
+
         console.log('pageView.value.pageConfig', pageView.value.pageConfig)
       });
+    }else {
+      ElMessage.error(res.msg)
     }
-  });
+  }).finally(() => btn.loading = false);
 }
 
 const calcPremium = () => {
+  const loading = openPageLoading('计算中...');
   const allData = pageView.value.getPageAllData();
   const params = {param: props.param, data: allData, user: userStore.user}
   console.log('calcPremium-params', params);
@@ -346,13 +372,16 @@ const calcPremium = () => {
     if(res.code === 200) {
       const pageData = trimPageData({...res.data});
       pageView.value.setPageAllData(pageData);
+      ElMessage.success('计算成功')
     }else {
       ElMessage.error(res.msg)
     }
+    setTimeout(() => loading.close(), 500)
   })
 }
 
 const submitToUndrFn = () => {
+  const loading = openPageLoading('提核中...');
   const allData = pageView.value.getPageAllData();
   const params = {param: props.param, data: allData, user: userStore.user}
   console.log('submitToUndrFn-params', params);
@@ -361,7 +390,7 @@ const submitToUndrFn = () => {
     if(res.code === 200) {
       // const pageData = trimPageData({...res.data});
       const newParams = getNewParams({
-        pageType: POSITE_PAGE_TYPE_READ,
+        initType: POSITE_PAGE_TYPE_READ,
       });
       router.replace({
         path: "/pcisapp/posite-page",
@@ -381,6 +410,7 @@ const submitToUndrFn = () => {
     }else {
       ElMessage.error(res.msg)
     }
+    setTimeout(() => loading.close(), 500)
   })
 }
 
@@ -436,10 +466,38 @@ const getNewParams = (param: any) => {
   };
 }
 
-onUnmounted(() => {
-  console.log('unmounted');
+
+const openPageLoading = (text?: string) => {
+  if(text) {
+    loadingText.value = text
+  }else {
+    loadingText.value = '加载中...'
+  }
+  pageLoading.value = true
+  return {
+    close: () => {
+      pageLoading.value = false
+    }
+  }
+}
+
+/**
+ * 获取button
+ * @param id
+ */
+const getBtn = (id: any) => {
+  const btn = bthList.value.find(item => {
+    return id === item.id
+  })
+  if(btn) return btn;
+  throw new Error(`${id} not found btn`);
+}
+
+onDeactivated(() => {
+  // 页面卸载 清理store缓存
   pageView.value.pageConfig.forEach((item: GroupForm) => {
     clearDataOpertaorByPageKey(item.groupId);
+    clearCodeListViewByPageKey(item.groupId);
   })
 })
 </script>
@@ -456,7 +514,7 @@ onUnmounted(() => {
 }
 .left_content{
   position: fixed;
-  top: 89px;
+  top: 86px;
   left: 7px;
   background-color: white;
   overflow: hidden;
@@ -472,8 +530,8 @@ onUnmounted(() => {
 .center_content {
   flex: 1;
   padding: 10px;
-  margin-left: 260px; /* 与侧边栏宽度保持一致 */
-  max-width: calc(100% - 260px);
+  margin-left: 250px; /* 与侧边栏宽度保持一致 */
+  max-width: calc(100% - 250px);
 }
 
 .bottom-items {

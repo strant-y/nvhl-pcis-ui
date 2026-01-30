@@ -55,6 +55,7 @@
 <script setup lang="ts">
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 type IconNames = keyof typeof ElementPlusIconsVue;
 
@@ -80,6 +81,8 @@ const props = defineProps({
     required: false,
   },
 });
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const emits = defineEmits(["update:item", "update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 
@@ -135,7 +138,7 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("update:item", val, option);
   // props.item.func ? props.item.func(val, option) : null;
 }
-const codeListStore = codeListViewStore();
+
 function uploadOption() {
   codeListStore
     .queryCodeList(

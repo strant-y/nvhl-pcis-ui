@@ -29,7 +29,6 @@ import {
 import { formInit } from "@/shared/from-init";
 import dayjs from "dayjs";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import moment from "moment";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
@@ -51,8 +50,8 @@ const props = defineProps({
     required: false,
   },
 });
-
 const applicantEditRef = ref<AppFreeEditMethod | null>(null);
+
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { getDefaultCompilerOptions } from "typescript";
 import { getAddressStr, qryCustomer, reset } from "@/api/query";
@@ -60,9 +59,10 @@ import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/us
 import { listChrDepts } from "@/api/dept";
 import { coverageHint } from "@/api/prod/index";
 import { eventBus } from "@/utils/event-bus";
-
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const formData = ref<any[]>([]);
 const cClntAddr = ref<any>(null);

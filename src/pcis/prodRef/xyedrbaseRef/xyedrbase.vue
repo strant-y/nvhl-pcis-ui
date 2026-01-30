@@ -17,7 +17,7 @@ import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-lis
 import { codeListViewStore } from "@/store";
 import dayjs from "dayjs";
 import { debug } from "console";
-const codeListStore = codeListViewStore();
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const opertaor = dataOpertaor('enteringDtl');
 const { getRules } = useValidator();
 const props = defineProps({
@@ -25,7 +25,8 @@ const props = defineProps({
   //   type: [Object],
   // },
 });
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const params= idxParam?.param
 const { getCUndrMrk, getBackClsList } = NewUdrListService();
 const edrbaseEditRef = ref<AppFreeEditMethod | null>(null);

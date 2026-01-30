@@ -25,6 +25,7 @@ import {useRoute} from "vue-router";
 const route = useRoute();
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
 };
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);

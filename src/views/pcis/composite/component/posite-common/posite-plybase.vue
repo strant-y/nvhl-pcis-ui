@@ -30,13 +30,12 @@ import {CompositePageView} from "@/views/pcis/support/composite.types";
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
-
-const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const dialogRef = ref<DialogMethod | null>(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const param = opertaor.getParam();
 console.log('plyBase-param', param)
 const sessionData = ref(null);

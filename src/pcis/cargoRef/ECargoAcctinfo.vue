@@ -10,12 +10,13 @@ import {
 } from "@/shared/app-free-edit-config";
 import { useValidator } from "@/typings/useValidator";
 import {formInit} from "@/shared/from-init";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(createAppFreeEditConfig({}));
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 const user = idxParam?.user;
