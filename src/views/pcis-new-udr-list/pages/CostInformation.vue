@@ -285,8 +285,12 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "nFeeProp",
-        inputtype: "rtinput",
-        title: "比例(%)",
+        inputtype: "rtnumber",
+				title: "比例(%)",
+        min: 0,
+        max: 999999999999999999.99,
+        step: 0.01,
+        clearable: true,
         minWidth: 80,
         func: (v: any,row:any) => {
           getNFeeList(row)
@@ -500,6 +504,9 @@ function tool_fix(num: any, prec: any) {
 
 // 根据输入手续费比例计算出相应金额
 function getNFeeList(row:any) {
+			if (row.nFeeProp == '' || row.nFeeProp == null || row.nFeeProp == undefined) {
+				row.nFeeProp = 0
+			}
       const feeProp = row.nFeeProp * 1;
       let feePropSum = freeEditRef.value?.getValue("nFeePropSum") * 1;
       let prmSum = freeEditRef.value?.getValue("nPrmSum") * 1;
@@ -771,6 +778,7 @@ async function saveFeeInfo() {
                   appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
                   A1_value:String(freeEditRef.value?.getValue("A1_value")),
                   B1_value:String(freeEditRef.value?.getValue("B1_value")),
+                  A6_value:String(freeEditRef.value?.getValue("A6_value")),
                   Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
                 };
                 updateIIogFee(paramStr2)
@@ -810,6 +818,7 @@ async function saveFeeInfo() {
                   appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
                   A1_value:String(freeEditRef.value?.getValue("A1_value")),
                   B1_value:String(freeEditRef.value?.getValue("B1_value")),
+									A6_value:String(freeEditRef.value?.getValue("A6_value")),
                   Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
                 };
                 updateIIogFee(paramStr2)
@@ -870,6 +879,7 @@ function findFeeBetween() {
                         my_min_value.value  = tool_fix(values[0] * 1, 2);    // 手续费的 输入区间  如果后台没查询到 默认为 0.00  【区间】
                         A1_value.value   = tool_fix(values[2] * 1, 2);
                         B1_value.value   = tool_fix(values[3] * 1, 2);
+                        A6_value.value   = tool_fix(values[8] * 1, 2);
                         A_value.value   = tool_fix(values[4] * 1, 2);
                         B_value.value = tool_fix(values[5] * 1, 2);
                         freeEditRef.value?.setValue("max_value", my_max_value.value);
