@@ -482,10 +482,10 @@ const method = {
     } catch (err) {
       console.log(err)
     }
-    // const param = opertaor.getParam();
-    // if (param.initFlag) {
-    //   return;
-    // }
+    const param = opertaor.getParam();
+    if (param.initFlag && !['orig', 'copy', 'template', 'inquiryToApp'].includes(param.pageType)) {
+      return;
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -504,10 +504,10 @@ const method = {
     if (val && idxParam && idxParam.setcAmtCur) {
       idxParam.setcAmtCur(val)
     }
-    // const param = opertaor.getParam();
-    // if (param.initFlag) {
-    //   return;
-    // }
+    const param = opertaor.getParam();
+    if (param.initFlag && !['orig', 'copy', 'template', 'inquiryToApp'].includes(param.pageType)) {
+      return;
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -597,6 +597,11 @@ const method = {
       endTm: baseBefore["Base.tInsrncEndTm"],
       prodNo,
       ratioType: val
+    }
+    const tgt = tabref["tgt"]?.getFromValue();
+    if(tgt?.['Tgt.cInsuranceMethod'] && ['613002', '613003', '613004'].includes(tgt?.['Tgt.cInsuranceMethod'])) {
+      setValue("Base.nRatioCoef", Number(1).toFixed(6));
+      return;
     }
     policyRatio(param).then((res: any) => {
       const { code, data, msg } = res;

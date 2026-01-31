@@ -3121,110 +3121,9 @@ const calcPremium = () => {
         // .getTableRefByKey("ourCompanyCiShare")
         // .setValue("Base.nPrm", 123);
 
-      // 满足山东见费出单业务
-      const cCiMrk = ops['plyBase']?.['Base.cCiMrk'];// 联共保
-      const cInstMrk = ops['base']?.['Base.cInstMrk'] || '0';// 缴费方式
-      const totalPrm = Number(ops['base']?.['Base.nPrm'] || 0);// 签单保费
-      const cClntMrk = ops['applicant']?.['Applicant.cClntMrk'];// 投保人性质
-      const tInsrncBgnTmA = ops['insrnc']?.["Base.tInsrncBgnTm"];// 保险期限起期
-      const tInsrncEndTmA = ops['insrnc']?.["Base.tInsrncEndTm"];// 保险期限止期
-      const basePrmCur = parseFloat(ops['base']?.["Base.nPrm"] || 0);//承保基本信息 
-      const basePrm = ops['base']?.["Base.cPrmCur"];//承保基本信息 总保费币种   // "CNY"
-      const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
-      const nPayNum = Number(ops['base']?.['Base.nPayNum'] || 0)  // "1"  缴费期数
-      const cNeedfeeFlag = ops['plyBase']?.['Base.cNeedfeeFlag'];
-      // 不见费出单原因
-      const cCanclfeersnCde = ops['plyBase']?.['Base.cCanclfeersnCde'];
-      if(cDptCde.startsWith('02370') && !cDptCde.startsWith('023702') && okProdPre.some(item => prod.startsWith(item)) 
-        && !(['019904','089031'].includes(prod)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY") && (['0', '1'].includes(cClntMrk))){
-        shanDongFlag = true;
-        if (cClntMrk == '1' && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
-          ElMessageBox.alert(
-          "根据山东省非车险业务“见费出单”实施方案，投保人是个人, 系统将更新为[见费出单][一次性缴费]！",
-          "提示", 
-          {
-            confirmButtonText: "确定",
-            type: "warning",
-          })
-          .then(() => {
-            opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-            opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
-          })
-        } else if (cClntMrk == '0' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0') && !needCalc.value){
-          ElMessageBox.alert(
-          "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
-          "提示", 
-          {
-            confirmButtonText: "确定",
-            type: "warning",
-          })
-          .then(() => {
-            opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-            opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
-          })
-        } else if (isShortTerm && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0') && cCanclfeersnCde!='NVPSM04') {// NVPSM04 政府主导或财政支持的统保项目
-          ElMessageBox.alert(
-          "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
-          "提示", 
-          {
-            confirmButtonText: "确定",
-            type: "warning",
-          })
-          .then(() => {
-            opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
-            opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
-          })
-        } else {
-          // 山东拆分只处理保费大于10万元业务，小于等于10万是一次性缴费
-          if (totalPrm < 100_000){
-            shanDongFlag = false;
-          } 
-          // 山东拆分只处理分期业务, 1期走普通拆分
-          if ( nPayNum < 2 ){
-            shanDongFlag = false;
-          }
-          /* ---------- 计算保险期限（自然年） ---------- */
-          const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
-          const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
-          const wholeYears = tmEnd.diff(tmStart, 'year'); 
-          const maxPhase = 4 + Math.max(0, wholeYears - 1);
-
-          /* ---------- 取期数---------- */
-          if (nPayNum > maxPhase) {
-            const remainDays = tmEnd
-              .subtract(wholeYears, 'year')
-              .diff(tmStart, 'day')
-            const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
-            const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
-            ElMessageBox.alert(
-              `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`,
-              "提示", 
-              {
-                confirmButtonText: "确定",
-                type: "warning",
-              })
-              .then(() => {
-                opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
-                shanDongFlag = true;
-                opertaor.getTableRefByKey("base").shanDongFun();  
-              })
-          }
-        }
-      }
-
-      const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
-
-      console.log("生成缴费计划内容", payInfo);
-      opertaor.getTableRefs()["payinfo"]?.setFormValue(payInfo);
       // const ciInfo = setCiInfo(ops["base"]);
       // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
       needCalc.value = false;
-      const baseRef = opertaor.getTableRefByKey("base");
-      if(shanDongFlag){
-         baseRef.shanDongFun();
-      } else{
-         baseRef.nPayNumberFun();
-      }
     } else {
       ElMessage.error(res.msg);
     }
@@ -3394,9 +3293,6 @@ const submitToUndrFn = async () => {
     ElMessage.error("请先进行保费计算!");
     return;
   }
-  if (await validateShanDong()) {
-      return;
-  }
   if (validateGuaranteeBgnTm()) {
     return;
   }
@@ -3411,12 +3307,6 @@ const submitToUndrFn = async () => {
         if (!validCi) {
           return; // 校验失败则中断后续流程
         }
-    }
-  }
-  // 云南分公司缴费期数特殊校验
-  if (shouldCheckYunnanPaymentRules()) {
-    if (!checkPaymentValidityYN()) {
-      return;
     }
   }
   // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
@@ -3540,38 +3430,6 @@ const submitToUndrFn = async () => {
          ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
         return false;
       }
-  }
-
-  // 缴费计划 付款人代码 名称为空处理
-  if(payList && payList.length>0){
-       const applicantRef = opertaor.getTableRefByKey("applicant");
-        let setArr =  payList.map(item => {
-        const cPayorCde = (item['Pay.cPayorCde'] == null || item['Pay.cPayorCde'] === '' || item['Pay.cPayorCde'] === undefined)
-          ? applicantRef.getValue('Applicant.cAppCde')||''
-          : item['Pay.cPayorCde'];
-
-        const cPayorNme = ( item['Pay.cPayorNme'] == null ||  item['Pay.cPayorNme'] === ''|| item['Pay.cPayorCde'] === undefined)
-          ? applicantRef.getValue('Applicant.cAppNme')||''
-          :  item['Pay.cPayorNme'] ;
-        return {
-          ...item,
-          'Pay.cPayorCde':cPayorCde,
-          "Pay.cPayorNme" :cPayorNme
-
-        };
-      });
-      opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
-  }
-
-    // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
-  const hasInvalidPlan = checkPayPlanValidity({ opertaor });
-  if(hasInvalidPlan){  // 缴费区间超出保险区间  缴费起期 > 缴费止期
-      //  ElMessage.warning('请注意，缴费计划-缴费区间不能超出保险区间, 并且每期缴费起期 > 缴费止期！缴费期限不能重叠！')
-
-
-      ElMessage.warning('缴费计划-存在无效项（格式错误、超出保险区间或期数重叠），请检查！');
-      // opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
-      return false;
   }
 
   adjustCiPremiumDifference()

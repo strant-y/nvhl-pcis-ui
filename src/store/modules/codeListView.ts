@@ -96,7 +96,7 @@ function queryOnce(typeList: string[] = undefined){
         return ;
       }
       const cacheData = codeListMap.value[param.codeListName];
-      if (!!cacheData) {
+      if (!!cacheData && (!param.codeListParam || Object.keys(param.codeListParam).length === 0)) {
         // 缓存有数据就返回
         resolve(cacheData);
         return;
