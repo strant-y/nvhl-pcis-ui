@@ -389,7 +389,8 @@ onMounted(() => {
             ZH: "ZH",
             FZ: "FZ",
         };
-        if(params.cRsnCde=='FZ' || params.cEdrRsnBundleCde =='FZ'){
+				if ((Object.hasOwn?.(params, 'cRsnCde') && params.cRsnCde === 'FZ') ||
+				(!Object.hasOwn?.(params, 'cRsnCde') && params?.cEdrRsnBundleCde === 'FZ')) {
 					param["calcMrk"] = '0'
 					codeListStore
             .queryCodeList({

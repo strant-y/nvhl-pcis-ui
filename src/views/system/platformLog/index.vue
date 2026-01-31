@@ -121,10 +121,10 @@ function handleQuery() {
   };
   getPlatformList(requestParams)
     .then((res) => {
-      const { code, data, msg } = res;
-      if (200 === code) {
-        platformLogList.value = res.data || [];
-        total.value = data.total || 0;
+      const { code, data, msg, total: resTotal } = res;
+      if (code === 200) {
+        platformLogList.value = data;
+        total.value = resTotal ?? data.length ?? 0;
       } else {
         ElMessage.error(msg);
       }
@@ -165,7 +165,7 @@ function handleExport() {
     tStartTm: queryParams.tStartTm,
     tEndTm: queryParams.tEndTm,
   };
-  
+
   exportLoading.value = true;
   request.post('/policy/exportPlatformList', requestParams, {
     responseType: 'blob'
@@ -245,25 +245,25 @@ const copyText = (text: any) => {
             placeholder="请选择"
             filterable
             clearable>
-            <el-option 
-              v-for="item in cTypOptions" 
-              :key="item.value" 
-              :label="item.label" 
-              :value="item.value" 
+            <el-option
+              v-for="item in cTypOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             />
           </el-select>
         </el-form-item>
-        
+
         <el-form-item label="平台" prop="addressType">
           <el-select
             v-model="queryParams.addressType"
             placeholder="请选择"
             filterable>
-            <el-option 
-              v-for="item in addressTypeOptions" 
-              :key="item.value" 
-              :label="item.label" 
-              :value="item.value" 
+            <el-option
+              v-for="item in addressTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             />
           </el-select>
         </el-form-item>
@@ -371,7 +371,7 @@ const copyText = (text: any) => {
   align-items: center;
   justify-content: center;
   line-height: 1.5;
-  
+
   span {
     white-space: nowrap;
     overflow: hidden;

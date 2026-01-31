@@ -129,7 +129,7 @@ const uwBtn = [
                   router.replace({ path: "/dashboard" });
                 });
               }else {
-                ElMessage.success(res.msg);
+                ElMessage.error(res.msg);
               }
             });
           }else {
@@ -148,7 +148,7 @@ const uwBtn = [
                   router.replace({ path: "/dashboard" });
                 });
               }else {
-                ElMessage.success(res.msg);
+                ElMessage.error(res.msg);
               }
             });
           }
@@ -1382,7 +1382,7 @@ async function save() {
 			}
     }else {
       isOk = false
-      ElMessage.success(res.msg);
+      ElMessage.error(res.msg);
     }
     return isOk
 }
@@ -1578,7 +1578,7 @@ async function  submit() {
       });
     }else {
       btn.loading = false;
-      ElMessage.success(res.msg);
+      ElMessage.error(res.msg);
     }
   }).finally(() => {
     btn.loading = false;
