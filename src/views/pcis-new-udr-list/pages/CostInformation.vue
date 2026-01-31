@@ -892,7 +892,8 @@ function findFeeBetween() {
                         my_min_value.value  = tool_fix(values[0] * 1, 2);    // 手续费的 输入区间  如果后台没查询到 默认为 0.00  【区间】
                         A1_value.value   = tool_fix(values[2] * 1, 2);
                         B1_value.value   = tool_fix(values[3] * 1, 2);
-                        A6_value.value   = tool_fix(values[8] * 1, 2);
+												const num = parseFloat(values[8]);
+												A6_value.value  = !isNaN(num) && isFinite(num) ? tool_fix(num * 1, 2) : 0.00;;
                         A_value.value   = tool_fix(values[4] * 1, 2);
                         B_value.value = tool_fix(values[5] * 1, 2);
                         freeEditRef.value?.setValue("max_value", my_max_value.value);
