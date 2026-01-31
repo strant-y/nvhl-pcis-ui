@@ -1,0 +1,1 @@
+import{cA as t}from"./index.3HMO9p8j.js";function e(e){return t("/role/getSysRoleList",e)}function n(e){return t("/template/list",e)}function r(e){return t("/template/delete",e)}export{n as a,r as d,e as g};
