@@ -235,7 +235,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "事故预防费用(A6)",
         itemWidth: 1,
         clearable: true,
-        precision: 2,
+				precision: 2,
+				func: (v:any) => {
+					if(!/^(\-|\+)?(\d+.?)\d{0,2}$/.test(v)){
+						ElMessage.error('只能输入数字，小数点后只能保留两位');
+						freeEditRef.value?.setValue('A6_value', A6_value.value)
+						return ;
+					}
+					
+					if(parseFloat(v)<parseFloat(0)){
+						ElMessage.error("事故预防费用(A6)不能小于零！");
+						freeEditRef.value?.setValue('A6_value', A6_value.value)
+						return ;
+					}
+        }
       }
     ],
   })
