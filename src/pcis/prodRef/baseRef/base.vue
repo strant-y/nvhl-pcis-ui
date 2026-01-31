@@ -598,6 +598,11 @@ const method = {
       prodNo,
       ratioType: val
     }
+    const tgt = tabref["tgt"]?.getFromValue();
+    if(tgt?.['Tgt.cInsuranceMethod'] && ['613002', '613003', '613004'].includes(tgt?.['Tgt.cInsuranceMethod'])) {
+      setValue("Base.nRatioCoef", Number(1).toFixed(6));
+      return;
+    }
     policyRatio(param).then((res: any) => {
       const { code, data, msg } = res;
       if (code === 200) {
