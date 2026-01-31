@@ -1013,9 +1013,9 @@ const method = {
             setValue('Applicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
-    }
 
-    checkUser();
+      checkUser();
+    }
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
