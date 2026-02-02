@@ -155,78 +155,102 @@ const formconfig = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: "nAmt",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nAmt",
+            inputtype: "rtnumber",
+            title: "我司总保额",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+          },
+          {
+            prop: "cAmtCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nAmtGroup",
         title: "我司总保额",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
       },
       {
-        prop: "cAmtCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
-      },
-      {
-        prop: "nPrm",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nPrm",
+            inputtype: "rtnumber",
+            title: "我司总保费",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+          },
+          {
+            prop: "cPrmCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nPrmGroup",
         title: "我司总保费",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
       },
       {
-        prop: "cPrmCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
-      },
-      {
-        prop: "nAmtVar",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nAmtVar",
+            inputtype: "rtnumber",
+            title: "我司总保额变化量",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+            defaultValue: "0",
+          },
+          {
+            prop: "cAmtCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nAmtVarGroup",
         title: "我司总保额变化量",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
-        defaultValue: "0",
       },
       {
-        prop: "cAmtCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
-      },
-      {
-        prop: "nPrmVar",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nPrmVar",
+            inputtype: "rtnumber",
+            title: "我司总保费变化量",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+            defaultValue: "0",
+          },
+          {
+            prop: "cPrmCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nPrmVarGroup",
         title: "我司总保费变化量",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
-        defaultValue: "0",
-      },
-      {
-        prop: "cPrmCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
       },
       {
         prop: "nAddedTax",
@@ -339,56 +363,68 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
-        prop: "nAmtVar",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nAmtVar",
+            inputtype: "rtnumber",
+            title: "我司保额变化",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+            func: (val: any) => {
+              if(nAmtVarInit.value) {
+                changeNamt(val);
+                nAmtVarInit.value = val
+              } else if (val) {
+                nAmtVarInit.value = val
+              }
+            },
+          },
+          {
+            prop: "cAmtCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nAmtVarGroup",
         title: "我司保额变化",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
-        func: (val: any) => {
-          if(nAmtVarInit.value) {
-            changeNamt(val);
-            nAmtVarInit.value = val
-          } else if (val) {
-            nAmtVarInit.value = val
-          }
-        },
       },
       {
-        prop: "cAmtCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
-      },
-      {
-        prop: "nPrmVar",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nPrmVar",
+            inputtype: "rtnumber",
+            title: "我司保费变化",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+            func: (val: any) => {
+              if(nPrmVarInit.value) {
+                changePrm(val);
+                nPrmVarInit.value = val
+              } else if (val) {
+                nPrmVarInit.value = val
+              }
+            },
+          },
+          {
+            prop: "cPrmCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nPrmVarGroup",
         title: "我司保费变化",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
-        func: (val: any) => {
-          if(nPrmVarInit.value) {
-            changePrm(val);
-            nPrmVarInit.value = val
-          } else if (val) {
-            nPrmVarInit.value = val
-          }
-        },
-      },
-      {
-        prop: "cPrmCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
       },
       {
         prop: "nAmt",
@@ -427,40 +463,54 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         disabled: true,
       },
       {
-        prop: "nCiAmt",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nCiAmt",
+            inputtype: "rtnumber",
+            title: "共保保额",
+            itemWidth: 0.5,
+            precision: 2,
+            clearable: true,
+            disabled: true,
+          },
+          {
+            prop: "cCiAmtCur",
+            inputtype: "rtselect",
+            title: "",
+            itemWidth: 0.5,
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nCiAmtGroup",
         title: "共保保额",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
       },
       {
-        prop: "cCiAmtCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
-      },
-      {
-        prop: "nCiPrm",
-        inputtype: "rtnumber",
+        groupList: [
+          {
+            prop: "nCiPrm",
+            inputtype: "rtnumber",
+            title: "共保保费",
+            precision: 2,
+            clearable: true,
+            disabled: true,
+          },
+          {
+            prop: "nCiPrmCur",
+            inputtype: "rtselect",
+            title: "",
+            clearable: true,
+            disabled: true,
+            typeCode: "FIN_CUR_CACHE",
+          },
+        ],
+        inputtype: "rtinputgroup",
+        itemWidth: 1,
+        prop: "nCiPrmGroup",
         title: "共保保费",
-        itemWidth: 0.5,
-        precision: 2,
-        clearable: true,
-        disabled: true,
-      },
-      {
-        prop: "nCiPrmCur",
-        inputtype: "rtselect",
-        title: "",
-        itemWidth: 0.5,
-        clearable: true,
-        disabled: true,
-        typeCode: "FIN_CUR_CACHE",
       },
       {
         prop: "nCiAmtVar",
@@ -749,11 +799,19 @@ const tableconfig1 = reactive<AppTableConfig>(
         readOnly: true,
       },
       {
+        prop: "cRiskLvlCde",
+        inputtype: "rtselect",
+        title: "风险等级",
+        minWidth: 180,
+        readOnly: false,
+        loadData: CRiskLvlCde_Options,
+      },
+      {
         prop: "cRiskLvlNme",
         inputtype: "rtinput",
         title: "风险等级",
         minWidth: 180,
-        hidden: true,
+        isShow: false,
       },
       {
         prop: "nAmt",
@@ -2073,7 +2131,7 @@ function downLoadTemplate() {
     fromSchema: [
       { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
       { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
-      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtinput' },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
       { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
       { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },
@@ -2157,7 +2215,19 @@ function importTemplate() {
 const exportBtn:any = tableconfig1.titleBtns?.find((item:any) => item.id === 'exportBtn')
 function exportTemplate() {
   exportBtn.loading = true;
-  exportUnit({cAppNo: params.cAppNo}).then((res:any) => {
+  const param = {
+    fromSchema: [
+      { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
+      { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options },
+      { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
+      { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
+      { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },
+    ],
+    title: '风险单位划分',
+    cAppNo: params.cAppNo,
+  }
+  exportUnit(param).then((res:any) => {
     exportBtn.loading = false;
     if (res.size <= 0) {
       ElMessage.error({ message: "导出出错", duration: 3000 });
