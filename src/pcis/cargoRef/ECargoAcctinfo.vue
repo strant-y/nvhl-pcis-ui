@@ -59,15 +59,6 @@ onMounted(() => {
     })
   })
 
-	let timer = setInterval(() => {
-		const applicantValue = formPage.getFormDataById('AgreementApplicant')
-    // 自动填充账户名称为投保人姓名
-    setValue('ECargoAcctinfo.cAcctNme', applicantValue['ECargoApplicant.cAppNme'] || '');
-    let cAcctNme = getValue('ECargoAcctinfo.cAcctNme')
-    if (cAcctNme) {
-      clearInterval(timer); //清除定时器
-    }
-  }, 1000)
 });
 
 // 可以操作的配置项处理  身份认真里面的几项

@@ -63,7 +63,7 @@
               </el-col>
               <el-col :span="3" justify="end">
                 <rtButton
-                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid' && pageparam.cProdNo !== '047005' "
+                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid' && pageparam.cProdNo !== '049022' "
                     @click="
                   () => {
                     addriskView();
@@ -225,7 +225,7 @@
             </template>
           </template>
           <template v-if="riskShowTyp === 'grid'">
-            <term047005 v-if="pageparam.cProdNo === '047005' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()" /> 
+            <term047005 v-if="pageparam.cProdNo === '049022' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()" /> 
             <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
@@ -1683,6 +1683,7 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
+  console.log(1111);
   if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
