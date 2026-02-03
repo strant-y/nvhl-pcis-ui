@@ -934,6 +934,10 @@ const method = {
   }
 };
 const updateMasterAgreementValues = () => {
+  const param = opertaor.getParam();
+  const isInit = param.initFlag; // 是否初始化/回显状态
+  const isCalcPremium = opertaor.getFatherPage().getIsCalcPremium();
+  if(isInit === true && isCalcPremium === false) return;
   // 一般批改如果保费变化量和保额变化量为0或批改原因为变更联共保信息，则不需要重新进行联共保保费的计算
   const edrBaseData = opertaor.getFatherPage().getEdrbaseValue();
   if(param.cAppTyp === 'E' && param.cRsnCde !== '47' && new Decimal(edrBaseData?.['EdrBase.nPrmVar']?.replaceAll(',','') || 0).toNumber() === 0 && new Decimal(edrBaseData?.['EdrBase.nAmtVar']?.replaceAll(',','') || 0).toNumber() === 0) return;
@@ -989,7 +993,7 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
-
+  opertaor.getFatherPage().setIsCalcPremium(false)
 };
 /**
  * 主共保标识、主联保标识、我司标识变化
