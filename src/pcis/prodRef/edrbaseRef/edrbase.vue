@@ -304,6 +304,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   return time.getTime() < new Date(tInsrncBgnTm).getTime()
         // },
         format:"YYYY-MM-DD 00:00:00",
+        valueFormat:"YYYY-MM-DD 00:00:00",
         func: (v) => {
           const tRepStopExtEndTm = getValue("EdrBase.tRepStopExtEndTm")
           const tInsrncBgnTm = opertaor.getTableRefByKey('insrnc')?.getValue('Base.tInsrncBgnTm')
@@ -333,6 +334,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         //   return time.getTime() > new Date(tInsrncEndTm).getTime()
         // },
         format:"YYYY-MM-DD 23:59:59",
+        valueFormat:"YYYY-MM-DD 23:59:59",
         func: (v) => {
           const tRepStopExtBgnTm = getValue("EdrBase.tRepStopExtBgnTm")
           const tInsrncBgnTm = opertaor.getTableRefByKey('insrnc')?.getValue('Base.tInsrncBgnTm')
