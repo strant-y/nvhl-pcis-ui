@@ -5317,7 +5317,7 @@ const submitEdrToUndrSurrender = async () => {
     return
   }
 	const edrexpValidate = await edrexp.value?.validate();
-  if(!edrexpValidate) {
+  if(!edrexpValidate && edrexp.value && edrexpFlag) {
     ElMessage.error("请填写批改扩展信息中的必填项")
     return
   }
@@ -5681,10 +5681,10 @@ const submitEdrToUndrFun = async () => {
       return
     }
   }
-	if(props.param.cTransMrk !== "1" ){
+	if(props.param.cTransMrk !== "1" && edrexp.value && edrexpFlag){
     const edrexpValidate = await edrexp.value?.validate();
      if(!edrexpValidate) {
-      ElMessage.warning("请填写批改信息中的必填项")
+      ElMessage.warning("请填写批改扩展信息中的必填项")
       return
     }
   }
