@@ -249,6 +249,12 @@ const schemaMap = reactive<Record<string, any>>({
       title: "codeKey",
     },
     {
+      prop: "filterable",
+      inputtype: "rtselect",
+      title: "是否支持模糊查询",
+      loadData: yesOrNo,
+    },
+    {
       prop: "clearable",
       inputtype: "rtselect",
       title: "是否显示清除按钮",
@@ -357,6 +363,12 @@ const schemaMap = reactive<Record<string, any>>({
       title: "codeKey",
     },
     {
+      prop: "filterable",
+      inputtype: "rtselect",
+      title: "是否支持模糊查询",
+      loadData: yesOrNo,
+    },
+    {
       prop: "clearable",
       inputtype: "rtselect",
       title: "是否显示清除按钮",
@@ -463,6 +475,12 @@ const schemaMap = reactive<Record<string, any>>({
       prop: "typeCode",
       inputtype: "rtinput",
       title: "codeKey",
+    },
+    {
+      prop: "filterable",
+      inputtype: "rtselect",
+      title: "是否支持模糊查询",
+      loadData: yesOrNo,
     },
     {
       prop: "clearable",

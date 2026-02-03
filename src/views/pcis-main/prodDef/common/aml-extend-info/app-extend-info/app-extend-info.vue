@@ -86,7 +86,8 @@ const schemaMap = reactive<Record<string, any>>({
 const cardConfig = reactive<CardConfig>(
 	creatCardConfig({
 		title: '投保人-法人扩展信息',
-		showMyfromBtm: true
+		showMyfromBtm: true,
+		showMyfrom: false,
 	})
 )
 
@@ -238,8 +239,7 @@ const tableconfig = reactive<AppGridEditConfig>(
 			{
 				prop: "cCusAddr",
 				inputtype: "rtinput",
-				title: "地址",
-				rules: [getRules("required", {})]
+				title: "地址"
 			}
 		],
 	})
@@ -256,7 +256,7 @@ const formconfigData = {
 			title: '姓名',
 			inputtype: "rtinput",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 		},
 		{
 			prop: 'CCertfCls_A',
@@ -264,7 +264,7 @@ const formconfigData = {
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			func:(val:any)=>{
 				if(val){
 						setFieldRules('CCertfCde_A',val,freeEditRef1,formconfig1)
@@ -275,7 +275,7 @@ const formconfigData = {
 		{
 			prop: 'CCertfCde_A',
 			title: '证件号码',
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			inputtype: "rtinput",
       		clearable: true,
 		},
@@ -284,7 +284,7 @@ const formconfigData = {
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			disabledDate: (time: Date) => {
 					const disTime =freeEditRef1.value?.getValue('TCertfEndTm_A')
 					if(disTime){
@@ -297,7 +297,7 @@ const formconfigData = {
 			title: '认证有效止期',
 			inputtype: "rtdatepicker",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			disabledDate: (time: Date) => {
 					const disTime =freeEditRef1.value?.getValue('TCertfBgnTm_A')
 					if(disTime){
@@ -319,7 +319,7 @@ const formconfigData2 = {
 			inputtype: "rtinput",
 
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 		},
 		{
 			prop: 'CCertfCls_B',
@@ -327,7 +327,7 @@ const formconfigData2 = {
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			func:(val:any)=>{
 				if(val){
 						setFieldRules('CCertfCde_B',val,freeEditRef2,formconfig2)
@@ -337,7 +337,7 @@ const formconfigData2 = {
 		{
 			prop: 'CCertfCde_B',
 			title: '证件号码',
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			inputtype: "rtinput",
       		clearable: true,
 		},
@@ -346,7 +346,7 @@ const formconfigData2 = {
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			disabledDate: (time: Date) => {
 					const disTime =freeEditRef2.value?.getValue('TCertfEndTm_B')
 					if(disTime){
@@ -360,7 +360,7 @@ const formconfigData2 = {
 			title: '认证有效止期',
 			inputtype: "rtdatepicker",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			disabledDate: (time: Date) => {
 			 	const disTime =freeEditRef2.value?.getValue('TCertfBgnTm_B')
 			 	if(disTime){
@@ -390,14 +390,14 @@ const formconfigData3 = {
 			title: '姓名',
 			inputtype: "rtinput",
       clearable: true,
-      rules: [getRules("required", {})],
+      // rules: [getRules("required", {})],
 		},
 		{
 			prop: 'CCertfCls_C',
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      rules: [getRules("required", {})],
+      // rules: [getRules("required", {})],
 			clearable: true,
 				func:(val:any)=>{
 				if(val){
@@ -408,7 +408,7 @@ const formconfigData3 = {
 		{
 			prop: 'CCertfCde_C',
 			title: '证件号码',
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
       		clearable: true,
 			inputtype: "rtinput"
 		},
@@ -417,7 +417,7 @@ const formconfigData3 = {
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
       clearable: true,
-      rules: [getRules("required", {})],
+      // rules: [getRules("required", {})],
 	  		disabledDate: (time: Date) => {
 					const disTime =freeEditRef3.value?.getValue('TCertfEndTm_C')
 					if(disTime){
@@ -430,7 +430,7 @@ const formconfigData3 = {
 			title: '认证有效止期',
 			inputtype: "rtdatepicker",
 			clearable: true,
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 				disabledDate: (time: Date) => {
 					const disTime =freeEditRef3.value?.getValue('TCertfBgnTm_C')
 					if(disTime){
@@ -460,7 +460,7 @@ const formconfigData4 = {
 			prop: 'CCusNme_D',
 			title: '姓名',
 			inputtype: "rtinput",
-      		rules: [getRules("required", {})],
+      		// rules: [getRules("required", {})],
 			clearable: true,
 		},
 		{
@@ -468,7 +468,7 @@ const formconfigData4 = {
 			title: '证件类型',
 			inputtype: "rtselect",
 			typeCode: "NATURAL_CERTIFICATE_ALL",
-      		rules: [getRules("required", {})],
+      		// rules: [getRules("required", {})],
 			clearable: true,
 			func:(val:any)=>{
 				if(val){
@@ -480,7 +480,7 @@ const formconfigData4 = {
 		{
 			prop: 'CCertfCde_D',
 			title: '证件号码',
-			rules: [getRules("required", {})],	
+			// rules: [getRules("required", {})],	
 			inputtype: "rtinput",
       		clearable: true,
 		},
@@ -488,7 +488,7 @@ const formconfigData4 = {
 			prop: 'TCertfBgnTm_D',
 			title: '认证有效起期',
 			inputtype: "rtdatepicker",
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			clearable: true,
 			disabledDate: (time: Date) => {
 					const disTime =freeEditRef4.value?.getValue('TCertfEndTm_D')
@@ -501,7 +501,7 @@ const formconfigData4 = {
 			prop: 'TCertfEndTm_D',
 			title: '认证有效止期',
 			inputtype: "rtdatepicker",
-			rules: [getRules("required", {})],
+			// rules: [getRules("required", {})],
 			clearable: true,
 			disabledDate: (time: Date) => {
 						const disTime =freeEditRef4.value?.getValue('TCertfBgnTm_D')
