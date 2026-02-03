@@ -261,7 +261,7 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
-          if(parparam.cProdNo === '047005'){
+          if(parparam.cProdNo === '049002'){
             data["Term.cExcessLayer"] = "01";
             riskList.forEach((item:any) => {
               item['TermRisktgt.cExcessLayer'] = '01';
