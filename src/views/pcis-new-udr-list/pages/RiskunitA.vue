@@ -2151,7 +2151,7 @@ function downLoadTemplate() {
     fromSchema: [
       { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
       { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
-      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options.value },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
       { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
       { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },
@@ -2239,7 +2239,7 @@ function exportTemplate() {
     fromSchema: [
       { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
       { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
-      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options.value },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
       { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
       { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },

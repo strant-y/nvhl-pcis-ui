@@ -570,7 +570,7 @@ export const NewUdrListService = () => {
    * @param queryParams
    */
   const exportUnit = async (queryParams: any): AxiosPromise<any> => {
-    return post(`/reinsured/exportUnit`, queryParams, {
+    return post(`/policy/exportUnit`, queryParams, {
       responseType: 'blob'
     });
   }
