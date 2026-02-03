@@ -9,6 +9,25 @@
       @page-change="handleQuery(false)"
     />
     <comDialog ref="dialog"></comDialog>
+    
+    <!-- 全产品组件更新弹窗 -->
+    <el-dialog
+      v-model="releaseDialogVisible"
+      title="全产品组件更新"
+      width="300px"
+    >
+      <el-radio-group v-model="cGrpMrk">
+        <el-radio label="0">个单</el-radio>
+        <el-radio label="1">团单</el-radio>
+        <el-radio label="9">全部</el-radio>
+      </el-radio-group>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="releaseDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleReleaseAll">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -28,6 +47,8 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 const dialog = ref<DialogMethod | null>(null);
+const releaseDialogVisible = ref(false);
+const cGrpMrk = ref("9"); // 默认选择"全部"
 import {
   AppTableConfig,
   AppTableMethod,
@@ -75,11 +96,7 @@ const formconfig = reactive<AppFreeEditConfig>(
         type: "success",
         label: "全产品组件更新",
         func: async () => {
-          releaseAllPage({}).then((res) => {
-            if (res.code === 200) {
-              ElMessage.success('全量发布成功');
-            }
-          })
+          releaseDialogVisible.value = true;
         },
       }),
     ],
@@ -327,6 +344,31 @@ function handleQuery(flag?: boolean) {
       }
     })
     .finally(() => {});
+}
+
+/** 全产品组件更新确认 */
+function handleReleaseAll() {
+  releaseDialogVisible.value = false;
+  ElNotification.closeAll();
+  ElNotification({
+    message: '产品发布中,请稍后~',
+    type: 'info',
+    title: '温馨提示',
+    duration: 0,
+    showClose: true,
+  });
+  releaseAllPage({ cGrpMrk: cGrpMrk.value }).then((res) => {
+    ElNotification.closeAll();
+    if (res.code === 200) {
+      ElNotification({
+        message: '全量发布成功',
+        type: 'info',
+        title: '温馨提示',
+        duration: 3000,
+        showClose: true,
+      });
+    }
+  });
 }
 </script>
 
