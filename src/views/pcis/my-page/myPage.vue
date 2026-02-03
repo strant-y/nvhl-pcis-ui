@@ -3117,8 +3117,10 @@ function baseValite(){
 /**
  * 投保保费计算
  */
+const isCalcPremium = ref(false);
 const calcPremium = () => {
   let shanDongFlag = false;
+  isCalcPremium.value = false;
   const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
   const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
   const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
@@ -3225,6 +3227,7 @@ const calcPremium = () => {
         })
       }
       opertaor.setDataAll(ops);
+      isCalcPremium.value = true;
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
             nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
 
@@ -4501,6 +4504,7 @@ const savePlyInfo = async () => {
     const plyBase = ops["plyBase"];
     const applicant = ops["applicant"];
     const insured = ops["insured"];
+    const ci = ops["ci"];
     if (base) {
       const baseRef = opertaor.getTableRefByKey("base");
       baseRef.setFormValue(base);
@@ -4516,6 +4520,14 @@ const savePlyInfo = async () => {
     if (insured) {
       const insuredRef = opertaor.getTableRefByKey("insured");
       insuredRef.setFormValue(insured);
+    }
+    if (ci && ci.length > 0) {
+      const ciRef = opertaor.getTableRefByKey("ci");
+      ciRef?.getFromValue()?.forEach((item: any, index: number) => {
+        const nCiPrm = ci[index]?.['Ci.nCiPrm'];
+        const dataId = item['_dataId'];
+        ciRef?.setValueByRowKey("Ci.nCiPrm", dataId, nCiPrm.toFixed(2));
+      });
     }
 
 
@@ -4678,6 +4690,7 @@ const calcPremiumEdr = async () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
     const edrbaseData = edrbase.value?.getFromValue();
+  isCalcPremium.value = false;
   // 条款
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
@@ -4801,6 +4814,7 @@ const calcPremiumEdr = async () => {
       //     }
       //   })
       // }
+      isCalcPremium.value = true;
       opertaor.setDataAll(ops);
       nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"]  : 0;
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
@@ -7305,7 +7319,17 @@ opertaor.setFatherPage({
   afterCalcSurrenEdr: afterCalcSurrenEdr,
   calcEdrFunc: calcEdrFunc,
   calcFunc: calcFunc,
+  getIsCalcPremium: getIsCalcPremium,
+  setIsCalcPremium: setIsCalcPremium,
 });
+
+function getIsCalcPremium() {
+  return isCalcPremium.value;
+}
+
+function setIsCalcPremium(val: boolean) {
+ isCalcPremium.value = val;
+}
 
 function getEdrbaseValue() {
   return edrbase.value?.getFromValue() || {};
