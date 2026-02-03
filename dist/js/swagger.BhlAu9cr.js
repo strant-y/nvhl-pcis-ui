@@ -1,0 +1,1 @@
+import{aV as a,c as e,e as t,l as r}from"./index.DFaLWN2w.js";const s={class:"app-container"};const i=a({},[["render",function(a,i){return t(),e("div",s,[...i[0]||(i[0]=[r("iframe",{src:"http://vapi.youlai.tech/swagger-ui.html",width:"100%",height:"100%",frameborder:"0"},null,-1)])])}],["__scopeId","data-v-56050cf3"]]);export{i as default};
