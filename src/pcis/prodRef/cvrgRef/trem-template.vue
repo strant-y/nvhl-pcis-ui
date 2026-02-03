@@ -550,6 +550,35 @@ function termDeductibleNote(){
     }
     
   }
+  // 070002责任免赔说明自动带出
+  if(riskShowTyp.value === 'grid') {
+    const k = deductibleKey.value[termNo]?deductibleKey.value[termNo]:deductibleKey.value['defrisk'];
+    const amtRisk = riskGridConfig.value?.fromSchema?.filter(item=>item['prop']==k['amt']);
+    const rateRisk = riskGridConfig.value?.fromSchema?.filter(item=>item['prop']==k['rate']);
+    const deductRisk = riskGridConfig.value?.fromSchema?.filter(item=>item['prop']==k['deduct']);
+
+    if(amtRisk && amtRisk.length > 0 
+      && rateRisk && rateRisk.length > 0
+      && deductRisk && deductRisk.length > 0
+    ) {
+      termData.riskList?.forEach((risk:any) => {
+        const r = risk['TermRisktgt.cLiabCode'];
+        const amt_d = risk[k['amt']];
+        const rate_d = risk[k['rate']];
+        const temk = (amt_d !== null && amt_d !== undefined ? '1':'0') + '' + (rate_d !== null && rate_d !== undefined ? '1':'0') ;
+        const strt = deductibleTemple.value[temk];
+        if(strt){
+          const filledString = fillTemplate(strt, {
+            amount: amt_d,
+            rate: rate_d,
+          });
+          riskTableRef.value?.setValueByRowKey(k['deduct'], risk._dataId, filledString);
+        } else if(risk[k['deduct']]) {
+          riskTableRef.value?.setValueByRowKey(k['deduct'], risk._dataId, '');
+        }
+      })
+    }
+  }
 }
 
 function riskDeductibleNote(risk: any) {
