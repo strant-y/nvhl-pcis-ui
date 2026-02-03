@@ -1,1 +1,0 @@
-import{aV as a,c as e,e as r,l as s}from"./index.BvvC17Al.js";const t={class:"app-container"};const d=a({},[["render",function(a,d){return r(),e("div",t,[...d[0]||(d[0]=[s("iframe",{src:"https://www.apifox.cn/apidoc/shared-195e783f-4d85-4235-a038-eec696de4ea5",width:"100%",height:"100%",frameborder:"0"},null,-1)])])}],["__scopeId","data-v-4ff6b735"]]);export{d as default};
