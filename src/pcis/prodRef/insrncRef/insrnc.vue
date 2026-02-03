@@ -585,6 +585,22 @@ const method = {
       setValue('Base.cTmLoanTrm', '')
     }
   },
+  // 借款止期
+  tRunEndTmChange: (v:any) => {
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否是初始化状态
+    if (isInit) return;
+    const bgnTm = getValue('Base.tRunBgnTm')
+    if(v && bgnTm && dayjs(v).isBefore(dayjs(bgnTm))) {
+      setValue('Base.tRunEndTm', '')
+      ElMessage.warning("借款止期不能小于借款起期")
+    } else if (v && bgnTm) {
+      const days = dayjs(v).add(1, 'second').diff(bgnTm, 'day')
+      setValue('Base.cTmLoanTrm', days)
+    } else if (!v || !bgnTm) {
+      setValue('Base.cTmLoanTrm', '')
+    }
+  },
   // 保证期起期
   tGuaranteeBgnTmChange: (val:any) => {
     if (opertaor.getParam()?.initFlag) return;

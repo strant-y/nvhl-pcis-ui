@@ -783,7 +783,7 @@ const tableconfig1 = reactive<AppTableConfig>(
       },
       {
         prop: "cDetailedAddress",
-        inputtype: "rtselect",
+        inputtype: "rtSelectV2",
         title: "标的地址",
         minWidth: 300,
         func: (val:any, row:any) => {
@@ -820,7 +820,7 @@ const tableconfig1 = reactive<AppTableConfig>(
       },
       {
         prop: "cRiskLvlCde",
-        inputtype: "rtselect",
+        inputtype: "rtSelectV2",
         title: "风险等级",
         minWidth: 180,
         readOnly: false,
@@ -2150,8 +2150,8 @@ function downLoadTemplate() {
   const param = {
     fromSchema: [
       { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
-      { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
-      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options },
+      { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtSelectV2', loadData: addressOptions.value },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtSelectV2', loadData: CRiskLvlCde_Options.value },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
       { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
       { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },
@@ -2238,8 +2238,8 @@ function exportTemplate() {
   const param = {
     fromSchema: [
       { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
-      { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtselect', loadData: addressOptions.value },
-      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtselect', loadData: CRiskLvlCde_Options },
+      { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtSelectV2', loadData: addressOptions.value },
+      { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtSelectV2', loadData: CRiskLvlCde_Options.value },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
       { title: '我司保费', prop: 'nPrm', inputtype: 'rtnumber' },
       { title: '自留额', prop: 'nRetAmt', inputtype: 'rtnumber' },
