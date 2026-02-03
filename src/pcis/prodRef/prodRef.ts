@@ -78,6 +78,7 @@ import deductibleFix from "./commodityRef/DeductibleFix.vue" //免赔条件选�
 import underwriteRef from "./underwriteRef/underwrite.vue"
 import auditwriteRef from "./auditwriteRef/auditwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
+import edrexpRef from "./edrexpRef/edrexp.vue"; // 批改扩展信息
 import edritemRef from "./edritemRef/edritem.vue"
 import xyedrbaseRef from "./xyedrbaseRef/xyedrbase.vue"
 import xyedritemRef from "./xyedritemRef/xyedritem.vue"
@@ -135,6 +136,7 @@ const componentMap = {
   SpecialAgreement: specialAgr, //录单页面中的特约信息组件
   underwriteRef: underwriteRef, //录单页面中的核保组件
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
+	edrexpRef: edrexpRef, //录单页面中的批改扩展信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
   xyedrbaseRef: xyedrbaseRef, //协议录单页面中的批改信息组件
   xyedritemRef: xyedritemRef, //协议录单页面中的批改比较项组件

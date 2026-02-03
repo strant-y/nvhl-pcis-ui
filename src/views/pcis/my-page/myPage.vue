@@ -51,7 +51,26 @@
                   >{{ edritemName }}</span
                 >
               </el-anchor-link>
-
+							<el-anchor-link
+                v-if="edrexpFlag"
+                @click="handleAnchorClick($event, `#edrexp`)"
+                :class="activeAnchor === 'edrexp' ? 'isActive' : ''"
+              >
+                <!-- <rt-icon
+                  :item="{ icon: 'Tickets' }"
+                /> -->
+                <el-tooltip
+                  effect="dark"
+                  content="批改扩展信息"
+                  placement="right"
+                  :disabled="NavigaShow"
+                >
+                  <i :class="['icon','iconfont',iconMap['edrbase']]"></i>
+                </el-tooltip>
+                <span class="icon-title" v-if="NavigaShow"
+                  >批改扩展信息</span
+                >
+              </el-anchor-link>
               <el-anchor-link
                 v-for="(k, i) in pageConfig?.pageInfo"
                 :key="i"
@@ -263,6 +282,14 @@
                 edritem = res
               }"
             ></edritemRef>
+          </div>
+					<div id="edrexp" v-if="edrexpFlag" style="margin-bottom: 10px">
+            <edrexpRef :ref="(res: any) => {
+              if(res && res.addProvide){
+                res.addProvide('domId', 'edrexp');
+              }
+              edrexp = res
+            }"></edrexpRef>
           </div>
           <template v-for="(pageConfig, v) in formconfig1" :key="v">
             <div
@@ -670,6 +697,7 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 const underwrite = ref(null);
 const edrbase = ref(null);
+const edrexp = ref(null);
 const edritem = ref(null);
 
 const ci = ref(null);
@@ -707,6 +735,7 @@ const rightBtnList = ref<Array<FreeButtonBase>>([]);
 const tempFindBtn: any[] = [];
 let underwriteFlag = ref(false);
 let edrbaseFlag = ref(false);
+let edrexpFlag = ref(false);
 let edritemFlag = ref(false);
 let edritemName = ref("批改比较项")
 let ciMasterAgreementFlag = ref(false); //
@@ -840,6 +869,7 @@ const highlightFirstVisibleAnchor = () => {
   // 添加批改信息锚点
   if (edrbaseFlag.value) possibleAnchors.push('edrbase');
   if (edritemFlag.value) possibleAnchors.push('edritem');
+  if (edrexpFlag.value) possibleAnchors.push('edrexp');
 
   // 添加页面配置的锚点
   if (formconfig1[0]?.pageInfo) {
@@ -960,16 +990,16 @@ const setCusBenefitInfo = () => {
   }
 	// 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
 	if(basePrmCur == "USD"){
-		if (basePrm < 20000) {
+		if (basePrm < 10000) {
 			ElMessage.error(
-					"根据反洗钱相关规定，当前保单保费大于等于2万元，才允许录入反洗钱扩展信息！"
+					"根据反洗钱相关规定，当前保单保费大于等于1万元，才允许录入反洗钱扩展信息！"
 			);
 			return;
 		}
 	} else {
-		if (baseValue < 200000) {
+		if (baseValue < 50000) {
 			ElMessage.error(
-					"根据反洗钱相关规定，当前保单保费折合人民币大于等于20万元，才允许录入反洗钱扩展信息！"
+					"根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许录入反洗钱扩展信息！"
 			);
 			return;
 		}
@@ -2849,6 +2879,17 @@ const loadAppPlyInfo = async (CAppNo) => {
           }
         }
         edrbase.value?.setFormValue(EdrBaseData);
+				nextTick(() => {
+					if (edrvalidateNPrmAmlya(EdrBaseData)) {
+						nextTick(() => {
+							edrexp.value?.setFormValue({
+								'EdrBase.cSubtractPrmRsn': EdrBaseData['EdrBase.cSubtractPrmRsn'],
+								'EdrBase.cNotBackAppRsn': EdrBaseData['EdrBase.cNotBackAppRsn'],
+								'EdrBase.cNotBackAppNo': EdrBaseData['EdrBase.cNotBackAppNo'],
+							});
+						})
+					}
+				})
       }
       ElMessage.success(res.msg);
       // if(ops['ci'] && ops['ci'].length>0){
@@ -3005,6 +3046,17 @@ const loadAppPlyInfo = async (CAppNo) => {
           })
         }
         edrbase.value?.setFormValue(EdrBaseData);
+				nextTick(() => {
+					if (edrvalidateNPrmAmlya(EdrBaseData)) {
+						nextTick(() => {
+							edrexp.value?.setFormValue({
+								'EdrBase.cSubtractPrmRsn': EdrBaseData['EdrBase.cSubtractPrmRsn'],
+								'EdrBase.cNotBackAppRsn': EdrBaseData['EdrBase.cNotBackAppRsn'],
+								'EdrBase.cNotBackAppNo': EdrBaseData['EdrBase.cNotBackAppNo'],
+							});
+						})
+					}
+				})
       }
       
       // 展示保费和保额金额
@@ -4013,11 +4065,11 @@ function amlyaFlag() {
   const CPrmCur = plyBaseData['Base.cPrmCur']; // 保费币种
   const diff = 0.00.toFixed(2);
   if (CPrmCur === 'USD') {// 美元大于等于2W
-    if (numSubp(NPrm, 20000, 2) >= diff) {
+    if (numSubp(NPrm, 10000, 2) >= diff) {
       return true;
     }
   } else {// 折合人民币大于等于20W
-    if (numSubp(NRmbPrm, 200000, 2) >= diff) {
+    if (numSubp(NRmbPrm, 50000, 2) >= diff) {
       return true;
     }
   }
@@ -4026,14 +4078,19 @@ function amlyaFlag() {
 
 // 校验反洗钱
 const validateNPrmAmlya = () => {
+	// 从共不管控（2,4不管控）
+	const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk');
+	if (CiMrk == '2' || CiMrk == '4') {
+		return true;
+  }
   if(amlyaFlag()) {
     const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
-    let msg = `根据反洗钱相关规定，当前保单保费大于等于${CPrmCur === 'USD' ? '2万美元' : '20万'}，请完善客户信息中：<br/>`;
+    let msg = `根据反洗钱相关规定，当前保单保费大于等于${CPrmCur === 'USD' ? '1万美元' : '5万'}，请完善客户信息中：<br/>`;
     let flag = false;
     
     // ----------投保人------------
-    const applicantArr = ['Applicant.cNation', 'Applicant.cBusinessScope', 'Applicant.cCntrNme', 'Applicant.cOperaterCertfTyp', 'Applicant.cOperaterCertfCde', 'Applicant.tOperaterCertfEndTm', 'Applicant.cOccupTyp', 'Applicant.cHabitualResidence'];
-    const applicantCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '职业类别', '经常居住地'];
+    const applicantArr = ['Applicant.cNation', 'Applicant.cBusinessScope', 'Applicant.cCntrNme', 'Applicant.cOperaterCertfTyp', 'Applicant.cOperaterCertfCde', 'Applicant.tOperaterCertfEndTm', 'Applicant.cOccupTyp', 'Applicant.cHabitualResidence', 'Applicant.tCertfBgnDate', 'Applicant.tCertfEndDate'];
+    const applicantCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '职业类别', '经常居住地', '证件有效起期', '证件有效止期'];
     let appMsg = '';
     if(opertaor.getDataAll()["applicant"]) {
       const applicantData = opertaor.getDataAll()["applicant"];
@@ -4055,8 +4112,8 @@ const validateNPrmAmlya = () => {
       }
     }
     // ----------被保人------------
-    const insuredArr = ['Insured.cNation', 'Insured.cBusinessScope', 'Insured.cCntrNme', 'Insured.cOperaterCertfTyp', 'Insured.cOperaterCertfCde', 'Insured.tOperaterCertfEndTm', 'Insured.cHabitualResidence'];
-    const insuredCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '经常居住地'];
+    const insuredArr = ['Insured.cNation', 'Insured.cBusinessScope', 'Insured.cCntrNme', 'Insured.cOperaterCertfTyp', 'Insured.cOperaterCertfCde', 'Insured.tOperaterCertfEndTm', 'Insured.cHabitualResidence', 'Insured.tCertfBgnDate', 'Insured.tCertfEndDate'];
+    const insuredCnmArr = ['国籍 ', '经营范围', '办理人员姓名', '办理人员证件种类', '办理人员证件号码', '办理人员证件有效期', '经常居住地', '证件有效起期', '证件有效止期'];
     if(props.param.cProdNo === '029900' || props.param.cProdNo === '120001' || props.param.cProdNo === '120003') {
       insuredArr.push('Insured.cOccupCde')
       insuredCnmArr.push('职业')
@@ -4120,6 +4177,12 @@ const validateNPrmAmlya = () => {
       applicantRef.setFormItem('Applicant.cHabitualResidence', {
         rules: [],
       });
+      applicantRef.setFormItem('Applicant.tCertfBgnDate', {
+        rules: [],
+      });
+      applicantRef.setFormItem('Applicant.tCertfEndDate', {
+        rules: [],
+      });
     }
     if(insured) {
       const insuredRef = opertaor.getTableRefByKey('insured');
@@ -4147,6 +4210,119 @@ const validateNPrmAmlya = () => {
         rules: [],
       });
       insuredRef.setFormItem('Insured.cHabitualResidence', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.tCertfBgnDate', {
+        rules: [],
+      });
+      insuredRef.setFormItem('Insured.tCertfEndDate', {
+        rules: [],
+      });
+    }
+  }
+  return true;
+}
+
+// 批改保费变化为负数，校验反洗钱
+function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
+	const plyBaseData = opertaor.getDataAll()["base"];
+	const cPrmCur = plyBaseData['Base.cPrmCur']; // 保费币种
+	const nPrmRmbExch = plyBaseData['Base.nPrmRmbExch']; // 总保费汇率
+  const nPrmVar = EdrBaseData['EdrBase.nPrmVar']; // 退费金额，退费时为负数
+
+  // 如果不是退费（>=0），不触发
+  if (nPrmVar >= 0) {
+    return false;
+  }
+
+  // 取退费的绝对值（正数）
+  const refundAmount = Math.abs(nPrmVar);
+
+  // 人民币：退费 >= 10,000
+  if (cPrmCur === 'CNY' && refundAmount >= 10000) {
+		edrexpFlag.value = true
+    return true;
+  }
+
+  // 美元：退费 >= 1,000
+  if (cPrmCur === 'USD' && refundAmount >= 1000) {
+		edrexpFlag.value = true
+    return true;
+  }
+
+  // 其他外币：需折算为人民币
+  if (cPrmCur !== 'CNY' && cPrmCur !== 'USD') {
+    if (nPrmRmbExch != null) {
+      const refundInCNY = refundAmount * nPrmRmbExch;
+      if (refundInCNY >= 10000) {
+				edrexpFlag.value = true
+        return true;
+      }
+    }
+  }
+	edrexpFlag.value = false
+  return false;
+}
+const edrvalidateNPrmAmlya = (EdrBaseData) => {
+	if (edramlyaFlag(EdrBaseData)) {
+		nextTick(() => {
+			const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
+			let msg = `根据反洗钱相关规定，当前批单保费变化大于等于${CPrmCur === 'USD' ? '1千美元' : '1万'}，请完善客户信息中：<br/>`;
+			let flag = false;
+			
+			// ----------投保人------------
+			const edrexptArr = ['EdrBase.cSubtractPrmRsn', 'EdrBase.cNotBackAppRsn', 'EdrBase.cNotBackAppNo'];
+			const edrexpCnmArr = ['退保、减保或者办理保单贷款原因', '未退还至投保人账户的原因', '反洗钱非投保人收款审批单号'];
+			let appMsg = '';
+			const edrexpDataVlue =  edrexp.value?.getFromValue()
+			if(edrbase.value) {
+				const cAppNme = opertaor.getDataAll()["applicant"]['Applicant.cAppNme']; // 投保人名称
+				const cAcctNme = opertaor.getDataAll()["acctinfo"]['Acctinfo.cAcctNme']; // 收款人户名
+				if(cAppNme != cAcctNme){
+					for (const i in edrexptArr) {
+						const objValue = edrexpDataVlue[edrexptArr[i]];
+						if (objValue === null || objValue === '' || objValue === undefined) {
+							appMsg += edrexpCnmArr[i] + '、';
+							edrexp.value.setFormItem(edrexptArr[i], {
+								rules: [getRules("required", {})],
+								hidden: false,
+								disabled: false
+							});
+							flag = true;
+						}
+					}
+				} else {
+					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
+					if (objValue === null || objValue === '' || objValue === undefined) {
+						appMsg = '退保、减保或者办理保单贷款原因';
+						edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
+							rules: [getRules("required", {})],
+							hidden: false,
+							disabled: false
+						});
+						flag = true;
+					}
+				}
+				
+				if (appMsg !== '') {
+					msg += `【批改扩展信息】${appMsg}<br/>`;
+				}
+			}
+			if (flag) {
+				msg += '字段！'
+				ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
+				return false;
+			}
+		})
+  } else {
+    if(edrexp.value) {
+      edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
+        rules: [],
+      });
+      edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
+        rules: [],
+      });
+      edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
         rules: [],
       });
     }
@@ -4580,6 +4756,10 @@ const calcPremiumEdr = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["EdrBase"] = edrbase.value?.getFromValue();
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		res["EdrBase"] = {...res["EdrBase"],...data}
+	}
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
@@ -4630,6 +4810,11 @@ const calcPremiumEdr = async () => {
           ","
         );
       edrbase.value?.setFormValue(EdrBaseData);
+			
+ 			// 反洗钱校验
+			if (!edrvalidateNPrmAmlya(EdrBaseData)) {
+				return;
+			}
       const nPrmVar = ops["plyBase"]["Base.nPrmVar"]  || 0;
       
       if(opertaor.getTableRefByKey("ciMasterAgreement")) {
@@ -4766,6 +4951,10 @@ const calcPremiumEdrSurrender = () => {
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		res["EdrBase"] = {...res["EdrBase"],...data}
+	}
   if (
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != null &&
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] != "" &&
@@ -4827,6 +5016,10 @@ const calcPremiumEdrSurrender = () => {
             ].split(",");
         }
         edrbase.value?.setFormValue(EdrBaseData);
+				// 反洗钱校验
+				if (!edrvalidateNPrmAmlya(EdrBaseData)) {
+					return;
+				}
       }
       needCalc.value = false;
     } else {
@@ -4864,7 +5057,10 @@ const saveApplicationEdr = async () => {
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		res["data"]["EdrBase"] = {...res["data"]["EdrBase"],...data}
+	}
   if (res["data"]?.["cvrg"]?.length > 0) {
     res["data"]["cvrg"].forEach((item:any) => {
       if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
@@ -4962,6 +5158,10 @@ const getSurrenderPrecisFun = () => {
   const res = opertaor.getDataAll();
   res["user"] = user;
   res["EdrBase"] = edrbase.value?.getFromValue();
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		res["EdrBase"] = {...res["EdrBase"],...data}
+	}
   res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
   getSurrenderPrecis(res).then((result:any) => {
@@ -5007,6 +5207,12 @@ const submitEdrToUndrSurrender = async () => {
     ElMessage.error("请填写批改信息中的必填项")
     return
   }
+	const edrexpValidate = await edrexp.value?.validate();
+  if(!edrexpValidate) {
+    ElMessage.error("请填写批改扩展信息中的必填项")
+    return
+  }
+
 
   // 从共主联、从共无联保和数据开关校验
   const qryTerminationStatusFunc = await qryTerminationFunc('2')
@@ -5044,7 +5250,10 @@ const submitEdrToUndrSurrender = async () => {
   res["data"]["EdrBase"] = edrbase.value?.getFromValue();
   res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"] =
     res["data"]["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-  
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		res["data"]["EdrBase"] = {...res["data"]["EdrBase"],...data}
+	}
   submitEdrSurrender(res).then((result) => {
     bthList.value.forEach((item:any) => {
       if(['btn010101','btn010102','btn010103','btnCalEdr','btnCompare'].includes(item.id)) {
@@ -5100,7 +5309,11 @@ const saveEdrPlyInfo = async () => {
   ) {
     res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       res["EdrBase"]?.["EdrBase.cEdrRsnDetail"].join();
-  }
+	}
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		res["EdrBase"] = {...res["EdrBase"],...data}
+	}
 
   if(res["cvrg"]?.length > 0) {
     res["cvrg"].forEach((item:any) => {
@@ -5359,6 +5572,13 @@ const submitEdrToUndrFun = async () => {
       return
     }
   }
+	if(props.param.cTransMrk !== "1" ){
+    const edrexpValidate = await edrexp.value?.validate();
+     if(!edrexpValidate) {
+      ElMessage.warning("请填写批改信息中的必填项")
+      return
+    }
+  }
   // 非涉费批改 投保人信息、被保人信息校验
   if(props.param.cRsnCde === "FZ") {
     const applicantValidate = await opertaor.getTableRefByKey('applicant')?.validate()
@@ -5389,10 +5609,18 @@ const submitEdrToUndrFun = async () => {
   //     return
   //   }
 
-  // 反洗钱校验
-  if (!validateNPrmAmlya()) {
-    return;
-  }
+	// 反洗钱校验
+	if (props.param.cTransMrk !== "1") {
+		let data = edrbase.value?.getFromValue()
+		if (!edrvalidateNPrmAmlya(data)) {
+    	return;
+  	}
+	} else {
+		if (!validateNPrmAmlya()) {
+    	return;
+  	}
+	}
+
   if (validateGuaranteeBgnTm()) {
     return;
   }
@@ -5579,7 +5807,11 @@ if(props.param.cTransMrk !== "1"){
         ) {
           calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] =
             calcData["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-        }
+				}
+				if (edrexp.value && edrexpFlag) {
+					let data = edrexp.value?.getFromValue();
+					calcData["EdrBase"] = {...calcData["EdrBase"],...data}
+				}
         // if(calcData['ci'] && calcData['ci'].length>0){
         //   calcData['ci'].forEach((item:any)=>{
         //     if(item['Ci.nCiShare']){
@@ -7036,7 +7268,11 @@ async function calcEdrFunc() {
   ) {
     calcData["EdrBase"]["EdrBase.cEdrRsnDetail"] =
       calcData["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-  }
+	}
+	if (edrexp.value && edrexpFlag) {
+		let data = edrexp.value?.getFromValue();
+		calcData["EdrBase"] = {...calcData["EdrBase"],...data}
+	}
   bthList.value.forEach((item:any) => {
     if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
       item.loading = true;
@@ -7352,7 +7588,11 @@ const queryTermRateLimitFun = (calcFun: any) => {
     ) {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
         res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
-    }
+		}
+		if (edrexp.value && edrexpFlag) {
+			let data = edrexp.value?.getFromValue();
+			res["EdrBase"] = {...res["EdrBase"],...data}
+		}
   } else if(calcFun === calcPremium) {
     res["plyBase"]["Base.cDptCde"] = props.param?.cDptCde;
     res["plyBase"]["Base.cProdNo"] = props.param?.cProdNo;
@@ -7367,6 +7607,10 @@ const queryTermRateLimitFun = (calcFun: any) => {
       res["EdrBase"]["EdrBase.cEdrRsnDetail"] =
         res["EdrBase"]["EdrBase.cEdrRsnDetail"].join();
     }
+		if (edrexp.value && edrexpFlag) {
+			let data = edrexp.value?.getFromValue();
+			res["EdrBase"] = {...res["EdrBase"],...data}
+		}
   }
   queryTermRateLimit(res).then((r:any) => {
     if(r.code === 200) {
