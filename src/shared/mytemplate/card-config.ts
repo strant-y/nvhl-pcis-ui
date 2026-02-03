@@ -40,7 +40,7 @@ export function creatCardConfig(
     showBtn: config.showBtn || true,
     shadow: config.shadow || true,
     showEdit: config.showEdit || false,
-    showMyfrom: config.showMyfrom || true,
+    showMyfrom: config.showMyfrom ?? true,
     showMyfromBtm: config.showMyfromBtm || false,
     showInTitle: config.showInTitle || false,
     production: config.production || false,

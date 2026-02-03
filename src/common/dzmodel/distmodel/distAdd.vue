@@ -405,6 +405,10 @@ onMounted(async () => {
 		if (item.prop == 'Dist.cCertfCls') {
       item['func'] =  cCertfClsChange;
     }
+		// 040019 保全被申请人信息 身份证
+		if (route.params.param.cProdNo == '040019' && item.prop == 'Dist.cMobile') {
+      item['rules'] = [getRules("phoneNo", {})];
+    }
     if(item.prop == 'Dist.cInvoiceCur'){
         const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
         const cargoList = distTableRef?.getTableData() || [];
