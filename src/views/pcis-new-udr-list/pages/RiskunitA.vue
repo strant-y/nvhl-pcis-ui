@@ -638,6 +638,26 @@ function setFromSchemaItem(key: any, rules: any, disabled: any) {
 const setFormItem = (key: any, obj: any) => {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
+      if(item.inputtype === "rtinputgroup") {
+        item.groupList.forEach((groupItem:any) => {
+          if (groupItem.prop === key) {
+            //控制尾部按钮的
+            if (groupItem.loadData && obj.loadData) {
+              let newBtnItems = null;
+              if (obj.loadData.length != 0) {
+                for (let key in obj.loadData) {
+                  groupItem.loadData[key] = obj.loadData[key];
+                }
+              } else {
+                groupItem.loadData = obj.loadData;
+              }
+              newBtnItems = groupItem.loadData;
+              newBtnItems && (obj.loadData = newBtnItems);
+            }
+            Object.assign(groupItem, obj);
+          }
+        });
+      } else
       if (item.prop === key) {
         //控制尾部按钮的
         if (item.loadData && obj.loadData) {
