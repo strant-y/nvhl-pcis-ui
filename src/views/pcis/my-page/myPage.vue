@@ -1044,11 +1044,106 @@ const copyPolicyFun = () => {
       router.push({
         path: "/pcisapp/myPage",
         query: {
-          param: JSON.stringify(param),
+          param: JSON.stringify({ ...param, pageType: 'copy', cAppTyp: 'A' }),
         },
       });
       setTimeout(() => {
-        window.location.reload();
+        getAppPolicyForCopy({
+          cAppNo: res.body.cAppNo,
+        }).then((res) => {
+          if (res) {
+            const ops = clearCAppNo(opertaor.convertData(res));
+            // 保险期限 投保日期更新为当前日期 保险起期和保险止期重置为第二天0点至一年后
+            if(ops.insrnc) {
+              // const beginTm = dayjs().add(1, 'day').format("YYYY-MM-DD 00:00:00")
+              // const endTm = dayjs().add(1, 'year').format("YYYY-MM-DD 23:59:59")
+              // ops.insrnc["Base.tInsrncBgnTm"] = beginTm;
+              // ops.insrnc["Base.tInsrncEndTm"] = endTm;
+              // ops.insrnc['Base.tAppTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
+              let productCode = route.params.param?.cProdNo;
+              setInsuranceTerm(ops,productCode);
+            }
+            // 条款信息中的cPkId删除
+            if(ops.cvrg && ops.cvrg.length > 0) {
+              ops.cvrg.forEach((item:any) => {
+                delete item['Term.cPkId']
+                if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
+                  item['Term.riskList'].forEach((i:any) => {
+                    delete i['Term.cPkId']
+                  })
+                }
+              })
+            }
+            // 承包基本信息中的保额和保费也初始化为0
+            if(ops.base) {
+              ops.base['Base.nPrm'] = 0
+              ops.base['Base.nAmt'] = 0
+            }
+            // 缴费计划列表清空
+            if(ops.payinfo && ops.payinfo.length > 0) {
+              ops.payinfo = []
+            }
+            // 特约信息
+            if(ops.SpecialAgreement && ops.SpecialAgreement.length > 0) {
+              ops.SpecialAgreement.forEach((item:any) => {
+                delete item['SpecialAgreement.cPkId']
+              })
+            }
+            // 免赔条件
+            if(ops.deductibleDist && ops.deductibleDist.length > 0) {
+              ops.deductibleDist.forEach((item:any) => {
+                delete item['DeductibleDist.cPkId']
+              })
+            }
+            // 保单基本信息 录单日期和签单日期默认为当前年月日
+            if(ops.plyBase) {
+              ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+              ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+              ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
+              ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
+              ops.plyBase['Base.cAgtAgrNo'] = "" // 代理合作协议
+              ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
+              ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
+              ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
+              // ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+              // ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+              // ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+              ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
+              ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
+              ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
+              ops.plyBase['Base.cSlsDptcde'] = "" // 业务员机构代码
+              ops.plyBase['Base.cSlsCde'] = "" // 业务员执业证号
+              ops.plyBase['Base.cCiOprRel'] = "" // 录单人联系方式
+              ops.plyBase['Base.cBunTrackInf'] = "" // 业务跟踪人信息
+              ops.plyBase['Base.cRemark'] = "" // 出单员备注
+              ops.plyBase['Base.cRiFacMrk'] = null
+              ops.plyBase['Base.cRiFacOpn'] = null
+              ops.plyBase['Base.cRiFacCde'] = null
+              ops.plyBase['Base.cSpecialApprovalCode'] = null // 特批码
+              ops.plyBase['Base.cConfirmSequenceNo'] = null // 核保确认码
+              ops.plyBase['Base.cPreConfirmSequenceNo'] = null // 保单/批单预确认码
+              ops.plyBase['Base.cUwConfirmSequenceNo'] = null // 保单/批单确认码
+            }
+            ops['plyBase']['Base.cPlyNo'] = ''
+            // if(ops['ci'] && ops['ci'].length>0){
+            //   ops['ci'].forEach((item:any)=>{
+            //     if(item['Ci.nCiShare']){
+            //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+            //     }
+            //   })
+            // }
+            opertaor.setDataAll(ops);
+            // 获取原申请单号下的清单列表数据
+            // const distMap = formconfig1[0].pageInfo.filter((item:any) => {
+            //   return item.pageKey === "dist";
+            // });
+            // distMap.forEach((item:any) => {
+            //   getDistData(props.param?.cAppNo, item)
+            // });
+            //获取单号
+            // getCAppNoFun();
+          }
+        });
       }, 500);
     }
   });
@@ -2127,9 +2222,9 @@ async function loadAfter() {
           ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
           ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
           ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
-          ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
-          ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
-          ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+          // ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+          // ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+          // ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
           ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
           ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
           ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
@@ -2309,9 +2404,9 @@ async function loadAfter() {
           ops.plyBase['Base.cBrkSlsCde'] = null // 代理业务员
           ops.plyBase['Base.cCertfNo'] = "" // 代理业务执业证号
           ops.plyBase['Base.cBrkrDptcde'] = "" // 代理业务员机构代码
-          ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
-          ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
-          ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
+          // ops.plyBase['Base.cPrjCtgTyp'] = null // 项目类别大类
+          // ops.plyBase['Base.cPrjCtgMidTyp'] = null // 项目类别中类
+          // ops.plyBase['Base.cPrjCtgSubTyp'] = null // 项目类别子类
           ops.plyBase['Base.cSlsId'] = "" // 业务员员工号
           ops.plyBase['Base.cSlsNme'] = "" // 业务员名称
           ops.plyBase['Base.cSlsTel'] = "" // 业务员电话
