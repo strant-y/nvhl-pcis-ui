@@ -1,1 +1,0 @@
-import{aX as s,W as e,c as t,e as a,F as r,w as n,br as o}from"./index.C5ua969O.js";const c={style:{padding:"30px"}};const d=s({},[["render",function(s,d){const i=e("router-view"),l=o;return a(),t("div",c,[r(l,{closable:!1,title:"菜单二级",type:"success"},{default:n((()=>[r(i)])),_:1})])}]]);export{d as default};
