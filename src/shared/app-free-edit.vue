@@ -156,7 +156,7 @@ interface dynamicFormMethod {
   getFromValue: () => any;
   setFormValue: (data: any, noupdate?: boolean) => void;
   validate: () => any;
-  setValue: (key: any, value: any) => void;
+  setValue: (key: any, value: any, noupdate?: boolean) => void;
   getValue: (key: any) => any;
   checkKey: (key: any) => boolean;
   clearValidate: (key: string | null ) => any;
@@ -271,11 +271,11 @@ function getValue(key: any) {
     return dynamicForm.value?.getValue(key);
   }
 }
-function setValue(key: any, value: any) {
+function setValue(key: any, value: any, noupdate = false) {
   if (superDynamicForm.value?.checkKey(key)) {
-    superDynamicForm.value?.setValue(key, value);
+    superDynamicForm.value?.setValue(key, value,noupdate);
   }else {
-    dynamicForm.value?.setValue(key, value);
+    dynamicForm.value?.setValue(key, value,noupdate);
   }
 }
 function setDisabledAll(isDisabled: boolean = true) {

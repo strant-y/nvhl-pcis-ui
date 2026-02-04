@@ -27,7 +27,7 @@ export interface AppFreeEditMethod {
   getFromValue: () => any;
   setFormValue: (data: any,noupdate?: boolean) => void; // 设置表单值 noupdate:限制不触发update方法
   validate: () => any;
-  setValue: (key: any, value: any) => void;
+  setValue: (key: any, value: any, noupdate?: boolean) => void;
   getValue: (key: any) => any;
   clearValidate: (key: string | null ) => any;
   setDisabledAll: (isDisabled: boolean) => void;
