@@ -3478,8 +3478,11 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
     "YYYY-MM-DD HH:mm:ss"
   );
+  // 如果保险期限小于30天，则缴费截止时间为保险期限止期
   if(Number(tmDay.value) < 30) {
-    pay["Pay.tPayEndTm"] = insrnc["Base.tInsrncEndTm"]
+    pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncEndTm"]).format(
+      "YYYY-MM-DD HH:mm:ss"
+    );
   }
   pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
