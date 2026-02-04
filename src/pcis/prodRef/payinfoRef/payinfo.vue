@@ -216,6 +216,7 @@ const method = {
       item['Pay.nPayablePrm'] = item['Pay.nPayablePrm'] || 0;
       item['Pay.nOwnPrm'] = item['Pay.nPayablePrm'] ? parseFloat((item['Pay.nPayablePrm'] * nCiShare ).toFixed(8)) : 0
       num += item['Pay.nOwnPrm']
+      item['Pay.nPrmVar'] = item['Pay.nPayablePrm'];
    })
     console.log('差额', getFromValue()[getFromValue().length - 1])
     if (!cCiMrk) {
