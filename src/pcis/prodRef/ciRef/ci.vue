@@ -531,12 +531,12 @@ const method = {
     }, 0);
     const diff = Math.abs(totalCiPrm - nPrm);
     // 如果差值大于1，则提示并恢复当前行的保费
-    // if (diff > 1) {
-    //   ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
-    //   // 恢复当前行的联共保保费为原来的值
-    //   freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
-    //   return;
-    // }
+    if (diff > 1) {
+      ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
+      // 恢复当前行的联共保保费为原来的值
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
+      return;
+    }
   },
   //保单编号change事件
   cPolicyNoChange: (val, row) => {
