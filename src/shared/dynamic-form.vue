@@ -704,9 +704,11 @@ function getValue(key: any) {
   return form[key];
 }
 
-function setValue(key: any, value: any) {
+function setValue(key: any, value: any, noupdate = false) {
   form[key] = value;
-  emits("formsDataUpdate", form);
+  if (!noupdate) {
+    emits("formsDataUpdate", form);
+  }
 }
 
 function checkRequired(item: any) {

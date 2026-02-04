@@ -1,1 +1,0 @@
-import{aV as a,c as s,e,l as r}from"./index.BvvC17Al.js";const n={class:"app-container"};const t=a({},[["render",function(a,t){return e(),s("div",n,[...t[0]||(t[0]=[r("iframe",{src:"https://juejin.cn/post/7228990409909108793",frameborder:"0"},null,-1)])])}],["__scopeId","data-v-7df23cf9"]]);export{t as default};

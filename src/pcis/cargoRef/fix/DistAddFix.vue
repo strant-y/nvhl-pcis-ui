@@ -958,9 +958,9 @@ const tCertMrkChecked = (val:any)=>{
     );
     setFormItem("ECargoInsuredDist.tCertfEndDate", { disabled: true });
 
-  } else {
-    setValue("ECargoInsuredDist.tCertfBgnDate", "");
-    setValue("ECargoInsuredDist.tCertfEndDate", "");
+	} else {
+    // setValue("ECargoInsuredDist.tCertfBgnDate", "");
+    // setValue("ECargoInsuredDist.tCertfEndDate", "");
     if (!initFlag || props.data.title === '新增') {
       setFormItem("ECargoInsuredDist.tCertfEndDate", { disabled: false });
     }
@@ -1340,9 +1340,12 @@ const checkUser = () => {
                   setValue(key, result[key]);
                 }
               });
-
-              setValue('ECargoInsuredDist.cInsuredCde', data[0]['ECargoInsuredDist.cCargoAppCde']);
-              setValue('ECargoInsuredDist.cCertfCde', data[0]['ECargoInsuredDist.cCargoCertfCde']);
+							if (data[0]['ECargoInsuredDist.cCargoAppCde']) {
+								setValue('ECargoInsuredDist.cInsuredCde', data[0]['ECargoInsuredDist.cCargoAppCde']);
+							}
+              if (data[0]['ECargoInsuredDist.cCargoCertfCde']) {
+								setValue('ECargoInsuredDist.cCertfCde', data[0]['ECargoInsuredDist.cCargoCertfCde']);
+							}
               let userId = getValue('ECargoInsuredDist.cCertfCde')
               idAnalysis(userId)
             }
