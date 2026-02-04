@@ -208,7 +208,7 @@ const loadDatOne = (val:any)=>{
       pageresult.list = res.data.data
       pageresult.total = res.data.total
     }else {
-      ElMessage.success(res.msg);
+      ElMessage.error(res.msg);
     }
   })
 }
@@ -229,13 +229,13 @@ const loadData = (cAppNodata = '',flag = true)=>{
 				pageresult.total = 0
 			}
 		}else {
-			ElMessage.success(res.msg);
+			ElMessage.error(res.msg);
 		}
 	})
 }
 
 // 更改
-const saveTgt = async (res:any)=>{
+const saveTgt = async (res:any, flag)=>{
 	const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
 	const cEcAgrNo = opertaor.getDataAll()['plyBase']['Base.cEcAgrNo'] || ''
   const newRow = {
@@ -246,8 +246,13 @@ const saveTgt = async (res:any)=>{
     },
     cAppNo: cAppNo || ''
   };
-  const result =  await cargoApi.saveDistNew(newRow)
-  loadData()
+	const result = await cargoApi.saveDistNew(newRow)
+	if (result.code == 200) {
+		loadData()
+		ElMessage.success(`${flag}成功`);
+	} else {
+		ElMessage.error(result.msg ||`${flag}失败`);
+	}
 }
  function filterFromSchema(obj:any) {
   // 如果对象不存在或者没有fromSchema属性，直接返回
@@ -318,7 +323,7 @@ const method = {
         },
         {
           isOk: (res: any) => {
-            saveTgt(res)
+            saveTgt(res, '新增')
           },
         },
         {width: "85"}
@@ -351,7 +356,7 @@ const method = {
         },
         {
           isOk: (res: any) => {
-            saveTgt(res)
+            saveTgt(res, '修改')
           },
         },
         {width: "85"}
@@ -385,7 +390,7 @@ const method = {
 			const param = {
 				cComponentTable:cComponentTableValue,
 				cPkId: [row['InsuredDist.cPkId']],
-				cAppNo: cAppNo || '',
+				cAppNo: cappNo || '',
 				cProdNo: route.params.param?.cProdNo,  //产品号
 			}
 			deleteDist(param).then((res: any) => {
@@ -397,7 +402,6 @@ const method = {
 				}
 			});
 		}).catch((err) => {
-			ElMessage.error(err.msg || '删除失败');
 		})
   },
 	// 批量删除
@@ -420,31 +424,32 @@ const method = {
       ElMessage.warning("请先选择要删除的数据");
       return;
     }
-    ElMessageBox.confirm(
-        "是否确认删除选中的数据？",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-    ).then(() => {
-      const param = {
-				cComponentTable:cComponentTableValue,
-        cPkId: selectedRows.value.map((row: any) => row['InsuredDist.cPkId']),
-        cAppNo:'',
+		ElMessageBox.confirm(
+			"是否确认删除选中的数据？",
+			"提示",
+			{
+				confirmButtonText: "确定",
+				cancelButtonText: "取消",
+				type: "warning",
+			}
+		).then(() => {
+			const param = {
+				cComponentTable: cComponentTableValue,
+				cPkId: selectedRows.value.map((row: any) => row['InsuredDist.cPkId']),
+				cAppNo: '',
 				cProdNo: route.params.param?.cProdNo,  //产品号
-      }
-      param['cAppNo'] = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
-      deleteDist(param).then((res: any) => {
-        if (res.code === 200) {
-          ElMessage.success("删除成功");
-          loadData()
+			}
+			param['cAppNo'] = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || ''
+			deleteDist(param).then((res: any) => {
+				if (res.code === 200) {
+					ElMessage.success("删除成功");
+					loadData()
 				} else {
 					ElMessage.error(res.msg || '删除失败');
 				}
-      });
-    });
+			});
+		}).catch((err) => {
+		});
   },
 
 	setregistAdd() {
@@ -746,7 +751,7 @@ function handleQuery(queryParams: any = { pageNum: 1, pageSize: 10 }) {
 				pageresult.total = 0
 			}
 		}else {
-			ElMessage.success(res.msg);
+			ElMessage.error(res.msg);
 		}
 	})
 }

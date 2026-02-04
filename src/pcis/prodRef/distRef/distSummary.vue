@@ -35,6 +35,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { useRoute } from "vue-router";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {eventBus} from "@/utils/event-bus";
 
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
@@ -134,7 +135,7 @@ const getCComponentTableValue = (cProdNo: string, title: string): string => {
   }
   return "";
 };
-
+let cRelatedInsuredflag = ref(false)  // 是否存在关联被保险人字段
 const formconfig11 = ref<any>({});
 onMounted(async () => {
   formconfig11.value = formInit(
@@ -160,6 +161,17 @@ onMounted(async () => {
   tableconfig.value.formconfig = createAppGridEditConfig({
     titleBtns: formconfig1.value.titleBtns,
     fromSchema: formconfig1.value.distSchema,
+	});
+	tableconfig.value.fromSchema.forEach( r => {
+		// 团单营业场所地址清单关联被保险人清单
+		if (r['prop'] === 'DistSummary.cRelatedInsured') {
+			cRelatedInsuredflag.value = true
+			eventBus.on('setMap-DistSummary040001', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
+    }
   });
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
@@ -375,6 +387,26 @@ const query = (param: any) => {
             });
         }
       }
+			// 040001 set 关联被保险人 下拉值
+			if (cRelatedInsuredflag.value) {
+					if(pageresult.list.length>0){
+						pageresult.list.forEach((item: any) => {
+							if (item['DistSummary.cRelatedInsured']) {
+								item['DistSummary.cRelatedInsured'] = item['DistSummary.cRelatedInsured'].split(',')
+							}
+						})
+					}
+					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
+					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
+						label: i['InsuredDist.cInsuredNme'],
+						value: i['InsuredDist.cPkId']
+						// value: i['InsuredDist.cInsuredCde']
+					})) : []
+					eventBus.emit('setMap-DistSummary040001', {
+						code: 'DistSummary.cRelatedInsured',
+						list
+					});
+        }
     }
   });
 }
