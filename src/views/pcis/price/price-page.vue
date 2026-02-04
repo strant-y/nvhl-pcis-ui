@@ -1131,7 +1131,7 @@ const basicBtn = [
     },
   }),
   createFreeButtonBase({
-    label: "申请核保",
+    label: "提交审批",
     type: "warning",
     id: "btn010103",
     func: () => {
@@ -1606,7 +1606,7 @@ async function loadAfter() {
           },
         }),
         createFreeButtonBase({
-          label: "申请核保",
+          label: "提交审批",
           type: "primary",
           id: "btn010103",
           func: () => {
