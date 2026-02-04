@@ -1357,6 +1357,7 @@ function initMethod(){
       termFactormap.value.forEach((item: any) => {
         if(item.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
+          item.readonly = false;
           item.funcBlur = (val:any) => nInsuranceFeeChange(val)
         }
       });
@@ -1423,6 +1424,7 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.readonly = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
@@ -1492,6 +1494,7 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.readonly = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });

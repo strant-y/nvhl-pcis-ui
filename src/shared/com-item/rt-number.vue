@@ -1,8 +1,8 @@
 <template>
   <template v-if="!showLabel">
     <el-tooltip
-        :content="changeContent"
-        :disabled="!changeContent"
+        :content="changeContent || vInput && item.precision ? vInput.toFixed(item.precision) : vInput"
+        :disabled="!changeContent && !vInput"
         placement="top"
     >
       <el-input-number

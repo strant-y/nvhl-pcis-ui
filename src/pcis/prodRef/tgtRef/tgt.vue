@@ -260,6 +260,10 @@ onMounted(async () => {
       }
     })
   }
+  // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
+  if(params.cProdNo === '059902') {
+    method.getcGuaranteeMethodChange('');
+  }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
     const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
@@ -468,7 +472,7 @@ function calAgeDif(val1: any, val2: any) {
 
   return Math.round(diffInYears)
 }
-const guaranteeMethodList = ['Tgt.cCollateralName', 'Tgt.cPledgeNumber', 'Tgt.cPledgeAddress', 'Tgt.cItemNumber', 'Tgt.nFaceValue', 'Tgt.cApplicationLine', 'Tgt.cBankApply', 'Tgt.cAcceptor', 'Tgt.cMaturityWeek', 'Tgt.cDueWeek', 'Tgt.tTicketStartingandending', 'Tgt.cConfirmingBank']
+const guaranteeMethodList = ['Tgt.cCollateralName', 'Tgt.cPledgeNumber', 'Tgt.cPledgeAddress', 'Tgt.cItemNumber', 'Tgt.nFaceValue', 'Tgt.cApplicationLine', 'Tgt.cBankApply', 'Tgt.cAcceptor', 'Tgt.cMaturityWeek', 'Tgt.cDueWeek', 'Tgt.tTicketStartingandending', 'Tgt.cConfirmingBank','Tgt.nLoanAmount']
 const cMortgageList = ['Tgt.cMortgageName', 'Tgt.cMortgageNumber', 'Tgt.cCollateralAddress']
 const setcDetailedAddress = (prop: any, aftProp: any) => {
   const ads = getValue(prop[0].prop);
@@ -524,6 +528,7 @@ const method = {
     setValue('Tgt.nServiceLife', calAgeDif(insrnc['Base.tAppTm'], val))
   },
   getcGuaranteeMethodChange: (val: string) => {
+    const param = opertaor.getParam();
     //担保方式选择"质押贷款"时带出
     if (val === 'B05Assure004') {
       guaranteeMethodList.forEach(item => {
@@ -536,6 +541,8 @@ const method = {
         setFormItem(item, {
           hidden: true,
         });
+        if (param.initFlag) return
+        setValue(item, '');
       })
     }
     // 担保方式选择"抵押贷款"时带出
@@ -550,6 +557,8 @@ const method = {
         setFormItem(item, {
           hidden: true,
         });
+        if (param.initFlag) return
+        setValue(item, '');
       })
     }
     // 担保方式选择"保证贷款 "时带出
@@ -561,6 +570,8 @@ const method = {
       setFormItem('Tgt.cTypeName', {
         hidden: true,
       });
+      if (param.initFlag) return
+      setValue('Tgt.cTypeName', '');
     }
   },
   // 是否单项工程 

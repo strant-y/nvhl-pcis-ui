@@ -1616,6 +1616,35 @@ const method = {
   tOEndTmDisable: (date: any) => {
     return disablePastDates(date);
   },
+  // 国籍
+  cNationChange:(val:any) => {
+    // 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+    if(val && val !== 'CHN') {
+      setFormItem("Insured.ClntAddrProp", {
+        disabled: true,
+        rules: []
+      });
+      setFormItem("Insured.RegisterProp", {
+        disabled: true,
+      });
+    } else {
+      setFormItem("Insured.ClntAddrProp", {
+        disabled: false,
+        rules: [getRules("required", {})]
+      });
+      setFormItem("Insured.RegisterProp", {
+        disabled: false,
+      });
+    }
+		const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    setValue("Insured.ClntAddrProp", null);
+    setValue("Insured.cSuffixAddr", '');
+    setValue("Insured.RegisterProp", null);
+    setValue("Insured.cRegisterSuffixAddr", '');
+  },
 };
 
 function setregistAdd() {
