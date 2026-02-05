@@ -94,6 +94,13 @@ const cardConfig = reactive<CardConfig>(
 	})
 );
 onMounted(async () => {
+	if (!!props.data?.pageType &&(props.data?.pageType == 'readonly' || props.data?.pageType == 'PLY_UW_PROCESS_SCENE' || props.data?.pageType == 'UW_READ_SCENE')) {
+		saveHidden.value = true
+		setTimeout(() => {
+			appExtendInfoRef?.value?.setDisabledAll(true)
+			inextendRef?.value?.setDisabledAll(true)
+		},1000)
+	}
 	if (!!props.data?.cRsnCde && props.data?.cRsnCde == "BH" && !props.getNo) {
 		saveHidden.value = true
 	}
