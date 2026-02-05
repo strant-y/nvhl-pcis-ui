@@ -173,7 +173,7 @@ const cProdNos = ['010001','010002','010003','010004','010020','070002'];
 
 // 货物信息回填到标的信息的产品
 const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017'])
-
+let cRelatedInsuredflag = ref(false)  // 是否存在关联被保险人字段
 watch(
     () => pageresult.list,
     async (newVal: any) => {
@@ -457,6 +457,7 @@ onMounted(async () => {
 		}
 		// 团单营业场所地址清单关联被保险人清单
 		if (r['prop'] === 'Dist.cRelatedInsured') {
+			cRelatedInsuredflag.value = true
       eventBus.on('setMap-AddressDist040001', (data: any) => {
         if(data.list && data.list.length > 0) {
           r.loadData = data.list
@@ -862,7 +863,7 @@ const method = {
 				}
 
 				// 040001 set 关联被保险人 下拉值
-				if (props.compKey === 'AddressDist040001') {
+				if (cRelatedInsuredflag.value) {
 					if(pageresult.list.length>0){
 						pageresult.list.forEach((item: any) => {
 							if (item['Dist.cRelatedInsured']) {
@@ -873,8 +874,8 @@ const method = {
 					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
 					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
 						label: i['InsuredDist.cInsuredNme'],
-						// value: i['InsuredDist.cPkId']
-						value: i['InsuredDist.cInsuredCde']
+						value: i['InsuredDist.cPkId']
+						// value: i['InsuredDist.cInsuredCde']
 					})) : []
 					eventBus.emit('setMap-AddressDist040001', {
 						code: 'Dist.cRelatedInsured',
@@ -1761,14 +1762,14 @@ function getFatherPageOldProductResData() {
       });
 		}
 		// 团单营业场所地址清单关联被保险人清单
-    if(props.compKey === 'AddressDist040001') {
+    if(cRelatedInsuredflag.value) {
 			oldPageSchema.value.fromSchema.forEach((item: any) => {
         if(item.prop === 'Dist.cRelatedInsured') {
-          const list = opertaor.getTableRefByKey('GrpMember')?.getTableData()
+          const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['InsuredDist.cInsuredNme'],
-            // value: i['InsuredDist.cPkId']
-            value: i['InsuredDist.cInsuredCde']
+            value: i['InsuredDist.cPkId']
+            // value: i['InsuredDist.cInsuredCde']
           })) : []
         }
       });

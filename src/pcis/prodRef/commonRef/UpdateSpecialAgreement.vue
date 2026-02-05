@@ -40,10 +40,7 @@ import {
   getUnbindSpecRefProd, editSpecStatus,
 } from "@/api/prod";
 import {ref, reactive, defineEmits, defineProps, onMounted} from "vue";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
 const emits = defineEmits(["ok", "cancel"]);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
 const props = defineProps<{
   data: Object;
   type: String;
@@ -52,7 +49,6 @@ const dialogVisible = ref(true);
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("prodInfo");
 const { getRules } = useValidator();
 
 
