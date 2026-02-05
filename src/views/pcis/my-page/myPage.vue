@@ -4398,7 +4398,15 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 			const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
 			let msg = `根据反洗钱相关规定，当前批单保费变化大于等于${CPrmCur === 'USD' ? '1千美元' : '1万'}，请完善客户信息中：<br/>`;
 			let flag = false;
-			
+			let isDis = false;
+			let isMsg = false;
+			if (props.param.pageType === "EDR_APP_NEW_SCENE") {
+				isDis = true
+				isMsg = true
+			} else if ((props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !=='1')) {
+				isDis = true
+				isMsg = false
+			}
 			// ----------投保人------------
 			const edrexptArr = ['EdrBase.cSubtractPrmRsn', 'EdrBase.cNotBackAppRsn', 'EdrBase.cNotBackAppNo'];
 			const edrexpCnmArr = ['退保、减保或者办理保单贷款原因', '未退还至投保人账户的原因', '反洗钱非投保人收款审批单号'];
@@ -4415,7 +4423,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 							edrexp.value.setFormItem(edrexptArr[i], {
 								rules: [getRules("required", {})],
 								hidden: false,
-								disabled: false
+								disabled: !isDis
 							});
 							flag = true;
 						}
@@ -4427,7 +4435,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 						edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
 							rules: [getRules("required", {})],
 							hidden: false,
-							disabled: false
+							disabled: !isDis
 						});
 						flag = true;
 					}
@@ -4437,7 +4445,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 					msg += `【批改扩展信息】${appMsg}<br/>`;
 				}
 			}
-			if (flag) {
+			if (flag && isMsg) {
 				msg += '字段！'
 				ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
 				return false;

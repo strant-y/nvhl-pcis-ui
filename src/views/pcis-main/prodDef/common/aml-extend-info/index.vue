@@ -180,7 +180,7 @@ const save = async () => {
         { prop: 'cCerftNation', label: '国籍' },
         { prop: 'tCerftBgnTm', label: '证件有效起期' },
         { prop: 'tCerftEndTm', label: '证件有效止期' },
-        { prop: 'cCusAddr', label: '地址' }
+        // { prop: 'cCusAddr', label: '地址' }
       ];
       
       for (let i = 0; i < appInfo.appGridEdit.items.length; i++) {
@@ -227,7 +227,7 @@ const save = async () => {
         { prop: 'cCerftCde', label: '证件号码' },
         { prop: 'tCerftBgnTm', label: '证件有效起期' },
         { prop: 'tCerftEndTm', label: '证件有效止期' },
-        { prop: 'cCusAddr', label: '地址' }
+        // { prop: 'cCusAddr', label: '地址' }
       ];
       
       for (let i = 0; i < insInfo.insGridEdit.items.length; i++) {
