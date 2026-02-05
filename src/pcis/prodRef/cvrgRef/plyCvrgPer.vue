@@ -316,7 +316,7 @@ const method = {
         }
         if(row.riskList){
             row.riskList.forEach((item:any)=>{
-                if(item['TermRisktgt.cDistPkId']){
+                if(item['TermRisktgt.cDistPkId'] && item['TermRisktgt.cLiabCode'] === selectedRow.value?.data?.['TermRisktgt.cLiabCode']){
                     existPkId.push(item['TermRisktgt.cDistPkId'])
                 }
             })
@@ -831,9 +831,11 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
       });
 		} else {
 			formData.value['m'][0]['riskList'].forEach((item: any) => {
-        item['TermRisktgt.cDistCodeNo'] = value;
-        item['TermRisktgt.cDistPkId'] = pkId;
-        item['TermRisktgt.nInsuranceAmount'] = amount;
+        if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
+          item['TermRisktgt.cDistCodeNo'] = value;
+          item['TermRisktgt.cDistPkId'] = pkId;
+          item['TermRisktgt.nInsuranceAmount'] = amount;
+        }
       });
 		}
   }
