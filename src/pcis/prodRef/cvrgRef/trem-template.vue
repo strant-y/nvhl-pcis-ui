@@ -1014,22 +1014,6 @@ function dataInit(initFlag : boolean = false) {
       rules: []
     });
   }
-  // 041014 团单展示 关联被保险人要素
-  if(pageparam.cProdNo === "041014" && pageparam.cGrpMrk == "0") {
-    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
-  }
-  // 041007 团单展示 关联被保险人要素且必填
-  if(pageparam.cProdNo === "041007") {
-    if(pageparam.cGrpMrk == "1") {
-      termFactormap.value.forEach((item:any) => {
-        if(item.prop === "Term.nRelatedInsuredCount") {
-          item.required = true
-        }
-      })
-    } else {
-      termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
-    }
-  }
 }
 
 // 是否需要数据初始化渲染
@@ -1040,6 +1024,20 @@ function setTermConf(d: any,initFlag: boolean){
   groupInfo.value = d.groupInfo;
   term.value = d.term;
   termFactormap.value = getUseData(d.termFactormap);
+	// 团单展示 关联被保险人要素
+  if(pageparam.cGrpMrk == "0") {
+    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
+  }
+  // 041007 团单展示 关联被保险人要素且必填
+  if(pageparam.cProdNo === "041007") {
+    if(pageparam.cGrpMrk == "1") {
+      termFactormap.value.forEach((item:any) => {
+        if(item.prop === "Term.nRelatedInsuredCount") {
+          item.required = true
+        }
+      })
+    }
+	}
 
   if (d.riskConf?.CCnm) { // 获取条择标，显示样式
     riskShowTyp.value = d.riskConf.CCnm;
@@ -1714,7 +1712,6 @@ async function validate() {
   return (res === true ? true : false) && validate;
 }
 function setDisabledAll() {
-  console.log(1111);
   if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType && !props.modelValue['Term.cRowId']){
     // 批改新增条款时，不禁用
     return ;
@@ -1934,14 +1931,18 @@ const methodMap = {
     termdata.value['Term.cExcessLayer'] = val;
     const r = riskTableRef.value?.getTableValue();
     let exdata = JSON.parse(JSON.stringify(r[r.length-1]));
+    let adddata = {};
     if(exdata){
-      Object.keys(exdata).forEach(ex=>{
-        if(ex === 'TermRisktgt.cExcessLayer' || ex ===  'TermRisktgt.nInsuranceAmount'){
-          delete exdata[ex];
+      riskGridConfig.value.fromSchema?.forEach(schema=>{
+        if(schema.prop === 'TermRisktgt.cExcessLayer' || schema.prop ===  'TermRisktgt.nInsuranceAmount' ){
+        }else{
+          if(exdata[schema.prop]){
+            adddata[schema.prop] = exdata[schema.prop];
+          }
         }
       })
     }
-    riskTableRef.value?.setRiskData(val,exdata,r);
+    riskTableRef.value?.setRiskData(val,adddata,r);
   },
   butTestCheck:(item: any,row: any) => {
     dialog.value?.open(

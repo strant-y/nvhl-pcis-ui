@@ -345,8 +345,10 @@ const tCertMrkChecked = (val:any)=>{
     setFormItem("InsuredDist.tCertfEndDate", { disabled: true });
 
   } else {
-    // setValue("InsuredDist.tCertfEndDate", "");
-    setFormItem("InsuredDist.tCertfEndDate", { disabled: false });
+		// setValue("InsuredDist.tCertfEndDate", "");
+		if (props.data.title != '详情') {
+			setFormItem("InsuredDist.tCertfEndDate", { disabled: false });
+		}
   }
 }
 // 移动电话
