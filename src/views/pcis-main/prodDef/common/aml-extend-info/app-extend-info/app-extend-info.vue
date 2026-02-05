@@ -863,16 +863,7 @@ const convertSuffix = (obj, fromSuffix = 'B', toSuffix = 'C') => {
   }
   return result;
 }
-
-// 反洗钱扩展信息投保人模块只读
-const setDisabledAll = (isDisabled: boolean) => {
-	freeEditRef1?.value?.setDisabledAll(isDisabled);
-	freeEditRef2?.value?.setDisabledAll(isDisabled);
-	freeEditRef3?.value?.setDisabledAll(isDisabled);
-	freeEditRef4?.value?.setDisabledAll(isDisabled);
-	tableRef?.value?.setDisabledAll(isDisabled);
-}
-defineExpose({getFrom, getdData,setDisabledAll });
+defineExpose({getFrom, getdData });
 </script>
 
 <style scoped></style>

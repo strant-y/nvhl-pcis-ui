@@ -748,16 +748,7 @@ const setData = (data,list) => {
 	freeEditRef3.value?.setFormValue(data.appFreeEdit.fromData3)
 	freeEditRef4.value?.setFormValue(data.appFreeEdit.fromData4)
 }
-
-// 反洗钱扩展信息被保人模块只读
-const setDisabledAll = (isDisabled: boolean) => {
-	freeEditRef1?.value?.setDisabledAll(isDisabled);
-	freeEditRef2?.value?.setDisabledAll(isDisabled);
-	freeEditRef3?.value?.setDisabledAll(isDisabled);
-	freeEditRef4?.value?.setDisabledAll(isDisabled);
-	tableRef?.value?.setDisabledAll(isDisabled);
-}
-defineExpose({ getFrom, setData, setDisabledAll });
+defineExpose({ getFrom, setData });
 </script>
 
 <style scoped></style>

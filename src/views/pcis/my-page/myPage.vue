@@ -2031,16 +2031,8 @@ async function loadAfter() {
         func: () => {
           handleRemoveReceived();
         },
-			}),
-      createFreeButtonBase({
-        label: "反洗钱扩展信息",
-        type: "primary",
-        buttonColor: bottomBtnColor1,
-        func: () => {
-          setCusBenefitInfo();
-        },
       }),
-	  )
+    )
     //核保处理
     nextTick(() => {
       opertaor.setDisabledAll();
@@ -2097,18 +2089,8 @@ async function loadAfter() {
       getFormconfig.fromSchema?.forEach((item) => {
         item.disabled = true;
       });
-		} else {
-			bthList.value.push(
-				createFreeButtonBase({
-					label: "反洗钱扩展信息",
-					type: "primary",
-					buttonColor: bottomBtnColor1,
-					func: () => {
-						setCusBenefitInfo();
-					},
-				}),
-			)
-		}
+    }
+    
     nextTick(() => {
       opertaor.setDisabledAll();
     });
@@ -2128,7 +2110,7 @@ async function loadAfter() {
       //   .getRefTab("applicant")
       //   .setFormValue(lowercaseKeys(data["applicant"]));
     });
-	} else if (props.param.pageType === "UW_READ_SCENE") {
+  } else if (props.param.pageType === "UW_READ_SCENE") {
     //核保查看
     nextTick(() => {
       opertaor.setDisabledAll();
@@ -2141,17 +2123,7 @@ async function loadAfter() {
       getFormconfig.fromSchema?.forEach((item) => {
         item.disabled = true;
       });
-		}
-		bthList.value.push(
-			createFreeButtonBase({
-				label: "反洗钱扩展信息",
-				type: "primary",
-				buttonColor: bottomBtnColor1,
-				func: () => {
-					setCusBenefitInfo();
-				},
-			}),
-		)
+    }
     nextTick(() => {
       opertaor.setDisabledAll();
     });
