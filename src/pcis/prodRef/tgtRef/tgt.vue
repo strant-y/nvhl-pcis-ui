@@ -2195,7 +2195,19 @@ const method = {
 				setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
 			}
 		}
-	}
+	},
+  // 融资性保证险
+  cFinancingGuaranteeBtnFunc:() => {
+    dialog.value?.open('cFinancingGuarantee', {
+      selectedData: getValue("Tgt.cFinancingGuaranteeCode"), //需要把自定义的过滤掉，只传过去从模板中选择的
+    },
+      {
+        getSelected(selectdata: any) {
+          setValue("Tgt.cFinancingGuaranteeCode", selectdata.map((item:any) => item.value).join(','))
+          setValue("Tgt.cFinancingGuarantee", selectdata.map((item:any) => `${item.value}. ${item.label}`).join('\n'))
+        },
+      }, { width: 45 });
+  },
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

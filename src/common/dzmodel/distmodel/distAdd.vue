@@ -932,7 +932,7 @@ function cInsuranceDutyChange(val:any){
     setFormItem('Dist.cSuitScope', { rules: [getRules("required", {})], disabled: false });
   } else {
     setFormItem('Dist.cSuitScope', { rules: [], disabled: true });
-    setValue('Dist.cSuitScope', null);
+    setValue('Dist.cSuitScope', []);
   }
 }
 

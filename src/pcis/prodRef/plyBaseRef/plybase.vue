@@ -220,9 +220,9 @@ const method = {
     // 对于询价单场景，不执行联共保菜单显示和信息初始化
   if (params.pageName === "priceInquiry") {
     productStore.setcPriceCiMrk(val)
-     setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
+    //  setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
   } else {
-    setFormItem("Base.cRemark", { rules: [], });
+    // setFormItem("Base.cRemark", { rules: [], });
     // 非询价单场景保持原有逻辑
     productStore.setcCiMrk(val);
     if (!!val && !opertaor.getParam().initFlag) {
