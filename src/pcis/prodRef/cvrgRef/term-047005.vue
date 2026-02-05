@@ -220,6 +220,13 @@ function setRiskData(data: any,exdata: any, olddata: any) {
       const od = olddata.find((item: any) => item['TermRisktgt.cExcessLayer'] === excessLayer.value[key]["value"]);
       if(od){
         newData['TermRisktgt.nInsuranceAmount'] = od['TermRisktgt.nInsuranceAmount'];
+
+        if(od['TermRisktgt.cPkId']){  // 回填PkId
+          newData['TermRisktgt.cPkId'] = od['TermRisktgt.cPkId'];
+        }
+        if(od['TermRisktgt.cRowId']){ // 回填RowId
+          newData['TermRisktgt.cRowId'] = od['TermRisktgt.cRowId'];
+        }
       }
     }
     let r = true;
