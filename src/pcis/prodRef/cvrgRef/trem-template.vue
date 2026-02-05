@@ -530,7 +530,6 @@ function termDeductibleNote(){
   const amt = termFactormap.value.filter(item=>item['prop']==k['amt']);
   const rate = termFactormap.value.filter(item=>item['prop']==k['rate']);
   const deduct = termFactormap.value.filter(item=>item['prop']==k['deduct']);
-
   if(amt && amt.length > 0 
       && rate && rate.length > 0
       && deduct && deduct.length > 0
@@ -1358,6 +1357,7 @@ function initMethod(){
       termFactormap.value.forEach((item: any) => {
         if(item.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
+          item.readonly = false;
           item.funcBlur = (val:any) => nInsuranceFeeChange(val)
         }
       });
@@ -1424,6 +1424,7 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.readonly = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
@@ -1493,6 +1494,7 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.readonly = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
@@ -1917,6 +1919,11 @@ function setData(params: any,data:any){
       
     }else if(propkey.startsWith("Term")){ 
       termdata.value[propkey] = data;
+
+      if( termTitleConf.value.cFactorTabType === "table" ||  termTitleConf.value.cFactorTabType === 'grid' ){
+      } else {
+        termRef.value?.setValue(propkey,data,true);
+      }
     }
   }
 }

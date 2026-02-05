@@ -290,6 +290,7 @@ function turnToDetail(cAppNo:any) {
         const params: any = {
           query: {
             param:  JSON.stringify({
+              ...data,
               cAppNo: data.cAppNo,
               cAppTyp: data.cAppTyp,
               cCiMrk: data.cCiMrk,

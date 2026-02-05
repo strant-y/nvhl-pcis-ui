@@ -268,7 +268,7 @@ const nPayNumberFun = () => {
     // 投保单期且保险期间小于30天，缴费止期等于保险止期
     const insrnc = opertaor.getTableRefByKey("insrnc");
     if(valArr.length === 1 && getValue("Base.nPayNum") == 1 && insrnc?.getValue("Base.cTmSysCde") && Number(insrnc?.getValue("Base.cTmSysCde")) < 30) {
-      valArr[0]["Pay.tPayEndTm"] = dayjs(insrnc["Base.tInsrncEndTm"]).format(
+      valArr[0]["Pay.tPayEndTm"] = dayjs(insrnc?.getValue("Base.tInsrncEndTm")).format(
         "YYYY-MM-DD HH:mm:ss"
       );
     }

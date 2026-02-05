@@ -1270,7 +1270,36 @@ cWorkDptChange:(val: any) => {
     }else{
         return true;
     }
-  }
+  },
+  // 国籍
+  cNationChange:(val:any) => {
+    // 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+    if(val && val !== 'CHN') {
+      setFormItem("Applicant.ClntAddrProp", {
+        disabled: true,
+        rules: []
+      });
+      setFormItem("Applicant.RegisterProp", {
+        disabled: true,
+      });
+    } else {
+      setFormItem("Applicant.ClntAddrProp", {
+        disabled: false,
+        rules: [getRules("required", {})]
+      });
+      setFormItem("Applicant.RegisterProp", {
+        disabled: false,
+      });
+    }
+		const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    setValue("Applicant.ClntAddrProp", null);
+    setValue("Applicant.cSuffixAddr", '');
+    setValue("Applicant.RegisterProp", null);
+    setValue("Applicant.cRegisterSuffixAddr", '');
+  },
 };
 
 function setregistAdd() {
