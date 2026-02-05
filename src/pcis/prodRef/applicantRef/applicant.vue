@@ -1442,7 +1442,8 @@ const method = {
       "07": "passPort",
       "553": "ariCard",
     };
-    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+    const oldRules = formconfig1.fromSchema?.find((item:any) => item.prop === 'Applicant.cOperaterCertfCde')?.rules || [];
+    baseRules = ruleMap[val] ? [...oldRules, getRules(ruleMap[val], {})] : oldRules;
 
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,
