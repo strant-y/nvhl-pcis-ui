@@ -2149,7 +2149,7 @@ const downloadBtn:any = tableconfig1.titleBtns?.find((item:any) => item.id === '
 function downLoadTemplate() {
   const param = {
     fromSchema: [
-      { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
+      { title: '风险单位名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
       { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtSelectV2', loadData: addressOptions.value },
       { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtSelectV2', loadData: CRiskLvlCde_Options.value },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
@@ -2237,7 +2237,7 @@ function exportTemplate() {
   exportBtn.loading = true;
   const param = {
     fromSchema: [
-      { title: '风险等级名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
+      { title: '风险单位名称', prop: 'cRiskUnitNme', inputtype: 'rtinput' },
       { title: '标的地址', prop: 'cDetailedAddress', inputtype: 'rtSelectV2', loadData: addressOptions.value },
       { title: '风险等级', prop: 'cRiskLvlCde', inputtype: 'rtSelectV2', loadData: CRiskLvlCde_Options.value },
       { title: '我司保额', prop: 'nAmt', inputtype: 'rtnumber' },
