@@ -268,7 +268,7 @@ const saveTgt = async (res:any, flag)=>{
         loadData: [
           {
             "label": "低风险",
-            "value": "952104"
+            "value": "925104"
           }
         ],
         disabled:'0'
