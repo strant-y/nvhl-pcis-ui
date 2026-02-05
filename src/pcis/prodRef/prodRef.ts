@@ -95,6 +95,7 @@ import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
 import insuredDistRef from "./insuredDistRef/insuredDist.vue"; // 被保人清单
+import cFinancingGuarantee from "./commodityRef/cFinancingGuarantee.vue" //融资性保证险弹框组件
 
 /** 组合出单公共组件 **/
 import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
@@ -198,6 +199,7 @@ const componentMap = {
   specialCateModal:specialCateModal,
   AgentTgtRef:AgentTgtRef,
   TransportinfoRef:TransportinfoRef,
+  cFinancingGuarantee:cFinancingGuarantee,
 
   positeBase: positeBase,
   positeApplicant: positeApplicant,
