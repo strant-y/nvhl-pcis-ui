@@ -1014,22 +1014,6 @@ function dataInit(initFlag : boolean = false) {
       rules: []
     });
   }
-  // 041014 团单展示 关联被保险人要素
-  if(pageparam.cProdNo === "041014" && pageparam.cGrpMrk == "0") {
-    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
-  }
-  // 041007 团单展示 关联被保险人要素且必填
-  if(pageparam.cProdNo === "041007") {
-    if(pageparam.cGrpMrk == "1") {
-      termFactormap.value.forEach((item:any) => {
-        if(item.prop === "Term.nRelatedInsuredCount") {
-          item.required = true
-        }
-      })
-    } else {
-      termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
-    }
-  }
 }
 
 // 是否需要数据初始化渲染
@@ -1040,6 +1024,20 @@ function setTermConf(d: any,initFlag: boolean){
   groupInfo.value = d.groupInfo;
   term.value = d.term;
   termFactormap.value = getUseData(d.termFactormap);
+	// 团单展示 关联被保险人要素
+  if(pageparam.cGrpMrk == "0") {
+    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
+  }
+  // 041007 团单展示 关联被保险人要素且必填
+  if(pageparam.cProdNo === "041007") {
+    if(pageparam.cGrpMrk == "1") {
+      termFactormap.value.forEach((item:any) => {
+        if(item.prop === "Term.nRelatedInsuredCount") {
+          item.required = true
+        }
+      })
+    }
+	}
 
   if (d.riskConf?.CCnm) { // 获取条择标，显示样式
     riskShowTyp.value = d.riskConf.CCnm;

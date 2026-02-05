@@ -1689,9 +1689,34 @@ async function loadAfter() {
     const cAppNo = props.param?.cInquiryNo || props.param?.cAppNo;
     await loadAppPlyInfo(cAppNo);
     if (props.param.cAppTyp == "A") {
-      bthList.value = basicBtn;
-			if(props.param?.pageName === "priceInquiry") {
+			if (props.param?.pageName === "priceInquiry") {
+				// 询价单
 				bthList.value.push(
+					createFreeButtonBase({
+						label: "保费计算",
+						type: "primary",
+						id: "btn010101",
+						func: () => {
+							// calcPremium();
+							queryTermRateLimitFun(calcPremium)
+						},
+					}),
+					createFreeButtonBase({
+						label: "保存",
+						type: "primary",
+						id: "btn010102",
+						func: () => {
+							savePlyInfo();
+						},
+					}),
+					createFreeButtonBase({
+						label: "提交审批",
+						type: "primary",
+						id: "btn010103",
+						func: () => {
+							submitToUndrFn();
+						},
+					}),
 					createFreeButtonBase({
 						label: "发起风勘",
 						type: "primary",
@@ -1702,7 +1727,7 @@ async function loadAfter() {
 							}
 							startWindExploration(); 
 						},
-					}),
+					}),	
 				)
 				if (clickableProducts.includes(props.param?.cProdNo)) {
 					bthList.value.push(
@@ -1720,6 +1745,7 @@ async function loadAfter() {
 					)
 				}
 			} else {
+				bthList.value = basicBtn;
 				rightBtnList.value = basicRightBtn;
 			}
     }
