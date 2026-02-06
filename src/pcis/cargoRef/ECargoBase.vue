@@ -38,13 +38,14 @@ import { useRoute } from "vue-router";
 import {getBsnsTypList,getChaTypeList,getChaSubtypList,} from "@/api/code-list-service";
 import dayjs from "dayjs";
 import { getDeptOptions } from "@/api/dept";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const route = useRoute();
 const fileInputRef = ref(null);
-const idxParam = inject<any>('idxParam', {});
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 const user = idxParam?.user;
-const codeListStore = codeListViewStore();
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const subDptCde = ref(); //所属分公司
 const initFlag = computed(() => formPage.init);
 const cIntroDptCnm = ref()

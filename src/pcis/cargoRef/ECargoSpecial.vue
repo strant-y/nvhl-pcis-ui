@@ -47,11 +47,12 @@ const rttableFrom = ref<any>(null);
 
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage: FormPage = idxParam?.formPage;
 const param = idxParam.param;
 

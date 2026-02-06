@@ -58,7 +58,8 @@ import { DocumentCopy } from "@element-plus/icons-vue";
 import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
 
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+
+
 
 const pcisQueryService = new PcisQueryService();
 const policyService = new PolicyService();

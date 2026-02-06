@@ -10,6 +10,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { useValidator } from "@/typings/useValidator";
 import {formInit} from "@/shared/from-init";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { getRules } = useValidator();
 import { codelistQuery } from "@/api/dict";
 import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";

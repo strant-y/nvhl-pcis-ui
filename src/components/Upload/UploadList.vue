@@ -192,6 +192,7 @@
 <script lang="ts" setup>
 import {codeListViewStore} from "@/store";
 import {ElTable} from "element-plus";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   fileList: {
@@ -232,7 +233,7 @@ const props = defineProps({
 const tableRef = ref(ElTable);
 const emits = defineEmits(['update:selectedFile','update:fileList','handle']);
 const {selectedFile,fileList} = useVModels(props,emits);
-
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const waitFileList = computed(()=>{
   if(!!fileList.value){
     return fileList.value.map((file)=>{
@@ -319,7 +320,7 @@ function handleSelectionChange(fileList: any[]) {
 
 // 获取code值
 function getLabelName(code: string,key: string){
-  const codeListStore =  codeListViewStore();
+  const codeListStore =  codeListViewStore(idxParam.cdeListViewProps);
   return codeListStore.getLabelByValue(code,key);
 };
 

@@ -41,6 +41,7 @@
 </template>
 
 <script lang="ts" setup>
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import {codeListViewStore} from "@/store";
 
 const props = defineProps({
@@ -72,8 +73,8 @@ const props = defineProps({
     default: undefined,
   }
 });
-
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const list = computed(()=> {
   if(!!props.typeCode){
     return codeListStore.getCacheCodeListByCode(props.typeCode); // codelist缓存

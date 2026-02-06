@@ -198,21 +198,20 @@ import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
 const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
 provide('codeListMap', codeListMap.value);
-
 // 添加一个标志位来标识是否通过funcadd方法调用
-const isFuncAddCalled = ref(false);
 
+const isFuncAddCalled = ref(false);
 const allTermMap = [
 '00425000281','00425000282','00425000283','00425000277','00425000279',
 '00425000278','00425000092','00425000280'
 ];
 
 const cAddTermNo = ref('');
-watch(() => cAddTermNo.value, (val) => { 
+
+watch(() => cAddTermNo.value, (val) => {
   if(allTermMap.includes(val)){
     const tgt = opertaor.getTableRefByKey('tgt');
     if(tgt){
@@ -226,6 +225,7 @@ watch(() => cAddTermNo.value, (val) => {
 })
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const parparam = opertaor.getParam();
 const terconfig = terConfig();
 terconfig.configInit(); // 条款配置数据初始化

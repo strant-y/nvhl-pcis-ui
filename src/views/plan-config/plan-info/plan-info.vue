@@ -102,6 +102,7 @@ const currentIndex = ref(0);
 const route = useRoute();
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
   // handleAnchorClick: handleAnchorClick,
 };
 provide(idxParamKey, idxParam);

@@ -208,6 +208,7 @@
 import {computed} from "vue";
 import { iconMap } from './iconMap';
 import {scrollByDomId} from "@/utils/common";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   bthList: {
@@ -217,7 +218,7 @@ const props = defineProps({
   pageWay:String,
 });
 let underwriteFlag = ref(false);
-const idxParam = inject<any>('idxParam', {});
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 idxParam.handleAnchorClick = handleAnchorClick;
 

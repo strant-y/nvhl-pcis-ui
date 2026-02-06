@@ -9,6 +9,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { formInit } from "@/shared/from-init";
 import { useProductStore } from "@/store/modules/prod";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   pageSchema: {
@@ -20,7 +21,7 @@ const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 

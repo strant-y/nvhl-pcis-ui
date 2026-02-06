@@ -87,7 +87,8 @@ import {
 } from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
 import { getpSpecialAgreement } from "@/api/prod";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const props = defineProps({
   data: {
     type: Object,
@@ -100,6 +101,8 @@ const props = defineProps({
     },
   },
 });
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const emits = defineEmits(["handleClose"]);
 const multipleTableRef = ref<MyTableMethod | null>(null);
 const multipleTableOtherRef = ref<MyTableMethod | null>(null);

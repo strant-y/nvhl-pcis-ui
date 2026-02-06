@@ -61,9 +61,11 @@ import {
     MyTableMethod,
 } from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const dialog = ref<DialogMethod | null>(null);
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 

@@ -26,7 +26,8 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+
+
 const props = defineProps({
   data: {
     type: Object,

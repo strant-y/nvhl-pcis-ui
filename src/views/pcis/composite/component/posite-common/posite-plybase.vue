@@ -30,14 +30,14 @@ import {CompositePageView} from "@/views/pcis/support/composite.types";
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
-
-const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const dialogRef = ref<DialogMethod | null>(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const param = opertaor.getParam();
+console.log('plyBase-param', param)
 const sessionData = ref(null);
 const props = defineProps({
   pageSchema: {
@@ -138,7 +138,7 @@ onMounted(async () => {
       }
     });
     // 涉农标志除了169001、169002两个产品，其他产品都不可编辑
-    if(param.cProdNo !== '169001' && param.cProdNo !== '169002') {
+    if(!param.cProdList.some((prdNo: string) => ['169001', '169002'].includes(prdNo))) {
       setFormItem('Base.cAgriMrk',{
         disabled:  true
       })
@@ -395,7 +395,8 @@ const method = {
             type: "show",
             data: {
               CDptCde: sessionData.value?.cDptCde || param.cDptCde, //机构
-              CProdNo: sessionData.value?.cProdNo || param.cProdNo, //产品
+              // CProdNo: sessionData.value?.cProdNo || param.cProdNo, //产品
+              CProdNo: param.cProdList[0], //产品
               cBsnsTyp: getValue("Base.cBsnsTyp"), //业务来源大类
               cChaType: getValue("Base.cChaType"), //业务来源中类
               cChaSubtype: getValue("Base.cChaSubtype"), //业务来源子类

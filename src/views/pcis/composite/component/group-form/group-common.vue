@@ -14,7 +14,7 @@
             : k.pageKey;
         opertaor.addTableRef(pageK, res);
         // 差异化组件关联上公共组件
-        pageView.linkedOperation((operation: any, config: any) => {
+        pageView.linkedOperation().executeForEach((operation, group) => {
           operation.addTableRef(pageK, res)
         });
         if(res && res.addProvide){
@@ -29,7 +29,7 @@
 </template>
 <script setup lang="ts">
 
-import {CommonComponentMap, CompositePageView} from "@/views/pcis/support/composite.types";
+import {CommonComponentMap, CompositePageView, OpertaorPosit} from "@/views/pcis/support/composite.types";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {dataOpertaor} from "@/store";
 import {ref} from "vue";
@@ -58,13 +58,19 @@ const edrbase = ref(null);
 // 储存原始组件配置信息
 const oldProductResData = ref<any[]>([]);
 
-
+const pageView = inject("pageView", ref(new CompositePageView()));
 const idxParam: IdxParamProps = {
-  opertaorProps: { id: props.groupId },
+  opertaorProps: {
+    id: props.groupId,
+    type: OpertaorPosit,
+    allDataFormat: pageView.value.allDataFormat,
+  },
+  cdeListViewProps: {
+    id: props.groupId,
+  }
   // handleAnchorClick: handleAnchorClick,
 };
 provide(idxParamKey, idxParam);
-const pageView = inject("pageView", ref(new CompositePageView()));
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 opertaor.init();
 

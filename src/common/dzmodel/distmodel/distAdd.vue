@@ -41,7 +41,7 @@ const dialog = ref<DialogMethod | null>(null);
 
 const { getRules } = useValidator();
 const tableRef = ref<MyTableMethod | null>(null);
-const codeListStore = codeListViewStore();
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const params = opertaor.getParam();
 const firstInvoiceCur = ref('');
 
