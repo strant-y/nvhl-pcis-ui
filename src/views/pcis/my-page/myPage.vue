@@ -956,15 +956,15 @@ const setTaxInfo = () => {
 /**
  * 反洗钱扩展信息hide
  */
-const setCusBenefitInfo = () => {
+const setCusBenefitInfo = (val) => {
   const tabref = opertaor.getTableRefs();
-  const appNo = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
-  const AppcClntMrk = tabref["applicant"].getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
-  const InscClntMrk = tabref["insured"].getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
-  const baseValue = opertaor.getTableRefByKey("base").getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
-  const basePrmCur = opertaor.getTableRefByKey("base").getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
-  const basePrm = opertaor.getTableRefByKey("base").getFromValue()["Base.nPrm"];//承保基本信息 总保费
-	
+  const appNo = tabref["applicant"]?.getFromValue()["Applicant.cAppNo"]; // 单据编号
+  const AppcClntMrk = tabref["applicant"]?.getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
+  const InscClntMrk = tabref["insured"]?.getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
+  const baseValue = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
+  const basePrmCur = opertaor.getTableRefByKey("base")?.getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
+  const basePrm = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nPrm"];//承保基本信息 总保费
+	let msg = val == 'view' ? '查看': '录入';
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -974,17 +974,17 @@ const setCusBenefitInfo = () => {
   //  投被保人性质 没有填写或者都为个人 提示
   if (AppcClntMrk == undefined || AppcClntMrk == null) {
     ElMessage.error(
-      "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+      `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
     );
     return;
   } else if (InscClntMrk == undefined || InscClntMrk === null) {
     ElMessage.error(
-      "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+      `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
     );
     return;
   } else if (AppcClntMrk === "1" && InscClntMrk === "1") {
     ElMessage.error(
-      "投保人性质或被保人性质为[法人]时，才允许录入反洗钱扩展信息！"
+      `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
     );
     return;
   }
@@ -992,14 +992,14 @@ const setCusBenefitInfo = () => {
 	if(basePrmCur == "USD"){
 		if (basePrm < 10000) {
 			ElMessage.error(
-					"根据反洗钱相关规定，当前保单保费大于等于1万元，才允许录入反洗钱扩展信息！"
+					`根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
 			);
 			return;
 		}
 	} else {
 		if (baseValue < 50000) {
 			ElMessage.error(
-					"根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许录入反洗钱扩展信息！"
+					`根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
 			);
 			return;
 		}
@@ -2037,7 +2037,7 @@ async function loadAfter() {
         type: "primary",
         buttonColor: bottomBtnColor1,
         func: () => {
-          setCusBenefitInfo();
+          setCusBenefitInfo('view');
         },
       }),
 	  )
@@ -2104,7 +2104,7 @@ async function loadAfter() {
 					type: "primary",
 					buttonColor: bottomBtnColor1,
 					func: () => {
-						setCusBenefitInfo();
+						setCusBenefitInfo('view');
 					},
 				}),
 			)
@@ -2148,7 +2148,7 @@ async function loadAfter() {
 				type: "primary",
 				buttonColor: bottomBtnColor1,
 				func: () => {
-					setCusBenefitInfo();
+					setCusBenefitInfo('view');
 				},
 			}),
 		)
