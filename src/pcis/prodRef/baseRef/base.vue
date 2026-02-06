@@ -140,6 +140,20 @@ onMounted(async () => {
       }
     })
   }
+    eventBus.on('setUnDisabledDone', () => {
+      nextTick(() => {
+        if(['10','ZQ','JQ','07','08','80'].includes(params.cRsnCde)) {
+          // 【是否修改累计赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【修改后的累计赔偿限额】可以放开编辑
+          if(getValue('Base.cCumulativeLimitManual') == '0') {
+            setFormItem("Base.nAmt", { disabled: false });
+          }
+          // 【是否修改每次事故赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【每次事故赔偿限额】【修改后的每次事故赔偿限额】可以放开编辑
+          if(getValue('Base.cAccidentLimitManual') == '0') {
+            setFormItem("Base.nModifiedAccidentLimit", { disabled: false });
+          }
+        }
+      })
+    })
   })
 });
 
@@ -250,6 +264,13 @@ const nPayNumberFun = () => {
       }
       valArr.push(val)
      
+    }
+    // 投保单期且保险期间小于30天，缴费止期等于保险止期
+    const insrnc = opertaor.getTableRefByKey("insrnc");
+    if(valArr.length === 1 && getValue("Base.nPayNum") == 1 && insrnc?.getValue("Base.cTmSysCde") && Number(insrnc?.getValue("Base.cTmSysCde")) < 30) {
+      valArr[0]["Pay.tPayEndTm"] = dayjs(insrnc?.getValue("Base.tInsrncEndTm")).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
     }
 
  
@@ -451,14 +472,20 @@ const method = {
     }
     try {
       const getFormconfig = opertaor.getTableRefs()['AgentTgt']
-      getFormconfig?.setValue('Tgt.cPayCur', val)
+			const cDestinationCountry = opertaor.getTableRefs()['tgt']?.getValue('Tgt.cDestinationCountry')
+			if (!!cDestinationCountry && cDestinationCountry != 'CHINA' && cDestinationCountry != '中国') {
+				getFormconfig?.setValue('Tgt.cPayCur', 'CNY')
+			} else { 
+				getFormconfig?.setValue('Tgt.cPayCur', val)
+			}
+
     } catch (err) {
       console.log(err)
     }
-    // const param = opertaor.getParam();
-    // if (param.initFlag) {
-    //   return;
-    // }
+    const param = opertaor.getParam();
+    if (param.initFlag && !['orig', 'copy', 'template', 'inquiryToApp'].includes(param.pageType)) {
+      return;
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -477,10 +504,10 @@ const method = {
     if (val && idxParam && idxParam.setcAmtCur) {
       idxParam.setcAmtCur(val)
     }
-    // const param = opertaor.getParam();
-    // if (param.initFlag) {
-    //   return;
-    // }
+    const param = opertaor.getParam();
+    if (param.initFlag && !['orig', 'copy', 'template', 'inquiryToApp'].includes(param.pageType)) {
+      return;
+    }
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -570,6 +597,11 @@ const method = {
       endTm: baseBefore["Base.tInsrncEndTm"],
       prodNo,
       ratioType: val
+    }
+    const tgt = tabref["tgt"]?.getFromValue();
+    if(tgt?.['Tgt.cInsuranceMethod'] && ['613002', '613003', '613004'].includes(tgt?.['Tgt.cInsuranceMethod'])) {
+      setValue("Base.nRatioCoef", Number(1).toFixed(6));
+      return;
     }
     policyRatio(param).then((res: any) => {
       const { code, data, msg } = res;

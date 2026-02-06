@@ -104,6 +104,7 @@ const appStatusOptions = ref([
 const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
 const paymentDialog = defineAsyncComponent(() => import("./paymentMethod.vue"));
 
+const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -111,6 +112,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "查询",
+				loading: queryLoading,
         func: async () => {
           handleQuery();
         },
@@ -376,19 +378,12 @@ const tableconfig = reactive<AppTableConfig>(
         title: "协议单号",
         minWidth: 180,
         isShow: false
-      },
-      {
-        prop: "cAppId",
+			},
+			{
+        prop: "cSubDptCnm",
         inputtype: "rtinput",
-        title: "客户编号",
-        lengthNum: 14,
-        lengthIsNumber: true,
-      },
-      {
-        prop: "cAppNme",
-        inputtype: "rtinput",
-        title: "客户名称",
-        slotName: "cAppNme",
+        title: "分公司",
+        slotName: "cSubDptCnm",
         align: 'left',
         // lengthNum: 12,
       },
@@ -401,13 +396,20 @@ const tableconfig = reactive<AppTableConfig>(
         // lengthNum: 12,
       },
       {
-        prop: "cSubDptCnm",
+        prop: "cAppId",
         inputtype: "rtinput",
-        title: "分公司",
-        slotName: "cSubDptCnm",
+        title: "投保人编号",
+        lengthNum: 14,
+        lengthIsNumber: true,
+      },
+      {
+        prop: "cAppNme",
+        inputtype: "rtinput",
+        title: "投保人名称",
+        slotName: "cAppNme",
         align: 'left',
         // lengthNum: 12,
-      },
+			},
       {
         prop: "tInsrncBgnTm",
         inputtype: "rtinput",
@@ -522,7 +524,7 @@ const handelDet = (cEcAgrAppNo:any)=>{
 function toDtl(row: any, type: string, payWay: string ) {
 
   if(row.cAppTyp === 'E'){
-    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});
+    router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify({...row,cRsnCde: row.cRsnCde || row.cEdrRsnBundleCde}), type: 'EDR_APP_NEW_SCENE',isActive:'1'}});
   }else {
     router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type, payWay: payWay}});
   }
@@ -532,6 +534,7 @@ function toDtl(row: any, type: string, payWay: string ) {
 function handleQuery(flag?: boolean) {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
+			queryLoading.value = true;
       const tm = freeEditRef.value?.getFromValue().Tm;
       const param = {
         sence: "1",// 1 协议录入 2 协议审核 3 协议批改
@@ -543,13 +546,14 @@ function handleQuery(flag?: boolean) {
         param.tInsrncEndTm = tm[1]
       }
       delete param.Tm
+			pageresult.list = []
       cargoApi.queryEcargoList(param)
         .then((res: any) => {
+					queryLoading.value = false;
           if (res && res.code === 200) {
             const pageData = res.data;
             if (pageData) {
-              pageresult.list = []
-              pageresult.list = pageData.data;
+              // pageresult.list = pageData.data;
 							pageresult.list = pageData.data.map((item) => ({
 								...item,
 								// 创建一个新字段合并两个值
@@ -562,6 +566,7 @@ function handleQuery(flag?: boolean) {
           }
         })
         .catch((err: any) => {
+					queryLoading.value = false;
           ElMessage.error(err.msg);
         });
     }

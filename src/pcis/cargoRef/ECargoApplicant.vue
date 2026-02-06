@@ -812,7 +812,7 @@ const method = {
       );
       setFormItem("ECargoApplicant.tCertfEndDate", { disabled: true });
     } else {
-      setValue("ECargoApplicant.tCertfEndDate", "");
+      // setValue("ECargoApplicant.tCertfEndDate", "");
       setFormItem("ECargoApplicant.tCertfEndDate", { disabled: false });
     }
   },

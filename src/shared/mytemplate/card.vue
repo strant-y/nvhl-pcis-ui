@@ -103,8 +103,14 @@ import { createAppFreeEditConfig } from "../app-free-edit-config";
 import { createAppGridEditConfig } from "../app-grid-edit-config";
 import { CardConfig } from "./card-config";
 import { View, Hide } from '@element-plus/icons-vue'; // 导入更多图标
+const props = defineProps({
+  cardConfig: {
+    type: Object as () => CardConfig,
+    required: true,
+  },
+});
 
-const showMyfrom = ref(true);
+const showMyfrom = ref(props.cardConfig.showMyfrom ?? true);
 const hasShowEditTrue = ref(false); // 用于跟踪cardConfig.showEdit是否曾经为true
 
 const formconfig = ref(createAppGridEditConfig({}));
@@ -113,13 +119,6 @@ const editRef = ref<AppFreeEditMethod | null>();
 defineOptions({
   name: "MyCard",
   inheritAttrs: false,
-});
-
-const props = defineProps({
-  cardConfig: {
-    type: Object as () => CardConfig,
-    required: true,
-  },
 });
 
 // 添加切换showEdit状态的方法

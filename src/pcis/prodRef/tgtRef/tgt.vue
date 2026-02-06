@@ -169,11 +169,7 @@ onMounted(async () => {
       rules: []
     });
   }
-
-  // 090003产品 工程名称非必填
-  if (params.cProdNo === '090003') {
-    setFormItem("Tgt.cProjectName", { rules: [] })
-  }
+  
   // 041007 被监护人数必填
   if(params.cProdNo === '041007') {
     setFormItem("Tgt.nGuardianshipNumber", { rules: [getRules("required", {})] })
@@ -182,11 +178,13 @@ onMounted(async () => {
   if(params.cProdNo === '089030') {
     setFormItem("Tgt.cBuildingStructure", { rules: [] })
   }
-  // 010021 承保区域必填 其他非必填
-  if(params.cProdNo === '010021') {
-    setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
-  } else {
-    setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+  // 010021 承保区域必填 其他非必填，010023不走这个逻辑
+	if (params.cProdNo !== '010023') { 
+		if(params.cProdNo === '010021') {
+			setFormItem("Tgt.cUnderwritingArea", { rules: [getRules("required", {})] })
+		} else {
+				setFormItem("Tgt.cUnderwritingArea", { rules: [] })
+		}
   }
   // 040014、110001、110003、110004 船舶种类必填
   if(params.cProdNo === '040014' || params.cProdNo === '110001' || params.cProdNo === '110003' || params.cProdNo === '110004') {
@@ -250,6 +248,22 @@ onMounted(async () => {
     rules: [getRules("phoneNo", {})],
   });
   selectType()
+  // 020019、020020、020021三款产品标的信息全部非必填
+  if(['020019','020020','020021'].includes(params.cProdNo)) {
+    formconfig11.fromSchema?.forEach((item:any) => {
+      if(item.rules?.length > 0) {
+        item.rules.forEach((i:any, index:any) => {
+          if(i.required === true) {
+            item.rules.splice(index, 1)
+          }
+        })
+      }
+    })
+  }
+  // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
+  if(params.cProdNo === '059902') {
+    method.getcGuaranteeMethodChange('');
+  }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
     const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
@@ -278,8 +292,9 @@ onMounted(async () => {
 		}
 		// 047002 诚信声明、保函类别没值的时候回填固定值，诚信声明、保函详细根据内容自动调整输入框高度
 		if (params.cProdNo === '047002') {
-			setFormItem('Tgt.cIntegrityStatement', { autosize: true })
-			setFormItem('Tgt.cGuaranteeLetter', { autosize: true }) // 保函详细
+			setFormItem('Tgt.cIntegrityStatement', { autosize: true,rules: [getRules("NoAsterisk", {sym: "*"})] })
+			setFormItem('Tgt.cGuaranteeLetter', { autosize: true,rules: [getRules("NoAsterisk", {sym: "*"})] }) // 保函详细
+			setFormItem('Tgt.cGuaranteeInstitution', { rules: [getRules("NoAsterisk", {sym: "x"})] }) // 保函详细
 			if (!getValue('Tgt.cIntegrityStatement') && (params.pageType == "app" || params.pageType == "copy" && params.pageType == "template")) {
 				setValue('Tgt.cIntegrityStatement', cIntegrityStatementData.value)
 				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
@@ -298,6 +313,18 @@ onMounted(async () => {
         }
       }
     })
+    for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
+    // 遍历groupList数组把函数赋值给fromSchema
+    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+        if (distContactList.includes(data.prop)) {
+          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
+          }
+        }
+      })
+    }
+  }
   })
 });
 function hasEnglish(str: any) {
@@ -445,7 +472,7 @@ function calAgeDif(val1: any, val2: any) {
 
   return Math.round(diffInYears)
 }
-const guaranteeMethodList = ['Tgt.cCollateralName', 'Tgt.cPledgeNumber', 'Tgt.cPledgeAddress', 'Tgt.cItemNumber', 'Tgt.nFaceValue', 'Tgt.cApplicationLine', 'Tgt.cBankApply', 'Tgt.cAcceptor', 'Tgt.cMaturityWeek', 'Tgt.cDueWeek', 'Tgt.tTicketStartingandending', 'Tgt.cConfirmingBank']
+const guaranteeMethodList = ['Tgt.cCollateralName', 'Tgt.cPledgeNumber', 'Tgt.cPledgeAddress', 'Tgt.cItemNumber', 'Tgt.nFaceValue', 'Tgt.cApplicationLine', 'Tgt.cBankApply', 'Tgt.cAcceptor', 'Tgt.cMaturityWeek', 'Tgt.cDueWeek', 'Tgt.tTicketStartingandending', 'Tgt.cConfirmingBank','Tgt.nLoanAmount']
 const cMortgageList = ['Tgt.cMortgageName', 'Tgt.cMortgageNumber', 'Tgt.cCollateralAddress']
 const setcDetailedAddress = (prop: any, aftProp: any) => {
   const ads = getValue(prop[0].prop);
@@ -470,7 +497,8 @@ const method = {
       if (item.prop == "Tgt.cPayCur" && (val === 'CHINA' || val === '中国')) {
         item.disabled = false;
       } else if (item.prop == "Tgt.cPayCur") {
-        item.disabled = true;
+				item.disabled = true;
+				opertaor.getTableRefs()['AgentTgt']?.setValue('Tgt.cPayCur', 'CNY')
       }
     });
   },
@@ -500,6 +528,7 @@ const method = {
     setValue('Tgt.nServiceLife', calAgeDif(insrnc['Base.tAppTm'], val))
   },
   getcGuaranteeMethodChange: (val: string) => {
+    const param = opertaor.getParam();
     //担保方式选择"质押贷款"时带出
     if (val === 'B05Assure004') {
       guaranteeMethodList.forEach(item => {
@@ -512,6 +541,8 @@ const method = {
         setFormItem(item, {
           hidden: true,
         });
+        if (param.initFlag) return
+        setValue(item, '');
       })
     }
     // 担保方式选择"抵押贷款"时带出
@@ -526,6 +557,8 @@ const method = {
         setFormItem(item, {
           hidden: true,
         });
+        if (param.initFlag) return
+        setValue(item, '');
       })
     }
     // 担保方式选择"保证贷款 "时带出
@@ -537,6 +570,8 @@ const method = {
       setFormItem('Tgt.cTypeName', {
         hidden: true,
       });
+      if (param.initFlag) return
+      setValue('Tgt.cTypeName', '');
     }
   },
   // 是否单项工程 
@@ -2019,22 +2054,19 @@ const method = {
 	// 建设工程信息-保险凭证类别
 	cCertificateTypefun: async (val) => {
 		setFormItem('Tgt.cCertificateDetailed', { autosize: true })
-		if (params.initFlag) {
-			return false
-		}
-		if (params.pageType != "app" && params.pageType != "copy" && params.pageType != "template" ) {
-			return false
-		}
+		const param = opertaor.getParam();
+		if (param.initFlag) return
 		const cCertificateTypeProd = ["059011", "059012", "059013", "059015", "059016", "059017", "059018", "059019", "059020"]
 		if (cCertificateTypeProd.includes(params.cProdNo)) {
 			try {
 				const res = await getProductTemplate({prodNo:params.cProdNo,isCommon:val});
-				
 				if (res.code !== '200') {
 					ElMessage.error(res.msg || '连接失败！');
 					return;
 				}
-				setValue("Tgt.cCertificateDetailed", res.data)
+				setValue("Tgt.cCertificateTitle", res.data.cCertificateTitle) // 保险凭证标题
+				setValue("Tgt.cCertificateInstitution", res.data.cInsuranceCompany) // 保险凭证机构
+				setValue("Tgt.cCertificateDetailed", res.data.textTemplate) // 保险凭证详细
 			} catch (err) {
 				console.error('查询异常:', err);
 				ElMessage.error('系统异常，请稍后重试');
@@ -2081,9 +2113,9 @@ const method = {
     } else {
       setFormItem('Tgt.cTargetType', { loadData: [] });
     }
-		if (!param.initFlag) {
-      setValue('Tgt.cTargetType', "");// 标的类型
-    }
+    const param = opertaor.getParam();
+    if (param.initFlag) return
+		setValue('Tgt.cTargetType', "");// 标的类型
 	},
   // 担保金额
   nGuaranteeAmountChange: (val:any) => {
@@ -2143,6 +2175,38 @@ const method = {
   // 是否施工联合体
   cIsConsortiumFunc: (val:any) => {
     eventBus.emit('setMap-cUnionMembers', val)
+  },
+	// 是否出具蓝卡
+	cBlueCardChange: async (val: any) => {
+		const param = opertaor.getParam();
+		if (param.initFlag) return
+		setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+		if (val == '1') {
+			try {
+				const [res1] = await Promise.all([
+					codeListStore.queryCodeList({ codeListName: 'MS040008' }),
+				]);
+				const getValue1 = (response) => {
+					const list = Array.isArray(response) ? response : response?.data || response?.list || [];
+					return list.length > 0 ? list[0].label || list[0].name || '' : '';
+				};
+				setValue('Tgt.cMaritimeAdministration', getValue1(res1)) // 海事局名称
+			} catch (error) {
+				setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
+			}
+		}
+	},
+  // 融资性保证险
+  cFinancingGuaranteeBtnFunc:() => {
+    dialog.value?.open('cFinancingGuarantee', {
+      selectedData: getValue("Tgt.cFinancingGuaranteeCode"), //需要把自定义的过滤掉，只传过去从模板中选择的
+    },
+      {
+        getSelected(selectdata: any) {
+          setValue("Tgt.cFinancingGuaranteeCode", selectdata.map((item:any) => item.value).join(','))
+          setValue("Tgt.cFinancingGuarantee", selectdata.map((item:any) => `${item.value}. ${item.label}`).join('\n'))
+        },
+      }, { width: 45 });
   },
 };
 

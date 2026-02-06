@@ -1590,9 +1590,10 @@ async function nInsuranceFeeChange(val:any) {
           const totalFee = item['Term.riskList'].reduce((sum, num) => new Decimal(sum).add(new Decimal(num['TermRisktgt.nTotalInsuranceFee'] || 0)), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
           if(term.value?.cRdrTyp === '0') {
-            termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
-          }
-          if(termRef.value?.setValue) {
+            if(termdata.value['Term.cPlanNo'] === item['Term.cPlanNo']) {
+							termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
+            }
+					} else if(termRef.value?.setValue) {
             termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
           }
         }
@@ -1669,9 +1670,10 @@ async function nInsuranceFeeChange(val:any) {
           const totalFee = item['Term.riskList'].reduce((sum, num) => new Decimal(sum).add(new Decimal(num['TermRisktgt.nTotalInsuranceFee'] || 0)), 0)
           item['Term.nInsuranceFee'] = totalFee > 0 ? totalFee : item['Term.nInsuranceFee']
           if(term.value?.cRdrTyp === '0') {
-            termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
-          }
-          if(termRef.value?.setValue) {
+            if(termdata.value['Term.cPlanNo'] === item['Term.cPlanNo']) {
+							termdata.value['Term.nInsuranceFee'] = item['Term.nInsuranceFee']
+            }
+					} else if(termRef.value?.setValue) {
             termRef.value.setValue('Term.nInsuranceFee', item['Term.nInsuranceFee'])
           }
         }

@@ -22,6 +22,8 @@ import plyCvrg04Ref from "./cvrgRef/plyCvrg04.vue";
 import plyCvrgPer from "./cvrgRef/plyCvrgPer.vue";
 import plyCvrgCross from "./cvrgRef/plyCvrgCross.vue";
 import plyCvrgPlanCross from "./cvrgRef/plyCvrgPlanCross.vue";
+import term047005 from "./cvrgRef/term-047005.vue";
+
 import plybaseRef from "./plyBaseRef/plybase.vue";
 import baseafterRef from "./baseafterRef/baseafter.vue";
 import informationRef from "./informationRef/information.vue";
@@ -76,6 +78,7 @@ import deductibleFix from "./commodityRef/DeductibleFix.vue" //免赔条件选�
 import underwriteRef from "./underwriteRef/underwrite.vue"
 import auditwriteRef from "./auditwriteRef/auditwrite.vue"
 import edrbaseRef from "./edrbaseRef/edrbase.vue"
+import edrexpRef from "./edrexpRef/edrexp.vue"; // 批改扩展信息
 import edritemRef from "./edritemRef/edritem.vue"
 import xyedrbaseRef from "./xyedrbaseRef/xyedrbase.vue"
 import xyedritemRef from "./xyedritemRef/xyedritem.vue"
@@ -92,6 +95,7 @@ import AgentTgtRef from "./agentTgtRef/AgentTgt.vue"
 import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
 import insuredDistRef from "./insuredDistRef/insuredDist.vue"; // 被保人清单
+import cFinancingGuarantee from "./commodityRef/cFinancingGuarantee.vue" //融资性保证险弹框组件
 
 /** 组合出单公共组件 **/
 import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
@@ -114,6 +118,7 @@ const componentMap = {
   webPlyTermCommon:PlyTermCommonRef,
   plyCvrgCross:plyCvrgCross,
   plyCvrgPlanCross:plyCvrgPlanCross,
+  term047005:term047005,
   plyBaseRef: plybaseRef,
   insuredRef: insuredRef,
   tgtobjRef: tgtobjRef,
@@ -132,6 +137,7 @@ const componentMap = {
   SpecialAgreement: specialAgr, //录单页面中的特约信息组件
   underwriteRef: underwriteRef, //录单页面中的核保组件
   edrbaseRef: edrbaseRef, //录单页面中的批改信息组件
+	edrexpRef: edrexpRef, //录单页面中的批改扩展信息组件
   edritemRef: edritemRef, //录单页面中的批改比较项组件
   xyedrbaseRef: xyedrbaseRef, //协议录单页面中的批改信息组件
   xyedritemRef: xyedritemRef, //协议录单页面中的批改比较项组件
@@ -193,6 +199,7 @@ const componentMap = {
   specialCateModal:specialCateModal,
   AgentTgtRef:AgentTgtRef,
   TransportinfoRef:TransportinfoRef,
+  cFinancingGuarantee:cFinancingGuarantee,
 
   positeBase: positeBase,
   positeApplicant: positeApplicant,

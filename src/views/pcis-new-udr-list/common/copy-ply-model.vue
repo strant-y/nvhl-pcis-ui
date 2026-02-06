@@ -454,11 +454,11 @@ const confirm = async () => {
     return;
   } else {
     if (selectedGrpMrk.value !== props.data.cGrpMrk) {
-      ElMessage.error("源保单和新单的团个单类型不同, 不允许复制");
+      ElMessage.error("原保单和新单的团个单类型不同, 不允许复制");
       return;
     }
     if (selectedCiMrk.value !== props.data['plyBase']["Base.cCiMrk"]) {
-      ElMessage.error("源保单和新单的共保方式不同, 不允许复制");
+      ElMessage.error("原保单和新单的共保方式不同, 不允许复制");
       return;
     }
     if (selected.value[0].cPlyNo?.length > 18) {

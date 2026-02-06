@@ -91,6 +91,9 @@ onMounted(async () => {
     if (item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 240
     }
+    if(item.prop === 'Ci.nSeqNo') {
+      item.lengthNum = 4
+    }
   })
   // 获取页面初始化的时候获取的组件配置信息
   if (opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
@@ -191,6 +194,7 @@ const method = {
     const { value, rowData, config, itemRef } = data;
     if (!rowData || !config || !itemRef) return;
     ciJiDptOptionsQuery(value, rowData);
+    if (param.pageType === 'readonly') return
     updateMasterAgreementValues()
   },
   // 共保公司改变事件
@@ -527,12 +531,12 @@ const method = {
     }, 0);
     const diff = Math.abs(totalCiPrm - nPrm);
     // 如果差值大于1，则提示并恢复当前行的保费
-    // if (diff > 1) {
-    //   ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
-    //   // 恢复当前行的联共保保费为原来的值
-    //   freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
-    //   return;
-    // }
+    if (diff > 1) {
+      ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
+      // 恢复当前行的联共保保费为原来的值
+      freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
+      return;
+    }
   },
   //保单编号change事件
   cPolicyNoChange: (val, row) => {
@@ -930,6 +934,13 @@ const method = {
   }
 };
 const updateMasterAgreementValues = () => {
+  const param = opertaor.getParam();
+  const isInit = param.initFlag; // 是否初始化/回显状态
+  const isCalcPremium = opertaor.getFatherPage().getIsCalcPremium();
+  if(isInit === true && isCalcPremium === false) return;
+  // 一般批改如果保费变化量和保额变化量为0或批改原因为变更联共保信息，则不需要重新进行联共保保费的计算
+  const edrBaseData = opertaor.getFatherPage().getEdrbaseValue();
+  if(param.cAppTyp === 'E' && param.cRsnCde !== '47' && new Decimal(edrBaseData?.['EdrBase.nPrmVar']?.replaceAll(',','') || 0).toNumber() === 0 && new Decimal(edrBaseData?.['EdrBase.nAmtVar']?.replaceAll(',','') || 0).toNumber() === 0) return;
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
@@ -982,7 +993,7 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", totalPrm.toFixed(2));  //我司份额保费
     }
   });
-
+  opertaor.getFatherPage().setIsCalcPremium(false)
 };
 /**
  * 主共保标识、主联保标识、我司标识变化
@@ -1089,8 +1100,8 @@ const initCiInfo = (data: any) => {
 
 //个性化校验封装方法
 const valideRequired = () => {
-  const cBsnsTyp = opertaor.getTableRefByKey('plyBase').getValue('Base.cBsnsTyp')
-  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+  const cBsnsTyp = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cBsnsTyp')
+  const cCiMrkValue = opertaor.getTableRefByKey("plyBase")?.getValue("Base.cCiMrk");
   nextTick(() => {
     setTimeout(() => {
       const rowItems = getFromValue()

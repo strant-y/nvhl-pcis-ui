@@ -263,7 +263,7 @@ onMounted(()=>{
     }
 	} else {
 		// 协议审核批单展示批改信息和批改比较项，不能修改
-		if (props.pageType === "audit" && idxParam.param.cAppTyp == 'E') {
+		if ((props.pageType === "audit" || props.pageType === "view") && idxParam.param.cAppTyp == 'E') {
 			edrbaseFlag.value =true
     	edritemFlag.value =true
 		} else {

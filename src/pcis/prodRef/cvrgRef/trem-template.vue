@@ -63,7 +63,7 @@
               </el-col>
               <el-col :span="3" justify="end">
                 <rtButton
-                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid'"
+                    v-if="!btnItem.addrisk.hidden && riskShowTyp === 'grid' && pageparam.cProdNo !== '049022' "
                     @click="
                   () => {
                     addriskView();
@@ -225,7 +225,8 @@
             </template>
           </template>
           <template v-if="riskShowTyp === 'grid'">
-            <app-grid-edit :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+            <term047005 v-if="pageparam.cProdNo === '049022' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()" /> 
+            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
               <template v-for="(ginfo, gk) in groupInfo" :key="gk">
@@ -529,7 +530,6 @@ function termDeductibleNote(){
   const amt = termFactormap.value.filter(item=>item['prop']==k['amt']);
   const rate = termFactormap.value.filter(item=>item['prop']==k['rate']);
   const deduct = termFactormap.value.filter(item=>item['prop']==k['deduct']);
-
   if(amt && amt.length > 0 
       && rate && rate.length > 0
       && deduct && deduct.length > 0
@@ -548,6 +548,35 @@ function termDeductibleNote(){
       },filledString);
     }
     
+  }
+  // 070002责任免赔说明自动带出
+  if(riskShowTyp.value === 'grid') {
+    const k = deductibleKey.value[termNo]?deductibleKey.value[termNo]:deductibleKey.value['defrisk'];
+    const amtRisk = riskGridConfig.value?.fromSchema?.filter(item=>item['prop']==k['amt']);
+    const rateRisk = riskGridConfig.value?.fromSchema?.filter(item=>item['prop']==k['rate']);
+    const deductRisk = riskGridConfig.value?.fromSchema?.filter(item=>item['prop']==k['deduct']);
+
+    if(amtRisk && amtRisk.length > 0 
+      && rateRisk && rateRisk.length > 0
+      && deductRisk && deductRisk.length > 0
+    ) {
+      termData.riskList?.forEach((risk:any) => {
+        const r = risk['TermRisktgt.cLiabCode'];
+        const amt_d = risk[k['amt']];
+        const rate_d = risk[k['rate']];
+        const temk = (amt_d !== null && amt_d !== undefined ? '1':'0') + '' + (rate_d !== null && rate_d !== undefined ? '1':'0') ;
+        const strt = deductibleTemple.value[temk];
+        if(strt){
+          const filledString = fillTemplate(strt, {
+            amount: amt_d,
+            rate: rate_d,
+          });
+          riskTableRef.value?.setValueByRowKey(k['deduct'], risk._dataId, filledString);
+        } else if(risk[k['deduct']]) {
+          riskTableRef.value?.setValueByRowKey(k['deduct'], risk._dataId, '');
+        }
+      })
+    }
   }
 }
 
@@ -985,22 +1014,6 @@ function dataInit(initFlag : boolean = false) {
       rules: []
     });
   }
-  // 041014 团单展示 关联被保险人要素
-  if(pageparam.cProdNo === "041014" && pageparam.cGrpMrk == "0") {
-    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
-  }
-  // 041007 团单展示 关联被保险人要素且必填
-  if(pageparam.cProdNo === "041007") {
-    if(pageparam.cGrpMrk == "1") {
-      termFactormap.value.forEach((item:any) => {
-        if(item.prop === "Term.nRelatedInsuredCount") {
-          item.required = true
-        }
-      })
-    } else {
-      termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
-    }
-  }
 }
 
 // 是否需要数据初始化渲染
@@ -1011,6 +1024,20 @@ function setTermConf(d: any,initFlag: boolean){
   groupInfo.value = d.groupInfo;
   term.value = d.term;
   termFactormap.value = getUseData(d.termFactormap);
+	// 团单展示 关联被保险人要素
+  if(pageparam.cGrpMrk == "0") {
+    termFactormap.value = termFactormap.value.filter((item:any) => item.prop !== "Term.nRelatedInsuredCount")
+  }
+  // 041007 团单展示 关联被保险人要素且必填
+  if(pageparam.cProdNo === "041007") {
+    if(pageparam.cGrpMrk == "1") {
+      termFactormap.value.forEach((item:any) => {
+        if(item.prop === "Term.nRelatedInsuredCount") {
+          item.required = true
+        }
+      })
+    }
+	}
 
   if (d.riskConf?.CCnm) { // 获取条择标，显示样式
     riskShowTyp.value = d.riskConf.CCnm;
@@ -1118,7 +1145,6 @@ function setTermConf(d: any,initFlag: boolean){
     setDisabledAll();
   }
   initMethod();
-
   if(initFlag){
     nextTick(()=>{
       initData(props.modelValue);
@@ -1329,6 +1355,7 @@ function initMethod(){
       termFactormap.value.forEach((item: any) => {
         if(item.prop === 'Term.nInsuranceFee') {
           item.disabled = false;
+          item.readonly = false;
           item.funcBlur = (val:any) => nInsuranceFeeChange(val)
         }
       });
@@ -1395,6 +1422,7 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.readonly = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
@@ -1464,6 +1492,7 @@ function initMethod(){
               termFactormap.value.forEach((item: any) => {
                 if(item.prop === 'Term.nInsuranceFee') {
                   item.disabled = false;
+                  item.readonly = false;
                   item.funcBlur = (val:any) => nInsuranceFeeChange(val)
                 }
               });
@@ -1845,7 +1874,7 @@ function methodLink(items: any) {
         items[i]['btnItems']["func"] = methodMap[items[i]['btnItems']["func"]];
       }
       // 地址编码下拉选项
-      if(items[i]['prop'] === 'TermRisktgt.cDistCodeNo') {
+      if(['TermRisktgt.cDistCodeNo','TermRisktgt.cAddrSeq'].includes(items[i]['prop'])) {
         items[i]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
       }
     }
@@ -1862,6 +1891,10 @@ function riskMethodLink(items: any) {
       }
       if(items[k]['btnItems'] && items[k]['btnItems']["func"] && typeof items[k]['btnItems']["func"] === "string"){ // 增加后置按钮方法绑定
         items[k]['btnItems']["func"] = methodMap[items[k]['btnItems']["func"]];
+      }
+      // 地址编码下拉选项
+      if(['TermRisktgt.cDistCodeNo','TermRisktgt.cAddrSeq'].includes(items[k]['prop'])) {
+        items[k]['loadData'] = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]');
       }
     });
   }
@@ -1883,11 +1916,34 @@ function setData(params: any,data:any){
       
     }else if(propkey.startsWith("Term")){ 
       termdata.value[propkey] = data;
+
+      if( termTitleConf.value.cFactorTabType === "table" ||  termTitleConf.value.cFactorTabType === 'grid' ){
+      } else {
+        termRef.value?.setValue(propkey,data,true);
+      }
     }
   }
 }
 
+
 const methodMap = {
+  excessLayerChange(val: any,row: any){
+    termdata.value['Term.cExcessLayer'] = val;
+    const r = riskTableRef.value?.getTableValue();
+    let exdata = JSON.parse(JSON.stringify(r[r.length-1]));
+    let adddata = {};
+    if(exdata){
+      riskGridConfig.value.fromSchema?.forEach(schema=>{
+        if(schema.prop === 'TermRisktgt.cExcessLayer' || schema.prop ===  'TermRisktgt.nInsuranceAmount' ){
+        }else{
+          if(exdata[schema.prop]){
+            adddata[schema.prop] = exdata[schema.prop];
+          }
+        }
+      })
+    }
+    riskTableRef.value?.setRiskData(val,adddata,r);
+  },
   butTestCheck:(item: any,row: any) => {
     dialog.value?.open(
       "chooseProdDialog",
@@ -2057,22 +2113,25 @@ const methodMap = {
 };
 
 const checkData = (v :any,item:any) => {
-    const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
-    if(cf){
-      const fk = item.prop
-      cf.forEach((c)=>{
-        if(c.cFatherKey === fk){
-          c.factorItem.max = v;
-          
-          if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
-            if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
-              riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
-            }
+  if(!groupconf.value[item.cGroupId]){
+    return ;
+  }
+  const cf = groupconf.value[item.cGroupId]['riskList'][item.cRiskNo]['rowConfig'][item.cColId];
+  if(cf){
+    const fk = item.prop
+    cf.forEach((c)=>{
+      if(c.cFatherKey === fk){
+        c.factorItem.max = v;
+        
+        if(riskList.value[c.cRiskNo][c.factorItem['prop']]){
+          if(v < riskList.value[c.cRiskNo][c.factorItem['prop']]){
+            riskList.value[c.cRiskNo][c.factorItem['prop']] = v;
           }
         }
-      });
-      update();
-    }
+      }
+    });
+    update();
+  }
 }
 
 const copyMaps = ['Term.nAccidentLimit','Term.nInsuranceAmount','Term.nLegalAccident','Term.nLegalTotal','Term.nRateVal',

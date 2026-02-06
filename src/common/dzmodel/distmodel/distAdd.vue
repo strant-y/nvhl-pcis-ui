@@ -405,6 +405,10 @@ onMounted(async () => {
 		if (item.prop == 'Dist.cCertfCls') {
       item['func'] =  cCertfClsChange;
     }
+		// 040019 保全被申请人信息 身份证
+		if (route.params.param.cProdNo == '040019' && item.prop == 'Dist.cMobile') {
+      item['rules'] = [getRules("phoneNo", {})];
+    }
     if(item.prop == 'Dist.cInvoiceCur'){
         const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
         const cargoList = distTableRef?.getTableData() || [];
@@ -613,6 +617,11 @@ onMounted(async () => {
             setValue("Dist.cVehicleAge", "")
           }
         }
+      }
+    }
+    if(item.prop === 'Dist.cInsuranceDuty') {
+      item.func = (val:any) => {
+        cInsuranceDutyChange(val)
       }
     }
     newSchema.push(item);
@@ -844,6 +853,7 @@ const cCertfClsChange = (val: any) => {
     "01": [getRules("socialCode", {})], // 统一社会信用代码
     "553": [getRules("ariCard", {})], // 外国人证件号
     "110001": [getRules("orgCode", {})], // 组织机构编码
+    '07': [getRules("passPort", {})], // 护照
     default: [] // 默认无规则
   };
   const baseRules = baseRuleMap[val] || baseRuleMap.default;
@@ -867,6 +877,7 @@ const cDocumentTypeChange = (val: any) => {
     "01": [getRules("socialCode", {})], // 统一社会信用代码
     "553": [getRules("ariCard", {})], // 外国人证件号
     "110001": [getRules("orgCode", {})], // 组织机构编码
+    '07': [getRules("passPort", {})], // 护照
     default: [] // 默认无规则
   };
 
@@ -913,6 +924,16 @@ const cIdTypefun = (val: any) => {
 	setFormItem("Dist.cIdNumber", {
 		rules: baseRules,
 	});
+}
+
+// 保险责任一级
+function cInsuranceDutyChange(val:any){
+  if(val === '02') {
+    setFormItem('Dist.cSuitScope', { rules: [getRules("required", {})], disabled: false });
+  } else {
+    setFormItem('Dist.cSuitScope', { rules: [], disabled: true });
+    setValue('Dist.cSuitScope', []);
+  }
 }
 
 function getAddressstr(val:any, row: any, pitem: any){
@@ -1044,10 +1065,10 @@ const cRelatedInsuredChange = () => {
 						let loadData = []
 						let datavalue = []
 						data.value.forEach((item)=>{
-							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
-							datavalue.push(item['InsuredDist.cInsuredCde'])
-							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
-							// datavalue.push(item['InsuredDist.cPkId'])
+							// loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cInsuredCde'] })
+							// datavalue.push(item['InsuredDist.cInsuredCde'])
+							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
+							datavalue.push(item['InsuredDist.cPkId'])
 						})
 						setValue("Dist.cRelatedInsured", datavalue);
 						setFormItem("Dist.cRelatedInsured", { loadData });

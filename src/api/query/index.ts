@@ -58,6 +58,14 @@ export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 平台日志列表查询
+ * @param queryParams
+ */
+export function getPlatformList(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getPlatformList`, queryParams);
+}
+
+/**
  * es查询
  * @param queryParams
  */

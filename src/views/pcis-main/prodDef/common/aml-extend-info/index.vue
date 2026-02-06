@@ -94,6 +94,13 @@ const cardConfig = reactive<CardConfig>(
 	})
 );
 onMounted(async () => {
+	if (!!props.data?.pageType &&(props.data?.pageType == 'readonly' || props.data?.pageType == 'PLY_UW_PROCESS_SCENE' || props.data?.pageType == 'UW_READ_SCENE')) {
+		saveHidden.value = true
+		setTimeout(() => {
+			appExtendInfoRef?.value?.setDisabledAll(true)
+			inextendRef?.value?.setDisabledAll(true)
+		},1000)
+	}
 	if (!!props.data?.cRsnCde && props.data?.cRsnCde == "BH" && !props.getNo) {
 		saveHidden.value = true
 	}
@@ -173,7 +180,7 @@ const save = async () => {
         { prop: 'cCerftNation', label: '国籍' },
         { prop: 'tCerftBgnTm', label: '证件有效起期' },
         { prop: 'tCerftEndTm', label: '证件有效止期' },
-        { prop: 'cCusAddr', label: '地址' }
+        // { prop: 'cCusAddr', label: '地址' }
       ];
       
       for (let i = 0; i < appInfo.appGridEdit.items.length; i++) {
@@ -220,7 +227,7 @@ const save = async () => {
         { prop: 'cCerftCde', label: '证件号码' },
         { prop: 'tCerftBgnTm', label: '证件有效起期' },
         { prop: 'tCerftEndTm', label: '证件有效止期' },
-        { prop: 'cCusAddr', label: '地址' }
+        // { prop: 'cCusAddr', label: '地址' }
       ];
       
       for (let i = 0; i < insInfo.insGridEdit.items.length; i++) {

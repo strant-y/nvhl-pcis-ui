@@ -92,53 +92,54 @@ export const codeListViewStore = (props?: CodeListViewProps) => {
       });
     }
 
-    /**
-     * 根绝code查询options数据
-     * @param param code类型 包含codeListName codelist参数以及codeListParam参数
-     * @param unAuthor 是否无权获取
-     * @param cache 是否缓存 默认false
-     */
-    function queryCodeList(param: any, unAuthor: boolean = false, cache: boolean = false): Promise<OptionType[]> {
-      return new Promise<OptionType[]>(async (resolve, reject) => {
-        const result = ref<OptionType[]>([]);
-        const k = param.codeListName + ((param.codeListParam && Object.keys(param.codeListParam).length > 0) ? JSON.stringify(param.codeListParam) : '');
-        const v = codeListMap.value[k];
-        if (codeListMap.value[k]) {
-          resolve(codeListMap.value[k]);
-          return;
-        }
-        const cacheData = codeListMap.value[param.codeListName];
-        if (!!cacheData) {
-          // 缓存有数据就返回
-          resolve(cacheData);
-          return;
-        } else if (!unAuthor) {
-          await codelistQuery(param).then((response) => {
-            if (response.code === 200) {
-              result.value = response.data;
-            } else {
-              ElMessage.error(response.msg);
-              reject('###[' + id + ']queryCodeList() -> codeList查询失败！typeCode: ' + param.codeListName + ';  msg: ' + response.msg);
-            }
-          });
-        } else {  //无权获取,一般用于登录时,提供一些无权下拉选获取,暂时无用,预留
-          await getDictOptionsUnAuthor(param).then((response) => {
-            if (response.code === 200) {
-              result.value = response.data;
-            } else {
-              ElMessage.error(response.msg);
-              reject('###[' + id + ']getDictOptionsUnAuthor() -> codeList查询失败！typeCode: ' + param.codeListName + 'msg: ' + response.msg);
-            }
-          });
-        }
-        // 插入缓存
-        if (!!result.value && cache) {
-          // setOptionsToCacheMap(param.codeListName, result.value);
-        }
-        codeListMap.value[k] = result.value;  // 将数据加入缓存,方便下次直接缓存获取不需要再数据库交互
-        resolve(result.value);
-      });
-    }
+    
+  /**
+   * 根绝code查询options数据
+   * @param param code类型 包含codeListName codelist参数以及codeListParam参数
+   * @param unAuthor 是否无权获取
+   * @param cache 是否缓存 默认false
+   */
+  function queryCodeList(param: any, unAuthor: boolean = false, cache: boolean = false): Promise<OptionType[]>{
+    return new Promise<OptionType[]> (async (resolve, reject) => {
+      const result = ref<OptionType[]>([]);
+      const k = param.codeListName + ((param.codeListParam && Object.keys(param.codeListParam).length > 0) ? JSON.stringify(param.codeListParam):'');
+      const v = codeListMap.value[k];
+      if(codeListMap.value[k]){
+        resolve(codeListMap.value[k]);
+        return ;
+      }
+      const cacheData = codeListMap.value[param.codeListName];
+      if (!!cacheData) {
+        // 缓存有数据就返回
+        resolve(cacheData);
+        return;
+      } else if (!unAuthor) {
+        await codelistQuery(param).then((response) => {
+          if (response.code === 200) {
+            result.value = response.data;
+          } else {
+            ElMessage.error(response.msg);
+            reject('queryCodeList() -> codeList查询失败！typeCode: ' + param.codeListName + 'msg: '+response.msg);
+          }
+        });
+      } else {  //无权获取,一般用于登录时,提供一些无权下拉选获取,暂时无用,预留
+        await getDictOptionsUnAuthor(param).then((response) => {
+          if (response.code === 200) {
+            result.value = response.data;
+          } else {
+            ElMessage.error(response.msg);
+            reject('getDictOptionsUnAuthor() -> codeList查询失败！typeCode: ' + param.codeListName + 'msg: '+response.msg);
+          }
+        });
+      }
+      // 插入缓存
+      if (!!result.value && cache) {
+        // setOptionsToCacheMap(param.codeListName, result.value);
+      }
+      codeListMap.value[k] = result.value;  // 将数据加入缓存,方便下次直接缓存获取不需要再数据库交互
+      resolve(result.value);
+    });
+  }
 
     /**
      * 获取缓存中的codeList
@@ -149,36 +150,34 @@ export const codeListViewStore = (props?: CodeListViewProps) => {
       return !!codeListMap.value[typeCode] ? codeListMap.value[typeCode] : [];
     }
 
-
-    /**
-     * 将数据存入缓存
-     * @param typeCode
-     * @param list
-     */
-    function setOptionsToCacheMap(typeCode: string, list: OptionType[]) {
-      if (list) {
-        codeListMap.value[typeCode] = Object.assign(list);
-      }
+  /**
+   * 将数据存入缓存
+   * @param typeCode
+   * @param list
+   */
+  function setOptionsToCacheMap(typeCode: string, list: OptionType[]){
+    if(list){
+      codeListMap.value[typeCode] = Object.assign(list);
     }
-
-    /**
-     * 根据code类型和value值查询label
-     * @param typeCode code类型 必填
-     * @param value 必填
-     * @param options codeList数据 默认undefined 填了就用
-     */
-    function getLabelByValue(typeCode: string, value: any, options: OptionType[] = undefined): any {
-      const codeList = ref<OptionType[]>(options);
-      if (!options) {
-        codeList.value = codeListMap.value[typeCode];
-      }
-      if (!codeList.value) {
-        console.error('###[' + id + ']没有查询到和 typeCode: ' + typeCode + ' 匹配的codeList！');
-        return value;
-      }
-      const option = codeList.value.find((option) => option.value === value);
-      return option ? option.label : value;
+  }
+      /**
+   * 根据code类型和value值查询label
+   * @param typeCode code类型 必填
+   * @param value 必填
+   * @param options codeList数据 默认undefined 填了就用
+   */
+  function getLabelByValue(typeCode: string, value: any, options: OptionType[] = undefined): any {
+    const codeList = ref<OptionType[]>(options);
+    if(!options){
+      codeList.value = codeListMap.value[typeCode];
     }
+    if(!codeList.value){
+      console.error('没有查询到和 typeCode: '+typeCode+' 匹配的codeList！');
+      return value;
+    }
+    const option = codeList.value.find((option) => option.value === value);
+    return option ? option.label : value;
+  }
 
 
     /**

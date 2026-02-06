@@ -451,7 +451,7 @@ const method = {
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
-    setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
+    // setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
 		clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -489,10 +489,10 @@ const method = {
       });
 
       // 为法人  企业成立日期
-			setFormItem("Applicant.tEstablishingDate", {
-				disabled: false,
-        rules: [getRules("required", {})],
-      });
+			// setFormItem("Applicant.tEstablishingDate", {
+			// 	disabled: false,
+      //   rules: [getRules("required", {})],
+      // });
     } else if (val === '07') {
       // 护照
       setFormItem("Applicant.cCertfCde", {
@@ -778,9 +778,6 @@ const method = {
       setFormItem("Applicant.cFirmscaleTyp", {
         rules: [getRules("required", {})],
       });
-      setFormItem("Applicant.cLegalRepresentative", {
-        rules: [getRules("required", {})],
-      });
 
       // 性别 、年龄、生日个人必填
       setFormItem("Applicant.tBirthday", {
@@ -963,9 +960,6 @@ const method = {
       setFormItem("Applicant.cFirmscaleTyp", {
         rules: [],
       });
-      setFormItem("Applicant.cLegalRepresentative", {
-        rules: [],
-      });
 
       codeListStore
         .queryCodeList({
@@ -1019,9 +1013,9 @@ const method = {
             setValue('Applicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
-    }
 
-    checkUser();
+      checkUser();
+    }
   },
   //大股东性质change事件
   funcShareholderNature: (val) => {
@@ -1448,7 +1442,8 @@ const method = {
       "07": "passPort",
       "553": "ariCard",
     };
-    baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
+    const oldRules = formconfig1.fromSchema?.find((item:any) => item.prop === 'Applicant.cOperaterCertfCde')?.rules || [];
+    baseRules = ruleMap[val] ? [...oldRules, getRules(ruleMap[val], {})] : oldRules;
 
     setFormItem("Applicant.cOperaterCertfCde", {
       rules: baseRules,
@@ -1551,6 +1546,35 @@ const method = {
         insuranceCoverageFlag = false
       })
     }
+  },
+  // 国籍
+  cNationChange:(val:any) => {
+    // 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+    if(val && val !== 'CHN') {
+      setFormItem("Applicant.ClntAddrProp", {
+        disabled: true,
+        rules: []
+      });
+      setFormItem("Applicant.RegisterProp", {
+        disabled: true,
+      });
+    } else {
+      setFormItem("Applicant.ClntAddrProp", {
+        disabled: false,
+        rules: [getRules("required", {})]
+      });
+      setFormItem("Applicant.RegisterProp", {
+        disabled: false,
+      });
+    }
+		const param = opertaor.getParam();
+    if (param.initFlag) {
+      return;
+    }
+    setValue("Applicant.ClntAddrProp", null);
+    setValue("Applicant.cSuffixAddr", '');
+    setValue("Applicant.RegisterProp", null);
+    setValue("Applicant.cRegisterSuffixAddr", '');
   },
 };
 

@@ -187,9 +187,9 @@ const method = {
     // 对于询价单场景，不执行联共保菜单显示和信息初始化
     if (params.pageName === "priceInquiry") {
       productStore.setcPriceCiMrk(val)
-      setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
+      // setFormItem("Base.cRemark", { rules: [getRules("required", {})], });
     } else {
-      setFormItem("Base.cRemark", { rules: [], });
+      // setFormItem("Base.cRemark", { rules: [], });
       // 非询价单场景保持原有逻辑
       productStore.setcCiMrk(val);
       if (!!val && !opertaor.getParam().initFlag) {
@@ -208,6 +208,16 @@ const method = {
     }else{
       setFormItem("Base.cCiOprRel", { hidden: true, rules: [getRules("contactPhone", {})] });
     }
+		// 两个从共---联共保主协议信息单证打印方式-默认值-按共保比例打印（602002）
+    if (!opertaor.getParam().initFlag) {
+			setTimeout(() => {
+				if (val == '2' || val == '4') {
+					opertaor.getTableRefByKey("ciMasterAgreement")?.setValue("Base.cCiPriTyp", '602002')
+				} else {
+					opertaor.getTableRefByKey("ciMasterAgreement")?.setValue("Base.cCiPriTyp", null)
+				}
+			}, 2000);
+		}
 
   },
   //业务来源大类

@@ -159,6 +159,8 @@ import { terConfig } from "@/store/modules/term-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useRoute } from "vue-router";
 const route = useRoute();
+import { useValidator } from "@/typings/useValidator";
+const { getRules } = useValidator();
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -259,6 +261,12 @@ onMounted(async () => {
           if (item.cRdrTyp === "1") {
             data["Term.cClauseCategory"] = item.cClauseCategory;
           }
+          if(parparam.cProdNo === '049002'){
+            data["Term.cExcessLayer"] = "01";
+            riskList.forEach((item:any) => {
+              item['TermRisktgt.cExcessLayer'] = '01';
+            })
+          }
           // 080011 费率默认1000
           if (parparam.cProdNo === '080011') {
             riskList.forEach((item:any) => {
@@ -308,7 +316,7 @@ const method = {
         }
         if(row.riskList){
             row.riskList.forEach((item:any)=>{
-                if(item['TermRisktgt.cDistPkId']){
+                if(item['TermRisktgt.cDistPkId'] && item['TermRisktgt.cLiabCode'] === selectedRow.value?.data?.['TermRisktgt.cLiabCode']){
                     existPkId.push(item['TermRisktgt.cDistPkId'])
                 }
             })
@@ -522,6 +530,7 @@ function deleteTermByNo(t: any) {
       }
     }
   });
+  updateInsrnc()
 }
 
 function refushCvrgInfo() {
@@ -599,6 +608,7 @@ function refushData(datas: any) {
   formData.value = {};
   nextTick(() => {
     formData.value = pd;
+    updateInsrnc()
     setTimeout(()=>{  
       showFlush();
     },50);
@@ -821,9 +831,11 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
       });
 		} else {
 			formData.value['m'][0]['riskList'].forEach((item: any) => {
-        item['TermRisktgt.cDistCodeNo'] = value;
-        item['TermRisktgt.cDistPkId'] = pkId;
-        item['TermRisktgt.nInsuranceAmount'] = amount;
+        if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
+          item['TermRisktgt.cDistCodeNo'] = value;
+          item['TermRisktgt.cDistPkId'] = pkId;
+          item['TermRisktgt.nInsuranceAmount'] = amount;
+        }
       });
 		}
   }
@@ -841,11 +853,24 @@ function getPlanNo() {
   return plans;
 }
 
+function updateInsrnc() {
+  if(parparam.cProdNo.startsWith("09")) {
+    if(formData.value['a1']?.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [getRules("required", {})] })
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [getRules("required", {})] })
+    } else {
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [] })
+      opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [] })
+    }
+  }
+}
+
 onActivated(() => {
   console.log('keep-alive -> onActivated')
 });
 onDeactivated(() => {
   console.log('keep-alive -> onDeactivated')
+  sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');
 });
 onUnmounted(() => {
   sessionStorage.getItem('getAddrSeqData') && sessionStorage.removeItem('getAddrSeqData');

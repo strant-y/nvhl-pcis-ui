@@ -24,6 +24,23 @@
         </div>
       </template>
     </app-table>
+		<app-table
+        :tableConfig="tableconfig2"
+        v-model:pageresult="pageresult2"
+        ref="tableRef2"
+    >
+      <template #column-cChgVal="{ row, column, index }">
+        <div style="display: flex; align-items: center;">
+          <span>{{ row.cChgVal }}</span>
+          <el-icon v-if="row.cChgVal && parseFloat(row.cChgVal) > 0" style="margin-left: 5px; color: #ef4747;">
+            <Top />
+          </el-icon>
+          <el-icon v-else-if="row.cChgVal && parseFloat(row.cChgVal) < 0" style="margin-left: 5px; color: #00b19d;">
+            <Bottom />
+          </el-icon>
+        </div>
+      </template>
+    </app-table>
     <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
       <rt-button
         :item="{
@@ -84,6 +101,7 @@ import {
   gettypflag,
   compareAppFeeInfo,
   getDpt,
+	getCompareAppFeeInfo,
 } from "@/api/prod";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { useFormLabelWidth } from "element-plus/es/components/form/src/utils";
@@ -93,6 +111,7 @@ import { number } from "echarts";
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const tableRef1 = ref<AppTableMethod | null>(null);
+const tableRef2 = ref<AppTableMethod | null>(null);
 const isDisabled = ref(true); //判断表单是否可编辑
 const dialogVisible = ref(true);
 const props = defineProps({
@@ -216,7 +235,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "事故预防费用(A6)",
         itemWidth: 1,
         clearable: true,
-        precision: 2,
+				precision: 2,
+				func: (v:any) => {
+					if(!/^(\-|\+)?(\d+.?)\d{0,2}$/.test(v)){
+						ElMessage.error('只能输入数字，小数点后只能保留两位');
+						freeEditRef.value?.setValue('A6_value', A6_value.value)
+						return ;
+					}
+					
+					if(parseFloat(v)<parseFloat(0)){
+						ElMessage.error("事故预防费用(A6)不能小于零！");
+						freeEditRef.value?.setValue('A6_value', A6_value.value)
+						return ;
+					}
+        }
       }
     ],
   })
@@ -232,6 +264,15 @@ const pageresult = reactive<Pageresult>({
 
 //更改比较表格数据参数
 const pageresult1 = reactive<Pageresult>({
+  result: "",
+  /** 数据列表 */
+  list: [],
+  /** 总数 */
+  total: 0,
+});
+
+//上次更改比较表格数据参数
+const pageresult2 = reactive<Pageresult>({
   result: "",
   /** 数据列表 */
   list: [],
@@ -257,8 +298,12 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "nFeeProp",
-        inputtype: "rtinput",
-        title: "比例(%)",
+        inputtype: "rtnumber",
+				title: "比例(%)",
+        min: 0,
+        max: 999999999999999999.99,
+        step: 0.01,
+        clearable: true,
         minWidth: 80,
         func: (v: any,row:any) => {
           getNFeeList(row)
@@ -342,12 +387,71 @@ const tableconfig1 = reactive<AppTableConfig>(
   })
 );
 
+//上次更改比较表格项
+const tableconfig2 = reactive<AppTableConfig>(
+  createTableEditConfig({
+    title: "上次更改比较",
+    editFlag: true,
+    isPage: false,
+    fromSchema: [
+      {
+        prop: "nSeqNo",
+        inputtype: "rtinput",
+        title: "序号",
+        minWidth: 20,
+      },
+      {
+        prop: "cFldNme",
+        inputtype: "rtinput",
+        title: "批改对象",
+        minWidth: 100,
+      },
+      {
+        prop: "cRelTableNme",
+        inputtype: "rtinput",
+        title: "批改项目",
+        minWidth: 100,
+      },
+      {
+        prop: "cRelFldNme",
+        inputtype: "rtinput",
+        title: "类型",
+        minWidth: 80,
+      },
+      {
+        prop: "cOldVal",
+        inputtype: "rtinput",
+        title: "原值",
+        clearable: true,
+        minWidth: 60,
+      },
+      {
+        prop: "cNewVal",
+        inputtype: "rtinput",
+        title: "新值",
+        clearable: true,
+        minWidth: 60,
+      },
+      {
+        prop: "cChgVal",
+        inputtype: "rtinput",
+        title: "变化值",
+        clearable: true,
+        minWidth: 60,
+        slotName: "cChgVal"
+      }
+    ],
+  })
+);
+
 onMounted(async () => {
   handleQuery();
   findFeeBetween(); // 承包 查询 手续费 区间信息
   findIlogC1(); // 查询ilog原始C1值
-  checktype();
-  
+	checktype();
+	setTimeout(() => {
+		getCompareAppFeeInfoquery()
+	}, 2000);
 });
 let param = {
       pagePos: '',
@@ -413,6 +517,9 @@ function tool_fix(num: any, prec: any) {
 
 // 根据输入手续费比例计算出相应金额
 function getNFeeList(row:any) {
+			if (row.nFeeProp == '' || row.nFeeProp == null || row.nFeeProp == undefined) {
+				row.nFeeProp = 0
+			}
       const feeProp = row.nFeeProp * 1;
       let feePropSum = freeEditRef.value?.getValue("nFeePropSum") * 1;
       let prmSum = freeEditRef.value?.getValue("nPrmSum") * 1;
@@ -621,6 +728,7 @@ function readOnlyAB() {
 }
 //比较接口
 async function compareAppFee(saveFlag:any) {
+	tableRef1.value?.setPartnerPage({ pageNum: 1, pageSize: 50 });
   let requstFlag = false;
   const paramStr = {
     appNo: params['appNo'],//保单号
@@ -683,6 +791,7 @@ async function saveFeeInfo() {
                   appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
                   A1_value:String(freeEditRef.value?.getValue("A1_value")),
                   B1_value:String(freeEditRef.value?.getValue("B1_value")),
+                  A6_value:String(freeEditRef.value?.getValue("A6_value")),
                   Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
                 };
                 updateIIogFee(paramStr2)
@@ -690,6 +799,7 @@ async function saveFeeInfo() {
                   if (null != res1 && null != res1['code']) {
                     if (res1['code'] === 200) {
                       ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+											dialogVisible.value = false;
                     } else {
                       ElMessage.error('iLog费用信息同步失败');
                     }
@@ -721,6 +831,7 @@ async function saveFeeInfo() {
                   appNo: props.data?.pageName === 'priceInquiry' ? props.data?.cInquiryNo : props.data?.cAppNo,
                   A1_value:String(freeEditRef.value?.getValue("A1_value")),
                   B1_value:String(freeEditRef.value?.getValue("B1_value")),
+									A6_value:String(freeEditRef.value?.getValue("A6_value")),
                   Coper: JSON.parse(String(sessionStorage.getItem("user"))).opCde,
                 };
                 updateIIogFee(paramStr2)
@@ -728,6 +839,7 @@ async function saveFeeInfo() {
                   if (null != res1 && null != res1['code']) {
                     if (res1['code'] === 200) {
                       ElMessage.success('iLog费用信息同步:' + res1['msg'],);
+											dialogVisible.value = false;
                     } else {
                       ElMessage.error('iLog费用信息同步失败');
                     }
@@ -780,6 +892,8 @@ function findFeeBetween() {
                         my_min_value.value  = tool_fix(values[0] * 1, 2);    // 手续费的 输入区间  如果后台没查询到 默认为 0.00  【区间】
                         A1_value.value   = tool_fix(values[2] * 1, 2);
                         B1_value.value   = tool_fix(values[3] * 1, 2);
+												const num = parseFloat(values[8]);
+												A6_value.value  = !isNaN(num) && isFinite(num) ? tool_fix(num * 1, 2) : 0.00;;
                         A_value.value   = tool_fix(values[4] * 1, 2);
                         B_value.value = tool_fix(values[5] * 1, 2);
                         freeEditRef.value?.setValue("max_value", my_max_value.value);
@@ -958,6 +1072,29 @@ function changeUpdValue(value:string){
       return ;
     }
   })
+}
+
+/**
+ * 查询上次比较数据
+ */
+function getCompareAppFeeInfoquery(flag?: boolean) {
+	tableRef2.value?.setPartnerPage({ pageNum: 1, pageSize: 50 });
+	pageresult2.list = [];
+  const param = {cAppNo:params.appNo}
+  //费用信息接口调用
+  getCompareAppFeeInfo(param)
+    .then((res:any) => {
+      if (res.code == 200) {
+        pageresult2.list = res.data;
+				pageresult2.total = res.data.length;
+				pageresult2.list.forEach((item, index) => {
+          item.nSeqNo = index + 1;
+        });
+      } else {
+        ElMessage.error(res.msg);
+      }
+    })
+    .finally(() => { });
 }
 </script>
 

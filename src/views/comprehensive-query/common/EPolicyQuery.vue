@@ -445,7 +445,15 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     { label: '电子投保单', value: 'TBD' },
                     { label: '电子批单', value: 'EDR' },
                     { label: '诚信声明', value: 'SOG' }
-                ]
+                ],
+                func: (val: any) => {
+                    const prodNo = freeEditRef.value?.getValue('CProdNo')
+                    if ((prodNo == '089900' && val == 'PLY') || (prodNo == '010022' && val == 'PLY') || val == 'BL') {
+                        setFormItem('CTyp', { disabled: false })
+                    } else {
+                        setFormItem('CTyp', { disabled: true })
+                    }
+                }
             },
             {
                 prop: 'CTyp',
@@ -593,12 +601,12 @@ const tableconfig = reactive<AppTableConfig>(
 
 const prodTotalDatas = ref([]);
 onBeforeMount(() => {
-		let params = {
-			level: 2,
-			type: 1,
-			cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-			cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
-		}
+    let params = {
+        level: 2,
+        type: 1,
+        cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
+        cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+    }
     getProdEnableList(params).then((res: any) => {
         if (res.data && res.data.length > 0) {
             prodTotalDatas.value = res.data;
@@ -702,7 +710,7 @@ function handleQuery(flag?: boolean) {
             let CAppTyp = plyTyp === 'EDR' ? 'E' : 'A'
             const CTyp = freeEditRef.value?.getValue('CTyp')
             if (plyTyp === 'BL' && !!CTyp) {
-               CAppTyp = CTyp
+                CAppTyp = CTyp
             }
             const param = Object.assign(
                 {

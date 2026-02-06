@@ -327,7 +327,7 @@ function setFormItem(key: any, obj: any) {
 onMounted(() => {
 	nextTick(() => {
 		// 协议审核批单展示批改信息和批改比较项，不能修改
-		if (params.type === "audit" && params.cAppTyp == 'E') {
+		if ((params.type === "audit" || params.type === "view") && params.cAppTyp == 'E') {
 			setFormItem("EdrECargoBase.cEdrMrk", { hidden: true })
 			setFormItem("EdrECargoBase.tEdrBgnTm", { disabled: true })
 			setFormItem("EdrECargoBase.cEdrCtnt", { disabled: true })
@@ -390,12 +390,10 @@ onMounted(() => {
             ZH: "ZH",
             FZ: "FZ",
         };
-        if(params.cRsnCde=='FZ' || params.cEdrRsnBundleCde =='FZ'){
-            param["calcMrk"] = '0'
-        }else{
-          param["calcMrk"] = '1'
-        }
-        codeListStore
+				if ((Object.hasOwn?.(params, 'cRsnCde') && params.cRsnCde === 'FZ') ||
+				(!Object.hasOwn?.(params, 'cRsnCde') && params?.cEdrRsnBundleCde === 'FZ')) {
+					param["calcMrk"] = '0'
+					codeListStore
             .queryCodeList({
                 codeListName: "EDR_RSN_LIST_ECARGO_FZ",
                 codeListParam: param,
@@ -403,6 +401,17 @@ onMounted(() => {
             .then((res) => {
                 setFormItem("EdrECargoBase.cEdrRsnDetail", { loadData: res });
             });
+        }else{
+					param["calcMrk"] = '1'
+					codeListStore
+            .queryCodeList({
+                codeListName: "EDR_RSN_LIST_FZ",
+                codeListParam: param,
+            })
+            .then((res) => {
+                setFormItem("EdrECargoBase.cEdrRsnDetail", { loadData: res });
+            });
+        }
     }
   });
 });
