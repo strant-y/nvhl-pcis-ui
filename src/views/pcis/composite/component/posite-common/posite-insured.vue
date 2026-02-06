@@ -61,6 +61,7 @@ const routeParam = JSON.parse(query.value?.param ? descryptParameter(query.value
 const productStore = useProductStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -72,7 +73,6 @@ const props = defineProps({
   },
 });
 const { getRules } = useValidator();
-const codeListStore = codeListViewStore();
 const insuredEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 // import { useRoute } from "vue-router";
@@ -1277,7 +1277,7 @@ const method = {
     // 单位性质
  cWorkDptChange:(val: any) => {
   setCapitalRequiredRule(getValue,setFormItem,'Insured');
-
+  const param = opertaor.getParam();
   const clientNature = getValue('Insured.cClntMrk');
   const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
   const requiredRule = [getRules("required", {})];

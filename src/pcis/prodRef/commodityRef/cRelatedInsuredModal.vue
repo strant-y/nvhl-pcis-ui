@@ -25,7 +25,8 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { codeListViewStore } from "@/store";
 import cargoApi from "@/api/cargo";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const { getRules } = useValidator();
 const props = defineProps({
   data: {
@@ -37,6 +38,8 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const emits = defineEmits(["handleClose"]);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);

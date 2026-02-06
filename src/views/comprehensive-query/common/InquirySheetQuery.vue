@@ -114,7 +114,6 @@ import {
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import dayjs from "dayjs";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -125,6 +124,8 @@ import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { getInquiryPolicyList, qryEndorseList, delInquiryPolicy, queryInsuredList } from "@/api/query";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const props = defineProps({
@@ -151,6 +152,7 @@ let cTermNoList = ref<any>([]);  // 条款数据
 let cTermNo = '';    // 条款编码
 let ESOriginalData = ref<any>([]);  // ES查询原始数据，转化成驼峰为适配操作列
 import { FIELD_MAP } from '@/constants/fieldMaps';
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({

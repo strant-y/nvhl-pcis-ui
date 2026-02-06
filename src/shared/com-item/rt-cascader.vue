@@ -47,8 +47,8 @@ import { codeListViewStore } from "@/store";
 import { CascaderProps } from "element-plus";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {checkIfTruncated} from "@/utils/common";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
 const props = defineProps({
   modelValue: {
     type: [String, Number, Array<any>],
@@ -75,11 +75,13 @@ const props = defineProps({
     required: false,
   },
 });
-
 interface OptionTypeBySelect extends OptionType {
   color?: string;
   disabled?: boolean;
 }
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const codeListMap = inject<any>('codeListMap', {});
 

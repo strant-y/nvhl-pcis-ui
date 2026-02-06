@@ -43,7 +43,6 @@ import { saveAs } from "file-saver";
 import moment from "moment";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
 import { CardConfig, creatCardConfig, MyCardMethod } from "@/shared/mytemplate/card-config";
@@ -56,13 +55,14 @@ import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTgtDetailByDist, getTermDetailByDist } from "@/api/query";
 import Decimal from "decimal.js";
-
-
 const { getRules } = useValidator();
+
+
 const route = useRoute();
 const dialog = ref<DialogMethod | null>(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const params = opertaor.getParam();
 const emit = defineEmits(['savePlyInfo']);  
 const btnDisabled = ref(false);

@@ -46,7 +46,10 @@ const { getRules } = useValidator();
 const emits = defineEmits(["ok", "cancel"]);
 import { v4 as uuidv4 } from "uuid";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);

@@ -101,8 +101,10 @@
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
 import {checkIfTruncated} from "@/utils/common";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const codeListMap = inject<any>('codeListMap', {});
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const props = defineProps({
   modelValue: {
     type: [String, Number, Array<any>, Boolean],

@@ -42,7 +42,6 @@ const router = useRouter();
 const route = useRoute();
 import { ref } from "vue";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -62,6 +61,10 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { SCENE_PLY_APP_READ } from "@/constants/tab-constants";
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const pcisQueryService = new PcisQueryService();
 const userStore = useUserStore();
 const user:any = ref(userStore.user) || ref({ companyId: "", opCde: "" });

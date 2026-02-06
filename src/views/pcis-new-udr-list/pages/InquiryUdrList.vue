@@ -54,7 +54,7 @@
     import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
     import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
     import { codeListViewStore } from "@/store";
-    const codeListStore = codeListViewStore();
+
     const pcisQueryService = new PcisQueryService();
     const policyService = new PolicyService();
     const {

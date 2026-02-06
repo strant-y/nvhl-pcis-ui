@@ -72,6 +72,7 @@ const route = useRoute();
 const dataparam = dataParam();
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
   // handleAnchorClick: handleAnchorClick,
 };
 provide(idxParamKey, idxParam);

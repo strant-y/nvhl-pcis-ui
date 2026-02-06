@@ -16,8 +16,8 @@ import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/us
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { useRoute } from "vue-router";
 const route = useRoute();
 const param = route.params.param;

@@ -37,7 +37,6 @@ import { getAddressStr, policyRatio } from "@/api/query";
 import { codeListViewStore } from "@/store";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
 import { eventBus } from "@/utils/event-bus";
 import {codelistQuery} from "@/api/dict";
@@ -45,12 +44,13 @@ const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
 const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
-
-
 const dzmodal = useDzModal();
+
+
 const { getRules } = useValidator();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const params = opertaor.getParam();
 const productStore = useProductStore()
 const dialog = ref<DialogMethod | null>(null);

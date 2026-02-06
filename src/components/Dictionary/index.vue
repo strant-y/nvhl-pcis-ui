@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   // 复选框类型 单选 多选
@@ -173,8 +174,8 @@ function handleChange(val?: string | number | Array<any> | undefined) {
   emits("update:modelValue", val, option);
   emits("update:loadData", val, option);
 }
-
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 function showMemu() {
   if (selectRef.value) {
     selectRef.value.toggleMenu();

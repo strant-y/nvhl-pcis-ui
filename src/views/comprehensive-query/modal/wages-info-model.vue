@@ -29,6 +29,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 const route = useRoute();
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
 };
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);

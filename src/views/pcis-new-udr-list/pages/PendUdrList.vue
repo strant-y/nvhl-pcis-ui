@@ -59,7 +59,9 @@
     import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
     import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
     import { codeListViewStore } from "@/store";
-    const codeListStore = codeListViewStore();
+
+    const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+    const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
     const pcisQueryService = new PcisQueryService();
     const policyService = new PolicyService();
     const {
@@ -73,6 +75,7 @@
     import moment from "moment";
     import { Row } from "element-plus/es/components/table-v2/src/components";
     import { submitUnderwriting } from "../../../api/query/index";
+    import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
     // import { saveAs } from 'file-saver';
     const userStore = useUserStore();
     const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });

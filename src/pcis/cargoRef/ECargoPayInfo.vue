@@ -12,6 +12,7 @@ import {
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
 import { numAdd } from "@/utils/Math";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   pageSchema: {
@@ -24,7 +25,7 @@ const props = defineProps({
   },
 });
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
 

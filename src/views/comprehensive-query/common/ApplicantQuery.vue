@@ -105,7 +105,6 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { DocumentCopy } from "@element-plus/icons-vue";
@@ -135,6 +134,8 @@ import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import { getAppPolicyList, qryEndorseList, delTmpPolicy, queryInsuredList} from "@/api/query";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 const policyService = new PolicyService();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 // 变更列
 const colChange = defineAsyncComponent(() => import("../modal/colChange.vue"));
 const PrintView = defineAsyncComponent(() => import("../modal/PrintView.vue"))
@@ -152,6 +153,7 @@ const props = defineProps({
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
 import { FIELD_MAP } from '@/constants/fieldMaps';
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 let addrowArr = [
     "cAppNo",

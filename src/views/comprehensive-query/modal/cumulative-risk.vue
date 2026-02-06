@@ -45,7 +45,6 @@ import {
 import { ref, reactive } from "vue";
 import { useValidator } from "@/typings/useValidator";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const props = defineProps<{
   visible: boolean;

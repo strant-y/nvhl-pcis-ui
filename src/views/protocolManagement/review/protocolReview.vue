@@ -73,14 +73,16 @@ import { initMultiCodeList } from "@/api/code-list-service"; // 代码列表服�
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
 import { codeListViewStore } from "@/store";
 import { DocumentCopy } from "@element-plus/icons-vue";
+import cargoApi from '@/api/cargo'
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
 const policyService = new PolicyService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-import cargoApi from '@/api/cargo'
-
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const params = route.query.data ? JSON.parse(route.query.data) : {};
 const dataSet = ref<any>([]); // 数据集合

@@ -24,11 +24,11 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { genCusConInfoBusinessList } from "../../../api/query/index";
 import { set } from "lodash";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const { getRules } = useValidator();
 const props = defineProps({
   data: {

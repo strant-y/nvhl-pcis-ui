@@ -42,10 +42,14 @@ import {
 import { template } from "lodash";
 const dzmodal = useDzModal();
 import { useUserStore } from "@/store";
+import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
-import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const undrDtyEdit = defineAsyncComponent(() => import("./undrDtyEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);

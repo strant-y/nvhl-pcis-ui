@@ -13,9 +13,8 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { codeListViewStore } from "@/store";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
-const codeListStore = codeListViewStore();
-
 const route = useRoute(); // 获取当前路由对象
+
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -26,9 +25,10 @@ const props = defineProps({
     required: false,
   },
 });
-
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 let cRsnDetailCde = ref(opertaor.getParam()?.cRsnDetailCde);
 const tgtobjEditRef = ref<AppFreeEditMethod | null>(null);

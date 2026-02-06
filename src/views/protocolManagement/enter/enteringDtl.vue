@@ -23,6 +23,7 @@ import moment from "moment";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
 import {CommonConstants} from "@/constants/CommonConstants";
+import {idxParamKey} from "@/views/pcis/support/useIdxParam";
 const policyService = new PolicyService();
 const tagsViewStore = useTagsViewStore();
 const router = useRouter();
@@ -58,7 +59,7 @@ let idxParam = reactive({
   readonly: computed(() => ['view','audit'].includes(props?.type || props.param?.type) || (props.type === 'EDR_APP_NEW_SCENE' &&  ['2','3'].includes(props.param?.cEdrType) )),
 });
 
-provide('idxParam', idxParam);
+provide(idxParamKey, idxParam);
 const mainRef = ref(null);
 const bthList = ref<Array<FreeButtonBase>>([]);
 const saveDistBatchFlag = ref(false);

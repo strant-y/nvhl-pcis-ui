@@ -10,11 +10,11 @@ import {
 } from "@/shared/app-grid-edit-config";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const dialogRef = ref<DialogMethod | null>(null);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
 import { number } from "echarts";
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 const { getRules } = useValidator();
 
 const props = defineProps({
@@ -29,10 +29,10 @@ const props = defineProps({
 });
 
 
-const idxParam = inject('idxParam');
+const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
 const param = idxParam?.param;
-
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const freeEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
 const initFlag = computed(() => formPage.init);

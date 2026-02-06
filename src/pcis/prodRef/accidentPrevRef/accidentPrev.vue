@@ -17,19 +17,19 @@ import { useRouter, useRoute } from 'vue-router';
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { getAddressStr } from "@/api/query";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { distRequiredMap } from '@/views/pcis/my-page/requiredDistMap';
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-
 const route = useRoute();
+
 const query = ref(route.query);
 const router = useRouter();
-
 const { getRules } = useValidator();
+
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const productStore = useProductStore()
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const dialog = ref<DialogMethod | null>(null);
 
 const props = defineProps({
