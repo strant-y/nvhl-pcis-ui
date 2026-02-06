@@ -624,6 +624,9 @@ const cIsIndvduBizChange = (val: any) => {
 }
 //证件有效期止期时间事件改变
 const tCertfEndDateChange = (val: any) => {
+	if (init.value || props.data.title == '详情') {
+		return false
+	}
 	const tableParam = opertaor.getTableRefs();
 	const tinsrncBgnTm = tableParam["insrnc"].getFromValue()["Base.tInsrncBgnTm"]  //投保开始日期
 	const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
@@ -634,7 +637,7 @@ const tCertfEndDateChange = (val: any) => {
     const insrncBgnTm = new Date(tinsrncBgnTm).getTime();
     if (certfEndDate < issueTm) {
       ElMessage.error("被保人证件有效期小于签单时间，请关注!");
-      setValue("Insured.tCertfEndDate", '');
+      setValue("InsuredDist.tCertfEndDate", '');
     }
     if (certfEndDate < insrncBgnTm) {
       ElMessage.error("被保人证件有效期小于投保开始日期，请关注!");
@@ -642,7 +645,10 @@ const tCertfEndDateChange = (val: any) => {
   }
 }
 //企业成立时间事件改变
-const tEstablishingDateChange = (val:any) => {
+const tEstablishingDateChange = (val: any) => {
+	if (init.value || props.data.title == '详情') {
+		return false
+	}
 	const tableParam = opertaor.getTableRefs();
   const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
   const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
