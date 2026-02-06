@@ -448,6 +448,7 @@ const method = {
 
       nPayNumberFun();
     }
+    eventBus.emit('change-special', val)
   },
   //争议处理选择事件
   cDisptSttlCdeChange(val){
