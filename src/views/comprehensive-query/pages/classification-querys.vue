@@ -1198,6 +1198,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   { label: "询价", value: "I" },
               ],
               func: (val:any) => {
+                setValue("cAppStatus",null)
                   if (val === "A") {
                       // 投保
                       formconfig1.fromSchema?.forEach((item) => {
