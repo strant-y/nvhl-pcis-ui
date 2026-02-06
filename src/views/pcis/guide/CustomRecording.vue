@@ -648,12 +648,39 @@ const handleArray = (obj:any)=>{
   }
   return newObj
 }
+const cGrpMrkProd = ref(['040001','040002','040007','040020','040021','041001','041007','041011','041014','041015','042002','043004','043005','043009','043011','043013','043022','045001','049001','049024','049026','049030','049031',])
 function next() {
   // console.log(formconfig1.value);
   freeEditRef.value?.validate().then(async (isValid: boolean) => {
     if (!isValid) {
       return false;
-    } else {
+		} else {
+			// 校验团单---自定义录单、新保、团单，并且选择产品不在cGrpMrkProd里面
+			if (formconfig1.value.cRecordType == 10) {
+				if (formconfig1.value.cGrpMrk == '1') {
+					const invalidProducts = formconfig1.value.cProdDtlList.filter(
+						item => !cGrpMrkProd.value.includes(item.cProdNo)
+					)
+					if (invalidProducts.length > 0) {
+						// 按格式 【编号：名称】 拼接
+						const messages = invalidProducts.map(
+							item => `【${item.cProdNo}：${item.cProdNme}】`
+						)
+						const errorMsg = `所选产品\n${messages.join('、')}不支持团单的类型，请调整后重新选择。`
+						ElMessage.error({
+							message: errorMsg,
+							dangerouslyUseHTMLString: false // 不建议用 HTML，纯文本即可
+						})
+						return
+					}
+				}
+			} else {
+				if (formconfig1.value.cGrpMrk == '1' && (formconfig1.value.cRenewMrk == '0'  || formconfig1.value.cRecordType != 1 ) && !cGrpMrkProd.value.includes(formconfig1.value.cProdNo)) {
+					ElMessage.error(`当前选择的产品【${formconfig1.value.cProdNo}：${formconfig1.value.cProdNme}】不支持团单功能，请重新选择其他产品。`);
+					return;
+				}
+			}
+			
       if(formconfig1.value.cRecordType === 10) {
         console.log('formconfig1.value', formconfig1.value)
         router.push({
@@ -893,6 +920,7 @@ function showModal() {
         formconfig1.value.cTermNo = selectedTerm.data.code;
         formconfig1.value.cTermNme = selectedTerm.data.value;
         formconfig1.value.cProdNo = selectedTerm.parent.data.code;
+        formconfig1.value.cProdNme = selectedTerm.parent.data.value;
         handleQuery();
       }
     });

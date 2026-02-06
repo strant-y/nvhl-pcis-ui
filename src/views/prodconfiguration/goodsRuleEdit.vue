@@ -99,8 +99,10 @@ const formconfig = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cRuleCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "规则名称",
+				clearable: true,
+				typeCode: "RULE_CODE",
       },
       {
         prop: "cRuleValue",

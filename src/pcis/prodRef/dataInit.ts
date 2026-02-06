@@ -108,7 +108,7 @@ export const getData = (opertaor: any) => {
     dataInit["Tgt.cUsageNature"] = "364113098";
     dataInit["Tgt.cPayCur"] = "CNY";
     // 标的信息中的车辆类型默认为电动自行车
-    dataInit["Tgt.cCarType"] = "00";
+    // dataInit["Tgt.cCarType"] = "00";
 
 
     return dataInit;
