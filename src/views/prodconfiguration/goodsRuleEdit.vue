@@ -99,8 +99,14 @@ const formconfig = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cRuleCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "规则名称",
+				clearable: true,
+				loadData: [
+					{label:'承保补录（天）', value:'RULE_01'},
+					{label:'全单退保限制', value:'RULE_02'},
+					{label:'团单补导限制', value:'RULE_03'},
+				]
       },
       {
         prop: "cRuleValue",

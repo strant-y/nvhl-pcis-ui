@@ -107,8 +107,14 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         // cRuleCde
         prop: "cRuleCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "规则名称",
+				clearable: true,
+				loadData: [
+					{label:'承保补录（天）', value:'RULE_01'},
+					{label:'全单退保限制', value:'RULE_02'},
+					{label:'团单补导限制', value:'RULE_03'},
+				]
       },
       {
         prop: "cPrd",
@@ -117,6 +123,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { codeListParam: "" },
         child: "cProdNo",
         title: "产品大类",
+				clearable: true,
         func: (val: any) => {
           // 更新产品下拉选
           setFormItem("cProdNo", {
@@ -133,6 +140,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cProdNo",
         inputtype: "rtselect",
         typeCode: "PROD_LIST",
+				clearable: true,
         codeParam: { cParCde: "999" },
         title: "产品",
       },
