@@ -1277,7 +1277,7 @@ const method = {
     // 单位性质
  cWorkDptChange:(val: any) => {
   setCapitalRequiredRule(getValue,setFormItem,'Insured');
-
+  const param = opertaor.getParam();
   const clientNature = getValue('Insured.cClntMrk');
   const isSpecialCase = cWorkDptList.includes(val) && clientNature === '0';
   const requiredRule = [getRules("required", {})];

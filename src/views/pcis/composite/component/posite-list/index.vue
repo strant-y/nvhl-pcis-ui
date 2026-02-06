@@ -82,11 +82,11 @@ const formconfig = ref(createAppGridEditConfig({
       loadData: [
         {
           label: "个单",
-          value: "1",
+          value: "0",
         },
         {
           label: "团单",
-          value: "0",
+          value: "1",
         },
         // {
         //   label: "家庭单",
@@ -174,6 +174,16 @@ watch(() => props.prodList, (newVal) => {
 }, {
   immediate: true
 });
+function getFormBtn() {
+  return gridEditRef?.value?.getFormBtn();
+}
+function getTableBtn() {
+  return gridEditRef?.value?.getTableBtn();
+}
+function setDisabledAll(isDisabled: boolean) {
+  gridEditRef?.value?.setDisabledAll(isDisabled);
+}
+defineExpose({setDisabledAll, getFormBtn, getTableBtn});
 </script>
 <style scoped>
 

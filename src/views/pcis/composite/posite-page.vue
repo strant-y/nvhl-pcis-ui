@@ -11,7 +11,7 @@
       </div>
       <div class="center_content">
         <div id="positeList" style="margin-bottom: 7px;">
-          <posite-list v-show="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
+          <posite-list ref="prodListRef" v-show="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
         </div>
         <template v-if="pageView.pageConfig[0]">
           <group-common
@@ -115,6 +115,9 @@ import groupCommon from "@/views/pcis/composite/component/group-form/group-commo
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import positeApi from "@/api/posite";
 import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, useUserStore} from "@/store";
+import { lessThan6Months, toDate } from "@/utils/date";
+import dayjs from "dayjs";
+import moment from "moment";
 
 const props:any = defineProps({
   param: {
@@ -133,6 +136,8 @@ const productList = ref<any[]>([]);
 const pageLoading = ref<boolean>(false);
 const loadingText = ref<string>('加载中...');
 const rightBtnList = ref<FreeButtonBase[]>();
+const prodListRef = ref();
+const user = userStore.user;
 
 const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
@@ -160,6 +165,23 @@ const bthList = ref<FreeButtonBase[]>([
     },
   }),
 ]);
+
+const needCalc = ref(true);
+const nPrmMap = reactive<Record<string, number>>({});
+const nAmtMap = reactive<Record<string, number>>({});
+
+const setNPrmMap = (prodNo: string, nPrm: number) => {
+  nPrmMap[prodNo] = nPrm;
+}
+const getNPrmMap = (prodNo: string) => {
+  return nPrmMap[prodNo];
+}
+const setNAmtMap = (prodNo: string, nAmt: number) => {
+  nAmtMap[prodNo] = nAmt;
+}
+const getNAmtMap = (prodNo: string) => {
+  return nAmtMap[prodNo];
+}
 
 /**
  * 页面结构数据组装完之后 组件开始加载之前执行
@@ -272,11 +294,12 @@ function saveInit(pageData: any) {
 }
 function readInit(pageData: any) {
   const data = trimPageData(pageData);
+  prodListRef.value?.setDisabledAll();
   pageView.value.setPageAllData(data);
   pageView.value.setPageDisabledAll();
   bthList.value.forEach(item => {
-    if(item && ['btn010102', 'btn010103'].includes(item.id)) {
-      item.hidden = true;
+    if(item && ['btn010101', 'btn010102', 'btn010103'].includes(item.id)) {
+      item.disabled = true;
     }
   })
   console.log('readInit', data);
@@ -363,7 +386,18 @@ const saveOpt = () => {
 }
 
 const calcPremium = () => {
+  const groupIdList = pageView.value.pageConfig
+      .map((group: GroupForm )=> group.groupId)
+      .filter(groupId => !groupId.includes('000000'))
+
   const loading = openPageLoading('计算中...');
+  groupIdList.forEach(groupId => {
+      const opertaor = pageView.value.getDataOpertaorByGroupId(groupId)
+      calcBeforeVerify(opertaor)
+  });
+  const btn = getBtn('btn010101')
+  btn.loading = true;
+
   const allData = pageView.value.getPageAllData();
   const params = {param: props.param, data: allData, user: userStore.user}
   console.log('calcPremium-params', params);
@@ -372,13 +406,306 @@ const calcPremium = () => {
     if(res.code === 200) {
       const pageData = trimPageData({...res.data});
       pageView.value.setPageAllData(pageData);
-      ElMessage.success('计算成功')
+      groupIdList.forEach(groupId => {
+        const list = groupId.split('-');
+        const prodNo = list[1]
+        const opertaor = pageView.value.getDataOpertaorByGroupId(groupId)
+        disposeAfter(opertaor, pageData[prodNo], prodNo, `[${prodNo}]产品，${res.msg}`)
+      });
+      // ElMessage.success('计算成功')
     }else {
       ElMessage.error(res.msg)
     }
     setTimeout(() => loading.close(), 500)
-  })
+  }).finally(() => btn.loading = false);
 }
+
+
+
+/**
+ * 计算前校验
+ */
+const calcBeforeVerify = (opertaor: any) => {
+  const btn = getBtn("btn010101");
+  if(btn && props.param.cRsnCde !== '99'){
+    // const btn = getBtn("btn010101");
+    btn.loading = true;
+  }
+  const res = opertaor.getDataAll();
+  res["user"] = user;
+  res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
+  res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  // if(res['ci'] && res['ci'].length>0){
+  //   res['ci'].forEach((item:any)=>{
+  //     if(item['Ci.nCiShare']){
+  //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])/100;
+  //     }
+  //   })
+  // }
+  if (res["cvrg"].length == 0) {
+    ElMessage.error("请录入条款信息");
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
+    return;
+  } else {
+    res["cvrg"].forEach((item:any) => {
+      if(item['Term.cDistCodeNo'] && Array.isArray(item['Term.cDistCodeNo'])) {
+        if(sessionStorage.getItem("getAddrSeqData")) {
+          const getAddrSeqData = JSON.parse(sessionStorage.getItem("getAddrSeqData") || '[]')
+          item['Term.cDistPkId'] = item['Term.cDistCodeNo'].map((item:any) => {
+            return getAddrSeqData.find((i:any) => i.value === item)?.id
+          })?.join(',')
+        }
+        item['Term.cDistCodeNo'] = item['Term.cDistCodeNo'].join(',')
+      }
+    })
+  }
+
+  const termref = opertaor.getTableRefByKey("cvrg");
+  const calccheck = termref.calcCheck();
+  if(!calccheck['res']){
+    ElMessage.error(calccheck['msg']);
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
+    return;
+  }
+  if (!baseValite(opertaor)) {
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
+    return;
+  }
+  // 校验标的信息中核定座位总数和投保座位数总数不一致！
+  const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
+  if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
+    ElMessage.error("核定座位总数和投保座位数总数不一致！");
+    if (btn && props.param.cRsnCde !== '99') {
+      btn.loading = false;
+    }
+    return;
+  }
+};
+const setPayInfo = (base: any, applicant: any, insrnc: any) => {
+  const payList: any[] = [];
+  const pay: any = {};
+  pay["Pay.nTms"] = 1;
+  if (applicant) {
+    pay["Pay.cPayorCde"] = applicant["Applicant.cAppCde"];
+    pay["Pay.cPayorNme"] = applicant["Applicant.cAppNme"];
+  } else {
+    pay["Pay.cPayorCde"] = "";
+    pay["Pay.cPayorNme"] = "";
+  }
+  pay["Pay.nPayablePrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
+
+  pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
+      "YYYY-MM-DD HH:mm:ss"
+  );
+  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
+      "YYYY-MM-DD HH:mm:ss"
+  );
+  pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
+  pay["Pay.cProdNo"] = base["Base.cProdNo"];
+  pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;
+  payList.push(pay);
+  return payList;
+};
+
+/**
+ * 公共验证，保费计算和核保，都需要走的验证方法
+ */
+function baseValite(opertaor: any){
+  let r = true;
+  // 校验承包基本信息中的总保额和总保费币种须一致
+  const baseValue = opertaor.getTableRefByKey("base").getFromValue();
+  if(baseValue["Base.cAmtCur"] !== baseValue["Base.cPrmCur"]) {
+    ElMessage.error("承保基本信息中的总保额币种和总保费币种须一致!");
+    r = false;
+  }
+  if(props.param.cProdNo.startsWith('02') && !['020013','020014','020018','020015','020019','020020','020021'].includes(props.param.cProdNo)){
+    const term = opertaor.getTableRefByKey("cvrg").getFromValue();
+    term.forEach((item:any) => {
+      if(item["Term.cRdrTyp"] === '0'){
+        if( !item["Term.riskList"] || item["Term.riskList"].length === 0 ){
+          ElMessage.error("至少需要一条责任信息!");
+          r = false;
+        }
+      }
+    });
+  }
+  return r;
+}
+
+const disposeAfter = (opertaor: any, ops: any, prodNo: string, msg: string) => {
+  console.log("disposeAfter-opertaor", opertaor);
+  console.log("disposeAfter-ops", ops);
+  if(!opertaor){
+    throw new Error("disposeAfter opertaor " + opertaor);
+  }
+  let shanDongFlag;
+  const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
+  const base  = opertaor.getTableRefByKey('base')?.getFromValue();
+  const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+  const cDptCde = plyBase['Base.cDptCde'];
+  const okProdPre = ['11','08','09','01','04','05','07','12'];
+  ops.needCalc = true;
+  ops["base"]["needCalc"] = true
+  if (
+      ops["base"]["Base.nPrm"] != undefined &&
+      ops["base"]["Base.nPrm"] != null
+  ) {
+    ElMessage.success(msg + "保费为：" + ops["base"]["Base.nPrm"]);
+  } else {
+    ElMessage.success(msg + "保费为：0");
+  }
+  // if(ops['ci'] && ops['ci'].length>0){
+  //   ops['ci'].forEach((item:any)=>{
+  //     if(item['Ci.nCiShare']){
+  //       item['Ci.nCiShare'] = Number(item['Ci.nCiShare'])*100;
+  //     }
+  //   })
+  // }
+  if(ops['deductibleDist'] && ops['deductibleDist'].length > 0) {
+    ops['deductibleDist'].forEach((item:any, index:any)=>{
+      item.nSeqNo = index + 1;
+    })
+  }
+  opertaor.setDataAll(ops);
+  setNPrmMap(prodNo, ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0);
+  setNAmtMap(prodNo, ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0);
+
+  const nAmtVal = ops["base"]["Base.nAmt"];
+  const nPrmVal = ops["base"]["Base.nPrm"];
+  const nPrmRmbExch = ops["base"]["Base.nPrmRmbExch"];
+  //
+  // productStore.setnPrm(nPrmVal);
+  // productStore.setnAmt(nAmtVal);
+  if(opertaor.getTableRefByKey("ciMasterAgreement")) {
+    opertaor
+        .getTableRefByKey("ciMasterAgreement")
+        .setValue("Base.nCiJntAmt", getNAmtMap(prodNo));
+    opertaor
+        .getTableRefByKey("ciMasterAgreement")
+        .setValue("Base.nCiJntPrm", getNPrmMap(prodNo));
+  }
+  opertaor.getTableRefs()["base"].setValue("Base.nPrm", getNPrmMap(prodNo));
+  opertaor.getTableRefs()["base"].setValue("Base.nRmbPrm", nPrmVal*nPrmRmbExch);
+
+  //     opertaor
+  // .getTableRefByKey("ourCompanyCiShare")
+  // .setValue("Base.groupPrmCur", 122);
+  //     opertaor
+  // .getTableRefByKey("ourCompanyCiShare")
+  // .setValue("Base.nPrm", 123);
+
+  // 满足山东见费出单业务
+  const cCiMrk = ops['plyBase']?.['Base.cCiMrk'];// 联共保
+  const cInstMrk = ops['base']?.['Base.cInstMrk'] || '0';// 缴费方式
+  const totalPrm = Number(ops['base']?.['Base.nPrm'] || 0);// 签单保费
+  const cClntMrk = ops['applicant']?.['Applicant.cClntMrk'];// 投保人性质
+  const tInsrncBgnTmA = ops['insrnc']?.["Base.tInsrncBgnTm"];// 保险期限起期
+  const tInsrncEndTmA = ops['insrnc']?.["Base.tInsrncEndTm"];// 保险期限止期
+  const basePrmCur = parseFloat(ops['base']?.["Base.nPrm"] || 0);//承保基本信息
+  const basePrm = ops['base']?.["Base.cPrmCur"];//承保基本信息 总保费币种   // "CNY"
+  const isShortTerm = lessThan6Months(tInsrncBgnTmA, tInsrncEndTmA);
+  const nPayNum = Number(ops['base']?.['Base.nPayNum'] || 0)  // "1"  缴费期数
+  const cNeedfeeFlag = ops['plyBase']?.['Base.cNeedfeeFlag'];
+  // 不见费出单原因
+  const cCanclfeersnCde = ops['plyBase']?.['Base.cCanclfeersnCde'];
+  if(cDptCde.startsWith('02370') && !cDptCde.startsWith('023702') && okProdPre.some(item => prodNo.startsWith(item))
+      && !(['019904','089031'].includes(prodNo)) && !(['2','4','6'].includes(cCiMrk)) && (basePrm == "CNY") && (['0', '1'].includes(cClntMrk))){
+    shanDongFlag = true;
+    if (cClntMrk == '1' && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0')){
+      ElMessageBox.alert(
+          "根据山东省非车险业务“见费出单”实施方案，投保人是个人, 系统将更新为[见费出单][一次性缴费]！",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            type: "warning",
+          })
+          .then(() => {
+            opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+            opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+          })
+    } else if (cClntMrk == '0' && totalPrm <= 100_000 && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0') && !needCalc.value){
+      ElMessageBox.alert(
+          "根据山东省非车险业务“见费出单”实施方案，投保人为非个人且单张保单签单保费小于10万元（含），系统将更新为[见费出单][一次性缴费]！",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            type: "warning",
+          })
+          .then(() => {
+            opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+            opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+          })
+    } else if (isShortTerm && (base['Base.cInstMrk'] == '5'|| cNeedfeeFlag == '0') && cCanclfeersnCde!='NVPSM04') {// NVPSM04 政府主导或财政支持的统保项目
+      ElMessageBox.alert(
+          "根据山东省非车险业务“见费出单”实施方案，保险期限低于6个月的短期业务，系统将更新为[见费出单][一次性缴费]！",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            type: "warning",
+          })
+          .then(() => {
+            opertaor.getTableRefByKey("plyBase").setValue("Base.cNeedfeeFlag", '1');
+            opertaor.getTableRefByKey("base").setValue("Base.cInstMrk", '0');
+          })
+    } else {
+      // 山东拆分只处理保费大于10万元业务，小于等于10万是一次性缴费
+      if (totalPrm < 100_000){
+        shanDongFlag = false;
+      }
+      // 山东拆分只处理分期业务, 1期走普通拆分
+      if ( nPayNum < 2 ){
+        shanDongFlag = false;
+      }
+      /* ---------- 计算保险期限（自然年） ---------- */
+      const tmStart = dayjs(insrnc['Base.tInsrncBgnTm']);
+      const tmEnd   = dayjs(insrnc['Base.tInsrncEndTm']).add(1, 'second');
+      const wholeYears = tmEnd.diff(tmStart, 'year');
+      const maxPhase = 4 + Math.max(0, wholeYears - 1);
+
+      /* ---------- 取期数---------- */
+      if (nPayNum > maxPhase) {
+        const remainDays = tmEnd
+            .subtract(wholeYears, 'year')
+            .diff(tmStart, 'day')
+        const yearTxt = wholeYears === 0 ? '' : `${wholeYears}年`
+        const dayTxt  = remainDays === 0 ? '' : `${remainDays}天`
+        ElMessageBox.alert(
+            `山东见费业务保险期限为${yearTxt}${dayTxt}，最多允许拆分 ${maxPhase} 期`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            })
+            .then(() => {
+              opertaor.getTableRefByKey('base').setValue("Base.nPayNum", maxPhase);
+              shanDongFlag = true;
+              opertaor.getTableRefByKey("base").shanDongFun();
+            })
+      }
+    }
+  }
+
+  const payInfo = setPayInfo(ops["base"], ops["applicant"], ops["insrnc"]);
+
+  console.log("生成缴费计划内容", payInfo);
+  opertaor.getTableRefs()["payinfo"]?.setFormValue(payInfo);
+  // const ciInfo = setCiInfo(ops["base"]);
+  // opertaor.getTableRefs()["ci"].setFormValue(ciInfo); //生产联共保信息
+  needCalc.value = false;
+  const baseRef = opertaor.getTableRefByKey("base");
+  if(shanDongFlag){
+    baseRef.shanDongFun();
+  } else{
+    baseRef.nPayNumberFun();
+  }
+}
+
 
 const submitToUndrFn = () => {
   const loading = openPageLoading('提核中...');
@@ -389,6 +716,7 @@ const submitToUndrFn = () => {
     console.log('submitCombination-res', res);
     if(res.code === 200) {
       // const pageData = trimPageData({...res.data});
+      ElMessage.success(res.msg)
       const newParams = getNewParams({
         initType: POSITE_PAGE_TYPE_READ,
       });
@@ -400,9 +728,10 @@ const submitToUndrFn = () => {
       }).then(() => {
         console.log('replace props.param', props.param);
         pageView.value.updatePageParams(props.param, productList.value);
+        prodListRef.value?.setDisabledAll();
         pageView.value.setPageDisabledAll();
         bthList.value.forEach(item => {
-          if(item && ['btn010102', 'btn010103'].includes(item.id)) {
+          if(item && ['btn010101', 'btn010102', 'btn010103'].includes(item.id)) {
             item.disabled = true;
           }
         })
@@ -410,7 +739,7 @@ const submitToUndrFn = () => {
     }else {
       ElMessage.error(res.msg)
     }
-    setTimeout(() => loading.close(), 500)
+    setTimeout(() => loading.close(), 200)
   })
 }
 
@@ -493,7 +822,7 @@ const getBtn = (id: any) => {
   throw new Error(`${id} not found btn`);
 }
 
-onDeactivated(() => {
+onUnmounted(() => {
   // 页面卸载 清理store缓存
   pageView.value.pageConfig.forEach((item: GroupForm) => {
     clearDataOpertaorByPageKey(item.groupId);

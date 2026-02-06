@@ -97,7 +97,7 @@ export class CompositePageView {
         if (config) {
             if(data) {
                 const item = config.params
-                const props = ['cAppNo', 'cPlyNo', 'cCombinationNo'];
+                const props = ['cAppNo', 'cPlyNo', 'cCombinationNo', 'cPkId'];
                 const formatList: any[] = [
                     {key: 'plyBase', pr: 'Base'},
                     {key: 'base', pr: 'Base'},
@@ -653,6 +653,7 @@ export class CompositePageView {
             const oertaor = this.getDataOpertaorByGroupId(group.groupId);
             if(oertaor) {
                 oertaor.setDisabledAll();
+                // oertaor.setReadOnly();
             }
         }
     }
