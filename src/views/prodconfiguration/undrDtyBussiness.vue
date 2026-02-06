@@ -19,7 +19,7 @@ const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+
 const dzmodal = useDzModal();
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -46,6 +46,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { ref, reactive } from "vue";
 import { saveRiskInfo } from "@/api/prod";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps<{
   data: {
@@ -54,7 +55,8 @@ const props = defineProps<{
   };
 }>();
 const emit = defineEmits(["row-click"]);
-
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig = reactive<AppFreeEditConfig>(

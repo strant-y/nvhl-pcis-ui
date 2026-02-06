@@ -58,6 +58,7 @@
 import { getDeptOptions } from "@/api/dept";
 import {codeListViewStore} from "@/store";
 import {onBeforeMount} from "vue";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   modelValue: {
@@ -65,9 +66,9 @@ const props = defineProps({
     default: undefined,
   },
 });
-
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const loading = ref(false);
-const codeListStore =  codeListViewStore();
 const queryList = ref<OptionType[]>(); // 部门列表
 const deptTreeRef = ref(ElTree); // 部门树
 const searchParam = ref(); // 机构树查询参数

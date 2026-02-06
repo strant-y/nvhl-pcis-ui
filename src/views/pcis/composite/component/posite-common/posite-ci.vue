@@ -17,7 +17,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 import { useRoute } from "vue-router";
 const route = useRoute();
 const param = route.params.param;
@@ -892,7 +892,9 @@ const initCiInfo = (data: any) => {
     setFormValue([]);
   }
   nextTick(() => {
-    const plyBase = opertaor.getDataAll()['plyBase'];
+    const allTab = opertaor.getDataAll()
+    console.log('allTab', allTab)
+    const plyBase = allTab['plyBase'];
     const cSlsId = plyBase['Base.cSlsId'];
     const cBrkSlsCde = plyBase['Base.cBrkSlsCde'];
     const cBrkrCde = plyBase['Base.cBrkrCde'];

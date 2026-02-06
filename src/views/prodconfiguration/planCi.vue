@@ -33,7 +33,11 @@ import { ref, reactive, onMounted } from "vue";
 import { pageFindPlanCiSNLBByParams,deletePlanCiInfoById } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const { getRules } = useValidator();
 

@@ -1,10 +1,11 @@
-import {OpertaorProps} from "@/store";
+import {CodeListViewProps, OpertaorProps} from "@/store";
 
 export const idxParamKey: string = 'idxParam';
 
 export interface IdxParamProps {
     opertaorProps: OpertaorProps; // dataOpertaor缓存工具初始化必要参数
-    [key: string]: any;
+    cdeListViewProps: CodeListViewProps; // cdeListView缓存工具初始化必要参数
+    [key: string]: any | Function;
 }
 
 /**
@@ -13,9 +14,10 @@ export interface IdxParamProps {
  * @param option
  */
 export const useIdxParam = (option: any = {}) :IdxParamProps => {
-    const params = ref<any>({
-        id: null,
+    const params = ref({
+        opertaorProps: {},
+        cdeListViewProps: {id: 'default'},
         ...option,
     });
-    return params.value as IdxParamProps;
+    return params.value;
 };

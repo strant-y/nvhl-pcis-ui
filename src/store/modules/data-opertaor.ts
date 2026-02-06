@@ -1,17 +1,22 @@
 import { defineStore } from "pinia";
 import { useProductStore, useTagsViewStore } from "@/store";
 import { eventBus } from "@/utils/event-bus";
+import {OpertaorPosit} from "@/views/pcis/support/composite.types";
 
 interface OpertaorProps {
+    // 唯一键
     id: string;
+    // 类型
     type?: string;
+    // 格式化页面数据
+    allDataFormat?: (id: string, pageData: any) => any
 }
 
 type StoreCache = Map<string, ReturnType<typeof defineStore>>
 const dataOpertaorMap: StoreCache = new Map();
 
 export const dataOpertaor = (props: OpertaorProps) => {
-    const {id, type} = props;
+    const {id, type, allDataFormat} = props;
     return storeFactory(id, defineStore(`dataOpertaor-${id}`, () => {
 
         const productStore = useProductStore();
@@ -61,7 +66,6 @@ export const dataOpertaor = (props: OpertaorProps) => {
         };
 
         const setDataAll = (alldata: any) => {
-
             param.initFlag = true;
             Object.keys(alldata).forEach((key) => {
                 if (tableRefs[key] && tableRefs[key].setFormValue && Object.keys(alldata[key]).length != 0) {
@@ -88,6 +92,14 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
+            console.log(`############## ${id} -> getDataAll()`)
+            // 组合出单场景
+            if(type === OpertaorPosit) {
+                if(allDataFormat && typeof allDataFormat === 'function') {
+                    const allFData = allDataFormat(id, res)
+                    if(allFData) return allFData;
+                }
+            }
             return res;
         };
         const setReadOnly = (formconfig: any) => {
@@ -505,7 +517,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
         }
         /** 判断场景是否只读 */
         const isReadOnlyScene = () => {
-            const param = opertaor.getParam();
+            const param = getParam();
             if(param.pageType === "readonly" || param.pageType === "UW_READ_SCENE"){
                 return true;
             }else{
@@ -563,6 +575,7 @@ export function clearDataOpertaorByPageKey(pageKey: string) {
         dataOpertaorMap.delete(pageKey);
     }
 }
+
 
 /**
  * 缓存管理

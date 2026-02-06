@@ -76,7 +76,6 @@ import { getProdEnableList } from "@/api/prod";
 const { getRules } = useValidator()
 const router = useRouter()
 const route = useRoute()
-const codeListStore = codeListViewStore()
 const freeEditRef = ref<AppFreeEditMethod | null>(null)
 const pcisQueryService = new PcisQueryService()
 const userStore = useUserStore()

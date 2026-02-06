@@ -27,9 +27,9 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { codeListViewStore } from "@/store";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
-const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const props = defineProps({
   pageSchema: {

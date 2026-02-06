@@ -112,14 +112,14 @@ const { getRules } = useValidator();
 const router = useRouter();
 const route = useRoute();
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 import { ref } from "vue";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
-
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
@@ -169,6 +169,7 @@ const props = defineProps({
 const homeJumpData = ref({}); //接收首页的参数，用于查询条件回显
 const queryType = ref("1");
 import { FIELD_MAP } from '@/constants/fieldMaps';
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 let addrowArr = [
     "cAppNo",

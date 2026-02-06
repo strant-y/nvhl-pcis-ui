@@ -266,7 +266,7 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 onMounted(async () => { 
-  // const codeListStore =  codeListViewStore();
+  // const codeListStore =  codeListViewStore(idxParam.cdeListViewProps);
   // codeListStore.queryCodeListByCode('EMP_DPT_LIST_CACHE',false,true)
   // .then((res) => {
   //   //console.log("qqqqqqqqqqqqq", res)

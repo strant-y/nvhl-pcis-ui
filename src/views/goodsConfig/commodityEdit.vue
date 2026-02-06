@@ -93,6 +93,7 @@ console.log(2,descryptParameter(query.value?.param))
 
 const idxParam: IdxParamProps = {
   opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
   // handleAnchorClick: handleAnchorClick,
 };
 provide(idxParamKey, idxParam);

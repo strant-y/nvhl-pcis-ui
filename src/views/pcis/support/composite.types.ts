@@ -1,7 +1,9 @@
 import {getProductPage} from "@/api/prod";
 import {AnchorItem, GroupForm} from "@/views/pcis/composite/component";
 import {CommonConstants} from "@/constants/CommonConstants";
-import {dataOpertaor} from "@/store";
+import {codeListViewStore, dataOpertaor} from "@/store";
+import {getData} from "@/pcis/prodRef/dataInit";
+import {initMultiCodeList} from "@/api/code-list-service";
 
 /**
  * 公共分组ID
@@ -35,25 +37,89 @@ export const POSITE_PAGE_TYPE_READ =  "positeRead";
  * 公共组件映射
  */
 export const CommonComponentMap = new Map<string, string>();
-CommonComponentMap.set("base", 'positeBase');
+// CommonComponentMap.set("base", 'positeBase');
 CommonComponentMap.set('applicant', 'positeApplicant');
 CommonComponentMap.set('insured', 'positeInsured');
-CommonComponentMap.set('plybase', 'positePlybase');
-CommonComponentMap.set('ci', 'positeCi');
+CommonComponentMap.set('plyBase', 'positePlybase');
+// CommonComponentMap.set('ci', 'positeCi');
+
+export interface CompositePageConfigType {
+    pageConfig: GroupForm[],
+    anchorConfig: AnchorItem[]
+}
+
+/**
+ * @param callback(param1, parma2) 需要操作的逻辑方法; param1: dataOpertaor(group.groupId)，parma2：pageConfig forEach item
+ */
+export type LinkedCallbackType = (callback: (operator: any, group: GroupForm) => void) => void;
+export interface LinkedOperationReturnType {
+    /**
+     * 执行遍历回调
+     * @type LinkedCallbackType
+     */
+    executeForEach: LinkedCallbackType
+
+    /**
+     * 执行第一条
+     * @type LinkedCallbackType
+     */
+    executeFirst: LinkedCallbackType
+}
 
 /**
  * 组合产品出单页面视图工具
  */
 export class CompositePageView {
-    public anchorConfig = new Array<AnchorItem>();
-    public pageConfig = new Array<GroupForm>();
+    public autoAssignTabKeys = reactive<string[]>([])
+    public activeAnchorId = reactive({value: ''})
+    public anchorConfig = reactive<AnchorItem[]>(new Array<AnchorItem>());
     public pageParams = reactive<any>({});
+    public pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
+    // 页面创建之前调用
+    public beforeCreation?: (config: CompositePageConfigType) => Promise<CompositePageConfigType>;
 
     constructor() {
-        this.anchorConfig = new Array<AnchorItem>();
-        this.pageConfig = new Array<any>();
+        this.activeAnchorId = reactive({value: ''})
+        this.anchorConfig = reactive<AnchorItem[]>(new Array<AnchorItem>());
+        this.pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
+        this.allDataFormat = this.allDataFormat.bind(this);
     }
 
+    /**
+     * 数据格式化处理
+     * @param id
+     * @param res
+     */
+    allDataFormat = (id: string, res: any): any => {
+        if(!id || !res || !this.pageConfig) return undefined;
+        const data = {...res}
+        const config: GroupForm | undefined = this.pageConfig.find((f: GroupForm) => f.groupId === id)
+        if (config) {
+            if(data) {
+                const item = config.params
+                const props = ['cAppNo', 'cPlyNo', 'cCombinationNo', 'cPkId'];
+                const formatList: any[] = [
+                    {key: 'plyBase', pr: 'Base'},
+                    {key: 'base', pr: 'Base'},
+                    {key: 'applicant', pr: 'Applicant'},
+                    {key: 'insured', pr: 'Insured'},
+                ];
+                formatList.forEach(format => {
+                    if(data[format.key]) {
+                        props.forEach(prop => {
+                            data[format.key][format.pr + '.' + prop] = item[prop]
+                        })
+                    }
+                })
+            }
+        }
+        return data
+    }
+
+    /**
+     * 设置路由参数
+     * @param params
+     */
     setPageParams(params: any) {
         Object.assign(this.pageParams, params);
     }
@@ -61,9 +127,8 @@ export class CompositePageView {
     /**
      * 页面构造方法
      * @param list
-     * @param modifCallBack 页面结构赋值前的回调 可修改结构后再返回
      */
-    buildPage(list: any[], modifCallBack: Function = () => {}) {
+    buildPage(list: any[]) {
         console.log('### buildPage-list', list);
         return new Promise((resolve, reject) => {
             const params: any[] = list.map((item: any) => {
@@ -84,21 +149,24 @@ export class CompositePageView {
                     productSchemasMap[key] = value as Array<any>;
                     compList.push(productSchemasMap[key]);
                 });
-                const commonList = this.mergeViews(compList);
-                // 替换公共组件 pageCode
-                commonList.forEach((common: any) => {
-                    const pageKey = common['pageKey'];
-                    if(CommonComponentMap.has(pageKey)) {
-                        common['pageCode'] = CommonComponentMap.get(pageKey);
-                    }
-                    common['id'] = `_${['dist', 'distSummary'].includes(common.pageKey)  ? common.pageCode : common.pageKey}-000000`
-                });
+                console.log('compList', compList)
+                const commonList = this.mergeViews(compList)
+                    .filter((item: any) => CommonComponentMap.has(item['pageKey']))
+                    .map((common: any) => { // 替换公共组件 pageCode
+                        const pageKey = common['pageKey'];
+                        if(CommonComponentMap.has(pageKey)) {
+                            common['pageCode'] = CommonComponentMap.get(pageKey);
+                        }
+                        common['id'] = `_${['dist', 'distSummary'].includes(common.pageKey)  ? common.pageCode : common.pageKey}-000000`
+                        return common;
+                    });
+                console.log('commonList', commonList)
                 const config = this.structureConfig(productSchemasMap, list, commonList);
                 console.log('### buildPage-config ', config);
                 // 加载前的回调
-                if(modifCallBack && typeof modifCallBack === CommonConstants.TYPE_OF_FUNCTION) {
-                    const modifConfig = await modifCallBack({...config});
-                    console.log('modifCallBack result: ', modifConfig);
+                if(this.beforeCreation) {
+                    const modifConfig = await this.beforeCreation({...config});
+                    console.log('beforeCreation result: ', modifConfig);
                     Object.assign(config, modifConfig);
                 }
                 // 新增或替换组
@@ -135,6 +203,7 @@ export class CompositePageView {
                     });
                 }
                 this.installDataOpertaor();
+                await this.installCodeListViewAndInit();
                 resolve({
                     code: 200,
                     config: {
@@ -163,7 +232,7 @@ export class CompositePageView {
         });
     }
 
-    private structureConfig(data: any, list: any[], commonList: any[]) {
+    private structureConfig(data: any, list: any[], commonList: any[]): CompositePageConfigType {
         const structure: GroupForm[] = [];
         const anchorList: AnchorItem[] = [];
 
@@ -193,6 +262,7 @@ export class CompositePageView {
                 title: '产品信息',
                 href: '#positeList',
                 expanded: true,
+                componentKey: 'positeList',
                 children: []
             }]
         });
@@ -208,6 +278,7 @@ export class CompositePageView {
                         title: index !== 0 ? `${config.params.cProdNo}-${item.pageTtile}` : item.pageTtile,
                         icon: item.icon,
                         expanded: true,
+                        tabKey: item.pageKey === 'dist' || item.pageKey === 'distSummary' ? item.pageCode : item.pageKey,
                         href: `#${id}`,
                         children: []
                     };
@@ -233,6 +304,10 @@ export class CompositePageView {
             const pageInfo = pageComponents.filter((item: any) => {
                 if(CommonComponentMap.has(item.pageKey)) {
                     return !commonCodes.includes(CommonComponentMap.get(item.pageKey));
+                }
+                // 暂时屏蔽联共保组件
+                if(['ci', 'ciMasterAgreement', 'ourCompanyCiShare'].includes(item.pageKey)) {
+                    return false
                 }
                 return !commonCodes.includes(item.pageCode)
             });
@@ -264,6 +339,8 @@ export class CompositePageView {
                 if (!existingProp.has(item.prop)) {
                     existingProp.add(item.prop);
                     merged.push(item);
+                }else if(item.rules && item.rules.length > 0) { // 有任意产品必填的 就需必填
+                    merged.splice(merged.findIndex((f: any) => item.prop === f.prop), 1, item);
                 }
             }
         }
@@ -280,10 +357,15 @@ export class CompositePageView {
         return result;
     }
 
-    private mergeViews(viewsArrays: any[][]): any[] {
+    private mergeViews(viewsLis: any[][]): any[] {
+
+        const viewsArrays: any[][] = viewsLis.map((item: any[]) => {
+            return item.filter(i => CommonComponentMap.has(i.pageKey));
+        });
         const pageCodeSets = viewsArrays.map(views => {
+            // console.log('views', views)
             const codes = new Set<string>();
-            views.forEach(view => codes.add(view.pageCode));
+            views.forEach(view => codes.add(view.pageKey));
             return codes;
         });
         const intersection = pageCodeSets.reduce((prev, current) => {
@@ -295,7 +377,7 @@ export class CompositePageView {
             basePageSchemaProp: Partial<any>
         }>();
         intersection.forEach(code => {
-            const baseView = viewsArrays.flat().find(view => view.pageCode === code);
+            const baseView = viewsArrays.flat().find(view => view.pageKey === code);
             if (baseView) {
                 pageCodeData.set(code, {
                     fromSchemas: [],
@@ -306,8 +388,8 @@ export class CompositePageView {
         });
         for (const views of viewsArrays) {
             for (const view of views) {
-                if (intersection.has(view.pageCode)) {
-                    const data = pageCodeData.get(view.pageCode);
+                if (intersection.has(view.pageKey)) {
+                    const data = pageCodeData.get(view.pageKey);
                     if (data) {
                         // 验证fromSchema是否为数组
                         if (!Array.isArray(view.pageSchema.fromSchema)) {
@@ -319,7 +401,6 @@ export class CompositePageView {
                 }
             }
         }
-
         return Array.from(pageCodeData.entries()).map(([pageCode, data]) => ({
             ...data.baseViewProp,
             pageCode,
@@ -339,6 +420,11 @@ export class CompositePageView {
         if(!sessionInfo) {
             const productPage = await getProductPage(param);
             const data = JSON.parse(productPage.data);
+            if(!data) {
+                console.log('productPage', productPage)
+                ElMessage.error(`页面配置信息获取失败-${CProdNo + '_' + CGrpMrk}`);
+                throw new Error('页面配置信息获取失败 -> ', data)
+            }
             result[param.CProdNo] = data[0].pageInfo;
             // 存入当前会话session 下一次获取优先从session里拿
             sessionStorage.setItem(CProdNo + '_' + CGrpMrk, JSON.stringify(data[0].pageInfo));
@@ -353,27 +439,175 @@ export class CompositePageView {
      */
     private installDataOpertaor() {
         for(const group of this.pageConfig) {
-            dataOpertaor({id: group.groupId, type: OpertaorPosit});
+            try {
+                const opertaor = this.getDataOpertaorByGroupId(group.groupId);
+                opertaor.init();
+                opertaor.setParam({sysDist: 'PCIS', ...group.params});
+            } catch (e) {
+                console.warn(`page group ${group.groupId} init error: `, e);
+            }
         }
     }
 
     /**
-     * 在公共组件里 操作其它产品dataOpertaor的方法
-     * @param fun
-     * @param exclude 需要排除的groupId
-     * fun(param1, parma2) 需要操作的逻辑方法; param1: dataOpertaor(group.groupId)，parma2：pageConfig forEach item
+     * 初始化所有产品的codelist
+     * @private
      */
-    linkedOperation(fun: Function, exclude: string[] = [CommonGroupId]) {
-        if(fun && typeof fun === CommonConstants.TYPE_OF_FUNCTION) {
-            for(const group of this.pageConfig) {
-                if(!exclude || !exclude.includes(group.groupId)) {
-                    const opertaor = dataOpertaor({id: group.groupId});
-                    fun(opertaor, group);
+    private async installCodeListViewAndInit() {
+        const setAllCodeList = (groupForm: GroupForm) => {
+            const codeListStore = codeListViewStore({id: groupForm.groupId});
+            const isDisabled = (v: any) => {
+                if (
+                    v === true ||
+                    v === 1 ||
+                    v === "1"
+                ) {
+                    return true;
+                } else {
+                    return false;
                 }
             }
-        }else {
-            console.warn('！！！ linkedOperation方法参数异常');
+            const codeList: any = {};
+            const pageInfo = groupForm.pageInfo
+            if(pageInfo){
+                for(let i = 0; i < pageInfo.length; i++){
+                    if(['acctinfo','ci','ourCompanyCiShare'].includes(pageInfo[i]['pageKey'])){
+                        continue;
+                    }
+                    const schema = pageInfo[i].pageSchema;
+                    if(schema && schema.fromSchema && schema.fromSchema.length>0){
+                        for(let j = 0; j < schema.fromSchema.length; j++){
+                            const sc = schema.fromSchema[j];
+                            if((sc.inputtype === 'rtSelectV2' || sc.inputtype === 'rtselect') && !isDisabled(sc.disabled) && sc.typeCode){
+                                const k = sc.typeCode + (sc.codeParam?sc.codeParam:'');
+                                const m = {codeListName:sc.typeCode,codeListParam:sc.codeParam,source:k};
+                                codeList[k] = m;
+                            }
+                        }
+                    }
+                }
+            }
+            const codeparam: any[] = [];
+            Object.keys(codeList).forEach(res =>{
+                if(res !== "Occupt_ZYLB") {
+                    codeparam.push(codeList[res]);
+                }
+            });
+            return new Promise((resolve, reject) => {
+                initMultiCodeList(codeparam).then((result: any) => {
+                    if(result.code === 200) {
+                        for(let i = 0; i < result.data.length ; i++){
+                            codeListStore.setOptionsToCacheMap(result.data[i]['key'],result.data[i]['data']);
+                        }
+                    }
+                    resolve(true)
+                })
+            })
         }
+
+        const initList: any[] = [];
+        this.pageConfig.forEach(group => initList.push(setAllCodeList(group)));
+        const list = await Promise.all(initList);
+        console.log('installCodeListViewAndInit-list', list)
+    }
+
+    initPageData() {
+        for(const group of this.pageConfig) {
+            try {
+                const opertaor = this.getDataOpertaorByGroupId(group.groupId);
+                nextTick(() => {
+                    const idata = getData(opertaor);
+                    const initData = opertaor.mapSetData(idata);
+                    opertaor.setDataAll(initData);
+                });
+            } catch (e) {
+                console.warn(`initPageData group ${group.groupId} init error: `, e);
+            }
+        }
+    }
+
+    /**
+     * 更新页面参数
+     */
+    updatePageParams(param: any, list: any[]) {
+        list.forEach((prod: any) => {
+            if(prod.cProdNo !== '000000') {
+                const config: GroupForm | undefined = this.pageConfig.find((f: GroupForm) => f.groupId === `group-${prod.cProdNo}`)
+                if (config) {
+                    config.params = {
+                        ...param,
+                        cPlyNo: prod.cPlyNo,
+                        cAppNo: prod.cAppNo,
+                        cCombinationNo: prod.cCombinationNo,
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * 在公共组件里 操作其它产品dataOpertaor的方法
+     * @param exclude 需要排除的groupId
+     * @return LinkedOperationReturnType
+     */
+    linkedOperation(exclude: string[] = [CommonGroupId]): LinkedOperationReturnType {
+        const groupList = this.pageConfig.filter(f => !exclude || !exclude.includes(f.groupId))
+        return {
+            executeForEach: (callback: (operator: any, group: GroupForm) => void) => {
+                groupList.forEach(item => {
+                    const opertaor = this.getDataOpertaorByGroupId(item.groupId);
+                    callback(opertaor, item);
+                })
+            },
+            executeFirst: (callback: (operator: any, group: GroupForm) => void) => {
+                const findLastGroup = groupList[0]
+                if(findLastGroup) {
+                    const opertaor = this.getDataOpertaorByGroupId(findLastGroup.groupId);
+                    callback(opertaor, findLastGroup);
+                } else {
+                    console.warn('first group not found');
+                }
+            }
+        } as LinkedOperationReturnType;
+    }
+
+    getDataOpertaorByProdNo(prodNo: string, params: any = {}) {
+        return dataOpertaor({
+            id: `group-${prodNo}`,
+            type: OpertaorPosit,
+            allDataFormat: this.allDataFormat,
+            ...params
+        });
+    }
+    getDataOpertaorByGroupId(groupId: string, params: any = {}) {
+        return dataOpertaor({
+            id: groupId,
+            type: OpertaorPosit,
+            allDataFormat: this.allDataFormat,
+            ...params
+        });
+    }
+
+    /**
+     * 校验所有组件
+     */
+    validateAll(): Promise<{validate: boolean, result: Record<string, any>}> {
+        return new Promise(async (resolve, reject) => {
+            let validate = true;
+            const result: Record<string, any> = {};
+            for(const group of this.pageConfig) {
+                const groupId = group.groupId;
+                const oertaor = this.getDataOpertaorByGroupId(groupId);
+                if(oertaor) {
+                    const vald = await oertaor.validateAll(false);
+                    result[groupId] = vald;
+                    if(!vald) {
+                        validate = false;
+                    }
+                }
+            }
+            resolve({validate, result});
+        })
     }
 
     /**
@@ -385,7 +619,7 @@ export class CompositePageView {
             const groupId = group.groupId;
             const groupArr = groupId.split('-');
             const cProdNo = groupArr[1];
-            const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
+            const oertaor = this.getDataOpertaorByGroupId(groupId);
             if(oertaor) {
                 result[cProdNo] = oertaor.getDataAll();
             }
@@ -397,13 +631,17 @@ export class CompositePageView {
      * set所有产品表单的数据
      */
     setPageAllData(data: any) {
-        const keys = Object.keys(data);
-        for(const key of keys) {
-            const groupId = `group-${data[key]}`;
-            const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
-            if(oertaor && data[key]) {
-                oertaor.setDataAll(data[key]);
+        if(data) {
+            for (const group of this.pageConfig) {
+                const groupId = group.groupId;
+                const key = groupId.replace('group-', '');
+                const oertaor = this.getDataOpertaorByGroupId(groupId);
+                if (oertaor && data[key]) {
+                    oertaor.setDataAll(data[key] ? data[key] : {});
+                }
             }
+        }else {
+            console.error('setPageAllData(data: any) param wrong !!!');
         }
     }
 
@@ -412,10 +650,10 @@ export class CompositePageView {
      */
     setPageDisabledAll() {
         for(const group of this.pageConfig) {
-            const groupId = group.groupId;
-            const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
+            const oertaor = this.getDataOpertaorByGroupId(group.groupId);
             if(oertaor) {
                 oertaor.setDisabledAll();
+                // oertaor.setReadOnly();
             }
         }
     }
@@ -425,8 +663,7 @@ export class CompositePageView {
     setPageUnDisabledByKeyList(list: any[]) {
         if(list && list.length > 0) {
             for(const group of this.pageConfig) {
-                const groupId = group.groupId;
-                const oertaor = dataOpertaor({id: groupId, type: OpertaorPosit});
+                const oertaor = this.getDataOpertaorByGroupId(group.groupId);
                 if(oertaor) {
                     oertaor.setUnDisabledByKeyList(list);
                 }

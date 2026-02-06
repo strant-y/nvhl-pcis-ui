@@ -27,9 +27,9 @@ import { useValidator } from "@/typings/useValidator";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 import { rsaEncoder } from "@/utils/encipher";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
 const { getRules } = useValidator();
 const props = defineProps({
   data: {

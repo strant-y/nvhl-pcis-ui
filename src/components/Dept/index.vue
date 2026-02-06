@@ -18,6 +18,7 @@
 import { listDepts, listChrDepts, deptLists } from "@/api/dept";
 import { DeptQuery } from "@/api/dept/types";
 import { codeListViewStore } from "@/store";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const props = defineProps({
   modelValue: {
@@ -45,8 +46,8 @@ const props = defineProps({
     default: false,
   },
 });
-
-const codeListStore = codeListViewStore();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const emits = defineEmits(["update:modelValue", "selectedItem"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const selectedValue = ref<string | number | Array<any> | undefined>();

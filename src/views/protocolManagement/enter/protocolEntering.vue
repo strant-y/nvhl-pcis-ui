@@ -77,7 +77,9 @@ const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
 const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
-const codeListStore = codeListViewStore();
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const params = route.query.data ? JSON.parse(route.query.data) : {};
 const dataSet = ref<any>([]); // 数据集合
@@ -85,6 +87,7 @@ const planSet = ref<any>([]); //结果集
 
 const dialog = ref<DialogMethod | null>(null);
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const selectedRows = ref<any[]>([]);
 const btnTitle = ref<any>([{ label: "" }, { label: "" }]);

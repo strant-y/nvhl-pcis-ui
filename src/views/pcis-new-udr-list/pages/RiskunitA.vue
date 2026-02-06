@@ -90,7 +90,9 @@ const {
 import { descryptParameter } from "@/utils/encipher.ts";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 import { saveAs } from "file-saver";
 const dzmodal = useDzModal();
 const route = useRoute();

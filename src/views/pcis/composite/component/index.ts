@@ -5,6 +5,7 @@ interface AnchorItem {
     icon?: string;
     href?: string;
     expanded?: boolean;
+    tabKey?: string;
     children: AnchorItem[]; // 可选属性，必须确保使用前初始化
 }
 

@@ -29,7 +29,9 @@ import {
 } from "@/shared/app-table-config";
 import { cloneDeep } from 'lodash-es';
 import { codeListViewStore } from "@/store";
-const codeListStore = codeListViewStore();
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const userStore = useUserStore();
 

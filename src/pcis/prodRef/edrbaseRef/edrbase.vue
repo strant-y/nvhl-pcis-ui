@@ -23,9 +23,9 @@ import { qryTerminationDataList, qryProdRuleList, queryLatestMrk, checkPlyChange
 import Decimal from "decimal.js";
 
 const pcisQueryService = new PcisQueryService();
-const codeListStore = codeListViewStore();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const { getRules } = useValidator();
 const props = defineProps({
   // param: {
