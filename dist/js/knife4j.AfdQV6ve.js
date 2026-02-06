@@ -1,0 +1,1 @@
+import{aV as a,c as t,e,l as r}from"./index.CQeRa1Z2.js";const s={class:"app-container"};const o=a({},[["render",function(a,o){return e(),t("div",s,[...o[0]||(o[0]=[r("iframe",{src:"http://vapi.youlai.tech/doc.html",width:"100%",height:"100%",frameborder:"0"},null,-1)])])}],["__scopeId","data-v-f4490f0d"]]);export{o as default};
