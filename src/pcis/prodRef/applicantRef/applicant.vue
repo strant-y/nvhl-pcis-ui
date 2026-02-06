@@ -672,9 +672,6 @@ const method = {
 				setFormItem("Applicant.cIsMicroEntpris", { // 是否小微企业
 					disabled: false,
 				});
-				setFormItem("Applicant.cIsIndvduBiz", {
-					disabled: true,
-				});
 				// 是否绿色产业客户
 				setFormItem("Applicant.cGreenIndustryCustomers", {
 					disabled: false,
@@ -690,6 +687,9 @@ const method = {
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
       }
+      setFormItem("Applicant.cIsIndvduBiz", {
+        disabled: true,
+      });
       setFormItem("Applicant.cWorkDpt", {
         rules: [getRules("required", {})],
       });
