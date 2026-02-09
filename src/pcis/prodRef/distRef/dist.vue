@@ -1813,6 +1813,24 @@ async function updateCvrgnInsuranceAmount() {
     })
   }
 }
+// 049021 联共保为从共主联。从共无联保时，申报产品名称、申报产品型号、总交易金额必填，其余非必填
+function setDistRuquired(val:any) {
+  if(['2','4'].includes(val)) {
+    formconfig11.value.fromSchema?.forEach((item:any) => {
+      if(['Dist.cProductName','Dist.cProductModel','Dist.nTotalAmount'].includes(item.prop)) {
+        item.rules = [getRules("required", {})]
+      } else {
+        item.rules = []
+      }
+    })
+  } else {
+    formconfig11.value.fromSchema?.forEach((item:any) => {
+      if(item.prop !== 'Dist.nSeqNo') {
+        item.rules = [getRules("required", {})]
+      }
+    })
+  }
+}
 
 defineExpose({
   getValue,
@@ -1827,6 +1845,7 @@ defineExpose({
   getFormConfig,
   setDisabledAll,
   getTableDataAll,
+  setDistRuquired,
 });
 </script>
 

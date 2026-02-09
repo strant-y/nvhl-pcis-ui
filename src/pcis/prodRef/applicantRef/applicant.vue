@@ -1686,7 +1686,7 @@ function handleFileChange(event: Event) {
                   .replace("日", "")
               );
             if (cardInfo["validate_date"]) {
-              tCertfDate.value = cardInfo["validate_date"].split("-");
+              tCertfDate.value = cardInfo["validate_date"].split("-")?.map((item: any) => (item.replaceAll(".", "-")));
               setValue(
                 "Applicant.tCertfBgnDate",
                 cardInfo["validate_date"].split("-")[0]?.replaceAll('.','-')
