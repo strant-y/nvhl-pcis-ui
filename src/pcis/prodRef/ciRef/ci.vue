@@ -147,6 +147,7 @@ const method = {
         'Ci.cDptCde': param.cDptCde,
       });
     } else {
+      const param = opertaor.getParam();
       freeEditRef?.value?.addRowByData({
         'Ci.nSeqNo': dataList.length + 1,
         'Ci.nPlyFeeRate': '0.00',
@@ -155,7 +156,8 @@ const method = {
         'Ci.cSlsId': "",
         "Ci.cBrkrCde": "",
         "Ci.cBrkSlsCde": "",
-        'Ci.cChiefMrk': '',
+        'Ci.cChiefMrk': param?.cRsnCde === "47" && param?.initFlag === false ? '0' : '',
+        'Ci.cIssueMrk': param?.cRsnCde === "47" && param?.initFlag === false ? '0' : '',
         // 'Ci.cCoinsurerCde': '327001',
         // 'Ci.cCiSubComp': param.dptCde,
         // 'Ci.cDptCde': param.cDptCde,
