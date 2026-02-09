@@ -153,7 +153,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
          hideBtns: (row) => {
           // if (!row.cSpecialContent.includes("*")) return true;
-           return row.cIfMust === '1' && row.cSpecialCode !== '34201122' && row.cSpecialCode !== '34201123';
+           return row.cIfMust === '1' || row.cSpecialCode == '34201122' || row.cSpecialCode == '34201123';
         },
         tableClick: (row) => {
            ElMessageBox.confirm(
@@ -290,8 +290,19 @@ const addData =()=>{
     } 
 }
 
-// 获取默认信息
+const changeSpecial =(val:any)=>{
+  const newFormData = formData.value?.filter((item:any) => item.cSpecialCode !== '34201123' && item.cSpecialCode !== '34201122');
+  if(val === '0') {// 一次交清
+    newFormData.push(defaultData.value?.find((item:any) => item.cSpecialCode ==='34201123'))
+  }
+  if(val === '5') {// 多次交清
+    newFormData.push(defaultData.value?.find((item:any) => item.cSpecialCode ==='34201122'))
+  }
+  setFormValue(newFormData)
+}
 
+// 获取默认信息
+const defaultData = ref([]);
 const refreshData = () => {
   // && parparam.cAppStatus !=='1' 暂存的不处理  parparam.pageType !== "copy" &&  
   // if (parparam.pageType !== "app" &&   parparam.pageType !== "template" ) {
@@ -313,9 +324,11 @@ const refreshData = () => {
     if (res.data?.result) {
             let len = 0;
             let sel : any[] = [];
+            defaultData.value = res.data.result;
+            const cInstMrk = opertaor.getTableRefByKey('base')?.getValue('Base.cInstMrk');
              if (parparam.pageType  == "app") {
                 res.data.result.forEach((item: any,index:number) => {
-                  if(item["cIfMust"] == "1"){
+                  if(item["cIfMust"] == "1" || (cInstMrk == "0" && item.cSpecialCode == '34201123') || (cInstMrk == "5" && item.cSpecialCode == '34201122')) {
                       item.index = len + 1;
                       sel.push(item);
                       len++;
@@ -344,17 +357,20 @@ onMounted(async () => {
     item.index = index + 1;
   });
   const gettAppTm = setInterval(() => {
-		if (opertaor.getDataAll().insrnc?.['Base.tAppTm']) {
+    const cInstMrk = opertaor.getTableRefByKey('base')?.getValue('Base.cInstMrk');
+		if (opertaor.getDataAll().insrnc?.['Base.tAppTm'] && cInstMrk) {
 			if (param.cRecordType != '9') {
 				refreshData();
 			}
       clearInterval(gettAppTm);
     }
   }, 500)
+  eventBus.on('change-special', changeSpecial)
 });
 // 组件卸载时移除事件监听（避免内存泄漏）
 onUnmounted(() => {
   eventBus.off('add-special', addData)
+  eventBus.off('change-special', changeSpecial)
 })
 
 // 复制数据处理

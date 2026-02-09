@@ -342,7 +342,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if(v && tRepStopExtBgnTm && new Date(v).getTime() < new Date(tRepStopExtBgnTm).getTime()) {
             ElMessage.warning("报停止期不能早于报停起期")
             setValue("EdrBase.tRepStopExtEndTm", null)
-          } else if(dayjs(v).isBefore(dayjs(tInsrncBgnTm)) || dayjs(v).isAfter(dayjs(tInsrncEndTm))) {
+          // } else if(dayjs(v).isBefore(dayjs(tInsrncBgnTm)) || dayjs(v).isAfter(dayjs(tInsrncEndTm))) {
             // ElMessage.warning("报停止期应该在保险起止期范围内")
             // setValue("EdrBase.tRepStopExtEndTm", null)
           } else if(v && tRepStopExtBgnTm && lastInsrncEndTm.value) {
