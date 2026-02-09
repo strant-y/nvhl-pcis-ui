@@ -594,17 +594,6 @@ const pageLoaded = ref(false);
 
 const { saveData, removeReceived } = NewUdrListService();
 
-const idxParam: IdxParamProps = {
-  opertaorProps: { id: route.name },
-  cdeListViewProps: { id: route.name },
-  handleAnchorClick: handleAnchorClick,
-  setcAmtCur,
-  getcPrmCur
-};
-provide(idxParamKey, idxParam);
-
-const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -692,6 +681,17 @@ const getcPrmCur = (val:any) => {
   //Base.cPrmCur 保费
   cPrmCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
 }
+
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
+  handleAnchorClick: handleAnchorClick,
+  setcAmtCur,
+  getcPrmCur
+};
+provide(idxParamKey, idxParam);
+
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 
