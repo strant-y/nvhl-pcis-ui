@@ -107,7 +107,8 @@ export class CompositePageView {
                 formatList.forEach(format => {
                     if(data[format.key]) {
                         props.forEach(prop => {
-                            data[format.key][format.pr + '.' + prop] = item[prop]
+                            const val = !item[prop] || item[prop] === '' ? undefined : item[prop];
+                            data[format.key][format.pr + '.' + prop] = val;
                         })
                     }
                 })
