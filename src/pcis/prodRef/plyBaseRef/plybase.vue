@@ -255,6 +255,9 @@ const method = {
 				}
 			}, 2000);
 		}
+    if(param.cProdNo === '049021') {
+      opertaor.getTableRefByKey('MaterialDist049021')?.setDistRuquired(val);
+    }
   },
   //业务来源大类
   businessKindFunc: (val) => {
