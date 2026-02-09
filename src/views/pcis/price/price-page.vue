@@ -594,17 +594,6 @@ const pageLoaded = ref(false);
 
 const { saveData, removeReceived } = NewUdrListService();
 
-const idxParam: IdxParamProps = {
-  opertaorProps: { id: route.name },
-  cdeListViewProps: { id: route.name },
-  handleAnchorClick: handleAnchorClick,
-  setcAmtCur,
-  getcPrmCur
-};
-provide(idxParamKey, idxParam);
-
-const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-
 
 //额度明细弹窗
 const limitDetails = defineAsyncComponent(
@@ -692,6 +681,17 @@ const getcPrmCur = (val:any) => {
   //Base.cPrmCur 保费
   cPrmCurLabel.value = val === 'CNY' ? '元' : codeListStore.getLabelByValue('FIN_CUR_CACHE',val)
 }
+
+const idxParam: IdxParamProps = {
+  opertaorProps: { id: route.name },
+  cdeListViewProps: { id: route.name },
+  handleAnchorClick: handleAnchorClick,
+  setcAmtCur,
+  getcPrmCur
+};
+provide(idxParamKey, idxParam);
+
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 
@@ -3310,32 +3310,12 @@ const checkStudentValidity  =  async() => {
 const submitToUndrFn = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
   const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
-  // 协议出单剩余预收保费校验
-  if(props.param?.cRecordType === 9 || props.param.cPolicySource == 9){
-    if(Number(nRecRemPrm.value) <= 0 || Number(nRecRemEstAmt.value) <= 0 || (Number(nPrm.value)  > Number(nRecRemPrm.value))){
-      ElMessage.error("协议剩余预收保费不足");
-      return;
-    }
-  }
   if (needCalc.value) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
   if (validateGuaranteeBgnTm()) {
     return;
-  }
- /**
-   * 联共保判断
-   */
-  if(props.param.pageName !== "priceInquiry"){
-    const CiMrk = opertaor.getTableRefByKey("plyBase").getValue('Base.cCiMrk')
-    if ('1' === CiMrk  || '5' === CiMrk || '2' === CiMrk) {
-        const validCi = JointInsuranceCheck();
-        // 如果联共保校验不通过，则不继续执行后续逻辑
-        if (!validCi) {
-          return; // 校验失败则中断后续流程
-        }
-    }
   }
   // 新增校验：比较标的中的学生总数与条款中各条目的学生数总和是否一致
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue();
@@ -3441,27 +3421,6 @@ const submitToUndrFn = async () => {
     //     return false;
     // }
 
-
-  // 判断应收保费是否同保费相同
-  let payList = opertaor.getTableRefByKey("payinfo").getFromValue();
-   if(payList && payList.length>0){
-      let nPrm = opertaor.getTableRefByKey("base").getFromValue()['Base.nPrm'];
-      const toCent = (amount:any) => {
-        return Math.round(Number(amount) * 100); // 转为分并四舍五入
-      };
-      let totalCent = 0;
-      payList.forEach((item:any) => {
-        totalCent += toCent(item['Pay.nPayablePrm']);
-      });
-       const basePrmCent = toCent(nPrm);
-       if(totalCent !== basePrmCent){
-         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-        return false;
-      }
-  }
-
-  adjustCiPremiumDifference()
-
   // 电梯责任保险 每部电梯累计赔偿限额小于每部电梯每人赔偿限额时校验
   if(props.param?.cProdNo==='043001') {
     const cvrgValue = opertaor.getTableRefByKey("cvrg").getFromValue()[0];
@@ -3526,16 +3485,6 @@ const submitToUndrFn = async () => {
         res["appNo"] = base["Base.cAppNo"];
         res['taskId'] = props.param.taskId ? props.param.taskId.toString() : null;
       }
-
-
-
-
-
-
-
-
-
-
 
       const params = opertaor.getParam();
       //:TODO 进行一次保费计算,如果发生保费变化,则告知需要进行保费计算
@@ -3771,25 +3720,6 @@ const savePlyInfo = async () => {
   //   })
   // }
 
-  let payList = res.payinfo;
-  if(payList && payList.length>0){
-      const toCent = (amount:any) => {
-        return Math.round(Number(amount) * 100); // 转为分并四舍五入
-      };
-      let totalCent = 0;
-      payList.forEach((item:any) => {
-        totalCent += toCent(item['Pay.nPayablePrm']);
-      });
-
-      const basePrmCent = toCent(res['base']['Base.nPrm']);
-
-       if(totalCent !== basePrmCent){
-         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-         btn.loading = false;
-        return false;
-      }
-  }
-
   if(!res['insrnc']['Base.tInsrncBgnTm'] || !res['insrnc']['Base.tInsrncEndTm']) {
     ElMessage.error('保险起期和保险止期不能为空！');
     if(btn) {
@@ -3876,15 +3806,10 @@ const savePlyInfo = async () => {
 
 
     saveFlag = true;
-    if((props.param?.pageType === "inquiryToApp" || props.param?.pageType === "orig") && saveDistBatchFlag.value) {
-      // 保存清单
-      const appNo = plyBase["Base.cAppNo"];
-      saveDist(appNo);
-    }
 
     // 保存后替换路由参数(判断如果保存前没有申请单号，保存后有申请单号就替换路由参数)
     if(props.param?.pageType === "app" || props.param?.pageType === "template" || props.param?.pageType === "copy" || props.param?.pageType === "inquiryToApp" || props.param.pageType === "orig") {
-      const queryParam = {
+      const queryParam:any = {
         pageSize: 10,
         pageNum: 1,
         cDptCde: opertaor.getDataAll().plyBase["Base.cDptCde"],
@@ -3892,43 +3817,24 @@ const savePlyInfo = async () => {
         cDataTyp: "app",
         queryType: "1"
       }
-      if(props.param?.pageName === "priceInquiry") {
-        queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-        queryParam['tAppTmStart'] = dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00")
-        queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
-        getInquiryPolicyList(queryParam).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            const data = res.data?.result[0];
-            router.replace({
-              path: "/pcisapp/pricePage",
-              query: {
-                param: JSON.stringify({
-                  ...data,
-                  ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
-                }),
-              },
-            });
-          }
-        })
-      } else {
-        queryParam['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
-        getAppPolicyList(queryParam).then((res:any) => {
-          if(res.data?.result && res.data?.result.length > 0) {
-            sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
-            const data = res.data?.result[0];
-            router.replace({
-              path: "/pcisapp/myPage",
-              query: {
-                  param: JSON.stringify({
-                      ...data,
-                      ...{ pageType: "TEMPORARY_DEPOSIT" },
-                  }),
-              },
-            });
-          }
-        })
-      }
+      queryParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+      queryParam['tAppTmStart'] = dayjs(new Date()).add(2,'day').subtract(3, "month").format("YYYY-MM-DD 00:00:00")
+      queryParam['tAppTmEnd'] = dayjs(new Date()).format("YYYY-MM-DD 23:59:59")
+      getInquiryPolicyList(queryParam).then((res:any) => {
+        if(res.data?.result && res.data?.result.length > 0) {
+          sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
+          const data = res.data?.result[0];
+          router.replace({
+            path: "/pcisapp/pricePage",
+            query: {
+              param: JSON.stringify({
+                ...data,
+                ...{ pageType: "TEMPORARY_DEPOSIT", pageName: 'priceInquiry' },
+              }),
+            },
+          });
+        }
+      })
     }
 
   } else {

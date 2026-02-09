@@ -953,6 +953,10 @@ const method = {
         rules: [getRules("required", { blur: true })],
       });
     }
+    const cvrgref = opertaor.getTableRefByKey("cvrg");
+    if (cvrgref.showFlush) {
+      cvrgref.showFlush();
+    }
     if (param.initFlag) return
     // 投保方式选择按工程造价投保、按建筑面积投保、按劳务合同价投保，短期费率类型默认按日，短期费率系数固定为1
     const baseRef = opertaor.getTableRefByKey('base'); 
@@ -978,10 +982,6 @@ const method = {
           baseRef.setValue('Base.nRatioCoef', Number(data).toFixed(6))
         }
       });
-    }
-    const cvrgref = opertaor.getTableRefByKey("cvrg");
-    if (cvrgref.showFlush) {
-      cvrgref.showFlush();
     }
   },
   cDeterminingChange: (val: any) => {

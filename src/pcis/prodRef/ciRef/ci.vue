@@ -147,6 +147,7 @@ const method = {
         'Ci.cDptCde': param.cDptCde,
       });
     } else {
+      const param = opertaor.getParam();
       freeEditRef?.value?.addRowByData({
         'Ci.nSeqNo': dataList.length + 1,
         'Ci.nPlyFeeRate': '0.00',
@@ -155,7 +156,8 @@ const method = {
         'Ci.cSlsId': "",
         "Ci.cBrkrCde": "",
         "Ci.cBrkSlsCde": "",
-        'Ci.cChiefMrk': '',
+        'Ci.cChiefMrk': param?.cRsnCde === "47" && param?.initFlag === false ? '0' : '',
+        'Ci.cIssueMrk': param?.cRsnCde === "47" && param?.initFlag === false ? '0' : '',
         // 'Ci.cCoinsurerCde': '327001',
         // 'Ci.cCiSubComp': param.dptCde,
         // 'Ci.cDptCde': param.cDptCde,
@@ -529,9 +531,14 @@ const method = {
       }
       return sum + (parseFloat(rowData["Ci.nCiPrm"]) || 0);
     }, 0);
+    const totalCiShare = allRows.reduce((sum, row) => {
+      const share = parseFloat(row['Ci.nCiShare'] || 0);
+      // 保留8位小数避免浮点数精度问题
+      return Math.round((sum + share) * 100000000) / 100000000;
+    }, 0);
     const diff = Math.abs(totalCiPrm - nPrm);
     // 如果差值大于1，则提示并恢复当前行的保费
-    if (diff > 1) {
+    if (diff > 1 && totalCiShare == 1) {
       ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
       // 恢复当前行的联共保保费为原来的值
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
