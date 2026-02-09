@@ -522,7 +522,13 @@ onMounted(async () => {
 	      handleQuery()
       }
     })
-  }
+	}
+	// 被保人清单更新清单信息重新查询
+	eventBus.on('insureDistEdit', (val: any) => {
+		if(val) {
+			handleQuery()
+		}
+	})
 });
 
 // const  modifyRules = (data, fieldValue)=> {

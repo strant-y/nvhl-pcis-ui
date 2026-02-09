@@ -500,7 +500,8 @@ onMounted(async () => {
         data['func'] = getAddressstr;
       })
     }
-    if (item.prop === 'Dist.cPlanNo') {
+		if (item.prop === 'Dist.cPlanNo') {
+			item['func'] =  cPlanNoChange;
       const termref = opertaor.getTableRefByKey('cvrg');
       const allPlans = termref.getPlanNo();   // 全部方案
 
@@ -1031,6 +1032,14 @@ function setregistAdd() {
   }
 }
 
+function cPlanNoChange(val) {
+	if (init.value) {
+		return false
+	}
+	setValue("Dist.cRelatedInsured", null);
+	clearValidate('Dist.cRelatedInsured')
+}
+
 //给表单赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
@@ -1051,14 +1060,18 @@ function setFormItem(key: any, obj: any) {
 
 
 const cRelatedInsuredChange = () => {
-    // const param = opertaor.getParam();
+		if (!getValue('Dist.cPlanNo')) {
+			ElMessage.warning('请选择方案号！');
+			return false
+		}
     dialog.value?.open(
       "cRelatedInsuredModal",
       {
         type: "show",
 				data: {
 					cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"] || '',
-					selectedData: getValue("Dist.cRelatedInsured") || []
+					selectedData: getValue("Dist.cRelatedInsured") || [],
+					cPlanNo: getValue('Dist.cPlanNo') || '',
 				},
         method: {
           getdbClickData: (data) => {
