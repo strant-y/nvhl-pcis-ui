@@ -529,9 +529,14 @@ const method = {
       }
       return sum + (parseFloat(rowData["Ci.nCiPrm"]) || 0);
     }, 0);
+    const totalCiShare = allRows.reduce((sum, row) => {
+      const share = parseFloat(row['Ci.nCiShare'] || 0);
+      // 保留8位小数避免浮点数精度问题
+      return Math.round((sum + share) * 100000000) / 100000000;
+    }, 0);
     const diff = Math.abs(totalCiPrm - nPrm);
     // 如果差值大于1，则提示并恢复当前行的保费
-    if (diff > 1) {
+    if (diff > 1 && totalCiShare == 1) {
       ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
       // 恢复当前行的联共保保费为原来的值
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
