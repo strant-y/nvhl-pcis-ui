@@ -6,28 +6,21 @@
 </template>
 
 <script setup lang="ts">
-import {
-  AppFreeEditMethod,
-  createAppFreeEditConfig,
-} from "@/shared/app-free-edit-config";
-import { formInit } from "@/shared/from-init";
-import {
-  getBsnsTypList,
-  getChaTypeList,
-  getChaSubtypList,
-} from "@/api/code-list-service";
-import { checkCdeptByCdptCde, getNmeByCde, coverageHint } from "@/api/prod/index";
-import moment from "moment";
-import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-import { useValidator } from "@/typings/useValidator";
+import {AppFreeEditMethod, createAppFreeEditConfig,} from "@/shared/app-free-edit-config";
+import {formInit} from "@/shared/from-init";
+import {getBsnsTypList, getChaSubtypList, getChaTypeList,} from "@/api/code-list-service";
+import {checkCdeptByCdptCde, coverageHint, getNmeByCde} from "@/api/prod/index";
+import {useDzModal} from "@/common/dzmodel/DzModalService";
+import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
+import {useValidator} from "@/typings/useValidator";
 import DepartmentTree from "../commodityRef/DepartmentTree.vue";
-import { codeListViewStore, dataOpertaor, useProductStore } from "@/store";
+import {codeListViewStore, dataOpertaor, useProductStore} from "@/store";
 import {PolicyService} from "@/views/pcis-main/service/my-page/policy.service";
-const productStore = useProductStore();
-import { descryptParameter, encryptParameter } from "@/utils/encipher";
+import {descryptParameter} from "@/utils/encipher";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
-import { getDeptOptions } from "@/api/dept";
+import {getDeptOptions} from "@/api/dept";
+
+const productStore = useProductStore();
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
@@ -1006,7 +999,7 @@ function getCheckCdeptByCdptCde() {
                   codeListName: "CPrjCtgTyp_List",
                   codeListParam: {
                     // CRangeCde: subDptCde.value,
-                    CRangeCde: ['0200000000000', subDptCde.value],
+                    CRangeCde: ['0200000000000', subDptCde.value, param.dptCde],
                     CParCde: '-1',
                     cLev: "1",
                   },
