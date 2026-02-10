@@ -80,7 +80,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               emits("handleClose");
               return;
             }
-          }
+					} else {
+						ElMessage.warning('请检查必填项！');
+					}
         },
       }),
       createFreeButtonBase({
@@ -125,8 +127,15 @@ onMounted(async  () => {
       item["func"] = funCheckUser;
 		}
 		// 证件类型
-    if(['InsuredDist.cCertfCls'].includes(item.prop)) {
-      item["func"] = InsuredCCertfCls;
+		if (['InsuredDist.cCertfCls'].includes(item.prop)) {
+			item["func"] = InsuredCCertfCls;
+			if (props.data.title == "编辑") {
+				if (props.data.rowData['InsuredDist.cClntMrk'] == '0') { // 法人
+					item['typeCode'] = 'UN_NATURAL_CERTIFICATE_CACHE'
+				} else {
+					item['typeCode'] = 'NATURAL_CERTIFICATE_CACHE'
+				}
+			}
 		}
 		// 证件号码
     if(['InsuredDist.cCertfCde'].includes(item.prop)) {
@@ -240,7 +249,11 @@ onMounted(async  () => {
 		}
   }, 100);
   console.log(' formconfig1.value', formconfig1.value)
-	nextTick(()=>{
+	nextTick(() => {
+		if (props.data.title == "新增") {
+			setValue("InsuredDist.cNation", "CHN"); // 国籍默认中国
+			setValue("InsuredDist.cStkMrk", "0"); // 股东客户默认否
+		}
 		setFormItem("InsuredDist.cMobile", { rules: [getRules("phoneNo", {})] })
 		// 固话
 		setFormItem("InsuredDist.cTel", { rules: [getRules("phone", {})] });
@@ -438,8 +451,9 @@ const idAnalysis = (id:string)=>{
   const sexCode = parseInt(id.substring(16, 17), 10);
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   const age = new Date().getFullYear() - birthYear;
-
-  setValue("InsuredDist.cNation", "CHN"); // 国籍
+	if (!getValue("InsuredDist.cNation")) {
+    setValue("InsuredDist.cNation", "CHN"); // 国籍
+  }
   setValue("InsuredDist.tBirthday", birthday);
   setValue("InsuredDist.nAge", age);
   setValue("InsuredDist.cSex", sex);
@@ -454,9 +468,11 @@ const InsuredCCertfCls =(val:any) => {
     clearValidate('InsuredDist.cCertfCde'); // 清除报错信息
 	}
 	const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
-  personFields.forEach(field => {
-    setFormItem(`InsuredDist.${field}`, { disabled: false });
-  });
+	if (props.data.title != '详情') {
+		personFields.forEach(field => {
+			setFormItem(`InsuredDist.${field}`, { disabled: false });
+		});
+	}
   setFormItem("InsuredDist.tCertfBgnDate", { rules: null });
   setFormItem("InsuredDist.tCertfEndDate", { rules: null });
   setFormItem("InsuredDist.tEstablishingDate", { disabled: true, rules: null });
@@ -693,8 +709,8 @@ const tEstablishingDateChange = (val: any) => {
 				hidden: true,
 			});
 			setFormItem("InsuredDist.cNation", {
-				hidden: true,
-			});
+        rules: [getRules('required',{})],
+      });
 			setFormItem("InsuredDist.cOccupTyp", {
 				hidden: true,
 			});
@@ -864,8 +880,8 @@ const tEstablishingDateChange = (val: any) => {
 				hidden: false,
 			});
 			setFormItem("InsuredDist.cNation", {
-				hidden: false,
-			});
+        rules: [],
+      });
 			setFormItem("InsuredDist.cOccupTyp", {
 				hidden: false,
 			});
@@ -1191,23 +1207,45 @@ const tOEndTmDisable =(date: any) => {
   return disablePastDates(date);
 }
 
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
+          }
+        });
+      }
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.value.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        } else {
-          Object.assign(item, obj);
-        }
-      }
-    });
+	if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.value.fromSchema || !Array.isArray(formconfig1.value.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.value.fromSchema, key, obj);
 }
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();

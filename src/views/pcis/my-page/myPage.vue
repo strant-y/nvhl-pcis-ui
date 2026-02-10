@@ -3730,12 +3730,12 @@ const submitToUndrFn = async () => {
       }
     }
   }
-   // 定义cInquiryNumber 和 cAppNo；
-   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
-   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+  // 定义cInquiryNumber 和 cAppNo；
+  const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
+  const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
 
-    // 043013   校验营业场所地址清
-    if(props.param.cProdNo === '043013') {
+  // 043013   校验营业场所地址清
+  if(props.param.cProdNo === '043013') {
     const selectParam = {
       cComponentTable: 'PollutionDist',
       cAppNo: cAppNo,
@@ -3745,7 +3745,13 @@ const submitToUndrFn = async () => {
       ElMessage.warning('营业场所地址清单至少有一条数据!');  
       return false;
     }
-  }
+	}
+	// 被保人清单校验
+	const insuredDist = opertaor.getTableRefByKey("insuredDist")?.getTableData() || []
+	if (insuredDist.length == 1) {
+		ElMessage.warning('至少录入两个被保险人!');  
+    return false;
+	}
 
 	// 风勘校验
  	if( props.param?.pageName === "priceInquiry" ){
