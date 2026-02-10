@@ -3338,6 +3338,18 @@ const submitToUndrFn = async () => {
       }
     }
   }
+  if(cvrgList?.length > 0) {
+    for(let i=0;i<cvrgList.length;i++) {
+      const item = cvrgList[i];
+      if(
+        item['Term.cUniqueTermNo'] && item['Term.cUniqueTermNo'] === "00425000193" && !item['Term.cInsuredName'] && 
+        !item['Term.cIdentityType'] && !item['Term.cIdentityNumber'] && !item['Term.cInsuredDetail']
+      ) {
+        ElMessage.warning(`${item['Term.cPlanNo']}方案的被保人保险中的被保险人名称、被保险人证件类型、被保险人证件号码和被保险人不能同时为空！`);
+        return false;
+      }
+    }
+  }
    // 定义cInquiryNumber 和 cAppNo；
    const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
    const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
