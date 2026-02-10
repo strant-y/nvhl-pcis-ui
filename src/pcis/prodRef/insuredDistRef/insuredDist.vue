@@ -5,7 +5,7 @@
           :tableConfig="tableconfig"
           v-model:pageresult="pageresult"
           ref="distTableRef"
-					@page-change="loadData(false)"
+					@page-change="loadData('',false)"
           @selection-change="handleSelectionChange"
       />
 		</myCard>
@@ -218,7 +218,9 @@ const loadData = (cAppNodata = '',flag = true)=>{
 	const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || cAppNodata
 	let param = Object.assign({
 		cComponentTable:cComponentTableValue,
-		cAppNo:cAppNo || ''},r);
+		cAppNo: cAppNo || ''
+	}, r);
+	pageresult.list = []
 	cargoApi.selectDistNew(param).then((res: any) => {
 		if(res.code === 200) {
 			if(res.data.data.length > 0 ){
