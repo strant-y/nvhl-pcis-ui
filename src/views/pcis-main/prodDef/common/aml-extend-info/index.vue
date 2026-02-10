@@ -225,6 +225,9 @@ const save = async () => {
         { prop: 'cCusFnme', label: '名' },
         { prop: 'cCerftCls', label: '证件类型' },
         { prop: 'cCerftCde', label: '证件号码' },
+        { prop: 'cCerftSex', label: '性别' },
+        { prop: 'cCerftBirthday', label: '出生日期' },
+        { prop: 'cCerftNation', label: '国籍' },
         { prop: 'tCerftBgnTm', label: '证件有效起期' },
         { prop: 'tCerftEndTm', label: '证件有效止期' },
         // { prop: 'cCusAddr', label: '地址' }
