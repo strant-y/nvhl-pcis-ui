@@ -1006,7 +1006,7 @@ function getCheckCdeptByCdptCde() {
                   codeListName: "CPrjCtgTyp_List",
                   codeListParam: {
                     // CRangeCde: subDptCde.value,
-                    CRangeCde: ['0200000000000', subDptCde.value],
+                    CRangeCde: ['0200000000000', subDptCde.value, param.dptCde],
                     CParCde: '-1',
                     cLev: "1",
                   },
