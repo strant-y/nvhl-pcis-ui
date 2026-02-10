@@ -488,6 +488,7 @@ import {POSITE_PAGE_TYPE_APP} from "@/views/pcis/support/composite.types";
 const policyService = new PolicyService();
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 import { saveAs } from "file-saver";
+import { cGrpMrkProd } from '@/views/pcis/my-page/requiredDistMap';
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -648,7 +649,7 @@ const handleArray = (obj:any)=>{
   }
   return newObj
 }
-const cGrpMrkProd = ref(['040001','040002','040007','040020','040021','041001','041007','041011','041014','041015','042002','043004','043005','043009','043011','043013','043022','045001','047002','049001','049024','049026','049030','049031',])
+
 function next() {
   // console.log(formconfig1.value);
   freeEditRef.value?.validate().then(async (isValid: boolean) => {
@@ -659,7 +660,7 @@ function next() {
 			if (formconfig1.value.cRecordType == 10) {
 				if (formconfig1.value.cGrpMrk == '1') {
 					const invalidProducts = formconfig1.value.cProdDtlList.filter(
-						item => !cGrpMrkProd.value.includes(item.cProdNo)
+						item => !cGrpMrkProd.includes(item.cProdNo)
 					)
 					if (invalidProducts.length > 0) {
 						// 按格式 【编号：名称】 拼接
@@ -675,7 +676,7 @@ function next() {
 					}
 				}
 			} else {
-				if (formconfig1.value.cGrpMrk == '1' && (formconfig1.value.cRenewMrk == '0'  || formconfig1.value.cRecordType != 1 ) && !cGrpMrkProd.value.includes(formconfig1.value.cProdNo)) {
+				if (formconfig1.value.cGrpMrk == '1' && (formconfig1.value.cRenewMrk == '0'  || formconfig1.value.cRecordType != 1 ) && !cGrpMrkProd.includes(formconfig1.value.cProdNo)) {
 					ElMessage.error(`当前选择的产品【${formconfig1.value.cProdNo}：${formconfig1.value.cProdNme}】不支持团单功能，请重新选择其他产品。`);
 					return;
 				}

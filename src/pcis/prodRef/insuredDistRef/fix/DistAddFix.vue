@@ -468,9 +468,11 @@ const InsuredCCertfCls =(val:any) => {
     clearValidate('InsuredDist.cCertfCde'); // 清除报错信息
 	}
 	const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
-  personFields.forEach(field => {
-    setFormItem(`InsuredDist.${field}`, { disabled: false });
-  });
+	if (props.data.title != '详情') {
+		personFields.forEach(field => {
+			setFormItem(`InsuredDist.${field}`, { disabled: false });
+		});
+	}
   setFormItem("InsuredDist.tCertfBgnDate", { rules: null });
   setFormItem("InsuredDist.tCertfEndDate", { rules: null });
   setFormItem("InsuredDist.tEstablishingDate", { disabled: true, rules: null });
