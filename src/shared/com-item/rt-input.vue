@@ -25,7 +25,7 @@
         :placeholder="item.placeholder"
         :size="item.size"
         :type="
-          item.type === 'color' || item.type === 'number' ? 'text' : item.type
+          ( item.type !== 'textarea' && item.type !== 'password') ? 'text' : item.type
         "
         :class="[
             ...customClass,
@@ -40,7 +40,12 @@
         "
         :maxlength="item.maxlength"
         :minlength="item.minlength"
-        :show-word-limit="item.showWordLimit === '1' ? true : false"
+        :show-word-limit="
+          item.showWordLimit ? 
+            typeof item.showWordLimit === 'boolean' ? 
+              item.showWordLimit : 
+              (item.showWordLimit === '1' ||  item.showWordLimit === 1) ? true : false
+            : false "
         :readonly="
           item.type === 'color' || item.type === 'icon'
             ? true
