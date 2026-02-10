@@ -77,7 +77,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         // rules: [getRules("required", {'message':'请选择方案号'})],
         title: "方案号",
         clearable:true,
-        typeCode: "cPlanType",
+				typeCode: "cPlanType",
+				disabled: true,
         // codeParam: { cParCde: "hangyefenlei2" },
       },
       {
@@ -246,7 +247,10 @@ const handleSave = async () => {
 	props.data.method?.getdbClickData(selValue);
 };
 
-onMounted(() => {handleQuery()});
+onMounted(() => {
+	setValue('cPlanNo',props.data.data.cPlanNo)
+	handleQuery()
+});
 
 defineExpose({
   getFromValue,
