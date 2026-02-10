@@ -54,7 +54,7 @@
                     >
                       <from-item
                           v-model="termdata[item.prop]"
-                          @update:modelValue="termUpdate()"
+                          @update:modelValue="termUpdate(termdata, item)"
                           :item="item"
                       />
                     </el-form-item>
@@ -121,7 +121,7 @@
                               >
                                 <from-item
                                   v-model="termdata[item.prop]"
-                                  @update:modelValue="termUpdate()"
+                                  @update:modelValue="termUpdate(termdata, item)"
                                   :item="item"
                                 />
                               </el-form-item>
@@ -179,7 +179,7 @@
                           >
                           <from-item
                             v-model="termdata[item.prop]"
-                            @update:modelValue="termUpdate()"
+                            @update:modelValue="termUpdate(termdata, item)"
                             :item="item"
                           />
                           </el-form-item>
@@ -201,7 +201,7 @@
                                   class="extendFormItem">
                                   <from-item
                                     v-model="termdata[item.prop]"
-                                    @update:modelValue="termUpdate()"
+                                    @update:modelValue="termUpdate(termdata, item)"
                                     :item="item"
                                   />
                                 </el-form-item>
@@ -220,13 +220,13 @@
               <app-free-edit
                 :freeEditConfig="formconfig1"
                 ref="termRef"
-                @updateDatas="termUpdate()"
+                @updateDatas="termUpdate"
               />
             </template>
           </template>
           <template v-if="riskShowTyp === 'grid'">
-            <term047005 v-if="pageparam.cProdNo === '049022' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()" /> 
-            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate()"/>
+            <term047005 v-if="pageparam.cProdNo === '049022' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate" /> 
+            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
               <template v-for="(ginfo, gk) in groupInfo" :key="gk">
@@ -356,7 +356,7 @@
                                                 ].factorItem?.prop
                                               ]
                                             "
-                                            @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo])"
+                                            @update:modelValue="riskUpdate(riskList[riskdata.rowConfig[colinfo.cColId][n - 1].cRiskNo],riskdata.rowConfig[colinfo.cColId][n - 1].factorItem)"
                                             :item="
                                               riskdata.rowConfig[colinfo.cColId][
                                                 n - 1
@@ -379,7 +379,7 @@
                                       >
                                         <from-item
                                           v-model="termdata[v.prop]"
-                                          @update:modelValue="termUpdate()"
+                                          @update:modelValue="termUpdate(termdata,v.prop)"
                                           :item="v"
                                         />
                                       </el-form-item>
@@ -512,21 +512,24 @@ const fuImageUrl = ref(new URL(`../../../assets/img/fu.png`, import.meta.url).hr
 const yingImageUrl = ref(new URL(`../../../assets/img/ying.png`, import.meta.url).href);
 const mianImageUrl = ref(new URL(`../../../assets/img/mian.png`, import.meta.url).href);
 
-function termUpdate(){
-  termDeductibleNote();
+function termUpdate(termdatas: nay,items: any){
+  termDeductibleNote(termdatas,items);
   update();
 }
 
-function riskUpdate(risk: any){
-  riskDeductibleNote(risk);
+function riskUpdate(risk: any,items: any){
+  riskDeductibleNote(risk,items);
   update();
 }
 
-function termDeductibleNote(){
+function termDeductibleNote(prop: nay,items: any){
   const termData = getDatas();
   const termNo = termData['Term.cClauseCode'];
   const k = deductibleKey.value[termNo]?deductibleKey.value[termNo]:deductibleKey.value['defterm'];
 
+  if(items && k['amt'] !== items.prop && k['rate'] !== items.prop){  // 只有免赔额,免赔率变更时,才触发修改变更对应免赔明细
+    return ;
+  }
   const amt = termFactormap.value.filter(item=>item['prop']==k['amt']);
   const rate = termFactormap.value.filter(item=>item['prop']==k['rate']);
   const deduct = termFactormap.value.filter(item=>item['prop']==k['deduct']);
@@ -551,10 +554,13 @@ function termDeductibleNote(){
   }
 }
 
-function riskDeductibleNote(risk: any) {
+function riskDeductibleNote(risk: any,items: any) {
   const r = risk['TermRisktgt.cLiabCode'];
   const k = deductibleKey.value[r]?deductibleKey.value[r]:deductibleKey.value['defrisk'];
   const riskdata = getRiskFactors(r);
+  if(items && k['amt'] !== items.prop && k['rate'] !== items.prop){  // 只有免赔额,免赔率变更时,才触发修改变更对应免赔明细
+    return ;
+  }
   const amt = riskdata.filter((item: any) => item['factorObj']['prop'] === k['amt']);
   const rate = riskdata.filter((item: any) => item['factorObj']['prop'] === k['rate']);
   const deduct = riskdata.filter((item: any) => item['factorObj']['prop'] === k['deduct']);
