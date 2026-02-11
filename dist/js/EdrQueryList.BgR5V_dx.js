@@ -1,1 +1,0 @@
-import s from"./index.OVphPL4y.js";import{d as e,c as r,e as i,F as o}from"./index.C0ncw4qO.js";import"./edr-qry-endorse-list.C6m9AHaw.js";import"./change-image-upload-mode.BJNfX-tJ.js";import"./api.25ix24EV.js";const a=e({__name:"EdrQueryList",setup:e=>(e,a)=>(i(),r("div",null,[o(s)]))});export{a as default};
