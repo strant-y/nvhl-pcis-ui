@@ -13,6 +13,10 @@ const typeMap = reactive<Record<string, Array<any>>>({
       value: "password",
     },
     {
+      label: "desensitization",
+      value: "desensitization",
+    },
+    {
       label: "color",
       value: "color",
     },
