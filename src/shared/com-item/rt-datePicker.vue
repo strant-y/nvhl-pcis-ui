@@ -53,6 +53,7 @@
           :dateFormat="'YYYY-MM-DD'"
           :timeFormat="'HH:mm:ss'"
           :valueFormat="item.valueFormat ? item.valueFormat : getValueFormat()"
+					:default-time="item.defaultTime"
           @change="handleChange"
           @blur="blur"
           :style="{width: '100%'}"

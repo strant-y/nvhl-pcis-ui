@@ -236,11 +236,11 @@ const tableconfig = reactive<AppGridEditConfig>(
 				rules: [getRules("required", {})],
 				
 			},
-			{
-				prop: "cCusAddr",
-				inputtype: "rtinput",
-				title: "地址"
-			}
+			// {
+			// 	prop: "cCusAddr",
+			// 	inputtype: "rtinput",
+			// 	title: "地址"
+			// }
 		],
 	})
 );
