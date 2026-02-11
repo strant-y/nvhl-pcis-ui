@@ -142,9 +142,9 @@ const { freeEditConfig } = toRefs(props);
 const emits = defineEmits(["updateDatas"]); // 父组件监听事件，同步子组件值的变化给父组件
 
 const formData = ref({});   // 临时存储数据,用于折叠式,数据回显
-function updateDatas(newDatas: any) {
+function updateDatas(newDatas: any, prop: any) {
   formData.value = newDatas;
-  emits("updateDatas", newDatas);
+  emits("updateDatas", newDatas, prop); // 更新时,将更新最新数据,以及更新目标字段,返回
 }
 
 const showMyfrom = ref(false);

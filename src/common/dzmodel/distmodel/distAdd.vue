@@ -625,6 +625,43 @@ onMounted(async () => {
         cInsuranceDutyChange(val)
       }
     }
+    // 049020、041007证件类型选择后证件号码必填
+    if(['049020','041007'].includes(params?.cProdNo)) {
+      if(item.prop === 'Dist.cDocumentType') {
+        item.func = (val:any) => {
+          if(val) {
+            setFormItem('Dist.cIdentificationNumber', { rules: [getRules("required", {})] })
+          } else {
+            setFormItem('Dist.cIdentificationNumber', { rules: [] })
+          }
+        }
+      }
+      if(item.prop === 'Dist.cIdentificationNumber') {
+        item.func = (val:any) => {
+          if(init.value) return;
+          if(val && ['111','553'].includes(getValue('Dist.cDocumentType'))) {
+            setValue('Dist.nAge', calculateAgeFromIdCard(val))
+          }
+        }
+      }
+      if(item.prop === 'Dist.tBirthDate') {
+        item.func = (val:any) => {
+          if(init.value) return;
+          if(val && !getValue('Dist.cIdentificationNumber')) {
+            const id = `123456${val.replaceAll('-','')}011234`
+            setValue('Dist.nAge', calculateAgeFromIdCard(id))
+          }
+        }
+      }
+      if(item.prop === 'Dist.nAge') {
+        item.func = (val:any) => {
+          if(init.value) return;
+          if(val && Number(val) >= 18) {
+            ElMessage.warning({message: '被监护人年龄超过18岁（含），请确认是否符合“限制民事行为能力人”情形。', duration: 3000})
+          }
+        }
+      }
+    }
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
