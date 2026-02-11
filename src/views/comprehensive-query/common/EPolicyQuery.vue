@@ -961,7 +961,7 @@ function batchDownloadEPolicy() {
         }
     })
     const data = {
-        plyNo: base64encoder(rsaEncoder(targetPlyNo)),
+        plyNo: base64encoder(targetPlyNo),
         type: 'EXP_EPOLICY_IMP_PDF',
         impType: plyTyp
     }
