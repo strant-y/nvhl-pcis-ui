@@ -254,11 +254,15 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "tStaTm",
         title: "生效时间",
         inputtype: "rtdatepicker",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
       },
       {
         prop: "tEndTm",
         title: "失效时间",
         inputtype: "rtdatepicker",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
       },
       {
         prop: "cRuleTyp",
