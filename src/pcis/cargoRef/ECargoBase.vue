@@ -39,6 +39,8 @@ import {getBsnsTypList,getChaTypeList,getChaSubtypList,} from "@/api/code-list-s
 import dayjs from "dayjs";
 import { getDeptOptions } from "@/api/dept";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+const policyService = new PolicyService();
 const route = useRoute();
 const fileInputRef = ref(null);
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -479,6 +481,17 @@ const method = {
     if (!initFlag.value) {
       setValue("ECargoBase.cBrkrCde", "");
 			setValue("ECargoBase.cBrkSlsCde", "");
+			// 非个人代理业务，清空业务员信息
+			if (getValue("ECargoBase.cBsnsTyp") != '19002' && getValue("ECargoBase.cChaType") != '1900201' && val != '1900201001') {
+				setFormItem("ECargoBase.cSlsId", {disabled: false,btnItems: {disabled: false}});
+				setFormItem("ECargoBase.cIntroSalecde", {loadData: [], btnItems: { disabled: false } });
+				setValue("ECargoBase.cSlsId", null); // 业务员员工号
+				setValue("ECargoBase.cSlsNme", null); // 业务员名称
+				setValue("ECargoBase.cSlsTel", null); // 业务员电话
+				setValue("ECargoBase.cSlsDptcde", null); // 业务员机构代码
+				setValue("ECargoBase.cSlsCde", null); // 业务员执业证号
+				setValue("ECargoBase.cIntroSalecde", null); // 服务机构业务员
+			}
 			checkProdGradeChange(false, 'ECargoBase.cChaSubtype');
     }
 	},
@@ -520,6 +533,45 @@ const method = {
                   CChaCde: params.CChaCde, //代理经纪人代码
                   CChaNme: params.CChaNme, //代理经纪人名称
                   loadData:[{value:  params["CChaCde"],label:params["CChaCde"] + params['CChaNme']}],
+                });
+              }
+							// 个人代理业务获取业务员信息
+							if (getValue("ECargoBase.cBsnsTyp") == '19002' && getValue("ECargoBase.cChaType") == '1900201' && getValue("ECargoBase.cChaSubtype") == '1900201001') {
+								policyService.getPrivateSelsList({cUserCode: params.CUserCode}).then((res) => {
+									if (res["code"] === 200 && !!res["data"]) {
+										setFormItem("ECargoBase.cSlsId", {disabled: true,btnItems: {disabled: true}});
+										setFormItem("ECargoBase.cIntroSalecde", {btnItems: {disabled: true}});
+										setValue("ECargoBase.cSlsId", res.data.cSlsCde); // 业务员员工号
+										setValue("ECargoBase.cSlsNme", res.data.cSlsNme); // 业务员名称
+										setValue("ECargoBase.cSlsTel", res.data.cTel); // 业务员电话
+										setValue("ECargoBase.cSlsDptcde", res.data.cDptCde); // 业务员机构代码
+										setValue("ECargoBase.cSlsCde", res.data.cCtfctNo); // 业务员执业证号
+										codeListStore.queryCodeList({codeListName: "CSaleCde_List",codeListParam: {CSlsCde: res.data["cSlsCde"],},},false,false).then((res1) => {
+											console.log("业务员=-==", res1);
+											if (res1 && res1.length > 0) {
+												const codeValData = res1;
+												if (codeValData) {
+													// 服务机构业务员下拉和显示的值
+													setFormItem("ECargoBase.cIntroSalecde", {
+														loadData: codeValData,
+													});
+													setValue("ECargoBase.cIntroSalecde", res.data.cSlsCde); // 服务机构业务员
+												}
+											}
+										});
+									} else {
+										setFormItem("ECargoBase.cSlsId", {disabled: false,btnItems: {disabled: false}});
+										setFormItem("ECargoBase.cIntroSalecde", {btnItems: {disabled: false}});
+										setValue("ECargoBase.cSlsId", null); // 业务员员工号
+										setValue("ECargoBase.cSlsNme", null); // 业务员名称
+										setValue("ECargoBase.cSlsTel", null); // 业务员电话
+										setValue("ECargoBase.cSlsDptcde", null); // 业务员机构代码
+										setValue("ECargoBase.cSlsCde", null); // 业务员执业证号
+										setFormItem("ECargoBase.cIntroSalecde", {loadData: []});
+										setValue("ECargoBase.cIntroSalecde", null); // 服务机构业务员
+									}
+								})
+								.catch((err) => {
                 });
               }
               dialog.value?.handleClose();
