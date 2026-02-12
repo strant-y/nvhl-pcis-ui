@@ -687,7 +687,7 @@ function next() {
         router.push({
           path: "/pcisapp/posite-page",
           query: {
-            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' } }),
+            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' }, dptCde: formconfig1.value?.dptCde || userStore.user.companyId }),
           },
         });
         return;
@@ -713,6 +713,9 @@ function next() {
         return
       }
       const data = formconfig1.value;
+      if(!isZGS.value && !data.dptCde) {
+        data.dptCde = userStore.user.companyId
+      }
 			if (formconfig1.value.cRenewMrk == "1") {
 				if(Object.keys(renewalComponent.value).length == 0) {
           ElMessage.error("上年保单号请点击查询！");
