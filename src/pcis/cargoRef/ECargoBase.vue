@@ -596,7 +596,7 @@ const method = {
           codeListName: "WEB_ORG_SALES_BY_ID",
           codeListParam: {value: value}
         }).then((res) => {
-          plyBaseEditRef.value?.addCodeListMap({
+          baseEditRef?.value?.addCodeListMap({
             code: "ECargoBase.cBrkSlsCde",
             list: res,
           });
