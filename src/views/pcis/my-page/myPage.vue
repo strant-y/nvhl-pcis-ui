@@ -958,13 +958,20 @@ const setTaxInfo = () => {
  */
 const setCusBenefitInfo = (val) => {
   const tabref = opertaor.getTableRefs();
-  const appNo = tabref["applicant"]?.getFromValue()["Applicant.cAppNo"]; // 单据编号
   const AppcClntMrk = tabref["applicant"]?.getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
   const InscClntMrk = tabref["insured"]?.getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
   const baseValue = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
   const basePrmCur = opertaor.getTableRefByKey("base")?.getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
   const basePrm = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nPrm"];//承保基本信息 总保费
 	let msg = val == 'view' ? '查看': '录入';
+
+
+	let appNo = null; // 单据编号
+	if (!!edrbase.value?.getFromValue()["EdrBase.cPlyNo"]) {
+			appNo = edrbase.value?.getFromValue()["EdrBase.cAppNo"];
+	} else {
+			appNo = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cAppNo');
+	}
   //  单据保存才有 单据编号
   if (!appNo) {
     ElMessage.error("请先保存单据");
@@ -3673,6 +3680,13 @@ const submitToUndrFn = async () => {
       return;
     }
   }
+	
+	// 校验销售资质
+	let plyBase = opertaor.getTableRefByKey("plyBase")
+	const saleQualifyCheckResult = await plyBase?.checkProdGradeChange(true, 'applyUnderwritingBtn');
+	if (!saleQualifyCheckResult) {
+			return;
+	}
 
   // 从共主联、从共无联保和数据开关校验
   const qryTerminationStatusFunc = await qryTerminationFunc('0')
