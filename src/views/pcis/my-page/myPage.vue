@@ -3680,6 +3680,13 @@ const submitToUndrFn = async () => {
       return;
     }
   }
+	
+	// 校验销售资质
+	let plyBase = opertaor.getTableRefByKey("plyBase")
+	const saleQualifyCheckResult = await plyBase?.checkProdGradeChange(true, 'applyUnderwritingBtn');
+	if (!saleQualifyCheckResult) {
+			return;
+	}
 
   // 从共主联、从共无联保和数据开关校验
   const qryTerminationStatusFunc = await qryTerminationFunc('0')

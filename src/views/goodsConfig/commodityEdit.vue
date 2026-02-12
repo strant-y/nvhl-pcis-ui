@@ -470,6 +470,15 @@ const saveAllSubmit = async () => {
   if (!isValid) {
     return;
   } else {
+		if ('add' === queryParam.editType || 'edit' === queryParam.editType) {
+			// 校验销售资质
+			const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
+			const saleQualifyCheckResult = await tabref3?.checkProdGradeChange(true);
+			if (!saleQualifyCheckResult) {
+					return false;
+			}
+		}
+
 
     const call = (commodityNo, status) => {
 

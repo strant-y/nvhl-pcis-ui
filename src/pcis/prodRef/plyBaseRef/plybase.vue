@@ -16,7 +16,7 @@ import {
   getChaTypeList,
   getChaSubtypList,
 } from "@/api/code-list-service";
-import { checkCdeptByCdptCde, getNmeByCde, coverageHint } from "@/api/prod/index";
+import { checkCdeptByCdptCde, getNmeByCde, coverageHint, checkProdGrade } from "@/api/prod/index";
 import moment from "moment";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -344,7 +344,8 @@ const method = {
         }
         if (!!ciRef) {
           ciRef.valideRequired();
-        }
+				}
+				checkProdGradeChange(false, 'Base.cBsnsTyp');
       });
     }
   },
@@ -386,8 +387,9 @@ const method = {
           setFormItem("Base.cSlsId", obj); //业务员工号
         }
         setFormItem("Base.cSlsId", { rules: [getRules("required", {})] }); //业务员工号
-      }
-
+			}
+			
+			checkProdGradeChange(false, 'Base.cChaType');
       getChaSubtypList(params).then((res) => {
         if (null != res && null != res["code"]) {
           if (res["code"] === 200) {
@@ -417,7 +419,8 @@ const method = {
         setValue("Base.cSlsDptcde", null); // 业务员机构代码
         setValue("Base.cSlsCde", null); // 业务员执业证号
         setValue("Base.cIntroSalecde", null); // 服务机构业务员
-      }
+			}
+			checkProdGradeChange(false, 'Base.cChaSubtype');
 		}
   },
   //代理(经纪)人change事件
@@ -445,7 +448,8 @@ const method = {
   updateSlsId: (v: any) => {
     const p = opertaor.getParam();
     if (!p.initFlag) {
-      setValue("Base.cIntroSalecde", v);
+			setValue("Base.cIntroSalecde", v);
+			checkProdGradeChange(false, 'Base.cSlsId');
     }
   },
   //代理(经纪)人icon事件
@@ -549,7 +553,8 @@ const method = {
 
           const codeMap = plyBaseEditRef.value?.getCodeListMap();
           console.log('cBrkSlsCdeChange-codeMap', codeMap)
-        });
+				});
+				checkProdGradeChange(false, 'Base.cBrkSlsCde');
       }
     // }
   },
@@ -1033,6 +1038,139 @@ function getCheckCdeptByCdptCde() {
     );
   }
 }
+/**
+* 检查产品分级信息(销售资质级别)
+* @param isPrompt 是否提示错误信息
+*/
+async function checkProdGradeChange(isPrompt: boolean, eventSrc: string): Promise<boolean> {
+  // 提示函数：仅在 isPrompt 为 true 时弹出 ElMessage
+  const showError = (msg: string) => {
+    if (isPrompt) {
+      ElMessage.error(msg);
+    }
+  };
+
+  try {
+    // 1. 产品校验
+    const prodNo = sessionData.value?.cProdNo || param?.cProdNo;
+    if (!prodNo) {
+      showError('请选择产品！');
+      return false;
+    }
+
+    // 2. 机构部门校验
+    const dptNo = getValue('Base.cDptCde') || param?.cDptCde;
+    if (!dptNo) {
+      showError('请选择机构部门！');
+      return false;
+    }
+
+    // 3. 业务来源校验
+    const bsnsTyp = getValue('Base.cBsnsTyp');
+    if (!bsnsTyp) {
+      showError('请选择业务来源！');
+      return false;
+    }
+
+    // 经纪业务（19003）直接通过
+    if (bsnsTyp === '19003') {
+      return true;
+    }
+
+    // 4. 渠道中级分类（代理/直销都需要）
+    const chaType = getValue('Base.cChaType');
+    if (!chaType) {
+      showError('请选择渠道中级分类！');
+      return false;
+    }
+
+    // 5. 获取其他字段
+    const chaSubtype = getValue('Base.cChaSubtype');
+    const brkrCde = getValue('Base.cBrkrCde');
+    const brkSlsCde = getValue('Base.cBrkSlsCde');
+    const agtAgrNo = getValue('Base.cAgtAgrNo');
+    const slsId = getValue('Base.cSlsId');
+
+    // 6. 分场景校验
+    if (bsnsTyp === '19001') {
+      // 直销业务
+      if (!slsId) {
+        showError('请选择业务员员工号！');
+        return false;
+      }
+      if (eventSrc !== 'Base.cSlsId' && eventSrc !== 'applyUnderwritingBtn') {
+        return false; // 非目标触发源，不继续
+      }
+    } else if (bsnsTyp === '19002') {
+      // 代理业务
+      if (chaType === '1900201') {
+        // 个人代理
+        if (!brkSlsCde || !agtAgrNo) {
+          showError('代理业务员和代理(合作)协议不能为空！');
+          return false;
+        }
+        if (eventSrc !== 'Base.cBrkSlsCde' && eventSrc !== 'applyUnderwritingBtn') {
+          return false;
+        }
+      } else {
+        // 兼业/专业代理
+        if (!slsId || !agtAgrNo) {
+          showError('业务员员工号和代理(合作)协议不能为空！');
+          return false;
+        }
+        if (eventSrc !== 'Base.cSlsId' && eventSrc !== 'applyUnderwritingBtn') {
+          return false;
+        }
+      }
+    }
+
+    // 7. 构造请求数据
+    const data = {
+      cProdNo: prodNo,
+      cDptCde: dptNo,
+      cBsnsTyp: bsnsTyp,
+      cChaType: chaType,
+      cChaSubtype: chaSubtype,
+      cSlsId: slsId,
+      cBrkrCde: brkrCde,
+      cBrkSlsCde: brkSlsCde,
+      cAgtAgrNo: agtAgrNo,
+      cIntroDptcde: getValue('Base.cIntroDptcde'),
+      cIntroSalecde: getValue('Base.cIntroSalecde'),
+      cSlsDpdcde: getValue('Base.cSlsDptcde'),
+      cBrkrDptCde: getValue('Base.cBrkrDptCde')
+    };
+
+    // 8. 调用后端校验接口
+    const res = await checkProdGrade(data);
+
+    if (res?.code === 200) {
+      return true;
+    } else {
+      const msg = res?.msg || '产品等级校验失败';
+      ElMessage.error(msg);
+
+      // 清空触发字段（根据 eventSrc）
+      if (eventSrc === 'Base.cSlsId') {
+				setValue('Base.cSlsId', null);
+				setValue('Base.cSlsNme', null);
+				setValue('Base.cSlsCde', null);
+				setValue('Base.cSlsTel', null);
+				setValue('Base.cSlsDptcde', null);
+      }
+      if (eventSrc === 'Base.cBrkSlsCde') {
+				setValue('Base.cBrkSlsCde', null);
+				setValue('Base.cCertfNo', null);
+				setValue('Base.cBrkrDptcde', null);
+      }
+
+      return false;
+    }
+  } catch (error) {
+    ElMessage.error('系统异常，请联系管理员');
+    return false;
+  }
+}
 
 function getFromValue() {
   return plyBaseEditRef?.value?.getFromValue();
@@ -1140,7 +1278,8 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
-  addProvide
+	addProvide,
+	checkProdGradeChange,
 });
 </script>
 

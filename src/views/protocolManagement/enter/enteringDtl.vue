@@ -1533,7 +1533,13 @@ async function  submit() {
   const isSuccess = premiumCalculation()
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
-  }
+	}
+	// 校验销售资质
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const saleQualifyCheckResult = await agreementBaseRef?.checkProdGradeChange(true, 'applyUnderwritingBtn');
+	if (!saleQualifyCheckResult) {
+			return;
+	}
   await nextTick()
   const isOk =  await save()
   if(!isOk) return
@@ -1559,7 +1565,7 @@ async function  submit() {
   const btn = getBtn("submit");
   btn.loading = true;
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+  // const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
     ...{user},
     sence:'arraigned',
