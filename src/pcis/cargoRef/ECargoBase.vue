@@ -589,7 +589,7 @@ const method = {
     }
   },
   cBrkSlsCdeChange: (value: any) =>{
-    const p = opertaor.getParam();
+    // const p = opertaor.getParam();
     // if (p.initFlag) {
       if(value && value != '') {
         codeListStore.queryCodeList({
