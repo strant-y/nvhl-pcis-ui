@@ -579,6 +579,7 @@ const getDptCdeList = ()=> {
                 dptCdeList.value = data.map((item) => ({
                     value: item.cDptCde,
                     label: item.cDptCnm,
+                    cTeamType: item.cTeamType || '',
                 }));
             }
         }).catch(err => console.error(err));
@@ -602,7 +603,11 @@ const getCDptCdeList = (data: any)=> {
             cDptCdeList.value = data.map((item) => ({
                 value: item.cDptCde,
                 label: item.cDptCnm,
-            }));
+								cTeamType: item.cTeamType || '',
+						}));
+						if (formconfig1.value.cRecordType == 9) {
+							selectedItem(formconfig1.value.cDptCde)
+						}
           // 清空已选择的承保机构
           // formconfig1.value.cDptCde = "";
           // formconfig1.value.cDptCnm = "";
@@ -634,6 +639,7 @@ function selectedItem(value: any) {
     selectTreeItem.value = item;
     formconfig1.value.cDptCnm = item?.label;
     formconfig1.value.cDptCde = item?.value;
+    formconfig1.value.cTeamType = item?.cTeamType || '';
 }
 
 // 下一步
