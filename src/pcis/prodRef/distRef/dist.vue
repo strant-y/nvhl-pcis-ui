@@ -797,6 +797,19 @@ const method = {
               data[key][1] = item['Dist.cSuitScope']
             }
           }
+          formconfig11.value?.fromSchema?.forEach((it:any) => {
+            if(it.inputtype === 'rtcascader') {
+              const cascaderprops = JSON.parse(it.cascaderprops);
+              if(cascaderprops?.length > 0) {
+                data[it.prop] = []
+                cascaderprops.forEach((i:any) => {
+                  if(item[i]) {
+                    data[it.prop].push(item[i])
+                  }
+                })
+              }
+            }
+          })
           
             console.log('pageresult.list',pageresult.list);
           return{
