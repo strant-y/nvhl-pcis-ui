@@ -595,32 +595,32 @@ const method = {
           leading: "CBrkSlsCde",
         },
         method: {
-          getSelected: (params) => {
-            console.log("代理业务员回显", params);
+          getSelected: (data) => {
+            console.log("代理业务员回显", data);
             setFormValue({
-              // "Base.cBrkSlsCde": params.CSlsCde, //代理业务员
-              "Base.cCertfNo": params.CCtfctNo, //代理业务执业证号
-              "Base.cBrkrDptcde": params.CDptCde, //代理业务员机构代码
+              // "Base.cBrkSlsCde": data.CSlsCde, //代理业务员
+              "Base.cCertfNo": data.CCtfctNo, //代理业务执业证号
+              "Base.cBrkrDptcde": data.CDptCde, //代理业务员机构代码
             });
               setFormItem("Base.cBrkSlsCde", {
               loadData: [
                 {
-                  value:  params["CSlsCde"],
-                  label:params["CSlsCde"] + params['CSlsNme'],
+                  value:  data["CSlsCde"],
+                  label:data["CSlsCde"] + data['CSlsNme'],
                 },
               ],
             });
             const ciRef = opertaor.getTableRefs()['ci'];
             if (!!ciRef) {
               ciRef.initProxySales({
-                cSlsId: params.CSlsCde, //业务员员工号
-                cSlsNme: params.CSlsNme, //业务员名称
-                loadData:[{value:  params["CSlsCde"],label:params["CSlsCde"] + params['CSlsNme']}],
+                cSlsId: data.CSlsCde, //业务员员工号
+                cSlsNme: data.CSlsNme, //业务员名称
+                loadData:[{value:  data["CSlsCde"],label:data["CSlsCde"] + data['CSlsNme']}],
               });
             }
-            setValue("Base.cBrkSlsCde", params.CSlsCde);
+            setValue("Base.cBrkSlsCde", data.CSlsCde);
 						// 专业代理业务通过代理业务员获取业务员信息
-						if (getValue("Base.cBsnsTyp") == '19002' && getValue("Base.cChaType") == '1900203' && getValue("Base.cChaSubtype") == '1900203002') {
+						if (params.cTeamType === "06" && getValue("Base.cBsnsTyp") == '19002' && getValue("Base.cChaType") == '1900203' && getValue("Base.cChaSubtype") == '1900203002') {
 							setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
 							setFormItem("Base.cIntroSalecde", {btnItems: {disabled: false}});
 							setValue("Base.cSlsId", null); // 业务员员工号
@@ -630,8 +630,8 @@ const method = {
 							setValue("Base.cSlsCde", null); // 业务员执业证号
 							setFormItem("Base.cIntroSalecde", {loadData: []});
 							setValue("Base.cIntroSalecde", null); // 服务机构业务员
-							if (!!params.cRecommendCode) {
-								policyService.getPrivateSelsList({cUserCode: params.cRecommendCode}).then((res) => {
+							if (!!data.cRecommendCode) {
+								policyService.getPrivateSelsList({cUserCode: data.cRecommendCode}).then((res) => {
 									if (res["code"] === 200 && !!res["data"]) {
 										setFormItem("Base.cSlsId", {disabled: true,btnItems: {disabled: true}});
 										setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
