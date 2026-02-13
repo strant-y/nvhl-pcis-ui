@@ -4450,7 +4450,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 				if(cAppNme != cAcctNme){
 					for (const i in edrexptArr) {
 						const objValue = edrexpDataVlue[edrexptArr[i]];
-						if (objValue === null || objValue === '' || objValue === undefined) {
+						// if (objValue === null || objValue === '' || objValue === undefined) {
 							appMsg += edrexpCnmArr[i] + '、';
 							edrexp.value.setFormItem(edrexptArr[i], {
 								rules: [getRules("required", {})],
@@ -4458,19 +4458,31 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 								disabled: !isDis
 							});
 							flag = true;
-						}
+						// }
 					}
 				} else {
 					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
-					if (objValue === null || objValue === '' || objValue === undefined) {
+					// if (objValue === null || objValue === '' || objValue === undefined) {
 						appMsg = '退保、减保或者办理保单贷款原因';
 						edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
 							rules: [getRules("required", {})],
 							hidden: false,
 							disabled: !isDis
 						});
+						edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
+							rules: [],
+							hidden: false,
+							disabled: true
+						});
+						edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
+							rules: [],
+							hidden: false,
+							disabled: true
+						});
+						edrexp.value.setValue('EdrBase.cNotBackAppRsn', null)
+						edrexp.value.setValue('EdrBase.cNotBackAppNo', null)
 						flag = true;
-					}
+					// }
 				}
 				
 				if (appMsg !== '') {
@@ -5588,7 +5600,7 @@ const generateEndorse = async () => {
   //   }
   // }
   // 批改原因和清单相关的需要提示先保存一下
-  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10" || props.param['cRsnCde'] === "80" || props.param['cRsnCde'] === "46") && saveEdrState.value === false) {
+  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10" || props.param['cRsnCde'] === "80" || props.param['cRsnCde'] === "46" || props.param['cRsnCde'] === "BH") && saveEdrState.value === false) {
     ElMessage.error("请先保存申请单")
     return
   }
