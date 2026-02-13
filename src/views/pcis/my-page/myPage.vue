@@ -909,6 +909,13 @@ onBeforeUnmount(() => {
     mainContent.removeEventListener('scroll', handleScroll);
   }
 });
+onDeactivated(() => {
+	console.log('keep-alive -> onDeactivated')
+	sessionStorage.getItem('cTeamType') && sessionStorage.removeItem('cTeamType');
+});
+onUnmounted(() => {
+	sessionStorage.getItem('cTeamType') && sessionStorage.removeItem('cTeamType');
+});
 const getActualRecordType = computed(() => {
   // 优先使用 cPolicySource，如果不存在则使用 cRecordType
   return props.param.cPolicySource ?? props.param.cRecordType ?? '';
@@ -3202,6 +3209,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       console.log('缓存的数据6666',ops)
       // 暂存数据
       sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+			sessionStorage.setItem("cTeamType", res.res.cTeamType || ''); // 部门类型
     }
   }
 };
@@ -4246,7 +4254,7 @@ const validateNPrmAmlya = () => {
   }
   if(amlyaFlag()) {
     const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
-    let msg = `根据反洗钱相关规定，当前保单保费大于等于${CPrmCur === 'USD' ? '1万美元' : '5万'}，请完善客户信息中：<br/>`;
+    let msg = `根据反洗钱相关规定，当前保单保费大于等于${CPrmCur === 'USD' ? '1万美元' : '5万'}时：`;
     let flag = false;
     
     // ----------投保人------------
@@ -4269,7 +4277,7 @@ const validateNPrmAmlya = () => {
         }
       }
       if (appMsg !== '') {
-        msg += `【投保人信息】${appMsg}<br/>`;
+				msg += '投保人信息中【' + appMsg.substring(0, appMsg.length - 1) + '】不能为空。';
       }
     }
     // ----------被保人------------
@@ -4299,12 +4307,11 @@ const validateNPrmAmlya = () => {
         }
       }
       if (insuredMsg !== '') {
-        msg += `【被保人信息】${insuredMsg}<br/>`;
+				msg += '被保人信息中【' + insuredMsg.substring(0, insuredMsg.length - 1) + '】不能为空。';
       }
     }
     if (flag) {
-      msg += '字段！'
-      ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
+      ElMessage.error(msg);
       return false;
     }
   } else {
@@ -4428,7 +4435,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 	if (edramlyaFlag(EdrBaseData)) {
 		nextTick(() => {
 			const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
-			let msg = `根据反洗钱相关规定，当前批单保费变化大于等于${CPrmCur === 'USD' ? '1千美元' : '1万'}，请完善客户信息中：<br/>`;
+			let msg = `根据反洗钱相关规定，当前批单保费变化大于等于${CPrmCur === 'USD' ? '1千美元' : '1万'}时：`;
 			let flag = false;
 			let isDis = false;
 			let isMsg = false;
@@ -4450,36 +4457,43 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 				if(cAppNme != cAcctNme){
 					for (const i in edrexptArr) {
 						const objValue = edrexpDataVlue[edrexptArr[i]];
-						if (objValue === null || objValue === '' || objValue === undefined) {
-							appMsg += edrexpCnmArr[i] + '、';
-							edrexp.value.setFormItem(edrexptArr[i], {
-								rules: [getRules("required", {})],
-								hidden: false,
-								disabled: !isDis
-							});
-							flag = true;
-						}
-					}
-				} else {
-					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
-					if (objValue === null || objValue === '' || objValue === undefined) {
-						appMsg = '退保、减保或者办理保单贷款原因';
-						edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
+						appMsg += edrexpCnmArr[i] + '、';
+						edrexp.value.setFormItem(edrexptArr[i], {
 							rules: [getRules("required", {})],
 							hidden: false,
 							disabled: !isDis
 						});
 						flag = true;
 					}
+				} else {
+					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
+					appMsg = '退保、减保或者办理保单贷款原因、';
+					edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
+						rules: [getRules("required", {})],
+						hidden: false,
+						disabled: !isDis
+					});
+					edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
+						rules: [],
+						hidden: false,
+						disabled: true
+					});
+					edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
+						rules: [],
+						hidden: false,
+						disabled: true
+					});
+					edrexp.value.setValue('EdrBase.cNotBackAppRsn', null)
+					edrexp.value.setValue('EdrBase.cNotBackAppNo', null)
+					flag = true;
 				}
 				
 				if (appMsg !== '') {
-					msg += `【批改扩展信息】${appMsg}<br/>`;
+					msg += '批改扩展信息中【' + appMsg.substring(0, appMsg.length - 1) + '】不能为空。';
 				}
 			}
 			if (flag && isMsg) {
-				msg += '字段！'
-				ElMessage.error({message: msg, duration: 3000, dangerouslyUseHTMLString: true});
+				ElMessage.error(msg);
 				return false;
 			}
 		})
@@ -5588,7 +5602,7 @@ const generateEndorse = async () => {
   //   }
   // }
   // 批改原因和清单相关的需要提示先保存一下
-  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10" || props.param['cRsnCde'] === "80" || props.param['cRsnCde'] === "46") && saveEdrState.value === false) {
+  if((props.param['cRsnCde'] === "ZQ" || props.param['cRsnCde'] === "JQ" || props.param['cRsnCde'] === "10" || props.param['cRsnCde'] === "80" || props.param['cRsnCde'] === "46" || props.param['cRsnCde'] === "BH") && saveEdrState.value === false) {
     ElMessage.error("请先保存申请单")
     return
   }

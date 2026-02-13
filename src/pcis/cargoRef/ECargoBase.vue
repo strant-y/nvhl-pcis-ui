@@ -669,8 +669,7 @@ const method = {
             }
 						setValue("ECargoBase.cBrkSlsCde", data.CSlsCde);
 						// 专业代理业务通过代理业务员获取业务员信息
-						debugger
-						if (param.cTeamType === "06" && getValue("ECargoBase.cBsnsTyp") == '19002' && getValue("ECargoBase.cChaType") == '1900203' && getValue("ECargoBase.cChaSubtype") == '1900203002') {
+						if ((param.cTeamType == "06" || sessionStorage.getItem("AgreementcTeamType") == '06') && getValue("ECargoBase.cBsnsTyp") == '19002' && getValue("ECargoBase.cChaType") == '1900203' && getValue("ECargoBase.cChaSubtype") == '1900203002') {
 							setFormItem("ECargoBase.cSlsId", {disabled: false,btnItems: {disabled: false}});
 							setFormItem("ECargoBase.cIntroSalecde", {btnItems: {disabled: false}});
 							setValue("ECargoBase.cSlsId", null); // 业务员员工号
