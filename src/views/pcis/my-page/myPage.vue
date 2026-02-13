@@ -909,6 +909,13 @@ onBeforeUnmount(() => {
     mainContent.removeEventListener('scroll', handleScroll);
   }
 });
+onDeactivated(() => {
+	console.log('keep-alive -> onDeactivated')
+	sessionStorage.getItem('cTeamType') && sessionStorage.removeItem('cTeamType');
+});
+onUnmounted(() => {
+	sessionStorage.getItem('cTeamType') && sessionStorage.removeItem('cTeamType');
+});
 const getActualRecordType = computed(() => {
   // 优先使用 cPolicySource，如果不存在则使用 cRecordType
   return props.param.cPolicySource ?? props.param.cRecordType ?? '';
@@ -3202,6 +3209,7 @@ const loadAppPlyInfo = async (CAppNo) => {
       console.log('缓存的数据6666',ops)
       // 暂存数据
       sessionStorage.setItem("getAppPolicyData", JSON.stringify(ops));
+			sessionStorage.setItem("cTeamType", res.res.cTeamType || ''); // 部门类型
     }
   }
 };

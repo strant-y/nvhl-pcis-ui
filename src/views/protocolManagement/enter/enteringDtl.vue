@@ -463,6 +463,14 @@ onBeforeMount(async () => {
 
 onMounted(() => {
 });
+
+onDeactivated(() => {
+	console.log('keep-alive -> onDeactivated')
+	sessionStorage.getItem('AgreementcTeamType') && sessionStorage.removeItem('AgreementcTeamType');
+});
+onUnmounted(() => {
+	sessionStorage.getItem('AgreementcTeamType') && sessionStorage.removeItem('AgreementcTeamType');
+});
 /**
  * 获取批改项
  * **/
@@ -1002,9 +1010,10 @@ function query() {
       });
 
 
-       // 暂存数据
-       console.log('缓存的数据',dataForm['AgreementSpecial'])
-        sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+      // 暂存数据
+      console.log('缓存的数据',dataForm['AgreementSpecial'])
+      sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+      sessionStorage.setItem("AgreementcTeamType", res.data.cTeamType || '');
     }else {
       ElMessage.error(res.msg);
     }

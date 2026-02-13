@@ -620,7 +620,7 @@ const method = {
             }
             setValue("Base.cBrkSlsCde", data.CSlsCde);
 						// 专业代理业务通过代理业务员获取业务员信息
-						if (params.cTeamType === "06" && getValue("Base.cBsnsTyp") == '19002' && getValue("Base.cChaType") == '1900203' && getValue("Base.cChaSubtype") == '1900203002') {
+						if ((params.cTeamType == "06" || sessionStorage.getItem("cTeamType") == '06') && getValue("Base.cBsnsTyp") == '19002' && getValue("Base.cChaType") == '1900203' && getValue("Base.cChaSubtype") == '1900203002') {
 							setFormItem("Base.cSlsId", {disabled: false,btnItems: {disabled: false}});
 							setFormItem("Base.cIntroSalecde", {btnItems: {disabled: false}});
 							setValue("Base.cSlsId", null); // 业务员员工号
