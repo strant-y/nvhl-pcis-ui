@@ -134,14 +134,14 @@ export class PcisQueryService {
      * 查询保费接口表
      */
     qryPrmDueList(ops: any): AxiosPromise<any> {
-      return post(`${this.qryPayFaildListUrl}`, ops)
-    }  
+        return post(`${this.qryPayFaildListUrl}`, ops)
+    }
     /**
      * 账户信息上传
      * @param ops
      */
     accountExDispose(ops: any): AxiosPromise<any> {
-      return post(`cash/accountExDispose`, ops)
+        return post(`cash/accountExDispose`, ops)
     }
     /**
      * 根据组合产品单号获取基本申请单号
@@ -466,7 +466,7 @@ export class PcisQueryService {
     queryEmpEPolicyList(ops: any): AxiosPromise<any> {
         return post(`${this.queryEmpEpolicyPolicyListUrl}`, ops)
     }
-    
+
     /**
      * 电子保单列表查询 
      * @param ops
@@ -491,7 +491,7 @@ export class PcisQueryService {
      * @returns 
      */
     downloadEPolicy(ops: any) {
-        return request.post(`${this.downloadEPolicyUrl}`,ops, {
+        return request.post(`${this.downloadEPolicyUrl}`, ops, {
             responseType: 'blob'
         });
     }
@@ -502,7 +502,8 @@ export class PcisQueryService {
      * @returns 
      */
     batchDownloadEPolicy(ops: any) {
-        return request.post(`${this.batchDownloadEPolicyUrl}`,ops, {
+        return request.post(`${this.batchDownloadEPolicyUrl}`, ops, {
+            timeout: 120000,
             responseType: 'blob'
         });
     }
@@ -647,20 +648,20 @@ export class PcisQueryService {
 
     // 消息信息 顶部导航喇叭
     getNotifyByReceiver(ops: any): AxiosPromise<any> {
-        return post(`${this.qryNotifyByReceiver}`,ops)
+        return post(`${this.qryNotifyByReceiver}`, ops)
     }
- 
+
     // 历史赔案 年度
     qryHistoryClaimYearAll(ops: any): AxiosPromise<any> {
-        return post(`${this.HistoryClaimYearAll}`,ops)
+        return post(`${this.HistoryClaimYearAll}`, ops)
     }
     // 历史赔案 年度明细
     qryHistoryClaimYearDetail(ops: any): AxiosPromise<any> {
-        return post(`${this.HistoryClaimYearDetail}`,ops)
+        return post(`${this.HistoryClaimYearDetail}`, ops)
     }
     // 历史赔案 赔案明细
     qryHistoryClaimDetail(ops: any): AxiosPromise<any> {
-        return post(`${this.HistoryClaimDetail}`,ops)
+        return post(`${this.HistoryClaimDetail}`, ops)
     }
     // 单据打印 根据单号查询详情接口
     getAppPolicy(ops: any): AxiosPromise<any> {
@@ -684,40 +685,40 @@ export class PcisQueryService {
     getTaskUrl(ops: any): AxiosPromise<any> {
         return post(`risk/getTaskUrl`, ops);
     }
-		/**
-		 * 协议号查询
-		 */
-		queryEcargoRelevancePolicy(ops: any): AxiosPromise<any> {
-			return post(`/ecargo/queryEcargoRelevancePolicy`, ops);
-		}
-		/**
-		 * 产品编码查询
-		 */
-		queryEcargoRelevancePolicyTermProd(ops: any): AxiosPromise<any> {
-			return post(`ecargo/queryEcargoRelevancePolicyTermProd`, ops);
-		}
-		/**
-		 * 被保人查询
-		 */
-		queryEcargoRelevancePolicyInsured(ops: any): AxiosPromise<any> {
-			return post(`ecargo/queryEcargoRelevancePolicyInsured`, ops);
-		}
-		/**
+    /**
+     * 协议号查询
+     */
+    queryEcargoRelevancePolicy(ops: any): AxiosPromise<any> {
+        return post(`/ecargo/queryEcargoRelevancePolicy`, ops);
+    }
+    /**
+     * 产品编码查询
+     */
+    queryEcargoRelevancePolicyTermProd(ops: any): AxiosPromise<any> {
+        return post(`ecargo/queryEcargoRelevancePolicyTermProd`, ops);
+    }
+    /**
+     * 被保人查询
+     */
+    queryEcargoRelevancePolicyInsured(ops: any): AxiosPromise<any> {
+        return post(`ecargo/queryEcargoRelevancePolicyInsured`, ops);
+    }
+    /**
      * 报停展期批改查询保单的保险止期
      */
-		getLastInsrncEndTm(ops: any): AxiosPromise<any> {
+    getLastInsrncEndTm(ops: any): AxiosPromise<any> {
         return post(`policy/getLastInsrncEndTm`, ops);
     }
-		/**
+    /**
      * 缴费通知书查询缴费期数
      */
-		getgetNTms(ops: any): AxiosPromise<any> {
-				return post(`smartbi/getNTms`, ops);
-		}
-		/**
-		 * 出单任务处理-询价-意见反馈保存
-		 */
-		inquiryFeedback(ops: any): AxiosPromise<any> {
-			return post(`policy/inquiryFeedback`, ops);
-		}
+    getgetNTms(ops: any): AxiosPromise<any> {
+        return post(`smartbi/getNTms`, ops);
+    }
+    /**
+     * 出单任务处理-询价-意见反馈保存
+     */
+    inquiryFeedback(ops: any): AxiosPromise<any> {
+        return post(`policy/inquiryFeedback`, ops);
+    }
 }
