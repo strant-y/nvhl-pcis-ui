@@ -1101,13 +1101,14 @@ const cRelatedInsuredChange = () => {
 			ElMessage.warning('请选择方案号！');
 			return false
 		}
+    const prop = route.params?.param?.cProdNo === '041007' ? 'Dist.cAssociatedGuardian' : 'Dist.cRelatedInsured';
     dialog.value?.open(
       "cRelatedInsuredModal",
       {
         type: "show",
 				data: {
 					cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"] || '',
-					selectedData: getValue("Dist.cRelatedInsured") || [],
+					selectedData: getValue(prop) || [],
 					cPlanNo: getValue('Dist.cPlanNo') || '',
 				},
         method: {
@@ -1120,8 +1121,8 @@ const cRelatedInsuredChange = () => {
 							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
 							datavalue.push(item['InsuredDist.cPkId'])
 						})
-						setValue("Dist.cRelatedInsured", datavalue);
-						setFormItem("Dist.cRelatedInsured", { loadData });
+						setValue(prop, datavalue);
+						setFormItem(prop, { loadData });
             dialog.value?.handleClose();
           },
         },
