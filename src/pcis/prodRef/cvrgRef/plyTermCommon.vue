@@ -251,7 +251,7 @@ function addAndinitData() {
   if (planDataCommon.value) {
     Object.keys(planDataCommon.value).forEach((item: any) => {
       if (item !== "m") {
-        iss.push(...item);
+        iss.push(...planDataCommon.value[item]);
       }
     });
   }

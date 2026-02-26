@@ -69,12 +69,16 @@ onMounted(() => {
   })
 
 
-  let timer = setInterval(() => {
-    setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']?.['Applicant.cAppNme'])
-    let cAcctNme = getValue('Acctinfo.cAcctNme')
-    if (cAcctNme) {
-      clearInterval(timer); //清除定时器
-    }
+	let timer = setInterval(() => {
+		if (!getValue('Acctinfo.cAcctNme')) {
+			setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']?.['Applicant.cAppNme'])
+			let cAcctNme = getValue('Acctinfo.cAcctNme')
+			if (cAcctNme) {
+				clearInterval(timer); //清除定时器
+			}
+		} else {
+			clearInterval(timer); //清除定时器
+		}
   }, 1000)
 });
 
@@ -281,8 +285,10 @@ const method = {
     const isInit = param.initFlag; // 是否初始化/回显状态
     console.log('是否初始化/回显状态', isInit);
 
-    // 自动填充账户名称为投保人姓名
-    setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'] || '');
+		// 自动填充账户名称为投保人姓名
+		if (!isInit) {
+			setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'] || '');
+		}
 
     // 规则：有银行大类值 无值→强制置灰   初始化不做处理  直连银行=1  不必填  非直连=0  必填  
     const setBankCdeStatusByCategory = (isRequired: any, isDisabled = false) => {

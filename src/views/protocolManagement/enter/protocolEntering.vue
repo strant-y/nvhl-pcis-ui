@@ -491,7 +491,8 @@ function showMethodModal() {
         const dptCde = res.body?.dptCde;
         const cDptCde = res.body?.cDptCde;
         const cDptCnm = res.body?.cDptCnm;
-        toDtl({dptCde,cDptCde,cDptCnm}, 'add', selectedPayment);
+        const cTeamType = res.body?.cTeamType;
+        toDtl({dptCde,cDptCde,cDptCnm,cTeamType}, 'add', selectedPayment);
       }
     });
 };

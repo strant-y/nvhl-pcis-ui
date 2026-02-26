@@ -463,6 +463,14 @@ onBeforeMount(async () => {
 
 onMounted(() => {
 });
+
+onDeactivated(() => {
+	console.log('keep-alive -> onDeactivated')
+	sessionStorage.getItem('AgreementcTeamType') && sessionStorage.removeItem('AgreementcTeamType');
+});
+onUnmounted(() => {
+	sessionStorage.getItem('AgreementcTeamType') && sessionStorage.removeItem('AgreementcTeamType');
+});
 /**
  * 获取批改项
  * **/
@@ -1002,9 +1010,10 @@ function query() {
       });
 
 
-       // 暂存数据
-       console.log('缓存的数据',dataForm['AgreementSpecial'])
-        sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+      // 暂存数据
+      console.log('缓存的数据',dataForm['AgreementSpecial'])
+      sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+      sessionStorage.setItem("AgreementcTeamType", res.data.cTeamType || '');
     }else {
       ElMessage.error(res.msg);
     }
@@ -1533,7 +1542,13 @@ async function  submit() {
   const isSuccess = premiumCalculation()
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
-  }
+	}
+	// 校验销售资质
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const saleQualifyCheckResult = await agreementBaseRef?.checkProdGradeChange(true, 'applyUnderwritingBtn');
+	if (!saleQualifyCheckResult) {
+			return;
+	}
   await nextTick()
   const isOk =  await save()
   if(!isOk) return
@@ -1559,7 +1574,7 @@ async function  submit() {
   const btn = getBtn("submit");
   btn.loading = true;
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+  // const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
     ...{user},
     sence:'arraigned',

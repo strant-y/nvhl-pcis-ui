@@ -697,7 +697,7 @@ function formsDataUpdate(item:any) {
       fromRef.value?.validateField(item.prop);
     }
   }
-  emits("formsDataUpdate", form);
+  emits("formsDataUpdate", form, item);
 }
 
 function getValue(key: any) {
@@ -707,7 +707,21 @@ function getValue(key: any) {
 function setValue(key: any, value: any, noupdate = false) {
   form[key] = value;
   if (!noupdate) {
-    emits("formsDataUpdate", form);
+    let item = null;
+    props.fromSchema.forEach((schema: any) => {
+    if (schema.inputtype === "rtinputgroup") {
+      schema.groupList.forEach((gkey: any) => {
+        if(gkey.prop === key){
+          item = gkey;
+        }
+      });
+    } else {
+      if(schema.prop === key){
+        item = schema;
+      }
+    }
+  });
+    emits("formsDataUpdate", form, item);
   }
 }
 

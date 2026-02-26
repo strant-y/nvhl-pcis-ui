@@ -579,6 +579,7 @@ const getDptCdeList = ()=> {
                 dptCdeList.value = data.map((item) => ({
                     value: item.cDptCde,
                     label: item.cDptCnm,
+                    cTeamType: item.cTeamType || '',
                 }));
             }
         }).catch(err => console.error(err));
@@ -602,7 +603,11 @@ const getCDptCdeList = (data: any)=> {
             cDptCdeList.value = data.map((item) => ({
                 value: item.cDptCde,
                 label: item.cDptCnm,
-            }));
+								cTeamType: item.cTeamType || '',
+						}));
+						if (formconfig1.value.cRecordType == 9) {
+							selectedItem(formconfig1.value.cDptCde)
+						}
           // 清空已选择的承保机构
           // formconfig1.value.cDptCde = "";
           // formconfig1.value.cDptCnm = "";
@@ -634,6 +639,7 @@ function selectedItem(value: any) {
     selectTreeItem.value = item;
     formconfig1.value.cDptCnm = item?.label;
     formconfig1.value.cDptCde = item?.value;
+    formconfig1.value.cTeamType = item?.cTeamType || '';
 }
 
 // 下一步
@@ -687,7 +693,7 @@ function next() {
         router.push({
           path: "/pcisapp/posite-page",
           query: {
-            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' } }),
+            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' }, dptCde: formconfig1.value?.dptCde || userStore.user.companyId }),
           },
         });
         return;
@@ -713,6 +719,9 @@ function next() {
         return
       }
       const data = formconfig1.value;
+      if(!isZGS.value && !data.dptCde) {
+        data.dptCde = userStore.user.companyId
+      }
 			if (formconfig1.value.cRenewMrk == "1") {
 				if(Object.keys(renewalComponent.value).length == 0) {
           ElMessage.error("上年保单号请点击查询！");
