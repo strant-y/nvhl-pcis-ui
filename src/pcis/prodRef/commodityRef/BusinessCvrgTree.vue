@@ -65,6 +65,12 @@ const defaultProps = {
 //   label: "name",
 //   isLeaf: "leaf",
 // };
+const props = defineProps({
+  cUndrClsCde: {
+    type: String,
+    required: false,
+  },
+})
 
 const emits = defineEmits(["ok"]);
 
@@ -101,8 +107,9 @@ function loadTree() {
   const param = {
     name: formconfig1.value.name,
     level: 1,
-		cOperId: JSON.parse(sessionStorage.getItem("user")).opCde,
-		cDptCde: JSON.parse(sessionStorage.getItem("user")).companyId,
+		cOperId: JSON.parse(sessionStorage.getItem("user") || '{}').opCde,
+		cDptCde: JSON.parse(sessionStorage.getItem("user") || '{}').companyId,
+    cUndrClsCde: props.cUndrClsCde
   };
   getProdEnableList(param).then((res: any) => {
     if (res.code === 200) {
