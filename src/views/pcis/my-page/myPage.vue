@@ -3004,7 +3004,9 @@ const loadAppPlyInfo = async (CAppNo) => {
         edrBaseDatas.value =  EdrBaseData
         console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
+          if(!res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]) {
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = ops["base"]["Base.cRatioTyp"] || "2";
+          }
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
             props.param["cEdrType"];
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
@@ -3138,7 +3140,9 @@ const loadAppPlyInfo = async (CAppNo) => {
         edrBaseDatas.value = EdrBaseData
         console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
+          if(!res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]) {
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = ops["base"]["Base.cRatioTyp"] || "2";
+          }
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
             props.param["cEdrType"];
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
