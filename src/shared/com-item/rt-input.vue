@@ -173,7 +173,11 @@
         <component :is="renderIcon(item.prefixIcon)" />
       </el-icon>
       <span v-if="item.prefix" style="vertical-align: top;">{{ item.prefix }}</span>
-      <el-text class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
+			<!-- 表格中数字也要展示成千分位格式 -->
+			<el-text v-if="item.type == 'number'" class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
+			{{vInput !== 'undefined' && vInput !== 'null' ? formatNumberForTable(vInput) : ''}}
+			</el-text>
+      <el-text v-if="item.type != 'number'" class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
         {{vInput !== 'undefined' && vInput !== 'null' ? vInput : ''}}
       </el-text>
       <!-- 添加复制图标 -->
@@ -454,6 +458,21 @@ function handleInput() {
   if(props.item?.funcBlur) {
     handleInputFlag.value = true;
   }
+}
+
+// 千分位格式化函数（安全处理 null/undefined/非数字）
+function formatNumberForTable (cellValue: any, row: any) {
+	if (cellValue == null || cellValue === '') return '';
+
+	// 尝试转为数字
+	const num = typeof cellValue === 'number' ? cellValue : parseFloat(cellValue);
+	if (isNaN(num)) return String(cellValue); // 非数字原样返回
+
+	// 使用 toLocaleString 格式化（保留原始小数位数）
+	return num.toLocaleString('en-US', {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 20 // 允许任意小数位（或按需限制）
+	});
 }
 defineExpose({
   setCustomClass,

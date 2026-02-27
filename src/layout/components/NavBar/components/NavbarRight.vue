@@ -1,15 +1,15 @@
 <template>
   <div class="flex">
     <template v-if="device !== 'mobile'">
-      <!--全屏 -->
-      <!-- <div class="setting-word" @click="downWord">
+      <!-- 操作手册 -->
+      <!-- <div class="setting-word" @click="downWord"> -->
+			<div class="setting-word" @click="view">
         <el-icon>
           <Memo />
         </el-icon>
-        操作手册
-      </div> -->
+      </div>
 
-
+      <!--全屏 -->
       <div class="setting-item" @click="toggle">
         <svg-icon :icon-class="isFullscreen ? 'fullscreen-exit' : 'fullscreen'" />
       </div>
@@ -197,6 +197,10 @@
       </div>
     </template>
   </el-dialog>
+	<el-dialog v-model="Dialogvisible" title="浏览" @close="handleCancel"
+   :width="1000" :height="500">
+      <ViewPdf ref="viewPdfData"></ViewPdf>
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, nextTick, unref } from "vue";
@@ -218,6 +222,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ElIcon } from 'element-plus'
 import { Notification } from '@element-plus/icons-vue'
+import ViewPdf from "@/views/apdfmodo/viewPdf.vue";
 const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(
   () => import("@/views/dashboard/components/shortMenuDialog.vue")
@@ -445,10 +450,34 @@ const changeDpt = () => {
   })
 }
 
-const downWord = () => {
-  let url = `/down/handBook`;
-  download(url, {}, '安责险事故预防平台操作手册.docx');
-}
+// const downWord = () => {
+//   let url = `/down/handBook`;
+//   download(url, {}, '安责险事故预防平台操作手册.docx');
+// }
+// 操作手册
+const Dialogvisible = ref(false);
+const viewPdfData = ref(null);
+const view = async () => {
+  try {
+    Dialogvisible.value = true
+    setTimeout(async () => {
+      try {
+        viewPdfData.value.fetchPdf();
+      }catch (error) {
+        console.error("浏览失败：", error);
+        ElMessage.error("浏览失败，请刷新重试");
+      }
+    }, 100);
+  } catch (error) {
+    console.log(error);
+    ElMessage.error("数据查询失败，请刷新重试");
+  }
+};
+
+/** 取消 */
+const handleCancel = () => {
+	Dialogvisible.value = false;
+};
 const formData = reactive({
   userId: userStore.user.opCde,
   oldPassword: undefined,
@@ -661,7 +690,6 @@ const initBulletinScroll = () => {
 .setting-word {
   display: inline-block;
   min-width: 40px;
-  margin-right: 10px;
   height: $navbar-height;
   line-height: $navbar-height;
   color: var(--el-text-color);
