@@ -131,21 +131,32 @@ const method = {
     // 新增行前计算剩余比例
     const remaining = (1 - totalCiShare).toFixed(8);
     const cChiefMrk = ['1', '3', '5'].includes(cCiMrkFlag) ? '1' : '0';
-    // const cSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
+    const cSlsCde = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cSlsId')
     if (dataList.length == 0) {
+      // 联保机构、出单机构 转 级联组件初始化
+      const dptList = [];
+      if (param['dptCde']) {
+        dptList.push(param['dptCde']);
+        if (param['cDptCde']) {
+          dptList.push(param['cDptCde']);
+        }
+      }
       freeEditRef?.value?.addRowByData({
         'Ci.nSeqNo': dataList.length + 1,
         'Ci.nPlyFeeRate': '0.00',
         'Ci.nPlyFee': '0.00',
         'Ci.nComm': '0.00',
-        'Ci.cSlsId': "",
+        'Ci.cSlsId': cSlsCde || "",
         "Ci.cBrkrCde": "",
         "Ci.cBrkSlsCde": "",
         'Ci.cChiefMrk': '',
         'Ci.cCoinsurerCde': '327001',
         'Ci.cCiSubComp': param.dptCde,
         'Ci.cDptCde': param.cDptCde,
+        'dptCascader': dptList,
       });
+      // 业务员加载
+      slsCodeListLoad(getFromValue()[0]);
     } else {
       const param = opertaor.getParam();
       freeEditRef?.value?.addRowByData({
