@@ -13,7 +13,7 @@
                   </a>
 
                   <template v-if="effectiveShowConf.showPlanNo">
-                    <span style="color: var(--el-text-color); margin-right: 3px;">
+                    <span style="color: var(--el-text-color); margin-right: 3px;white-space: nowrap;">
                       {{termdata['Term.cPlanNo']}}方案
                     </span>
                   </template>
