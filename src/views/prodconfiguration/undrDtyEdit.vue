@@ -72,14 +72,14 @@ const formconfig = reactive<AppFreeEditConfig>(
           if (!isValid) return false;
           dzmodal.open(BusinessCvrgTree, {cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde")}).then((res:any) => {
             if (res.type == "ok") {
-              const selectObj = res.body;
+              const selectObj = res.body?.filter((item:any) => item.parentCode);
               selectObj.forEach((item, index) => {
                 gridEditRef.value?.addRowByData({
                   cProdNo: item.code,
                   cProdNme: item.value,
                   cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde"),
                   cKindNo: item.parentCode,
-                  // cStatus: "0",
+                  cStatus: "1",
                 });
               });
               console.log("子组件传过来的值", res);
