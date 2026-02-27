@@ -597,8 +597,8 @@ onMounted(async () => {
         }
       }
     }
-    // 020018 运输范围省内运输时省份必填 车龄根据初登日期自动算出
-    if(params?.cProdNo === '020018') {
+		// 020018/020014 运输范围省内运输时省份必填 车龄根据初登日期自动算出
+    if(params?.cProdNo === '020018' || params?.cProdNo === '020014') {
       if(item.prop === 'Dist.cTransportScope') {
         item.func = (val:any) => {
           if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
