@@ -877,6 +877,7 @@ const method = {
   },
   // 联共保信息导入
   importCi: () => {
+    const btn:any = formconfig1.titleBtns?.find((item:any) => item.id === "importExcelCi") || {};
     let cappNo = '';
     const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
@@ -895,6 +896,7 @@ const method = {
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
     input.onchange = () => {
+      btn.loading = true
       if (input.files?.length) {
         const file = input.files[0];
         const reader = new FileReader();
@@ -916,25 +918,37 @@ const method = {
             if (res.code === 200) {
               const ciDataLength = opertaor.getTableRefByKey("ci")?.getFromValue()?.length || 0;
               res.data?.successList?.forEach((item:any, index:number) => {
-                freeEditRef?.value?.addRowByData({
+                const rowData = {
                   ...item,
                   'Ci.nSeqNo': ciDataLength + (index + 1)
-                })
+                }
+                if(item['Ci.cCiSubComp'] && item['Ci.cDptCde']) {
+                  rowData['dptCascader'] = [item['Ci.cCiSubComp'], item['Ci.cDptCde']]
+                }
+                if(parseFloat(item['Ci.nCiShare']) > 0) {
+                  rowData['Ci.nCiShare'] = parseFloat(item['Ci.nCiShare'])/100
+                }
+                freeEditRef?.value?.addRowByData(rowData)
               })
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
+            btn.loading = false
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
             console.error("导入错误：", error);
+            btn.loading = false
           });
         };
 
         reader.onerror = (e) => {
           console.error("文件读取失败", e);
           ElMessage.error("文件读取失败");
+          btn.loading = false
         };
         reader.readAsDataURL(file); // 启动读取
+      } else {
+        btn.loading = false
       }
     };
     input.click(); // 触发文件选择对话框
