@@ -197,10 +197,7 @@
       </div>
     </template>
   </el-dialog>
-	<el-dialog v-model="Dialogvisible" title="浏览" @close="handleCancel"
-   :width="1000" :height="500">
-      <ViewPdf ref="viewPdfData"></ViewPdf>
-  </el-dialog>
+  <ViewPdf ref="pdfDialogRef"></ViewPdf>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, nextTick, unref } from "vue";
@@ -222,6 +219,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ElIcon } from 'element-plus'
 import { Notification } from '@element-plus/icons-vue'
+import { viewManual } from "@/api/prod";
 import ViewPdf from "@/views/apdfmodo/viewPdf.vue";
 const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(
@@ -271,6 +269,7 @@ const loadMore = () => {
   loadData()
 };
 
+const pdfDialogRef = ref(null);
 onMounted(() => {
   selectDpt.value = user.companyId;
   dptList.value = user.opOrgs;
@@ -282,7 +281,13 @@ onMounted(() => {
     showChangeDpt.value = false;
   }
   loadData()
-  getShortMenuList()
+	getShortMenuList()
+	nextTick(() => {
+    if (pdfDialogRef.value) {
+      // 调用 preload：静默执行，成功则存缓存，失败也不报错
+      pdfDialogRef.value.preload(() => viewManual());
+    }
+  });
 });
 
 
@@ -455,29 +460,15 @@ const changeDpt = () => {
 //   download(url, {}, '安责险事故预防平台操作手册.docx');
 // }
 // 操作手册
-const Dialogvisible = ref(false);
-const viewPdfData = ref(null);
 const view = async () => {
-  try {
-    Dialogvisible.value = true
-    setTimeout(async () => {
-      try {
-        viewPdfData.value.fetchPdf();
-      }catch (error) {
-        console.error("浏览失败：", error);
-        ElMessage.error("浏览失败，请刷新重试");
-      }
-    }, 100);
-  } catch (error) {
-    console.log(error);
-    ElMessage.error("数据查询失败，请刷新重试");
+  if (pdfDialogRef.value) {
+    // 调用 open 方法
+    // 如果预加载成功，这里会瞬间打开并显示 PDF
+    // 如果预加载失败或没做，这里会打开 Dialog 并显示 Loading 然后请求
+    await pdfDialogRef.value.open(() => viewManual());
   }
 };
 
-/** 取消 */
-const handleCancel = () => {
-	Dialogvisible.value = false;
-};
 const formData = reactive({
   userId: userStore.user.opCde,
   oldPassword: undefined,

@@ -16,6 +16,7 @@ import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
 import { syncDist, selectDist, checkAppBase, queryNrmbAmt, getProductTemplate} from "@/api/prod";
 import { productListA, productListB, productListC, cIntegrityStatementData, guaranteeTypeMap } from "./productList";
+import Decimal from "decimal.js";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
@@ -263,6 +264,15 @@ onMounted(async () => {
   // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
   if(params.cProdNo === '059902') {
     method.getcGuaranteeMethodChange('');
+	}
+	// 019904  089031 农户缴费比例大于等于2%
+  if(params.cProdNo === '019904' || params.cProdNo === '089031') {
+    setFormItem("Tgt.nCentralSubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nCentralSubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nProvincialSubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nProvincialSubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nCitySubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nCitySubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nCountySubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nCountySubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nOtherSubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nOtherSubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nFarmerPaymentRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nFarmerPaymentRate'), trigger: 'blur' }, getRules("farmerPaymentRateRule", {})],});
   }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
@@ -2208,6 +2218,66 @@ const method = {
         },
       }, { width: 45 });
   },
+};
+
+const subsidyFields = [
+  { key: 'Tgt.nCentralSubsidyRate', label: '中央财政补贴比例' },
+  { key: 'Tgt.nProvincialSubsidyRate', label: '省财政补贴比例' },
+  { key: 'Tgt.nCitySubsidyRate', label: '地市财政补贴比例' },
+  { key: 'Tgt.nCountySubsidyRate', label: '县(区)补贴比例' },
+  { key: 'Tgt.nOtherSubsidyRate', label: '其他补贴比例' },
+  { key: 'Tgt.nFarmerPaymentRate', label: '农户缴费比例' }
+];
+// 019904  089031产品六个比例之和为100%
+const createSumValidator = (currentFieldKey) => {
+  return (rule, value, callback) => {
+		// 辅助函数：获取值并转为 Decimal
+    const getDataValue = (key) => {
+      let val = getValue(key);
+      clearValidate(key)
+      if (val === '' || val === null || val === undefined) return null;
+      
+      const num = new Decimal(val);
+      if (num.isNaN()) return null;
+      
+      return num;
+    };
+
+    const values = [];
+    let hasEmpty = false;
+
+    for (let field of subsidyFields) {
+      const rawVal = getDataValue(field.key);
+      
+      if (rawVal === null) {
+        hasEmpty = true;
+        break;
+      }
+
+      // 【核心逻辑】：
+      // 1. times(100): 将前端的小数 (0.2) 转为百分比数值 (20)
+      // 2. 不做任何 toDecimalPlaces 处理，保留原始精度
+      const percentVal = rawVal.times(100);
+      
+      values.push(percentVal);
+    }
+
+    // 如果有空值，跳过校验
+    if (hasEmpty) {
+      return callback();
+    }
+
+    // D. 计算总和 (纯累加，无精度截断)
+    const sum = values.reduce((acc, curr) => acc.plus(curr), new Decimal(0));
+
+    // E. 严格判断是否等于 100
+    // Decimal 的 equals 方法会进行精确比较
+    if (!sum.equals(100)) {
+      return callback(new Error(`所有比例之和必须严格等于 100%。当前计算总和为 ${sum.toNumber()}%`));
+    }
+
+    return callback();
+  };
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {
