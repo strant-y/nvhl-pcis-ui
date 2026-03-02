@@ -548,7 +548,7 @@ import {
 	queryEcargoRelevancePolicyDetails,
 	enquiryToAppEndorseChange
 } from "../../../api/query/index";
-import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange, getNewSysDays, checkCdeptByCdptCde } from "@/api/prod";
+import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange, getNewSysDays, checkCdeptByCdptCde, getOaTermination, checkTgtEmployeeNumber  } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
 import moment from "moment";
 import {numAdd} from "@/utils/Math";
@@ -3004,7 +3004,9 @@ const loadAppPlyInfo = async (CAppNo) => {
         edrBaseDatas.value =  EdrBaseData
         console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
+          if(!res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]) {
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = ops["base"]["Base.cRatioTyp"] || "2";
+          }
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
             props.param["cEdrType"];
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
@@ -3138,7 +3140,9 @@ const loadAppPlyInfo = async (CAppNo) => {
         edrBaseDatas.value = EdrBaseData
         console.log("edrBaseDatas",edrBaseDatas.value)
         if ("EDR_APP_NEW_SCENE" === props.param.pageType) {
-          res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = "2";
+          if(!res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"]) {
+            res["res"]["composition"]["EdrBase"][0]["EdrBase.cRatioTyp"] = ops["base"]["Base.cRatioTyp"] || "2";
+          }
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrType"] =
             props.param["cEdrType"];
           res["res"]["composition"]["EdrBase"][0]["EdrBase.cEdrRsnBundleCde"] =
@@ -3920,6 +3924,21 @@ const submitToUndrFn = async () => {
   // 反洗钱校验
   if (!validateNPrmAmlya()) {
     return;
+  }
+
+  // 雇主移动端，江苏万人风电保单，申请核保时校验雇员清单
+  const CPrjCtgTyp = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cPrjCtgTyp'];
+  const CPrjCtgSubTyp = opertaor.getTableRefByKey("plyBase").getFromValue()['Base.cPrjCtgSubTyp'];
+  const subSidiary = props.param.dptCde;// 分公司机构代码
+  if (props.param?.cProdNo == '040002' && subSidiary == '0232010000000' && '12400008' == CPrjCtgTyp && ('32400015' == CPrjCtgSubTyp || '32400016' == CPrjCtgSubTyp)) {
+    const getOaTerminationResult:any = await getOaTermination({cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")})
+    if(getOaTerminationResult?.msg == '0') {
+      const checkTgtEmployeeNumberResult:any = await checkTgtEmployeeNumber({ cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo"), tgtNum: opertaor.getTableRefByKey("tgt").getValue("Tgt.nInsuredEmployees") })
+      if(checkTgtEmployeeNumberResult?.code !== 200) {
+        ElMessage.error(checkTgtEmployeeNumberResult.msg);
+        return;
+      }
+    }
   }
   const f = await savePlyInfo(); // 提交核保,需要默认执行一次保存操作
   if (f) {

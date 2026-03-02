@@ -597,8 +597,8 @@ onMounted(async () => {
         }
       }
     }
-    // 020018 运输范围省内运输时省份必填 车龄根据初登日期自动算出
-    if(params?.cProdNo === '020018') {
+		// 020018/020014 运输范围省内运输时省份必填 车龄根据初登日期自动算出
+    if(params?.cProdNo === '020018' || params?.cProdNo === '020014') {
       if(item.prop === 'Dist.cTransportScope') {
         item.func = (val:any) => {
           if(val === "Transport02001802") {// 省内运输 省份/直辖市必填
@@ -1101,13 +1101,14 @@ const cRelatedInsuredChange = () => {
 			ElMessage.warning('请选择方案号！');
 			return false
 		}
+    const prop = route.params?.param?.cProdNo === '041007' ? 'Dist.cAssociatedGuardian' : 'Dist.cRelatedInsured';
     dialog.value?.open(
       "cRelatedInsuredModal",
       {
         type: "show",
 				data: {
 					cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"] || '',
-					selectedData: getValue("Dist.cRelatedInsured") || [],
+					selectedData: getValue(prop) || [],
 					cPlanNo: getValue('Dist.cPlanNo') || '',
 				},
         method: {
@@ -1120,8 +1121,8 @@ const cRelatedInsuredChange = () => {
 							loadData.push({ label: item['InsuredDist.cInsuredNme'], value: item['InsuredDist.cPkId'] })
 							datavalue.push(item['InsuredDist.cPkId'])
 						})
-						setValue("Dist.cRelatedInsured", datavalue);
-						setFormItem("Dist.cRelatedInsured", { loadData });
+						setValue(prop, datavalue);
+						setFormItem(prop, { loadData });
             dialog.value?.handleClose();
           },
         },

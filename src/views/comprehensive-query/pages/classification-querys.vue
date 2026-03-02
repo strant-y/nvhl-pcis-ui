@@ -2297,6 +2297,7 @@ async function queryAE( flag?: boolean, isEs = false) {
     console.log('param----------', param);
     if(isEs) {
         setFormItem('cQueryStr',{btnItems: {loading: true}})
+				ElMessage.success({ message: "全文搜索功能仅支持查询已落地的保单，暂不包含暂存单。", duration: 1000 });
     } else {
         formconfig1.endBtns[0].loading = true
     }
@@ -2440,6 +2441,7 @@ async function queryI(flag?: boolean, isEs = false) {
     }
     if(isEs) {
         setFormItem('cQueryStr',{btnItems: {loading: true}})
+				ElMessage.success({ message: "全文搜索功能仅支持查询已落地的保单，暂不包含暂存单。", duration: 1000 });
     } else {
         formconfig1.endBtns[0].loading = true
     }

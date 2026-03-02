@@ -1,15 +1,15 @@
 <template>
   <div class="flex">
     <template v-if="device !== 'mobile'">
-      <!--全屏 -->
-      <!-- <div class="setting-word" @click="downWord">
+      <!-- 操作手册 -->
+      <!-- <div class="setting-word" @click="downWord"> -->
+			<div class="setting-word" @click="view">
         <el-icon>
           <Memo />
         </el-icon>
-        操作手册
-      </div> -->
+      </div>
 
-
+      <!--全屏 -->
       <div class="setting-item" @click="toggle">
         <svg-icon :icon-class="isFullscreen ? 'fullscreen-exit' : 'fullscreen'" />
       </div>
@@ -197,6 +197,7 @@
       </div>
     </template>
   </el-dialog>
+  <ViewPdf ref="pdfDialogRef"></ViewPdf>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, nextTick, unref } from "vue";
@@ -218,6 +219,8 @@ import { useRouter, useRoute } from "vue-router";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { ElIcon } from 'element-plus'
 import { Notification } from '@element-plus/icons-vue'
+import { viewManual } from "@/api/prod";
+import ViewPdf from "@/views/apdfmodo/viewPdf.vue";
 const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(
   () => import("@/views/dashboard/components/shortMenuDialog.vue")
@@ -266,6 +269,7 @@ const loadMore = () => {
   loadData()
 };
 
+const pdfDialogRef = ref(null);
 onMounted(() => {
   selectDpt.value = user.companyId;
   dptList.value = user.opOrgs;
@@ -277,7 +281,13 @@ onMounted(() => {
     showChangeDpt.value = false;
   }
   loadData()
-  getShortMenuList()
+	getShortMenuList()
+	nextTick(() => {
+    if (pdfDialogRef.value) {
+      // 调用 preload：静默执行，成功则存缓存，失败也不报错
+      pdfDialogRef.value.preload(() => viewManual());
+    }
+  });
 });
 
 
@@ -445,10 +455,20 @@ const changeDpt = () => {
   })
 }
 
-const downWord = () => {
-  let url = `/down/handBook`;
-  download(url, {}, '安责险事故预防平台操作手册.docx');
-}
+// const downWord = () => {
+//   let url = `/down/handBook`;
+//   download(url, {}, '安责险事故预防平台操作手册.docx');
+// }
+// 操作手册
+const view = async () => {
+  if (pdfDialogRef.value) {
+    // 调用 open 方法
+    // 如果预加载成功，这里会瞬间打开并显示 PDF
+    // 如果预加载失败或没做，这里会打开 Dialog 并显示 Loading 然后请求
+    await pdfDialogRef.value.open(() => viewManual());
+  }
+};
+
 const formData = reactive({
   userId: userStore.user.opCde,
   oldPassword: undefined,
@@ -661,7 +681,6 @@ const initBulletinScroll = () => {
 .setting-word {
   display: inline-block;
   min-width: 40px;
-  margin-right: 10px;
   height: $navbar-height;
   line-height: $navbar-height;
   color: var(--el-text-color);

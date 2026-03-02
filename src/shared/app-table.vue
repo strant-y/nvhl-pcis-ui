@@ -89,15 +89,17 @@
             <slot :name="slotName" v-bind="slotData" />
           </template>
         </rttable>
-        <el-pagination
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          layout="total, prev, pager, next, jumper"
-          :total="pageresult.total"
-          v-if="tableConfig.isPage && pageresult.total > 0"
-          @size-change="pageChange"
-          @current-change="pageChange"
-        />
+        <el-config-provider :locale="enLocale">
+          <el-pagination
+            v-model:current-page="queryParams.pageNum"
+            v-model:page-size="queryParams.pageSize"
+            layout="total, prev, pager, next, jumper"
+            :total="pageresult.total"
+            v-if="tableConfig.isPage && pageresult.total > 0"
+            @size-change="pageChange"
+            @current-change="pageChange"
+          />
+        </el-config-provider>
         <div
           style="margin-top: 20px"
           :style="{ textAlign: tableConfig.endBtnsPosition }"
@@ -117,11 +119,13 @@ import { AppGridEditConfig } from "./app-grid-edit-config";
 import { AppTableConfig } from "./app-table-config";
 import { ref, reactive, defineEmits, defineProps, onMounted, watch } from "vue";
 import { dynamicFormMethod } from "./dynamic-form-config";
+import zhCn from "element-plus/es/locale/lang/zh-cn";
 
 defineOptions({
   name: "AppTable",
   inheritAttrs: false,
 });
+const enLocale = zhCn;
 const codeListMap = ref<any>({});
 const customMap = ref<any>({});
 provide('codeListMap', codeListMap.value);

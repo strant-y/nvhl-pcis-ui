@@ -1706,3 +1706,16 @@ export function getCompareAppFeeInfo(queryParams: any): AxiosPromise<any> {
 export function checkProdGrade(queryParams: any): AxiosPromise<any> {
   return post(`/policy/checkProdGrade`, queryParams);
 }
+
+/* 操作手册详情*/
+export function viewManual(): AxiosPromise<any> {
+	return post(`/proddef/viewManual`, {}, { responseType: 'blob' });
+}
+
+export function getOaTermination(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/getOaTermination`, queryParams);
+}
+
+export function checkTgtEmployeeNumber(queryParams: any): AxiosPromise<any> {
+  return post(`/policy/checkTgtEmployeeNumber`, queryParams);
+}
