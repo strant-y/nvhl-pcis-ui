@@ -1969,12 +1969,12 @@ const methodMap = {
       { title: "选择保单号", width: 50 }
     );
   },
-  excludeLimitChang:(val:any,row:any,item:any) => {
-    if (pageparam.cProdNo === "040015") {
-      termdata.value['Term.nInsuranceAmount'] = val;
-    }
-    update();
-  },
+  // excludeLimitChang:(val:any,row:any,item:any) => {
+  //   if (pageparam.cProdNo === "040015") {
+  //     termdata.value['Term.nInsuranceAmount'] = val;
+  //   }
+  //   update();
+  // },
   unifiedPremiumChange: (val: any) => {
     if (pageparam.cProdNo === "040006") {
       termFactormap.value.forEach((item: any) => {
