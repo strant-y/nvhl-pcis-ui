@@ -249,18 +249,6 @@ onMounted(async () => {
     rules: [getRules("phoneNo", {})],
   });
   selectType()
-  // 020019、020020、020021三款产品标的信息全部非必填
-  if(['020019','020020','020021'].includes(params.cProdNo)) {
-    formconfig11.fromSchema?.forEach((item:any) => {
-      if(item.rules?.length > 0) {
-        item.rules.forEach((i:any, index:any) => {
-          if(i.required === true) {
-            item.rules.splice(index, 1)
-          }
-        })
-      }
-    })
-  }
   // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
   if(params.cProdNo === '059902') {
     method.getcGuaranteeMethodChange('');

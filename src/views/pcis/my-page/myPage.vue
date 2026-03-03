@@ -3767,7 +3767,24 @@ const submitToUndrFn = async () => {
         return false;
       }
     }
-  }
+	}
+	// 040015 保障信息-非单独承保污染责任情况-除污染责任外的累计赔偿限额和累计赔偿限额二选一必填
+	if(props.param.cProdNo === '040015') {
+		if (cvrgList && cvrgList.length > 0) {
+			const has040173 = cvrgList[0]['Term.riskList'].some(i => i['TermRisktgt.cLiabCode'] == '040173');
+  		const hasOthers = cvrgList[0]['Term.riskList'].length > 1;
+
+			if (has040173 && hasOthers) {
+				const v1 = cvrgList[0]['Term.nExcludeLimit'];
+				const v2 = cvrgList[0]['Term.nInsuranceAmount'];
+				// 简单判空：如果都是 falsy (null, undefined, '') 且不是数字0
+				if ((!v1 && v1 !== 0) && (!v2 && v2 !== 0)) {
+					ElMessage.error('保障信息中【除污染责任外的累计赔偿限额】和【累计赔偿限额】二选一必填！');
+					return false;
+				}
+			}
+		}
+	}
   // 定义cInquiryNumber 和 cAppNo；
   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
