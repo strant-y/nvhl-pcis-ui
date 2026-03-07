@@ -4494,28 +4494,36 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 					for (const i in edrexptArr) {
 						const objValue = edrexpDataVlue[edrexptArr[i]];
 						appMsg += edrexpCnmArr[i] + '、';
-						edrexp.value.setFormItem(edrexptArr[i], {
-							rules: [getRules("required", {})],
-							hidden: false,
-							disabled: !isDis
-						});
+						if (edrexptArr[i] == 'EdrBase.cNotBackAppNo') {
+							edrexp.value.setFormItem(edrexptArr[i], {
+								rules: [getRules("required", {}),getRules("maxLength", {len:50})],
+								hidden: false,
+								disabled: !isDis
+							});
+						} else {
+							edrexp.value.setFormItem(edrexptArr[i], {
+								rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
+								hidden: false,
+								disabled: !isDis
+							});
+						}
 						flag = true;
 					}
 				} else {
 					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
 					appMsg = '退保、减保或者办理保单贷款原因、';
 					edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-						rules: [getRules("required", {})],
+						rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
 						hidden: false,
 						disabled: !isDis
 					});
 					edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-						rules: [],
+						rules: [getRules("maxLength", {len:2000})],
 						hidden: false,
 						disabled: true
 					});
 					edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-						rules: [],
+						rules: [getRules("maxLength", {len:50})],
 						hidden: false,
 						disabled: true
 					});
@@ -4536,13 +4544,13 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
   } else {
     if(edrexp.value) {
       edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-        rules: [],
+        rules: [getRules("maxLength", {len:2000})],
       });
       edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-        rules: [],
+        rules: [getRules("maxLength", {len:2000})],
       });
       edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-        rules: [],
+        rules: [getRules("maxLength", {len:50})],
       });
     }
   }

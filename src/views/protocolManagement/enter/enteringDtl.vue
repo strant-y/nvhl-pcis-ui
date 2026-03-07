@@ -1,6 +1,6 @@
 <!-- ECargo协议录入-->
 <template>
-  <detail-component :bth-list="bthList" :page-type =props.type :page-way=props.way  ref="mainRef" />
+  <detail-component :bth-list="bthList" :page-type =props.type :page-way=props.way :page-param="props.param"  ref="mainRef" />
 </template>
 <script setup lang="ts">
 import cargoApi from '@/api/cargo';
@@ -113,13 +113,15 @@ const uwBtn = [
         if (isValid) {
           const user = JSON.parse(sessionStorage.getItem("user"));
           let param = mainRef.value?.getUnderwriteValue()
-          let sence = param.cUndrMrk === 'A' ? 'audit' : 'bounced'
+					let sence = param.cUndrMrk
+					let taskId = props.param.curtTask || null;
           if(props.param?.cAppTyp === 'A'){
             cargoApi.save({
               ...param,
               cEcAgrAppNo:props?.param?.cEcAgrAppNo,
               ...{user},
-              sence
+							sence,
+							taskId,
             }).then((res: any) => {
               if(res.code === 200) {
                 ElMessage.success(res.msg)

@@ -74,8 +74,18 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 import { codeListViewStore } from "@/store";
 import { DocumentCopy } from "@element-plus/icons-vue";
 import cargoApi from '@/api/cargo'
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
 
+const {
+  getBaseInfoByAppNo,
+  getBackUdrList,
+  getNewUdrList,
+  removeReceived,
+  checkEdrPocly,
+  hasReceived,
+  getAppTask,
+} = NewUdrListService();
 const policyService = new PolicyService();
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: "", opCde: "" });
@@ -101,6 +111,10 @@ const appStatusOptions = ref([
   { label: "见费出单退回", value: "8" },
 ])
 const departmentTree = defineAsyncComponent(() => import("@/pcis/prodRef/commodityRef/DepartmentTree.vue"))
+// 任务痕迹列表 弹框页面
+const TaskListVestige = defineAsyncComponent(
+  () => import("../../pcis-new-udr-list/common/TaskListVestige.vue")
+);
 const queryLoading = ref(false); // 控制按钮 loading 图标
 const formconfig1 = reactive<AppFreeEditConfig>(
     createAppFreeEditConfig({
@@ -125,7 +139,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 							cEcAgrAppNo: "",
 							cEcAgrNo: "",
               cAppNme: "",
-              insuredNme: "",
+							insuredNme: "",
+							udrType: "1",
               Tm: [
                 moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
 								moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
@@ -145,7 +160,20 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         }),
       ],
-      fromSchema: [
+			fromSchema: [
+				{
+					prop: "udrType",
+					inputtype: "rtSelectV2",
+					title: "单据状态",
+					minWidth: 180,
+					loadData: [
+						{ label: "待核保任务", value: "1" },
+						{ label: "暂存任务", value: "2" },
+						{ label: "已上报任务", value: "3" },
+						{ label: "核保退回任务", value: "4" },
+						{ label: "核保通过任务", value: "5" },
+					],
+				},
         {
           prop: "cDptCde",
           inputtype: "rtselect",
@@ -297,22 +325,175 @@ const pageresult = reactive<Pageresult>({
   total: 0,
 });
 
+const tableBtns = [
+	createFreeButtonBase({
+		id: "score",
+		link: true,
+		tooltip: "接收",
+		type: "info",
+		size: "large",
+		icon: "Message",
+		iconSize: "25",
+		hidden: true,
+		tableClick: (row) => {
+			//待核保任务 接收
+			handleWorkFlow(row, "handleReceived");
+		},
+	}),
+	createFreeButtonBase({
+		id: "score",
+		link: true,
+		tooltip: "修改",
+		type: "success",
+		size: "large",
+		icon: "Edit",
+		iconSize: "25",
+		hideBtns: (row: any) => {
+			if (row.udrType === "2") {
+				return false;
+			} else {
+				return true;
+			}
+		},
+		tableClick: (row) => {
+			console.log(row);
+			if (row.state == "1") toDtl({ ...row, sence:'app' }, 'audit');
+		},
+	}),
+	createFreeButtonBase({
+		id: "score",
+		link: true,
+		tooltip: "取消接收",
+		type: "info",
+		size: "large",
+		icon: "Release",
+		iconSize: "25",
+		hideBtns: (row: any) => {
+			if (row.udrType === "2") {
+				return false;
+			} else {
+				return true;
+			}
+		},
+		tableClick: (row) => {
+			handleWorkFlow(row, "removeReceived");
+		},
+	}),
+	createFreeButtonBase({
+		id: "score",
+		link: true,
+		tooltip: "撤回",
+		type: "danger",
+		size: "large",
+		icon: "return",
+		iconSize: "25",
+		hideBtns: (row: any) => {
+			// if (row.udrType === "3" && !!row.curtTask) {
+				// return false;
+			// } else {
+				return true;
+			// }
+		},
+		tableClick: (row) => {
+			// showDetails(row)
+			const res = {};
+			res["cUndrMrk"] = "W";
+			res["undrMrk"] = "W";
+			res["user"] = JSON.parse(sessionStorage.getItem("user"));
+			res["user"]["opRelCde"] = "10030892";
+			res["appNo"] = row.cEcAgrAppNo;
+			res["taskId"] = row.curtTask;
+			res["appTyp"] = row.cAppTyp;
+			res["cAntiLnderRisk"] = "0"; //关联交易确认
+			res["cIsTransaction"] = "0"; //反洗钱风险
+			res["CRiBesprakMrk"] = "0"; // 预约分保标志
+			res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
+			res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
+			res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
+				"userName"
+			]; // 退回指定核保人员名称
+			let submitUnder;
+			submitUnder = submitUnderwriting(res);
+			submitUnder.then((res) => {
+				if (res["code"] == "200") {
+					ElMessage.success(res.msg);
+					handleQuery();
+				} else {
+					ElMessage.error(res.msg);
+				}
+			});
+		},
+	}),
+	createFreeButtonBase({
+		id: "score",
+		link: true,
+		tooltip: "查看",
+		type: "primary",
+		size: "large",
+		icon: "View",
+		iconSize: "25",
+		hideBtns: (row: any) => {
+			if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
+				return false;
+			} else {
+				return true;
+			}
+		},
+		tableClick: (row) => {
+			toDtl({ ...row, sence:'app' }, 'view');
+		},
+	}),
+	createFreeButtonBase({
+		id: "score",
+		link: true,
+		tooltip: "承保流程",
+		type: "danger",
+		size: "large",
+		icon: "Refresh",
+		iconSize: "25",
+		hideBtns: (row: any) => {
+			if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
+				return false;
+			} else {
+				return true;
+			}
+		},
+		tableClick: (row) => {
+			let data;
+			if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
+				data = { objId: row.objId, sysType: row.objExt };
+			} else {
+				data = {
+					objId: row.cEcAgrAppNo,
+					sysType:
+						!!row["cAppTyp"] &&
+						("A" === row["cAppTyp"] || "P" === row["cAppTyp"])
+							? "U"
+							: "E",
+				};
+			}
+			dzmodal
+				.open(TaskListVestige, { type: "Issuer", data })
+				.then((res) => {
+					if (res.type === "ok") {
+						handleQuery(true);
+					}
+				});
+		},
+	}),
+]
+
 const tableconfig = reactive<AppTableConfig>(
-    createTableEditConfig({
-      tableBtn: [
-        createFreeButtonBase({
-          id: "score",
-          link: true,
-          tooltip: "编辑",
-          type: "success",
-          size: "large",
-          icon: "Edit",
-          tableClick: (row) => {
-            console.log(row);
-            toDtl({ ...row, sence:'app' }, 'audit');
-          },
-        }),
-      ],
+	createTableEditConfig({
+			editFlag: true,
+			editList: ["cStatus"],
+			showSelection: true,
+			tableBtnType: "btn",
+			tableBtnWidth: 80,
+			fixed: true,
+			tableBtnPosition: "right",
+			rowDbClickFun:(row:any)=> rowDbClick(row),
+      tableBtn: tableBtns,
       tableBtnWidth: 95,
       tableBtnPosition: "right",
       tableBtnType: "btn",
@@ -423,6 +604,7 @@ onMounted(async () => {
 		cEcAgrNo: "",
 		cAppNme: "",
 		insuredNme: "",
+		udrType: "1",
 		Tm: [
 			moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
 			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
@@ -440,6 +622,8 @@ onMounted(async () => {
 });
 
 function toDtl(row: any, type: string) {
+	row.rightbtns = true
+	row.sysType = row.objExt
   router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
 }
 
@@ -462,7 +646,8 @@ function handleQuery(flag?: boolean) {
       const param = {
         sence: "2",// 1 协议录入 2 协议审核 3 协议批改
         ...freeEditRef.value?.getFromValue(),
-        ...tableRef.value?.getPartnerPage(flag),//获取分页数据
+				...tableRef.value?.getPartnerPage(flag),//获取分页数据
+				user: JSON.parse(sessionStorage.getItem("user")),
       };
       if(tm && tm.length > 1) {
         param.tInsrncBgnTm = tm[0]
@@ -473,7 +658,12 @@ function handleQuery(flag?: boolean) {
       cargoApi.queryEcargoList(param).then((res: any) => {
 				queryLoading.value = false;
         if (res && res.code === 200) {
-          ElMessage.success(res.msg)
+					ElMessage.success(res.msg)
+					if(param.udrType === "1") {
+						tableconfig.tableBtn = []
+					} else {
+						tableconfig.tableBtn = tableBtns
+					}
           const pageData = res.data;
           if (pageData) {
             // pageresult.list = pageData.data;
@@ -495,36 +685,64 @@ function handleQuery(flag?: boolean) {
       });
     }
   });
-  // pageresult.list = [
-  //   {
-  //     cAgreementNo: '1234567890',
-  //     cClientNo: '222',
-  //     cClientNme: '张三',
-  //     cDptCde: '0200000000000',
-  //     tEffectTm: '2025-01-01 00:00:00',
-  //     tExpireTm: '2026-01-01 00:00:00',
-  //     cStatus: '正常',
-  //     nPayBalance: 100,
-  //   },
-  //   {
-  //     cAgreementNo: '1234567890',
-  //     cClientNo: '222',
-  //     cClientNme: '张三',
-  //     cDptCde: '0200000000000',
-  //     tEffectTm: '2025-01-01 00:00:00',
-  //     tExpireTm: '2026-01-01 00:00:00',
-  //     cStatus: '正常',
-  //     nPayBalance: 100,
-  //   },
-  // ]
-  // pageresult.total = 2;
+}
+
+// 行双击事件
+function rowDbClick(row: any) {
+  if(row.udrType === "1") {// 待核保任务
+    handleWorkFlow(row, "handleReceived");
+  } else if(row.udrType === "2") {// 暂存任务
+    if (row.state == "1") {
+      toDtl({ ...row, sence:'app' }, 'audit');
+    }
+  } else if(row.udrType === "4") {// 核保退回任务
+    toDtl({ ...row, sence:'app' }, 'view');
+  } else if(row.udrType === "5") {// 核保通过任务
+    toDtl({ ...row, sence:'app' }, 'view');
+  }
+}
+
+// 工作流处理
+function handleWorkFlow(row: any, type: any) {
+  const param = {
+    taskId: row.curtTask,
+    user: user.value,
+  };
+
+  let udrData;
+  // 接收 / 取消接收
+  if (type === "handleReceived") {
+    udrData = hasReceived(param);
+  }
+  if (type === "removeReceived") udrData = removeReceived(param);
+  udrData && udrData
+      .then((result: any) => {
+        if (result.code !== 200) {
+          ElMessage.error({ message: result.msg, duration: 3000 });
+        } else {
+          if (type === "handleReceived") {
+						// 详情
+						toDtl({ ...row, sence:'app' }, 'audit');
+          }
+          if (type === "removeReceived") {
+            ElMessage.success({ message: '解除接收成功', duration: 3000 });
+            handleQuery(true);
+          }
+        }
+      })
+      .catch((error: any) => {
+        console.log("出错了", error);
+        ElMessage.error({
+          message: "后台服务异常,请联系管理员",
+          duration: 3000,
+        });
+      });
 }
 
 // 选中事件
 function handleSelectionChange(rows: any) {
   selectedRows.value = rows;
 }
-
 
 function setValue(key: string, value: any) {
   freeEditRef?.value?.setValue(key, value);
