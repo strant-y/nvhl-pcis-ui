@@ -173,6 +173,16 @@
         </div>
         <el-backtop :target="'.el-main'" :right="100" :bottom="150" />
       </el-main>
+			<div class="right-btns" v-if="pageLoaded">
+        <div class="btns-content" v-if="rightBtnList.length > 0">
+          <rt-button
+            v-for="(bth, idx) in rightBtnList"
+            :item="bth"
+            :key="idx"
+            :loading="bth.loading"
+          />
+        </div>
+      </div>
     </el-container>
 		<el-affix position="bottom">
 			<div class="bottom-items">
@@ -209,13 +219,16 @@ import {computed} from "vue";
 import { iconMap } from './iconMap';
 import {scrollByDomId} from "@/utils/common";
 import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
-
+import { createFreeButtonBase, FreeButtonBase } from "@/shared/button-config";
+import { useDzModal } from "@/common/dzmodel/DzModalService";
+const dzmodal = useDzModal();
 const props = defineProps({
   bthList: {
     type: Array,
   },
   pageType:String,
-  pageWay:String,
+	pageWay: String,
+	pageParam: Object,
 });
 let underwriteFlag = ref(false);
 const idxParam = inject(idxParamKey, useIdxParam());
@@ -246,7 +259,17 @@ const getNo = computed(() => {
   const agreementBaseRef = formPage?.getFormDataById('AgreementBase')
   return (agreementBaseRef && agreementBaseRef['ECargoBase.cEcAgrAppNo']) ? agreementBaseRef['ECargoBase.cEcAgrAppNo'] : '暂无'
 })
-onMounted(()=>{
+const pageLoaded = ref(false);
+const rightBtnList = ref<Array<FreeButtonBase>>([]);
+// 任务痕迹
+const TaskListVestige = defineAsyncComponent(
+  () => import("@/views/pcis-new-udr-list/common/TaskListVestige.vue")
+);
+// 核保信息
+const UndrOpnList = defineAsyncComponent(
+	() => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
+onMounted(() => {
   if (props.pageType === "audit") {
     underwriteFlag.value = true;
   } else {
@@ -270,8 +293,49 @@ onMounted(()=>{
 			edrbaseFlag.value =false
 			edritemFlag.value =false
 		}
-  }
-
+	}
+	if (props.pageParam.rightbtns) {
+		nextTick(() => {
+			pageLoaded.value = true;
+			rightBtnList.value = [
+				createFreeButtonBase({
+					label: "任务痕迹",
+					type: "primary",
+					id: "taskVestige",
+					// svgIcon: "track", // 使用本地图标库
+					// iconSize: "20", // 设置图标大小
+					icon: "SetUp",
+					func: () => {
+						dzmodal
+							.open(TaskListVestige, {
+								type: "Issuer",
+								data: { objId: props.pageParam?.cEcAgrAppNo, sysType: props.pageParam?.sysType },
+							})
+							.then((res: any) => {
+								if (res.type === "ok") {
+								}
+							});
+					},
+				}),
+				createFreeButtonBase({
+					label: "核保信息",
+					type: "primary",
+					id: "undrInfo",
+					// svgIcon: "Agree", // 使用本地图标库
+					// iconSize: "25", // 设置图标大小
+					icon: "DocumentChecked",
+					func: () => {
+						dzmodal
+							.open(UndrOpnList, { type: "", CAppNo: props.pageParam?.cEcAgrAppNo })
+							.then((res: any) => {
+								if (res.type === "ok") {
+								}
+							});
+					},
+				}),
+			]
+		})
+	}
 })
 // 复制申请单号
 const copyPolicyNumber = () => {
@@ -366,6 +430,16 @@ defineExpose({
 <style lang="scss" scoped>
 @import "@/styles/custom-index";
 
+$btn-icon-color-1: #ff3e00;
+$btn-icon-color-2: #0060ff;
+$btn-icon-color-3: #4500ff;
+$btn-icon-color-4: #ffb200;
+$btn-icon-color-5: #00ff31;
+$btn-icon-bg-color-1: rgb(253, 222, 212);
+$btn-icon-bg-color-2: rgb(238, 244, 254);
+$btn-icon-bg-color-3: rgb(234, 227, 253);
+$btn-icon-bg-color-4: rgb(255, 242, 212);
+$btn-icon-bg-color-5: rgb(230, 251, 234);
 .bottom-items {
   height: 45px;
   background-color: var(--rt-bg-color);
@@ -392,5 +466,83 @@ defineExpose({
 .dynamic-container {
   height: calc(100vh - $navbar-height - 60px - 90px);
   overflow: auto;
+}
+
+.right-btns {
+	// padding: 0 3rem;
+	margin: 5px 5px 0 0;
+	// min-width: calc(150px + 6rem);
+	.btns-content {
+		margin-top: 5px;
+		background: var(--rt-bg-color);
+		border: var(--rt-border);
+		padding: 10px;
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		// width: 150px;
+		:deep(.el-button) {
+			margin: 0 0 12px 0;
+			border: none;
+			background-color: transparent!important;
+			color: var(--el-text-color);
+			padding: 0;
+			.el-icon {
+				width: 32px;
+				height: 32px;
+				padding: 6px;
+				border-radius: 2px;
+				margin-right: 10px!important;
+				svg {
+					width: 20px;
+					height: 20px;
+				}
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
+			&:nth-child(5n + 1) {
+				.el-icon {
+					background-color: $btn-icon-bg-color-1;
+					svg {
+						color: $btn-icon-color-1;
+					}
+				}
+			}
+			&:nth-child(5n + 2) {
+				.el-icon {
+					background-color: $btn-icon-bg-color-2;
+					svg {
+						color: $btn-icon-color-2;
+					}
+				}
+			}
+			&:nth-child(5n + 3) {
+				.el-icon {
+					background-color: $btn-icon-bg-color-3;
+					svg {
+						color: $btn-icon-color-3;
+					}
+				}
+			}
+			&:nth-child(5n + 4) {
+				.el-icon {
+					background-color: $btn-icon-bg-color-4;
+					svg {
+						color: $btn-icon-color-4;
+					}
+				}
+			}
+			&:nth-child(5n + 5) {
+				.el-icon {
+					background-color: $btn-icon-bg-color-5;
+					svg {
+						color: $btn-icon-color-5;
+					}
+				}
+			}
+		}
+	}
 }
 </style>
