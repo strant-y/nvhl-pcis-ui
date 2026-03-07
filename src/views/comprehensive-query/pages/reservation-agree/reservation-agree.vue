@@ -96,19 +96,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
     ],
 		fromSchema: [
 			{
-				prop: "udrType",
-				inputtype: "rtSelectV2",
-				title: "单据状态",
-				minWidth: 180,
-				loadData: [
-					{ label: "待核保任务", value: "1" },
-					{ label: "暂存任务", value: "2" },
-					{ label: "已上报任务", value: "3" },
-					{ label: "核保退回任务", value: "4" },
-					{ label: "核保通过任务", value: "5" },
-				],
-			},
-			{
         prop: "cDptCde",
         inputtype: "rtselect",
         title: "归属机构名称",
@@ -245,13 +232,6 @@ const tableconfig = reactive<AppTableConfig>(
 				size: "large",
 				icon: "Refresh",
 				iconSize: "25",
-				// hideBtns: (row: any) => {
-				// 	if (row.udrType === "3" || row.udrType === "4" || row.udrType === "5") {
-				// 		return false;
-				// 	} else {
-				// 		return true;
-				// 	}
-				// },
 				tableClick: (row) => {
 					dzmodal
 						.open(UndrOpnList, { type: "", CAppNo: row.cEcAgrAppNo })
@@ -498,7 +478,6 @@ function reset (){
 	freeEditRef.value?.setFormValue({
 		cDptCde: "0200000000000",
 		cAppStatus: 4,
-		udrType: "1",
 		tAppTm: [
 			moment(new Date(Date.now() - 5 * 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 00:00:00"),
 			moment(new Date(Date.now() + 1000 * 60 * 60 * 24)).format("YYYY-MM-DD 23:59:59"),
