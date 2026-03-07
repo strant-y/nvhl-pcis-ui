@@ -64,6 +64,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cNotBackAppNo",
         inputtype: "rtinput",
         title: "反洗钱非投保人收款审批单号",
+        rules: [getRules("maxLength", {len:50})],
         disabled:true
       },
     ],
