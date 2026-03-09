@@ -1270,7 +1270,7 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
       // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
       // 退保和注销(修改后折人民币协议预收保费 + 折人民币预扣保费 - 修改前预收保费)
       if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
-        pay["ECargoPay.nPayablePrm"] = decimalMinus(new Decimal(agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)).plus(new Decimal(agreementFeeWarnData['ECargoBase.nWhRmbPrm'].toFixed(2))), edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2))
+        pay["ECargoPay.nPayablePrm"] = decimalMinus(new Decimal(agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)).plus(new Decimal(agreementFeeWarnData['ECargoBase.nWhRmbPrm']?.toFixed(2) || 0)), edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2))
       } else {
         pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
       }
