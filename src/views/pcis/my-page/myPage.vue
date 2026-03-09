@@ -971,6 +971,7 @@ const setCusBenefitInfo = (val) => {
   const baseValue = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
   const basePrmCur = opertaor.getTableRefByKey("base")?.getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
   const basePrm = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nPrm"];//承保基本信息 总保费
+	let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];
 	let msg = val == 'view' ? '查看': '录入';
 
 
@@ -1004,19 +1005,21 @@ const setCusBenefitInfo = (val) => {
     return;
   }
 	// 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
-	if(basePrmCur == "USD"){
-		if (basePrm < 10000) {
-			ElMessage.error(
-					`根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
-			);
-			return;
-		}
-	} else {
-		if (baseValue < 50000) {
-			ElMessage.error(
-					`根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
-			);
-			return;
+	if (cRsnCde && cRsnCde != 'BH') {
+		if(basePrmCur == "USD"){
+			if (basePrm < 10000) {
+				ElMessage.error(
+						`根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
+				);
+				return;
+			}
+		} else {
+			if (baseValue < 50000) {
+				ElMessage.error(
+						`根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
+				);
+				return;
+			}
 		}
 	}
 
