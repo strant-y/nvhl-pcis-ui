@@ -546,7 +546,8 @@ import {
 	isUndrClsBlackList,
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails,
-	enquiryToAppEndorseChange
+	enquiryToAppEndorseChange,
+	getBusinessType,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange, getNewSysDays, checkCdeptByCdptCde, getOaTermination, checkTgtEmployeeNumber  } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -3881,9 +3882,15 @@ const submitToUndrFn = async () => {
       totalCent += toCent(item['Pay.nPayablePrm']);
     });
     const basePrmCent = toCent(nPrm);
-    if(totalCent !== basePrmCent){
+		if (totalCent !== basePrmCent) {
+			let params = {
+				cAppNo: cAppNo
+			}
+			const BusinessType = await getBusinessType(params)
+			if (BusinessType.code != 200 || BusinessType.data.data < 1) {
         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-      return false;
+      	return false;
+			}
     }
     const lastName = payList[payList.length - 1]?.['Pay.cPayorNme'];
     const applicantName = opertaor.getTableRefByKey("applicant").getValue('Applicant.cAppNme');
@@ -4638,11 +4645,17 @@ const savePlyInfo = async () => {
       });
       const basePrmCent = toCent(res['base']['Base.nPrm']);
        if(totalCent !== basePrmCent){
-         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
+				let params = {
+					cAppNo: res["plyBase"]["Base.cAppNo"]
+				}
+				const BusinessType = await getBusinessType(params)
+				if (BusinessType.code != 200 || BusinessType.data.data < 1) {
+					ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
           if(btn) {
             btn.loading = false;
           }
-        return false;
+       		return false;
+				}
       }
   }
 
