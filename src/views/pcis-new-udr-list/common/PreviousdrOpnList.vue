@@ -301,7 +301,7 @@ function turnToDetail(cAppNo:any) {
               cTermNme: data.cTermNme,
               cPolicySource:data.cPolicySource,
               pageType: "readonly",
-              showBtn: false,
+              showBtn: true,
             })
           }
         };
