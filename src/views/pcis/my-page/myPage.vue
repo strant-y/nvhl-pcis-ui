@@ -7298,7 +7298,8 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
     if(nDpdDays.code === 200) {
       if(nDpdDays.data?.code == '1') {
         if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
-          rebackDay = nDpdDays.data?.result[0]?.cRuleValue || 0;
+          const cRuleValue = nDpdDays.data?.result[0]?.cRuleValue || 0;
+          rebackDay = cRuleValue > 0 ? cRuleValue : 0;
         }
       } else {
         ElMessage.error(nDpdDays.data?.message)
