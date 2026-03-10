@@ -1180,8 +1180,8 @@ const premiumCalculation = ()=>{
       if(props.param?.cEdrType == '3') {
         // 一般退保 修改后的预收保费不能大于原预收保费 YY
         if(props.param?.cRsnCde === 's2') {
-          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] <= 0) {
-            ElMessage.error('一般退保预收保费必须大于0！')
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] < 0) {
+            ElMessage.error('一般退保预收保费必须大于等于0！')
             return
           }
           if(allFromData.AgreementFeeWarn?.['ECargoBase.nReceivedPrm'] > pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
