@@ -163,7 +163,7 @@ onMounted(() => {
   // 组织机构代码
   // setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
   // 经常居住地校验
-  setFormItem("Insured.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+  setFormItem("Insured.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
   // 税务登记号
   // setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
   // 证件号码

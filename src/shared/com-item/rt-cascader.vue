@@ -192,8 +192,26 @@ onMounted(() => {
   if (props.item) {
     if(getCodeListMapToOption()) {
       // 优先查 codeListMap.value
-    } else if (props.item.loadData) {
-      options.value = props.item.loadData;
+		} else if (props.item.loadData) {
+			const hasCHN = props.item.loadData.some(item => item.value === 'CHN');
+
+      if (hasCHN) {
+        // 3. 只有当存在 CHN 时，才进行特殊处理
+        const processedData = props.item.loadData.map(item => {
+          // 规则：如果是 CHN，则 isLeaf = false (允许展开)
+          //       如果不是 CHN (无论是 HKG, MAC 还是其他)，则 isLeaf = true (直接选中)
+          const isLeaf = item.value !== 'CHN';
+
+          return {
+            ...item,
+            leaf: isLeaf
+          };
+        });
+        
+        options.value = processedData;
+      } else {
+        options.value = props.item.loadData;
+      }
       isDataLoaded.value = true;
     } else if (
       props.item.typeCode &&

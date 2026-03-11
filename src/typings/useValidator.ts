@@ -798,7 +798,7 @@ const farmerPaymentRateRule = () => {
       return isNull()
     }
     if(type == 'valiAddress') {
-      return valiAddress()
+      return valiAddress(param)
     }
     if(type == 'chequeNumberValidation') {
       return chequeNumberValidation()
