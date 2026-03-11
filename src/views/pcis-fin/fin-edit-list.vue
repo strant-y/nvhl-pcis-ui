@@ -63,8 +63,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				func: () => {
 					freeEditRef.value?.resetFields()
 					nextTick(() => {
-						freeEditRef.value?.setValue('tUnTmStart', startTm)
-						freeEditRef.value?.setValue('tUnTmEnd', endTm)
+						reset()
 					})
 				},
 			}),
@@ -247,23 +246,26 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
 	nextTick(() => {
-
-		console.log( JSON.parse(sessionStorage.getItem("user")))
-		let user = JSON.parse(sessionStorage.getItem("user"))
-		freeEditRef.value?.setValue('tUnTmStart', startTm)
-		freeEditRef.value?.setValue('tUnTmEnd', endTm)
-		  setFormItem("cDptCde", {
-				loadData: [
-				{
-					label: user.companyId + user.companyCnm ,
-					value: user.companyId,
-				},
-				],
-			});
-
-			setValue('cDptCde',user.companyId)
+		reset()
 	})
 });
+
+const reset = () => {
+	console.log( JSON.parse(sessionStorage.getItem("user")))
+	let user = JSON.parse(sessionStorage.getItem("user"))
+	freeEditRef.value?.setValue('tUnTmStart', startTm)
+	freeEditRef.value?.setValue('tUnTmEnd', endTm)
+	setFormItem("cDptCde", {
+		loadData: [
+		{
+			label: user.companyId + user.companyCnm ,
+			value: user.companyId,
+		},
+		],
+	});
+
+	setValue('cDptCde',user.companyId)
+}
 
 // 绑定方法
 const method = {

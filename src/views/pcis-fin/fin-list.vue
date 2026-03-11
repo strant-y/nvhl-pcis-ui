@@ -62,8 +62,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				func: () => {
 					freeEditRef.value?.resetFields()
 					nextTick(() => {
-						freeEditRef.value?.setValue('tUnTmStart', startTm)
-						freeEditRef.value?.setValue('tUnTmEnd', endTm)
+						reset()
 					})
 				},
 			}),
@@ -228,10 +227,24 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
 	nextTick(() => {
-		freeEditRef.value?.setValue('tUnTmStart', startTm)
-		freeEditRef.value?.setValue('tUnTmEnd', endTm)
+		reset()
 	})
 });
+
+const reset = () => {
+	freeEditRef.value?.setValue('tUnTmStart', startTm)
+	freeEditRef.value?.setValue('tUnTmEnd', endTm)
+	setFormItem("cDptCde", {
+		loadData: [
+		{
+			label: user.value.companyId + user.value.companyCnm ,
+			value: user.value.companyId,
+		},
+		],
+	});
+
+	setValue('cDptCde',user.value.companyId)
+}
 
 // 绑定方法
 const method = {
