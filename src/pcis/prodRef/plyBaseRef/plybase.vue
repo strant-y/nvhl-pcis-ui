@@ -14,7 +14,8 @@ import { formInit } from "@/shared/from-init";
 import {
   getBsnsTypList,
   getChaTypeList,
-  getChaSubtypList,
+	getChaSubtypList,
+	getListByCode,
 } from "@/api/code-list-service";
 import { checkCdeptByCdptCde, getNmeByCde, coverageHint, checkProdGrade } from "@/api/prod/index";
 import moment from "moment";
@@ -953,11 +954,15 @@ const method = {
     }
   },
   // 录单人
-  cOprCdeChange:(val:any) => {
-    if(val) {
-      setFormItem("Base.cOprCde", {
-        codeParam: { 'cOperId': val },
-      });
+	cOprCdeChange: (val: any) => {
+		if (val) {
+			getListByCode("WEB_ORG_OPER", { value: val }).then((res) => {
+				if (!!res && !!res.data) {
+					setFormItem("Base.cOprCde", {
+						loadData: res.data
+					});
+				}
+			});
     }
   },
   // 累计保额按钮

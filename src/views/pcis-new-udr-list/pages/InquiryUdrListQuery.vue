@@ -190,51 +190,51 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           handleQuery();
         },
       }),
-      createFreeButtonBase({
-        label: "批量退回",
-        func: () => {
-          if (selectData.value.length < 1) {
-            ElMessage.warning("所选记录为空！");
-            return;
-          }
+      // createFreeButtonBase({
+      //   label: "批量退回",
+      //   func: () => {
+      //     if (selectData.value.length < 1) {
+      //       ElMessage.warning("所选记录为空！");
+      //       return;
+      //     }
 
-          if (selectData.value.length > 5) {
-            ElMessage.warning("所选数据最多为5条！");
-            return;
-          }
-          let obj = {};
-          Object.keys(selectData.value).forEach((k) => {
-            obj[selectData.value[k]["objId"]] = selectData.value[k]["curtTask"];
-          });
-          console.log(obj);
-          const res = {};
-          res["user"] = JSON.parse(sessionStorage.getItem("user"));
-          res["user"]["opRelCde"] = "10030892";
-          res["appNoAndTaskIdMap"] = obj;
-          res["cUndrMrk"] = "BB";
-          res["undrMrk"] = "BB";
-          res["cAntiLnderRisk"] = "0"; //关联交易确认
-          res["cIsTransaction"] = "0"; //反洗钱风险
-          res["CRiBesprakMrk"] = "0"; // 预约分保标志
-          res["backUndrDptCde"] = null; // 退回指定核保级别机构编码
-          res["backUndrClsCde"] = null; // 退回指定核保级别编码
-          res["backUndrDptCnm"] = null; // 退回指定核保人员名称
-          console.log(res);
-          formconfig1.endBtns[2].loading = true;
-          let submitUnder;
-          submitUnder = submitUnderwrite(res);
-          submitUnder.then((res) => {
-            console.log("submitUnderwrite-res", res);
-            if (res["code"] == "200") {
-              ElMessage.success(res.msg);
-              handleQuery();
-            } else {
-              ElMessage.error(res.msg);
-            }
-            formconfig1.endBtns[2].loading = false;
-          });
-        },
-      }),
+      //     if (selectData.value.length > 5) {
+      //       ElMessage.warning("所选数据最多为5条！");
+      //       return;
+      //     }
+      //     let obj = {};
+      //     Object.keys(selectData.value).forEach((k) => {
+      //       obj[selectData.value[k]["objId"]] = selectData.value[k]["curtTask"];
+      //     });
+      //     console.log(obj);
+      //     const res = {};
+      //     res["user"] = JSON.parse(sessionStorage.getItem("user"));
+      //     res["user"]["opRelCde"] = "10030892";
+      //     res["appNoAndTaskIdMap"] = obj;
+      //     res["cUndrMrk"] = "BB";
+      //     res["undrMrk"] = "BB";
+      //     res["cAntiLnderRisk"] = "0"; //关联交易确认
+      //     res["cIsTransaction"] = "0"; //反洗钱风险
+      //     res["CRiBesprakMrk"] = "0"; // 预约分保标志
+      //     res["backUndrDptCde"] = null; // 退回指定核保级别机构编码
+      //     res["backUndrClsCde"] = null; // 退回指定核保级别编码
+      //     res["backUndrDptCnm"] = null; // 退回指定核保人员名称
+      //     console.log(res);
+      //     formconfig1.endBtns[2].loading = true;
+      //     let submitUnder;
+      //     submitUnder = submitUnderwrite(res);
+      //     submitUnder.then((res) => {
+      //       console.log("submitUnderwrite-res", res);
+      //       if (res["code"] == "200") {
+      //         ElMessage.success(res.msg);
+      //         handleQuery();
+      //       } else {
+      //         ElMessage.error(res.msg);
+      //       }
+      //       formconfig1.endBtns[2].loading = false;
+      //     });
+      //   },
+      // }),
       createFreeButtonBase({
         label: "导出",
         func: () => {

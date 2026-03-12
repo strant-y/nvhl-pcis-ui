@@ -266,7 +266,7 @@ onMounted(async  () => {
 		setFormItem("InsuredDist.cGcidCode", {
 			rules: [getRules("leiCode", {})],
 		});
-		setFormItem("InsuredDist.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+		setFormItem("InsuredDist.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
 		setTimeout(() => {
 			init.value = false
     }, 500);

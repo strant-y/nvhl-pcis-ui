@@ -4503,7 +4503,9 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 				if(cAppNme != cAcctNme){
 					for (const i in edrexptArr) {
 						const objValue = edrexpDataVlue[edrexptArr[i]];
-						appMsg += edrexpCnmArr[i] + '、';
+						if (!objValue) {
+							appMsg += edrexpCnmArr[i] + '、';
+						}
 						if (edrexptArr[i] == 'EdrBase.cNotBackAppNo') {
 							edrexp.value.setFormItem(edrexptArr[i], {
 								rules: [getRules("required", {}),getRules("maxLength", {len:50})],
@@ -4521,7 +4523,9 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 					}
 				} else {
 					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
-					appMsg = '退保、减保或者办理保单贷款原因、';
+					if (!objValue) {
+						appMsg = '退保、减保或者办理保单贷款原因、';
+					}
 					edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
 						rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
 						hidden: false,
@@ -4546,7 +4550,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 					msg += '批改扩展信息中【' + appMsg.substring(0, appMsg.length - 1) + '】不能为空。';
 				}
 			}
-			if (flag && isMsg) {
+			if (flag && isMsg && appMsg) {
 				ElMessage.error(msg);
 				return false;
 			}

@@ -164,7 +164,7 @@ onMounted(() => {
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", { rules: [getRules("txnApprovalNo", {})] });
     // 经常居住地校验
-    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
     // 证件号码
     // setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
     if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT") && (param.cTransMrk == '1' || param.cRsnCde === '99' || param.cEdrRsnBundle === '99' || param.cEdrRsnBundleCde === '99')) {

@@ -1024,7 +1024,7 @@ onMounted(async () => {
       freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
       handleQuery();
     }
-	} else if (!!params && params.param.appNo) {
+	} else if (!!params && params.param?.appNo) {
 		freeEditRef.value?.setValue("cAppNo", params.param.appNo);
 		handleQuery();
   } else {
@@ -1552,7 +1552,7 @@ function handle_hasReceived(row: any) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  selectData.value = Array.from(new Set(selectData.value.concat(selection)));
+	selectData.value = selection
 }
 
 // 详情 核保通过任务

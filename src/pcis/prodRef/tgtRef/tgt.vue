@@ -1947,7 +1947,15 @@ const method = {
       setFormItem("Tgt.cListingLocation", { rules: [] })
       setFormItem("Tgt.cStockCode", { rules: [] })
     }
-  },
+	},
+	// 上市地点
+	cListingLocationChange: (val:any) => {
+		if (val == '5') {
+			setFormItem("Tgt.cOtherRegions", { rules: [getRules("required", {})] })
+		} else {
+			setFormItem("Tgt.cOtherRegions", { rules: [] })
+		}
+	},
   // 是否包含退市后责任（run-off）
   cIncludeDelistingChange: (val:any) => {
     if(val === "1") {// 选是 ___年必填

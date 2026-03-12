@@ -343,7 +343,7 @@ onMounted(async  () => {
   // 关联交易审批单编号
   setFormItem("ECargoInsuredDist.cRelateNo", { rules: [getRules("txnApprovalNo", {})] });
   // 经常居住地校验
-  setFormItem("ECargoInsuredDist.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+  setFormItem("ECargoInsuredDist.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
 });
 
 const funccopyvalue = () => {
