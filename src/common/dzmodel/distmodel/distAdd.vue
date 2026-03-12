@@ -431,7 +431,10 @@ onMounted(async () => {
     }
     if(item.prop =='Dist.cPrmCur'){
       item['func'] =  InsurancecurrencyChange;
-    }
+		}
+		if(item.prop =='Dist.nTransportLimit'){
+      item['func'] =  nTransportLimitChange;
+		}
     if(item.prop =='Dist.nInsuranceAmount'){
       item['func'] =  nInsuranceAmountChange;
 		}
@@ -842,8 +845,12 @@ const nInsuranceAmountChange = (val:any)=>{
 const InsurancecurrencyChange = (val:any)=>{
   console.log('保险金额币种')
   if(!val) {
-    setValue("Dist.nAmtExch", null);
-    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		setValue("Dist.nAmtExch", null);
+		if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit')))
+		} else {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		}
   } else if (val !== "CNY") {
     codeListStore
         .queryCodeList({
@@ -852,12 +859,27 @@ const InsurancecurrencyChange = (val:any)=>{
         })
         .then((res) => {
           console.log("0000000", res);
-          setValue("Dist.nAmtExch", res[0].currency_rate);
-          setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+					setValue("Dist.nAmtExch", res[0].currency_rate);
+					if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+						setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit'))*getValue('Dist.nAmtExch'))
+					} else {
+						setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+					}
         });
   } else {
-    setValue("Dist.nAmtExch", "1.000000");
-    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		setValue("Dist.nAmtExch", "1.000000");
+		if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit')))
+		} else {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		}
+  }
+}
+// 运输信息航次运输限额change事件
+const nTransportLimitChange = (val:any) => {
+	const nAmtExchData = getValue('Dist.nAmtExch')
+  if(nAmtExchData){
+    setValue('Dist.nRmbLimit',Number(nAmtExchData * val))
   }
 }
 const cEquipmentTypesFunc = ()=>{
