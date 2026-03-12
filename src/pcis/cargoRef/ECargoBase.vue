@@ -15,6 +15,7 @@ import {
   createAppFreeEditConfig,
 } from "@/shared/app-free-edit-config";
 import { checkCdeptByCdptCde, getNmeByCde, checkProdGrade } from "@/api/prod/index";
+import { getListByCode } from "@/api/code-list-service";
 import { queryEcargoDetails } from "@/api/cargo";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore,dataOpertaor, useProductStore } from "@/store";
@@ -883,7 +884,19 @@ const method = {
           }
         });
     }
-  },
+	},
+	// 录单人
+	ECargoOprCdeChange: (val: any) => {
+		if (val) {
+			getListByCode("WEB_ORG_OPER", { value: val }).then((res) => {
+				if (!!res && !!res.data) {
+					setFormItem("ECargoBase.cOprCde", {
+						loadData: res.data
+					});
+				}
+			});
+		}
+	}
 };
 
 
