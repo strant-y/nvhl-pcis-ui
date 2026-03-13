@@ -219,14 +219,13 @@ function setRiskData(data: any,exdata: any, olddata: any) {
     if(olddata && olddata.length > 0){
       const od = olddata.find((item: any) => item['TermRisktgt.cExcessLayer'] === excessLayer.value[key]["value"]);
       if(od){
-        newData['TermRisktgt.nInsuranceAmount'] = od['TermRisktgt.nInsuranceAmount'];
-
-        if(od['TermRisktgt.cPkId']){  // 回填PkId
-          newData['TermRisktgt.cPkId'] = od['TermRisktgt.cPkId'];
-        }
-        if(od['TermRisktgt.cRowId']){ // 回填RowId
-          newData['TermRisktgt.cRowId'] = od['TermRisktgt.cRowId'];
-        }
+          newData = Object.assign(JSON.parse(JSON.stringify(od)));
+          props.gridEditConfig.fromSchema?.forEach(schema=>{
+          if(schema.prop === 'TermRisktgt.cExcessLayer' || schema.prop ===  'TermRisktgt.nInsuranceAmount' ){
+          }else{
+            delete newData[schema.prop] ;
+          }
+        })
       }
     }
     let r = true;
