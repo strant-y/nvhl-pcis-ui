@@ -1719,3 +1719,8 @@ export function getOaTermination(queryParams: any): AxiosPromise<any> {
 export function checkTgtEmployeeNumber(queryParams: any): AxiosPromise<any> {
   return post(`/policy/checkTgtEmployeeNumber`, queryParams);
 }
+
+// Excel导入出单查询
+export function selectImportRecord(queryParams: any): AxiosPromise<any> {
+  return post(`/policyTemplate/selectImportRecord`, queryParams);
+}
