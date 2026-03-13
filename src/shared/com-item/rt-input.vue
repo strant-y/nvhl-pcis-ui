@@ -2,7 +2,7 @@
   <template v-if="!showLabel">
     <el-tooltip
         :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0' || vInput === 'null' || vInput === 'NaN' || item.type === 'textarea')"
-        placement="top"
+        placement="top" :trigger-keys="[]"
     >
       <template #content>
         <div style="display: flex;align-items: center;font-size: 13px">

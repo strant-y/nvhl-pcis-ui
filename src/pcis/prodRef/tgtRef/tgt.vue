@@ -211,7 +211,7 @@ onMounted(async () => {
 	}
 
   //  运输工具名称
-  const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
+  const cTransportationNames = ['020003', '020011', '020013'];
 	const isNonRequired = cTransportationNames.includes(params.cProdNo);
 
 	// 风险累积按钮核保切是规定产品展示
@@ -264,7 +264,7 @@ onMounted(async () => {
   }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
-    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
+    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017', '020019', '020020', '020021' ]
     if(ProdNo.includes(params.cProdNo)) {
       eventBus.on('goodsMxChange', handelGoodsMx);
     }
@@ -298,6 +298,10 @@ onMounted(async () => {
 				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
 			}
 		}
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: false, disabled: false });
+			setFormItem('Tgt.nInvoicceValue', { readonly: false, disabled: false });
+		}
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
         const data = getFromValue();
@@ -330,7 +334,11 @@ function hasEnglish(str: any) {
 }
 const handelGoodsMx = (val: any) => {
   console.log(val)
-  if (val.length > 0) {
+	if (val.length > 0) {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: true, disabled: true });
+			setFormItem('Tgt.nInvoicceValue', { readonly: true, disabled: true });
+		}
     setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
     setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
     setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
@@ -340,7 +348,11 @@ const handelGoodsMx = (val: any) => {
     setValue('Tgt.cTradeNum', val[0]['Dist.cTradeNum'])
     setValue('Tgt.cLadingNum', val[0]['Dist.cBillNum'])
     setValue('Tgt.cCreditNum', val[0]['Dist.cLetterNum'])
-  } else {
+	} else {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: false, disabled: false });
+			setFormItem('Tgt.nInvoicceValue', { readonly: false, disabled: false });
+		}
     setValue('Tgt.nAdditiveCoefficient', '')
     setValue('Tgt.cTradeNum', '')
     setValue('Tgt.cLadingNum', '')

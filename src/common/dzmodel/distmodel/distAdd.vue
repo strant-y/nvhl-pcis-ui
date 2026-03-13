@@ -211,6 +211,10 @@ const formconfig1 = ref<AppFreeEditConfig>(
 						// AddressDist040001营业场所地址清单-Dist.cRelatedInsured关联被保险人
 						if (params.dist['Dist.cRelatedInsured']) {
 							params.dist['Dist.cRelatedInsured'] = params.dist['Dist.cRelatedInsured'].toString()
+							}
+						// PersonnelDist0410071人员清单-Dist.cAssociatedGuardian关联监护人
+						if (params.dist['Dist.cAssociatedGuardian']) {
+							params.dist['Dist.cAssociatedGuardian'] = params.dist['Dist.cAssociatedGuardian'].toString()
 						}
             // 级联地址表格显示问题处理
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
@@ -332,7 +336,7 @@ onMounted(async () => {
     //  item['rules'] = [getRules("required", {}), getRules("vinNumber", {})];
     // }
     // 043009 关联被保人
-    if(item.prop === 'Dist.cRelatedInsured'){
+    if(item.prop === 'Dist.cRelatedInsured' || item.prop === 'Dist.cAssociatedGuardian'){
       if(cGrpMrk.value === '1') {
         // const insured = opertaor.getDataAll()['insured'];
         // if (insured && insured['Insured.cInsuredCde']) {
@@ -431,7 +435,10 @@ onMounted(async () => {
     }
     if(item.prop =='Dist.cPrmCur'){
       item['func'] =  InsurancecurrencyChange;
-    }
+		}
+		if(item.prop =='Dist.nTransportLimit'){
+      item['func'] =  nTransportLimitChange;
+		}
     if(item.prop =='Dist.nInsuranceAmount'){
       item['func'] =  nInsuranceAmountChange;
 		}
@@ -842,8 +849,12 @@ const nInsuranceAmountChange = (val:any)=>{
 const InsurancecurrencyChange = (val:any)=>{
   console.log('保险金额币种')
   if(!val) {
-    setValue("Dist.nAmtExch", null);
-    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		setValue("Dist.nAmtExch", null);
+		if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit')))
+		} else {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		}
   } else if (val !== "CNY") {
     codeListStore
         .queryCodeList({
@@ -852,12 +863,27 @@ const InsurancecurrencyChange = (val:any)=>{
         })
         .then((res) => {
           console.log("0000000", res);
-          setValue("Dist.nAmtExch", res[0].currency_rate);
-          setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+					setValue("Dist.nAmtExch", res[0].currency_rate);
+					if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+						setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit'))*getValue('Dist.nAmtExch'))
+					} else {
+						setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
+					}
         });
   } else {
-    setValue("Dist.nAmtExch", "1.000000");
-    setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		setValue("Dist.nAmtExch", "1.000000");
+		if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit')))
+		} else {
+			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
+		}
+  }
+}
+// 运输信息航次运输限额change事件
+const nTransportLimitChange = (val:any) => {
+	const nAmtExchData = getValue('Dist.nAmtExch')
+  if(nAmtExchData){
+    setValue('Dist.nRmbLimit',Number(nAmtExchData * val))
   }
 }
 const cEquipmentTypesFunc = ()=>{
@@ -1075,6 +1101,8 @@ function cPlanNoChange(val) {
 	}
 	setValue("Dist.cRelatedInsured", null);
 	clearValidate('Dist.cRelatedInsured')
+	setValue("Dist.cAssociatedGuardian", null);
+	clearValidate('Dist.cAssociatedGuardian')
 }
 
 //给表单赋值
@@ -1087,8 +1115,21 @@ function setFormItem(key: any, obj: any) {
           for (let key in obj.btnItems) {
             item.btnItems[key] = obj.btnItems[key];
           }
-        }else{
-          Object.assign(item, obj);
+				} else {
+					if (obj.loadData) {
+						const oldList = item.loadData || [];
+						const newList = obj.loadData;
+						const map = new Map();
+						oldList.forEach(i => i.value && map.set(i.value, i));
+						newList.forEach(i => {
+							if (i.value && !map.has(i.value)) {
+								map.set(i.value, i);
+							}
+						});
+						item.loadData = Array.from(map.values()); 
+					}
+					const { loadData, ...otherProps } = obj;
+          Object.assign(item, otherProps);
         }
       }
     });
@@ -1102,6 +1143,7 @@ const cRelatedInsuredChange = () => {
 			return false
 		}
     const prop = route.params?.param?.cProdNo === '041007' ? 'Dist.cAssociatedGuardian' : 'Dist.cRelatedInsured';
+    const title = route.params?.param?.cProdNo === '041007' ? '关联监护人' : '关联被保险人';
     dialog.value?.open(
       "cRelatedInsuredModal",
       {
@@ -1128,7 +1170,7 @@ const cRelatedInsuredChange = () => {
         },
       },
       {},
-      { title: "关联被保险人", width: 85 }
+      { title: title, width: 85 }
     );
 };
 

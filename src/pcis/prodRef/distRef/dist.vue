@@ -174,6 +174,7 @@ const cProdNos = ['010001','010002','010003','010004','010020','070002'];
 // 货物信息回填到标的信息的产品
 const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017'])
 let cRelatedInsuredflag = ref(false)  // 是否存在关联被保险人字段
+let cAssociatedGuardianflag = ref(false)  // 是否存在关联监护人字段
 watch(
     () => pageresult.list,
     async (newVal: any) => {
@@ -459,6 +460,15 @@ onMounted(async () => {
 		if (r['prop'] === 'Dist.cRelatedInsured') {
 			cRelatedInsuredflag.value = true
       eventBus.on('setMap-AddressDist040001', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
+		}
+		// 041007团单人员清单关联监护人
+		if (r['prop'] === 'Dist.cAssociatedGuardian') {
+			cAssociatedGuardianflag.value = true
+			eventBus.on('setMap-PersonnelDist0410071', (data: any) => {
         if(data.list && data.list.length > 0) {
           r.loadData = data.list
         }
@@ -900,7 +910,27 @@ const method = {
 						code: 'Dist.cRelatedInsured',
 						list
 					});
-        }
+				}
+				//  041007 set 关联监护人 下拉值
+				if (cAssociatedGuardianflag.value) {
+					if(pageresult.list.length>0){
+						pageresult.list.forEach((item: any) => {
+							if (item['Dist.cAssociatedGuardian']) {
+								item['Dist.cAssociatedGuardian'] = item['Dist.cAssociatedGuardian'].split(',')
+							}
+						})
+					}
+					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
+					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
+						label: i['InsuredDist.cInsuredNme'],
+						value: i['InsuredDist.cPkId']
+						// value: i['InsuredDist.cInsuredCde']
+					})) : []
+					eventBus.emit('setMap-PersonnelDist0410071', {
+						code: 'Dist.cAssociatedGuardian',
+						list
+					});
+				}
         // 刷新汇总表格
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
@@ -1784,6 +1814,19 @@ function getFatherPageOldProductResData() {
     if(cRelatedInsuredflag.value) {
 			oldPageSchema.value.fromSchema.forEach((item: any) => {
         if(item.prop === 'Dist.cRelatedInsured') {
+          const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
+          item.loadData = list.length > 0 ? list.map((i:any) => ({
+            label: i['InsuredDist.cInsuredNme'],
+            value: i['InsuredDist.cPkId']
+            // value: i['InsuredDist.cInsuredCde']
+          })) : []
+        }
+      });
+		}
+		// 041007团单人员清单关联监护人清单
+    if(cAssociatedGuardianflag.value) {
+			oldPageSchema.value.fromSchema.forEach((item: any) => {
+				if (item.prop === 'Dist.cAssociatedGuardian') {
           const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
           item.loadData = list.length > 0 ? list.map((i:any) => ({
             label: i['InsuredDist.cInsuredNme'],
