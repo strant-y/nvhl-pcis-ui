@@ -289,11 +289,14 @@ async function handleQuery(flag?: boolean) {
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   if(!s.cAppNo && s.cOperType === 'AppPrm') {
     ElMessage.warning('投保手动修改保费，请录入申请单号!');
-  } else if(!s.cAppNo && s.cOperType === 'EdrPrm') {
-    ElMessage.warning('一般批改手动修改责任保费，请录入申请单号!');
-  } else if(!s.cAppNo && s.cOperType === 'SurPrm') {
-    ElMessage.warning('一般退保手动修改退保总保费，请录入申请单号!');
-  } else if(s.cPlyNo || s.cAppNo) {
+	}
+	// else if (!s.cAppNo && s.cOperType === 'EdrPrm') {
+  //   ElMessage.warning('一般批改手动修改责任保费，请录入申请单号!');
+	// }
+	// else if (!s.cAppNo && s.cOperType === 'SurPrm') {
+  //   ElMessage.warning('一般退保手动修改退保总保费，请录入申请单号!');
+	// }
+	else if (s.cPlyNo || s.cAppNo) {
     const r = await freeEditRef.value?.validate();
     if(r){
       const param = Object.assign(s);
