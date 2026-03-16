@@ -248,6 +248,7 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
+	setFormItem('Tgt.cCertificateDetailed', { autosize: true })
   selectType()
   // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
   if(params.cProdNo === '059902') {
