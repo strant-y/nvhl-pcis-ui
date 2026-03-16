@@ -274,23 +274,28 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-	const tgt = opertaor.getTableRefByKey("tgt").getFromValue();
-	let params = {
-		cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
-	}
-	getBusinessType(params).then((res) => {
-		if (res.code == 200 && res.data.data >= 1) {
-			if (tgt['Tgt.nFarmerPaymentAmt']) {
-				value.forEach((item) => {
-					item["Pay.nPayablePrm"] = tgt["Tgt.nFarmerPaymentAmt"] ? tgt["Tgt.nFarmerPaymentAmt"] : 0;
-				})
-			} else {
-				ElMessage.error("农户自缴费用出错，请重新计算");
-				return false;
-			}
+	const tgt = opertaor.getTableRefByKey("tgt")?.getFromValue();
+	if (!!tgt) {
+		let params = {
+			cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
 		}
+		getBusinessType(params).then((res) => {
+			if (res.code == 200 && res.data.data >= 1) {
+				if (tgt['Tgt.nFarmerPaymentAmt']) {
+					value.forEach((item) => {
+						item["Pay.nPayablePrm"] = tgt["Tgt.nFarmerPaymentAmt"] ? tgt["Tgt.nFarmerPaymentAmt"] : 0;
+					})
+				} else {
+					ElMessage.error("农户自缴费用出错，请重新计算");
+					return false;
+				}
+			}
+			payinfoEditRef?.value?.setFormValue(value);
+		})
+	} else {
 		payinfoEditRef?.value?.setFormValue(value);
-	})
+	}
+	
 }
 
 function validate() {

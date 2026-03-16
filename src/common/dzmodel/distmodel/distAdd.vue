@@ -1138,7 +1138,7 @@ function setFormItem(key: any, obj: any) {
 
 
 const cRelatedInsuredChange = () => {
-		if (!getValue('Dist.cPlanNo')) {
+		if (!getValue('Dist.cPlanNo') && formconfig1.value.fromSchema.some(item => item.prop === 'Dist.cPlanNo')) {
 			ElMessage.warning('请选择方案号！');
 			return false
 		}
