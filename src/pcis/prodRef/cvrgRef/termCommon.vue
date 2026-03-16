@@ -2,7 +2,7 @@
   <template v-if="planData['m'] && planData['m'].length > 0">
     <tremTemplate
       v-for="(i, index) in planData['m']"
-      :key="index"
+      :key="i['Term.cClauseCode']"
       :rowIndex="i['Term.cPlanNo']"
       v-model="planData['m'][index]"
       :disabled-flag="disableflg"
@@ -15,7 +15,7 @@
       :showConf="{ showHeader: false, showTerm: false }"
       :ref="
         (res) => {
-          tremTemplateRefs['m' + index] = res;
+          if(res) tremTemplateRefs['m' + i['Term.cClauseCode']] = res;
         }
       "
     />
@@ -24,7 +24,7 @@
     <el-form ref="cvrgFormfef" :model="planData['a1']" :inline-message="true">
       <tremTemplate
         v-for="(i, index) in planData['a1']"
-        :key="index"
+        :key="i['Term.cClauseCode']"
         :rowIndex="i['Term.cPlanNo']"
         v-model="planData['a1'][index]"
         :disabled-flag="disableflg"
@@ -36,7 +36,7 @@
         :faters="faters"
         :ref="
           (res) => {
-            tremTemplateRefs['a1' + index] = res;
+						if(res) tremTemplateRefs['a1' + i['Term.cClauseCode']] = res;
           }
         "
       />
@@ -141,29 +141,30 @@ function deleteData(term: any) {
 }
 
 function deleteTermByNo(t: any) {
-  Object.keys(planData.value).forEach((item) => {
-    let deleindex: any = null;
-    for (const i in planData.value[item]) {
-      if (planData.value[item][i]["Term.cClauseCode"] === t) {
-        // 批改的情况下，标记该单为删除状态
-        if (parparam.cEdrType && planData.value[item][i]["Term.cRowId"]) {
-          if (
-            planData.value[item][i]["Term.cRdrTyp"] !== "0" &&
-            planData.value[item][i]["Term.cClauseCategory"] !== "1"
-          ) {
-            // 规范类，限制类，退保状态只标记
-            planData.value[item][i]["Term.cCancelMrk"] = "1";
-          } else {
-            tremTemplateRefs.value[item + i].setCancel();
-          }
-        } else {
-          deleindex = i;
-        }
+  Object.keys(planData.value).forEach((itemKey) => {
+    const list = planData.value[itemKey];
+    if (!list) return;
+
+    // 找到要删除的项
+    const targetIndex = list.findIndex(item => item["Term.cClauseCode"] === t);
+    if (targetIndex === -1) return;
+    
+    const targetItem = list[targetIndex];
+
+    // 批改模式：标记或调用方法，不删除
+    if (parparam.cEdrType && targetItem["Term.cRowId"]) {
+      if (
+        targetItem["Term.cRdrTyp"] !== "0" &&
+        targetItem["Term.cClauseCategory"] !== "1"
+      ) {
+        targetItem["Term.cCancelMrk"] = "1";
+      } else {
+        const refKey = itemKey + targetItem["Term.cClauseCode"];
+        tremTemplateRefs.value[refKey]?.setCancel();
       }
-      if (deleindex != null) {
-        planData.value[item].splice(deleindex, 1);
-        deleindex = null;
-      }
+    } else {
+      // 非批改模式：直接删除
+      list.splice(targetIndex, 1);
     }
   });
 }
