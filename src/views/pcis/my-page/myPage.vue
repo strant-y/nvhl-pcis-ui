@@ -2628,6 +2628,10 @@ async function loadAfter() {
             if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
               item['Term.riskList'].forEach((i:any) => {
                 delete i['Term.cPkId']
+								// 询价转投保按钮进入，解决保障信息中的地址编码存在之前数据的问题
+								if (props.param.pageType != "TEMPORARY_DEPOSIT" && props.param.cPolicySource == '6') {
+									i['TermRisktgt.cDistCodeNo'] = null
+								}
               })
             }
           })
