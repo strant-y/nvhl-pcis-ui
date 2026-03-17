@@ -58,7 +58,7 @@
                 >
                   <tremTemplate
                     v-for="(i, index) in planData[k]['m']"
-                    :key="index"
+                    :key="i['Term.cClauseCode']"
                     :rowIndex="i['Term.cPlanNo']"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
@@ -75,7 +75,7 @@
                     :faters="faters"
                     :ref="
                       (res) => {
-                        tremTemplateRefs[k + 'm' + index] = res;
+												if(res) tremTemplateRefs[k + 'm' + i['Term.cClauseCode']] = res;
                       }
                     "
                   />
@@ -98,7 +98,7 @@
                   >
                     <tremTemplate
                       v-for="(i, index) in planData[k]['a1']"
-                      :key="index"
+                      :key="i['Term.cClauseCode']"
                       :rowIndex="i['Term.cPlanNo']"
                       v-model="planData[k]['a1'][index]"
                       :disabled-flag="disAbledFlag"
@@ -110,7 +110,7 @@
                       :faters="faters"
                       :ref="
                         (res) => {
-                          tremTemplateRefs[k + 'a1' + index] = res;
+													if(res) tremTemplateRefs[k + 'a1' + i['Term.cClauseCode']] = res;
                         }
                       "
                     />
@@ -697,24 +697,29 @@ function deleteData(plan: string, term: any) {
 
 function deleteTermByNo(plan: any, t: any) {
   Object.keys(planData.value[plan]).forEach((item) => {
-    let deleindex = null;
-    for (let i = 0; i < planData.value[plan][item].length; i++) {
-      if (planData.value[plan][item][i]["Term.cClauseCode"] === t) {
-        // 批改的情况下，标记该单为删除状态
-        if (parparam.cEdrType && planData.value[plan][item][i]['Term.cRowId']) {
-          if( planData.value[plan][item][i]['Term.cRdrTyp'] !== '0' && planData.value[plan][item][i]['Term.cClauseCategory'] !== '1'){
-            planData.value[plan][item][i]['Term.cCancelMrk'] = '1';
-          }else{
-            tremTemplateRefs.value[plan+item+i].setCancel();
-          }
-        } else {
-          deleindex = i;
-        }
-      }
-    }
-    if (deleindex != null) {
-      planData.value[plan][item].splice(deleindex, 1);
-    }
+		const list = planData.value[plan][item];
+		if (!list) return;
+		// 找到要删除的项
+		const targetIndex = list.findIndex(item => item["Term.cClauseCode"] === t);
+		if (targetIndex === -1) return;
+		
+		const targetItem = list[targetIndex];
+
+		// 批改模式：标记或调用方法，不删除
+		if (parparam.cEdrType && targetItem["Term.cRowId"]) {
+			if (
+				targetItem["Term.cRdrTyp"] !== "0" &&
+				targetItem["Term.cClauseCategory"] !== "1"
+			) {
+				targetItem["Term.cCancelMrk"] = "1";
+			} else {
+				const refKey = itemKey + targetItem["Term.cClauseCode"];
+				tremTemplateRefs.value[refKey]?.setCancel();
+			}
+		} else {
+			// 非批改模式：直接删除
+			list.splice(targetIndex, 1);
+		}
   });
 }
 
