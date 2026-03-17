@@ -606,6 +606,7 @@ const method = {
         "distAdd",
         {
           fromSchema: tableconfig.value.fromSchema,
+					fromUi: tableconfig.value.fromUi,
           title: "编辑",
           rowData: {
             ...row, 
@@ -708,6 +709,7 @@ const method = {
             "distAdd",
             {
               fromSchema: fromSchema,
+							fromUi: tableconfig.value.fromUi,
               title: "新增",
               tab: formconfig1.value.title,
               compKey: props.compKey,
@@ -1020,6 +1022,7 @@ const method = {
             "distAdd",
             {
               fromSchema: tableconfig.value.fromSchema,
+							fromUi: tableconfig.value.fromUi,
               title: "新增",
               tab: formconfig1.value.title,
               compKey: props.compKey,

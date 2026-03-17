@@ -1557,15 +1557,25 @@ const method = {
       });
       setFormItem("Applicant.RegisterProp", {
         disabled: true,
+        rules: []
       });
     } else {
       setFormItem("Applicant.ClntAddrProp", {
         disabled: false,
         rules: [getRules("required", {})]
-      });
-      setFormItem("Applicant.RegisterProp", {
-        disabled: false,
-      });
+			});
+			let cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+			if (cClntMrk == '0') {
+				setFormItem("Applicant.RegisterProp", {
+					disabled: false,
+					rules: [getRules("required", {})]
+				});
+			} else {
+				setFormItem("Applicant.RegisterProp", {
+					disabled: false,
+				});
+			}
+
     }
 		const param = opertaor.getParam();
     if (param.initFlag) {
