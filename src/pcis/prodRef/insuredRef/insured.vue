@@ -1638,7 +1638,7 @@ const method = {
       });
     }
 		const param = opertaor.getParam();
-    if (param.initFlag) {
+    if (param.initFlag || isCoypBtn.value || isOcrEcho) {
       return;
     }
     setValue("Insured.ClntAddrProp", null);
