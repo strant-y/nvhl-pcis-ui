@@ -674,12 +674,15 @@ onMounted(async () => {
 		if (params?.cProdNo === '020019' || params?.cProdNo === '020020' || params?.cProdNo === '020021') {
 			if(item.prop === 'Dist.cDispatchDetail'){ // 起运地
 				item["btnItems"]["func"] = cDispatchCountryFunc;
+				item["btnItems"]["disabled"] = false;
 			}
 			if(item.prop === 'Dist.cTransitDetail'){ // 中转地
 				item["btnItems"]["func"] = cTransitCountryFun;
+				item["btnItems"]["disabled"] = false;
 			}
 			if(item.prop === 'Dist.cDestinationDetail'){ // 目的地
 				item["btnItems"]["func"] = cDestinationCountryFunc;
+				item["btnItems"]["disabled"] = false;
 			}
 		}
     newSchema.push(item);
