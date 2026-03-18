@@ -512,11 +512,9 @@ const tableBtns = [
       res["cAntiLnderRisk"] = "0"; //关联交易确认
       res["cIsTransaction"] = "0"; //反洗钱风险
       res["CRiBesprakMrk"] = "0"; // 预约分保标志
-      res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
+			res["backUndrDptCde"] = row.tPreDptCde; // 退回指定核保级别机构编码
       res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
-      res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
-        "userName"
-      ]; // 退回指定核保人员名称
+      res["backUndrDptCnm"] = row.tPreDptName // 退回指定核保人员名称
       let submitUnder;
       submitUnder = submitUnderwriting(res);
       submitUnder.then((res) => {
