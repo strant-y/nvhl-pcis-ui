@@ -35,6 +35,7 @@ import {
 import { FinService } from './service/fin.service';
 import { useUserStore } from "@/store/modules/user";
 import { cloneDeep } from "lodash-es";
+import { getAppPolicy } from "../../api/query/index";
 const userStore = useUserStore();
 const user = ref(userStore.user);
 const finService = new FinService();
@@ -317,7 +318,8 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 onMounted(async () => {
-  if (props.type === "update" && props.data) {
+	if (props.type === "update" && props.data) {
+		getPlyPolicyFun(props.data)
     nextTick(() => {
       freeEditRef.value?.setFormValue(props.data);
 
@@ -475,6 +477,54 @@ function changeBank() {
     ElMessage.error(err.message)
   });
 }
+
+// 判断当前单能否满足反洗钱条件，不能修改账户人名称
+function getPlyPolicyFun(data) {
+	const param = {
+		scene: "EDR_APP_NEW_SCENE",
+		CPlyNo: data.cPlyNo,
+	};
+	getAppPolicy(param).then((res: any) => {
+		console.log("投保单明细", res);
+		if (res["code"] == "200") {
+			let plyBaseData = res["res"]["composition"]["plyBase"][0]
+			const cPrmCur = plyBaseData['Base.cPrmCur']; // 保费币种
+			const nPrmRmbExch = plyBaseData['Base.nPrmRmbExch']; // 总保费汇率
+			const nPrmVar = plyBaseData['Base.nPrmVar']; // 退费金额，退费时为负数
+
+			// 如果不是退费（>=0），不触发
+			if (nPrmVar >= 0) {
+				return false;
+			}
+
+			// 取退费的绝对值（正数）
+			const refundAmount = Math.abs(nPrmVar);
+
+			// 人民币：退费 >= 10,000
+			if (cPrmCur === 'CNY' && refundAmount >= 10000) {
+				setFormItem('cAcctNme', { disabled: true })
+				return true
+			}
+
+			// 美元：退费 >= 1,000
+			if (cPrmCur === 'USD' && refundAmount >= 1000) {
+				setFormItem('cAcctNme', { disabled: true })
+				return true
+			}
+
+			// 其他外币：需折算为人民币
+			if (cPrmCur !== 'CNY' && cPrmCur !== 'USD') {
+				if (nPrmRmbExch != null) {
+					const refundInCNY = refundAmount * nPrmRmbExch;
+					if (refundInCNY >= 10000) {
+						setFormItem('cAcctNme', { disabled: true })
+						return true
+					}
+				}
+			}
+		}
+	});
+};
 
 //给表单下拉项赋值
 const setFormItem = (key, obj) => {

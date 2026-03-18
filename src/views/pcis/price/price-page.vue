@@ -1058,7 +1058,8 @@ const copyPolicyFun = () => {
     if (res.type === "ok") {
       const param = {
         // ...props.param,
-        ...res.body
+        ...res.body,
+				detailsCopy: '1',
       }
       router.push({
         path: "/pcisapp/myPage",
@@ -2238,6 +2239,11 @@ async function loadAfter() {
           ops.plyBase['Base.cRiFacMrk'] = null
           ops.plyBase['Base.cRiFacOpn'] = null
           ops.plyBase['Base.cRiFacCde'] = null
+					// 适用详情页复制出单刷新后机构前后不一致
+					if (props.param["detailsCopy"] == '1') {
+						ops.plyBase['Base.cIntroDptcde'] = props.param["cDptCde"] // 服务机构
+						ops.plyBase['Base.cDptCde'] = props.param["cDptCde"] // 机构部门
+					}
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){

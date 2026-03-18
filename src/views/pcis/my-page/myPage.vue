@@ -1092,7 +1092,7 @@ const copyPolicyFun = () => {
       router.push({
         path: "/pcisapp/myPage",
         query: {
-          param: JSON.stringify({ ...param, pageType: 'copy', cAppTyp: 'A' }),
+          param: JSON.stringify({ ...param, pageType: 'copy', cAppTyp: 'A', detailsCopy: '1', }),
         },
       });
       setTimeout(() => {
@@ -1171,6 +1171,8 @@ const copyPolicyFun = () => {
               ops.plyBase['Base.cConfirmSequenceNo'] = null // 核保确认码
               ops.plyBase['Base.cPreConfirmSequenceNo'] = null // 保单/批单预确认码
               ops.plyBase['Base.cUwConfirmSequenceNo'] = null // 保单/批单确认码
+              ops.plyBase['Base.cIntroDptcde'] = props.param["cDptCde"] // 服务机构
+              ops.plyBase['Base.cDptCde'] = props.param["cDptCde"] // 机构部门
             }
             ops['plyBase']['Base.cPlyNo'] = ''
             // if(ops['ci'] && ops['ci'].length>0){
@@ -2316,6 +2318,11 @@ async function loadAfter() {
           ops.plyBase['Base.cConfirmSequenceNo'] = null // 核保确认码
           ops.plyBase['Base.cPreConfirmSequenceNo'] = null // 保单/批单预确认码
           ops.plyBase['Base.cUwConfirmSequenceNo'] = null // 保单/批单确认码
+					// 适用详情页复制出单刷新后机构前后不一致
+					if (props.param["detailsCopy"] == '1') {
+						ops.plyBase['Base.cIntroDptcde'] = props.param["cDptCde"] // 服务机构
+            ops.plyBase['Base.cDptCde'] = props.param["cDptCde"] // 机构部门
+					}
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){

@@ -1,1 +1,0 @@
-import{cM as t}from"./index.BdS1cSkj.js";function e(e){return t("/role/getSysRoleList",e)}function n(e){return t("/template/list",e)}function r(e){return t("/template/delete",e)}export{n as a,r as d,e as g};
