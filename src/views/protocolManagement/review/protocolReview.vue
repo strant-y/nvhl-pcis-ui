@@ -624,7 +624,17 @@ onMounted(async () => {
 function toDtl(row: any, type: string) {
 	row.rightbtns = true
 	row.sysType = row.objExt
-  router.push({path: "/protocolManagement/enteringDtl", query: {param: JSON.stringify(row), type: type}});
+	let query = {
+		param: JSON.stringify(row),
+		type: type
+	}
+	if (row.udrType == '1' || row.udrType == '2') {
+		query.title = '协议审核'
+	}
+	router.push({
+		path: "/protocolManagement/enteringDtl",
+		query
+	});
 }
 
 // 绑定方法

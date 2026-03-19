@@ -414,16 +414,26 @@ onMounted(async () => {
 		if (route.params.param.cProdNo == '040019' && item.prop == 'Dist.cMobile') {
       item['rules'] = [getRules("phoneNo", {})];
     }
-    if(item.prop == 'Dist.cInvoiceCur'){
+    if(item.prop == 'Dist.cInvoiceCur' || item.prop == 'Dist.cPrmCur'){
         const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
         const cargoList = distTableRef?.getTableData() || [];
         // 02开头的货物明细清单
         if(cComponentTable.value == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && cargoList.length > 0 ){
             const firstRow = cargoList[0];
-            firstInvoiceCur.value = firstRow['Dist.cInvoiceCur'] || 'CNY';
+						if (item.prop == 'Dist.cInvoiceCur') {
+							firstInvoiceCur.value = firstRow['Dist.cInvoiceCur'] || 'CNY';
+						}
+						if (item.prop == 'Dist.cPrmCur') {
+							firstInvoiceCur.value = firstRow['Dist.cPrmCur'] || 'CNY';
+						}
             // 已存在一条记录 → 后续新增只能选择该币种
             item.disabled = true;
-            nextTick(() => setValue('Dist.cInvoiceCur', firstInvoiceCur.value))
+						if (item.prop == 'Dist.cInvoiceCur') {
+							nextTick(() => setValue('Dist.cInvoiceCur', firstInvoiceCur.value))
+						}
+						if (item.prop == 'Dist.cPrmCur') {
+							nextTick(() => setValue('Dist.cPrmCur', firstInvoiceCur.value))
+						}
         }
         item['func'] = InvoiceCurrencyChange;
     }
@@ -767,7 +777,7 @@ const getDistoccupType = (val) => {
 // 020009 020011 020013 020016 保险金额根据发票金额带出，可修改 必填
 // 020001、020002、020003、020004、020005、020006、020017 保险金额根据发票金额公式计算，不可修改，置灰 必填
 const  isShownInsuranceAmount = ref(false)
-const nInsuranceAmountListA = ['020009', '020011', '020013', '020016']
+const nInsuranceAmountListA = ['020009', '020011', '020013', '020016', '020019', '020020', '020021']
 const nInsuranceAmountListB = ['020001','020002','020003','020004','020005','020006','020017']
 const handelnInsuranceAmountList = ()=>{
   if(nInsuranceAmountListA.includes(params?.cProdNo)){
