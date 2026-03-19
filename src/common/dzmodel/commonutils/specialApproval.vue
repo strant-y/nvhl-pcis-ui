@@ -187,14 +187,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       },
       {
         prop: "namt",
-        inputtype: "rtnumber",
+        inputtype: "rtinput",
+				type: "number",
         rules: [getRules("required", {})],
         title: "总保险金额",
         disabled: true,
       },
       {
         prop: "nprm",
-        inputtype: "rtnumber",
+        inputtype: "rtinput",
+				type: "number",
         rules: [getRules("required", {})],
         title: "总含税保费",
         disabled: true,

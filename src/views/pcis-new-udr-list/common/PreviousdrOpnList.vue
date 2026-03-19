@@ -136,6 +136,7 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "nPrmVar",
         inputtype: "rtinput",
+				type: "number",
         title: "保费变化",
       },
       {
