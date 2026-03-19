@@ -174,6 +174,7 @@ const pageName = computed(() => route.params?.param?.pageName || opertaor.getPar
 const emit = defineEmits(['savePlyInfo']);
 const addrSeqArray = ref([]);
 const exli = ref(['010001','010002','010003','010004','010020','070002']);
+const allowedList = ref(['020019','020020','020021']); // 定期产品
 
 const props = defineProps({
   pageSchema: {
@@ -339,7 +340,18 @@ const method = {
               const ids = selectdata.map(item => item['Dist.nSeqNo']).join(',');
               const codeNos = selectdata.map(item => item['Dist.cCodeNo']).join(',');
               const cPkIds = selectdata.map(item => item['Dist.cPkId']).join(',');
-              setCargoSeq(codeNos, cPkIds, amount);
+							let nAmtExchs // 保险金额汇率
+							let cPrmCurs // 折人民币保险金额
+							let nRmbLimits // 折人民币保险金额
+							if (allowedList.value.includes(parparam.cProdNo)) {
+								nAmtExchs = selectdata[0]['Dist.nAmtExch']; // 保险金额汇率
+								cPrmCurs = selectdata[0]['Dist.cPrmCur']; // 保险金额币种
+								nRmbLimits = selectdata.reduce((sum, item) => { // 折人民币保险金额
+									const val = Number(item['Dist.nRmbLimit']) || 0;
+									return sum + val;
+                }, 0);
+							}
+              setCargoSeq(codeNos, cPkIds, amount, nAmtExchs, cPrmCurs, nRmbLimits);
             }else {
               setCargoSeq('');
             }
@@ -812,7 +824,7 @@ function calcCheck(){
     msg: "验证通过",
   };
 }
-const setCargoSeq = (value: string, pkId: string, amount: string) => {
+const setCargoSeq = (value: string, pkId: string, amount: string, nAmtExchs, cPrmCurs, nRmbLimits) => {
 	const { index, data } = selectedRow.value;
   if(formData.value['m'] && formData.value['m'].length > 0) {
     if(data && data['Term.cClauseCode']) {
@@ -825,7 +837,12 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
         if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
           item['TermRisktgt.cDistCodeNo'] = value;
           item['TermRisktgt.cDistPkId'] = pkId;
-          item['TermRisktgt.nInsuranceAmount'] = amount;
+					item['TermRisktgt.nInsuranceAmount'] = amount;
+					if (allowedList.value.includes(parparam.cProdNo)) {
+						item['TermRisktgt.nOriginalRate'] = nAmtExchs;
+						item['TermRisktgt.cOriginalCurrency'] = cPrmCurs;
+						item['TermRisktgt.nRmbAmount'] = nRmbLimits;
+					}
           selectedRow.value.data = item;
         }
       });
@@ -835,6 +852,11 @@ const setCargoSeq = (value: string, pkId: string, amount: string) => {
           item['TermRisktgt.cDistCodeNo'] = value;
           item['TermRisktgt.cDistPkId'] = pkId;
           item['TermRisktgt.nInsuranceAmount'] = amount;
+					if (allowedList.value.includes(parparam.cProdNo)) {
+						item['TermRisktgt.nOriginalRate'] = nAmtExchs;
+						item['TermRisktgt.cOriginalCurrency'] = cPrmCurs;
+						item['TermRisktgt.nRmbAmount'] = nRmbLimits;
+					}
         }
       });
 		}
