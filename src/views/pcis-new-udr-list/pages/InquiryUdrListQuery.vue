@@ -1264,12 +1264,16 @@ function updateUdrDetail(row: any) {
           pageName: "priceInquiry",
           cAppNo: row.cAppNo,
           cPolicySource: row.cPolicySource,
-        });
+				});
+				let query = {
+					param: en
+				}
+				if (row.udrType == '1' || row.udrType == '2') {
+					query.title = '询价单审核'
+				}
         router.push({
           path: "/pcisapp/pricePage",
-          query: {
-            param: en,
-          },
+          query
         });
       } else {
         const en = JSON.stringify({
@@ -1297,11 +1301,15 @@ function updateUdrDetail(row: any) {
           cAppNo: row.cAppNo,
           cPolicySource: row.cPolicySource,
         });
+				let query = {
+					param: en
+				}
+				if (row.udrType == '1' || row.udrType == '2') {
+					query.title = '询价单审核'
+				}
         router.push({
           path: "/pcisapp/pricePage",
-          query: {
-            param: en,
-          },
+          query
         });
       }
     }
@@ -1340,12 +1348,16 @@ function handleWorkFlow(row: any, type: any) {
                 cProdNmeCn: row.cProdNmeCn,
                 cPolicySource: row.cPolicySource,
               });
-              router.push({
-                path: "/pcisapp/pricePage",
-                query: {
-                  param: en,
-                },
-              });
+							let query = {
+								param: en
+							}
+							if (row.udrType == '1' || row.udrType == '2') {
+								query.title = '询价单审核'
+							}
+							router.push({
+								path: "/pcisapp/pricePage",
+								query
+							});
             } else {
               // 详情
               updateUdrDetail(row);
@@ -1429,12 +1441,16 @@ function handle_hasReceived(row: any) {
             cPolicySource: row.cPolicySource,
           };
           const en = JSON.stringify(data);
-          router.push({
-            path: "/pcisapp/pricePage",
-            query: {
-              param: en,
-            },
-          });
+					let query = {
+						param: en
+					}
+					if (row.udrType == '1' || row.udrType == '2') {
+						query.title = '询价单审核'
+					}
+					router.push({
+						path: "/pcisapp/pricePage",
+						query
+					});
         }
       });
     } else {
@@ -1527,12 +1543,16 @@ function showDetails(row: any) {
             pageName: "priceInquiry",
             cPolicySource: row.cPolicySource,
           });
-          router.push({
-            path: "/pcisapp/pricePage",
-            query: {
-              param: en,
-            },
-          });
+					let query = {
+						param: en
+					}
+					if (row.udrType == '1' || row.udrType == '2') {
+						query.title = '询价单审核'
+					}
+					router.push({
+						path: "/pcisapp/pricePage",
+						query
+					});
         } else {
           const en = JSON.stringify({
             cInquiryNo: row.objId ? row.objId : row.cInquiryNo,
@@ -1552,12 +1572,16 @@ function showDetails(row: any) {
             pageName: "priceInquiry",
             cPolicySource: row.cPolicySource,
           });
-          router.push({
-            path: "/pcisapp/pricePage",
-            query: {
-              param: en,
-            },
-          });
+					let query = {
+						param: en
+					}
+					if (row.udrType == '1' || row.udrType == '2') {
+						query.title = '询价单审核'
+					}
+					router.push({
+						path: "/pcisapp/pricePage",
+						query
+					});
         }
       }
     });
