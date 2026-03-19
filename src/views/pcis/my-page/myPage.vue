@@ -7267,6 +7267,18 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
     const calcres:any = flag === '0' ? await calcFunc() : await calcEdrFunc();
     if(calcres && calcres.code === 200) {
       const newOp: any = opertaor.convertData(calcres);
+			opertaor.setDataAll(newOp);
+			bthList.value.forEach((item:any) => {
+			if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
+					item.loading = true;
+				}
+			});
+			await new Promise(resolve => setTimeout(resolve, 2000)); // 等待数据回填完成
+			bthList.value.forEach((item:any) => {
+				if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
+					item.loading = false;
+				}
+			});
       const nPrm = newOp.base["Base.nPrm"];
 
       let minPrm:any = 0;
