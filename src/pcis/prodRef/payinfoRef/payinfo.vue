@@ -275,7 +275,7 @@ function getFromValue() {
 
 function setFormValue(value: any) {
 	const tgt = opertaor.getTableRefByKey("tgt")?.getFromValue();
-	if (!!tgt) {
+	if (!!tgt && !!tgt['Tgt.nFarmerPaymentAmt']) {
 		let params = {
 			cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
 		}
@@ -285,12 +285,12 @@ function setFormValue(value: any) {
 					value.forEach((item) => {
 						item["Pay.nPayablePrm"] = tgt["Tgt.nFarmerPaymentAmt"] ? tgt["Tgt.nFarmerPaymentAmt"] : 0;
 					})
+					payinfoEditRef?.value?.setFormValue(value);
 				} else {
 					ElMessage.error("农户自缴费用出错，请重新计算");
 					return false;
 				}
 			}
-			payinfoEditRef?.value?.setFormValue(value);
 		})
 	} else {
 		payinfoEditRef?.value?.setFormValue(value);
