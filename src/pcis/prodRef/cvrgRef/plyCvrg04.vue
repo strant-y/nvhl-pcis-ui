@@ -58,7 +58,7 @@
                 >
                   <tremTemplate
                     v-for="(i, index) in planData[k]['m']"
-                    :key="index"
+                    :key="planData[k]['m'][index]['&rowId']"
                     :rowIndex="i['Term.cPlanNo']"
                     v-model="planData[k]['m'][index]"
                     :disabled-flag="disAbledFlag"
@@ -98,7 +98,7 @@
                   >
                     <tremTemplate
                       v-for="(i, index) in planData[k]['a1']"
-                      :key="index"
+                      :key="planData[k]['a1'][index]['&rowId']"
                       :rowIndex="i['Term.cPlanNo']"
                       v-model="planData[k]['a1'][index]"
                       :disabled-flag="disAbledFlag"
@@ -197,6 +197,7 @@ import { codeListViewStore } from "@/store";
 import { qryProdRelTermRiskList } from "@/api/prod";
 import { getEdrRsnTermItem } from "@/api/query";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { v4 as uuidv4 } from "uuid";
 
 const disAbledFlag = ref(false);
 const codeListMap = ref<any>({});
@@ -572,6 +573,7 @@ function refushData(planNo: string, datas: any) {
     if (!pd[key]) {
       pd[key] = [];
     }
+		item['&rowId'] = uuidv4();  // 用作组件id标记,用于刷新组件
     pd[key].push(item);
   });
   // 强制刷新组件,对数据进行更新
@@ -727,6 +729,7 @@ function getFromValue() {
         const i = JSON.parse(JSON.stringify(d));
         i["Term.cPlanNo"] = plan;
         i["Term.nSeqNo"] = idex++;
+				delete i["&rowId"]; // 删除标记rowId字符串
         if (i["riskList"]) {
           let risk_index = 1;
           i["Term.riskList"] = i["riskList"].map((m: any) => {

@@ -154,7 +154,6 @@ props.data.data.isselectData?.forEach((item: any) => {
     });
     seadd["riskList"] = list;
   }
-
   selectAdditionNodes.value.push(seadd);
 });
 
@@ -231,11 +230,12 @@ onMounted(async () => {
 function setNode() {
   const addMainKey: any[] = [];
   const param = props.data.data;
-  if (param.showType === "main" && param.showMethod === "add") {
+  if (param.showType === "main" || param.showMethod === "add" ) {
     addMainKey.push(param['mainTerm']);
   } else {
     if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
       selectAdditionNodes.value.forEach((item: any) => {
+        addMainKey.push(item["cTermNo"]);
         if (item["riskList"] && item["riskList"].length > 0) {
           item["riskList"].forEach((risk: any) => {
             const k = item["cTermNo"] + risk["cRiskNo"];

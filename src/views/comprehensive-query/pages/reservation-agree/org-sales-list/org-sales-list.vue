@@ -158,6 +158,7 @@ const refreshData = (reset = false) => {
       CBrkrCde: formData.value["CBrkrCde"],
       CSlsTyp: formData.value["CSlsTyp"],
       CChaType: formData.value["CChaType"],
+			CChaSubtype: formData.value['cChaSubtype'],
       CDptAttr: formData.value["CDptAttr"],
       CSlsCde: formData.value["CSlsCde"],
       subSidiary: formData.value["subSidiary"],

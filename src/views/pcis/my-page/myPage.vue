@@ -546,7 +546,8 @@ import {
 	isUndrClsBlackList,
   queryTermRateLimit,
 	queryEcargoRelevancePolicyDetails,
-	enquiryToAppEndorseChange
+	enquiryToAppEndorseChange,
+	getBusinessType,
 } from "../../../api/query/index";
 import { checkFeeWindowType, selectDist, getReleaseInquiryPage, copyDist, checkoutn, checkDistForSubmit, qryTerminationDataList, getPremiumAdjustmentRange, getNewSysDays, checkCdeptByCdptCde, getOaTermination, checkTgtEmployeeNumber  } from "@/api/prod";
 import { dataOpertaor, useProductStore,useTagsViewStore } from "@/store";
@@ -970,6 +971,7 @@ const setCusBenefitInfo = (val) => {
   const baseValue = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
   const basePrmCur = opertaor.getTableRefByKey("base")?.getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
   const basePrm = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nPrm"];//承保基本信息 总保费
+	let cRsnCde = props.param['cRsnCde']? props.param['cRsnCde']: props.param['cEdrRsnBundleCde'];
 	let msg = val == 'view' ? '查看': '录入';
 
 
@@ -1003,19 +1005,21 @@ const setCusBenefitInfo = (val) => {
     return;
   }
 	// 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
-	if(basePrmCur == "USD"){
-		if (basePrm < 10000) {
-			ElMessage.error(
-					`根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
-			);
-			return;
-		}
-	} else {
-		if (baseValue < 50000) {
-			ElMessage.error(
-					`根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
-			);
-			return;
+	if (cRsnCde && cRsnCde != 'BH') {
+		if(basePrmCur == "USD"){
+			if (basePrm < 10000) {
+				ElMessage.error(
+						`根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
+				);
+				return;
+			}
+		} else {
+			if (baseValue < 50000) {
+				ElMessage.error(
+						`根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
+				);
+				return;
+			}
 		}
 	}
 
@@ -1088,7 +1092,7 @@ const copyPolicyFun = () => {
       router.push({
         path: "/pcisapp/myPage",
         query: {
-          param: JSON.stringify({ ...param, pageType: 'copy', cAppTyp: 'A' }),
+          param: JSON.stringify({ ...param, pageType: 'copy', cAppTyp: 'A', detailsCopy: '1', }),
         },
       });
       setTimeout(() => {
@@ -1167,6 +1171,8 @@ const copyPolicyFun = () => {
               ops.plyBase['Base.cConfirmSequenceNo'] = null // 核保确认码
               ops.plyBase['Base.cPreConfirmSequenceNo'] = null // 保单/批单预确认码
               ops.plyBase['Base.cUwConfirmSequenceNo'] = null // 保单/批单确认码
+              ops.plyBase['Base.cIntroDptcde'] = props.param["cDptCde"] // 服务机构
+              ops.plyBase['Base.cDptCde'] = props.param["cDptCde"] // 机构部门
             }
             ops['plyBase']['Base.cPlyNo'] = ''
             // if(ops['ci'] && ops['ci'].length>0){
@@ -2312,6 +2318,11 @@ async function loadAfter() {
           ops.plyBase['Base.cConfirmSequenceNo'] = null // 核保确认码
           ops.plyBase['Base.cPreConfirmSequenceNo'] = null // 保单/批单预确认码
           ops.plyBase['Base.cUwConfirmSequenceNo'] = null // 保单/批单确认码
+					// 适用详情页复制出单刷新后机构前后不一致
+					if (props.param["detailsCopy"] == '1') {
+						ops.plyBase['Base.cIntroDptcde'] = props.param["cDptCde"] // 服务机构
+            ops.plyBase['Base.cDptCde'] = props.param["cDptCde"] // 机构部门
+					}
         }
         ops['plyBase']['Base.cPlyNo'] = ''
         // if(ops['ci'] && ops['ci'].length>0){
@@ -2624,6 +2635,10 @@ async function loadAfter() {
             if(item['Term.riskList'] && Array.isArray(item['Term.riskList']) && item['Term.riskList'].length > 0) {
               item['Term.riskList'].forEach((i:any) => {
                 delete i['Term.cPkId']
+								// 询价转投保按钮进入，解决保障信息中的地址编码存在之前数据的问题
+								if (props.param.pageType != "TEMPORARY_DEPOSIT" && props.param.cPolicySource == '6') {
+									i['TermRisktgt.cDistCodeNo'] = null
+								}
               })
             }
           })
@@ -3767,7 +3782,24 @@ const submitToUndrFn = async () => {
         return false;
       }
     }
-  }
+	}
+	// 040015 保障信息-非单独承保污染责任情况-除污染责任外的累计赔偿限额和累计赔偿限额二选一必填
+	if(props.param.cProdNo === '040015') {
+		if (cvrgList && cvrgList.length > 0) {
+			const has040173 = cvrgList[0]['Term.riskList'].some(i => i['TermRisktgt.cLiabCode'] == '040173');
+  		const hasOthers = cvrgList[0]['Term.riskList'].length > 1;
+
+			if (has040173 && hasOthers) {
+				const v1 = cvrgList[0]['Term.nExcludeLimit'];
+				const v2 = cvrgList[0]['Term.nInsuranceAmount'];
+				// 简单判空：如果都是 falsy (null, undefined, '') 且不是数字0
+				if ((!v1 && v1 !== 0) && (!v2 && v2 !== 0)) {
+					ElMessage.error('保障信息中【除污染责任外的累计赔偿限额】和【累计赔偿限额】二选一必填！');
+					return false;
+				}
+			}
+		}
+	}
   // 定义cInquiryNumber 和 cAppNo；
   const cInquiryNumber = opertaor.getTableRefByKey("plyBase").getValue("Base.cInquiryNo")
   const cAppNo = opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
@@ -3864,9 +3896,15 @@ const submitToUndrFn = async () => {
       totalCent += toCent(item['Pay.nPayablePrm']);
     });
     const basePrmCent = toCent(nPrm);
-    if(totalCent !== basePrmCent){
+		if (totalCent !== basePrmCent) {
+			let params = {
+				cAppNo: cAppNo
+			}
+			const BusinessType = await getBusinessType(params)
+			if (BusinessType.code != 200 || BusinessType.data.data < 1) {
         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-      return false;
+      	return false;
+			}
     }
     const lastName = payList[payList.length - 1]?.['Pay.cPayorNme'];
     const applicantName = opertaor.getTableRefByKey("applicant").getValue('Applicant.cAppNme');
@@ -4476,29 +4514,41 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 				if(cAppNme != cAcctNme){
 					for (const i in edrexptArr) {
 						const objValue = edrexpDataVlue[edrexptArr[i]];
-						appMsg += edrexpCnmArr[i] + '、';
-						edrexp.value.setFormItem(edrexptArr[i], {
-							rules: [getRules("required", {})],
-							hidden: false,
-							disabled: !isDis
-						});
+						if (!objValue) {
+							appMsg += edrexpCnmArr[i] + '、';
+						}
+						if (edrexptArr[i] == 'EdrBase.cNotBackAppNo') {
+							edrexp.value.setFormItem(edrexptArr[i], {
+								rules: [getRules("required", {}),getRules("maxLength", {len:50})],
+								hidden: false,
+								disabled: !isDis
+							});
+						} else {
+							edrexp.value.setFormItem(edrexptArr[i], {
+								rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
+								hidden: false,
+								disabled: !isDis
+							});
+						}
 						flag = true;
 					}
 				} else {
 					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
-					appMsg = '退保、减保或者办理保单贷款原因、';
+					if (!objValue) {
+						appMsg = '退保、减保或者办理保单贷款原因、';
+					}
 					edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-						rules: [getRules("required", {})],
+						rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
 						hidden: false,
 						disabled: !isDis
 					});
 					edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-						rules: [],
+						rules: [getRules("maxLength", {len:2000})],
 						hidden: false,
 						disabled: true
 					});
 					edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-						rules: [],
+						rules: [getRules("maxLength", {len:50})],
 						hidden: false,
 						disabled: true
 					});
@@ -4511,7 +4561,7 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
 					msg += '批改扩展信息中【' + appMsg.substring(0, appMsg.length - 1) + '】不能为空。';
 				}
 			}
-			if (flag && isMsg) {
+			if (flag && isMsg && appMsg) {
 				ElMessage.error(msg);
 				return false;
 			}
@@ -4519,13 +4569,13 @@ const edrvalidateNPrmAmlya = (EdrBaseData) => {
   } else {
     if(edrexp.value) {
       edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-        rules: [],
+        rules: [getRules("maxLength", {len:2000})],
       });
       edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-        rules: [],
+        rules: [getRules("maxLength", {len:2000})],
       });
       edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-        rules: [],
+        rules: [getRules("maxLength", {len:50})],
       });
     }
   }
@@ -4613,11 +4663,17 @@ const savePlyInfo = async () => {
       });
       const basePrmCent = toCent(res['base']['Base.nPrm']);
        if(totalCent !== basePrmCent){
-         ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
+				let params = {
+					cAppNo: res["plyBase"]["Base.cAppNo"]
+				}
+				const BusinessType = await getBusinessType(params)
+				if (BusinessType.code != 200 || BusinessType.data.data < 1) {
+					ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
           if(btn) {
             btn.loading = false;
           }
-        return false;
+       		return false;
+				}
       }
   }
 
@@ -5422,7 +5478,7 @@ const submitEdrToUndrSurrender = async () => {
   }
 	const edrexpValidate = await edrexp.value?.validate();
   if(!edrexpValidate && edrexp.value && edrexpFlag) {
-    ElMessage.error("请填写批改扩展信息中的必填项")
+    ElMessage.error("请检查批改扩展信息中的必填项")
     return
   }
 
@@ -5502,6 +5558,11 @@ const submitEdrToUndrSurrender = async () => {
  * **/
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
+	const edrexpValidate = await edrexp.value?.validate();
+  if(!edrexpValidate && edrexp.value && edrexpFlag) {
+    ElMessage.error("请检查批改扩展信息中的必填项")
+    return
+  }
   let saveEdrFlag = false;
   bthList.value.forEach((item:any) => {
     if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
@@ -5778,17 +5839,10 @@ const submitEdrToUndrFun = async () => {
   if(!validateTgt()) {
     return;
   }
-    if(props.param.cTransMrk !== "1" ){
+  if(props.param.cTransMrk !== "1" ){
     const edrBaseValidate = await edrbase.value?.validate();
      if(!edrBaseValidate) {
       ElMessage.warning("请填写批改信息中的必填项")
-      return
-    }
-  }
-	if(props.param.cTransMrk !== "1" && edrexp.value && edrexpFlag){
-    const edrexpValidate = await edrexp.value?.validate();
-     if(!edrexpValidate) {
-      ElMessage.warning("请填写批改扩展信息中的必填项")
       return
     }
   }
@@ -5846,6 +5900,13 @@ const submitEdrToUndrFun = async () => {
     	return;
   	}
 	}
+	if(props.param.cTransMrk !== "1" && edrexp.value && edrexpFlag){
+    const edrexpValidate = await edrexp.value?.validate();
+     if(!edrexpValidate) {
+      ElMessage.warning("请检查批改扩展信息中的必填项")
+      return
+    }
+  }
 
   if (validateGuaranteeBgnTm()) {
     return;
@@ -7252,7 +7313,8 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
     if(nDpdDays.code === 200) {
       if(nDpdDays.data?.code == '1') {
         if(nDpdDays.data?.result && nDpdDays.data?.result[0]?.cRuleValue) {
-          rebackDay = nDpdDays.data?.result[0]?.cRuleValue || 0;
+          const cRuleValue = nDpdDays.data?.result[0]?.cRuleValue || 0;
+          rebackDay = cRuleValue > 0 ? cRuleValue : 0;
         }
       } else {
         ElMessage.error(nDpdDays.data?.message)

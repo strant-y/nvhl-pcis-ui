@@ -210,6 +210,7 @@ const obj = {
         CBrkrCde: props.data['cBrkrCde'],
         CSlsTyp: props.data['cSlsTyp'],
         CChaType: props.data['cChaType'],
+				CChaSubtype: props.data['cChaSubtype'],
         CDptAttr: props.data['cDptAttr'],
         subSidiary: props.data['subSidiary'],
         leading: props.data['leading'],

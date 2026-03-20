@@ -163,7 +163,7 @@ onMounted(() => {
   // 组织机构代码
   // setFormItem("Insured.cOrganizationCode", {rules: [getRules("socialCode", {})]});
   // 经常居住地校验
-  setFormItem("Insured.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+  setFormItem("Insured.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
   // 税务登记号
   // setFormItem("Insured.cTaxRegistrationNo", {rules: [getRules("taxValidation", {})]});
   // 证件号码
@@ -1627,18 +1627,28 @@ const method = {
       });
       setFormItem("Insured.RegisterProp", {
         disabled: true,
+        rules: []
       });
     } else {
       setFormItem("Insured.ClntAddrProp", {
         disabled: false,
         rules: [getRules("required", {})]
-      });
-      setFormItem("Insured.RegisterProp", {
-        disabled: false,
-      });
+			});
+			let cClntMrk = getValue('Insured.cClntMrk'); // 法人  1个人  0法人
+			if (cClntMrk == '0') { 
+				setFormItem("Insured.RegisterProp", {
+					disabled: false,
+					rules: [getRules("required", {})]
+				});
+			} else {
+				setFormItem("Insured.RegisterProp", {
+					disabled: false,
+				});
+			}
+
     }
 		const param = opertaor.getParam();
-    if (param.initFlag) {
+    if (param.initFlag || isCoypBtn.value || isOcrEcho) {
       return;
     }
     setValue("Insured.ClntAddrProp", null);

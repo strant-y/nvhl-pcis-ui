@@ -164,7 +164,7 @@ onMounted(() => {
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", { rules: [getRules("txnApprovalNo", {})] });
     // 经常居住地校验
-    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
     // 证件号码
     // setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
     if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT") && (param.cTransMrk == '1' || param.cRsnCde === '99' || param.cEdrRsnBundle === '99' || param.cEdrRsnBundleCde === '99')) {
@@ -1557,15 +1557,25 @@ const method = {
       });
       setFormItem("Applicant.RegisterProp", {
         disabled: true,
+        rules: []
       });
     } else {
       setFormItem("Applicant.ClntAddrProp", {
         disabled: false,
         rules: [getRules("required", {})]
-      });
-      setFormItem("Applicant.RegisterProp", {
-        disabled: false,
-      });
+			});
+			let cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+			if (cClntMrk == '0') {
+				setFormItem("Applicant.RegisterProp", {
+					disabled: false,
+					rules: [getRules("required", {})]
+				});
+			} else {
+				setFormItem("Applicant.RegisterProp", {
+					disabled: false,
+				});
+			}
+
     }
 		const param = opertaor.getParam();
     if (param.initFlag) {

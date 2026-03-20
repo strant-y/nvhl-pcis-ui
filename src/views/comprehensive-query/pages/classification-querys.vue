@@ -41,7 +41,7 @@
        <template #column-policyInfoXJ="{ row, column, index }">
         <div class="policy-info-cell">
           <!-- 询价 -->
-          <template v-if="cAppType == 'I' || row.tabtyp == 'A' || row.tabtyp == 'I'">
+          <template v-if="cAppType == 'I' || row.tabtyp == 'I'">
             <div v-if="row.cAppNo" class="policy-number-row">
                 <span v-html="row.cAppNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">

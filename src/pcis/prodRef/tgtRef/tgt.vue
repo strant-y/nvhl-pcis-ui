@@ -211,7 +211,7 @@ onMounted(async () => {
 	}
 
   //  运输工具名称
-  const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
+  const cTransportationNames = ['020003', '020011', '020013'];
 	const isNonRequired = cTransportationNames.includes(params.cProdNo);
 
 	// 风险累积按钮核保切是规定产品展示
@@ -248,19 +248,8 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
+	setFormItem('Tgt.cCertificateDetailed', { autosize: true })
   selectType()
-  // 020019、020020、020021三款产品标的信息全部非必填
-  if(['020019','020020','020021'].includes(params.cProdNo)) {
-    formconfig11.fromSchema?.forEach((item:any) => {
-      if(item.rules?.length > 0) {
-        item.rules.forEach((i:any, index:any) => {
-          if(i.required === true) {
-            item.rules.splice(index, 1)
-          }
-        })
-      }
-    })
-  }
   // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
   if(params.cProdNo === '059902') {
     method.getcGuaranteeMethodChange('');
@@ -276,7 +265,7 @@ onMounted(async () => {
   }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
-    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
+    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017', '020019', '020020', '020021' ]
     if(ProdNo.includes(params.cProdNo)) {
       eventBus.on('goodsMxChange', handelGoodsMx);
     }
@@ -310,6 +299,10 @@ onMounted(async () => {
 				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
 			}
 		}
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: false, disabled: false });
+			setFormItem('Tgt.nInvoicceValue', { readonly: false, disabled: false });
+		}
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
         const data = getFromValue();
@@ -342,7 +335,11 @@ function hasEnglish(str: any) {
 }
 const handelGoodsMx = (val: any) => {
   console.log(val)
-  if (val.length > 0) {
+	if (val.length > 0) {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: true, disabled: true });
+			setFormItem('Tgt.nInvoicceValue', { readonly: true, disabled: true });
+		}
     setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
     setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
     setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
@@ -352,7 +349,11 @@ const handelGoodsMx = (val: any) => {
     setValue('Tgt.cTradeNum', val[0]['Dist.cTradeNum'])
     setValue('Tgt.cLadingNum', val[0]['Dist.cBillNum'])
     setValue('Tgt.cCreditNum', val[0]['Dist.cLetterNum'])
-  } else {
+	} else {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: false, disabled: false });
+			setFormItem('Tgt.nInvoicceValue', { readonly: false, disabled: false });
+		}
     setValue('Tgt.nAdditiveCoefficient', '')
     setValue('Tgt.cTradeNum', '')
     setValue('Tgt.cLadingNum', '')
@@ -1959,7 +1960,15 @@ const method = {
       setFormItem("Tgt.cListingLocation", { rules: [] })
       setFormItem("Tgt.cStockCode", { rules: [] })
     }
-  },
+	},
+	// 上市地点
+	cListingLocationChange: (val:any) => {
+		if (val == '5') {
+			setFormItem("Tgt.cOtherRegions", { rules: [getRules("required", {})] })
+		} else {
+			setFormItem("Tgt.cOtherRegions", { rules: [] })
+		}
+	},
   // 是否包含退市后责任（run-off）
   cIncludeDelistingChange: (val:any) => {
     if(val === "1") {// 选是 ___年必填

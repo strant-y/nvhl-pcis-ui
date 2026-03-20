@@ -153,7 +153,23 @@ export const NewUdrListService = () => {
     } catch (error) {
       return handleError(error);
     }
+	}
+	// 获取核保选项
+  const ecargoGetCUndrMrk = async (ops: any) => {
+    try {
+      return post(`ecargo/getCUndrMrk`, ops);
+    } catch (error) {
+      return handleError(error);
+    }
   }
+	// 协议获取退回到指定核保级别人员
+	const ecargoGetBackClsList = async (ops: any) => {
+		try {
+			return post(`ecargo/getBackClsList`, ops);
+		} catch (error) {
+			return handleError(error);
+		}
+	}
 
   // 解除接收
   const removeReceived = async (ops: any) => {
@@ -584,7 +600,9 @@ export const NewUdrListService = () => {
     hasReceived,
     checkEdrPocly,
     getCUndrMrk,
-    getBackClsList,
+		getBackClsList,
+		ecargoGetCUndrMrk,
+		ecargoGetBackClsList,
     removeReceived,
     withdraw,
     delTmpPolicy,

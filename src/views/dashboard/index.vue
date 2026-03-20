@@ -1316,10 +1316,10 @@ const getData = (user: any, roles: any = []) => {
   requestId.value = Math.random();// 每次请求时生成一个随机数
   if (isAudit.value) {
     getAuditTableData(requestId.value);
-    currentTabName.value = tabs.value[0].name;
+    currentTabName.value = tabs.value[0]?.name;
   } else {
     getIssueTableData(requestId.value);
-    currentTabName.value = tabs.value[0].name;
+    currentTabName.value = tabs.value[0]?.name;
   }
 };
 
