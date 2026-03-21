@@ -696,6 +696,7 @@ const changeInside = (e) => {
  */
 const getCaptchaParam = ref({});
 function getCaptcha(param) {
+	getCaptchaParam.value = {}
   thirdPartyData.value.captchaCode = "";
   Object.assign(getCaptchaParam.value, param);
   getCaptchaParam.value.inside = inside.value;
@@ -916,7 +917,7 @@ const forgetPwd = () => {
 					isVisible.value = true;
 					forgetPwdVerify.value = true;
           // 获取验证码
-          getCaptcha({ serial: serial });
+          getCaptcha({ serial: serial, Changepassword: '1' });
 				} else {
 					ElMessage.error(msg || "系统出错");
 				}

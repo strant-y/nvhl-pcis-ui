@@ -442,7 +442,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 const policyService = new PolicyService();
 import { delTmpPolicy, delInquiryPolicy } from "@/api/query";
 import { createFreeButtonBase } from "@/shared/button-config";
-
+import labelIcon from '@/assets/img/slash.png'; 
 defineOptions({
   name: "Dashboard",
   inheritAttrs: false,
@@ -494,7 +494,6 @@ const moreBtnItem = ref({
     toQuery(moreurl.value);
   },
 });
-const labelIcon = "/src/assets/img/slash.png";
 
 const env = import.meta.env;
 const platformUrl = env.MODE === "prod" ? 'https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68f5e3f9f367b2000104542a&projectId=Pi2GPKuRX7dZ4TCs&access_type=1': 'https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1';
