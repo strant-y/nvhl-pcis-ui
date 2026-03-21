@@ -696,7 +696,7 @@ const changeInside = (e) => {
  */
 const getCaptchaParam = ref({});
 function getCaptcha(param) {
-	getCaptchaParam.value = {}
+	delete getCaptchaParam.value['Changepassword']
   thirdPartyData.value.captchaCode = "";
   Object.assign(getCaptchaParam.value, param);
   getCaptchaParam.value.inside = inside.value;
