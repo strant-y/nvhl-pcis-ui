@@ -447,6 +447,18 @@ onMounted(async () => {
     if(item.prop =='Dist.cPrmCur'){
       item['func'] =  InsurancecurrencyChange;
 		}
+    if(item.prop =='Dist.cPerCurrency'){
+      item['func'] =  cPerCurrencyChange;
+		}
+    if(item.prop =='Dist.nPerCoverage'){
+      item['func'] =  nPerCoverageChange;
+		}
+    if(item.prop =='Dist.cCoverageCurrency'){
+      item['func'] =  cCoverageCurrencyChange;
+		}
+    if(item.prop =='Dist.nPerValue'){
+      item['func'] =  nPerValueChange;
+		}
 		if(item.prop =='Dist.nTransportLimit'){
       item['func'] =  nTransportLimitChange;
 		}
@@ -904,6 +916,64 @@ const InsurancecurrencyChange = (val:any)=>{
 		} else {
 			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
 		}
+  }
+}
+// 每集装箱价值
+const nPerValueChange = (val:any) => {
+	if(val){
+    setValue('Dist.nRmbCurrency',Number(getValue('Dist.nPerValue'))*getValue('Dist.nPerRate'))
+  } else {
+    setValue('Dist.nRmbCurrency',null)
+  }
+}
+// 每集装箱价值币种
+const cPerCurrencyChange = (val:any) => {
+  if(!val) {
+		setValue("Dist.nPerRate", null);
+		setValue('Dist.nRmbCurrency', null)
+  } else if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+					setValue("Dist.nPerRate", res[0].currency_rate);
+					setValue('Dist.nRmbCurrency',Number(getValue('Dist.nPerValue'))*getValue('Dist.nPerRate'))
+        });
+  } else {
+		setValue("Dist.nPerRate", "1.000000");
+		setValue('Dist.nRmbCurrency',Number(getValue('Dist.nPerValue')))
+  }
+}
+// 每集装箱保额
+const nPerCoverageChange = (val:any) => {
+	if(val){
+    setValue('Dist.nRmbAmount',Number(getValue('Dist.nPerCoverage'))*getValue('Dist.nExchangeRate'))
+  } else {
+    setValue('Dist.nRmbAmount',null)
+  }
+}
+// 每集装箱保额币种
+const cCoverageCurrencyChange = (val:any) => {
+  if(!val) {
+		setValue("Dist.nExchangeRate", null);
+		setValue('Dist.nRmbAmount', null)
+  } else if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+					setValue("Dist.nExchangeRate", res[0].currency_rate);
+					setValue('Dist.nRmbAmount',Number(getValue('Dist.nPerCoverage'))*getValue('Dist.nExchangeRate'))
+        });
+  } else {
+		setValue("Dist.nExchangeRate", "1.000000");
+		setValue('Dist.nRmbAmount',Number(getValue('Dist.nPerCoverage')))
   }
 }
 // 运输信息航次运输限额change事件
