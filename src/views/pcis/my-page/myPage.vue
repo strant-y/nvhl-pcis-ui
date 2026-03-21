@@ -3277,7 +3277,8 @@ function baseValite(){
 const isCalcPremium = ref(false);
 const calcPremium = () => {
   let shanDongFlag = false;
-  isCalcPremium.value = false;
+	isCalcPremium.value = false;
+	isEditnPrm.value = false;
   const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
   const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
   const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
@@ -3696,6 +3697,7 @@ const checkStudentValidity  =  async() => {
  * 投保申请核保
  */
 const qryTerminationStatus = ref(false);
+const isEditnPrm = ref(false)
 const submitToUndrFn = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
   const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
@@ -3721,7 +3723,7 @@ const submitToUndrFn = async () => {
     return;
   }
 
-  if (needCalc.value && !qryTerminationStatus.value) {
+  if (needCalc.value && (!qryTerminationStatus.value || !isEditnPrm.value)) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -4945,7 +4947,8 @@ const calcPremiumEdr = async () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
     const edrbaseData = edrbase.value?.getFromValue();
-  isCalcPremium.value = false;
+	isCalcPremium.value = false;
+	isEditnPrm.value = false;
   // 条款
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
@@ -5824,8 +5827,8 @@ const submitEdrToUndrFun = async () => {
   if(!qryTerminationStatusFunc){
     return;
   }
-  
-  if (needCalc.value && props.param.cTransMrk !== "1" && !qryTerminationStatus.value) {
+
+  if (needCalc.value && props.param.cTransMrk !== "1" && (!qryTerminationStatus.value || !isEditnPrm.value)) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -7267,18 +7270,6 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
     const calcres:any = flag === '0' ? await calcFunc() : await calcEdrFunc();
     if(calcres && calcres.code === 200) {
       const newOp: any = opertaor.convertData(calcres);
-			opertaor.setDataAll(newOp);
-			bthList.value.forEach((item:any) => {
-			if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
-					item.loading = true;
-				}
-			});
-			await new Promise(resolve => setTimeout(resolve, 2000)); // 等待数据回填完成
-			bthList.value.forEach((item:any) => {
-				if(['btnCalEdr','saveEdr','btnSubmitEdr'].includes(item.id)) {
-					item.loading = false;
-				}
-			});
       const nPrm = newOp.base["Base.nPrm"];
 
       let minPrm:any = 0;
@@ -7587,6 +7578,10 @@ async function calcEdrFunc() {
   return caclres;
 }
 
+function setIsEditnPrm(flag:any) {
+ isEditnPrm.value = flag
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -7607,6 +7602,7 @@ opertaor.setFatherPage({
   calcFunc: calcFunc,
   getIsCalcPremium: getIsCalcPremium,
   setIsCalcPremium: setIsCalcPremium,
+	setIsEditnPrm: setIsEditnPrm,
 });
 
 function getIsCalcPremium() {

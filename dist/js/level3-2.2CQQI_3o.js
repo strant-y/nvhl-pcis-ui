@@ -1,1 +1,0 @@
-import{aY as s,c as t,e as a,F as e,bs as n}from"./index.Hk9mXRc7.js";const o={style:{padding:"30px"}};const r=s({},[["render",function(s,r){const i=n;return a(),t("div",o,[e(i,{closable:!1,title:"菜单三级-2",type:"warning"})])}]]);export{r as default};
