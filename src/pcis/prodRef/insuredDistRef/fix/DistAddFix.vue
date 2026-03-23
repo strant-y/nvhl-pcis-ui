@@ -850,27 +850,31 @@ const tEstablishingDateChange = (val: any) => {
 			setFormItem("InsuredDist.nYearincomeNum", {
 				rules: [],
 			});
-
-			codeListStore
-				.queryCodeList({
-					codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
-					codeListParam: {},
-				})
-				.then((res) => {
-					if (
-						!res.some((item) =>
-							Object.values(item).includes(getValue("InsuredDist.cCertfCls"))
-						)
-					) {
-						// setValue("Insured.cCertfCls", "");
-					}
-					freeEditRef.value?.addCodeListMap({
-						code: "InsuredDist.cCertfCls",
-						list: res
+			if (!init.value) {
+				codeListStore
+					.queryCodeList({
+						codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+						codeListParam: {},
 					})
-					setValue('InsuredDist.cCertfCls', '01')
-				});
-
+					.then((res) => {
+						if (
+							!res.some((item) =>
+								Object.values(item).includes(getValue("InsuredDist.cCertfCls"))
+							)
+						) {
+							if (getValue('InsuredDist.cCertfCls')) {
+								setValue("InsuredDist.cCertfCls", "");
+							}
+						}
+						freeEditRef.value?.addCodeListMap({
+							code: "InsuredDist.cCertfCls",
+							list: res
+						})
+						if (val === '0') {
+							setValue('InsuredDist.cCertfCls', '01')
+						}
+					});
+			}
 			setFormItem("InsuredDist.cWorkDpt", {
 				rules: [getRules("required", {})],
 			});

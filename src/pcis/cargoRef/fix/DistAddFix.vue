@@ -609,8 +609,8 @@ const cClntMrkFunc = (val:any) => {
     setFormItem("ECargoInsuredDist.nYearincomeNum", {
       rules: [],
     });
-
-    codeListStore
+		if (!initFlag) {
+			codeListStore
       .queryCodeList({
         codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
         codeListParam: {},
@@ -621,14 +621,19 @@ const cClntMrkFunc = (val:any) => {
             Object.values(item).includes(getValue("ECargoInsuredDist.cCertfCls"))
           )
         ) {
-          // setValue("Insured.cCertfCls", "");
+					if (getValue('ECargoInsuredDist.cCertfCls')) {
+						setValue("ECargoInsuredDist.cCertfCls", "");
+					}
         }
         freeEditRef.value?.addCodeListMap({
           code: "ECargoInsuredDist.cCertfCls",
           list: res
-        })
-        setValue('ECargoInsuredDist.cCertfCls', '01')
+				})
+				if (val === '0') {
+					setValue('ECargoInsuredDist.cCertfCls', '01')
+				}
       });
+		}
 
     setFormItem("ECargoInsuredDist.cWorkDpt", {
       rules: [getRules("required", {})],

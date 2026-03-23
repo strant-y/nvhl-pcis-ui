@@ -686,7 +686,7 @@ const method = {
       co = 'UN_NATURAL_CERTIFICATE_CACHE';
     }
 
-    // if (initFlag.value) {
+    if (!initFlag.value) {
       codeListStore
         .queryCodeList({
           codeListName: co,
@@ -705,7 +705,7 @@ const method = {
             setValue('ECargoApplicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
-    // }
+    }
 
     checkUser();
   },
