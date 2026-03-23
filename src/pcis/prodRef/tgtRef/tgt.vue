@@ -2215,6 +2215,16 @@ const method = {
 			}
 		}
 	},
+	// 是否融资性保证险
+	cIsFinancingChange: (val: any) => {
+		if (val == '1') {
+			setFormItem('Tgt.cFinancingGuarantee',{rules: [getRules("required", {})]})
+		} else {
+			clearValidate('Tgt.cFinancingGuarantee');
+			setFormItem('Tgt.cFinancingGuarantee', { rules: [] })
+			setValue('Tgt.cFinancingGuarantee', null) // 海事局名称
+    }
+	},
   // 融资性保证险
   cFinancingGuaranteeBtnFunc:() => {
     dialog.value?.open('cFinancingGuarantee', {

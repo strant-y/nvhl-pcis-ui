@@ -96,22 +96,46 @@ onMounted(() => {
   });
 });
 //给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        } else {
-          Object.assign(item, obj);
-        }
-      }
-    });
+function setFormItem(key: string, obj: Record<string, any>): void {
+  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
 }
+
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
+          }
+        });
+      }
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
+
 const handelItemShow = (data:any)=>{
   // 遍历主数组
   data.forEach(item => {
@@ -662,7 +686,7 @@ const method = {
       co = 'UN_NATURAL_CERTIFICATE_CACHE';
     }
 
-    // if (initFlag.value) {
+    if (!initFlag.value) {
       codeListStore
         .queryCodeList({
           codeListName: co,
@@ -681,7 +705,7 @@ const method = {
             setValue('ECargoApplicant.cCertfCls', '01');  // 法人默认机构代码
           }
         });
-    // }
+    }
 
     checkUser();
   },
@@ -1101,6 +1125,45 @@ const method = {
         rules: null
       });
     }
+	},
+	// 国籍
+  cNationChange:(val:any) => {
+    // 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+    if(val && val !== 'CHN') {
+      setFormItem("ECargoApplicant.Prop", {
+        disabled: true,
+        rules: []
+      });
+      setFormItem("ECargoApplicant.RegisterProp", {
+        disabled: true,
+        rules: []
+      });
+    } else {
+      setFormItem("ECargoApplicant.Prop", {
+        disabled: false,
+        rules: [getRules("required", {})]
+			});
+			let cClntMrk = getValue('ECargoApplicant.cClntMrk'); // 法人  1个人  0法人
+			if (cClntMrk == '0') { 
+				setFormItem("ECargoApplicant.RegisterProp", {
+					disabled: false,
+					rules: [getRules("required", {})]
+				});
+			} else {
+				setFormItem("ECargoApplicant.RegisterProp", {
+					disabled: false,
+				});
+			}
+
+    }
+
+    if (initFlag.value) {
+      return;
+    }
+    setValue("ECargoApplicant.Prop", null);
+    setValue("ECargoApplicant.cSuffixAddr", '');
+    setValue("ECargoApplicant.RegisterProp", null);
+    setValue("ECargoApplicant.cRegisterSuffixAddr", '');
   },
 };
 

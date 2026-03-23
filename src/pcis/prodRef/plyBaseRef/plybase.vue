@@ -488,7 +488,7 @@ const method = {
 								policyService.getPrivateSelsList({cUserCode: params.CUserCode}).then((res) => {
 									if (res["code"] === 200 && !!res["data"]) {
 										setFormItem("Base.cSlsId", {disabled: true,btnItems: {disabled: true}});
-										setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
+										// setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
 										setValue("Base.cSlsId", res.data.cSlsCde); // 业务员员工号
 										setValue("Base.cSlsNme", res.data.cSlsNme); // 业务员名称
 										setValue("Base.cSlsTel", res.data.cTel); // 业务员电话
@@ -635,7 +635,7 @@ const method = {
 								policyService.getPrivateSelsList({cUserCode: data.cRecommendCode}).then((res) => {
 									if (res["code"] === 200 && !!res["data"]) {
 										setFormItem("Base.cSlsId", {disabled: true,btnItems: {disabled: true}});
-										setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
+										// setFormItem("Base.cIntroSalecde", {btnItems: {disabled: true}});
 										setValue("Base.cSlsId", res.data.cSlsCde); // 业务员员工号
 										setValue("Base.cSlsNme", res.data.cSlsNme); // 业务员名称
 										setValue("Base.cSlsTel", res.data.cTel); // 业务员电话
