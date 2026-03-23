@@ -174,6 +174,11 @@ onMounted(async  () => {
 		// 办理人员证件有效止期
     if(['InsuredDist.tOperaterCertfEndTm'].includes(item.prop)) {
       item["disabledDate"] = tOEndTmDisable;
+		}
+		
+		// 办理人员证件有效止期
+    if(['InsuredDist.cNation'].includes(item.prop)) {
+      item["func"] = cNationChange;
     }
     // 单位性质
     if(['InsuredDist.cWorkDpt'].includes(item.prop)) {
@@ -1205,6 +1210,46 @@ const cWorkDptChange = (val: any) => {
 // 办理人员止期 禁用处理
 const tOEndTmDisable =(date: any) => {
   return disablePastDates(date);
+}
+
+// 国籍
+const cNationChange = (val:any) => {
+	// 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+	if(val && val !== 'CHN') {
+		setFormItem("InsuredDist.ClntAddrProp", {
+			disabled: true,
+			rules: []
+		});
+		setFormItem("InsuredDist.RegisterProp", {
+			disabled: true,
+			rules: []
+		});
+	} else {
+		setFormItem("InsuredDist.ClntAddrProp", {
+			disabled: false,
+			rules: [getRules("required", {})]
+		});
+		let cClntMrk = getValue('InsuredDist.cClntMrk'); // 法人  1个人  0法人
+		if (cClntMrk == '0') { 
+			setFormItem("InsuredDist.RegisterProp", {
+				disabled: false,
+				rules: [getRules("required", {})]
+			});
+		} else {
+			setFormItem("InsuredDist.RegisterProp", {
+				disabled: false,
+			});
+		}
+
+	}
+
+	if (init.value) {
+		return;
+	}
+	setValue("InsuredDist.ClntAddrProp", null);
+	setValue("InsuredDist.cSuffixAddr", '');
+	setValue("InsuredDist.RegisterProp", null);
+	setValue("InsuredDist.cRegisterSuffixAddr", '');
 }
 
 function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {

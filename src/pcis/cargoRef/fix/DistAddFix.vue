@@ -192,6 +192,10 @@ onMounted(async  () => {
     if(['ECargoInsuredDist.tOperaterCertfEndTm'].includes(item.prop)) {
       item["disabledDate"] = tOEndTmDisable;
     }
+    // 国籍
+    if(['ECargoInsuredDist.cNation'].includes(item.prop)) {
+      item["func"] = cNationChange;
+    }
     // 单位性质
     if(['ECargoInsuredDist.cWorkDpt'].includes(item.prop)) {
       item["func"] = cWorkDptChange;
@@ -1245,6 +1249,46 @@ const tOEndTmDisable =(date: any) => {
   return disablePastDates(date);
 }
 
+// 国籍
+const cNationChange = (val:any) => {
+	// 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+	if(val && val !== 'CHN') {
+		setFormItem("ECargoInsuredDist.Prop", {
+			disabled: true,
+			rules: []
+		});
+		setFormItem("ECargoInsuredDist.RegisterProp", {
+			disabled: true,
+			rules: []
+		});
+	} else {
+		setFormItem("ECargoInsuredDist.Prop", {
+			disabled: false,
+			rules: [getRules("required", {})]
+		});
+		let cClntMrk = getValue('ECargoInsuredDist.cClntMrk'); // 法人  1个人  0法人
+		if (cClntMrk == '0') { 
+			setFormItem("ECargoInsuredDist.RegisterProp", {
+				disabled: false,
+				rules: [getRules("required", {})]
+			});
+		} else {
+			setFormItem("ECargoInsuredDist.RegisterProp", {
+				disabled: false,
+			});
+		}
+
+	}
+
+	if (initFlag.value || isCoypBtn.value) {
+		return;
+	}
+	setValue("ECargoInsuredDist.Prop", null);
+	setValue("ECargoInsuredDist.cSuffixAddr", '');
+	setValue("ECargoInsuredDist.RegisterProp", null);
+	setValue("ECargoInsuredDist.cRegisterSuffixAddr", '');
+}
+
 function setregistAdd() {
   const ads = getValue("ECargoInsuredDist.Prop");
   const a = getValue("ECargoInsuredDist.cSuffixAddr") || "";
@@ -1461,22 +1505,46 @@ const getDistoccupType = (val) => {
 };
 
 //给表单下拉项赋值
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.value.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        } else {
-          Object.assign(item, obj);
-        }
-      }
-    });
+function setFormItem(key: string, obj: Record<string, any>): void {
+  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.value.fromSchema || !Array.isArray(formconfig1.value.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.value.fromSchema, key, obj);
 }
+
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
+          }
+        });
+      }
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
+
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();
 }
