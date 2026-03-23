@@ -282,12 +282,12 @@ onMounted(() => {
   }
   loadData()
 	getShortMenuList()
-	nextTick(() => {
-    if (pdfDialogRef.value) {
-      // 调用 preload：静默执行，成功则存缓存，失败也不报错
-      pdfDialogRef.value.preload(() => viewManual());
-    }
-  });
+	// nextTick(() => {
+  //   if (pdfDialogRef.value) {
+  //     // 调用 preload：静默执行，成功则存缓存，失败也不报错
+  //     pdfDialogRef.value.preload(() => viewManual());
+  //   }
+  // });
 });
 
 
