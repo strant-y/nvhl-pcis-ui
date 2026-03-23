@@ -127,7 +127,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
               cParCde: val,
               cOperId: user.value?.opCde,
               cDptCde: user.value?.companyId,
-            },
+						},
+						loadData: []
           });
           freeEditRef.value?.setValue("cProdNo", null);
         },
