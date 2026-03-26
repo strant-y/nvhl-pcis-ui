@@ -6,7 +6,7 @@ LABEL authors="duqian"
 #COPY default.conf /etc/nginx/conf.d/default.conf
 
 # 定义构建参数，默认为 uat
-# ARG ENV=nginx
+ARG ENV=nginx
 
 # 将自定义的 Nginx 配置文件复制到容器中
 COPY nginx/${ENV:-nginx}.conf /etc/nginx/conf.d/nginx.conf
