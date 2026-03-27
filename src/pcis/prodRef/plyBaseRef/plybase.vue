@@ -705,7 +705,7 @@ const method = {
               "Base.cSlsId": params.CSlsCde, //业务员员工号
               "Base.cSlsNme": params.CSlsNme, //业务员名称
               "Base.cSlsCde": params.CCtfctNo, //业务员执业证号
-              "Base.cSlsTel": params.CMobile, //业务员电话
+              "Base.cSlsTel": params.CTel, //业务员电话
               "Base.cSlsDptcde": params.CDptCde, //业务员机构代码
               "Base.cIntroDptcde": "", //清空服务机构值
             });
