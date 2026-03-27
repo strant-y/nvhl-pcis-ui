@@ -115,7 +115,7 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "所在部门代码",
             },
             {
-                prop: "CMobile",
+                prop: "CTel",
                 inputtype: "rtinput",
                 title: "联系电话",
             },
