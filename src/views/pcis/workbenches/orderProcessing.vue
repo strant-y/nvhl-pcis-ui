@@ -157,7 +157,7 @@ const inquiryTaskStatusOptions = [
   { label: "询价退回/撤回", value: "3" },
   { label: "询价通过", value: "5" },
 ]
-const baseTypeStatus = ref("询价");
+const baseTypeStatus = ref("投保");
 const cAppStatusOptions = computed(() => {
   if (baseTypeStatus.value === "询价") {
     return inquiryTaskStatusOptions;
@@ -209,7 +209,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             ],
           });
           freeEditRef.value?.setFormValue({
-            baseType: "询价",
+            baseType: "投保",
             cAppNme: "",
             cDptCde: user.companyId,
             cLoadSub: '1',
@@ -284,9 +284,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "任务类型",
         clearable: true,
         loadData: [
-          { label: "询价", value: "询价" },
           { label: "投保", value: "投保" },
           { label: "批改", value: "批改" },
+          { label: "询价", value: "询价" },
           { label: "组合单", value: "组合单" },
         ],
         func: (val: any) => {
@@ -992,7 +992,7 @@ onMounted(() => {
       dayjs().subtract(7, "day").format("YYYY-MM-DD 00:00:00"),
       dayjs().format("YYYY-MM-DD 23:59:59"),
     ],
-    baseType: "询价"
+    baseType: "投保"
   }
   if (sessionStorage.getItem("navToOrderProcessing")) {
     param['taskStatus'] = JSON.parse(
