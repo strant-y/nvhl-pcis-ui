@@ -4,28 +4,29 @@
        :element-loading-text="loadingText"
        element-loading-background="rgba(0, 0, 0, 0.6)"
   >
-      <div class="left_content">
+      <div class="left_content" v-if="anchorConfig">
         <div class="_anchor" style="overflow: auto">
-          <anchor-collapse :anchor-list="pageView.anchorConfig" @collapse-change="activeChange"/>
+          <anchor-collapse :anchor-list="anchorConfig" @collapse-change="activeChange"/>
         </div>
       </div>
       <div class="center_content">
-        <div id="positeList" style="margin-bottom: 7px;">
-          <posite-list ref="prodListRef" v-show="positeListShow" :prod-list="productList" @prod-list-change="prodListChange"/>
+        <div id="positeList" style="margin-bottom: 7px;" v-show="positeListShow">
+          <posite-list ref="prodListRef" :prod-list="productList" @prod-list-change="prodListChange"/>
         </div>
-        <template v-if="pageView.pageConfig[0]">
+        <template v-if="commonComp">
           <group-common
-              :group-id="pageView.pageConfig[0].groupId"
-              :group-config="pageView.pageConfig[0]"
+              :group-id="commonComp.groupId"
+              :group-config="commonComp"
               :index="0"
           />
         </template>
-        <template v-for="(group, idx) in pageView.pageConfig" :key="idx">
+        <template v-if="formComp">
           <group-form
-              v-if="idx > 0"
+              v-for="(group, idx) in formComp"
               :group-id="group.groupId"
               :group-config="group"
               :index="idx"
+              :key="idx"
           />
         </template>
         <div class="fixed bottom-0 right-0 bottom-items">
@@ -118,6 +119,17 @@ import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, useUserStore} fr
 import { lessThan6Months, toDate } from "@/utils/date";
 import dayjs from "dayjs";
 import moment from "moment";
+import {imageMethod} from "@/views/pcis/my-page/imageMethod";
+
+//发票信息
+const invoiceInfoModel = defineAsyncComponent(
+    () => import("@/views/pcis-new-udr-list/common/invoice-info-model.vue")
+);
+
+//反洗钱
+const amlExtendInfo = defineAsyncComponent(
+    () => import("@/views/pcis-main/prodDef/common/aml-extend-info/index.vue")
+);
 
 const props:any = defineProps({
   param: {
@@ -138,6 +150,11 @@ const loadingText = ref<string>('加载中...');
 const rightBtnList = ref<FreeButtonBase[]>();
 const prodListRef = ref();
 const user = userStore.user;
+let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
+
+const commonComp = computed(() => pageView.value.pageConfig[0])
+const formComp = computed(() => pageView.value.pageConfig.filter((item, idx) => idx > 0))
+const anchorConfig = computed(() => pageView.value.anchorConfig)
 
 const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
@@ -162,6 +179,27 @@ const bthList = ref<FreeButtonBase[]>([
     id: "btn010103",
     func: () => {
       submitToUndrFn();
+    },
+  }),
+  createFreeButtonBase({
+    label: "发票信息",
+    type: "success",
+    func: () => {
+      setTaxInfo();
+    },
+  }),
+  createFreeButtonBase({
+    label: "反洗钱扩展信息",
+    type: "success",
+    func: () => {
+      setCusBenefitInfo({});
+    },
+  }),
+  createFreeButtonBase({
+    label: '影像管理',
+    type: "warning",
+    func: () => {
+      imageMethod.showImage({});
     },
   }),
 ]);
@@ -224,7 +262,6 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
         acctinfoIdx != -1 && item.pageInfo.splice(acctinfoIdx, 1);
       }
     })
-
     console.info('### info anchorConfig', anchorConfig);
     console.info('### info pageConfig', pageConfig);
     resolve({
@@ -285,11 +322,13 @@ onBeforeMount(() => {
 
 function appInit() {
   pageView.value.initPageData();
+  inti06PlanData()
   console.log('appInit');
 }
 function saveInit(pageData: any) {
   const data = trimPageData(pageData);
   pageView.value.setPageAllData(data);
+  inti06PlanData(data)
   console.log('saveInit', data);
 }
 function readInit(pageData: any) {
@@ -303,6 +342,61 @@ function readInit(pageData: any) {
     }
   })
   console.log('readInit', data);
+}
+
+/**
+ * 意健险方案数据初始化
+ */
+const inti06PlanData = (data?: any) => {
+  const prodList06 = productList.value.filter((prod: any) => prod.cKindNo === '06' && prod.cPlanNo)
+  console.log('prodList06', prodList06)
+  if(data) {
+    const dataKeys = Object.keys(data)
+    if(prodList06.some(prod => dataKeys.includes(prod.cProdNo))) {
+      console.log('dataKeys', dataKeys)
+      return;
+    }
+  }
+  if(prodList06 && prodList06.length > 0) {
+    positeApi.getYjxPlanInfo({
+      planNo: prodList06.map(p => p.cPlanNo).join(',')
+    }).then((res: any) => {
+      console.log('getYjxPlanInfo-res', res)
+      if(res.code === 200) {
+        let nPrm = 0;
+        let nAmt = 0;
+        const planList: any[] = res.data.map((item: any, index: number) => {
+          const nSumPrm = item['PlanBase.nPerPrm'] * 5
+          const nSumAmt = item['PlanBase.nPerAmt'] * 5
+          nPrm += nSumPrm
+          nAmt += nSumAmt
+          return {
+            ...item,
+            ...{
+              'PlanBase.nSumPrm': nSumPrm,
+              'PlanBase.nSumAmt': nSumAmt,
+              'PlanBase.nAppCopies': 1,
+              'PlanBase.nAppPersons': 5,
+              'PlanBase.nSeqNo': index + 1,
+            }
+          }
+        });
+        planList.forEach((item: any) => {
+          item['PlanBase.nAmt'] = nAmt;
+          item['PlanBase.nPrm'] = nPrm;
+        })
+        prodList06.forEach((prod: any) => {
+          const opertaor = pageView.value.getDataOpertaorByProdNo(prod.cProdNo)
+          if(opertaor) {
+            const yjxPlan = opertaor.getTableRefs()['yjxPlan']
+            if(yjxPlan) {
+              yjxPlan.setFormValue(planList.filter(p => p['PlanBase.cPlanNo'] === prod.cPlanNo))
+            }
+          }
+        })
+      }
+    })
+  }
 }
 
 const prodListChange = (list: any[]) => {
@@ -385,22 +479,24 @@ const saveOpt = () => {
   }).finally(() => btn.loading = false);
 }
 
-const calcPremium = () => {
+const calcPremium = async () => {
+  const allData = pageView.value.getPageAllData();
+  const params = {param: props.param, data: allData, user: userStore.user}
+  console.log('calcPremium-params', params);
+  // const v = await pageView.value.validateAll()
+  // if(!v.validate) {
+  //   return;
+  // }
+  const loading = openPageLoading('计算中...');
   const groupIdList = pageView.value.pageConfig
       .map((group: GroupForm )=> group.groupId)
-      .filter(groupId => !groupId.includes('000000'))
-
-  const loading = openPageLoading('计算中...');
-  groupIdList.forEach(groupId => {
+      .filter(groupId => !groupId.includes('000000') && !groupId.includes('060030'))
+  groupIdList.forEach((groupId: string) => {
       const opertaor = pageView.value.getDataOpertaorByGroupId(groupId)
       calcBeforeVerify(opertaor)
   });
   const btn = getBtn('btn010101')
   btn.loading = true;
-
-  const allData = pageView.value.getPageAllData();
-  const params = {param: props.param, data: allData, user: userStore.user}
-  console.log('calcPremium-params', params);
   positeApi.appCombinationCalc(params).then((res: any) => {
     console.log('calcPremium-res', res);
     if(res.code === 200) {
@@ -707,11 +803,15 @@ const disposeAfter = (opertaor: any, ops: any, prodNo: string, msg: string) => {
 }
 
 
-const submitToUndrFn = () => {
-  const loading = openPageLoading('提核中...');
+const submitToUndrFn = async () => {
   const allData = pageView.value.getPageAllData();
   const params = {param: props.param, data: allData, user: userStore.user}
   console.log('submitToUndrFn-params', params);
+  const v = await pageView.value.validateAll()
+  if(!v.validate) {
+    return;
+  }
+  const loading = openPageLoading('提核中...');
   positeApi.submitCombination(params).then((res: any) => {
     console.log('submitCombination-res', res);
     if(res.code === 200) {
@@ -753,6 +853,7 @@ const trimPageData = (pageData: any) => {
   const resultMap: any = {};
   const dataKeys = Object.keys(pageData);
   const prodList = productList.value.map((item: any) =>  {return{...item}});
+  let cCombinationNo;
   for(const key of dataKeys) {
     if(!pageData[key]) return;
     const prodData = {...pageData[key]};
@@ -774,15 +875,26 @@ const trimPageData = (pageData: any) => {
     }else if(prodData['plyBase']) {
       // 回填产品组件数据
       const plyBase = prodData['plyBase'][0];
+      cCombinationNo = plyBase['Base.cCombinationNo'];
       const idx = prodList.findIndex(prodInfo => prodInfo.cProdNo === key);
       if(idx != -1) {
         prodList[idx]['cAppNo'] = plyBase['Base.cAppNo']
         prodList[idx]['cPlyNo'] = plyBase['Base.cPlyNo']
-        prodList[idx]['cCombinationNo'] = plyBase['Base.cCombinationNo']
+        prodList[idx]['cCombinationNo'] = cCombinationNo
       }
     }
     const opertaor = pageView.value.getDataOpertaorByProdNo(key);
     resultMap[key] = opertaor.convertData({res: {composition: prodData}})
+  }
+  // 意健险产品列表数据回填处理
+  const keys06 = dataKeys.filter(key =>  key.startsWith('06'))
+  if(cCombinationNo && keys06) {
+    for(const key of keys06) {
+      const idx = prodList.findIndex(prodInfo => prodInfo.cProdNo === key);
+      if (idx != -1) {
+        prodList[idx]['cCombinationNo'] = cCombinationNo
+      }
+    }
   }
   productList.value = prodList;
   return resultMap
@@ -809,6 +921,99 @@ const openPageLoading = (text?: string) => {
     }
   }
 }
+
+
+
+/**
+ * 发票信息
+ */
+const setTaxInfo = () => {
+  // const tabref = opertaor.getTableRefs();
+  // const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
+  // if (!!appLicantValue) {
+  //   dzmodal
+  //       .open(invoiceInfoModel, { type: "Issuer", data: {} })
+  //       .then((res: any) => {
+  //         if (res.type === "ok") {
+  //         }
+  //       });
+  // } else {
+  //   ElMessage.error("请先保存单据");
+  //   return;
+  // }
+};
+
+
+
+/**
+ * 反洗钱扩展信息hide
+ */
+const setCusBenefitInfo = (val?: any) => {
+  // const tabref = opertaor.getTableRefs();
+  // const appNo = tabref["applicant"]?.getFromValue()["Applicant.cAppNo"]; // 单据编号
+  // const AppcClntMrk = tabref["applicant"]?.getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
+  // const InscClntMrk = tabref["insured"]?.getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
+  // const baseValue = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
+  // const basePrmCur = opertaor.getTableRefByKey("base")?.getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
+  // const basePrm = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nPrm"];//承保基本信息 总保费
+  // let msg = val == 'view' ? '查看': '录入';
+  // //  单据保存才有 单据编号
+  // if (!appNo) {
+  //   ElMessage.error("请先保存单据");
+  //   return;
+  // }
+  //
+  // //  投被保人性质 没有填写或者都为个人 提示
+  // if (AppcClntMrk == undefined || AppcClntMrk == null) {
+  //   ElMessage.error(
+  //       `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
+  //   );
+  //   return;
+  // } else if (InscClntMrk == undefined || InscClntMrk === null) {
+  //   ElMessage.error(
+  //       `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
+  //   );
+  //   return;
+  // } else if (AppcClntMrk === "1" && InscClntMrk === "1") {
+  //   ElMessage.error(
+  //       `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
+  //   );
+  //   return;
+  // }
+  // // 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
+  // if(basePrmCur == "USD"){
+  //   if (basePrm < 10000) {
+  //     ElMessage.error(
+  //         `根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
+  //     );
+  //     return;
+  //   }
+  // } else {
+  //   if (baseValue < 50000) {
+  //     ElMessage.error(
+  //         `根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
+  //     );
+  //     return;
+  //   }
+  // }
+  //
+  //
+  // //  显示标志   1：投保人 2：被保人  3：都展示
+  // if (AppcClntMrk == "0" && InscClntMrk == "0") {
+  //   controlFlag = "3";
+  // } else if (AppcClntMrk == "0" && InscClntMrk == "1") {
+  //   controlFlag = "1";
+  // } else if (AppcClntMrk == "1" && InscClntMrk == "0") {
+  //   controlFlag = "2";
+  // }
+  //
+  // dzmodal
+  //     .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam,data: props.param, getNo: getNo.value })
+  //     .then((res: any) => {
+  //       if (res.type === "ok") {
+  //       }
+  //     });
+};
 
 /**
  * 获取button

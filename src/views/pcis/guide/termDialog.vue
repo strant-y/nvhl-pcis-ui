@@ -211,6 +211,21 @@ function loadTree(type: number) {
         })),
       }));
       addSearchKey(nodesData);
+      nodesData.push({
+        code: '06',
+        value: '意健险',
+        searchKey: '_06意健险',
+        list: [
+          {
+            code: 'P26000176',
+            value: '陕西秦科保团体人身意外伤害保险',
+            searchKey: '__06意健险_060030团体人身意外伤害保险_P26000176陕西秦科保团体人身意外伤害保险',
+            isDutyFree: "0",
+            isPlan: true
+          },
+        ],
+      })
+      console.log('nodesData', nodesData)
       nodes.value = nodesData;
       nextTick(() => {
         if(props.selectedList && props.selectedList.length > 0) {

@@ -18,7 +18,7 @@
           operation.addTableRef(pageK, res)
         });
         if(res && res.addProvide){
-          res.addProvide('domId',  k.pageKey === 'dist' || k.pageKey === 'distSummary' ? k.pageCode : k.pageKey);
+          res.addProvide('domId',  k.id);
         }
       }"
       :is="k.pageType === 'custom' || CommonComponentMap.has(k.pageKey) ? k.pageCode : k.pageKey  + '-ref'"
@@ -34,7 +34,7 @@ import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {dataOpertaor} from "@/store";
 import {ref} from "vue";
 import dayjs from "dayjs";
-import {lowercaseKeys} from "@/utils/common";
+import {lowercaseKeys, scrollByDomId} from "@/utils/common";
 
 const props:any = defineProps({
   index: {
@@ -53,7 +53,7 @@ const emits = defineEmits(["transferItemRef"]);
 const currentIndex = ref(0);
 const tmDay = ref(0);
 const cacheKey = ref();
-const edrbase = ref(null);
+const edrbase = ref();
 
 // 储存原始组件配置信息
 const oldProductResData = ref<any[]>([]);
@@ -67,8 +67,8 @@ const idxParam: IdxParamProps = {
   },
   cdeListViewProps: {
     id: props.groupId,
-  }
-  // handleAnchorClick: handleAnchorClick,
+  },
+  handleAnchorClick: handleAnchorClick,
 };
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
@@ -112,7 +112,7 @@ function getEdrbaseValue(key:any) {
 }
 function getSaveDataParams() {
   const res = opertaor.getDataAll();
-  const plyClauseObj = {
+  const plyClauseObj: any = {
     cClauseCode: props.param?.cTermNo,
     cClauseName: props.param?.cTermNme,
   }
@@ -159,7 +159,7 @@ function getSaveDataParams() {
     plyClauseObj.nPerIndemLmt = "";
   }
   /* 除上述几个险种以外，其他险种plyClauseObj中不用传nAmt、nOnceIndemLmt、nPerIndemLmt这三个参数 */
-  const param = [
+  const param: any[] = [
     {
       "cPlyAppNo": res['applicant']['Applicant.cAppNo'],
       "cPlyNo": res['applicant']['Base.cPlyNo'] || "",
@@ -207,6 +207,12 @@ function getSaveDataParams() {
   return param;
 }
 
+function getTotalNum(arr: any[]) {
+  return arr.reduce((acc, item) => {
+    return Number(acc) + Number(item);
+  }, 0);
+}
+
 function getOldProductResData() {
   // 根据条款获取清单方案号下拉选项
   oldProductResData.value[0]['pageInfo'].forEach((i:any) => {
@@ -222,6 +228,30 @@ function getOldProductResData() {
     }
   })
   return oldProductResData.value;
+}
+
+/**
+ * 锚点点击事件
+ */
+function handleAnchorClick(event: any, selector: string) {
+  if (event) {
+    event.preventDefault();
+  }
+  // 先设置当前激活的锚点
+  if(selector.startsWith('#')) {
+    pageView.value.activeAnchorId.value = selector.substring(1); // 去掉#号
+  }
+  const target: any = document.querySelector(selector);
+  if (target) {
+    scrollByDomId(selector)
+    // const mainContent = document.querySelector('.main-content');
+    // if (mainContent) {
+    //   mainContent.scrollTo({
+    //     top: target.offsetTop - 75, // 减去一些偏移量
+    //     behavior: 'smooth'
+    //   });
+    // }
+  }
 }
 </script>
 <style lang="scss" scoped>

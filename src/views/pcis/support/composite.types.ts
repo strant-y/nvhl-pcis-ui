@@ -4,6 +4,7 @@ import {CommonConstants} from "@/constants/CommonConstants";
 import {codeListViewStore, dataOpertaor} from "@/store";
 import {getData} from "@/pcis/prodRef/dataInit";
 import {initMultiCodeList} from "@/api/code-list-service";
+import cargoApi from "@/api/cargo";
 
 /**
  * 公共分组ID
@@ -11,6 +12,12 @@ import {initMultiCodeList} from "@/api/code-list-service";
 export const CommonGroupId = "group-000000";
 
 export const OpertaorPosit = "posit";
+
+/**
+ * 意健险组件
+ */
+const YjxPositCompMap = new Map<string, string[]>();
+YjxPositCompMap.set('P26000176', ['yjxPlan060030']);
 
 /**
  * 组合出单申请
@@ -134,9 +141,12 @@ export class CompositePageView {
         return new Promise((resolve, reject) => {
             const params: any[] = list.map((item: any) => {
                 return {
-                    CProdNo: item.cProdNo,
+                    CKindNo: item.cKindNo,
                     CGrpMrk: item.cGrpMrk,
+                    CProdNo: item.cProdNo,
                     CProdNme: item.cProdNme,
+                    CPlanNo: item.cPlanNo,
+                    CPlanNme: item.cPlanNme,
                     CTermNo: item.cTermNo,
                 }
             });
@@ -263,20 +273,25 @@ export class CompositePageView {
                 title: '产品信息',
                 href: '#positeList',
                 expanded: true,
-                componentKey: 'positeList',
                 children: []
             }]
         });
         structure.forEach((config: any, index: number) => {
+            const cKindNo = config.params.cKindNo;
+            const cProdNo = config.params.cProdNo;
+            const cProdNme = config.params.cProdNme;
+            const cPlanNo = config.params.cPlanNo;
+            const cPlanNme = config.params.cPlanNme;
+
             const anchor: AnchorItem = {
-                id: config.params.cProdNo,
-                title: index !== 0 ? `${config.params.cProdNo}-${config.params.cProdNme}` : config.params.cProdNme,
+                id: cProdNo,
+                title: index !== 0 ? `${cProdNo}-${config.params.cProdNme}` : config.params.cProdNme,
                 expanded: true,
                 children: config.pageInfo.map((item: any) => {
-                    const id = `_${item.pageKey === 'dist' || item.pageKey === 'distSummary' ? item.pageCode : item.pageKey}-${config.params.cProdNo}`;
+                    const id = `_${item.pageKey === 'dist' || item.pageKey === 'distSummary' ? item.pageCode : item.pageKey}-${cProdNo}`;
                     const childrenItem: AnchorItem = {
                         id: id,
-                        title: index !== 0 ? `${config.params.cProdNo}-${item.pageTtile}` : item.pageTtile,
+                        title: index !== 0 ? `${cProdNo}-${item.pageTtile}` : item.pageTtile,
                         icon: item.icon,
                         expanded: true,
                         tabKey: item.pageKey === 'dist' || item.pageKey === 'distSummary' ? item.pageCode : item.pageKey,
@@ -359,12 +374,12 @@ export class CompositePageView {
     }
 
     private mergeViews(viewsLis: any[][]): any[] {
-
-        const viewsArrays: any[][] = viewsLis.map((item: any[]) => {
-            return item.filter(i => CommonComponentMap.has(i.pageKey));
-        });
+        const viewsArrays: any[][] = viewsLis
+            .filter(item => !YjxPositCompMap.keys().some(key => YjxPositCompMap.get(key)?.includes(item[0].pageCode)))
+            .map((item: any[]) => {
+                return item.filter(i => CommonComponentMap.has(i.pageKey));
+            });
         const pageCodeSets = viewsArrays.map(views => {
-            // console.log('views', views)
             const codes = new Set<string>();
             views.forEach(view => codes.add(view.pageKey));
             return codes;
@@ -416,19 +431,29 @@ export class CompositePageView {
     /**请求指定产品的页面配置数据**/
     private async reqPageJson(param: any) {
         const result: any = {};
-        const {CProdNo, CGrpMrk} = param;
-        const sessionInfo = sessionStorage.getItem(CProdNo + '_' + CGrpMrk);
+        const {CKindNo, CProdNo, CGrpMrk, CPlanNo} = param;
+        const key = CKindNo === '06' ? CPlanNo : CProdNo;
+        const reqKey = key  + '_' + CGrpMrk;
+        const sessionInfo = sessionStorage.getItem(reqKey);
         if(!sessionInfo) {
-            const productPage = await getProductPage(param);
-            const data = JSON.parse(productPage.data);
+            let data;
+            if(CKindNo === '06') { //  意健险组件获取
+                const productPage = await cargoApi.getECargoPageView({
+                    'compKeyList': YjxPositCompMap.get(key)
+                });
+                data = productPage.data;
+            }else {
+                const productPage = await getProductPage(param);
+                data = JSON.parse(productPage.data);
+            }
+
             if(!data) {
-                console.log('productPage', productPage)
-                ElMessage.error(`页面配置信息获取失败-${CProdNo + '_' + CGrpMrk}`);
+                ElMessage.error(`页面配置信息获取失败-${reqKey}`);
                 throw new Error('页面配置信息获取失败 -> ', data)
             }
             result[param.CProdNo] = data[0].pageInfo;
             // 存入当前会话session 下一次获取优先从session里拿
-            sessionStorage.setItem(CProdNo + '_' + CGrpMrk, JSON.stringify(data[0].pageInfo));
+            sessionStorage.setItem(reqKey, JSON.stringify(data[0].pageInfo));
         }else {
             result[param.CProdNo] = JSON.parse(sessionInfo);
         }
@@ -594,20 +619,19 @@ export class CompositePageView {
      */
     validateAll(): Promise<{validate: boolean, result: Record<string, any>}> {
         return new Promise(async (resolve, reject) => {
-            let validate = true;
             const result: Record<string, any> = {};
             for(const group of this.pageConfig) {
                 const groupId = group.groupId;
                 const oertaor = this.getDataOpertaorByGroupId(groupId);
                 if(oertaor) {
-                    const vald = await oertaor.validateAll(false);
+                    const vald = await oertaor.validateAll();
                     result[groupId] = vald;
                     if(!vald) {
-                        validate = false;
+                        resolve({validate: false, result});
                     }
                 }
             }
-            resolve({validate, result});
+            resolve({validate: true, result: {}});
         })
     }
 
@@ -620,10 +644,23 @@ export class CompositePageView {
             const groupId = group.groupId;
             const groupArr = groupId.split('-');
             const cProdNo = groupArr[1];
-            const oertaor = this.getDataOpertaorByGroupId(groupId);
-            if(oertaor) {
-                result[cProdNo] = oertaor.getDataAll();
+            const opertaor = this.getDataOpertaorByGroupId(groupId);
+            if(opertaor) {
+                result[cProdNo] = opertaor.getDataAll();
             }
+        }
+
+        // 意健险数据组装
+        const prod06No = Object.keys(result).find(key => key.startsWith('06'))
+        if(prod06No && result[prod06No]) {
+            const prodDefNo = Object.keys(result).find(key => key !== '000000' && key !== prod06No)
+            const prod06Keys = Object.keys(result[prod06No]);
+            prodDefNo &&
+            ['plyBase', 'base', 'applicant', 'insured'].forEach(key => {
+                if(!prod06Keys.includes(key)) {
+                    result[prod06No][key] = result[prodDefNo][key]
+                }
+            })
         }
         return result;
     }

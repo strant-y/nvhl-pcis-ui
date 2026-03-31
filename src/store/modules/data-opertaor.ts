@@ -462,8 +462,11 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     return ref?.validate?.()
                 }
             });
-            // 险别验证独立完成
-            const cv = await tableRefs['cvrg'].validate();
+            let cv = true;
+            if(tableRefs['cvrg']) {
+                // 险别验证独立完成
+                cv = await tableRefs['cvrg'].validate();
+            }
             // 2. 等待所有Promise完成并关联结果与key
             const results = await Promise.all(validationPromises);
             // 3. 关联每个结果与对应的key
