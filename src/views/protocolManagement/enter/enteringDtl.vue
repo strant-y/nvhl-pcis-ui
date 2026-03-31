@@ -110,9 +110,13 @@ const uwBtn = [
     func: () => {
       console.log('props',props.param)
       mainRef.value?.getUnderwriteRef().then((isValid) => {
-        if (isValid) {
+				if (isValid) {
           const user = JSON.parse(sessionStorage.getItem("user"));
           let param = mainRef.value?.getUnderwriteValue()
+					const parts = param["cBckOp"].split("-");
+					param["backUndrClsCde"] = parts[0]; // 退回指定核保级别编码
+					param["backUndrDptCde"] = parts[1]; // 退回指定核保级别机构编码
+					param["backUndrDptCnm"] = parts[3]; // 退回机构名称
 					let sence = param.cUndrMrk
 					let taskId = props.param.curtTask || null;
           if(props.param?.cAppTyp === 'A'){
