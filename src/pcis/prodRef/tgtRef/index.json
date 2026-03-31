@@ -1,3148 +1,3195 @@
-[
-	{
-			"tab": "insured",
-			"readonly": 1,
-			"prop": "Insured.cInsuredCde",
-			"inputtype": "rtinput",
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"disabled": true,
-			"title": "客户代码",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"func": "funCheckUser",
-			"readonly": 0,
-			"prop": "Insured.cInsuredNme",
-			"inputtype": "rtinput",
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"disabled": true,
-			"title": "客户名称",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"func": "cClntMrkFunc",
-			"prop": "Insured.cClntMrk",
-			"codeParam": "{\"cParCde\":\"clnt_mrk\"}",
-			"inputtype": "rtSelectV2",
-			"disabled": true,
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "被保人性质",
-			"typeCode": "INSURE_NATURE_CACHE",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"func": "InsuredCCertfCls",
-			"prop": "Insured.cCertfCls",
-			"codeParam": "{\"C_PAR_CDE\":\"120\"}",
-			"inputtype": "rtSelectV2",
-			"disabled": true,
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "证件类型",
-			"typeCode": "NATURAL_CERTIFICATE_CACHE",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"func": "cCertfCdeChange",
-			"readonly": 0,
-			"prop": "Insured.cCertfCde",
-			"inputtype": "rtinput",
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"disabled": true,
-			"title": "证件号码",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"readonly": 0,
-			"prop": "Insured.tCertfBgnDate",
-			"disabledDate": "tCertfBgnDateDisable",
-			"inputtype": "rtdatepicker",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "证件有效起期",
-			"type": "date",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"readonly": 0,
-			"prop": "Insured.tCertfEndDate",
-			"disabledDate": "tCertfEndDateDisable",
-			"inputtype": "rtdatepicker",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "证件有效止期",
-			"type": "date",
-			"group": "group1"
-	},
-	{
-			"falseValue": "0",
-			"keymap": {
-					"y": "1",
-					"n": "0"
+{
+	"termFactormap": [],
+	"riskConf": null,
+	"riskFactormap": [],
+	"colInfo": [
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
 			},
-			"tab": "insured",
-			"func": "tCertMrkChecked",
-			"prop": "Insured.cLongendTyp",
-			"trueValue": "1",
-			"inputtype": "rtcheckbox",
-			"cSysConfig": "020",
-			"title": "证件有效期长期标识",
-			"group": "group1",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"func": "cIsBranchChange",
-			"prop": "Insured.cIsBranch",
-			"codeParam": "{\"cParCde\":\"yes_no\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "是否分支机构",
-			"typeCode": "WEB_SYS_STA_DICT",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"readonly": 0,
-			"prop": "Insured.tBirthday",
-			"inputtype": "rtdatepicker",
-			"cSysConfig": "020",
-			"disabled": true,
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "出生日期",
-			"type": "date",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"readonly": 0,
-			"prop": "Insured.nAge",
-			"inputtype": "rtnumber",
-			"cSysConfig": "020",
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"disabled": true,
-			"title": "年龄",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cSex",
-			"codeParam": "{\"cParCde\":\"ZF7\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "性别",
-			"typeCode": "Sex_List",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"func": "cNationChange",
-			"prop": "Insured.cNation",
-			"codeParam": "{\"cType\":\"0\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "国籍",
-			"typeCode": "AREA_COUNTRY_CACHE",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cOccupTyp",
-			"codeParam": "{\"cParCde\":\"5933\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "职业类别",
-			"group": "group1",
-			"typeCode": "WEB_BAS_COMM_CODE",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cStkMrk",
-			"codeParam": "{\"cParCde\":\"yes_no\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "股东客户",
-			"typeCode": "WEB_SYS_STA_DICT",
-			"group": "group1"
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cBusinessScope",
-			"codeParam": "{\"cParCde\":\"BusinessScope\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "经营范围",
-			"group": "group1",
-			"typeCode": "WEB_BAS_COMM_CODE",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cMrgCde",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "婚姻状况",
-			"group": "group1",
-			"typeCode": "MARITAL_STATUS_LIST_CACHE"
-	},
-	{
-			"prop": "Insured.ClntAddrAddress",
-			"inputtype": "rtinputgroup",
-			"itemWidth": 3,
-			"cSysConfig": "020",
-			"groupList": [
-					{
-							"tab": "insured",
-							"func": "getProp",
-							"prop": "Insured.ClntAddrProp",
-							"inputtype": "rtcascader",
-							"loadData": [
-									{
-											"label": "中国",
-											"value": "CHN"
-									},
-									{
-											"label": "中国香港",
-											"value": "HKG"
-									},
-									{
-											"label": "中国澳门",
-											"value": "MAC"
-									},
-									{
-											"label": "中国台湾",
-											"value": "TWN"
-									},
-									{
-											"label": "阿鲁巴",
-											"value": "ABW"
-									},
-									{
-											"label": "阿富汗",
-											"value": "AFG"
-									},
-									{
-											"label": "安哥拉",
-											"value": "AGO"
-									},
-									{
-											"label": "安圭拉",
-											"value": "AIA"
-									},
-									{
-											"label": "阿尔巴尼亚",
-											"value": "ALB"
-									},
-									{
-											"label": "安道尔",
-											"value": "AND"
-									},
-									{
-											"label": "荷属安的列斯",
-											"value": "ANT"
-									},
-									{
-											"label": "阿联酋",
-											"value": "ARE"
-									},
-									{
-											"label": "阿根廷",
-											"value": "ARG"
-									},
-									{
-											"label": "亚美尼亚",
-											"value": "ARM"
-									},
-									{
-											"label": "美属萨摩亚",
-											"value": "ASM"
-									},
-									{
-											"label": "南极洲",
-											"value": "ATA"
-									},
-									{
-											"label": "法属南部领土",
-											"value": "ATF"
-									},
-									{
-											"label": "安提瓜和巴布达",
-											"value": "ATG"
-									},
-									{
-											"label": "澳大利亚",
-											"value": "AUS"
-									},
-									{
-											"label": "奥地利",
-											"value": "AUT"
-									},
-									{
-											"label": "阿塞拜疆",
-											"value": "AZE"
-									},
-									{
-											"label": "布隆迪",
-											"value": "BDI"
-									},
-									{
-											"label": "比利时",
-											"value": "BEL"
-									},
-									{
-											"label": "贝宁",
-											"value": "BEN"
-									},
-									{
-											"label": "布基纳法索",
-											"value": "BFA"
-									},
-									{
-											"label": "孟加拉国",
-											"value": "BGD"
-									},
-									{
-											"label": "保加利亚",
-											"value": "BGR"
-									},
-									{
-											"label": "巴林",
-											"value": "BHR"
-									},
-									{
-											"label": "巴哈马",
-											"value": "BHS"
-									},
-									{
-											"label": "波黑",
-											"value": "BIH"
-									},
-									{
-											"label": "白俄罗斯",
-											"value": "BLR"
-									},
-									{
-											"label": "伯利兹",
-											"value": "BLZ"
-									},
-									{
-											"label": "百慕大",
-											"value": "BMU"
-									},
-									{
-											"label": "玻利维亚",
-											"value": "BOL"
-									},
-									{
-											"label": "博内尔",
-											"value": "BON"
-									},
-									{
-											"label": "巴西",
-											"value": "BRA"
-									},
-									{
-											"label": "巴巴多斯",
-											"value": "BRB"
-									},
-									{
-											"label": "文莱",
-											"value": "BRN"
-									},
-									{
-											"label": "不丹",
-											"value": "BTN"
-									},
-									{
-											"label": "布维岛",
-											"value": "BVT"
-									},
-									{
-											"label": "博茨瓦纳",
-											"value": "BWA"
-									},
-									{
-											"label": "中非",
-											"value": "CAF"
-									},
-									{
-											"label": "加拿大",
-											"value": "CAN"
-									},
-									{
-											"label": "科科斯(基林)群岛",
-											"value": "CCK"
-									},
-									{
-											"label": "瑞士",
-											"value": "CHE"
-									},
-									{
-											"label": "智利",
-											"value": "CHL"
-									},
-									{
-											"label": "科特迪瓦",
-											"value": "CIV"
-									},
-									{
-											"label": "喀麦隆",
-											"value": "CMR"
-									},
-									{
-											"label": "加那利群岛",
-											"value": "CNY"
-									},
-									{
-											"label": "刚果（金）",
-											"value": "COD"
-									},
-									{
-											"label": "刚果（布）",
-											"value": "COG"
-									},
-									{
-											"label": "库克群岛",
-											"value": "COK"
-									},
-									{
-											"label": "哥伦比亚",
-											"value": "COL"
-									},
-									{
-											"label": "科摩罗",
-											"value": "COM"
-									},
-									{
-											"label": "佛得角",
-											"value": "CPV"
-									},
-									{
-											"label": "哥斯达黎加",
-											"value": "CRI"
-									},
-									{
-											"label": "圣诞岛",
-											"value": "CSR"
-									},
-									{
-											"label": "古巴",
-											"value": "CUB"
-									},
-									{
-											"label": "库腊索岛",
-											"value": "CUW"
-									},
-									{
-											"label": "开曼群岛",
-											"value": "CYM"
-									},
-									{
-											"label": "塞浦路斯",
-											"value": "CYP"
-									},
-									{
-											"label": "捷克",
-											"value": "CZE"
-									},
-									{
-											"label": "德国",
-											"value": "DEU"
-									},
-									{
-											"label": "吉布提",
-											"value": "DJI"
-									},
-									{
-											"label": "多米尼克",
-											"value": "DMA"
-									},
-									{
-											"label": "丹麦",
-											"value": "DNK"
-									},
-									{
-											"label": "多米尼加共和国",
-											"value": "DOM"
-									},
-									{
-											"label": "阿尔及利亚",
-											"value": "DZA"
-									},
-									{
-											"label": "厄瓜多尔",
-											"value": "ECU"
-									},
-									{
-											"label": "埃及",
-											"value": "EGY"
-									},
-									{
-											"label": "厄立特里亚",
-											"value": "ERI"
-									},
-									{
-											"label": "西撒哈拉",
-											"value": "ESH"
-									},
-									{
-											"label": "西班牙",
-											"value": "ESP"
-									},
-									{
-											"label": "爱沙尼亚",
-											"value": "EST"
-									},
-									{
-											"label": "埃塞俄比亚",
-											"value": "ETH"
-									},
-									{
-											"label": "芬兰",
-											"value": "FIN"
-									},
-									{
-											"label": "斐济",
-											"value": "FJI"
-									},
-									{
-											"label": "福克兰群岛(马尔维纳斯)",
-											"value": "FLK"
-									},
-									{
-											"label": "法国",
-											"value": "FRA"
-									},
-									{
-											"label": "法罗群岛",
-											"value": "FRO"
-									},
-									{
-											"label": "密克罗尼西亚联邦",
-											"value": "FSM"
-									},
-									{
-											"label": "加蓬",
-											"value": "GAB"
-									},
-									{
-											"label": "英国",
-											"value": "GBR"
-									},
-									{
-											"label": "格鲁吉亚",
-											"value": "GEO"
-									},
-									{
-											"label": "加纳",
-											"value": "GHA"
-									},
-									{
-											"label": "直布罗陀",
-											"value": "GIB"
-									},
-									{
-											"label": "几内亚",
-											"value": "GIN"
-									},
-									{
-											"label": "瓜德罗普",
-											"value": "GLP"
-									},
-									{
-											"label": "冈比亚Gambia",
-											"value": "GMB"
-									},
-									{
-											"label": "盖比群岛",
-											"value": "GMR"
-									},
-									{
-											"label": "几内亚比绍",
-											"value": "GNB"
-									},
-									{
-											"label": "赤道几内亚",
-											"value": "GNQ"
-									},
-									{
-											"label": "希腊",
-											"value": "GRC"
-									},
-									{
-											"label": "格林纳达",
-											"value": "GRD"
-									},
-									{
-											"label": "格陵兰",
-											"value": "GRL"
-									},
-									{
-											"label": "危地马拉",
-											"value": "GTM"
-									},
-									{
-											"label": "法属圭亚那",
-											"value": "GUF"
-									},
-									{
-											"label": "关岛",
-											"value": "GUM"
-									},
-									{
-											"label": "圭亚那",
-											"value": "GUY"
-									},
-									{
-											"label": "赫德岛和麦克唐纳岛",
-											"value": "HMD"
-									},
-									{
-											"label": "洪都拉斯",
-											"value": "HND"
-									},
-									{
-											"label": "克罗地亚",
-											"value": "HRV"
-									},
-									{
-											"label": "海地",
-											"value": "HTI"
-									},
-									{
-											"label": "匈牙利",
-											"value": "HUN"
-									},
-									{
-											"label": "印度尼西亚",
-											"value": "IDN"
-									},
-									{
-											"label": "马恩岛",
-											"value": "IMN"
-									},
-									{
-											"label": "印度",
-											"value": "IND"
-									},
-									{
-											"label": "英属印度洋领土",
-											"value": "IOT"
-									},
-									{
-											"label": "爱尔兰",
-											"value": "IRL"
-									},
-									{
-											"label": "伊朗",
-											"value": "IRN"
-									},
-									{
-											"label": "伊拉克",
-											"value": "IRQ"
-									},
-									{
-											"label": "冰岛",
-											"value": "ISL"
-									},
-									{
-											"label": "以色列",
-											"value": "ISR"
-									},
-									{
-											"label": "意大利",
-											"value": "ITA"
-									},
-									{
-											"label": "牙买加",
-											"value": "JAM"
-									},
-									{
-											"label": "约旦",
-											"value": "JOR"
-									},
-									{
-											"label": "日本",
-											"value": "JPN"
-									},
-									{
-											"label": "哈萨克斯坦",
-											"value": "KAZ"
-									},
-									{
-											"label": "肯尼亚",
-											"value": "KEN"
-									},
-									{
-											"label": "吉尔吉斯斯坦",
-											"value": "KGZ"
-									},
-									{
-											"label": "柬埔寨",
-											"value": "KHM"
-									},
-									{
-											"label": "基里巴斯",
-											"value": "KIR"
-									},
-									{
-											"label": "韩国",
-											"value": "KOR"
-									},
-									{
-											"label": "科威特",
-											"value": "KWT"
-									},
-									{
-											"label": "老挝",
-											"value": "LAO"
-									},
-									{
-											"label": "黎巴嫩",
-											"value": "LBN"
-									},
-									{
-											"label": "利比里亚",
-											"value": "LBR"
-									},
-									{
-											"label": "利比亚",
-											"value": "LBY"
-									},
-									{
-											"label": "圣卢西亚",
-											"value": "LCA"
-									},
-									{
-											"label": "列支敦士登",
-											"value": "LIE"
-									},
-									{
-											"label": "斯里兰卡",
-											"value": "LKA"
-									},
-									{
-											"label": "莱索托",
-											"value": "LSO"
-									},
-									{
-											"label": "立陶宛",
-											"value": "LTU"
-									},
-									{
-											"label": "卢森堡",
-											"value": "LUX"
-									},
-									{
-											"label": "拉脱维亚",
-											"value": "LVA"
-									},
-									{
-											"label": "法属圣马丁",
-											"value": "MAF"
-									},
-									{
-											"label": "摩洛哥",
-											"value": "MAR"
-									},
-									{
-											"label": "摩纳哥",
-											"value": "MCO"
-									},
-									{
-											"label": "摩尔多瓦",
-											"value": "MDA"
-									},
-									{
-											"label": "马达加斯加",
-											"value": "MDG"
-									},
-									{
-											"label": "马尔代夫",
-											"value": "MDV"
-									},
-									{
-											"label": "墨西哥",
-											"value": "MEX"
-									},
-									{
-											"label": "马绍尔群岛",
-											"value": "MHL"
-									},
-									{
-											"label": "前南马其顿",
-											"value": "MKD"
-									},
-									{
-											"label": "马里",
-											"value": "MLI"
-									},
-									{
-											"label": "梅利利亚",
-											"value": "MLN"
-									},
-									{
-											"label": "马耳他",
-											"value": "MLT"
-									},
-									{
-											"label": "缅甸",
-											"value": "MMR"
-									},
-									{
-											"label": "黑山",
-											"value": "MNE"
-									},
-									{
-											"label": "蒙古",
-											"value": "MNG"
-									},
-									{
-											"label": "北马里亚纳",
-											"value": "MNP"
-									},
-									{
-											"label": "莫桑比克",
-											"value": "MOZ"
-									},
-									{
-											"label": "毛里塔尼亚",
-											"value": "MRT"
-									},
-									{
-											"label": "蒙特塞拉特",
-											"value": "MSR"
-									},
-									{
-											"label": "马提尼克",
-											"value": "MTQ"
-									},
-									{
-											"label": "毛里求斯",
-											"value": "MUS"
-									},
-									{
-											"label": "马拉维",
-											"value": "MWI"
-									},
-									{
-											"label": "马来西亚",
-											"value": "MYS"
-									},
-									{
-											"label": "马约特",
-											"value": "MYT"
-									},
-									{
-											"label": "纳米比亚",
-											"value": "NAM"
-									},
-									{
-											"label": "新喀里多尼亚",
-											"value": "NCL"
-									},
-									{
-											"label": "尼日尔",
-											"value": "NER"
-									},
-									{
-											"label": "诺福克岛",
-											"value": "NFK"
-									},
-									{
-											"label": "尼日利亚",
-											"value": "NGA"
-									},
-									{
-											"label": "尼加拉瓜",
-											"value": "NIC"
-									},
-									{
-											"label": "纽埃",
-											"value": "NIU"
-									},
-									{
-											"label": "荷兰",
-											"value": "NLD"
-									},
-									{
-											"label": "诺曼底群岛",
-											"value": "NME"
-									},
-									{
-											"label": "挪威",
-											"value": "NOR"
-									},
-									{
-											"label": "尼泊尔",
-											"value": "NPL"
-									},
-									{
-											"label": "瑙鲁",
-											"value": "NRU"
-									},
-									{
-											"label": "新西兰",
-											"value": "NZL"
-									},
-									{
-											"label": "阿曼",
-											"value": "OMN"
-									},
-									{
-											"label": "巴基斯坦",
-											"value": "PAK"
-									},
-									{
-											"label": "巴拿马",
-											"value": "PAN"
-									},
-									{
-											"label": "皮特凯恩群岛",
-											"value": "PCN"
-									},
-									{
-											"label": "秘鲁",
-											"value": "PER"
-									},
-									{
-											"label": "菲律宾",
-											"value": "PHL"
-									},
-									{
-											"label": "帕劳",
-											"value": "PLW"
-									},
-									{
-											"label": "巴布亚新几内亚",
-											"value": "PNG"
-									},
-									{
-											"label": "波兰",
-											"value": "POL"
-									},
-									{
-											"label": "波多黎各",
-											"value": "PRI"
-									},
-									{
-											"label": "朝鲜",
-											"value": "PRK"
-									},
-									{
-											"label": "葡萄牙",
-											"value": "PRT"
-									},
-									{
-											"label": "巴拉圭",
-											"value": "PRY"
-									},
-									{
-											"label": "巴勒斯坦",
-											"value": "PST"
-									},
-									{
-											"label": "法属波利尼西亚",
-											"value": "PYF"
-									},
-									{
-											"label": "卡塔尔",
-											"value": "QAT"
-									},
-									{
-											"label": "留尼汪",
-											"value": "REU"
-									},
-									{
-											"label": "罗马尼亚",
-											"value": "ROM"
-									},
-									{
-											"label": "俄罗斯联邦",
-											"value": "RUS"
-									},
-									{
-											"label": "卢旺达",
-											"value": "RWA"
-									},
-									{
-											"label": "萨巴",
-											"value": "SAB"
-									},
-									{
-											"label": "塞卜泰(休达)",
-											"value": "SAI"
-									},
-									{
-											"label": "沙特阿拉伯",
-											"value": "SAU"
-									},
-									{
-											"label": "塞尔维亚和黑山",
-											"value": "SCG"
-									},
-									{
-											"label": "苏丹",
-											"value": "SDN"
-									},
-									{
-											"label": "塞内加尔",
-											"value": "SEN"
-									},
-									{
-											"label": "新加坡",
-											"value": "SGP"
-									},
-									{
-											"label": "南乔治亚岛和南桑德韦奇岛",
-											"value": "SGS"
-									},
-									{
-											"label": "圣赫勒拿",
-											"value": "SHN"
-									},
-									{
-											"label": "斯瓦尔巴群岛",
-											"value": "SJM"
-									},
-									{
-											"label": "所罗门群岛",
-											"value": "SLB"
-									},
-									{
-											"label": "塞拉利昂",
-											"value": "SLE"
-									},
-									{
-											"label": "萨尔瓦多",
-											"value": "SLV"
-									},
-									{
-											"label": "圣马力诺",
-											"value": "SMR"
-									},
-									{
-											"label": "社会群岛",
-											"value": "SOC"
-									},
-									{
-											"label": "索马里",
-											"value": "SOM"
-									},
-									{
-											"label": "圣皮埃尔和密克隆",
-											"value": "SPM"
-									},
-									{
-											"label": "塞尔维亚",
-											"value": "SRB"
-									},
-									{
-											"label": "南苏丹",
-											"value": "SSD"
-									},
-									{
-											"label": "圣多美和普林西比",
-											"value": "STp"
-									},
-									{
-											"label": "苏里南",
-											"value": "SUR"
-									},
-									{
-											"label": "斯洛伐克",
-											"value": "SVK"
-									},
-									{
-											"label": "斯洛文尼亚",
-											"value": "SVN"
-									},
-									{
-											"label": "瑞典",
-											"value": "SWE"
-									},
-									{
-											"label": "斯威士兰",
-											"value": "SWZ"
-									},
-									{
-											"label": "荷属圣马丁",
-											"value": "SXM"
-									},
-									{
-											"label": "塞舌尔",
-											"value": "SYC"
-									},
-									{
-											"label": "叙利亚",
-											"value": "SYR"
-									},
-									{
-											"label": "特克斯科斯群岛",
-											"value": "TCA"
-									},
-									{
-											"label": "乍得",
-											"value": "TCD"
-									},
-									{
-											"label": "多哥",
-											"value": "TGO"
-									},
-									{
-											"label": "泰国",
-											"value": "THA"
-									},
-									{
-											"label": "塔吉克斯坦",
-											"value": "TJK"
-									},
-									{
-											"label": "托克劳",
-											"value": "TKL"
-									},
-									{
-											"label": "土库曼斯坦",
-											"value": "TKM"
-									},
-									{
-											"label": "东帝汶",
-											"value": "TMP"
-									},
-									{
-											"label": "土阿莫土群岛",
-											"value": "TMU"
-									},
-									{
-											"label": "汤加",
-											"value": "TON"
-									},
-									{
-											"label": "特立尼达和多巴哥",
-											"value": "TTO"
-									},
-									{
-											"label": "突尼斯",
-											"value": "TUN"
-									},
-									{
-											"label": "土耳其",
-											"value": "TUR"
-									},
-									{
-											"label": "图瓦卢",
-											"value": "TUV"
-									},
-									{
-											"label": "坦桑尼亚",
-											"value": "TZA"
-									},
-									{
-											"label": "乌干达",
-											"value": "UGA"
-									},
-									{
-											"label": "乌克兰",
-											"value": "UKR"
-									},
-									{
-											"label": "美国本土外小岛屿",
-											"value": "UMI"
-									},
-									{
-											"label": "乌拉圭",
-											"value": "URY"
-									},
-									{
-											"label": "美国",
-											"value": "USA"
-									},
-									{
-											"label": "乌兹别克斯坦",
-											"value": "UZB"
-									},
-									{
-											"label": "梵蒂冈",
-											"value": "VAT"
-									},
-									{
-											"label": "圣文森特和格林纳丁斯",
-											"value": "VCT"
-									},
-									{
-											"label": "委内瑞拉",
-											"value": "VEN"
-									},
-									{
-											"label": "英属维尔京群岛",
-											"value": "VGB"
-									},
-									{
-											"label": "美属维尔京群岛",
-											"value": "VIR"
-									},
-									{
-											"label": "越南",
-											"value": "VNM"
-									},
-									{
-											"label": "瓦努阿图",
-											"value": "VUT"
-									},
-									{
-											"label": "瓦利斯和富图纳",
-											"value": "WLF"
-									},
-									{
-											"label": "萨摩亚",
-											"value": "WSM"
-									},
-									{
-											"label": "也门",
-											"value": "YEM"
-									},
-									{
-											"label": "南斯拉夫",
-											"value": "YUG"
-									},
-									{
-											"label": "南非",
-											"value": "ZAF"
-									},
-									{
-											"label": "赞比亚",
-											"value": "ZMB"
-									},
-									{
-											"label": "津巴布韦",
-											"value": "ZWE"
-									},
-									{
-											"label": "基利巴斯",
-											"value": "103143"
-									},
-									{
-											"label": "新客里多尼亚",
-											"value": "103146"
-									},
-									{
-											"label": "北马里亚纳群岛",
-											"value": "103149"
-									},
-									{
-											"label": "塞班",
-											"value": "103150"
-									},
-									{
-											"label": "东萨摩亚",
-											"value": "103166"
-									},
-									{
-											"label": "加拿利群岛",
-											"value": "103169"
-									},
-									{
-											"label": "海峡群岛",
-											"value": "103170"
-									},
-									{
-											"label": "格林兰岛",
-											"value": "103173"
-									},
-									{
-											"label": "泽西岛",
-											"value": "103176"
-									},
-									{
-											"label": "塔西提",
-											"value": "103183"
-									},
-									{
-											"label": "捷克共和国",
-											"value": "103190"
-									},
-									{
-											"label": "阿美尼亚",
-											"value": "103200"
-									},
-									{
-											"label": "波斯尼亚－黑塞哥维那",
-											"value": "103204"
-									},
-									{
-											"label": "孟加拉",
-											"value": "103211"
-									},
-									{
-											"label": "巴巴多期",
-											"value": "103212"
-									},
-									{
-											"label": "佛得角群岛",
-											"value": "103214"
-									},
-									{
-											"label": "布丹",
-											"value": "103216"
-									},
-									{
-											"label": "中非共和国",
-											"value": "103217"
-									},
-									{
-											"label": "科摩罗群岛",
-											"value": "103221"
-									},
-									{
-											"label": "多米尼加联邦",
-											"value": "103229"
-									},
-									{
-											"label": "科特迪亚",
-											"value": "103231"
-									},
-									{
-											"label": "荷属安第刑斯",
-											"value": "103253"
-									},
-									{
-											"label": "冈比亚",
-											"value": "103258"
-									},
-									{
-											"label": "圣巴泰勒米",
-											"value": "103270"
-									},
-									{
-											"label": "圣尤斯特歇斯",
-											"value": "103273"
-									},
-									{
-											"label": "圣基茨和尼维斯岛",
-											"value": "103275"
-									},
-									{
-											"label": "圣文斯特",
-											"value": "103278"
-									},
-									{
-											"label": "特克斯和凯科斯群岛",
-											"value": "103281"
-									},
-									{
-											"label": "吉尔吉思",
-											"value": "103282"
-									},
-									{
-											"label": "马其顿",
-											"value": "103295"
-									},
-									{
-											"label": "马召尔群岛",
-											"value": "103301"
-									},
-									{
-											"label": "马约特岛",
-											"value": "103303"
-									},
-									{
-											"label": "纽埃岛",
-											"value": "103313"
-									},
-									{
-											"label": "诺福克群岛",
-											"value": "103314"
-									},
-									{
-											"label": "留尼汪岛",
-											"value": "103318"
-									},
-									{
-											"label": "俄罗斯",
-											"value": "103319"
-									},
-									{
-											"label": "塞拉里昂",
-											"value": "103324"
-									},
-									{
-											"label": "圣马丁",
-											"value": "103351"
-									},
-									{
-											"label": "特里尼达和多巴哥",
-											"value": "103352"
-									},
-									{
-											"label": "阿尔及尼亚",
-											"value": "103353"
-									},
-									{
-											"label": "库腊索岛(荷属)",
-											"value": "103356"
-									},
-									{
-											"label": "圣基茨和尼维斯岛",
-											"value": "103425"
-									},
-									{
-											"label": "其他",
-											"value": "XXX"
-									}
-							],
-							"rules": [
-									{
-											"type": "required"
-									}
-							],
-							"persent": 8,
-							"placeholder": "省市区",
-							"title": "联系地址（常住地址）",
-							"cascaderprops": "[\"Insured.cCountry\",\"Insured.cProvince\",\"Insured.cCity\",\"Insured.cCounty\"]",
-							"typeCode": "getarealist",
-							"disabled": true
-					},
-					{
-							"tab": "insured",
-							"func": "getcSuffixAddr",
-							"maxlength": 100,
-							"prop": "Insured.cSuffixAddr",
-							"showWordLimit": "1",
-							"inputtype": "rtinput",
-							"rules": [
-									{
-											"type": "required"
-									}
-							],
-							"persent": 8,
-							"placeholder": "详细地址",
-							"title": "街道",
-							"disabled": true
-					}
-			],
-			"title": "常住地址",
-			"group": "group2"
-	},
-	{
-			"tab": "insured",
-			"func": "getcClntAddr",
-			"readonly": 1,
-			"prop": "Insured.cClntAddr",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"itemWidth": 3,
-			"disabled": true,
-			"title": "常住地址",
-			"group": "group2"
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cZipCde",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "邮编",
-			"group": "group2",
-			"disabled": true
-	},
-	{
-			"falseValue": "0",
-			"keymap": {
-					"y": "1",
-					"n": "0"
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "8f9ac89f144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
 			},
-			"tab": "insured",
-			"func": "isSameChange",
-			"readonly": 0,
-			"prop": "Insured.cIsSame",
-			"trueValue": "1",
-			"inputtype": "rtcheckbox",
-			"cSysConfig": "020",
-			"itemWidth": 2,
-			"title": "注册地址是否同上",
-			"group": "group2",
-			"disabled": true
-	},
-	{
-			"prop": "Insured.RegisterAddress",
-			"inputtype": "rtinputgroup",
-			"itemWidth": 3,
-			"cSysConfig": "020",
-			"groupList": [
-					{
-							"clearable": 1,
-							"tab": "insured",
-							"func": "getAllProp",
-							"prop": "Insured.RegisterProp",
-							"inputtype": "rtcascader",
-							"loadData": [
-									{
-											"label": "中国",
-											"value": "CHN"
-									},
-									{
-											"label": "中国香港",
-											"value": "HKG"
-									},
-									{
-											"label": "中国澳门",
-											"value": "MAC"
-									},
-									{
-											"label": "中国台湾",
-											"value": "TWN"
-									},
-									{
-											"label": "阿鲁巴",
-											"value": "ABW"
-									},
-									{
-											"label": "阿富汗",
-											"value": "AFG"
-									},
-									{
-											"label": "安哥拉",
-											"value": "AGO"
-									},
-									{
-											"label": "安圭拉",
-											"value": "AIA"
-									},
-									{
-											"label": "阿尔巴尼亚",
-											"value": "ALB"
-									},
-									{
-											"label": "安道尔",
-											"value": "AND"
-									},
-									{
-											"label": "荷属安的列斯",
-											"value": "ANT"
-									},
-									{
-											"label": "阿联酋",
-											"value": "ARE"
-									},
-									{
-											"label": "阿根廷",
-											"value": "ARG"
-									},
-									{
-											"label": "亚美尼亚",
-											"value": "ARM"
-									},
-									{
-											"label": "美属萨摩亚",
-											"value": "ASM"
-									},
-									{
-											"label": "南极洲",
-											"value": "ATA"
-									},
-									{
-											"label": "法属南部领土",
-											"value": "ATF"
-									},
-									{
-											"label": "安提瓜和巴布达",
-											"value": "ATG"
-									},
-									{
-											"label": "澳大利亚",
-											"value": "AUS"
-									},
-									{
-											"label": "奥地利",
-											"value": "AUT"
-									},
-									{
-											"label": "阿塞拜疆",
-											"value": "AZE"
-									},
-									{
-											"label": "布隆迪",
-											"value": "BDI"
-									},
-									{
-											"label": "比利时",
-											"value": "BEL"
-									},
-									{
-											"label": "贝宁",
-											"value": "BEN"
-									},
-									{
-											"label": "布基纳法索",
-											"value": "BFA"
-									},
-									{
-											"label": "孟加拉国",
-											"value": "BGD"
-									},
-									{
-											"label": "保加利亚",
-											"value": "BGR"
-									},
-									{
-											"label": "巴林",
-											"value": "BHR"
-									},
-									{
-											"label": "巴哈马",
-											"value": "BHS"
-									},
-									{
-											"label": "波黑",
-											"value": "BIH"
-									},
-									{
-											"label": "白俄罗斯",
-											"value": "BLR"
-									},
-									{
-											"label": "伯利兹",
-											"value": "BLZ"
-									},
-									{
-											"label": "百慕大",
-											"value": "BMU"
-									},
-									{
-											"label": "玻利维亚",
-											"value": "BOL"
-									},
-									{
-											"label": "博内尔",
-											"value": "BON"
-									},
-									{
-											"label": "巴西",
-											"value": "BRA"
-									},
-									{
-											"label": "巴巴多斯",
-											"value": "BRB"
-									},
-									{
-											"label": "文莱",
-											"value": "BRN"
-									},
-									{
-											"label": "不丹",
-											"value": "BTN"
-									},
-									{
-											"label": "布维岛",
-											"value": "BVT"
-									},
-									{
-											"label": "博茨瓦纳",
-											"value": "BWA"
-									},
-									{
-											"label": "中非",
-											"value": "CAF"
-									},
-									{
-											"label": "加拿大",
-											"value": "CAN"
-									},
-									{
-											"label": "科科斯(基林)群岛",
-											"value": "CCK"
-									},
-									{
-											"label": "瑞士",
-											"value": "CHE"
-									},
-									{
-											"label": "智利",
-											"value": "CHL"
-									},
-									{
-											"label": "科特迪瓦",
-											"value": "CIV"
-									},
-									{
-											"label": "喀麦隆",
-											"value": "CMR"
-									},
-									{
-											"label": "加那利群岛",
-											"value": "CNY"
-									},
-									{
-											"label": "刚果（金）",
-											"value": "COD"
-									},
-									{
-											"label": "刚果（布）",
-											"value": "COG"
-									},
-									{
-											"label": "库克群岛",
-											"value": "COK"
-									},
-									{
-											"label": "哥伦比亚",
-											"value": "COL"
-									},
-									{
-											"label": "科摩罗",
-											"value": "COM"
-									},
-									{
-											"label": "佛得角",
-											"value": "CPV"
-									},
-									{
-											"label": "哥斯达黎加",
-											"value": "CRI"
-									},
-									{
-											"label": "圣诞岛",
-											"value": "CSR"
-									},
-									{
-											"label": "古巴",
-											"value": "CUB"
-									},
-									{
-											"label": "库腊索岛",
-											"value": "CUW"
-									},
-									{
-											"label": "开曼群岛",
-											"value": "CYM"
-									},
-									{
-											"label": "塞浦路斯",
-											"value": "CYP"
-									},
-									{
-											"label": "捷克",
-											"value": "CZE"
-									},
-									{
-											"label": "德国",
-											"value": "DEU"
-									},
-									{
-											"label": "吉布提",
-											"value": "DJI"
-									},
-									{
-											"label": "多米尼克",
-											"value": "DMA"
-									},
-									{
-											"label": "丹麦",
-											"value": "DNK"
-									},
-									{
-											"label": "多米尼加共和国",
-											"value": "DOM"
-									},
-									{
-											"label": "阿尔及利亚",
-											"value": "DZA"
-									},
-									{
-											"label": "厄瓜多尔",
-											"value": "ECU"
-									},
-									{
-											"label": "埃及",
-											"value": "EGY"
-									},
-									{
-											"label": "厄立特里亚",
-											"value": "ERI"
-									},
-									{
-											"label": "西撒哈拉",
-											"value": "ESH"
-									},
-									{
-											"label": "西班牙",
-											"value": "ESP"
-									},
-									{
-											"label": "爱沙尼亚",
-											"value": "EST"
-									},
-									{
-											"label": "埃塞俄比亚",
-											"value": "ETH"
-									},
-									{
-											"label": "芬兰",
-											"value": "FIN"
-									},
-									{
-											"label": "斐济",
-											"value": "FJI"
-									},
-									{
-											"label": "福克兰群岛(马尔维纳斯)",
-											"value": "FLK"
-									},
-									{
-											"label": "法国",
-											"value": "FRA"
-									},
-									{
-											"label": "法罗群岛",
-											"value": "FRO"
-									},
-									{
-											"label": "密克罗尼西亚联邦",
-											"value": "FSM"
-									},
-									{
-											"label": "加蓬",
-											"value": "GAB"
-									},
-									{
-											"label": "英国",
-											"value": "GBR"
-									},
-									{
-											"label": "格鲁吉亚",
-											"value": "GEO"
-									},
-									{
-											"label": "加纳",
-											"value": "GHA"
-									},
-									{
-											"label": "直布罗陀",
-											"value": "GIB"
-									},
-									{
-											"label": "几内亚",
-											"value": "GIN"
-									},
-									{
-											"label": "瓜德罗普",
-											"value": "GLP"
-									},
-									{
-											"label": "冈比亚Gambia",
-											"value": "GMB"
-									},
-									{
-											"label": "盖比群岛",
-											"value": "GMR"
-									},
-									{
-											"label": "几内亚比绍",
-											"value": "GNB"
-									},
-									{
-											"label": "赤道几内亚",
-											"value": "GNQ"
-									},
-									{
-											"label": "希腊",
-											"value": "GRC"
-									},
-									{
-											"label": "格林纳达",
-											"value": "GRD"
-									},
-									{
-											"label": "格陵兰",
-											"value": "GRL"
-									},
-									{
-											"label": "危地马拉",
-											"value": "GTM"
-									},
-									{
-											"label": "法属圭亚那",
-											"value": "GUF"
-									},
-									{
-											"label": "关岛",
-											"value": "GUM"
-									},
-									{
-											"label": "圭亚那",
-											"value": "GUY"
-									},
-									{
-											"label": "赫德岛和麦克唐纳岛",
-											"value": "HMD"
-									},
-									{
-											"label": "洪都拉斯",
-											"value": "HND"
-									},
-									{
-											"label": "克罗地亚",
-											"value": "HRV"
-									},
-									{
-											"label": "海地",
-											"value": "HTI"
-									},
-									{
-											"label": "匈牙利",
-											"value": "HUN"
-									},
-									{
-											"label": "印度尼西亚",
-											"value": "IDN"
-									},
-									{
-											"label": "马恩岛",
-											"value": "IMN"
-									},
-									{
-											"label": "印度",
-											"value": "IND"
-									},
-									{
-											"label": "英属印度洋领土",
-											"value": "IOT"
-									},
-									{
-											"label": "爱尔兰",
-											"value": "IRL"
-									},
-									{
-											"label": "伊朗",
-											"value": "IRN"
-									},
-									{
-											"label": "伊拉克",
-											"value": "IRQ"
-									},
-									{
-											"label": "冰岛",
-											"value": "ISL"
-									},
-									{
-											"label": "以色列",
-											"value": "ISR"
-									},
-									{
-											"label": "意大利",
-											"value": "ITA"
-									},
-									{
-											"label": "牙买加",
-											"value": "JAM"
-									},
-									{
-											"label": "约旦",
-											"value": "JOR"
-									},
-									{
-											"label": "日本",
-											"value": "JPN"
-									},
-									{
-											"label": "哈萨克斯坦",
-											"value": "KAZ"
-									},
-									{
-											"label": "肯尼亚",
-											"value": "KEN"
-									},
-									{
-											"label": "吉尔吉斯斯坦",
-											"value": "KGZ"
-									},
-									{
-											"label": "柬埔寨",
-											"value": "KHM"
-									},
-									{
-											"label": "基里巴斯",
-											"value": "KIR"
-									},
-									{
-											"label": "韩国",
-											"value": "KOR"
-									},
-									{
-											"label": "科威特",
-											"value": "KWT"
-									},
-									{
-											"label": "老挝",
-											"value": "LAO"
-									},
-									{
-											"label": "黎巴嫩",
-											"value": "LBN"
-									},
-									{
-											"label": "利比里亚",
-											"value": "LBR"
-									},
-									{
-											"label": "利比亚",
-											"value": "LBY"
-									},
-									{
-											"label": "圣卢西亚",
-											"value": "LCA"
-									},
-									{
-											"label": "列支敦士登",
-											"value": "LIE"
-									},
-									{
-											"label": "斯里兰卡",
-											"value": "LKA"
-									},
-									{
-											"label": "莱索托",
-											"value": "LSO"
-									},
-									{
-											"label": "立陶宛",
-											"value": "LTU"
-									},
-									{
-											"label": "卢森堡",
-											"value": "LUX"
-									},
-									{
-											"label": "拉脱维亚",
-											"value": "LVA"
-									},
-									{
-											"label": "法属圣马丁",
-											"value": "MAF"
-									},
-									{
-											"label": "摩洛哥",
-											"value": "MAR"
-									},
-									{
-											"label": "摩纳哥",
-											"value": "MCO"
-									},
-									{
-											"label": "摩尔多瓦",
-											"value": "MDA"
-									},
-									{
-											"label": "马达加斯加",
-											"value": "MDG"
-									},
-									{
-											"label": "马尔代夫",
-											"value": "MDV"
-									},
-									{
-											"label": "墨西哥",
-											"value": "MEX"
-									},
-									{
-											"label": "马绍尔群岛",
-											"value": "MHL"
-									},
-									{
-											"label": "前南马其顿",
-											"value": "MKD"
-									},
-									{
-											"label": "马里",
-											"value": "MLI"
-									},
-									{
-											"label": "梅利利亚",
-											"value": "MLN"
-									},
-									{
-											"label": "马耳他",
-											"value": "MLT"
-									},
-									{
-											"label": "缅甸",
-											"value": "MMR"
-									},
-									{
-											"label": "黑山",
-											"value": "MNE"
-									},
-									{
-											"label": "蒙古",
-											"value": "MNG"
-									},
-									{
-											"label": "北马里亚纳",
-											"value": "MNP"
-									},
-									{
-											"label": "莫桑比克",
-											"value": "MOZ"
-									},
-									{
-											"label": "毛里塔尼亚",
-											"value": "MRT"
-									},
-									{
-											"label": "蒙特塞拉特",
-											"value": "MSR"
-									},
-									{
-											"label": "马提尼克",
-											"value": "MTQ"
-									},
-									{
-											"label": "毛里求斯",
-											"value": "MUS"
-									},
-									{
-											"label": "马拉维",
-											"value": "MWI"
-									},
-									{
-											"label": "马来西亚",
-											"value": "MYS"
-									},
-									{
-											"label": "马约特",
-											"value": "MYT"
-									},
-									{
-											"label": "纳米比亚",
-											"value": "NAM"
-									},
-									{
-											"label": "新喀里多尼亚",
-											"value": "NCL"
-									},
-									{
-											"label": "尼日尔",
-											"value": "NER"
-									},
-									{
-											"label": "诺福克岛",
-											"value": "NFK"
-									},
-									{
-											"label": "尼日利亚",
-											"value": "NGA"
-									},
-									{
-											"label": "尼加拉瓜",
-											"value": "NIC"
-									},
-									{
-											"label": "纽埃",
-											"value": "NIU"
-									},
-									{
-											"label": "荷兰",
-											"value": "NLD"
-									},
-									{
-											"label": "诺曼底群岛",
-											"value": "NME"
-									},
-									{
-											"label": "挪威",
-											"value": "NOR"
-									},
-									{
-											"label": "尼泊尔",
-											"value": "NPL"
-									},
-									{
-											"label": "瑙鲁",
-											"value": "NRU"
-									},
-									{
-											"label": "新西兰",
-											"value": "NZL"
-									},
-									{
-											"label": "阿曼",
-											"value": "OMN"
-									},
-									{
-											"label": "巴基斯坦",
-											"value": "PAK"
-									},
-									{
-											"label": "巴拿马",
-											"value": "PAN"
-									},
-									{
-											"label": "皮特凯恩群岛",
-											"value": "PCN"
-									},
-									{
-											"label": "秘鲁",
-											"value": "PER"
-									},
-									{
-											"label": "菲律宾",
-											"value": "PHL"
-									},
-									{
-											"label": "帕劳",
-											"value": "PLW"
-									},
-									{
-											"label": "巴布亚新几内亚",
-											"value": "PNG"
-									},
-									{
-											"label": "波兰",
-											"value": "POL"
-									},
-									{
-											"label": "波多黎各",
-											"value": "PRI"
-									},
-									{
-											"label": "朝鲜",
-											"value": "PRK"
-									},
-									{
-											"label": "葡萄牙",
-											"value": "PRT"
-									},
-									{
-											"label": "巴拉圭",
-											"value": "PRY"
-									},
-									{
-											"label": "巴勒斯坦",
-											"value": "PST"
-									},
-									{
-											"label": "法属波利尼西亚",
-											"value": "PYF"
-									},
-									{
-											"label": "卡塔尔",
-											"value": "QAT"
-									},
-									{
-											"label": "留尼汪",
-											"value": "REU"
-									},
-									{
-											"label": "罗马尼亚",
-											"value": "ROM"
-									},
-									{
-											"label": "俄罗斯联邦",
-											"value": "RUS"
-									},
-									{
-											"label": "卢旺达",
-											"value": "RWA"
-									},
-									{
-											"label": "萨巴",
-											"value": "SAB"
-									},
-									{
-											"label": "塞卜泰(休达)",
-											"value": "SAI"
-									},
-									{
-											"label": "沙特阿拉伯",
-											"value": "SAU"
-									},
-									{
-											"label": "塞尔维亚和黑山",
-											"value": "SCG"
-									},
-									{
-											"label": "苏丹",
-											"value": "SDN"
-									},
-									{
-											"label": "塞内加尔",
-											"value": "SEN"
-									},
-									{
-											"label": "新加坡",
-											"value": "SGP"
-									},
-									{
-											"label": "南乔治亚岛和南桑德韦奇岛",
-											"value": "SGS"
-									},
-									{
-											"label": "圣赫勒拿",
-											"value": "SHN"
-									},
-									{
-											"label": "斯瓦尔巴群岛",
-											"value": "SJM"
-									},
-									{
-											"label": "所罗门群岛",
-											"value": "SLB"
-									},
-									{
-											"label": "塞拉利昂",
-											"value": "SLE"
-									},
-									{
-											"label": "萨尔瓦多",
-											"value": "SLV"
-									},
-									{
-											"label": "圣马力诺",
-											"value": "SMR"
-									},
-									{
-											"label": "社会群岛",
-											"value": "SOC"
-									},
-									{
-											"label": "索马里",
-											"value": "SOM"
-									},
-									{
-											"label": "圣皮埃尔和密克隆",
-											"value": "SPM"
-									},
-									{
-											"label": "塞尔维亚",
-											"value": "SRB"
-									},
-									{
-											"label": "南苏丹",
-											"value": "SSD"
-									},
-									{
-											"label": "圣多美和普林西比",
-											"value": "STp"
-									},
-									{
-											"label": "苏里南",
-											"value": "SUR"
-									},
-									{
-											"label": "斯洛伐克",
-											"value": "SVK"
-									},
-									{
-											"label": "斯洛文尼亚",
-											"value": "SVN"
-									},
-									{
-											"label": "瑞典",
-											"value": "SWE"
-									},
-									{
-											"label": "斯威士兰",
-											"value": "SWZ"
-									},
-									{
-											"label": "荷属圣马丁",
-											"value": "SXM"
-									},
-									{
-											"label": "塞舌尔",
-											"value": "SYC"
-									},
-									{
-											"label": "叙利亚",
-											"value": "SYR"
-									},
-									{
-											"label": "特克斯科斯群岛",
-											"value": "TCA"
-									},
-									{
-											"label": "乍得",
-											"value": "TCD"
-									},
-									{
-											"label": "多哥",
-											"value": "TGO"
-									},
-									{
-											"label": "泰国",
-											"value": "THA"
-									},
-									{
-											"label": "塔吉克斯坦",
-											"value": "TJK"
-									},
-									{
-											"label": "托克劳",
-											"value": "TKL"
-									},
-									{
-											"label": "土库曼斯坦",
-											"value": "TKM"
-									},
-									{
-											"label": "东帝汶",
-											"value": "TMP"
-									},
-									{
-											"label": "土阿莫土群岛",
-											"value": "TMU"
-									},
-									{
-											"label": "汤加",
-											"value": "TON"
-									},
-									{
-											"label": "特立尼达和多巴哥",
-											"value": "TTO"
-									},
-									{
-											"label": "突尼斯",
-											"value": "TUN"
-									},
-									{
-											"label": "土耳其",
-											"value": "TUR"
-									},
-									{
-											"label": "图瓦卢",
-											"value": "TUV"
-									},
-									{
-											"label": "坦桑尼亚",
-											"value": "TZA"
-									},
-									{
-											"label": "乌干达",
-											"value": "UGA"
-									},
-									{
-											"label": "乌克兰",
-											"value": "UKR"
-									},
-									{
-											"label": "美国本土外小岛屿",
-											"value": "UMI"
-									},
-									{
-											"label": "乌拉圭",
-											"value": "URY"
-									},
-									{
-											"label": "美国",
-											"value": "USA"
-									},
-									{
-											"label": "乌兹别克斯坦",
-											"value": "UZB"
-									},
-									{
-											"label": "梵蒂冈",
-											"value": "VAT"
-									},
-									{
-											"label": "圣文森特和格林纳丁斯",
-											"value": "VCT"
-									},
-									{
-											"label": "委内瑞拉",
-											"value": "VEN"
-									},
-									{
-											"label": "英属维尔京群岛",
-											"value": "VGB"
-									},
-									{
-											"label": "美属维尔京群岛",
-											"value": "VIR"
-									},
-									{
-											"label": "越南",
-											"value": "VNM"
-									},
-									{
-											"label": "瓦努阿图",
-											"value": "VUT"
-									},
-									{
-											"label": "瓦利斯和富图纳",
-											"value": "WLF"
-									},
-									{
-											"label": "萨摩亚",
-											"value": "WSM"
-									},
-									{
-											"label": "也门",
-											"value": "YEM"
-									},
-									{
-											"label": "南斯拉夫",
-											"value": "YUG"
-									},
-									{
-											"label": "南非",
-											"value": "ZAF"
-									},
-									{
-											"label": "赞比亚",
-											"value": "ZMB"
-									},
-									{
-											"label": "津巴布韦",
-											"value": "ZWE"
-									},
-									{
-											"label": "基利巴斯",
-											"value": "103143"
-									},
-									{
-											"label": "新客里多尼亚",
-											"value": "103146"
-									},
-									{
-											"label": "北马里亚纳群岛",
-											"value": "103149"
-									},
-									{
-											"label": "塞班",
-											"value": "103150"
-									},
-									{
-											"label": "东萨摩亚",
-											"value": "103166"
-									},
-									{
-											"label": "加拿利群岛",
-											"value": "103169"
-									},
-									{
-											"label": "海峡群岛",
-											"value": "103170"
-									},
-									{
-											"label": "格林兰岛",
-											"value": "103173"
-									},
-									{
-											"label": "泽西岛",
-											"value": "103176"
-									},
-									{
-											"label": "塔西提",
-											"value": "103183"
-									},
-									{
-											"label": "捷克共和国",
-											"value": "103190"
-									},
-									{
-											"label": "阿美尼亚",
-											"value": "103200"
-									},
-									{
-											"label": "波斯尼亚－黑塞哥维那",
-											"value": "103204"
-									},
-									{
-											"label": "孟加拉",
-											"value": "103211"
-									},
-									{
-											"label": "巴巴多期",
-											"value": "103212"
-									},
-									{
-											"label": "佛得角群岛",
-											"value": "103214"
-									},
-									{
-											"label": "布丹",
-											"value": "103216"
-									},
-									{
-											"label": "中非共和国",
-											"value": "103217"
-									},
-									{
-											"label": "科摩罗群岛",
-											"value": "103221"
-									},
-									{
-											"label": "多米尼加联邦",
-											"value": "103229"
-									},
-									{
-											"label": "科特迪亚",
-											"value": "103231"
-									},
-									{
-											"label": "荷属安第刑斯",
-											"value": "103253"
-									},
-									{
-											"label": "冈比亚",
-											"value": "103258"
-									},
-									{
-											"label": "圣巴泰勒米",
-											"value": "103270"
-									},
-									{
-											"label": "圣尤斯特歇斯",
-											"value": "103273"
-									},
-									{
-											"label": "圣基茨和尼维斯岛",
-											"value": "103275"
-									},
-									{
-											"label": "圣文斯特",
-											"value": "103278"
-									},
-									{
-											"label": "特克斯和凯科斯群岛",
-											"value": "103281"
-									},
-									{
-											"label": "吉尔吉思",
-											"value": "103282"
-									},
-									{
-											"label": "马其顿",
-											"value": "103295"
-									},
-									{
-											"label": "马召尔群岛",
-											"value": "103301"
-									},
-									{
-											"label": "马约特岛",
-											"value": "103303"
-									},
-									{
-											"label": "纽埃岛",
-											"value": "103313"
-									},
-									{
-											"label": "诺福克群岛",
-											"value": "103314"
-									},
-									{
-											"label": "留尼汪岛",
-											"value": "103318"
-									},
-									{
-											"label": "俄罗斯",
-											"value": "103319"
-									},
-									{
-											"label": "塞拉里昂",
-											"value": "103324"
-									},
-									{
-											"label": "圣马丁",
-											"value": "103351"
-									},
-									{
-											"label": "特里尼达和多巴哥",
-											"value": "103352"
-									},
-									{
-											"label": "阿尔及尼亚",
-											"value": "103353"
-									},
-									{
-											"label": "库腊索岛(荷属)",
-											"value": "103356"
-									},
-									{
-											"label": "圣基茨和尼维斯岛",
-											"value": "103425"
-									},
-									{
-											"label": "其他",
-											"value": "XXX"
-									}
-							],
-							"persent": 8,
-							"placeholder": "省市区",
-							"title": "联系地址（注册地址）",
-							"cascaderprops": "[\"Insured.cRegisterCountry\",\"Insured.cRegisterProvince\",\"Insured.cRegisterCity\",\"Insured.cRegisterCounty\"]",
-							"typeCode": "getarealist",
-							"disabled": true
-					},
-					{
-							"clearable": 1,
-							"tab": "insured",
-							"func": "getcRegisterSuffixAddr",
-							"maxlength": 100,
-							"prop": "Insured.cRegisterSuffixAddr",
-							"showWordLimit": "1",
-							"inputtype": "rtinput",
-							"persent": 8,
-							"placeholder": "详细地址",
-							"title": "街道/镇",
-							"disabled": true
-					}
-			],
-			"title": "注册地址",
-			"group": "group2"
-	},
-	{
-			"tab": "insured",
-			"readonly": 1,
-			"prop": "Insured.cRegisteredcapDre",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"itemWidth": 3,
-			"disabled": true,
-			"title": "注册地址",
-			"group": "group2"
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cCustRiskRank",
-			"codeParam": "{\"cParCde\":\"9251\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "反洗钱风险等级",
-			"typeCode": "WEB_BAS_COMM_CODE",
-			"group": "group3"
-	},
-	{
-			"btnItems": {
-					"func": "funcNdustryCate",
-					"size": "default",
-					"upper": "c0975b949b8d43f6967c37c2281e016d",
-					"icon": "Search",
-					"iconSize": "large",
-					"type": "primary",
-					"order": "1",
-					"disabled": true
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
 			},
-			"tab": "insured",
-			"prop": "Insured.cTrdCde",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"showExBtn": true,
-			"title": "国民经济行业分类",
-			"group": "group3",
-			"typeCode": "Search_TrdCde_List3"
-	},
-	{
-			"tab": "insured",
-			"func": "mobileChange",
-			"prop": "Insured.cMobile",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "移动电话",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"func": "cIsIndvduBizChange",
-			"prop": "Insured.cIsIndvduBiz",
-			"codeParam": "{\"cParCde\":\"yes_no\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "是否个体工商户",
-			"group": "group3",
-			"typeCode": "WEB_SYS_STA_DICT",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cEdubackgroudTyp",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "客户学历",
-			"group": "group3",
-			"typeCode": "Eduback",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"max": 1000000000,
-			"prop": "Insured.nYearincomeNum",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "年收入（单位万元）",
-			"type": "number",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"func": "cWorkDptChange",
-			"prop": "Insured.cWorkDpt",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"itemWidth": 1,
-			"disabled": true,
-			"rules": [
-					{
-							"type": "required"
-					}
-			],
-			"title": "单位性质",
-			"typeCode": "CompanyType",
-			"group": "group3"
-	},
-	{
-			"tab": "insured",
-			"max": 100000,
-			"prop": "Insured.nEntprisPeopTtl",
-			"inputtype": "rtnumber",
-			"cSysConfig": "020",
-			"title": "单位总人数",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"func": "cIsMicroEntprisChange",
-			"prop": "Insured.cIsMicroEntpris",
-			"codeParam": "{\"cParCde\":\"yes_no\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"title": "是否小微企业",
-			"typeCode": "WEB_SYS_STA_DICT",
-			"group": "group3"
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cParticiinsocTyp",
-			"codeParam": "{\"cParCde\":\"yes_no\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "参加社会统筹标志",
-			"group": "group3",
-			"typeCode": "WEB_SYS_STA_DICT",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"func": "tEstablishingDateChange",
-			"prop": "Insured.tEstablishingDate",
-			"inputtype": "rtdatepicker",
-			"cSysConfig": "020",
-			"title": "企业成立日期",
-			"type": "date",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cFirmscaleTyp",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"loadData": [
-					{
-							"label": "大型",
-							"value": "1"
-					},
-					{
-							"label": "中型",
-							"value": "2"
-					},
-					{
-							"label": "小型",
-							"value": "3"
-					},
-					{
-							"label": "微型",
-							"value": "4"
-					}
-			],
-			"title": "企业规模类型",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.nRegisteredCapital",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "注册资本(单位:万元)",
-			"type": "number",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"maxlength": 30,
-			"prop": "Insured.cLegalRepresentative",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "法定代表人/责任人",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"maxlength": 50,
-			"prop": "Insured.cEnterpriseTel",
-			"showWordLimit": "1",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "企业电话",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"btnItems": {
-					"func": "cOccupCdeChange",
-					"upper": "a1d8b429da6c43b6ae0e8da4bc52be0e",
-					"icon": "Search",
-					"type": "primary",
-					"order": "1",
-					"disabled": true
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
 			},
-			"tab": "insured",
-			"func": "",
-			"prop": "Insured.cOccupCde",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"disabled": true,
-			"showExBtn": true,
-			"title": "职业",
-			"group": "group3",
-			"typeCode": "INDUSTRY_INQUIRY_EX"
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			}
+	],
+	"collist": [
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "8f9ac89f144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "8f8db6aa144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "65db20f15b5e495c8af394dabf63c454",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "8fab83c5144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "8f9ac89f144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "8fba4769144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "cc75891713b111f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "8fba4769144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "8fba4769144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "8fba4769144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "8fba4769144711f191befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "d3ad7a8638764052bc0eb1e5247af0f5",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "责任类型"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "be0eccd5321842a2b7a18e5324589fc8",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "0f17ffcf49d24df482dbfd711bf44b2b",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "货物明细序号"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "834e61ec08df4a00977f17c55995be25",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "91b740f230e844bc9cc3620838af09c3",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "费率（‰）"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "aff6baa47c8f49e48da4a2019fd16052",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "1",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8ee542fb67a547d7a0f1fd2392f3da89",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "a5ca8588e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "868022bf7e184bd5bbf441e7b505ba73",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额币种"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "a6a5e330e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1c3803aea3f34537a884a4590dec80ab",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险金额汇率"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "a68759a2e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "1a90e6acec1643f68578b5889db9e22f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保险金额（元）"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "cca774a2aa364c0e839d14331066512c",
+					"cGroupType": "grid",
+					"cPorpDisabled": "1",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "a46eff8cbb5c4697b7063ef8ca246ff0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保险费"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "a639f6dce15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "7df803fb8f87408cb71b72038b2cd74a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费币种"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "a5abfa6de15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "fd1873380bb3488d9fcb404271009db9",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "保费汇率"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "a7889a59e15b11f091befa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "03144a7cce464362ba1d8a9100237d0a",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "折人民币保费（元）"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "21b3843601da41f6b659d3408db1e9f2",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "54370f0bf4144a75bae1b88dac51aa76",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔率"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "3bb454fe5d7e419a97664a88a538098f",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔额"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "95d17542201f4a7fb69e8761e621995a",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "5c468473f02646b98963f328821a773c",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "免赔说明"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "9624a8d28b1442199504e4f7c1176983",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cColId": "dbea1251ce9411f099a3fa163e3db1d5",
+					"cColTitle": "责任保险费",
+					"cGroupName": "出口货运险定期",
+					"cColWidth": "80",
+					"cPorpRequired": "0",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8"
+			},
+			{
+					"cRiskNo": "020323",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020315",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020313",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020317",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020316",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020318",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020314",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020319",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020320",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020321",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			},
+			{
+					"cRiskNo": "020322",
+					"cFactorId": "fc0cb97486a449648a90a72501f630fb",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "8d3e33407390471f8c3f6bc7fa183036",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "备注"
+			}
+	],
+	"term": {
+			"additionalInsuranceType": null,
+			"averageCostRate": 1,
+			"cClassOfClause": null,
+			"cCrtCde": "cd0000001",
+			"cDesc": null,
+			"cEnableFlag": "1",
+			"cFilingNo": "43424",
+			"cIsExist": null,
+			"cIsGroup": null,
+			"cIsInternet": "0",
+			"cKindNo": "02",
+			"cNmeCn": "出口货运险定期",
+			"cNmeEn": null,
+			"cPkId": "c0f7674bfc4a4824972b017b189e6a4e",
+			"cRdrTyp": "0",
+			"cRegisteredNo": "54363",
+			"cTermNo": "00225100000",
+			"cTermRdrCde": null,
+			"cUpdCde": "cd0000001",
+			"cVersion": null,
+			"cWebsite": null,
+			"costRateUpper": 1,
+			"isDutyfree": "0",
+			"tCrtTm": null,
+			"tFeedbackTm": "2026-03-28 00:00:00",
+			"tFilingTm": "2025-03-28 00:00:00",
+			"tUpdTm": null,
+			"termRateLower": 1,
+			"termRateUpper": 1
 	},
-	{
-			"tab": "insured",
-			"func": "cTelChange",
-			"prop": "Insured.cTel",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "固定电话",
-			"group": "group3",
-			"disabled": true
+	"groupInfo": {
+			"3cc9a8814de942658485c3b9014683b8": {
+					"cRiskNo": "020323",
+					"cFactorId": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"cGroupType": "grid",
+					"cPorpDisabled": "0",
+					"cGroupName": "出口货运险定期",
+					"cPorpRequired": "0",
+					"cGroupTitle": "出口货运险定期",
+					"cPorpType": "null",
+					"cPropIndent": "0",
+					"cColId": "72499979fa1c438db65a517d3ecb3621",
+					"cGroupId": "3cc9a8814de942658485c3b9014683b8",
+					"cColTitle": "条款名称"
+			}
 	},
-	{
-			"tab": "insured",
-			"func": "emailChange",
-			"prop": "Insured.cEmail",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "电子邮箱",
-			"group": "group3",
-			"disabled": true
+	"factormap": {
+			"be0eccd5321842a2b7a18e5324589fc8": {
+					"c_pk_id": "be0eccd5321842a2b7a18e5324589fc8",
+					"tab": "TermRisktgt",
+					"readonly": 1,
+					"prop": "TermRisktgt.cDistCodeNo",
+					"inputtype": "rtinput",
+					"disabled": 1,
+					"showExBtn": 0,
+					"title": "货物编码",
+					"type": "text",
+					"required": 1
+			},
+			"a5ca8588e15b11f091befa163e3db1d5": {
+					"c_pk_id": "a5ca8588e15b11f091befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cOriginalCurrency",
+					"inputtype": "rtSelectV2",
+					"showExBtn": 0,
+					"title": "保险金额币种",
+					"typeCode": "FIN_CUR_CACHE"
+			},
+			"aff6baa47c8f49e48da4a2019fd16052": {
+					"c_pk_id": "aff6baa47c8f49e48da4a2019fd16052",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nInsuranceAmount",
+					"precision": 2,
+					"inputtype": "rtinput",
+					"showExBtn": 0,
+					"title": "保险金额",
+					"type": "number"
+			},
+			"8f9ac89f144711f191befa163e3db1d5": {
+					"c_pk_id": "8f9ac89f144711f191befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabilityType",
+					"inputtype": "rtSelectV2",
+					"loadData": [
+							{
+									"label": "航空运输险",
+									"value": "020286"
+							},
+							{
+									"label": "航空运输一切险",
+									"value": "020287"
+							}
+					],
+					"showExBtn": 0,
+					"title": "责任类型020316"
+			},
+			"cc75891713b111f191befa163e3db1d5": {
+					"c_pk_id": "cc75891713b111f191befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabilityType",
+					"inputtype": "rtSelectV2",
+					"loadData": [
+							{
+									"label": "陆运险",
+									"value": "020284"
+							},
+							{
+									"label": "陆运一切险",
+									"value": "020285"
+							}
+					],
+					"showExBtn": 0,
+					"title": "责任类型020314"
+			},
+			"834e61ec08df4a00977f17c55995be25": {
+					"c_pk_id": "834e61ec08df4a00977f17c55995be25",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nItemRate",
+					"precision": 7,
+					"inputtype": "rtnumber",
+					"disabled": 0,
+					"suffix": "‰",
+					"showExBtn": 0,
+					"title": "分项费率",
+					"type": "number",
+					"required": 1
+			},
+			"8f8db6aa144711f191befa163e3db1d5": {
+					"c_pk_id": "8f8db6aa144711f191befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabilityType",
+					"inputtype": "rtSelectV2",
+					"loadData": [
+							{
+									"label": "陆上运输冷藏货物险",
+									"value": "020288"
+							}
+					],
+					"showExBtn": 0,
+					"title": "责任类型020315"
+			},
+			"8fab83c5144711f191befa163e3db1d5": {
+					"c_pk_id": "8fab83c5144711f191befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabilityType",
+					"inputtype": "rtSelectV2",
+					"loadData": [
+							{
+									"label": "冷藏险",
+									"value": "020282"
+							},
+							{
+									"label": "冷藏一切险",
+									"value": "020283"
+							}
+					],
+					"showExBtn": 0,
+					"title": "责任类型020317"
+			},
+			"fc0cb97486a449648a90a72501f630fb": {
+					"c_pk_id": "fc0cb97486a449648a90a72501f630fb",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cRemarkInfo",
+					"inputtype": "rtinput",
+					"showExBtn": 0,
+					"title": "备注"
+			},
+			"8fba4769144711f191befa163e3db1d5": {
+					"c_pk_id": "8fba4769144711f191befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabilityType",
+					"inputtype": "rtSelectV2",
+					"loadData": [
+							{
+									"label": "平安险",
+									"value": "020279"
+							},
+							{
+									"label": "水渍险",
+									"value": "020280"
+							},
+							{
+									"label": "一切险",
+									"value": "020281"
+							}
+					],
+					"showExBtn": 0,
+					"title": "责任类型020318"
+			},
+			"65db20f15b5e495c8af394dabf63c454": {
+					"c_pk_id": "65db20f15b5e495c8af394dabf63c454",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabilityType",
+					"inputtype": "rtSelectV2",
+					"loadData": [
+							{
+									"label": "邮包险",
+									"value": "020007"
+							},
+							{
+									"label": "邮包一切险",
+									"value": "020289"
+							}
+					],
+					"showExBtn": 0,
+					"title": "责任类型020313"
+			},
+			"997b6aa6b4fe4592b6fbd96b060f466d": {
+					"c_pk_id": "997b6aa6b4fe4592b6fbd96b060f466d",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nDeductibleAmount",
+					"inputtype": "rtinput",
+					"showExBtn": 0,
+					"title": "免赔额",
+					"type": "number"
+			},
+			"95d17542201f4a7fb69e8761e621995a": {
+					"c_pk_id": "95d17542201f4a7fb69e8761e621995a",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cDeductibleNote",
+					"inputtype": "rtinput",
+					"disabled": 0,
+					"showExBtn": 0,
+					"title": "免赔说明"
+			},
+			"a639f6dce15b11f091befa163e3db1d5": {
+					"c_pk_id": "a639f6dce15b11f091befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"func": "cFeeCurrencyChange",
+					"prop": "TermRisktgt.cFeeCurrency",
+					"inputtype": "rtSelectV2",
+					"showExBtn": 0,
+					"title": "保费币种",
+					"typeCode": "FIN_CUR_CACHE"
+			},
+			"a68759a2e15b11f091befa163e3db1d5": {
+					"c_pk_id": "a68759a2e15b11f091befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nRmbAmount",
+					"precision": 2,
+					"inputtype": "rtinput",
+					"showExBtn": 0,
+					"title": "折人民币保险金额",
+					"type": "number"
+			},
+			"a6a5e330e15b11f091befa163e3db1d5": {
+					"c_pk_id": "a6a5e330e15b11f091befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nOriginalRate",
+					"precision": 6,
+					"inputtype": "rtnumber",
+					"showExBtn": 0,
+					"title": "保险金额汇率"
+			},
+			"21b3843601da41f6b659d3408db1e9f2": {
+					"c_pk_id": "21b3843601da41f6b659d3408db1e9f2",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nDeductibleRate",
+					"precision": 2,
+					"inputtype": "rtnumber",
+					"disabled": 0,
+					"suffix": "%",
+					"showExBtn": 0,
+					"title": "免赔率"
+			},
+			"ef133490-f502-11ef-b066-fa163e3db1d5": {
+					"c_pk_id": "ef133490-f502-11ef-b066-fa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.cLiabCode",
+					"inputtype": "rttag",
+					"showExBtn": 0,
+					"title": "责任编码",
+					"typeCode": "risk_code_list"
+			},
+			"9624a8d28b1442199504e4f7c1176983": {
+					"c_pk_id": "9624a8d28b1442199504e4f7c1176983",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nTotalInsuranceFee",
+					"inputtype": "rtinput",
+					"showExBtn": 0,
+					"title": "责任总保险费"
+			},
+			"cca774a2aa364c0e839d14331066512c": {
+					"c_pk_id": "cca774a2aa364c0e839d14331066512c",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nItemFee",
+					"inputtype": "rtinput",
+					"disabled": 0,
+					"showExBtn": 0,
+					"title": "分项保费",
+					"type": "number",
+					"required": 1
+			},
+			"a5abfa6de15b11f091befa163e3db1d5": {
+					"c_pk_id": "a5abfa6de15b11f091befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nFeeRate",
+					"precision": 6,
+					"inputtype": "rtnumber",
+					"showExBtn": 0,
+					"title": "保费汇率"
+			},
+			"a7889a59e15b11f091befa163e3db1d5": {
+					"c_pk_id": "a7889a59e15b11f091befa163e3db1d5",
+					"tab": "TermRisktgt",
+					"prop": "TermRisktgt.nRmbFee",
+					"inputtype": "rtinput",
+					"showExBtn": 0,
+					"title": "折人民币保费",
+					"type": "number"
+			}
 	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cCntrNme",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "办理人员姓名",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"func": "cOperaterCertfTypChange",
-			"prop": "Insured.cOperaterCertfTyp",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "办理人员证件种类",
-			"group": "group3",
-			"typeCode": "ACCEPTING_OFFICER",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cOperaterCertfCde",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "办理人员证件号码",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.tOperaterCertfEndTm",
-			"disabledDate": "tOEndTmDisable",
-			"inputtype": "rtdatepicker",
-			"cSysConfig": "020",
-			"title": "办理人员证件有效止期",
-			"type": "date",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"maxlength": 50,
-			"prop": "Insured.cAgencyReason",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "代办原因",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cGcidCode",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "全球法人机构识别编码",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cRealnameAuthFlag",
-			"codeParam": "{\"cParCde\":\"yes_no\"}",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"title": "实名认证标识",
-			"group": "group3",
-			"typeCode": "WEB_SYS_STA_DICT",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cRealnameAuthType",
-			"inputtype": "rtSelectV2",
-			"cSysConfig": "020",
-			"loadData": [
-					{
-							"label": "保险实名查验登记系统认证",
-							"value": "1"
-					},
-					{
-							"label": "前置认证",
-							"value": "2"
-					},
-					{
-							"label": "保险机构自主认证",
-							"value": "3"
-					}
-			],
-			"title": "实名认证方式",
-			"group": "group3",
-			"disabled": true
-	},
-	{
-			"tab": "insured",
-			"prop": "Insured.cHabitualResidence",
-			"inputtype": "rtinput",
-			"cSysConfig": "020",
-			"title": "经常居住地",
-			"group": "group3",
-			"disabled": true
+	"termTitleConf": {
+			"CCnm": "{\"cFactorTabType\":\"table\"}",
+			"CParCde": "termTitleConf",
+			"CCde": "termconf00225100000"
 	}
-]
-
-
-
-[
-	{
-			"Insured.cUpdCde": "10121376",
-			"Insured.cInsuredCls": "0",
-			"Insured.cRegisterSuffixAddr": "马朱罗阿吉尔塔克岛阿吉尔塔克路信托公司大楼",
-			"Insured.cPkId": "2033836804401319937",
-			"Insured.cHabitualResidence": "中国山东省青岛市崂山区1",
-			"Insured.nRegisteredCapital": 10,
-			"Insured.cInsuredCde": "91363488584",
-			"Insured.cIsMicroEntpris": "0",
-			"Insured.cCustRiskRank": "925104",
-			"Insured.cGreenIndustryCustomers": "0",
-			"Insured.cIsUploadFlag": "0",
-			"Insured.cIsIndvduBiz": "",
-			"Insured.cIsSame": "1",
-			"Insured.cCountry": "MHL",
-			"Insured.tEstablishingDate": 1748534400000,
-			"Insured.cRegisterCountry": "MHL",
-			"Insured.tCertfBgnDate": 1748534400000,
-			"Insured.cStkMrk": "0",
-			"Insured.cCrtCde": "10121376",
-			"Insured.cParticiinsocTyp": "0",
-			"Insured.cAppNo": "237022604000000207",
-			"Insured.cClntAddr": "马绍尔群岛马朱罗阿吉尔塔克岛阿吉尔塔克路信托公司大楼",
-			"Insured.cGreenIndustryList": "",
-			"Insured.cClntMrk": "0",
-			"Insured.cFirmscaleTyp": "3",
-			"Insured.cMobile": "13579866832",
-			"Insured.cInsuredNme": "HEBO SHIPPING LIMITED",
-			"Insured.tUpdTm": 1773824589000,
-			"Insured.nEdrPrjNo": 0,
-			"Insured.cPlyNo": "337022604000000092",
-			"Insured.cRegisteredcapDre": "马绍尔群岛马朱罗阿吉尔塔克岛阿吉尔塔克路信托公司大楼",
-			"Insured.tCrtTm": 1773739455000,
-			"Insured.cSuffixAddr": "马朱罗阿吉尔塔克岛阿吉尔塔克路信托公司大楼",
-			"Insured.cEnterpriseTel": "13579866832",
-			"Insured.cWorkDpt": "330",
-			"Insured.cRealnameAuthType": "3",
-			"Insured.cLatestMrk": "1",
-			"Insured.cLongendTyp": "1",
-			"Insured.cCertfCde": "132885",
-			"Insured.cLegalRepresentative": "某某",
-			"Insured.cIsBranch": "1",
-			"Insured.cNation": "MHL",
-			"Insured.tCertfEndDate": 253402214400000,
-			"Insured.cCertfCls": "11",
-			"Insured.cTrdCde": "G5522"
-	}
-]
+}
