@@ -1635,7 +1635,7 @@ function setFormValue(value: any) {
     eventBus.on('setUnDisabledDone', () => {
       nextTick(() => {
         const cClntMrk = formconfig1.fromSchema?.find((item:any) => item.prop === 'Applicant.cClntMrk')
-        if(cClntMrk?.disabled !== true) {
+        if(cClntMrk?.disabled !== true && value['Applicant.cClntMrk'] == '1') {
           method.InsureChange(value['Applicant.cClntMrk'])
         }
       })

@@ -452,8 +452,10 @@ function selectMainTerm(isselect = true) {
             }
             if(v.cRowId && v.cTermNo === item.cTermNo){
               item.disabled = props.data.data.type !== 'ECargo';
+              item.oldSelect = true;  // 批改时,如果是批改原条款,进行标记,用于后期显示条款排序时,老条款在新增条款之前
               item.children?.forEach((i: any) => {
                 i.disabled = props.data.data.type !== 'ECargo';
+                item.oldSelect = true;
               });
             }
           })
@@ -649,34 +651,60 @@ function flushSelectData() {
   });
 
   const addtree = additionalRef.value?.getCheckedNodes(false, true);
-
+  // 先获取老条款数据,再获取新增条款数据,保证新老数据item保持一致
   addtree?.forEach((item: any) => {
     // 获取选中的主条款信息
     if (item.cTermNo) {
-      let seterm = Object.assign({}, item);
-      let childnode: any[] = [];
-      item.children?.forEach((child: any) => {
-        const issel = childnode?.filter(
-          (node: any) => node.cRiskNo === child.cRiskNo
-        );
-        if (issel != null && issel.length > 0) {
-          return;
-        }
-        const f = addtree?.filter(
-          (child2: any) => child2.cRiskNo === child.cRiskNo
-        );
-        if (f !== null && f.length > 0) {
-          childnode.push(...f);
-        }
-      });
-      seterm.cRdrTyp = "1";
-      seterm.children = childnode;
-      selectNode1.push(seterm);
+      if(item.oldSelect){ // 将老条款数据,前置
+        let seterm = Object.assign({}, item);
+        let childnode: any[] = [];
+        item.children?.forEach((child: any) => {
+          const issel = childnode?.filter(
+            (node: any) => node.cRiskNo === child.cRiskNo
+          );
+          if (issel != null && issel.length > 0) {
+            return;
+          }
+          const f = addtree?.filter(
+            (child2: any) => child2.cRiskNo === child.cRiskNo
+          );
+          if (f !== null && f.length > 0) {
+            childnode.push(...f);
+          }
+        });
+        seterm.cRdrTyp = "1";
+        seterm.children = childnode;
+        selectNode1.push(seterm);
+      }
+    }
+  });
+  addtree?.forEach((item: any) => {
+    if (item.cTermNo) {
+      if(!item.oldSelect){ // 本次新增条款后置
+        let seterm = Object.assign({}, item);
+        let childnode: any[] = [];
+        item.children?.forEach((child: any) => {
+          const issel = childnode?.filter(
+            (node: any) => node.cRiskNo === child.cRiskNo
+          );
+          if (issel != null && issel.length > 0) {
+            return;
+          }
+          const f = addtree?.filter(
+            (child2: any) => child2.cRiskNo === child.cRiskNo
+          );
+          if (f !== null && f.length > 0) {
+            childnode.push(...f);
+          }
+        });
+        seterm.cRdrTyp = "1";
+        seterm.children = childnode;
+        selectNode1.push(seterm);
+      }
     }
   });
 
   // selectNode.push(addtree);
-
   data3.value = selectNode;
   data4.value = selectNode1;
 

@@ -399,6 +399,7 @@ const router = useRouter();
 import { AppKey } from "@/constants/api";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { statisticProps } from "element-plus";
+import {plyTotalData, plyTotalData1, plyTotalData2} from './index.ts'
 const dzmodal = useDzModal();
 const shortMenuDialog = defineAsyncComponent(
   () => import("./components/shortMenuDialog.vue")
@@ -442,7 +443,7 @@ import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service"
 const policyService = new PolicyService();
 import { delTmpPolicy, delInquiryPolicy } from "@/api/query";
 import { createFreeButtonBase } from "@/shared/button-config";
-
+import labelIcon from '@/assets/img/slash.png'; 
 defineOptions({
   name: "Dashboard",
   inheritAttrs: false,
@@ -494,7 +495,6 @@ const moreBtnItem = ref({
     toQuery(moreurl.value);
   },
 });
-const labelIcon = "/src/assets/img/slash.png";
 
 const env = import.meta.env;
 const platformUrl = env.MODE === "prod" ? 'https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68f5e3f9f367b2000104542a&projectId=Pi2GPKuRX7dZ4TCs&access_type=1': 'https://yfpt-devops.yaic.com.cn:30011/plugin/Nq98Zt7s/3HjTkVPb/EXeviQzu/latest/modules/about-blank-Pv2J/index.html?orgUUID=Nq98Zt7s&teamUUID=3HjTkVPb&appID=EXeviQzu&origin=https%3A%2F%2Fyfpt-devops.yaic.com.cn%3A30011&formId=68633ed3e2156d0001578d68&projectId=Pi2GPKuRX7dZ4TCs&access_type=1';
@@ -1046,11 +1046,12 @@ function init() {
 
 function getOrderInfo() {
   (async () => {
-    try {
-      const res: any = await getAnalysis({ type: "ply_total", cDptCde: user.companyId });
-      if (res.code === 200) {
-        tabDataMap.value = res.dataMap;
-        const keys = Object.keys(res.dataMap).filter(
+    // try {
+      // const res: any = await getAnalysis({ type: "ply_total", cDptCde: user.companyId });
+      // if (res.code === 200) {
+        // tabDataMap.value = res.dataMap;
+        tabDataMap.value = plyTotalData;
+        const keys = Object.keys(plyTotalData).filter(
             (item: any) =>
                 item === "核心出单" ||
                 item === "复制出单" ||
@@ -1061,12 +1062,12 @@ function getOrderInfo() {
         keys.splice(0, 0, keys.splice(keys.indexOf("核心出单"), 1)[0]);
         currentTab.value = keys[0];
         statisticTabList.value = keys;
-      } else {
-        ElMessage.error(res.msg);
-      }
-    } catch (err) {
-      ElMessage.error(err);
-    }
+      // } else {
+      //   ElMessage.error(res.msg);
+      // }
+    // } catch (err) {
+      // ElMessage.error(err);
+    // }
   })();
 }
 
@@ -1088,16 +1089,18 @@ async function handleRefreshEcharts() {
     nPrmBtnItem.value.type = "primary";
   }
   if (echartsOptionsData.value.length < 1) {
-    const param = {
-      // type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
-      type: "ply",
-      cDptCde: user.companyId,
-    };
-    try {
-      const res: any = await getAnalysis(param);
-      if (res.code === 200) {
-        echartsOptionsData.value = res.dataMap;
-        const data = res.dataMap[currentTab.value] || [];
+    // const param = {
+    //   // type: ecahrtsBtnIndex.value === 0 ? 'ply' : 'fee'
+    //   type: "ply",
+    //   cDptCde: user.companyId,
+    // };
+    // try {
+      // const res: any = await getAnalysis(param);
+      // if (res.code === 200) {
+        // echartsOptionsData.value = res.dataMap;
+        echartsOptionsData.value = plyTotalData1;
+        // const data = res.dataMap[currentTab.value] || [];
+        const data = plyTotalData1[currentTab.value] || [];
         echartsOptions.xAxis[0].data = data.map((item: any) => item.item);
         echartsOptions.series[0].data = data.map((item: any) => item.value);
         echartsOptions.series[1].data = data.map((item: any) => item.rate);
@@ -1113,12 +1116,12 @@ async function handleRefreshEcharts() {
             ? echartsOptions
             : echartsOptionsPie
         );
-      } else {
-        ElMessage.error(res.msg);
-      }
-    } catch (err) {
-      ElMessage.error(err);
-    }
+      // } else {
+        // ElMessage.error(res.msg);
+      // }
+    // } catch (err) {
+      // ElMessage.error(err);
+    // }
   } else {
     echartsOptions.xAxis[0].data = echartsOptionsData.value[
         currentTab.value
@@ -1145,15 +1148,17 @@ async function handleRefreshEcharts() {
     );
   }
   if (echartsOptionsData1.value.length < 1) {
-    const param1 = {
-      type: "fee",
-      cDptCde: user.companyId,
-    };
-    try {
-      const res: any = await getAnalysis(param1);
-      if (res.code === 200) {
-        echartsOptionsData1.value = res.dataMap;
-        const data = res.dataMap[currentTab.value] || [];
+    // const param1 = {
+    //   type: "fee",
+    //   cDptCde: user.companyId,
+    // };
+    // try {
+      // const res: any = await getAnalysis(param1);
+      // if (res.code === 200) {
+        // echartsOptionsData1.value = res.dataMap;
+				// const data = res.dataMap[currentTab.value] || [];
+				echartsOptionsData1.value = plyTotalData2;
+        const data = plyTotalData2[currentTab.value] || [];
         echartsOptions1.xAxis[0].data = data.map((item: any) => item.item);
         echartsOptions1.series[0].data = data.map((item: any) => item.value);
         echartsOptions1.series[1].data = data.map((item: any) => item.rate);
@@ -1169,12 +1174,12 @@ async function handleRefreshEcharts() {
             ? echartsOptions1
             : echartsOptions1Pie
         );
-      } else {
-        ElMessage.error(res.msg);
-      }
-    } catch (err) {
-      ElMessage.error(err);
-    }
+      // } else {
+        // ElMessage.error(res.msg);
+      // }
+    // } catch (err) {
+      // ElMessage.error(err);
+    // }
   } else {
     echartsOptions1.xAxis[0].data = echartsOptionsData1.value[
         currentTab.value

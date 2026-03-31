@@ -2056,8 +2056,8 @@ const methodMap = {
   },
   // 费率计算方式(0: 按限额 1: 按人)
   cRateMethodChange:(val:any)=> {
-    // 040020-保险经纪人的条款费率计算方式:按限额，费率必填；按人，每人保费必填、在职保险经纪人人数（标的信息）必填
-    if(termdata.value["Term.cUniqueTermNo"] !== "00425000144") return;
+    // 040020/040007-保险经纪人的条款费率计算方式:按限额，费率必填；按人，每人保费必填、在职保险经纪人人数（标的信息）必填
+    if(termdata.value["Term.cUniqueTermNo"] !== "00425000144" && termdata.value["Term.cUniqueTermNo"] !== "00425000090") return;
     termFactormap.value.forEach((item: any) => {
       if (item["prop"] === "Term.nRateVal") {
         if(val === "0") {
@@ -2073,7 +2073,8 @@ const methodMap = {
           item.cPorpRequired = false;
         }
       }
-    });
+		});
+		if(termdata.value["Term.cUniqueTermNo"] !== "00425000144") return;
     const tgt = opertaor.getTableRefByKey("tgt")
     if(val === "1") {
       tgt?.setFormItem('Tgt.nAgentNumber',{ rules: [getRules("required", {})] })
@@ -2167,6 +2168,7 @@ const selectRow = (key: any) => {
   }
 };
 async function nInsuranceFeeChange(val:any) {
+	opertaor.getFatherPage().setIsEditnPrm(true)
   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
   let qryTerminationStatus = false;
   // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
@@ -2250,7 +2252,7 @@ async function nInsuranceFeeChange(val:any) {
     })
   }
   // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
-  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
+  if(((pageparam.pageType === "TEMPORARY_DEPOSIT" && pageparam.cTransMrk !=='1') || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType === '1') {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
     let nInsuranceFee:any = 0;

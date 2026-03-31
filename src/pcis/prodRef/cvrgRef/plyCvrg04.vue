@@ -878,7 +878,7 @@ function setTermData(param: any, value: any){
   const formData = planData.value[planNo];
     formData&&Object.keys(formData).forEach((item) => {
         formData[item].forEach((d: any) => {
-          if(d['Term.cUniqueTermNo'] === termNo){
+          if(d['Term.cUniqueTermNo'] === termNo || d['Term.cClauseCode'] === termNo){
             if(!prop.startsWith('TermRisktgt')){
               d[prop] = value;
             }

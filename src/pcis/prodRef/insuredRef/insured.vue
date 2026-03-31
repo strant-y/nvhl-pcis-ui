@@ -714,35 +714,30 @@ const method = {
       });
       setFormItem("Insured.nYearincomeNum", {
         rules: [],
-      });
-
-      codeListStore
-        .queryCodeList({
-          codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
-          codeListParam: {},
-        })
-        .then((res) => {
-          if (
-            !res.some((item) =>
-              Object.values(item).includes(getValue("Insured.cCertfCls"))
-            )
-          ) {
-            // setValue("Insured.cCertfCls", "");
-          }
-          insuredEditRef.value?.addCodeListMap({
-            code: "Insured.cCertfCls",
-            list: res
-          })
-          setValue('Insured.cCertfCls', '01')
-          // setFormItem("Insured.cCertfCls", {
-          //   loadData: [],
-          // });
-          // setFormItem("Insured.cCertfCls", {
-          //   loadData: res,
-          //   rules: [getRules("required", {})],
-          // });
-        });
-
+			});
+			if (!param.initFlag) {
+				codeListStore
+					.queryCodeList({
+						codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+						codeListParam: {},
+					})
+					.then((res) => {
+						if (
+							!res.some((item) =>
+								Object.values(item).includes(getValue("Insured.cCertfCls"))
+							)
+						) {
+							setValue("Insured.cCertfCls", "");
+						}
+						insuredEditRef.value?.addCodeListMap({
+							code: "Insured.cCertfCls",
+							list: res
+						})
+						if (val === '0') {
+							setValue('Insured.cCertfCls', '01')
+						}
+					});
+			}
       setFormItem("Insured.cWorkDpt", {
         rules: [getRules("required", {})],
       });

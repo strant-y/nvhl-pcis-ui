@@ -1609,8 +1609,8 @@ const method = {
                 setValue("Tgt.cDepartureAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
                 setValue("Tgt.cDepartureAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
-                setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDepartureAirportProvince", res.cCityCn);
+								setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                // setValue("Tgt.cDepartureAirportProvince", res.cCityCn);
                 setValue("Tgt.cDepartureAirport", res.cCityCn + ',' + res.cCountryCn);
               }
             } else {
@@ -1620,7 +1620,7 @@ const method = {
                 setValue("Tgt.cDepartureAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDepartureAirportProvince", res.cCityEn);
+                // setValue("Tgt.cDepartureAirportProvince", res.cCityEn);
                 setValue("Tgt.cDepartureAirport", res.cCityEn + ',' + res.cCountryEn);
               }
             }
@@ -1632,7 +1632,7 @@ const method = {
                 setValue("Tgt.cDepartureAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
                 setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
+                // setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
                 setValue("Tgt.cDepartureAirport", res.cAirportCity + ',' + res.cCountryCn);
               }
             } else {
@@ -1642,7 +1642,7 @@ const method = {
                 setValue("Tgt.cDepartureAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDepartureAirportProvince", res.cAirportEn);
+                // setValue("Tgt.cDepartureAirportProvince", res.cAirportEn);
                 setValue("Tgt.cDepartureAirport", res.cAirportEn + ',' + res.cCountryEn);
               }
             }
@@ -1680,7 +1680,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDestAirportProvince", res.cCityCn);
+                // setValue("Tgt.cDestAirportProvince", res.cCityCn);
                 setValue("Tgt.cDestinationAirport", res.cCityCn + ',' + res.cCountryCn);
               }
             } else {
@@ -1690,7 +1690,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDestAirportProvince", res.cCityEn);
+                // setValue("Tgt.cDestAirportProvince", res.cCityEn);
                 setValue("Tgt.cDestinationAirport", res.cCityEn + ',' + res.cCountryEn);
               }
             }
@@ -1702,7 +1702,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDestAirportProvince", res.cAirportCity);
+                // setValue("Tgt.cDestAirportProvince", res.cAirportCity);
                 setValue("Tgt.cDestinationAirport", res.cAirportCity + ',' + res.cCountryCn);
               }
             } else {
@@ -1712,7 +1712,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDestAirportProvince", res.cAirportEn);
+                // setValue("Tgt.cDestAirportProvince", res.cAirportEn);
                 setValue("Tgt.cDestinationAirport", res.cAirportEn + ',' + res.cCountryEn);
               }
             }
@@ -2214,6 +2214,16 @@ const method = {
 				setValue('Tgt.cMaritimeAdministration', null) // 海事局名称
 			}
 		}
+	},
+	// 是否融资性保证险
+	cIsFinancingChange: (val: any) => {
+		if (val == '1') {
+			setFormItem('Tgt.cFinancingGuarantee',{rules: [getRules("required", {})]})
+		} else {
+			clearValidate('Tgt.cFinancingGuarantee');
+			setFormItem('Tgt.cFinancingGuarantee', { rules: [] })
+			setValue('Tgt.cFinancingGuarantee', null) // 海事局名称
+    }
 	},
   // 融资性保证险
   cFinancingGuaranteeBtnFunc:() => {

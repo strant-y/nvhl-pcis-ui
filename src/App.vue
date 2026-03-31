@@ -127,7 +127,9 @@ watchEffect(() => {
     color: var(--el-color-primary);
   }
 }
-
+.el-message--warning{
+	z-index: 99999 !important;
+}
 </style>
 <style>
 .el-popper .el-menu--horizontal.el-menu--popup-container {

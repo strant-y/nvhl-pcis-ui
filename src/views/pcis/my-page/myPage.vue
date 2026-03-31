@@ -3277,7 +3277,8 @@ function baseValite(){
 const isCalcPremium = ref(false);
 const calcPremium = () => {
   let shanDongFlag = false;
-  isCalcPremium.value = false;
+	isCalcPremium.value = false;
+	isEditnPrm.value = false;
   const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
   const applicant = opertaor.getTableRefByKey('applicant')?.getFromValue();
   const insrnc = opertaor.getTableRefByKey('insrnc')?.getFromValue();
@@ -3696,6 +3697,7 @@ const checkStudentValidity  =  async() => {
  * 投保申请核保
  */
 const qryTerminationStatus = ref(false);
+const isEditnPrm = ref(false)
 const submitToUndrFn = async () => {
   const getcNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getFromValue()["Base.cNeedfeeFlag"];
   const getcInstMrk = opertaor.getTableRefByKey("base").getFromValue()['Base.cInstMrk'];
@@ -3721,7 +3723,7 @@ const submitToUndrFn = async () => {
     return;
   }
 
-  if (needCalc.value && !qryTerminationStatus.value) {
+  if (needCalc.value && (!qryTerminationStatus.value || !isEditnPrm.value)) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -4945,7 +4947,8 @@ const calcPremiumEdr = async () => {
     const res = opertaor.getDataAll();
     const dataAll = opertaor.getDataAll();
     const edrbaseData = edrbase.value?.getFromValue();
-  isCalcPremium.value = false;
+	isCalcPremium.value = false;
+	isEditnPrm.value = false;
   // 条款
   const nInsuranceAmount:any = [];
   res['cvrg'].forEach((item:any) => {
@@ -5824,8 +5827,8 @@ const submitEdrToUndrFun = async () => {
   if(!qryTerminationStatusFunc){
     return;
   }
-  
-  if (needCalc.value && props.param.cTransMrk !== "1" && !qryTerminationStatus.value) {
+
+  if (needCalc.value && props.param.cTransMrk !== "1" && (!qryTerminationStatus.value || !isEditnPrm.value)) {
     ElMessage.error("请先进行保费计算!");
     return;
   }
@@ -7575,6 +7578,10 @@ async function calcEdrFunc() {
   return caclres;
 }
 
+function setIsEditnPrm(flag:any) {
+ isEditnPrm.value = flag
+}
+
 opertaor.setFatherPage({
   currentIndex: currentIndex,
   lowercaseKeys: lowercaseKeys,
@@ -7595,6 +7602,7 @@ opertaor.setFatherPage({
   calcFunc: calcFunc,
   getIsCalcPremium: getIsCalcPremium,
   setIsCalcPremium: setIsCalcPremium,
+	setIsEditnPrm: setIsEditnPrm,
 });
 
 function getIsCalcPremium() {

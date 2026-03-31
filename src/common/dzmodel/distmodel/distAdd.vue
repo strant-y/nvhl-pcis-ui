@@ -447,6 +447,18 @@ onMounted(async () => {
     if(item.prop =='Dist.cPrmCur'){
       item['func'] =  InsurancecurrencyChange;
 		}
+    if(item.prop =='Dist.cPerCurrency'){
+      item['func'] =  cPerCurrencyChange;
+		}
+    if(item.prop =='Dist.nPerCoverage'){
+      item['func'] =  nPerCoverageChange;
+		}
+    if(item.prop =='Dist.cCoverageCurrency'){
+      item['func'] =  cCoverageCurrencyChange;
+		}
+    if(item.prop =='Dist.nPerValue'){
+      item['func'] =  nPerValueChange;
+		}
 		if(item.prop =='Dist.nTransportLimit'){
       item['func'] =  nTransportLimitChange;
 		}
@@ -528,22 +540,23 @@ onMounted(async () => {
       const getTableDataAll = await distTableRef?.getTableDataAll();
       const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row:any) => row['Dist.cPlanNo']) : [];
       // 去重
-      const uniqueAdded = [...new Set(added)]; 
-      let nextIdx = 0;
-      for(let j = 1; j < allPlans.length + 1; j++) {
-        const planNo = 'P' + j;
-        // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
-        if(!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
-          nextIdx = j;   // 已添加的方案跳过
-          break;
-        }
-      }
+      const uniqueAdded = [...new Set(added)];
+      // let nextIdx = 0;
+      // for (let j = 1; j < allPlans.length + 1; j++) {
+      //   const planNo = 'P' + j;
+      //   // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+      //   if (!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
+      //     nextIdx = j;   // 已添加的方案跳过
+      //     break;
+      //   }
+      // }
 
-        item.typeCode = null;
-        item.loadData = allPlans.map((p: any, idx: number) => ({
-            ...p,
-            disabled: idx > nextIdx     // 未开始
-        }));
+      item.typeCode = null;
+      item.loadData = allPlans;
+      // item.loadData = allPlans.map((p: any, idx: number) => ({
+      //   ...p,
+      //   disabled: idx > nextIdx     // 未开始
+      // }));
     }
     // 解决特种设备清单信息新增数据后点击编辑或新增，表单中特种设备种类的按钮无法点击
     if((route.params.param.cProdNo == '041014' || route.params.param.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {
@@ -904,6 +917,64 @@ const InsurancecurrencyChange = (val:any)=>{
 		} else {
 			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
 		}
+  }
+}
+// 每集装箱价值
+const nPerValueChange = (val:any) => {
+	if(val){
+    setValue('Dist.nRmbCurrency',Number(getValue('Dist.nPerValue'))*getValue('Dist.nPerRate'))
+  } else {
+    setValue('Dist.nRmbCurrency',null)
+  }
+}
+// 每集装箱价值币种
+const cPerCurrencyChange = (val:any) => {
+  if(!val) {
+		setValue("Dist.nPerRate", null);
+		setValue('Dist.nRmbCurrency', null)
+  } else if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+					setValue("Dist.nPerRate", res[0].currency_rate);
+					setValue('Dist.nRmbCurrency',Number(getValue('Dist.nPerValue'))*getValue('Dist.nPerRate'))
+        });
+  } else {
+		setValue("Dist.nPerRate", "1.000000");
+		setValue('Dist.nRmbCurrency',Number(getValue('Dist.nPerValue')))
+  }
+}
+// 每集装箱保额
+const nPerCoverageChange = (val:any) => {
+	if(val){
+    setValue('Dist.nRmbAmount',Number(getValue('Dist.nPerCoverage'))*getValue('Dist.nExchangeRate'))
+  } else {
+    setValue('Dist.nRmbAmount',null)
+  }
+}
+// 每集装箱保额币种
+const cCoverageCurrencyChange = (val:any) => {
+  if(!val) {
+		setValue("Dist.nExchangeRate", null);
+		setValue('Dist.nRmbAmount', null)
+  } else if (val !== "CNY") {
+    codeListStore
+        .queryCodeList({
+          codeListName: "WEB_BAS_CHGRATE",
+          codeListParam: { value: val },
+        })
+        .then((res) => {
+          console.log("0000000", res);
+					setValue("Dist.nExchangeRate", res[0].currency_rate);
+					setValue('Dist.nRmbAmount',Number(getValue('Dist.nPerCoverage'))*getValue('Dist.nExchangeRate'))
+        });
+  } else {
+		setValue("Dist.nExchangeRate", "1.000000");
+		setValue('Dist.nRmbAmount',Number(getValue('Dist.nPerCoverage')))
   }
 }
 // 运输信息航次运输限额change事件
