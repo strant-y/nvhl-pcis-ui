@@ -62,6 +62,8 @@ const downloadTemplateLoading = ref(false); // 模板下载Loading
 const importTemplateLoading = ref(false); // 模板导入Loading
 const prodTotalDatas = ref([]); // 所有产品数据
 const cProdData = ref([]); // 选中产品大类的产品
+const isProdList = ["010022", "040002", "043002", "043009", "047002", "047003", "059903", "059905", "059906", "059908", "059914", "080002", "080026", "080027", "120003", "120005", "130001", "130002", "130003"]; // 可以点击模板导入和下载的产品
+const hidden = ref(true);
 const kindData: any = computed(() => {
     return prodTotalDatas.value.map((item: any) => ({
         label: item.code + " " + item.value,
@@ -244,6 +246,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				filterable: true,
 				rules: [getRules("required", {})],
 				func: (val) => {
+					if (isProdList.includes(val)) {
+						hidden.value = false
+					} else {
+						hidden.value = true
+					}
 					setValue("cTermNo","")
 					if (val && val.length > 0) {
 						let options: any = [];
@@ -433,6 +440,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "模板下载",
 				type: "primary",
 				loading: downloadTemplateLoading,
+				hidden: hidden,
 				func: function () {
 					let formData = freeEditRef.value?.getFromValue()
 					if(!formData.cProdNo || !formData.cTermNo) {
@@ -485,6 +493,7 @@ const tableconfig = reactive<AppTableConfig>(
         label: "Excel导入",
         type: "primary",
         icon: "Upload",
+				hidden: hidden,
 				func: function () {
 					let formData = freeEditRef.value?.getFromValue()
 					if(!formData.cProdNo || !formData.cTermNo) {
