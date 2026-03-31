@@ -4783,7 +4783,9 @@ const savePlyInfo = async () => {
       ciRef?.getFromValue()?.forEach((item: any, index: number) => {
         const nCiPrm = ci[index]?.['Ci.nCiPrm'];
         const dataId = item['_dataId'];
-        ciRef?.setValueByRowKey("Ci.nCiPrm", dataId, nCiPrm.toFixed(2));
+				if (typeof nCiPrm === 'number') {
+					ciRef?.setValueByRowKey("Ci.nCiPrm", dataId, nCiPrm.toFixed(2));
+				}
       });
     }
 
