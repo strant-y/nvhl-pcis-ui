@@ -1,1 +1,0 @@
-import{aY as a,c as s,e,l as r,aT as t,aU as n}from"./index.Cx1QjBgk.js";const o={},c={class:"app-container"},d=[(a=>(t("data-v-f59700b2"),a=a(),n(),a))((()=>r("iframe",{src:"https://juejin.cn/post/7228990409909108793",frameborder:"0"},null,-1)))];const f=a(o,[["render",function(a,r){return e(),s("div",c,d)}],["__scopeId","data-v-f59700b2"]]);export{f as default};

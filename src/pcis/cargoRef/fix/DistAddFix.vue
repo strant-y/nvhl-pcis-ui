@@ -521,9 +521,9 @@ const cClntMrkFunc = (val:any) => {
     setFormItem("ECargoInsuredDist.cGreenIndustryCustomers", {
       rules: [getRules("required", {})],
     });
-    if (!initFlag || props.data.title === '新增') {
+    if (!initFlag.value || props.data.title === '新增') {
       setFormItem("ECargoInsuredDist.cIsMicroEntpris", {
-        disabled: false,
+        disabled: props.data.title !== '详情' ? false : true,
       });
       setFormItem("ECargoInsuredDist.cIsIndvduBiz", {
         disabled: true,
@@ -579,12 +579,12 @@ const cClntMrkFunc = (val:any) => {
       rules: isSpecialCase ? requiredRule : []
     });
 		// 企业成立日
-		if (!initFlag && !isSpecialCase) {
+		if (!initFlag.value && !isSpecialCase) {
 			setValue("ECargoInsuredDist.tEstablishingDate", null);
 			clearValidate('ECargoInsuredDist.tEstablishingDate')  // 清除报错信息
 		}
     setFormItem("ECargoInsuredDist.tEstablishingDate", {
-			disabled: !initFlag && isSpecialCase ? false : true,
+			disabled: !initFlag.value && isSpecialCase && props.data.title !== '详情' ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
 
@@ -609,7 +609,7 @@ const cClntMrkFunc = (val:any) => {
     setFormItem("ECargoInsuredDist.nYearincomeNum", {
       rules: [],
     });
-		if (!initFlag) {
+		if (!initFlag.value) {
 			codeListStore
       .queryCodeList({
         codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -680,7 +680,7 @@ const cClntMrkFunc = (val:any) => {
     setFormItem("ECargoInsuredDist.cEnterpriseTel", {
       rules: [],
     });
-    if (!initFlag || props.data.title === '新增') {
+    if (!initFlag.value || props.data.title === '新增') {
       setFormItem("ECargoInsuredDist.cWorkDpt", {
         disabled: false,
       });
@@ -744,7 +744,7 @@ const cClntMrkFunc = (val:any) => {
       rules: []
     });
 		//企业成立日期
-		if (!initFlag) { 
+		if (!initFlag.value) { 
 			setValue("ECargoInsuredDist.tEstablishingDate", null);
 			clearValidate('ECargoInsuredDist.tEstablishingDate')  // 清除报错信息
 		}
@@ -893,7 +893,7 @@ const funcreset = () => {
       ECargoInsuredDistValue[k] = null;
     }
   }
-  if (!initFlag || props.data.title === '新增') {
+  if (!initFlag.value || props.data.title === '新增') {
     setFormItem("ECargoInsuredDist.cInsuredNme", {
       disabled: false,
     });
@@ -971,7 +971,7 @@ const tCertMrkChecked = (val:any)=>{
 	} else {
     // setValue("ECargoInsuredDist.tCertfBgnDate", "");
     // setValue("ECargoInsuredDist.tCertfEndDate", "");
-    if (!initFlag || props.data.title === '新增') {
+    if (!initFlag.value || props.data.title === '新增') {
       setFormItem("ECargoInsuredDist.tCertfEndDate", { disabled: false });
     }
   }
@@ -1009,7 +1009,7 @@ const cTelChange = (val:any) => {
 }
 // 证件类型change
 const InsuredCCertfCls =(val:any) => {
-  if (!initFlag || props.data.title === '新增') {
+  if (!initFlag.value || props.data.title === '新增') {
     checkUser(); // 调用客户信息接口
     clearValidate('ECargoInsuredDist.cCertfCde'); // 清除报错信息
   }
@@ -1056,7 +1056,7 @@ const InsuredCCertfCls =(val:any) => {
 		});
 		// 为法人  企业成立日期
 		setFormItem("ECargoInsuredDist.tEstablishingDate", {
-			disabled: false,
+			disabled: props.data.title == '详情' ? true : false,
 			rules: [getRules("required", {})],
 		});
   } else if (val === '07') {
@@ -1075,7 +1075,7 @@ const InsuredCCertfCls =(val:any) => {
     });
   }
   // 回显不执行下方操作
-  if (initFlag || isCoypBtn.value || props.data.title !== '新增') return;
+  if (initFlag.value || isCoypBtn.value || props.data.title !== '新增') return;
   // 切换清空
   if (val) {
     const fieldsToClear = ["ECargoInsuredDist.tBirthday", "ECargoInsuredDist.nAge", "ECargoInsuredDist.cCertfCde", "ECargoInsuredDist.tEstablishingDate"];
@@ -1090,7 +1090,7 @@ const InsuredCCertfCls =(val:any) => {
 // 证件号码change
 const cCertfCdeChange =(val:any) => {
   setTimeout(() => {
-    if (initFlag && props.data.title !== '新增') {
+    if (initFlag.value && props.data.title !== '新增') {
       return;
     }
     checkUser();
@@ -1118,7 +1118,7 @@ const emailChange = (val:any) => {
 }
 //注册地址是否同上
 const isSameChange = (val:any) => {
-  if(initFlag && props.data.title !== '新增') {
+  if(initFlag.value && props.data.title !== '新增') {
     return;
   }
 	if (val == "1") {
@@ -1168,10 +1168,10 @@ const cWorkDptChange = (val: any) => {
   });
   // 企业成立日
   setFormItem("ECargoInsuredDist.tEstablishingDate", {
-		disabled: !initFlag && isSpecialCase ? false : true,
+		disabled: !initFlag.value && isSpecialCase && props.data.title !== '详情' ? false : true,
     rules: isSpecialCase ? requiredRule : []
 	});
-	if (!initFlag && !isSpecialCase) {
+	if (!initFlag.value && !isSpecialCase) {
 		setValue("ECargoInsuredDist.tEstablishingDate", null);
 		clearValidate('ECargoInsuredDist.tEstablishingDate')  // 清除报错信息
 	}
