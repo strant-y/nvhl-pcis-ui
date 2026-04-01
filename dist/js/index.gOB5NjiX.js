@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:dist/js/index.BTIQZ8oj.js
-import{cQ as e,gW as o}from"./index.Bzq2W6ms.js";function r(o){return e("/role/getSysRoleList",o)}function n(o,r){return e("/role/roleMenusAllot",{roleCde:o,opCdeList:r})}function t(o){return e("/role/roleMenuIds",{roleCde:o})}function l(){return o("/role/roleOptionsList")}function s(o){return e("/role/saveRoleInfo",o)}function u(o){return e("/role/saveRoleInfo",o)}function i(o){return e("/role/delRoleInfo",{roleIds:o})}export{s as a,t as b,n as c,i as d,l as e,r as g,u};
-========
-import{cO as e,gW as o}from"./index.Cx1QjBgk.js";function r(o){return e("/role/getSysRoleList",o)}function n(o,r){return e("/role/roleMenusAllot",{roleCde:o,opCdeList:r})}function t(o){return e("/role/roleMenuIds",{roleCde:o})}function l(){return o("/role/roleOptionsList")}function s(o){return e("/role/saveRoleInfo",o)}function u(o){return e("/role/saveRoleInfo",o)}function i(o){return e("/role/delRoleInfo",{roleIds:o})}export{s as a,t as b,n as c,i as d,l as e,r as g,u};
->>>>>>>> origin/uat:dist/js/index.gOB5NjiX.js
