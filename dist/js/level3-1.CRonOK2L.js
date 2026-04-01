@@ -1,1 +1,0 @@
-import{aY as s,c as e,e as t,F as a,bs as r}from"./index.3C23CXDI.js";const n={style:{padding:"30px"}};const o=s({},[["render",function(s,o){const c=r;return t(),e("div",n,[a(c,{closable:!1,title:"菜单三级-1",type:"error"})])}]]);export{o as default};
