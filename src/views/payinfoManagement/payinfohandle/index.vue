@@ -375,7 +375,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				  {value: '3', label: '支票号'},
 				  {value: '4', label: '保单号'},
 				  {value: '5', label: '交易号'},
-				  {value: '6', label: '支付号'}
+				  {value: '6', label: '支付号'},
+          {value: '7', label: '组合单号'}
 				],
         		defaultValue: '1',
 			},
