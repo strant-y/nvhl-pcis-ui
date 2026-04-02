@@ -250,6 +250,7 @@ function setFormItem(key: string, obj: Record<string, any>): void {
 // 解析身份证
 const idAnalysis = (id: string) => {
   const tabref = opertaor.getTableRefs();
+  console.log('idAnalysis-tabref', tabref)
   const applicantValue = tabref["applicant"].getFromValue();
 
   if (!validateIdCard(id) || (applicantValue["Applicant.cCertfCls"] !== '111' && applicantValue["Applicant.cCertfCls"] !== '553')) {
@@ -1828,6 +1829,18 @@ async function getDptCdeList() {
     }
   }
 }
+
+function getFormBtn() {
+  return applicantEditRef?.value?.getFormBtn();
+}
+function setDisabledAll(isDisabled: boolean = true) {
+  applicantEditRef?.value?.setDisabledAll(isDisabled);
+  const formBtn = getFormBtn();
+  if(formBtn && Object.keys(formBtn).length > 0) {
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = isDisabled;})
+  }
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1838,7 +1851,8 @@ defineExpose({
   clearValidate,
   setFormItem,
   addProvide,
-  getCodeListMap
+  getCodeListMap,
+  setDisabledAll
 });
 </script>
 

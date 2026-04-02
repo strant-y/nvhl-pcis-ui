@@ -463,7 +463,7 @@ const tableconfig = reactive<AppTableConfig>(
           size: "large",
           icon: "View",
           hideBtns: (row: any) => {
-            if (row.taskStatus === "4" || row.taskStatus === "5") {
+            if (row.taskStatus === "2" || row.taskStatus === "4" || row.taskStatus === "5") {
               return false;
             } else {
               return true;
@@ -505,21 +505,21 @@ const tableconfig = reactive<AppTableConfig>(
           lengthNum: 21,
           lengthIsNumber: true,
         },
-        {
-          prop: "cEdrNo",
-          inputtype: "rtselect",
-          title: "批改申请单号/批单号",
-          slotName: "cEdrNo",
-          lengthNum: 21,
-          lengthIsNumber: true,
-        },
-        {
-          prop: "cRsnCdeText",
-          inputtype: "rtinput",
-          title: "批改原因",
-          align: "left",
-          lengthNum: 8,
-        },
+        // {
+        //   prop: "cEdrNo",
+        //   inputtype: "rtselect",
+        //   title: "批改申请单号/批单号",
+        //   slotName: "cEdrNo",
+        //   lengthNum: 21,
+        //   lengthIsNumber: true,
+        // },
+        // {
+        //   prop: "cRsnCdeText",
+        //   inputtype: "rtinput",
+        //   title: "批改原因",
+        //   align: "left",
+        //   lengthNum: 8,
+        // },
         {
           prop: "cTermNme",
           inputtype: "rtinput",

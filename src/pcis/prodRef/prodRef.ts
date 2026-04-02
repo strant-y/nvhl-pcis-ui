@@ -96,7 +96,8 @@ import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
 import insuredDistRef from "./insuredDistRef/insuredDist.vue"; // 被保人清单
 import cFinancingGuarantee from "./commodityRef/cFinancingGuarantee.vue" //融资性保证险弹框组件
-import yjxPlanBase from "@/views/pcis/composite/component/posite-yjx/yjx-plan-base.vue" //融资性保证险弹框组件
+import yjxPlanBase from "@/views/pcis/composite/component/posite-yjx/yjx-plan-base.vue" // 意健险方案数据
+import yjxGrpMember from "@/views/pcis/composite/component/posite-yjx/yjx-grp-member.vue" // 意健险团体成员数据
 
 /** 组合出单公共组件 **/
 import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
@@ -209,6 +210,7 @@ const componentMap = {
   positeCi: positeCi,
 
   yjxPlanRef: yjxPlanBase,
+  yjxGrpMemberRef: yjxGrpMember,
 };
 
 const install = (Vue) => {

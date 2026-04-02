@@ -1,7 +1,7 @@
 import {getProductPage} from "@/api/prod";
 import {AnchorItem, GroupForm} from "@/views/pcis/composite/component";
 import {CommonConstants} from "@/constants/CommonConstants";
-import {codeListViewStore, dataOpertaor} from "@/store";
+import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, codeListViewStore, dataOpertaor} from "@/store";
 import {getData} from "@/pcis/prodRef/dataInit";
 import {initMultiCodeList} from "@/api/code-list-service";
 import cargoApi from "@/api/cargo";
@@ -17,7 +17,7 @@ export const OpertaorPosit = "posit";
  * 意健险组件
  */
 const YjxPositCompMap = new Map<string, string[]>();
-YjxPositCompMap.set('P26000176', ['yjxPlan060030']);
+YjxPositCompMap.set('P26000176', ['yjxPlan060030', 'GrpMemberYjx060030']);
 
 /**
  * 组合出单申请
@@ -151,7 +151,10 @@ export class CompositePageView {
                 }
             });
             const reqList: any = [];
-            params.forEach((item: any) => reqList.push(this.reqPageJson(item)));
+            params.forEach((item: any) => {
+                reqList.push(this.reqPageJson(item)); // 请求页面配置数据
+                this.clear(item.CProdNo);  // 清除store
+            });
             Promise.all(reqList).then(async (arrResult: any) => {
                 const productSchemasMap: any = {};
                 const compList: any[] = [];
@@ -258,6 +261,7 @@ export class CompositePageView {
                 cProdNme: "公共信息",
                 cProdNo: "000000",
                 cTermNo: "0000000000",
+                cProdList: list.map(p => p.cProdNo)
             },
         });
         const productFromSchemas = this.parseSelfProductFromSchemas(data, list, commonList);
@@ -691,7 +695,13 @@ export class CompositePageView {
             const oertaor = this.getDataOpertaorByGroupId(group.groupId);
             if(oertaor) {
                 oertaor.setDisabledAll();
-                // oertaor.setReadOnly();
+                const tabs = oertaor.getTableRefs()
+                const titleBtnComps = ['payinfo', 'applicant', 'insured']
+                titleBtnComps.forEach(key => {
+                    if(tabs && tabs[key] && tabs[key].setDisabledAll) {
+                        tabs[key].setDisabledAll(true)
+                    }
+                })
             }
         }
     }
@@ -706,6 +716,20 @@ export class CompositePageView {
                     oertaor.setUnDisabledByKeyList(list);
                 }
             }
+        }
+    }
+
+    clear(prodNo?: string) {
+        console.log('################### clear', prodNo)
+        if(!prodNo) {
+            this.pageConfig.forEach((item: GroupForm) => {
+                clearDataOpertaorByPageKey(item.groupId);
+                clearCodeListViewByPageKey(item.groupId);
+            })
+        }else {
+            const groupId = `group-${prodNo}`
+            clearDataOpertaorByPageKey(groupId);
+            clearCodeListViewByPageKey(groupId);
         }
     }
 

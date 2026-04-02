@@ -304,6 +304,16 @@ function setFormItem(key: any, obj: any) {
     });
   }
 }
+function getFormBtn() {
+  return payinfoEditRef?.value?.getFormBtn();
+}
+function setDisabledAll(isDisabled: boolean = true) {
+  payinfoEditRef?.value?.setDisabledAll(isDisabled);
+  const formBtn = getFormBtn();
+  if(formBtn && Object.keys(formBtn).length > 0) {
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = isDisabled;})
+  }
+}
 function addProvide<T>(key: InjectionKey<T> | string, value: T) {
   payinfoEditRef?.value?.addProvide(key, value);
 }
@@ -315,6 +325,7 @@ defineExpose({
   getFormconfig,
   setFormItem,
   // splitnPrm,
+  setDisabledAll,
   addProvide
 });
 </script>

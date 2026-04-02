@@ -184,6 +184,7 @@ const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
     label: "发票信息",
     type: "success",
+    id: "btn010104",
     func: () => {
       setTaxInfo();
     },
@@ -191,6 +192,7 @@ const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
     label: "反洗钱扩展信息",
     type: "success",
+    id: "btn010105",
     func: () => {
       setCusBenefitInfo({});
     },
@@ -198,6 +200,7 @@ const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
     label: '影像管理',
     type: "warning",
+    id: "btn010106",
     func: () => {
       imageMethod.showImage({});
     },
@@ -279,9 +282,13 @@ onBeforeMount(() => {
     // 初始化产品信息
     productList.value = props.param.cProdDtlList.map((item: any) => {
       return {
-        cKindNo: item.cProdNo.substring(0, 2),
+        cAppNo: item.cAppNo,
+        cPlyNo: item.cPlyNo,
+        cCombinationNo: item.cCombinationNo,
+        cKindNo: item.cKindNo,
         cProdNo: item.cProdNo,
-        cGrpMrk: props.param.cGrpMrk
+        cGrpMrk: props.param.cGrpMrk,
+        nPrm: item.nPrm
       }
     });
     // 存储路由参数
@@ -336,8 +343,15 @@ function readInit(pageData: any) {
   prodListRef.value?.setDisabledAll();
   pageView.value.setPageAllData(data);
   pageView.value.setPageDisabledAll();
-  bthList.value.forEach(item => {
-    if(item && ['btn010101', 'btn010102', 'btn010103'].includes(item.id)) {
+  bthList.value.forEach((item: any) => {
+    if(item && [
+      'btn010101',
+      'btn010102',
+      'btn010103',
+      'btn010104',
+      'btn010105',
+      'btn010106'
+    ].includes(item.id)) {
       item.disabled = true;
     }
   })
@@ -363,28 +377,7 @@ const inti06PlanData = (data?: any) => {
     }).then((res: any) => {
       console.log('getYjxPlanInfo-res', res)
       if(res.code === 200) {
-        let nPrm = 0;
-        let nAmt = 0;
-        const planList: any[] = res.data.map((item: any, index: number) => {
-          const nSumPrm = item['PlanBase.nPerPrm'] * 5
-          const nSumAmt = item['PlanBase.nPerAmt'] * 5
-          nPrm += nSumPrm
-          nAmt += nSumAmt
-          return {
-            ...item,
-            ...{
-              'PlanBase.nSumPrm': nSumPrm,
-              'PlanBase.nSumAmt': nSumAmt,
-              'PlanBase.nAppCopies': 1,
-              'PlanBase.nAppPersons': 5,
-              'PlanBase.nSeqNo': index + 1,
-            }
-          }
-        });
-        planList.forEach((item: any) => {
-          item['PlanBase.nAmt'] = nAmt;
-          item['PlanBase.nPrm'] = nPrm;
-        })
+        const planList: any[] = res.data
         prodList06.forEach((prod: any) => {
           const opertaor = pageView.value.getDataOpertaorByProdNo(prod.cProdNo)
           if(opertaor) {
@@ -441,15 +434,16 @@ const activeChange = (activeItems: AnchorItem[]) => {
 /**
  * 保存
  */
-const saveOpt = () => {
+const saveOpt = async (isret: boolean = true) => {
   const btn = getBtn('btn010102')
   btn.loading = true;
   const allData = pageView.value.getPageAllData();
   const params = {param: props.param, data: allData, user: userStore.user}
   console.log('saveOpt-params', params);
-  positeApi.savePositeInfo(params).then((res: any) => {
-    console.log('savePositeInfo-res', res);
-    if(res.code === 200) {
+  const res = await positeApi.savePositeInfo(params)
+  console.log('savePositeInfo-res', res);
+  if(res.code === 200) {
+    if(isret) {
       const pageData = trimPageData({...res.data});
       const cCombinationNo = productList.value[0]['cCombinationNo']
       const newParams = getNewParams({
@@ -473,10 +467,11 @@ const saveOpt = () => {
 
         console.log('pageView.value.pageConfig', pageView.value.pageConfig)
       });
-    }else {
-      ElMessage.error(res.msg)
     }
-  }).finally(() => btn.loading = false);
+  }else {
+    ElMessage.error(res.msg)
+  }
+  btn.loading = false
 }
 
 const calcPremium = async () => {
@@ -653,6 +648,11 @@ const disposeAfter = (opertaor: any, ops: any, prodNo: string, msg: string) => {
       ops["base"]["Base.nPrm"] != null
   ) {
     ElMessage.success(msg + "保费为：" + ops["base"]["Base.nPrm"]);
+    productList.value.forEach(prod => {
+      if(prod.cProdNo === prodNo) {
+        prod['nPrm'] = ops["base"]["Base.nPrm"]
+      }
+    })
   } else {
     ElMessage.success(msg + "保费为：0");
   }
@@ -811,6 +811,7 @@ const submitToUndrFn = async () => {
   if(!v.validate) {
     return;
   }
+  await saveOpt(false)
   const loading = openPageLoading('提核中...');
   positeApi.submitCombination(params).then((res: any) => {
     console.log('submitCombination-res', res);
@@ -830,8 +831,15 @@ const submitToUndrFn = async () => {
         pageView.value.updatePageParams(props.param, productList.value);
         prodListRef.value?.setDisabledAll();
         pageView.value.setPageDisabledAll();
-        bthList.value.forEach(item => {
-          if(item && ['btn010101', 'btn010102', 'btn010103'].includes(item.id)) {
+        bthList.value.forEach((item: any) => {
+          if(item && [
+            'btn010101',
+            'btn010102',
+            'btn010103',
+            'btn010104',
+            'btn010105',
+            'btn010106'
+          ].includes(item.id)) {
             item.disabled = true;
           }
         })
@@ -928,91 +936,109 @@ const openPageLoading = (text?: string) => {
  * 发票信息
  */
 const setTaxInfo = () => {
-  // const tabref = opertaor.getTableRefs();
-  // const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
-  // if (!!appLicantValue) {
-  //   dzmodal
-  //       .open(invoiceInfoModel, { type: "Issuer", data: {} })
-  //       .then((res: any) => {
-  //         if (res.type === "ok") {
-  //         }
-  //       });
-  // } else {
-  //   ElMessage.error("请先保存单据");
-  //   return;
-  // }
+  const prod = productList.value[0]
+  if (!!prod.cAppNo) {
+    dzmodal
+        .open(invoiceInfoModel, { type: "Issuer", data: {} , opertaor: pageView.value.getDataOpertaorByProdNo(prod.cProdNo)})
+        .then((res: any) => {
+          if (res.type === "ok") {
+          }
+        });
+  } else {
+    ElMessage.error("请先保存单据");
+    return;
+  }
 };
-
 
 
 /**
  * 反洗钱扩展信息hide
  */
 const setCusBenefitInfo = (val?: any) => {
-  // const tabref = opertaor.getTableRefs();
-  // const appNo = tabref["applicant"]?.getFromValue()["Applicant.cAppNo"]; // 单据编号
-  // const AppcClntMrk = tabref["applicant"]?.getFromValue()["Applicant.cClntMrk"]; // 投保人 法人01
-  // const InscClntMrk = tabref["insured"]?.getFromValue()["Insured.cClntMrk"]; // 被保人  法人01
-  // const baseValue = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
-  // const basePrmCur = opertaor.getTableRefByKey("base")?.getFromValue()["Base.cPrmCur"];//承保基本信息 总保费币种
-  // const basePrm = opertaor.getTableRefByKey("base")?.getFromValue()["Base.nPrm"];//承保基本信息 总保费
-  // let msg = val == 'view' ? '查看': '录入';
-  // //  单据保存才有 单据编号
-  // if (!appNo) {
-  //   ElMessage.error("请先保存单据");
-  //   return;
-  // }
-  //
-  // //  投被保人性质 没有填写或者都为个人 提示
-  // if (AppcClntMrk == undefined || AppcClntMrk == null) {
-  //   ElMessage.error(
-  //       `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
-  //   );
-  //   return;
-  // } else if (InscClntMrk == undefined || InscClntMrk === null) {
-  //   ElMessage.error(
-  //       `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
-  //   );
-  //   return;
-  // } else if (AppcClntMrk === "1" && InscClntMrk === "1") {
-  //   ElMessage.error(
-  //       `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
-  //   );
-  //   return;
-  // }
-  // // 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
-  // if(basePrmCur == "USD"){
-  //   if (basePrm < 10000) {
-  //     ElMessage.error(
-  //         `根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
-  //     );
-  //     return;
-  //   }
-  // } else {
-  //   if (baseValue < 50000) {
-  //     ElMessage.error(
-  //         `根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
-  //     );
-  //     return;
-  //   }
-  // }
-  //
-  //
-  // //  显示标志   1：投保人 2：被保人  3：都展示
-  // if (AppcClntMrk == "0" && InscClntMrk == "0") {
-  //   controlFlag = "3";
-  // } else if (AppcClntMrk == "0" && InscClntMrk == "1") {
-  //   controlFlag = "1";
-  // } else if (AppcClntMrk == "1" && InscClntMrk == "0") {
-  //   controlFlag = "2";
-  // }
-  //
-  // dzmodal
-  //     .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam,data: props.param, getNo: getNo.value })
-  //     .then((res: any) => {
-  //       if (res.type === "ok") {
-  //       }
-  //     });
+  const validateIsFxq = () => {
+    let res: any;
+    const isFxq = productList.value.filter((item: any) => item.cKindNo !== '06')
+      .some((item: any) => {
+        const opertaor = pageView.value.getDataOpertaorByProdNo(item.cProdNo)
+        const dataAll = opertaor.getDataAll()
+        const appNo = dataAll["applicant"]["Applicant.cAppNo"]; // 单据编号
+        const AppcClntMrk = dataAll["applicant"]["Applicant.cClntMrk"]; // 投保人 法人01
+        const InscClntMrk = dataAll["insured"]["Insured.cClntMrk"]; // 被保人  法人01
+        const baseValue = dataAll["base"]["Base.nRmbPrm"];//承保基本信息 折合人民币总保费
+        const basePrmCur = dataAll["base"]["Base.cPrmCur"];//承保基本信息 总保费币种
+        const basePrm = dataAll["base"]["Base.nPrm"];//承保基本信息 总保费
+        let msg = val == 'view' ? '查看': '录入';
+        //  单据保存才有 单据编号
+        if (!appNo) {
+          ElMessage.error("请先保存单据");
+          return false;
+        }
+
+        //  投被保人性质 没有填写或者都为个人 提示
+        if (AppcClntMrk == undefined || AppcClntMrk == null) {
+          ElMessage.error(
+              `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
+          );
+          return false;
+        } else if (InscClntMrk == undefined || InscClntMrk === null) {
+          ElMessage.error(
+              `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
+          );
+          return false;
+        } else if (AppcClntMrk === "1" && InscClntMrk === "1") {
+          ElMessage.error(
+              `投保人性质或被保人性质为[法人]时，才允许${msg}反洗钱扩展信息！`
+          );
+          return false;
+        }
+        // 币种为美元，大于2万可以录入反洗钱扩展信息，其他币种判断折合人民币大于20万
+        if(basePrmCur == "USD"){
+          if (basePrm < 10000) {
+            ElMessage.error(
+                `根据反洗钱相关规定，当前保单保费大于等于1万元，才允许${msg}反洗钱扩展信息！`
+            );
+            return false;
+          }
+        } else {
+          if (baseValue < 50000) {
+            ElMessage.error(
+                `根据反洗钱相关规定，当前保单保费折合人民币大于等于5万元，才允许${msg}反洗钱扩展信息！`
+            );
+            return false;
+          }
+        }
+        res = {
+          AppcClntMrk,
+          InscClntMrk,
+          opertaor,
+          idxParam: {opertaorProps: opertaor.getProps()},
+          appNo
+        };
+        return true;
+      })
+    return isFxq ? res : false;
+  }
+
+  const result: any = validateIsFxq()
+  if(!result) {
+    return;
+  }
+  const {AppcClntMrk, InscClntMrk, idxParam, appNo} = result;
+  //  显示标志   1：投保人 2：被保人  3：都展示
+  if (AppcClntMrk == "0" && InscClntMrk == "0") {
+    controlFlag = "3";
+  } else if (AppcClntMrk == "0" && InscClntMrk == "1") {
+    controlFlag = "1";
+  } else if (AppcClntMrk == "1" && InscClntMrk == "0") {
+    controlFlag = "2";
+  }
+
+  dzmodal
+      .open(amlExtendInfo, { type: "Issuer", controlFlag, idxParam: idxParam,data: props.param, getNo: appNo })
+      .then((res: any) => {
+        if (res.type === "ok") {
+        }
+      });
 };
 
 /**
@@ -1029,10 +1055,7 @@ const getBtn = (id: any) => {
 
 onUnmounted(() => {
   // 页面卸载 清理store缓存
-  pageView.value.pageConfig.forEach((item: GroupForm) => {
-    clearDataOpertaorByPageKey(item.groupId);
-    clearCodeListViewByPageKey(item.groupId);
-  })
+  pageView.value?.clear()
 })
 </script>
 

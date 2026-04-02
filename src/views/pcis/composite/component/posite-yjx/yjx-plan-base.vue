@@ -51,67 +51,6 @@ onMounted(() => {
   formconfig1.showPosition = 'right';
   Object.assign(formconfig1, formconfig11);
   addProvide(CommonConstants.FORM_DATA_KEY, 'PlanBase.cPkId')
-  // const list = [
-  //   {
-  //     'PlanBase.nPrm': 150,
-  //     'PlanBase.nPerAmt': 100000,
-  //     'PlanBase.nSeqNo': 1,
-  //     'PlanBase.nSumPrm': 58.1,
-  //     'PlanBase.cPkId': 'yutgearfw',
-  //     'PlanBase.cRiskNme': '团体人身意外身故保险',
-  //     'PlanBase.cProdNo': '060030',
-  //     'PlanBase.cPlanNme': '陕西秦科保团体人身意外伤害保险',
-  //     'PlanBase.nSumAmt': 500000,
-  //     'PlanBase.cPlanNo': 'P26000176',
-  //     'PlanBase.nAppCopies': 1,
-  //     'PlanBase.nPerPrm': 11.62,
-  //     'PlanBase.cRiskNo': '065403',
-  //     'PlanBase.nAppPersons': 5,
-  //     'PlanBase.nAmt': 550000,
-  //     'PlanBase.cCvrgNo': '065403',
-  //     'PlanBase.cCvrgNme': '团体人身意外身故保险',
-  //   },
-  //   {
-  //     'PlanBase.nPrm': 150,
-  //     'PlanBase.nPerAmt': 10000,
-  //     'PlanBase.nSeqNo': 2,
-  //     'PlanBase.nSumPrm': 54.55,
-  //     'PlanBase.cPkId': 'yutgearfw',
-  //     'PlanBase.cRiskNme': '意外医疗',
-  //     'PlanBase.cProdNo': '060030',
-  //     'PlanBase.cPlanNme': '陕西秦科保团体人身意外伤害保险',
-  //     'PlanBase.nSumAmt': 50000,
-  //     'PlanBase.cPlanNo': 'P26000176',
-  //     'PlanBase.nAppCopies': 1,
-  //     'PlanBase.nPerPrm': 10.91,
-  //     'PlanBase.cRiskNo': '060029',
-  //     'PlanBase.nAppPersons': 5,
-  //     'PlanBase.nAmt': 550000,
-  //     'PlanBase.cCvrgNo': '066405',
-  //     'PlanBase.cCvrgNme': '附加意外伤害医疗保险条款',
-  //   },
-  //   {
-  //     'PlanBase.nPrm': 150,
-  //     'PlanBase.nPerAmt': 100000,
-  //     'PlanBase.nSeqNo': 3,
-  //     'PlanBase.nSumPrm': 37.35,
-  //     'PlanBase.cPkId': 'yutgearfw',
-  //     'PlanBase.cRiskNme': '团体人身意外残疾保险',
-  //     'PlanBase.cProdNo': '060030',
-  //     'PlanBase.cPlanNme': '陕西秦科保团体人身意外伤害保险',
-  //     'PlanBase.nSumAmt': 500000,
-  //     'PlanBase.cPlanNo': 'P26000176',
-  //     'PlanBase.nAppCopies': 1,
-  //     'PlanBase.nPerPrm': 7.47,
-  //     'PlanBase.cRiskNo': '065404',
-  //     'PlanBase.nAppPersons': 5,
-  //     'PlanBase.nAmt': 550000,
-  //     'PlanBase.cCvrgNo': '065404',
-  //     'PlanBase.cCvrgNme': '团体人身意外残疾保险',
-  //   },
-  // ]
-  //
-  // setFormValue(list)
 });
 
 // 绑定方法
@@ -229,11 +168,49 @@ const currentChange = (currentRow: any, oldCurrentRow: any) => {
 // 绑定特殊验证器
 const exRules = {};
 
+
+function calculateData(list: any[]): any[] {
+  let nPrm = 0;
+  let nAmt = 0;
+  let nAppPersons = 0;
+  const yjxGrpMemberList = opertaor.getTableRefs()['yjxGrpMember'].getFormValue()
+  if(yjxGrpMemberList) {
+    nAppPersons = yjxGrpMemberList.length
+  }
+  const planList = [...list].map((item: any, index: number) => {
+    const nSumPrm = item['PlanBase.nPerPrm'] * nAppPersons
+    const nSumAmt = item['PlanBase.nPerAmt'] * nAppPersons
+    nPrm += nSumPrm
+    nAmt += nSumAmt
+    return {
+      ...item,
+      ...{
+        'PlanBase.nSumPrm': nSumPrm,
+        'PlanBase.nSumAmt': nSumAmt,
+        'PlanBase.nAppCopies': 1,
+        'PlanBase.nAppPersons': nAppPersons,
+        'PlanBase.nSeqNo': index + 1,
+      }
+    }
+  });
+  planList.forEach((item: any) => {
+    item['PlanBase.nAmt'] = nAmt;
+    item['PlanBase.nPrm'] = nPrm;
+  })
+  return planList
+}
+
+function refushData() {
+  const list = calculateData(getFromValue())
+  planEditRef?.value?.setFormValue(list);
+}
+
 function getFromValue() {
   return planEditRef?.value?.getFromValue();
 }
 function setFormValue(value: any) {
-  planEditRef?.value?.setFormValue(value);
+  const list = calculateData(value)
+  planEditRef?.value?.setFormValue(list);
 }
 
 function validate() {
@@ -293,7 +270,8 @@ defineExpose({
   getFormBtn,
   setDisabledAll,
   getTableBtn,
-  addProvide
+  addProvide,
+  refushData
 });
 </script>
 

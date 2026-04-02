@@ -527,6 +527,9 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 return false;
             }
         }
+        const getProps = () => {
+            return props;
+        }
         return {
             setTableConfig,
             getTableConfig,
@@ -550,7 +553,8 @@ export const dataOpertaor = (props: OpertaorProps) => {
             setReadOnly,
             mapSetData,
             isEditScene,
-            isReadOnlyScene
+            isReadOnlyScene,
+            getProps
         };
     },
     {
@@ -572,10 +576,19 @@ export const dataOpertaor = (props: OpertaorProps) => {
  * @param pageKey 
  */
 export function clearDataOpertaorByPageKey(pageKey: string) {
-    if (dataOpertaorMap.has(pageKey)) {
-        const store = dataOpertaorMap.get(pageKey);
+    const del = (key: string) => {
+        const store = dataOpertaorMap.get(key);
         store?.$dispose?.();
-        dataOpertaorMap.delete(pageKey);
+        dataOpertaorMap.delete(key);
+    }
+    if(pageKey === 'posite-page') {
+        dataOpertaorMap.keys().forEach(key => {
+            if(key.startsWith('group-')) {
+                del(key)
+            }
+        })
+    }else if (dataOpertaorMap.has(pageKey)) {
+        del(pageKey)
     }
 }
 

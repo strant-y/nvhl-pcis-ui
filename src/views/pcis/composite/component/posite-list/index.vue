@@ -110,29 +110,13 @@ const formconfig = ref(createAppGridEditConfig({
             {label: '意健险', value: '06'}
           ]
         });
+        if(rowData['cKindNo']) {
+          await setProdOptions(rowData, value)
+        }
       },
       func: async (value: string, rowData: any) => {
-        let list;
-        if(value === '06') {
-          list = [
-            {
-              value: '060030',
-              label: '陕西秦科保团体人身意外伤害保险',
-              planNo: 'P26000176',
-              planNme: '陕西秦科保团体人身意外伤害保险'
-            }
-          ]
-        }else {
-          list = await codeListStore.queryCodeList({
-            codeListName: 'PROD_LIST',
-            codeListParam: {"cParCde": value},
-          });
-        }
         gridEditRef.value?.setValueByRowKey('cProdNo', rowData['_dataId'], undefined)
-        gridEditRef.value?.addCodeListMap({
-          code: 'cProdNo' + rowData['_dataId'],
-          list: list
-        });
+        await setProdOptions(rowData, value)
       }
     },
     {
@@ -159,8 +143,17 @@ const formconfig = ref(createAppGridEditConfig({
       },
       onInit: (options: any) => {
         const {value, rowData} = options;
-        setProdNme(rowData, value);
+        console.log('### onInit', value, rowData)
+        if(rowData['cProdNo']) {
+          setProdNme(rowData, value);
+        }
       },
+    },
+    {
+      prop: 'nPrm',
+      inputtype: 'rtinput',
+      title: "保费",
+      disabled: true,
     },
     {
       prop: 'cProdNme',
@@ -183,6 +176,26 @@ const formconfig = ref(createAppGridEditConfig({
   ]
 }));
 
+const setProdOptions = async (rowData: any, cKindNo: string) => {
+  let list = [];
+  if(cKindNo === '06') {
+    list.push({
+      value: '060030',
+      label: '陕西秦科保团体人身意外伤害保险'
+    })
+  }else {
+    list = await codeListStore.queryCodeList({
+      codeListName: 'PROD_LIST',
+      codeListParam: {"cParCde": cKindNo},
+    });
+  }
+  console.log('setProdOptions', cKindNo, list)
+  gridEditRef.value?.addCodeListMap({
+    code: 'cProdNo' + rowData['_dataId'],
+    list: list
+  });
+}
+
 const setProdNme = async (rowData: any, cProdNo: string) => {
   if(rowData && rowData['cKindNo']) {
     let list = [];
@@ -191,23 +204,17 @@ const setProdNme = async (rowData: any, cProdNo: string) => {
         value: '060030',
         label: '陕西秦科保团体人身意外伤害保险'
       })
+      gridEditRef.value?.setValueByRowKey('cPlanNo', rowData['_dataId'], 'P26000176');
+      gridEditRef.value?.setValueByRowKey('cPlanNme', rowData['_dataId'], '陕西秦科保团体人身意外伤害保险');
     }else {
       list = await codeListStore.queryCodeList({
         codeListName: 'PROD_LIST',
-        codeListParam: {"cParCde": rowData['cKindNo']},
+        codeListParam: {"value": cProdNo},
       });
     }
-    gridEditRef.value?.addCodeListMap({
-      code: 'cProdNo' + rowData['_dataId'],
-      list: list
-    });
     const item = list.find((item: any) => item.value === cProdNo);
     if(item) {
       gridEditRef.value?.setValueByRowKey('cProdNme', rowData['_dataId'], item.label?.trim().replace(cProdNo, ''));
-    }
-    if(rowData['cKindNo'] === '06') {
-      gridEditRef.value?.setValueByRowKey('cPlanNo', rowData['_dataId'], 'P26000176');
-      gridEditRef.value?.setValueByRowKey('cPlanNme', rowData['_dataId'], '陕西秦科保团体人身意外伤害保险');
     }
   }
 };
