@@ -334,24 +334,6 @@ const method = {
     }).catch((err) => {
     });
   },
-
-  setregistAdd() {
-    const ads = yjxGrpMemberRef?.value?.getValue('GrpMemberYjx.AllProp');
-    const a = yjxGrpMemberRef?.value?.getValue("GrpMemberYjx.cRegisterSuffixAddr") || "";
-    if (ads) {
-      getAddressStr({address: ads}).then((res: any) => {
-        const {code, data, msg} = res;
-        if (code === 200) {
-          const b = (data ? data['addStr'] : "") + a;
-          setAddressStr("GrpMemberYjx.cClntAddr", b);
-        }
-      });
-    } else {
-      setAddressStr("GrpMemberYjx.cClntAddr", a);
-    }
-    console.log("清单级联事件触发")
-  },
-
   //导出
   exportExcel: () => {
     const formconfig = filterFromSchema(formconfig1.value)
@@ -510,7 +492,6 @@ const saveTgt = async (res: any, flag: string)=>{
     cAppNo: cCombinationNo,
     cProdNo: cProdNo
   };
-  console.log('newRow', newRow)
   const result: any = await cargoApi.saveDistNew(newRow)
   if (result.code == 200) {
     loadData()
@@ -531,14 +512,12 @@ function loadData(flag: boolean = true) {
     cAppNo: cCombinationNo,
     cCombinationNo: cCombinationNo,
   },r);
-  console.log('*****************loadData-param',param )
   cargoApi.selectDistNew(param).then((res: any) => {
     if(res.code === 200) {
       if(res.data.data.length > 0 ){
-        pageresult.list = res.data.data
+        setFormValue(res.data.data)
         pageresult.total = res.data.total
         const tableRefs = opertaor.getTableRefs();
-        console.log('tableRefs', tableRefs)
         tableRefs['yjxPlan'].refushData()
       } else {
         pageresult.list = []
@@ -609,7 +588,7 @@ function handleQuery(queryParams: any = { pageNum: 1, pageSize: 10 }) {
   cargoApi.selectDistNew(selData).then((res: any) => {
     if(res.code === 200) {
       if(res.data.data.length > 0 ){
-        pageresult.list = res.data.data
+        setFormValue(res.data.data)
         pageresult.total = res.data.total
       } else {
         pageresult.list = []
@@ -622,7 +601,14 @@ function handleQuery(queryParams: any = { pageNum: 1, pageSize: 10 }) {
 }
 
 function setTableData(data: any) {
-  pageresult.list = data
+  pageresult.list = data.map((item: any) => {
+    return  {
+      ...item,
+      ...{
+        'GrpMemberYjx.country': item['GrpMemberYjx.country'] ? item['GrpMemberYjx.country'] : "CHN"
+      }
+    }
+  })
 }
 
 

@@ -103,12 +103,12 @@ onMounted(async  () => {
       };
 		}
 		// 被保人地址
-    if(['GrpMemberYjx.addrcodegroup'].includes(item.prop)) {
+    if(['GrpMemberYjx.insuredAddress'].includes(item.prop)) {
       if(item.groupList.length>0){
         item.groupList[0]["func"] = (value: any, rowData: any) => { //  省市区 级联选择器 GrpMemberYjx.addrProp
           console.log("addrPropChange", value, rowData);
         };
-        item.groupList[1]["func"] = (value: any) => { // 街道 GrpMemberYjx.insuredAddress
+        item.groupList[1]["func"] = (value: any) => { // 街道 GrpMemberYjx.suffixAddr
           console.log("getcSuffixAddr", value);
         };
       }
@@ -126,14 +126,14 @@ onMounted(async  () => {
   }
   formconfig1.value.fromSchema = newSchema;
   formconfig1.value.title = props.data.title;
-
+  console.log('props.data.rowData', props.data.rowData)
 	if (props.data.title == "编辑") {
     setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data.rowData);
+      setFormValue(props.data.rowData);
     }, 150);
   } else if(props.data.title == '详情'){
     setTimeout(() => {
-      freeEditRef.value?.setFormValue(props.data.rowData);
+      setFormValue(props.data.rowData);
       freeEditRef.value?.setDisabledAll();
     }, 150);
   }else {
@@ -166,7 +166,7 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  freeEditRef?.value?.setFormValue(value);
+    freeEditRef?.value?.setFormValue(value);
 }
 function validate() {
   return freeEditRef?.value?.validate();
