@@ -800,13 +800,22 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     console.log("rowData", rowData);
-    if(rowData['Ci.cDptCde']){
+		if (rowData['Ci.cDptCde']) {
+			const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+			let ywdata = {}
+			// 主共主联并且共保公司是永安,点击代理经纪人回显业务来源
+			if (cCiMrkValue == '1' && rowData['Ci.cCoinsurerCde'] == '327001') {
+				ywdata.cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp"); // 业务来源大类
+				ywdata.cChaType = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaType"); // 业务来源中类
+				ywdata.cChaSubtype = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaSubtype"); // 业务来源子类
+			}
       dialogRef.value?.open(
         "ciagentPer",
         {
           type: "show",
           data: {
-            rowData: rowData,
+						rowData: rowData,
+						...ywdata
           },
           method: {
             getSelected: (params) => {

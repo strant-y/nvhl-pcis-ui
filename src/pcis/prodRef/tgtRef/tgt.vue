@@ -317,17 +317,21 @@ onMounted(async () => {
       }
     })
     for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
-    // 遍历groupList数组把函数赋值给fromSchema
-    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
-      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
-        if (distContactList.includes(data.prop)) {
-          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
-            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
-          }
-        }
-      })
+			// 遍历groupList数组把函数赋值给fromSchema
+			if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+				formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+					if (distContactList.includes(data.prop)) {
+						formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+							return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
+						}
+					}
+				})
+			}
+		}
+    // 记名投保默认值记名
+    if(params.cProdNo === '080011') {
+      setValue('Tgt.cRegisteredInsurance', '01')
     }
-  }
   })
 });
 function hasEnglish(str: any) {

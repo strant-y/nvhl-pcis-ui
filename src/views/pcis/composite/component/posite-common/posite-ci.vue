@@ -640,13 +640,22 @@ const method = {
   cBrkrCdeChange:()=>{
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
-    console.log("rowData", rowData);
+		console.log("rowData", rowData);
+		const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+		let ywdata = {}
+		// 主共主联并且共保公司是永安,点击代理经纪人回显业务来源
+		if (cCiMrkValue == '1' && rowData['Ci.cCoinsurerCde'] == '327001') {
+			ywdata.cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp") || null; // 业务来源大类
+			ywdata.cChaType = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaType") || null; // 业务来源中类
+			ywdata.cChaSubtype = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaSubtype") || null; // 业务来源子类
+		}
     dialogRef.value?.open(
       "ciagentPer",
       {
         type: "show",
         data: {
           rowData:rowData,
+					...ywdata
         },
         method: {
           getSelected: (params) => {

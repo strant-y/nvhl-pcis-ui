@@ -290,6 +290,8 @@ function setFormValue(value: any) {
 					ElMessage.error("农户自缴费用出错，请重新计算");
 					return false;
 				}
+			} else {
+				payinfoEditRef?.value?.setFormValue(value);
 			}
 		})
 	} else {

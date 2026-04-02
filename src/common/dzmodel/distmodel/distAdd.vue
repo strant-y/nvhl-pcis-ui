@@ -128,6 +128,7 @@ const mapAddr = {
   }
 };
 
+const submitLoding = ref(false);
 const dataParams = ref({});
 const appNo = ref("");
 const cGrpMrk = ref("");
@@ -143,7 +144,8 @@ const formconfig1 = ref<AppFreeEditConfig>(
     titleBtns: [
       createFreeButtonBase({
         type: "primary",
-        label: "确定",
+				label: "确定",
+				loading: submitLoding,
         func: async () => {
             const productNo = route.params?.param?.cProdNo;
             const idNumber = getValue('Dist.cIdentificationNumber'); // 证件号码
@@ -1127,7 +1129,7 @@ function getAddressstr(val:any, row: any, pitem: any){
 function setAddressBykey(getv1: any, getv2: any , setv: any) {
    const a = freeEditRef?.value?.getValue(getv1[0]?.prop);
    const b = freeEditRef?.value?.getValue(getv2[0]?.prop);
-
+	 submitLoding.value = true
    const setS = setv.prop;
    if (a) {
     getAddressStr({ address: a }).then((res: any) => {
@@ -1136,9 +1138,12 @@ function setAddressBykey(getv1: any, getv2: any , setv: any) {
         const c = (data ? data["addStr"] : "") + (b ? b: "");
         setValue(setS, c);
       }
-    });
+		}).finally(() => {
+			submitLoding.value = false
+		})
    }else{
-    setValue(setS, b);
+		 setValue(setS, b);
+		 submitLoding.value = false
    }
 };
 
