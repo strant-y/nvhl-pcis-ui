@@ -94,7 +94,7 @@ const tableconfig = reactive<AppTableConfig>(
             originalData.value = deepClone(formData.value)
           }
           let param = {};
-          if (row['cIfMust'] !== '9') {
+          if (row['cIfMust'] !== '9' && row['cIfFix'] !== '0') {
 
             let rid = row.cSpecialCode || row.cSpecialCode
             const f = originalData.value.find(f => rid === f.cSpecialCode);
@@ -109,7 +109,9 @@ const tableconfig = reactive<AppTableConfig>(
             param['editList'] = row.editList
           }
           dzmodal.open(specEdit, {
-            type: "view", data: param,
+						type: "view",
+						data: param,
+            idxParam: idxParam,
             callback: (res: any) => {
               if (res.type === "ok") {
                 // row.cSpecialContent = res.data.cSpecialContent
@@ -117,7 +119,7 @@ const tableconfig = reactive<AppTableConfig>(
 
                 let list = formData.value;
                 const index = list.findIndex(
-                  item => item.cSpecialCode === row.cSpecialCode
+                  item => item.cSpecialCode === row.cSpecialCode && item.cPkId === row.cPkId && item.nSeqNo === row.nSeqNo && item._dataId === row._dataId
                 );
                 if (index !== -1) {
                   nextTick(() => {

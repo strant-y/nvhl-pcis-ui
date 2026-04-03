@@ -1952,10 +1952,35 @@ const tableObj = {
                         return false
                     }
                 },
-                tableClick: (row) => {
+                tableClick: async(row) => {
+										const r = await row;
+                    // 把ES带html的字段洗净
+                    const cleanRow = {
+                        ...r,
+                        cAppNo: stripHtml(r.cAppNo),
+                        cPlyNo: stripHtml(r.cPlyNo),
+                        cEdrNo: stripHtml(r.cEdrNo),
+                        cDptCnm: stripHtml(r.cDptCnm),
+                        nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+                        cInquiryNo: stripHtml(r.cInquiryNo),
+                        tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+                        tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+                        cTermNme: stripHtml(r.cTermNme),
+                        cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+                        cAppNme: stripHtml(r.cAppNme),
+                        cInsuredNme: stripHtml(r.cInsuredNme),
+                        cClntAddr: stripHtml(r.cClntAddr),
+                        cNmeCn: stripHtml(r.cNmeCn),
+                        tUdrTm: stripHtml(r.tUdrTm),
+                        tIssueTm: stripHtml(r.tIssueTm),
+                        cProdNmeCn: stripHtml(r.cProdNmeCn),
+                        nAmt: stripHtml(r.nAmt),
+                        nPrm: stripHtml(r.nPrm),
+                        cUdrNme: stripHtml(r.cUdrNme),
+                    };
                     dzmodal
                         .open(TaskListVestige, { type: "Issuer",
-                            data: { objId: row["taskTyp"] === "I" ? row.cInquiryNo : row.cAppNo, sysType:!!row["cAppTyp"] && ("A" === row["cAppTyp"] )
+                            data: { objId: cleanRow["taskTyp"] === "I" ? cleanRow.cInquiryNo : cleanRow.cAppNo, sysType:!!cleanRow["cAppTyp"] && ("A" === cleanRow["cAppTyp"] )
                                   ? "U"
                                   : "E" } })
                         .then((res:any) => {
@@ -1977,9 +2002,35 @@ const tableObj = {
                 //         return true
                 //     }
                 // },
-                tableClick: (row) => {
+                tableClick: async(row) => {
+									const r = await row;
+
+									// 把ES带html的字段洗净
+									const cleanRow = {
+											...r,
+											cAppNo: stripHtml(r.cAppNo),
+											cPlyNo: stripHtml(r.cPlyNo),
+											cEdrNo: stripHtml(r.cEdrNo),
+											cDptCnm: stripHtml(r.cDptCnm),
+											nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+											cInquiryNo: stripHtml(r.cInquiryNo),
+											tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+											tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+											cTermNme: stripHtml(r.cTermNme),
+											cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+											cAppNme: stripHtml(r.cAppNme),
+											cInsuredNme: stripHtml(r.cInsuredNme),
+											cClntAddr: stripHtml(r.cClntAddr),
+											cNmeCn: stripHtml(r.cNmeCn),
+											tUdrTm: stripHtml(r.tUdrTm),
+											tIssueTm: stripHtml(r.tIssueTm),
+											cProdNmeCn: stripHtml(r.cProdNmeCn),
+											nAmt: stripHtml(r.nAmt),
+											nPrm: stripHtml(r.nPrm),
+											cUdrNme: stripHtml(r.cUdrNme),
+									};
                   dzmodal
-                    .open(PrintView, { type: "edit", data: row })
+                    .open(PrintView, { type: "edit", data: cleanRow })
                     .then((res:any) => {
 
                     })
@@ -1999,9 +2050,34 @@ const tableObj = {
                         return false
                     }
                 },
-                tableClick: (row) => {
+                tableClick: async(row) => {
+										const r = await row;
+                    // 把ES带html的字段洗净
+                    const cleanRow = {
+                        ...r,
+                        cAppNo: stripHtml(r.cAppNo),
+                        cPlyNo: stripHtml(r.cPlyNo),
+                        cEdrNo: stripHtml(r.cEdrNo),
+                        cDptCnm: stripHtml(r.cDptCnm),
+                        nEdrPrjNo: stripHtml(r.nEdrPrjNo),
+                        cInquiryNo: stripHtml(r.cInquiryNo),
+                        tInsrncBgnTm: stripHtml(r.tInsrncBgnTm),
+                        tInsrncEndTm: stripHtml(r.tInsrncEndTm),
+                        cTermNme: stripHtml(r.cTermNme),
+                        cSecondDptCnm: stripHtml(r.cSecondDptCnm),
+                        cAppNme: stripHtml(r.cAppNme),
+                        cInsuredNme: stripHtml(r.cInsuredNme),
+                        cClntAddr: stripHtml(r.cClntAddr),
+                        cNmeCn: stripHtml(r.cNmeCn),
+                        tUdrTm: stripHtml(r.tUdrTm),
+                        tIssueTm: stripHtml(r.tIssueTm),
+                        cProdNmeCn: stripHtml(r.cProdNmeCn),
+                        nAmt: stripHtml(r.nAmt),
+                        nPrm: stripHtml(r.nPrm),
+                        cUdrNme: stripHtml(r.cUdrNme),
+                    };
                     dzmodal
-                        .open(UndrOpnList, { type: "", CAppNo: row.taskTyp === "I" ? row.cInquiryNo : row.cAppNo })
+                        .open(UndrOpnList, { type: "", CAppNo: cleanRow.taskTyp === "I" ? cleanRow.cInquiryNo : cleanRow.cAppNo })
                         .then((res: any) => {
                             if (res.type === "ok") {
                             }

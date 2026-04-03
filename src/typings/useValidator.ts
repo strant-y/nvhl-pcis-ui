@@ -378,6 +378,19 @@ const ariCard = () => {
   };
 };
 
+// 身份证类型为其他，身份证号的校验
+const CustomRule = () => {
+		return {
+			// 正则逻辑：
+			// 1. ^.{1,50}$  -> 限制长度1-50，且排除特殊字符（因为特殊字符通常不被包含在预期的有效字符集中，且.匹配任意字符，这里配合下面的排除逻辑）
+			// 2. (?!^[\u4e00-\u9fa5]+$) -> 负向先行断言，确保字符串不是“纯汉字”
+			// 3. [\u4e00-\u9fa5a-zA-Z0-9] -> 允许的字符范围：汉字、字母、数字
+			pattern: /^(?!^[\u4e00-\u9fa5]+$)[\u4e00-\u9fa5a-zA-Z0-9]{1,50}$/,
+			message: "证件号码格式不正确（长度1-50，允许汉字/字母/数字组合，不可为纯汉字或特殊字符）",
+			trigger: "blur"
+		};
+	};
+
 // 营业执照校验
 const businessLicense = () => {
   return {
@@ -763,6 +776,9 @@ const farmerPaymentRateRule = () => {
     }
     if(type === 'ariCard') {
       return ariCard()
+    }
+    if(type === 'CustomRule') {
+      return CustomRule()
     }
     if(type == 'businessLicense') {
       return businessLicense()

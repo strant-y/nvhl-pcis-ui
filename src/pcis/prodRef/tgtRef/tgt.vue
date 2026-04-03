@@ -513,7 +513,6 @@ const method = {
         item.disabled = false;
       } else if (item.prop == "Tgt.cPayCur") {
 				item.disabled = true;
-				opertaor.getTableRefs()['AgentTgt']?.setValue('Tgt.cPayCur', 'CNY')
       }
     });
   },
