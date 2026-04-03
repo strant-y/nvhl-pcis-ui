@@ -1110,6 +1110,10 @@ const method = {
       setFormItem("Insured.cCertfCde", {
         rules: [getRules("required", {}),getRules("ariCard", {})],
       });
+    } else if(val == "11"){
+      setFormItem("Insured.cCertfCde", {
+        rules: [getRules("required", {}),getRules("CustomRule", {})],
+      });
     } else {
       setFormItem("Insured.cCertfCde", { 
         rules: [getRules("required", {})],

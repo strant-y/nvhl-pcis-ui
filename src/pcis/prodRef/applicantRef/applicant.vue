@@ -503,6 +503,10 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("ariCard", {})],
       });
+    } else if (val == "11")  {
+      setFormItem("Applicant.cCertfCde", {
+        rules: [getRules("required", {}), getRules("CustomRule", {})],
+      });
     } else {
       setFormItem("Applicant.cCertfCde", {
         rules: [getRules("required", {})],

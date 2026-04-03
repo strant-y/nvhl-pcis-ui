@@ -472,18 +472,8 @@ const method = {
     if (val && idxParam && idxParam.getcPrmCur) {
       idxParam.getcPrmCur(val)
     }
-    try {
-      const getFormconfig = opertaor.getTableRefs()['AgentTgt']
-			const cDestinationCountry = opertaor.getTableRefs()['tgt']?.getValue('Tgt.cDestinationCountry')
-			if (!!cDestinationCountry && cDestinationCountry != 'CHINA' && cDestinationCountry != '中国') {
-				getFormconfig?.setValue('Tgt.cPayCur', 'CNY')
-			} else { 
-				getFormconfig?.setValue('Tgt.cPayCur', val)
-			}
-
-    } catch (err) {
-      console.log(err)
-    }
+    const getFormconfig = opertaor.getTableRefs()['AgentTgt']
+		getFormconfig?.setValue('Tgt.cPayCur', val)
     const param = opertaor.getParam();
     if (param.initFlag && !['orig', 'copy', 'template', 'inquiryToApp'].includes(param.pageType)) {
       return;
