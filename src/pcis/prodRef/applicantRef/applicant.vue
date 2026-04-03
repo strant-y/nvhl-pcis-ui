@@ -164,7 +164,7 @@ onMounted(() => {
     // 关联交易审批单编号
     setFormItem("Applicant.cRelateNo", { rules: [getRules("txnApprovalNo", {})] });
     // 经常居住地校验
-    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+    setFormItem("Applicant.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
     // 证件号码
     // setFormItem("Applicant.cCertfCde", { minWidth: '165px' });
     if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT") && (param.cTransMrk == '1' || param.cRsnCde === '99' || param.cEdrRsnBundle === '99' || param.cEdrRsnBundleCde === '99')) {
@@ -672,9 +672,6 @@ const method = {
 				setFormItem("Applicant.cIsMicroEntpris", { // 是否小微企业
 					disabled: false,
 				});
-				setFormItem("Applicant.cIsIndvduBiz", {
-					disabled: true,
-				});
 				// 是否绿色产业客户
 				setFormItem("Applicant.cGreenIndustryCustomers", {
 					disabled: false,
@@ -690,6 +687,9 @@ const method = {
         //是否个体工商户
         setValue("Applicant.cIsIndvduBiz", "");
       }
+      setFormItem("Applicant.cIsIndvduBiz", {
+        disabled: true,
+      });
       setFormItem("Applicant.cWorkDpt", {
         rules: [getRules("required", {})],
       });
@@ -1087,18 +1087,29 @@ const method = {
   // 是否个体工商户
   cIsIndvduBizChange: (val: any) => {
     if (val == "1") {
-
       setFormItem("Applicant.cOccupCde", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cOccupCde", { btnItems: { disabled: false } });
       setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})] });
       setFormItem("Applicant.cTrdCde", { btnItems: { disabled: false } });
     } else if (val == "0") {
       setFormItem("Applicant.cOccupCde", { rules: [] });
-      setFormItem("Applicant.cTrdCde", { rules: [] });
       setFormItem("Applicant.cOccupCde", { btnItems: { disabled: true } });
-      setFormItem("Applicant.cTrdCde", { btnItems: { disabled: true } });
-      setValue("Applicant.cOccupCde", null);
-      setValue("Applicant.cTrdCde", null);
+			setValue("Applicant.cOccupCde", null);
+			//【国民经济行业分类】初始化必填，只有法人时才必填，现在个人也是必填了（老系统需求：040001/042002/043004/043005/043011五款产品不区分法人个人投保，国民经济行业分类都必填，其他产品只有法人才必填）
+			const cProdNo = param.cProdNo;
+			if (
+				cProdNo === "040001" ||
+				cProdNo === "042002" ||
+				cProdNo === "043004" ||
+				cProdNo === "043005" ||
+				cProdNo === "043011"
+			) {
+				setFormItem("Applicant.cTrdCde", { rules: [getRules("required", {})],btnItems: { disabled: false } });
+			} else {
+				setFormItem("Applicant.cTrdCde", { rules: [] });
+				setFormItem("Applicant.cTrdCde", { btnItems: { disabled: true } });
+				setValue("Applicant.cTrdCde", null);
+			}
     } else {
       setFormItem("Applicant.cOccupCde", { btnItems: { disabled: false } });
       setFormItem("Applicant.cTrdCde", { btnItems: { disabled: false } });
@@ -1557,15 +1568,25 @@ const method = {
       });
       setFormItem("Applicant.RegisterProp", {
         disabled: true,
+        rules: []
       });
     } else {
       setFormItem("Applicant.ClntAddrProp", {
         disabled: false,
         rules: [getRules("required", {})]
-      });
-      setFormItem("Applicant.RegisterProp", {
-        disabled: false,
-      });
+			});
+			let cClntMrk = getValue('Applicant.cClntMrk'); // 法人  1个人  0法人
+			if (cClntMrk == '0') {
+				setFormItem("Applicant.RegisterProp", {
+					disabled: false,
+					rules: [getRules("required", {})]
+				});
+			} else {
+				setFormItem("Applicant.RegisterProp", {
+					disabled: false,
+				});
+			}
+
     }
 		const param = opertaor.getParam();
     if (param.initFlag) {
@@ -1625,7 +1646,7 @@ function setFormValue(value: any) {
     eventBus.on('setUnDisabledDone', () => {
       nextTick(() => {
         const cClntMrk = formconfig1.fromSchema?.find((item:any) => item.prop === 'Applicant.cClntMrk')
-        if(cClntMrk?.disabled !== true) {
+        if(cClntMrk?.disabled !== true && value['Applicant.cClntMrk'] == '1') {
           method.InsureChange(value['Applicant.cClntMrk'])
         }
       })
@@ -1686,7 +1707,7 @@ function handleFileChange(event: Event) {
                   .replace("日", "")
               );
             if (cardInfo["validate_date"]) {
-              tCertfDate.value = cardInfo["validate_date"].split("-");
+              tCertfDate.value = cardInfo["validate_date"].split("-")?.map((item: any) => (item.replaceAll(".", "-")));
               setValue(
                 "Applicant.tCertfBgnDate",
                 cardInfo["validate_date"].split("-")[0]?.replaceAll('.','-')

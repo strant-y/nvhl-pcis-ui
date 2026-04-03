@@ -121,7 +121,7 @@ const pageresult = reactive<Pageresult>({
 });
 const addTableData = reactive([]); //添加其他特约
 const activeName = ref("first");
-const selectable = (row) => row["cIfMust"] != "1"; //这里调用是把必选的置灰
+const selectable = (row) => row["cIfMust"] != "1" && row["cSpecialCode"] != '34201122' && row["cSpecialCode"] != '34201123'; //这里调用是把必选的置灰
 const tableRowClassName = ({ row, rowIndex }) => {
   let sty = "";
   selected.value.forEach((item) => {

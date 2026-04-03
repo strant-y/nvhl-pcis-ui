@@ -512,11 +512,9 @@ const tableBtns = [
       res["cAntiLnderRisk"] = "0"; //关联交易确认
       res["cIsTransaction"] = "0"; //反洗钱风险
       res["CRiBesprakMrk"] = "0"; // 预约分保标志
-      res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
+			res["backUndrDptCde"] = row.tPreDptCde; // 退回指定核保级别机构编码
       res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
-      res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
-        "userName"
-      ]; // 退回指定核保人员名称
+      res["backUndrDptCnm"] = row.tPreDptName // 退回指定核保人员名称
       let submitUnder;
       submitUnder = submitUnderwriting(res);
       submitUnder.then((res) => {
@@ -694,11 +692,9 @@ const tableconfig = reactive<AppTableConfig>(
           res["cAntiLnderRisk"] = "0"; //关联交易确认
           res["cIsTransaction"] = "0"; //反洗钱风险
           res["CRiBesprakMrk"] = "0"; // 预约分保标志
-          res["backUndrDptCde"] = row.dptCde; // 退回指定核保级别机构编码
+          res["backUndrDptCde"] = row.tPreDptCde; // 退回指定核保级别机构编码
           res["backUndrClsCde"] = row.level; // 退回指定核保级别编码
-          res["backUndrDptCnm"] = JSON.parse(sessionStorage.getItem("user"))[
-            "userName"
-          ]; // 退回指定核保人员名称
+          res["backUndrDptCnm"] = row.tPreDptName // 退回指定核保人员名称
           let submitUnder;
           submitUnder = submitUnderwriting(res);
           submitUnder.then((res) => {
@@ -1024,7 +1020,7 @@ onMounted(async () => {
       freeEditRef.value?.setValue("udrType", homeJumpData.udrType);
       handleQuery();
     }
-	} else if (!!params && params.param.appNo) {
+	} else if (!!params && params.param?.appNo) {
 		freeEditRef.value?.setValue("cAppNo", params.param.appNo);
 		handleQuery();
   } else {
@@ -1350,12 +1346,16 @@ function updateUdrDetail(row: any) {
           cEdrRsnBundleCde: row.cEdrRsnBundleCde,
           nRecRemPrm: row.nRecRemPrm,
           nRecRemEstAmt: row.nRecRemEstAmt,
-        });
+				});
+				let query = {
+					param: en
+				}
+				if (row.udrType == '1' || row.udrType == '2') {
+					query.title = '申请单审核'
+				}
         router.push({
           path: "/pcisapp/myPage",
-          query: {
-            param: en,
-          },
+          query
         });
       } else {
         const en = JSON.stringify({
@@ -1385,11 +1385,15 @@ function updateUdrDetail(row: any) {
           nRecRemPrm: row.nRecRemPrm,
           nRecRemEstAmt: row.nRecRemEstAmt,
         });
+				let query = {
+					param: en
+				}
+				if (row.udrType == '1' || row.udrType == '2') {
+					query.title = '申请单审核'
+				}
         router.push({
           path: "/pcisapp/myPage",
-          query: {
-            param: en,
-          },
+          query
         });
       }
     }
@@ -1430,12 +1434,16 @@ function handleWorkFlow(row: any, type: any) {
                 cRelateBusi: row.cRelateBusi,
                 cEdrRsnBundleCde: row.cEdrRsnBundleCde,
               });
-              router.push({
-                path: "/pcisapp/myPage",
-                query: {
-                  param: en,
-                },
-              });
+							let query = {
+								param: en
+							}
+							if (row.udrType == '1' || row.udrType == '2') {
+								query.title = '申请单审核'
+							}
+							router.push({
+								path: "/pcisapp/myPage",
+								query
+							});
             } else {
               // 详情
               updateUdrDetail(row);
@@ -1514,12 +1522,16 @@ function handle_hasReceived(row: any) {
             cEdrRsnBundleCde: row.cEdrRsnBundleCde,
           };
           const en = JSON.stringify(data);
-          router.push({
-            path: "/pcisapp/myPage",
-            query: {
-              param: en,
-            },
-          });
+					let query = {
+						param: en
+					}
+					if (row.udrType == '1' || row.udrType == '2') {
+						query.title = '申请单审核'
+					}
+					router.push({
+						path: "/pcisapp/myPage",
+						query
+					});
         }
       });
     } else {
@@ -1552,7 +1564,7 @@ function handle_hasReceived(row: any) {
 
 // 多选事件
 function handleSelectionChange(selection: any) {
-  selectData.value = Array.from(new Set(selectData.value.concat(selection)));
+	selectData.value = selection
 }
 
 // 详情 核保通过任务
@@ -1610,12 +1622,16 @@ function showDetails(row: any) {
               nRecRemPrm: row.nRecRemPrm,
               nRecRemEstAmt: row.nRecRemEstAmt,
             });
-            router.push({
-              path: "/pcisapp/myPage",
-              query: {
-                param: en,
-              },
-            });
+						let query = {
+							param: en
+						}
+						if (row.udrType == '1' || row.udrType == '2') {
+							query.title = '申请单审核'
+						}
+						router.push({
+							path: "/pcisapp/myPage",
+							query
+						});
           } else {
             const en = JSON.stringify({
               cAppNo: row.objId ? row.objId : row.cAppNo,
@@ -1636,12 +1652,16 @@ function showDetails(row: any) {
               nRecRemPrm: row.nRecRemPrm,
               nRecRemEstAmt: row.nRecRemEstAmt,
             });
-            router.push({
-              path: "/pcisapp/myPage",
-              query: {
-                param: en,
-              },
-            });
+						let query = {
+							param: en
+						}
+						if (row.udrType == '1' || row.udrType == '2') {
+							query.title = '申请单审核'
+						}
+						router.push({
+							path: "/pcisapp/myPage",
+							query
+						});
           }
         }
       }
@@ -1676,12 +1696,16 @@ function handleEdit(row: any) {
     cProdNmeCn: row.cProdNmeCn,
     cPolicySource: row.cPolicySource,
   });
-  router.push({
-    path: "/pcisapp/myPage",
-    query: {
-      param: en,
-    },
-  });
+	let query = {
+		param: en
+	}
+	if (row.udrType == '1' || row.udrType == '2') {
+		query.title = '申请单审核'
+	}
+	router.push({
+		path: "/pcisapp/myPage",
+		query
+	});
 }
 
 // 删除  核保通过任务

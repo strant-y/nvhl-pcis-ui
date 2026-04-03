@@ -80,7 +80,9 @@ const formconfig1 = ref<AppFreeEditConfig>(
               emits("handleClose");
               return;
             }
-          }
+					} else {
+						ElMessage.warning('请检查必填项！');
+					}
         },
       }),
       createFreeButtonBase({
@@ -125,8 +127,15 @@ onMounted(async  () => {
       item["func"] = funCheckUser;
 		}
 		// 证件类型
-    if(['InsuredDist.cCertfCls'].includes(item.prop)) {
-      item["func"] = InsuredCCertfCls;
+		if (['InsuredDist.cCertfCls'].includes(item.prop)) {
+			item["func"] = InsuredCCertfCls;
+			if (props.data.title == "编辑") {
+				if (props.data.rowData['InsuredDist.cClntMrk'] == '0') { // 法人
+					item['typeCode'] = 'UN_NATURAL_CERTIFICATE_CACHE'
+				} else {
+					item['typeCode'] = 'NATURAL_CERTIFICATE_CACHE'
+				}
+			}
 		}
 		// 证件号码
     if(['InsuredDist.cCertfCde'].includes(item.prop)) {
@@ -165,6 +174,11 @@ onMounted(async  () => {
 		// 办理人员证件有效止期
     if(['InsuredDist.tOperaterCertfEndTm'].includes(item.prop)) {
       item["disabledDate"] = tOEndTmDisable;
+		}
+		
+		// 办理人员证件有效止期
+    if(['InsuredDist.cNation'].includes(item.prop)) {
+      item["func"] = cNationChange;
     }
     // 单位性质
     if(['InsuredDist.cWorkDpt'].includes(item.prop)) {
@@ -240,7 +254,11 @@ onMounted(async  () => {
 		}
   }, 100);
   console.log(' formconfig1.value', formconfig1.value)
-	nextTick(()=>{
+	nextTick(() => {
+		if (props.data.title == "新增") {
+			setValue("InsuredDist.cNation", "CHN"); // 国籍默认中国
+			setValue("InsuredDist.cStkMrk", "0"); // 股东客户默认否
+		}
 		setFormItem("InsuredDist.cMobile", { rules: [getRules("phoneNo", {})] })
 		// 固话
 		setFormItem("InsuredDist.cTel", { rules: [getRules("phone", {})] });
@@ -253,7 +271,7 @@ onMounted(async  () => {
 		setFormItem("InsuredDist.cGcidCode", {
 			rules: [getRules("leiCode", {})],
 		});
-		setFormItem("InsuredDist.cHabitualResidence", { rules: [getRules("valiAddress", {})] });
+		setFormItem("InsuredDist.cHabitualResidence", { rules: [getRules("valiAddress", {minLength : 2})] });
 		setTimeout(() => {
 			init.value = false
     }, 500);
@@ -438,8 +456,9 @@ const idAnalysis = (id:string)=>{
   const sexCode = parseInt(id.substring(16, 17), 10);
   const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
   const age = new Date().getFullYear() - birthYear;
-
-  setValue("InsuredDist.cNation", "CHN"); // 国籍
+	if (!getValue("InsuredDist.cNation")) {
+    setValue("InsuredDist.cNation", "CHN"); // 国籍
+  }
   setValue("InsuredDist.tBirthday", birthday);
   setValue("InsuredDist.nAge", age);
   setValue("InsuredDist.cSex", sex);
@@ -454,9 +473,11 @@ const InsuredCCertfCls =(val:any) => {
     clearValidate('InsuredDist.cCertfCde'); // 清除报错信息
 	}
 	const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
-  personFields.forEach(field => {
-    setFormItem(`InsuredDist.${field}`, { disabled: false });
-  });
+	if (props.data.title != '详情') {
+		personFields.forEach(field => {
+			setFormItem(`InsuredDist.${field}`, { disabled: false });
+		});
+	}
   setFormItem("InsuredDist.tCertfBgnDate", { rules: null });
   setFormItem("InsuredDist.tCertfEndDate", { rules: null });
   setFormItem("InsuredDist.tEstablishingDate", { disabled: true, rules: null });
@@ -624,6 +645,9 @@ const cIsIndvduBizChange = (val: any) => {
 }
 //证件有效期止期时间事件改变
 const tCertfEndDateChange = (val: any) => {
+	if (init.value || props.data.title == '详情') {
+		return false
+	}
 	const tableParam = opertaor.getTableRefs();
 	const tinsrncBgnTm = tableParam["insrnc"].getFromValue()["Base.tInsrncBgnTm"]  //投保开始日期
 	const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
@@ -634,7 +658,7 @@ const tCertfEndDateChange = (val: any) => {
     const insrncBgnTm = new Date(tinsrncBgnTm).getTime();
     if (certfEndDate < issueTm) {
       ElMessage.error("被保人证件有效期小于签单时间，请关注!");
-      setValue("Insured.tCertfEndDate", '');
+      setValue("InsuredDist.tCertfEndDate", '');
     }
     if (certfEndDate < insrncBgnTm) {
       ElMessage.error("被保人证件有效期小于投保开始日期，请关注!");
@@ -642,7 +666,10 @@ const tCertfEndDateChange = (val: any) => {
   }
 }
 //企业成立时间事件改变
-const tEstablishingDateChange = (val:any) => {
+const tEstablishingDateChange = (val: any) => {
+	if (init.value || props.data.title == '详情') {
+		return false
+	}
 	const tableParam = opertaor.getTableRefs();
   const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
   const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
@@ -687,8 +714,8 @@ const tEstablishingDateChange = (val:any) => {
 				hidden: true,
 			});
 			setFormItem("InsuredDist.cNation", {
-				hidden: true,
-			});
+        rules: [getRules('required',{})],
+      });
 			setFormItem("InsuredDist.cOccupTyp", {
 				hidden: true,
 			});
@@ -823,27 +850,31 @@ const tEstablishingDateChange = (val:any) => {
 			setFormItem("InsuredDist.nYearincomeNum", {
 				rules: [],
 			});
-
-			codeListStore
-				.queryCodeList({
-					codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
-					codeListParam: {},
-				})
-				.then((res) => {
-					if (
-						!res.some((item) =>
-							Object.values(item).includes(getValue("InsuredDist.cCertfCls"))
-						)
-					) {
-						// setValue("Insured.cCertfCls", "");
-					}
-					freeEditRef.value?.addCodeListMap({
-						code: "InsuredDist.cCertfCls",
-						list: res
+			if (!init.value) {
+				codeListStore
+					.queryCodeList({
+						codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
+						codeListParam: {},
 					})
-					setValue('InsuredDist.cCertfCls', '01')
-				});
-
+					.then((res) => {
+						if (
+							!res.some((item) =>
+								Object.values(item).includes(getValue("InsuredDist.cCertfCls"))
+							)
+						) {
+							if (getValue('InsuredDist.cCertfCls')) {
+								setValue("InsuredDist.cCertfCls", "");
+							}
+						}
+						freeEditRef.value?.addCodeListMap({
+							code: "InsuredDist.cCertfCls",
+							list: res
+						})
+						if (val === '0') {
+							setValue('InsuredDist.cCertfCls', '01')
+						}
+					});
+			}
 			setFormItem("InsuredDist.cWorkDpt", {
 				rules: [getRules("required", {})],
 			});
@@ -858,8 +889,8 @@ const tEstablishingDateChange = (val:any) => {
 				hidden: false,
 			});
 			setFormItem("InsuredDist.cNation", {
-				hidden: false,
-			});
+        rules: [],
+      });
 			setFormItem("InsuredDist.cOccupTyp", {
 				hidden: false,
 			});
@@ -1185,23 +1216,85 @@ const tOEndTmDisable =(date: any) => {
   return disablePastDates(date);
 }
 
+// 国籍
+const cNationChange = (val:any) => {
+	// 国籍选择非中国时常住地址和注册地址的省市区不可编辑
+	if(val && val !== 'CHN') {
+		setFormItem("InsuredDist.ClntAddrProp", {
+			disabled: true,
+			rules: []
+		});
+		setFormItem("InsuredDist.RegisterProp", {
+			disabled: true,
+			rules: []
+		});
+	} else {
+		setFormItem("InsuredDist.ClntAddrProp", {
+			disabled: false,
+			rules: [getRules("required", {})]
+		});
+		let cClntMrk = getValue('InsuredDist.cClntMrk'); // 法人  1个人  0法人
+		if (cClntMrk == '0') { 
+			setFormItem("InsuredDist.RegisterProp", {
+				disabled: false,
+				rules: [getRules("required", {})]
+			});
+		} else {
+			setFormItem("InsuredDist.RegisterProp", {
+				disabled: false,
+			});
+		}
+
+	}
+
+	if (init.value) {
+		return;
+	}
+	setValue("InsuredDist.ClntAddrProp", null);
+	setValue("InsuredDist.cSuffixAddr", '');
+	setValue("InsuredDist.RegisterProp", null);
+	setValue("InsuredDist.cRegisterSuffixAddr", '');
+}
+
+function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<string, any>) {
+  items.forEach((item) => {
+    // 1. 如果当前项是分组（含groupList），先递归处理子项
+    if (item.inputtype === 'rtinputgroup' && item.groupList && Array.isArray(item.groupList)) {
+      recursiveSetFormItem(item.groupList, targetKey, obj);
+    }
+
+    // 2. 匹配到目标prop，执行赋值
+    if (item.prop === targetKey) {
+      if (item.btnItems && obj.btnItems) {
+        Object.entries(obj.btnItems).forEach(([btnKey, value]) => {
+          if (item.btnItems!.hasOwnProperty(btnKey)) {
+            item.btnItems![btnKey] = value;
+          }
+        });
+      }
+
+      // 处理其他属性（包括rules必填规则）
+      const { btnItems: _, ...otherProps } = obj;
+      Object.assign(item, otherProps);
+      if (otherProps.rules) {
+        item.rules = otherProps.rules;
+      }
+    }
+  });
+}
 
 //给表单下拉项赋值
 function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.value.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        } else {
-          Object.assign(item, obj);
-        }
-      }
-    });
+	if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+    return;
   }
+
+  if (!formconfig1.value.fromSchema || !Array.isArray(formconfig1.value.fromSchema)) {
+    return;
+  }
+
+  // 调用递归方法处理所有项（包括嵌套的groupList）
+  recursiveSetFormItem(formconfig1.value.fromSchema, key, obj);
 }
 function getFromValue() {
   return freeEditRef?.value?.getFromValue();

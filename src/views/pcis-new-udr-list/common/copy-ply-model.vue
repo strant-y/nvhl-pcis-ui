@@ -484,14 +484,14 @@ const confirm = async () => {
     emits("ok", {
       cAppNo: displayData.value,
       queryType: freeEditRef.value?.getValue("queryType"),
-      dptCde: freeEditRef.value?.getValue("dptCde"),
-      cDptCde: freeEditRef.value?.getValue("cDptCde"),
+      dptCde: props.data.dptCde, //分公司编码---详情的复制出单用详情的机构
+      cDptCde: props.data.cDptCde, // 承保机构编码---详情的复制出单用详情的机构
       cProdNo: freeEditRef.value?.getValue("cProdNo"),
       cRenewMrk: selected.value[0].cRenewMrk,
       cGrpMrk: selectedGrpMrk.value,
       pageType:"copy",
       cCiMrk: selected.value[0].cCiMrk,//共保方式
-      cDptCnm: selected.value[0].cDptCnm,//承保机构名称
+      cDptCnm: props.data.cDptCnm,//承保机构名称---详情的复制出单用详情的机构
       cTermNme: selected.value[0].cTermNme,//条款名称
       cTermNo: selected.value[0].cTermNo,// 条款code值
       cProdNme: selected.value[0].cProdNme,//产品名称

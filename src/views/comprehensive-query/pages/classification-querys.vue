@@ -41,7 +41,7 @@
        <template #column-policyInfoXJ="{ row, column, index }">
         <div class="policy-info-cell">
           <!-- 询价 -->
-          <template v-if="cAppType == 'I' || row.tabtyp == 'A' || row.tabtyp == 'I'">
+          <template v-if="cAppType == 'I' || row.tabtyp == 'I'">
             <div v-if="row.cAppNo" class="policy-number-row">
                 <span v-html="row.cAppNo"></span>
                 <el-icon class="copy-icon" @click="copyText(row.cAppNo)">
@@ -2297,6 +2297,7 @@ async function queryAE( flag?: boolean, isEs = false) {
     console.log('param----------', param);
     if(isEs) {
         setFormItem('cQueryStr',{btnItems: {loading: true}})
+				ElMessage.success({ message: "全文搜索功能仅支持查询已落地的保单，暂不包含暂存单。", duration: 1000 });
     } else {
         formconfig1.endBtns[0].loading = true
     }
@@ -2440,6 +2441,7 @@ async function queryI(flag?: boolean, isEs = false) {
     }
     if(isEs) {
         setFormItem('cQueryStr',{btnItems: {loading: true}})
+				ElMessage.success({ message: "全文搜索功能仅支持查询已落地的保单，暂不包含暂存单。", duration: 1000 });
     } else {
         formconfig1.endBtns[0].loading = true
     }

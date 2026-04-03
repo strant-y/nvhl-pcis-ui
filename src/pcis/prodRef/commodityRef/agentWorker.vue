@@ -115,7 +115,7 @@ const tableconfig = reactive<AppTableConfig>(
                 title: "所在部门代码",
             },
             {
-                prop: "CMobile",
+                prop: "CTel",
                 inputtype: "rtinput",
                 title: "联系电话",
             },
@@ -169,6 +169,7 @@ function handleQuery(flag?: boolean) {
         CBrkrCde: props.data.data['CBrkrCde'],
         CSlsTyp: props.data.data['CSlsTyp'],
         CChaType: props.data.data['CChaType'],
+				CChaSubtype: props.data.data['cChaSubtype'],
         CDptAttr: props.data.data['CDptAttr'],
         // CSlsCde: props.data.data['CSlsCde'],
         subSidiary: props.data.data['subSidiary'],

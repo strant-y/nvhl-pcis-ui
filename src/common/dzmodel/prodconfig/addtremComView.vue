@@ -154,7 +154,6 @@ props.data.data.isselectData?.forEach((item: any) => {
     });
     seadd["riskList"] = list;
   }
-
   selectAdditionNodes.value.push(seadd);
 });
 
@@ -214,8 +213,10 @@ onMounted(async () => {
       selectAdditionNodes.value.forEach((v) => {
         if (v.cRowId && v.cTermNo === item.cTermNo) {
           item.disabled = param.type !== "ECargo";
+          item.oldSelect = true;  // 批改时,如果是批改原条款,进行标记,用于后期显示条款排序时,老条款在新增条款之前
           item.children?.forEach((i: any) => {
             i.disabled = param.type !== "ECargo";
+            i.oldSelect = true;  
           });
         }
       });
@@ -231,11 +232,12 @@ onMounted(async () => {
 function setNode() {
   const addMainKey: any[] = [];
   const param = props.data.data;
-  if (param.showType === "main" && param.showMethod === "add") {
+  if (param.showType === "main" || param.showMethod === "add" ) {
     addMainKey.push(param['mainTerm']);
   } else {
     if (selectAdditionNodes.value && selectAdditionNodes.value.length > 0) {
       selectAdditionNodes.value.forEach((item: any) => {
+        addMainKey.push(item["cTermNo"]);
         if (item["riskList"] && item["riskList"].length > 0) {
           item["riskList"].forEach((risk: any) => {
             const k = item["cTermNo"] + risk["cRiskNo"];
@@ -333,26 +335,56 @@ function flushSelectData() {
   tree?.forEach((item: any) => {
     // 获取选中的主条款信息
     if (item.cTermNo) {
-      let seterm = Object.assign({}, item);
-      let childnode: any[] = [];
+      if(item.oldSelect){
+        let seterm = Object.assign({}, item);
+        let childnode: any[] = [];
 
-      item.children?.forEach((child: any) => {
-        const issel = childnode?.filter(
-          (node: any) => node.cRiskNo === child.cRiskNo
-        );
-        if (issel != null && issel.length > 0) {
-          return;
-        }
-        const f = tree?.filter(
-          (child2: any) => child2.cRiskNo === child.cRiskNo
-        );
-        if (f !== null && f.length > 0) {
-          childnode.push(...f);
-        }
-      });
-      seterm.cRdrTyp = seterm.cRdrTyp;
-      seterm.children = childnode;
-      selectNode.push(seterm);
+        item.children?.forEach((child: any) => {
+          const issel = childnode?.filter(
+            (node: any) => node.cRiskNo === child.cRiskNo
+          );
+          if (issel != null && issel.length > 0) {
+            return;
+          }
+          const f = tree?.filter(
+            (child2: any) => child2.cRiskNo === child.cRiskNo
+          );
+          if (f !== null && f.length > 0) {
+            childnode.push(...f);
+          }
+        });
+        seterm.cRdrTyp = seterm.cRdrTyp;
+        seterm.children = childnode;
+        selectNode.push(seterm);
+      }
+    }
+  });
+
+  tree?.forEach((item: any) => {
+    // 获取选中的主条款信息
+    if (item.cTermNo) {
+      if(!item.oldSelect){
+        let seterm = Object.assign({}, item);
+        let childnode: any[] = [];
+
+        item.children?.forEach((child: any) => {
+          const issel = childnode?.filter(
+            (node: any) => node.cRiskNo === child.cRiskNo
+          );
+          if (issel != null && issel.length > 0) {
+            return;
+          }
+          const f = tree?.filter(
+            (child2: any) => child2.cRiskNo === child.cRiskNo
+          );
+          if (f !== null && f.length > 0) {
+            childnode.push(...f);
+          }
+        });
+        seterm.cRdrTyp = seterm.cRdrTyp;
+        seterm.children = childnode;
+        selectNode.push(seterm);
+      }
     }
   });
 

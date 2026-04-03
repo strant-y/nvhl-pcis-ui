@@ -23,6 +23,7 @@ import {
   // getPageList,
 } from "@/api/code-list-service";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import { checkProdGrade } from "@/api/prod/index";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -177,7 +178,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 }
 
               }
-
+							checkProdGradeChange(false)
 
 
             })
@@ -193,7 +194,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if (val) {
             //  查询子类 selelct 
             // setValue("cChaSubType", "");
-            queryCChaSubtype(val)
+						queryCChaSubtype(val)
+						checkProdGradeChange(false)
           }
         }
       },
@@ -202,6 +204,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "渠道子类",
         rules: [getRules("required", {})],
+        func: (val: any) => {
+          if (val) {
+						checkProdGradeChange(false)
+          }
+        }
       },
       {
         prop: "cDptCde",
@@ -238,6 +245,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           },
         },
         rules: [getRules("required", {})],
+        func: (val: any) => {
+          if (val) {
+						checkProdGradeChange(false)
+          }
+        }
       },
       {
         prop: "cOperId",
@@ -331,6 +343,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             });
           },
         },
+        func: (val: any) => {
+          if (val) {
+						checkProdGradeChange(false)
+          }
+        }
       },
       {
         prop: "cBrkrCde",
@@ -385,6 +402,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             });
           },
         },
+        func: (val: any) => {
+          if (val) {
+						checkProdGradeChange(false)
+          }
+        }
       },
 
       {
@@ -451,13 +473,21 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             );
           },
         },
+        func: (val: any) => {
+          if (val) {
+						checkProdGradeChange(false)
+          }
+        }
       },
-      {},
-
       {
         prop: "cAgtAgrNo",
         inputtype: "rtinput",
         title: "代理协议号",
+        func: (val: any) => {
+          if (val) {
+						checkProdGradeChange(false)
+          }
+        }
       },
       {
         prop: "nPropFeeRate",
@@ -538,6 +568,121 @@ const queryCChaSubtype = (val: any) => {
   });
 }
 
+/**
+* 检查产品分级信息(销售资质级别)
+* @param isPrompt 是否提示错误信息
+*/
+async function checkProdGradeChange(isPrompt: boolean): Promise<boolean> {
+  // 提示函数：仅在 isPrompt 为 true 时弹出 ElMessage
+  const showError = (msg: string) => {
+    if (isPrompt) {
+      ElMessage.error(msg);
+    }
+  };
+
+	try {
+		// 如果不是新增或者编辑的话, 则返回
+		if ('add' !== param.editType && 'edit' !== param.editType) {
+				return true;
+		}
+    // 1. 产品校验
+    const prodNo = tabref.getValue('cProdNo');
+    if (!prodNo) {
+      showError('请选择产品名称！');
+      return false;
+    }
+
+    // 2. 机构部门校验
+    const dptNo = getValue('cDptCde');
+    if (!dptNo) {
+      showError('请选择出单机构！');
+      return false;
+    }
+
+    // 3. 渠道大类校验
+    const bsnsTyp = getValue('cBsnsTyp');
+    if (!bsnsTyp) {
+      showError('请选择渠道大类！');
+      return false;
+    }
+
+    // 经纪业务（19003）直接通过
+    if (bsnsTyp === '19003') {
+      return true;
+    }
+
+    // 4. 渠道中级分类（代理/直销都需要）
+    const chaType = getValue('cChaType');
+    if (!chaType) {
+      showError('请选择渠道中级分类！');
+      return false;
+		}
+
+		// 5. 渠道子类
+    const cChaSubtype = getValue('cChaSubType');
+    if (!cChaSubtype) {
+      showError('请选择渠道子类！');
+      return false;
+    }
+
+    // 6. 获取其他字段
+    const brkrCde = getValue('cBrkrCde'); // 代理人/经纪人
+    const brkSlsCde = getValue('cBrkSlsCde'); // 代理业务员
+    const agtAgrNo = getValue('cAgtAgrNo'); // 代理协议号
+    const slsId = getValue('cSlsId'); // 业务员
+
+    // 6. 分场景校验
+    if (bsnsTyp === '19001') {
+      // 直销业务
+      if (!slsId) {
+        showError('请选择业务员/产险专员！');
+        return false;
+      }
+    } else if (bsnsTyp === '19002') {
+      // 代理业务
+      if (chaType === '1900201') {
+        // 个人代理
+        if (!brkSlsCde || !agtAgrNo) {
+          showError('代理业务员和代理协议号不能为空！');
+          return false;
+        }
+      } else {
+        // 兼业/专业代理
+        if (!slsId || !agtAgrNo) {
+          showError('业务员/产险专员和代理协议号不能为空！');
+          return false;
+        }
+      }
+    }
+
+    // 7. 构造请求数据
+    const data = {
+      cProdNo: prodNo, // 产品
+      cDptCde: dptNo, // 机构部门
+      cBsnsTyp: bsnsTyp, // 业务来源 (19001: 直销业务, 19002:代理业务, 19003: 经纪业务)
+      cChaType: chaType, // 渠道中级分类 (1900201: 个人代理, 1900202: 兼业代理, 1900203: 专业代理)
+      cChaSubtype: cChaSubtype, // 渠道子类
+      cSlsId: slsId, // 业务员员工号
+      cBrkrCde: brkrCde, // 代理(经纪)人
+      cBrkSlsCde: brkSlsCde, // 代理业务员
+      cAgtAgrNo: agtAgrNo, // 代理(合作)协议
+    };
+
+    // 8. 调用后端校验接口
+    const res = await checkProdGrade(data);
+
+    if (res?.code === 200) {
+      return true;
+    } else {
+      const msg = res?.msg || '产品等级校验失败';
+      ElMessage.error(msg);
+      return false;
+    }
+  } catch (error) {
+    ElMessage.error('系统异常，请联系管理员');
+    return false;
+  }
+}
 
 onMounted(() => {
   eventBus.on('cKindNo-change', queryCBsnsTyp)
@@ -618,6 +763,7 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  setFormItem,
+	setFormItem,
+	checkProdGradeChange,
 });
 </script>

@@ -16,6 +16,7 @@ import { rule } from "postcss";
 import { useValidator } from "@/typings/useValidator";
 import { syncDist, selectDist, checkAppBase, queryNrmbAmt, getProductTemplate} from "@/api/prod";
 import { productListA, productListB, productListC, cIntegrityStatementData, guaranteeTypeMap } from "./productList";
+import Decimal from "decimal.js";
 const wagesInfo = defineAsyncComponent(
   () => import("@/views/comprehensive-query/modal/wages-info-model.vue")
 );
@@ -210,7 +211,7 @@ onMounted(async () => {
 	}
 
   //  运输工具名称
-  const cTransportationNames = ['020003', '020011', '020013', '020019', '020021'];
+  const cTransportationNames = ['020003', '020011', '020013'];
 	const isNonRequired = cTransportationNames.includes(params.cProdNo);
 
 	// 风险累积按钮核保切是规定产品展示
@@ -247,26 +248,24 @@ onMounted(async () => {
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
   });
+	setFormItem('Tgt.cCertificateDetailed', { autosize: true })
   selectType()
-  // 020019、020020、020021三款产品标的信息全部非必填
-  if(['020019','020020','020021'].includes(params.cProdNo)) {
-    formconfig11.fromSchema?.forEach((item:any) => {
-      if(item.rules?.length > 0) {
-        item.rules.forEach((i:any, index:any) => {
-          if(i.required === true) {
-            item.rules.splice(index, 1)
-          }
-        })
-      }
-    })
-  }
   // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
   if(params.cProdNo === '059902') {
     method.getcGuaranteeMethodChange('');
+	}
+	// 019904  089031 农户缴费比例大于等于2%
+  if(params.cProdNo === '019904' || params.cProdNo === '089031') {
+    setFormItem("Tgt.nCentralSubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nCentralSubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nProvincialSubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nProvincialSubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nCitySubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nCitySubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nCountySubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nCountySubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nOtherSubsidyRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nOtherSubsidyRate'), trigger: 'blur' }],});
+    setFormItem("Tgt.nFarmerPaymentRate", {rules: [getRules("required", {}), { validator: createSumValidator('Tgt.nFarmerPaymentRate'), trigger: 'blur' }, getRules("farmerPaymentRateRule", {})],});
   }
   nextTick(() => {
     // 货物信息回填到标的信息的产品
-    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017']
+    const ProdNo = ['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017', '020019', '020020', '020021' ]
     if(ProdNo.includes(params.cProdNo)) {
       eventBus.on('goodsMxChange', handelGoodsMx);
     }
@@ -300,6 +299,10 @@ onMounted(async () => {
 				setValue('Tgt.cGuaranteeType', 'BL_047002_01')
 			}
 		}
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: false, disabled: false });
+			setFormItem('Tgt.nInvoicceValue', { readonly: false, disabled: false });
+		}
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
         const data = getFromValue();
@@ -314,17 +317,21 @@ onMounted(async () => {
       }
     })
     for (let i = 0; formconfig11.fromSchema && i < formconfig11.fromSchema.length; i++) {
-    // 遍历groupList数组把函数赋值给fromSchema
-    if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
-      formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
-        if (distContactList.includes(data.prop)) {
-          formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
-            return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
-          }
-        }
-      })
+			// 遍历groupList数组把函数赋值给fromSchema
+			if (formconfig11.fromSchema[i]["groupList"] && formconfig11.fromSchema[i]["groupList"].length > 0) {
+				formconfig11.fromSchema[i]["groupList"].forEach((data: any, index: number, arr: any) => {
+					if (distContactList.includes(data.prop)) {
+						formconfig11.fromSchema[i]["groupList"][index]['func'] = function () {
+							return setcDetailedAddress(arr, JSON.parse(JSON.stringify(formconfig11.fromSchema[i + 1])))
+						}
+					}
+				})
+			}
+		}
+    // 记名投保默认值记名
+    if(params.cProdNo === '080011') {
+      setValue('Tgt.cRegisteredInsurance', '01')
     }
-  }
   })
 });
 function hasEnglish(str: any) {
@@ -332,7 +339,11 @@ function hasEnglish(str: any) {
 }
 const handelGoodsMx = (val: any) => {
   console.log(val)
-  if (val.length > 0) {
+	if (val.length > 0) {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: true, disabled: true });
+			setFormItem('Tgt.nInvoicceValue', { readonly: true, disabled: true });
+		}
     setValue('Tgt.cGoodsNo',val.map(obj => obj['Dist.cGoodsNo']).join(','))
     setValue('Tgt.nGoodsNum',val.reduce((sum, obj) => sum + (obj['Dist.nNum'] || 0), 0))
     setValue('Tgt.nInvoicceValue',val.reduce((sum, obj) => sum + (obj['Dist.nInvoiceValue'] || 0), 0))
@@ -342,7 +353,11 @@ const handelGoodsMx = (val: any) => {
     setValue('Tgt.cTradeNum', val[0]['Dist.cTradeNum'])
     setValue('Tgt.cLadingNum', val[0]['Dist.cBillNum'])
     setValue('Tgt.cCreditNum', val[0]['Dist.cLetterNum'])
-  } else {
+	} else {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
+			setFormItem('Tgt.nGoodsNum', { readonly: false, disabled: false });
+			setFormItem('Tgt.nInvoicceValue', { readonly: false, disabled: false });
+		}
     setValue('Tgt.nAdditiveCoefficient', '')
     setValue('Tgt.cTradeNum', '')
     setValue('Tgt.cLadingNum', '')
@@ -953,6 +968,10 @@ const method = {
         rules: [getRules("required", { blur: true })],
       });
     }
+    const cvrgref = opertaor.getTableRefByKey("cvrg");
+    if (cvrgref.showFlush) {
+      cvrgref.showFlush();
+    }
     if (param.initFlag) return
     // 投保方式选择按工程造价投保、按建筑面积投保、按劳务合同价投保，短期费率类型默认按日，短期费率系数固定为1
     const baseRef = opertaor.getTableRefByKey('base'); 
@@ -978,10 +997,6 @@ const method = {
           baseRef.setValue('Base.nRatioCoef', Number(data).toFixed(6))
         }
       });
-    }
-    const cvrgref = opertaor.getTableRefByKey("cvrg");
-    if (cvrgref.showFlush) {
-      cvrgref.showFlush();
     }
   },
   cDeterminingChange: (val: any) => {
@@ -1598,8 +1613,8 @@ const method = {
                 setValue("Tgt.cDepartureAirportProvince", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn);
                 setValue("Tgt.cDepartureAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
-                setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDepartureAirportProvince", res.cCityCn);
+								setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
+                // setValue("Tgt.cDepartureAirportProvince", res.cCityCn);
                 setValue("Tgt.cDepartureAirport", res.cCityCn + ',' + res.cCountryCn);
               }
             } else {
@@ -1609,7 +1624,7 @@ const method = {
                 setValue("Tgt.cDepartureAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDepartureAirportProvince", res.cCityEn);
+                // setValue("Tgt.cDepartureAirportProvince", res.cCityEn);
                 setValue("Tgt.cDepartureAirport", res.cCityEn + ',' + res.cCountryEn);
               }
             }
@@ -1621,7 +1636,7 @@ const method = {
                 setValue("Tgt.cDepartureAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
                 setValue("Tgt.cDepartureAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
+                // setValue("Tgt.cDepartureAirportProvince", res.cAirportCity);
                 setValue("Tgt.cDepartureAirport", res.cAirportCity + ',' + res.cCountryCn);
               }
             } else {
@@ -1631,7 +1646,7 @@ const method = {
                 setValue("Tgt.cDepartureAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDepartureAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDepartureAirportProvince", res.cAirportEn);
+                // setValue("Tgt.cDepartureAirportProvince", res.cAirportEn);
                 setValue("Tgt.cDepartureAirport", res.cAirportEn + ',' + res.cCountryEn);
               }
             }
@@ -1669,7 +1684,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDestAirportProvince", res.cCityCn);
+                // setValue("Tgt.cDestAirportProvince", res.cCityCn);
                 setValue("Tgt.cDestinationAirport", res.cCityCn + ',' + res.cCountryCn);
               }
             } else {
@@ -1679,7 +1694,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDestAirportProvince", res.cCityEn);
+                // setValue("Tgt.cDestAirportProvince", res.cCityEn);
                 setValue("Tgt.cDestinationAirport", res.cCityEn + ',' + res.cCountryEn);
               }
             }
@@ -1691,7 +1706,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceCn + '/' + res.cCityCn + '/' + res.cDistrictCn + '/' + res.cAddressCn + ',' + res.cCountryCn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryCn);
-                setValue("Tgt.cDestAirportProvince", res.cAirportCity);
+                // setValue("Tgt.cDestAirportProvince", res.cAirportCity);
                 setValue("Tgt.cDestinationAirport", res.cAirportCity + ',' + res.cCountryCn);
               }
             } else {
@@ -1701,7 +1716,7 @@ const method = {
                 setValue("Tgt.cDestinationAirport", res.cProvinceEn + '/' + res.cCityEn + '/' + res.cDistrictEn + '/' + res.cAddressEn + ',' + res.cCountryEn);
               } else {
                 setValue("Tgt.cDestAirportCountry", res.cCountryEn);
-                setValue("Tgt.cDestAirportProvince", res.cAirportEn);
+                // setValue("Tgt.cDestAirportProvince", res.cAirportEn);
                 setValue("Tgt.cDestinationAirport", res.cAirportEn + ',' + res.cCountryEn);
               }
             }
@@ -1949,7 +1964,15 @@ const method = {
       setFormItem("Tgt.cListingLocation", { rules: [] })
       setFormItem("Tgt.cStockCode", { rules: [] })
     }
-  },
+	},
+	// 上市地点
+	cListingLocationChange: (val:any) => {
+		if (val == '5') {
+			setFormItem("Tgt.cOtherRegions", { rules: [getRules("required", {})] })
+		} else {
+			setFormItem("Tgt.cOtherRegions", { rules: [] })
+		}
+	},
   // 是否包含退市后责任（run-off）
   cIncludeDelistingChange: (val:any) => {
     if(val === "1") {// 选是 ___年必填
@@ -2196,6 +2219,16 @@ const method = {
 			}
 		}
 	},
+	// 是否融资性保证险
+	cIsFinancingChange: (val: any) => {
+		if (val == '1') {
+			setFormItem('Tgt.cFinancingGuarantee',{rules: [getRules("required", {})]})
+		} else {
+			clearValidate('Tgt.cFinancingGuarantee');
+			setFormItem('Tgt.cFinancingGuarantee', { rules: [] })
+			setValue('Tgt.cFinancingGuarantee', null) // 海事局名称
+    }
+	},
   // 融资性保证险
   cFinancingGuaranteeBtnFunc:() => {
     dialog.value?.open('cFinancingGuarantee', {
@@ -2208,6 +2241,66 @@ const method = {
         },
       }, { width: 45 });
   },
+};
+
+const subsidyFields = [
+  { key: 'Tgt.nCentralSubsidyRate', label: '中央财政补贴比例' },
+  { key: 'Tgt.nProvincialSubsidyRate', label: '省财政补贴比例' },
+  { key: 'Tgt.nCitySubsidyRate', label: '地市财政补贴比例' },
+  { key: 'Tgt.nCountySubsidyRate', label: '县(区)补贴比例' },
+  { key: 'Tgt.nOtherSubsidyRate', label: '其他补贴比例' },
+  { key: 'Tgt.nFarmerPaymentRate', label: '农户缴费比例' }
+];
+// 019904  089031产品六个比例之和为100%
+const createSumValidator = (currentFieldKey) => {
+  return (rule, value, callback) => {
+		// 辅助函数：获取值并转为 Decimal
+    const getDataValue = (key) => {
+      let val = getValue(key);
+      clearValidate(key)
+      if (val === '' || val === null || val === undefined) return null;
+      
+      const num = new Decimal(val);
+      if (num.isNaN()) return null;
+      
+      return num;
+    };
+
+    const values = [];
+    let hasEmpty = false;
+
+    for (let field of subsidyFields) {
+      const rawVal = getDataValue(field.key);
+      
+      if (rawVal === null) {
+        hasEmpty = true;
+        break;
+      }
+
+      // 【核心逻辑】：
+      // 1. times(100): 将前端的小数 (0.2) 转为百分比数值 (20)
+      // 2. 不做任何 toDecimalPlaces 处理，保留原始精度
+      const percentVal = rawVal.times(100);
+      
+      values.push(percentVal);
+    }
+
+    // 如果有空值，跳过校验
+    if (hasEmpty) {
+      return callback();
+    }
+
+    // D. 计算总和 (纯累加，无精度截断)
+    const sum = values.reduce((acc, curr) => acc.plus(curr), new Decimal(0));
+
+    // E. 严格判断是否等于 100
+    // Decimal 的 equals 方法会进行精确比较
+    if (!sum.equals(100)) {
+      return callback(new Error(`所有比例之和必须严格等于 100%。当前计算总和为 ${sum.toNumber()}%`));
+    }
+
+    return callback();
+  };
 };
 
 function setAddressBykey(getv1: any, getv2: any, setv: any) {

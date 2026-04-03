@@ -375,7 +375,8 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				  {value: '3', label: '支票号'},
 				  {value: '4', label: '保单号'},
 				  {value: '5', label: '交易号'},
-				  {value: '6', label: '支付号'}
+				  {value: '6', label: '支付号'},
+          {value: '7', label: '组合单号'}
 				],
         		defaultValue: '1',
 			},
@@ -466,37 +467,40 @@ const tableconfig = reactive<AppTableConfig>(
 							ElMessage.warning('所选记录为空！');
 							return ;
 						}
-                        ElMessageBox.confirm("确认要获取支付号吗？", "提示", {
-                            confirmButtonText: "确定",
-                            cancelButtonText: "取消",
-                            type: "warning",
-                            lockScroll: false,
-                        }).then(() => {
-                            let CUniqueNos = ''; // 所选项的流水号组合
-                            multipleSelection.value.forEach(item => {
-                                CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
-                            });
-                            const param = {
-                                "UserId": user.value['opCde'],
-                                "CompanyId": user.value['companyId'],
-                                "OpRelCde": user.value['opCde'],
-                                "CUniqueNo": CUniqueNos,
-                                "isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
-                            };
-                            //这一块儿如果要校验缴费类型的话，请排除云南分公司
-                            console.log(param)
-                            pcisQueryService.getPaymentNo(param)
-                                .then((res) => {
-                                    const { code, data, msg } = res;
-                                    if (200 === code) {
-                                        ElMessage.success(msg);
-                                        handleQuery();
-                                    } else {
-                                        ElMessage.error(msg);
-                                    }
-                                })
-                                .finally(() => { });
-                        });
+						if (multipleSelection.value.some(item => item.cClntMrk == '0')) {
+							ElMessage.warning('当前投保人性质为法人单位，根据监管要求，财务缴费审核请选择：支票审核。');
+						}
+						ElMessageBox.confirm("确认要获取支付号吗？", "提示", {
+								confirmButtonText: "确定",
+								cancelButtonText: "取消",
+								type: "warning",
+								lockScroll: false,
+						}).then(() => {
+								let CUniqueNos = ''; // 所选项的流水号组合
+								multipleSelection.value.forEach(item => {
+										CUniqueNos = CUniqueNos === '' ? item['cUniqueNo'] : CUniqueNos + ',' + item['cUniqueNo'];
+								});
+								const param = {
+										"UserId": user.value['opCde'],
+										"CompanyId": user.value['companyId'],
+										"OpRelCde": user.value['opCde'],
+										"CUniqueNo": CUniqueNos,
+										"isEcargo": freeEditRef.value?.getFromValue().isEcargo || '0',
+								};
+								//这一块儿如果要校验缴费类型的话，请排除云南分公司
+								console.log(param)
+								pcisQueryService.getPaymentNo(param)
+										.then((res) => {
+												const { code, data, msg } = res;
+												if (200 === code) {
+														ElMessage.success(msg);
+														handleQuery();
+												} else {
+														ElMessage.error(msg);
+												}
+										})
+										.finally(() => { });
+						});
 					},
 				}),
 				createFreeButtonBase({

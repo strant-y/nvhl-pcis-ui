@@ -411,3 +411,8 @@ export function enquiryToAppEndorseChange(queryParams: any): AxiosPromise<any> {
 	return post(`/edr/enquiryToAppEndorseChange`, queryParams);
 }
 
+// 询价转投保-生成比较项
+export function getBusinessType(queryParams: any): AxiosPromise<any> {
+	return post(`/policy/getBusinessType`, queryParams);
+}
+

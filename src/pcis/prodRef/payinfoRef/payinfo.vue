@@ -18,6 +18,7 @@ import {
 } from "@/shared/app-grid-edit-config";
 import { numAdd } from "@/utils/Math";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
+import { getBusinessType } from "../../../api/query/index";
 
 const policyService = new PolicyService();
 const props = defineProps({
@@ -273,7 +274,30 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  payinfoEditRef?.value?.setFormValue(value);
+	const tgt = opertaor.getTableRefByKey("tgt")?.getFromValue();
+	if (!!tgt && !!tgt['Tgt.nFarmerPaymentAmt']) {
+		let params = {
+			cAppNo: opertaor.getTableRefByKey("plyBase").getValue("Base.cAppNo")
+		}
+		getBusinessType(params).then((res) => {
+			if (res.code == 200 && res.data.data >= 1) {
+				if (tgt['Tgt.nFarmerPaymentAmt']) {
+					value.forEach((item) => {
+						item["Pay.nPayablePrm"] = tgt["Tgt.nFarmerPaymentAmt"] ? tgt["Tgt.nFarmerPaymentAmt"] : 0;
+					})
+					payinfoEditRef?.value?.setFormValue(value);
+				} else {
+					ElMessage.error("农户自缴费用出错，请重新计算");
+					return false;
+				}
+			} else {
+				payinfoEditRef?.value?.setFormValue(value);
+			}
+		})
+	} else {
+		payinfoEditRef?.value?.setFormValue(value);
+	}
+	
 }
 
 function validate() {

@@ -225,14 +225,14 @@ const copyText = (text: any) => {
   <div class="app-container">
     <div class="search-container">
       <el-form ref="queryFormRef" :model="queryParams" :inline="true">
-        <el-form-item label="申请单号" prop="cPlyNo">
+        <el-form-item label="申请单号" prop="cAppNo">
           <el-input
               v-model="queryParams.cPlyNo"
               placeholder="申请单号"
               clearable
           />
         </el-form-item>
-        <el-form-item label="保单号" prop="cAppNo">
+        <el-form-item label="保单号" prop="cPlyNo">
           <el-input
             v-model="queryParams.cAppNo"
             placeholder="保单号"
@@ -243,8 +243,7 @@ const copyText = (text: any) => {
           <el-select
             v-model="queryParams.cTyp"
             placeholder="请选择"
-            filterable
-            clearable>
+            filterable>
             <el-option
               v-for="item in cTypOptions"
               :key="item.value"

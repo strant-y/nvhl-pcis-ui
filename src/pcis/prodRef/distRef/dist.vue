@@ -174,6 +174,7 @@ const cProdNos = ['010001','010002','010003','010004','010020','070002'];
 // 货物信息回填到标的信息的产品
 const ProdNo = ref(['020001', '020002', '020003', '020004', '020005', '020006', '020007', '020009', '020011', '020013', '020015', '020016', '020017'])
 let cRelatedInsuredflag = ref(false)  // 是否存在关联被保险人字段
+let cAssociatedGuardianflag = ref(false)  // 是否存在关联监护人字段
 watch(
     () => pageresult.list,
     async (newVal: any) => {
@@ -463,6 +464,15 @@ onMounted(async () => {
           r.loadData = data.list
         }
       })
+		}
+		// 041007团单人员清单关联监护人
+		if (r['prop'] === 'Dist.cAssociatedGuardian') {
+			cAssociatedGuardianflag.value = true
+			eventBus.on('setMap-PersonnelDist0410071', (data: any) => {
+        if(data.list && data.list.length > 0) {
+          r.loadData = data.list
+        }
+      })
     }
 		// 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
 		if (r['prop'] === 'Dist.cItemLiability') {
@@ -522,7 +532,13 @@ onMounted(async () => {
 	      handleQuery()
       }
     })
-  }
+	}
+	// 被保人清单更新清单信息重新查询
+	eventBus.on('insureDistEdit', (val: any) => {
+		if(val) {
+			handleQuery()
+		}
+	})
 });
 
 // const  modifyRules = (data, fieldValue)=> {
@@ -590,6 +606,7 @@ const method = {
         "distAdd",
         {
           fromSchema: tableconfig.value.fromSchema,
+					fromUi: tableconfig.value.fromUi,
           title: "编辑",
           rowData: {
             ...row, 
@@ -692,6 +709,7 @@ const method = {
             "distAdd",
             {
               fromSchema: fromSchema,
+							fromUi: tableconfig.value.fromUi,
               title: "新增",
               tab: formconfig1.value.title,
               compKey: props.compKey,
@@ -791,6 +809,19 @@ const method = {
               data[key][1] = item['Dist.cSuitScope']
             }
           }
+          formconfig11.value?.fromSchema?.forEach((it:any) => {
+            if(it.inputtype === 'rtcascader') {
+              const cascaderprops = JSON.parse(it.cascaderprops);
+              if(cascaderprops?.length > 0) {
+                data[it.prop] = []
+                cascaderprops.forEach((i:any) => {
+                  if(item[i]) {
+                    data[it.prop].push(item[i])
+                  }
+                })
+              }
+            }
+          })
           
             console.log('pageresult.list',pageresult.list);
           return{
@@ -881,7 +912,27 @@ const method = {
 						code: 'Dist.cRelatedInsured',
 						list
 					});
-        }
+				}
+				//  041007 set 关联监护人 下拉值
+				if (cAssociatedGuardianflag.value) {
+					if(pageresult.list.length>0){
+						pageresult.list.forEach((item: any) => {
+							if (item['Dist.cAssociatedGuardian']) {
+								item['Dist.cAssociatedGuardian'] = item['Dist.cAssociatedGuardian'].split(',')
+							}
+						})
+					}
+					const insuredDistData = opertaor.getTableRefs()['insuredDist']?.getFormValue() || [];
+					const list = insuredDistData.length > 0 ? insuredDistData.map((i:any) => ({
+						label: i['InsuredDist.cInsuredNme'],
+						value: i['InsuredDist.cPkId']
+						// value: i['InsuredDist.cInsuredCde']
+					})) : []
+					eventBus.emit('setMap-PersonnelDist0410071', {
+						code: 'Dist.cAssociatedGuardian',
+						list
+					});
+				}
         // 刷新汇总表格
         if(distSummaryRef.value) {
           distSummaryRef.value?.handleQuery();
@@ -971,6 +1022,7 @@ const method = {
             "distAdd",
             {
               fromSchema: tableconfig.value.fromSchema,
+							fromUi: tableconfig.value.fromUi,
               title: "新增",
               tab: formconfig1.value.title,
               compKey: props.compKey,
@@ -1773,6 +1825,19 @@ function getFatherPageOldProductResData() {
           })) : []
         }
       });
+		}
+		// 041007团单人员清单关联监护人清单
+    if(cAssociatedGuardianflag.value) {
+			oldPageSchema.value.fromSchema.forEach((item: any) => {
+				if (item.prop === 'Dist.cAssociatedGuardian') {
+          const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
+          item.loadData = list.length > 0 ? list.map((i:any) => ({
+            label: i['InsuredDist.cInsuredNme'],
+            value: i['InsuredDist.cPkId']
+            // value: i['InsuredDist.cInsuredCde']
+          })) : []
+        }
+      });
     }
   }
   return oldPageSchema.value;
@@ -1813,6 +1878,24 @@ async function updateCvrgnInsuranceAmount() {
     })
   }
 }
+// 049021 联共保为从共主联。从共无联保时，申报产品名称、申报产品型号、总交易金额必填，其余非必填
+function setDistRuquired(val:any) {
+  if(['2','4'].includes(val)) {
+    formconfig11.value.fromSchema?.forEach((item:any) => {
+      if(['Dist.cProductName','Dist.cProductModel','Dist.nTotalAmount'].includes(item.prop)) {
+        item.rules = [getRules("required", {})]
+      } else {
+        item.rules = []
+      }
+    })
+  } else {
+    formconfig11.value.fromSchema?.forEach((item:any) => {
+      if(item.prop !== 'Dist.nSeqNo') {
+        item.rules = [getRules("required", {})]
+      }
+    })
+  }
+}
 
 defineExpose({
   getValue,
@@ -1827,6 +1910,7 @@ defineExpose({
   getFormConfig,
   setDisabledAll,
   getTableDataAll,
+  setDistRuquired,
 });
 </script>
 

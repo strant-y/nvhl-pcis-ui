@@ -131,22 +131,34 @@ const method = {
     // 新增行前计算剩余比例
     const remaining = (1 - totalCiShare).toFixed(8);
     const cChiefMrk = ['1', '3', '5'].includes(cCiMrkFlag) ? '1' : '0';
-    // const cSlsCde = opertaor.getTableRefByKey('plyBase').getValue('Base.cSlsId')
+    const cSlsCde = opertaor.getTableRefByKey('plyBase')?.getValue('Base.cSlsId')
     if (dataList.length == 0) {
+      // 联保机构、出单机构 转 级联组件初始化
+      const dptList = [];
+      if (param['dptCde']) {
+        dptList.push(param['dptCde']);
+        if (param['cDptCde']) {
+          dptList.push(param['cDptCde']);
+        }
+      }
       freeEditRef?.value?.addRowByData({
         'Ci.nSeqNo': dataList.length + 1,
         'Ci.nPlyFeeRate': '0.00',
         'Ci.nPlyFee': '0.00',
         'Ci.nComm': '0.00',
-        'Ci.cSlsId': "",
+        'Ci.cSlsId': cSlsCde || "",
         "Ci.cBrkrCde": "",
         "Ci.cBrkSlsCde": "",
         'Ci.cChiefMrk': '',
         'Ci.cCoinsurerCde': '327001',
         'Ci.cCiSubComp': param.dptCde,
         'Ci.cDptCde': param.cDptCde,
+        'dptCascader': dptList,
       });
+      // 业务员加载
+      slsCodeListLoad(getFromValue()[0]);
     } else {
+      const param = opertaor.getParam();
       freeEditRef?.value?.addRowByData({
         'Ci.nSeqNo': dataList.length + 1,
         'Ci.nPlyFeeRate': '0.00',
@@ -155,7 +167,8 @@ const method = {
         'Ci.cSlsId': "",
         "Ci.cBrkrCde": "",
         "Ci.cBrkSlsCde": "",
-        'Ci.cChiefMrk': '',
+        'Ci.cChiefMrk': param?.cRsnCde === "47" && param?.initFlag === false ? '0' : '',
+        'Ci.cIssueMrk': param?.cRsnCde === "47" && param?.initFlag === false ? '0' : '',
         // 'Ci.cCoinsurerCde': '327001',
         // 'Ci.cCiSubComp': param.dptCde,
         // 'Ci.cDptCde': param.cDptCde,
@@ -529,9 +542,14 @@ const method = {
       }
       return sum + (parseFloat(rowData["Ci.nCiPrm"]) || 0);
     }, 0);
+    const totalCiShare = allRows.reduce((sum, row) => {
+      const share = parseFloat(row['Ci.nCiShare'] || 0);
+      // 保留8位小数避免浮点数精度问题
+      return Math.round((sum + share) * 100000000) / 100000000;
+    }, 0);
     const diff = Math.abs(totalCiPrm - nPrm);
     // 如果差值大于1，则提示并恢复当前行的保费
-    if (diff > 1) {
+    if (diff > 1 && totalCiShare == 1) {
       ElMessage.warning("联共保保费之和与保单总保费差值不能大于1");
       // 恢复当前行的联共保保费为原来的值
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
@@ -782,13 +800,22 @@ const method = {
     const rowData = freeEditRef.value?.getSelectRow();
     const rowId = rowData?._dataId;
     console.log("rowData", rowData);
-    if(rowData['Ci.cDptCde']){
+		if (rowData['Ci.cDptCde']) {
+			const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+			let ywdata = {}
+			// 主共主联并且共保公司是永安,点击代理经纪人回显业务来源
+			if (cCiMrkValue == '1' && rowData['Ci.cCoinsurerCde'] == '327001') {
+				ywdata.cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp"); // 业务来源大类
+				ywdata.cChaType = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaType"); // 业务来源中类
+				ywdata.cChaSubtype = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaSubtype"); // 业务来源子类
+			}
       dialogRef.value?.open(
         "ciagentPer",
         {
           type: "show",
           data: {
-            rowData: rowData,
+						rowData: rowData,
+						...ywdata
           },
           method: {
             getSelected: (params) => {
@@ -870,6 +897,7 @@ const method = {
   },
   // 联共保信息导入
   importCi: () => {
+    const btn:any = formconfig1.titleBtns?.find((item:any) => item.id === "importExcelCi") || {};
     let cappNo = '';
     const edrbase = opertaor.getFatherPage().getEdrbaseValue();
     // 判断有无批改类型参数，有则是批单
@@ -888,6 +916,7 @@ const method = {
     input.type = 'file';
     input.accept = '.xlsx, .xls, .xlsm'; // 支持的文件类型
     input.onchange = () => {
+      btn.loading = true
       if (input.files?.length) {
         const file = input.files[0];
         const reader = new FileReader();
@@ -909,25 +938,37 @@ const method = {
             if (res.code === 200) {
               const ciDataLength = opertaor.getTableRefByKey("ci")?.getFromValue()?.length || 0;
               res.data?.successList?.forEach((item:any, index:number) => {
-                freeEditRef?.value?.addRowByData({
+                const rowData = {
                   ...item,
                   'Ci.nSeqNo': ciDataLength + (index + 1)
-                })
+                }
+                if(item['Ci.cCiSubComp'] && item['Ci.cDptCde']) {
+                  rowData['dptCascader'] = [item['Ci.cCiSubComp'], item['Ci.cDptCde']]
+                }
+                if(parseFloat(item['Ci.nCiShare']) > 0) {
+                  rowData['Ci.nCiShare'] = parseFloat(item['Ci.nCiShare'])/100
+                }
+                freeEditRef?.value?.addRowByData(rowData)
               })
             } else {
               ElMessage.error(res.msg || "增量导入失败");
             }
+            btn.loading = false
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
             console.error("导入错误：", error);
+            btn.loading = false
           });
         };
 
         reader.onerror = (e) => {
           console.error("文件读取失败", e);
           ElMessage.error("文件读取失败");
+          btn.loading = false
         };
         reader.readAsDataURL(file); // 启动读取
+      } else {
+        btn.loading = false
       }
     };
     input.click(); // 触发文件选择对话框
@@ -940,7 +981,7 @@ const updateMasterAgreementValues = () => {
   if(isInit === true && isCalcPremium === false) return;
   // 一般批改如果保费变化量和保额变化量为0或批改原因为变更联共保信息，则不需要重新进行联共保保费的计算
   const edrBaseData = opertaor.getFatherPage().getEdrbaseValue();
-  if(param.cAppTyp === 'E' && param.cRsnCde !== '47' && new Decimal(edrBaseData?.['EdrBase.nPrmVar']?.replaceAll(',','') || 0).toNumber() === 0 && new Decimal(edrBaseData?.['EdrBase.nAmtVar']?.replaceAll(',','') || 0).toNumber() === 0) return;
+  if(param.cAppTyp === 'E' && param.cRsnCde !== '47' && new Decimal(edrBaseData?.['EdrBase.nPrmVar'] || 0).toNumber() === 0 && new Decimal(edrBaseData?.['EdrBase.nAmtVar']?.replaceAll(',','') || 0).toNumber() === 0) return;
   const cCiMrk = opertaor.getTableRefByKey("plyBase").getFromValue();
   const allRows = getFromValue(); // 获取所有行数据
   let totalAmt = 0;
