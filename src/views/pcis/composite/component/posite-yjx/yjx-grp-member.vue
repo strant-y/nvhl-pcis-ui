@@ -253,7 +253,8 @@ const method = {
         },
         {
           isOk: (res: any) => {
-            // saveTgt(res, '修改')
+            console.log('isOk', res)
+            saveTgt(res, '修改')
           },
         },
         {width: "85"}
@@ -632,21 +633,35 @@ function getFormconfig() {
     fromType: "custom",
   };
 }
-function setDisabledAll(isDisabled: boolean, noSet: string[] = []) {
+function setDisabledAll(isDisabled: boolean = true, noSet: string[] = []) {
+  const noSetList = [
+      'viewBtn',
+      ...noSet
+  ]
   tableconfig.value.formconfig?.endBtns?.forEach((item: any) => {
-    item.hidden = true;
+    if(!noSetList.includes(item.id)) {
+      item.hidden = isDisabled;
+    }
   });
   tableconfig.value.formconfig?.titleBtns?.forEach((item: any) => {
-    item.hidden = true;
+    if(!noSetList.includes(item.id)) {
+      item.hidden = isDisabled;
+    }
   });
   tableconfig.value.tableBtn?.forEach((item: any) => {
-    item.hidden = true;
+    if(!noSetList.includes(item.id)) {
+      item.hidden = isDisabled;
+    }
   });
+}
+const validate = () => {
+  return pageresult.list && pageresult.list.length > 0
 }
 defineExpose({
   getFormValue,
   setFormValue,
   getFormconfig,
+  validate,
   setUnDisabledByKeyList,
   handleQuery,
   getTableData,
