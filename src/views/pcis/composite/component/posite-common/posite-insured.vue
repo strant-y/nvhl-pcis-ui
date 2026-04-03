@@ -1632,6 +1632,17 @@ function cancel(){
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   insuredEditRef?.value?.addProvide(key, value);
 }
+
+function getFormBtn() {
+  return insuredEditRef?.value?.getFormBtn();
+}
+function setDisabledAll(isDisabled: boolean = true) {
+  insuredEditRef?.value?.setDisabledAll(isDisabled);
+  const formBtn = getFormBtn();
+  if(formBtn && Object.keys(formBtn).length > 0) {
+    Object.keys(formBtn).forEach((key: any) => {formBtn[key].hidden = isDisabled;})
+  }
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -1642,7 +1653,8 @@ defineExpose({
   clearValidate,
   setFormItem,
   change403009,
-  addProvide
+  addProvide,
+  setDisabledAll
 });
 </script>
 

@@ -259,9 +259,18 @@ function storeFactory(
  */
 export function clearCodeListViewByPageKey(pageKey: string) {
   if(!pageKey) pageKey = 'default';
-  if (codeListViewMap.has(pageKey)) {
-    const store = codeListViewMap.get(pageKey);
+  const del = (key: string) => {
+    const store = codeListViewMap.get(key);
     store?.$dispose?.();
-    codeListViewMap.delete(pageKey);
+    codeListViewMap.delete(key);
+  }
+  if(pageKey === 'posite-page') {
+    codeListViewMap.keys().forEach(key => {
+      if(key.startsWith('group-')) {
+        del(key)
+      }
+    })
+  }else if (codeListViewMap.has(pageKey)) {
+    del(pageKey)
   }
 }

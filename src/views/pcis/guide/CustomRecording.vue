@@ -948,10 +948,18 @@ function selectProdList() {
       console.log('res', res);
       prodList.value = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
-        return {
-          value: datas[3].substring(0, 6),
-          label: datas[3].substring(6),
-        };
+        const kindNo = datas[3].substring(0, 2);
+        if(kindNo === '06') {
+          return {
+            value: datas[3].substring(0, 6),
+            label: datas[4].substring(9),
+          };
+        }else {
+          return {
+            value: datas[3].substring(0, 6),
+            label: datas[3].substring(6),
+          };
+        }
       });
       formconfig1.value.cProdList = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
@@ -959,12 +967,21 @@ function selectProdList() {
       });
       formconfig1.value.cProdDtlList = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
+        const cProdNo = datas[3].substring(0, 6);
+        const kindNo = datas[3].substring(0, 2);
+        // 意健险方案数据特殊处理
+        const cPlanNo = kindNo === '06' ? item.code : '';
+        const prodName = datas[3].substring(6);
+        const planNme = item.value;
         return {
-          cProdNo: datas[3].substring(0, 6),
-          cProdNme: datas[3].substring(6),
-          cTermNo: item.code,
-          cGrpMrk: formconfig1.value.cGrpMrk,
-          searchKey: item.searchKey
+          cKindNo: kindNo,
+          cProdNo: cProdNo,
+          cPlanNo: cPlanNo,
+          cPlanNme: planNme,
+          cProdNme: prodName,
+          cGrpMrk: kindNo !== '06' ? formconfig1.value.cGrpMrk : '1',
+          searchKey: item.searchKey,
+          cTermNo: kindNo !== '06' ? item.code : undefined,
         };
       });
     }

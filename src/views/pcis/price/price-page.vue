@@ -931,7 +931,7 @@ const setTaxInfo = () => {
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
   if (!!appLicantValue) {
     dzmodal
-      .open(invoiceInfoModel, { type: "Issuer", data: {} })
+      .open(invoiceInfoModel, { type: "Issuer", data: {}, opertaor: opertaor })
       .then((res: any) => {
         if (res.type === "ok") {
         }
