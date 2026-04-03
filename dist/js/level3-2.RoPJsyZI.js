@@ -1,0 +1,1 @@
+import{aW as s,c as t,e as a,F as e,bq as n}from"./index.tSUlZYn6.js";const o={style:{padding:"30px"}};const r=s({},[["render",function(s,r){const i=n;return a(),t("div",o,[e(i,{closable:!1,title:"菜单三级-2",type:"warning"})])}]]);export{r as default};
