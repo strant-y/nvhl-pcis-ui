@@ -14,6 +14,7 @@ const { getRules } = useValidator();
 import { codelistQuery } from "@/api/dict";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive<AppFreeEditConfig>(createAppFreeEditConfig({}));
+import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
 const idxParam = inject(idxParamKey, useIdxParam());
 const formPage = idxParam?.formPage;
