@@ -1069,6 +1069,10 @@ const InsuredCCertfCls =(val:any) => {
     setFormItem("ECargoInsuredDist.cCertfCde", {
       rules: [getRules("required", {}),getRules("ariCard", {})],
     });
+  } else if(val == "11") {
+    setFormItem("ECargoInsuredDist.cCertfCde", {
+      rules: [getRules("required", {}), getRules("CustomRule", {})],
+    });
   } else {
     setFormItem("ECargoInsuredDist.cCertfCde", {
       rules: [getRules("required", {})],

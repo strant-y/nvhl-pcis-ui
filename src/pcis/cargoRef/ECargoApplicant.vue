@@ -293,6 +293,10 @@ const method = {
       setFormItem("ECargoApplicant.cCertfCde", {
         rules: [getRules("required", {}), getRules("ariCard", {})],
       });
+    } else if (val == "11")  {
+      setFormItem("ECargoApplicant.cCertfCde", {
+        rules: [getRules("required", {}), getRules("CustomRule", {})],
+      });
     } else {
       setFormItem("ECargoApplicant.cCertfCde", {
         rules: [getRules("required", {})],
