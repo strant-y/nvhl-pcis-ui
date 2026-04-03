@@ -280,17 +280,7 @@ onBeforeMount(() => {
     const initType = props.param.initType;
     const loading = openPageLoading();
     // 初始化产品信息
-    productList.value = props.param.cProdDtlList.map((item: any) => {
-      return {
-        cAppNo: item.cAppNo,
-        cPlyNo: item.cPlyNo,
-        cCombinationNo: item.cCombinationNo,
-        cKindNo: item.cKindNo,
-        cProdNo: item.cProdNo,
-        cGrpMrk: item.cGrpMrk,
-        nPrm: item.nPrm
-      }
-    });
+    initProdListData();
     // 存储路由参数
     pageView.value.setPageParams(props.param);
     // 初始化页面结构
@@ -820,6 +810,7 @@ const submitToUndrFn = async () => {
       ElMessage.success(res.msg)
       const newParams = getNewParams({
         initType: POSITE_PAGE_TYPE_READ,
+        cProdDtlList: res.data ?? productList.value
       });
       router.replace({
         path: "/pcisapp/posite-page",
@@ -828,6 +819,7 @@ const submitToUndrFn = async () => {
         },
       }).then(() => {
         console.log('replace props.param', props.param);
+        initProdListData();
         pageView.value.updatePageParams(props.param, productList.value);
         prodListRef.value?.setDisabledAll();
         pageView.value.setPageDisabledAll();
@@ -906,6 +898,21 @@ const trimPageData = (pageData: any) => {
   }
   productList.value = prodList;
   return resultMap
+}
+
+
+const initProdListData = () => {
+  productList.value = props.param.cProdDtlList.map((item: any) => {
+    return {
+      cAppNo: item.cAppNo,
+      cPlyNo: item.cPlyNo,
+      cCombinationNo: item.cCombinationNo,
+      cKindNo: item.cKindNo,
+      cProdNo: item.cProdNo,
+      cGrpMrk: item.cGrpMrk,
+      nPrm: item.nPrm
+    }
+  });
 }
 
 const getNewParams = (param: any) => {
