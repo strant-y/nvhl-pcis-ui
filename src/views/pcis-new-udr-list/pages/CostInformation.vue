@@ -285,7 +285,7 @@ const tableconfig = reactive<AppTableConfig>(
     title: "费用信息",
     editFlag: true,
     isPage: false,
-    editList: ["nFeeProp","nFee","cFeeFlag"],
+    editList: ["nUpdFeeProp","nUpdFee","cFeeFlag"],
     fromSchema: [
       {
         prop: "cTypCde",
@@ -297,7 +297,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       },
       {
-        prop: "nFeeProp",
+        prop: "nUpdFeeProp",
         inputtype: "rtnumber",
 				title: "比例(%)",
         min: 0,
@@ -311,7 +311,7 @@ const tableconfig = reactive<AppTableConfig>(
         },
       },
       {
-        prop: "nFee",
+        prop: "nUpdFee",
         inputtype: "rtinput",
         title: "金额",
         minWidth: 80,
@@ -341,46 +341,46 @@ const tableconfig1 = reactive<AppTableConfig>(
         prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
-        minWidth: 20,
+        minWidth: 30,
       },
       {
         prop: "cFldNme",
         inputtype: "rtinput",
         title: "批改对象",
-        minWidth: 100,
+        minWidth: 140,
       },
       {
         prop: "cRelTableNme",
         inputtype: "rtinput",
         title: "批改项目",
-        minWidth: 100,
+        // minWidth: 100,
       },
       {
         prop: "cRelFldNme",
         inputtype: "rtinput",
         title: "类型",
-        minWidth: 80,
+        minWidth: 100,
       },
       {
         prop: "cOldVal",
         inputtype: "rtinput",
         title: "原值",
         clearable: true,
-        minWidth: 60,
+        minWidth: 100,
       },
       {
         prop: "cNewVal",
         inputtype: "rtinput",
         title: "新值",
         clearable: true,
-        minWidth: 60,
+        minWidth: 100,
       },
       {
         prop: "cChgVal",
         inputtype: "rtinput",
         title: "变化值",
         clearable: true,
-        minWidth: 60,
+        minWidth: 100,
         slotName: "cChgVal"
       }
     ],
@@ -398,46 +398,46 @@ const tableconfig2 = reactive<AppTableConfig>(
         prop: "nSeqNo",
         inputtype: "rtinput",
         title: "序号",
-        minWidth: 20,
+        minWidth: 30,
       },
       {
         prop: "cFldNme",
         inputtype: "rtinput",
         title: "批改对象",
-        minWidth: 100,
+        minWidth: 140,
       },
       {
         prop: "cRelTableNme",
         inputtype: "rtinput",
         title: "批改项目",
-        minWidth: 100,
+        // minWidth: 145,
       },
       {
         prop: "cRelFldNme",
         inputtype: "rtinput",
         title: "类型",
-        minWidth: 80,
+        minWidth: 100,
       },
       {
         prop: "cOldVal",
         inputtype: "rtinput",
         title: "原值",
         clearable: true,
-        minWidth: 60,
+        minWidth: 100,
       },
       {
         prop: "cNewVal",
         inputtype: "rtinput",
         title: "新值",
         clearable: true,
-        minWidth: 60,
+        minWidth: 100,
       },
       {
         prop: "cChgVal",
         inputtype: "rtinput",
         title: "变化值",
         clearable: true,
-        minWidth: 60,
+        minWidth: 100,
         slotName: "cChgVal"
       }
     ],
@@ -520,7 +520,7 @@ function getNFeeList(row:any) {
 			if (row.nFeeProp == '' || row.nFeeProp == null || row.nFeeProp == undefined) {
 				row.nFeeProp = 0
 			}
-      const feeProp = row.nFeeProp * 1;
+      const feeProp = row.nUpdFeeProp * 1;
       let feePropSum = freeEditRef.value?.getValue("nFeePropSum") * 1;
       let prmSum = freeEditRef.value?.getValue("nPrmSum") * 1;
       const fee = params['nPrm'];
@@ -528,7 +528,7 @@ function getNFeeList(row:any) {
       const gotPrm = formartNum(temp);
       feePropSum = formartNum(feeProp);
       prmSum = formartNum(gotPrm);
-      tableRef.value?.setValueByRowKey('nFee', row._dataId, gotPrm);
+      tableRef.value?.setValueByRowKey('nUpdFee', row._dataId, gotPrm);
       freeEditRef.value?.setValue("nFeePropSum", feePropSum);
       freeEditRef.value?.setValue("nPrmSum", prmSum);
       sumMoney(true,row);
@@ -556,18 +556,18 @@ function sumMoney(flag_to_alert: any,row:any) {
       const fee = params['nPrm'];
       for (const item of items) {
         my_node_name = row.cTypCde;
-        my_rate = my_rate + parseFloat(item['nFeeProp']);
-        my_sum = my_sum + parseFloat(item['nFee']);
+        my_rate = my_rate + parseFloat(item['nUpdFeeProp']);
+        my_sum = my_sum + parseFloat(item['nUpdFee']);
         const appTyp = params['appTyp'];
         if (flag_to_alert && my_node_name === '手续费/佣金：') {
-          const targetRate = parseFloat(row.nFeeProp);
+          const targetRate = parseFloat(row.nUpdFeeProp);
           if (targetRate > my_max_value.value || targetRate < my_min_value.value) {
             if (my_max_value.value === my_min_value.value) {
               ElMessage.error('手续费(佣金)比率 输入错误！\n应为：[ ' + my_max_value.value + ' ]');
             } else {
               ElMessage.error('手续费(佣金)比率 输入错误！\n应为： ' + my_min_value.value + ' 到 ' + my_max_value.value + '  之间的比率！');
             }
-            tableRef.value?.setValueByRowKey('nFeeProp', row._dataId, '0.00');
+            tableRef.value?.setValueByRowKey('nUpdFeeProp', row._dataId, '0.00');
             savenFeeValue();
             // if (my_min_value.value !== 0) {
             //   sumMoney(false,row); // 是否要再次检查 手续费 区间
@@ -578,7 +578,7 @@ function sumMoney(flag_to_alert: any,row:any) {
           }
           else if (targetRate > freeEditRef.value?.getValue("ilog_c1") && appTyp !== 'E' && typ_flag === '01') {
             ElMessage.error('手续费(佣金)比率 不可高于默认值！,请重新输入！');
-            tableRef.value?.setValueByRowKey('nFeeProp', item._dataId, '0.00');
+            tableRef.value?.setValueByRowKey('nUpdFeeProp', item._dataId, '0.00');
             return false;
           }
 
@@ -590,16 +590,16 @@ function sumMoney(flag_to_alert: any,row:any) {
         my_sum=0
         if (items.length > 0) {
           for (let i = 0; i < items.length; i++) {
-            tableRef.value?.setValueByRowKey('nFeeProp', items[i]._dataId, '0.00');
-            tableRef.value?.setValueByRowKey('nFee', items[i]._dataId, '0.00');
+            tableRef.value?.setValueByRowKey('nUpdFeeProp', items[i]._dataId, '0.00');
+            tableRef.value?.setValueByRowKey('nUpdFee', items[i]._dataId, '0.00');
           }
          freeEditRef.value?.setValue("nFeePropSum", formartNum(0.00));
          freeEditRef.value?.setValue("nPrmSum",formartNum(0.00));
           //sumMoney(true,row);
           return false;
         } else {
-          tableRef.value?.setValueByRowKey('nFeeProp', row._dataId, '0.00');
-          tableRef.value?.setValueByRowKey('nFee',row._dataId, '0.00');
+          tableRef.value?.setValueByRowKey('nUpdFeeProp', row._dataId, '0.00');
+          tableRef.value?.setValueByRowKey('nUpdFee',row._dataId, '0.00');
           //sumMoney(true,row);
           return false;
         }
@@ -619,21 +619,21 @@ function  readCheck() {
     if (readOnle_flag === '0' || readOnle_flag === '1') {  // --- 批改系列操作 均设为只读
       // 保费
       for (let i = 0; i < pageresult.list.length; i++) {
-        tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFee", 'disabled',true);
+        tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nUpdFee", 'disabled',true);
         if (appTyp === 'E') {
-          tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',true);
+          tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nUpdFeeProp", 'disabled',true);
         } else {
           if (updFlag === '1') {
             const feetyp1 = pageresult.list[i]['cFeetypCde'];
             const bsnsTyp1 = params['bsnsTyp'];
             if (bsnsTyp1 === '19001' && (feetyp1 === 'C1' || feetyp1 === 'C23')) {
-              tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',true);  // 比例
+              tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nUpdFeeProp", 'disabled',true);  // 比例
             } else {
-              tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',false); // 比例
+              tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nUpdFeeProp", 'disabled',false); // 比例
             }
-            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',false);
+            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nUpdFeeProp", 'disabled',false);
           } else {
-            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nFeeProp", 'disabled',true);
+            tableRef.value?.setFormSchema(pageresult.list[i]._dataId, "nUpdFeeProp", 'disabled',true);
           }
         }
       }
@@ -709,11 +709,11 @@ function readOnlyAB() {
           }
           if (my_node_name === '手续费/佣金') {
             if (bsnsTyp === '19001') {
-              tableRef.value?.setValueByRowKey('nFee', item[i]._dataId, '0.00');
-              tableRef.value?.setValueByRowKey('nFeeProp', item[i]._dataId, '0.00');
+              tableRef.value?.setValueByRowKey('nUpdFee', item[i]._dataId, '0.00');
+              tableRef.value?.setValueByRowKey('nUpdFeeProp', item[i]._dataId, '0.00');
             } else {
-              tableRef.value?.setValueByRowKey('nFee', item[i]._dataId, gotFee);
-              tableRef.value?.setValueByRowKey('nFeeProp', item[i]._dataId, my_min_value.value);
+              tableRef.value?.setValueByRowKey('nUpdFee', item[i]._dataId, gotFee);
+              tableRef.value?.setValueByRowKey('nUpdFeeProp', item[i]._dataId, my_min_value.value);
               freeEditRef.value?.setValue("nFeePropSum", my_min_value.value);
               freeEditRef.value?.setValue("nPrmSum",gotFee);
             }
@@ -770,7 +770,7 @@ async function saveFeeInfo() {
     let my_node_name = '';
     for (let i = 0; i < items.length; i++) { // 改用普通 for 循环
       const item = items[i];
-      const nfee = item['nFee'];
+      const nfee = item['nUpdFee'];
       my_node_name = item['cFeetypCde'];
       if (my_node_name === 'C1' && (nfee == 0.00 || nfee == 0)) {
         ElMessageBox.confirm('手续费为零确定保存吗？', '提示', {
@@ -1003,14 +1003,14 @@ function  onFeePropKeyDown(row:any) {
     const subDptCde = params['subDptCde'];
     const feetypCde = row.cFeetypCde;
   if (bsnsTyp === '19001' && feetypCde === 'C1') {
-    tableRef.value?.setFormSchema(row._dataId, "nFeeProp", 'disabled',true); 
+    tableRef.value?.setFormSchema(row._dataId, "nUpdFeeProp", 'disabled',true);
   } else if (feetypCde === 'C27') {
-    tableRef.value?.setFormSchema(row._dataId, "nFeeProp", 'disabled',true); 
+    tableRef.value?.setFormSchema(row._dataId, "nUpdFeeProp", 'disabled',true);
   } else if (feetypCde === 'C33') {
-    tableRef.value?.setFormSchema(row._dataId, "nFeeProp", 'disabled',true); 
+    tableRef.value?.setFormSchema(row._dataId, "nUpdFeeProp", 'disabled',true);
   } else if (appTyp === 'E') {
     for (let i = 0; i < pageresult.list.length; i++) {
-      tableRef.value?.setFormSchema(row._dataId[i], "nFeeProp", 'disabled',true); 
+      tableRef.value?.setFormSchema(row._dataId[i], "nUpdFeeProp", 'disabled',true);
     }
   }
     // 如果是直销业务的时候 要不要去掉河南机构的此控制？20140428

@@ -5,7 +5,7 @@
           :tableConfig="tableconfig"
           v-model:pageresult="pageresult"
           ref="distTableRef"
-					@page-change="loadData(false)"
+					@page-change="loadData('',false)"
           @selection-change="handleSelectionChange"
       />
 		</myCard>
@@ -138,7 +138,7 @@ onMounted(async () => {
     if (e.cShowLocation === '0') {
       e.isShow = false
     }
-		if(e.prop === "ECargoInsuredDist.cCertfCls") {
+		if(e.prop === "InsuredDist.cCertfCls") {
       e.typeCode = "TYPE_OF_ID"
     }
     return e;
@@ -154,7 +154,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
-  tableconfig.value.isPage = false;
+  // tableconfig.value.isPage = false;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -162,7 +162,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
-  tableconfig.value.isPage = false;
+  // tableconfig.value.isPage = false;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
   nextTick(()=>{
@@ -218,7 +218,9 @@ const loadData = (cAppNodata = '',flag = true)=>{
 	const cAppNo = opertaor.getDataAll()['plyBase']['Base.cAppNo'] || cAppNodata
 	let param = Object.assign({
 		cComponentTable:cComponentTableValue,
-		cAppNo:cAppNo || ''},r);
+		cAppNo: cAppNo || ''
+	}, r);
+	pageresult.list = []
 	cargoApi.selectDistNew(param).then((res: any) => {
 		if(res.code === 200) {
 			if(res.data.data.length > 0 ){
@@ -250,6 +252,9 @@ const saveTgt = async (res:any, flag)=>{
 	if (result.code == 200) {
 		loadData()
 		ElMessage.success(`${flag}成功`);
+		if (flag == '修改') {
+			eventBus.emit('insureDistEdit', '1');
+		}
 	} else {
 		ElMessage.error(result.msg ||`${flag}失败`);
 	}

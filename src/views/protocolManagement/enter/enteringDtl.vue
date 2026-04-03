@@ -1,6 +1,6 @@
 <!-- ECargo协议录入-->
 <template>
-  <detail-component :bth-list="bthList" :page-type =props.type :page-way=props.way  ref="mainRef" />
+  <detail-component :bth-list="bthList" :page-type =props.type :page-way=props.way :page-param="props.param"  ref="mainRef" />
 </template>
 <script setup lang="ts">
 import cargoApi from '@/api/cargo';
@@ -110,16 +110,22 @@ const uwBtn = [
     func: () => {
       console.log('props',props.param)
       mainRef.value?.getUnderwriteRef().then((isValid) => {
-        if (isValid) {
+				if (isValid) {
           const user = JSON.parse(sessionStorage.getItem("user"));
           let param = mainRef.value?.getUnderwriteValue()
-          let sence = param.cUndrMrk === 'A' ? 'audit' : 'bounced'
+					const parts = param["cBckOp"].split("-");
+					param["backUndrClsCde"] = parts[0]; // 退回指定核保级别编码
+					param["backUndrDptCde"] = parts[1]; // 退回指定核保级别机构编码
+					param["backUndrDptCnm"] = parts[3]; // 退回机构名称
+					let sence = param.cUndrMrk
+					let taskId = props.param.curtTask || null;
           if(props.param?.cAppTyp === 'A'){
             cargoApi.save({
               ...param,
               cEcAgrAppNo:props?.param?.cEcAgrAppNo,
               ...{user},
-              sence
+							sence,
+							taskId,
             }).then((res: any) => {
               if(res.code === 200) {
                 ElMessage.success(res.msg)
@@ -138,7 +144,8 @@ const uwBtn = [
               ...param,
               cEcAgrAppNo:props?.param?.cEcAgrAppNo,
               ...{user},
-              sence
+              sence,
+							taskId,
             }).then((res: any) => {
               if(res.code === 200) {
                 ElMessage.success(res.msg)
@@ -462,6 +469,14 @@ onBeforeMount(async () => {
 });
 
 onMounted(() => {
+});
+
+onDeactivated(() => {
+	console.log('keep-alive -> onDeactivated')
+	sessionStorage.getItem('AgreementcTeamType') && sessionStorage.removeItem('AgreementcTeamType');
+});
+onUnmounted(() => {
+	sessionStorage.getItem('AgreementcTeamType') && sessionStorage.removeItem('AgreementcTeamType');
 });
 /**
  * 获取批改项
@@ -1002,9 +1017,10 @@ function query() {
       });
 
 
-       // 暂存数据
-       console.log('缓存的数据',dataForm['AgreementSpecial'])
-        sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+      // 暂存数据
+      console.log('缓存的数据',dataForm['AgreementSpecial'])
+      sessionStorage.setItem("AgreementSpecial", JSON.stringify(dataForm['AgreementSpecial']));
+      sessionStorage.setItem("AgreementcTeamType", res.data.cTeamType || '');
     }else {
       ElMessage.error(res.msg);
     }
@@ -1168,8 +1184,8 @@ const premiumCalculation = ()=>{
       if(props.param?.cEdrType == '3') {
         // 一般退保 修改后的预收保费不能大于原预收保费 YY
         if(props.param?.cRsnCde === 's2') {
-          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] <= 0) {
-            ElMessage.error('一般退保预收保费必须大于0！')
+          if(allFromData.AgreementFeeWarn?.['ECargoBase.nRmbReceivedPrm'] < 0) {
+            ElMessage.error('一般退保预收保费必须大于等于0！')
             return
           }
           if(allFromData.AgreementFeeWarn?.['ECargoBase.nReceivedPrm'] > pgxx['EdrECargoBase.nBefEdrReceivedPrm']) {
@@ -1258,7 +1274,7 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
       // pay["ECargoPay.nPayablePrm"] = decimalTimes(edrbaseData['EdrECargoBase.nReceivedPrmVar'], insrnc["ECargoBase.nReceivedRate"]);
       // 退保和注销(修改后折人民币协议预收保费 + 折人民币预扣保费 - 修改前预收保费)
       if(props.param?.cEdrType === '2' || props.param?.cEdrType === '3') {
-        pay["ECargoPay.nPayablePrm"] = decimalMinus(new Decimal(agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)).plus(new Decimal(agreementFeeWarnData['ECargoBase.nWhRmbPrm'].toFixed(2))), edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2))
+        pay["ECargoPay.nPayablePrm"] = decimalMinus(new Decimal(agreementFeeWarnData['ECargoBase.nRmbReceivedPrm'].toFixed(2)).plus(new Decimal(agreementFeeWarnData['ECargoBase.nWhRmbPrm']?.toFixed(2) || 0)), edrbaseData['EdrECargoBase.nBefEdrnRmbReceivedPrm'].toFixed(2))
       } else {
         pay["ECargoPay.nPayablePrm"] = edrbaseData['EdrECargoBase.nReceivedPrmVar'];
       }
@@ -1533,7 +1549,13 @@ async function  submit() {
   const isSuccess = premiumCalculation()
   if(!isSuccess){
     return  ElMessage.error('请先进行保费计算')
-  }
+	}
+	// 校验销售资质
+	const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+	const saleQualifyCheckResult = await agreementBaseRef?.checkProdGradeChange(true, 'applyUnderwritingBtn');
+	if (!saleQualifyCheckResult) {
+			return;
+	}
   await nextTick()
   const isOk =  await save()
   if(!isOk) return
@@ -1559,7 +1581,7 @@ async function  submit() {
   const btn = getBtn("submit");
   btn.loading = true;
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
+  // const agreementBaseRef = formPage.value?.getComponentRefById('AgreementBase')
   cargoApi.submit({
     ...{user},
     sence:'arraigned',

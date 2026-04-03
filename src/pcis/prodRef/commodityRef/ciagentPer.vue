@@ -434,9 +434,6 @@ onMounted(() => {
             };
             setFormItem("CBsnsTyp", obj);
             setValue("CBsnsTyp", props.data.data.cBsnsTyp);
-            nextTick(() => {
-              handleQuery();
-            })
           }
         }
       });
@@ -460,7 +457,6 @@ onMounted(() => {
     const paramSub = {
       CChaType: props.data.data.cChaType,
       flag: 1,
-
       scene: "PLY_APP_NEW_SCENE",
     };
     getChaSubtypList(paramSub).then((res) => {
@@ -470,7 +466,10 @@ onMounted(() => {
             loadData: res.data,
           };
           setFormItem("CChaSubtype", obj);
-          setValue("CChaSubtype", props.data.data.cChaSubtype);
+					setValue("CChaSubtype", props.data.data.cChaSubtype);
+					nextTick(() => {
+						handleQuery();
+					})
         }
       }
     });

@@ -10,7 +10,12 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { useValidator } from "@/typings/useValidator";
+import { NewUdrListService } from "@/views/pcis-new-udr-list/service/new-udr-list.service";
+import { idxParamKey, useIdxParam } from "@/views/pcis/support/useIdxParam";
+const idxParam = inject(idxParamKey, useIdxParam());
+const params = idxParam.param;
 const { getRules } = useValidator();
+const { ecargoGetCUndrMrk, ecargoGetBackClsList } = NewUdrListService();
 const undrOpnMap = {
   "0": "经过审核，同意承保该业务。",
   "1": "经过审核，该业务缺少如下必要信息，请补充后再提交：",
@@ -20,9 +25,11 @@ const undrOpnMap = {
   "5":
     "此业务已经超出本级别核保权限，提交上级核保。" +
     "\n" +
-    "初步审核意见如下：",
+		"初步审核意见如下：",
+	"6": "经过审核，同意承保该业务。",
 };
 const underwriteEditRef = ref<AppFreeEditMethod | null>(null);
+const user = JSON.parse(sessionStorage.getItem("user"));
 const cUndrMrkOptions = ref([])
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -33,22 +40,38 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "cUndrMrk",
         inputtype: "rtselect",
         title: "核保选项",
-        loadData: [
-          {value: 'A', label: '同意'},
-          {value: 'B', label: '退回给出单员'}
+				loadData: [
+					{value: 'audit', label: '同意'},
+          {value: 'report', label: '上报'},
+          {value: 'bounced', label: '退回给出单员'},
+          {value: 'back', label: '退回至指定核保级别人员'}
         ],
         rules: [getRules("required", {})],
         clearable: true,
-        func: (v:string) => {
-          setFormItem('cUndrOpnList',{disabled:false})
-          setFormItem('undrOpn',{disabled:false})
-          if ("A" === v) {
-            setValue("cUndrOpnList", "");
+				func: (v: string) => {
+					setValue("cUndrOpnList", "");
+					if ("audit" === v) {
+            if ("E" === params["cAppTyp"]) {
+              setFormItem("cUndrOpnList", {
+                loadData: [{ label: "审核通过", value: "6" }],
+              });
+              setValue("cUndrOpnList", "6");
+            } else {
+              setFormItem("cUndrOpnList", {
+                loadData: [{ label: "审核通过", value: "0" }],
+              });
+              setValue("cUndrOpnList", "0");
+            }
+          } else if ("report" === v) {
             setFormItem("cUndrOpnList", {
-              loadData: [{ label: "审核通过", value: "0" }],
+              loadData: [{ label: "提交上级", value: "5" }],
             });
-          }else {
-            setValue("cUndrOpnList", "");
+            setValue("cUndrOpnList", "5");
+          } else if(!v) {
+            setFormItem("cUndrOpnList", {
+              loadData: [],
+            });
+          } else {
             setFormItem("cUndrOpnList", {
               loadData: [
                 { label: "缺少必要信息", value: "1" },
@@ -60,6 +83,29 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 { label: "其他", value: "9" },
               ],
             });
+            setValue("cUndrOpnList", "9");
+          }
+          if ("back" === v) {
+            setValue("cBckOp", "");
+            setFormItem("cBckOp", {
+              hidden: false,
+              rules: [getRules("required", {})],
+						});
+            const param = {
+              usrDptCde: user["companyId"],
+              operId: user["opCde"],
+              prodNo: '029900',
+              appNo: params.cEcAgrAppNo,
+							dptCde: params.cDptCde,
+            };
+            console.log(param);
+            getBackClsListUrlFn(param);
+          } else {
+            setFormItem("cBckOp", {
+              hidden: true,
+              rules: "",
+            });
+            setValue("cBckOp", "");
           }
         },
       },
@@ -91,18 +137,65 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "核保意见",
         rows: 3,
         itemWidth: 2,
-      }
+			},
+			{
+        prop: "cBckOp",
+        inputtype: "rtselect",
+        title: "退回核保级别",
+        loadData: [],
+				clearable: true,
+				hidden: true,
+      },
     ],
     fromUi: createFromUiConfig({
       cols: 2,
     }),
   })
 );
-onMounted(()=>{
-  setFormItem('cUndrOpnList',{disabled:true})
-  setFormItem('undrOpn',{disabled:true})
 
+// 查询核保选项下拉值
+function getCUndrMrkUrlFn(prarm) {
+  ecargoGetCUndrMrk(prarm).then((r: any) => {
+    console.log(prarm);
+    if (r.code == 200) {
+      cUndrMrkOptions.value = r["data"];
+      setFormItem("cUndrMrk", {
+        loadData: r["data"],
+      });
+    }
+  });
+}
+
+// 核保选项为【退回至指定核保级别人员】时，查询退回核保级别
+function getBackClsListUrlFn(prarm) {
+  ecargoGetBackClsList(prarm).then((r: any) => {
+    console.log(prarm);
+    if (r.code !== 200) {
+      ElMessage.error({ message: r.msg, duration: 6000 });
+    } else {
+      setFormItem("cBckOp", {
+        loadData: r["data"],
+      });
+      if(r["data"]?.length === 1) {
+        setValue("cBckOp", r["data"][0]["value"]);
+      }
+    }
+  });
+}
+onMounted(()=>{
+	nextTick(() => {
+		console.log(cUndrMrkOptions)
+    const param = {
+      cProdNo: '029900',
+      opCde: user.opCde,
+      companyId: user.companyId,
+			cAppNo: params.cEcAgrAppNo,
+    };
+    // 获取核保选项
+    getCUndrMrkUrlFn(param);
+  });
 })
+
 function getFromValue() {
   return underwriteEditRef?.value?.getFromValue();
 }

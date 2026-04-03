@@ -306,4 +306,7 @@ function updateTermlist() {
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
 }
+:deep(.el-tree-node) {
+  width: fit-content;
+}
 </style>

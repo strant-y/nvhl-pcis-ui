@@ -45,6 +45,7 @@ const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
 const fixSpecData = ref([]); //存储已选择的特别约定数据
+const nAmt = ref(null)
 onMounted(async () => {
   const formconfig11 = formInit(
     JSON.stringify(props.pageSchema),
@@ -140,20 +141,20 @@ onMounted(async () => {
       }
     })
   }
-    eventBus.on('setUnDisabledDone', () => {
-      nextTick(() => {
-        if(['10','ZQ','JQ','07','08','80'].includes(params.cRsnCde)) {
-          // 【是否修改累计赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【修改后的累计赔偿限额】可以放开编辑
-          if(getValue('Base.cCumulativeLimitManual') == '0') {
-            setFormItem("Base.nAmt", { disabled: false });
-          }
-          // 【是否修改每次事故赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【每次事故赔偿限额】【修改后的每次事故赔偿限额】可以放开编辑
-          if(getValue('Base.cAccidentLimitManual') == '0') {
-            setFormItem("Base.nModifiedAccidentLimit", { disabled: false });
-          }
-        }
-      })
-    })
+    // eventBus.on('setUnDisabledDone', () => {
+    //   nextTick(() => {
+    //     if(['10','ZQ','JQ','07','08','80'].includes(params.cRsnCde)) {
+    //       // 【是否修改累计赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【修改后的累计赔偿限额】可以放开编辑
+    //       if(getValue('Base.cCumulativeLimitManual') == '0') {
+    //         setFormItem("Base.nAmt", { disabled: false });
+    //       }
+    //       // 【是否修改每次事故赔偿限额】为否，增加/减少清单信息、增加/减少保额批改，【每次事故赔偿限额】【修改后的每次事故赔偿限额】可以放开编辑
+    //       if(getValue('Base.cAccidentLimitManual') == '0') {
+    //         setFormItem("Base.nModifiedAccidentLimit", { disabled: false });
+    //       }
+    //     }
+    //   })
+    // })
   })
 });
 
@@ -448,6 +449,7 @@ const method = {
 
       nPayNumberFun();
     }
+    eventBus.emit('change-special', val)
   },
   //争议处理选择事件
   cDisptSttlCdeChange(val){
@@ -641,6 +643,9 @@ const method = {
     if (param.initFlag) {
       return;
     }
+		if (val) {
+			opertaor.getFatherPage().setEdrValue("EdrBase.nAmt", val)
+		}
     // 联共保主协议信息-共保总保额ciMasterAgreement
     if(val && getValue("Base.nCumulativeLimitModified") && val > Number(getValue("Base.nCumulativeLimitModified"))) {
       ElMessage.warning("修改后总保额(累计赔偿限额)不能大于总保额(累计赔偿限额！");
@@ -665,21 +670,28 @@ const method = {
       }
     }
   },
-  // 是否修改累计赔偿限额 是和否change事件
-  nAmtLimitManualChange: (val: any) => {
-    if(val == '0'){
-      setFormItem("Base.nAmt", { disabled: true });
-    } else{
-      setFormItem("Base.nAmt", { disabled: false });
-    }
+	// 是否修改累计赔偿限额 是和否change事件
+	nAmtLimitManualChange: (val: any) => {
+		setTimeout(() => {
+			if(val == '0'){
+				setFormItem("Base.nAmt", { disabled: true });
+				setValue('Base.nAmt', nAmt.value)
+				nAmt.value = null
+			} else{
+				setFormItem("Base.nAmt", { disabled: false });
+				nAmt.value = getValue('Base.nAmt')
+			}
+		}, 500);
   },
    // 是否修改每次事故赔偿限额
-  cAccidentLimitChange: (val: any) => {
-    if(val == '0'){ // 否 
-        setFormItem("Base.nModifiedAccidentLimit", { rules: [], disabled: true });
-    } else{  // 是 必填
-        setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})], disabled: false });
-    }
+	cAccidentLimitChange: (val: any) => {
+		setTimeout(() => {
+			if(val == '0'){ // 否 
+					setFormItem("Base.nModifiedAccidentLimit", { rules: [], disabled: true });
+			} else{  // 是 必填
+					setFormItem("Base.nModifiedAccidentLimit", { rules: [getRules("required", {})], disabled: false });
+			}
+		}, 500);
   },
   // 总保费汇率change事件
   nPrmRmbExchChange: (val: any) => {

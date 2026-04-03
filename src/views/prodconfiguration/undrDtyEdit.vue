@@ -1,11 +1,13 @@
 <template>
   <div>
     <el-dialog v-model="dialogVisible" title="" width="80%">
-      <app-free-edit
-        v-model:freeEditConfig="formconfig"
-        ref="freeEditRef"
-        @row-click="handleRowClick"
-      />
+      <el-config-provider :locale="enLocale">
+        <app-free-edit
+          v-model:freeEditConfig="formconfig"
+          ref="freeEditRef"
+          @row-click="handleRowClick"
+        />
+      </el-config-provider>
       <app-grid-edit v-model:gridEditConfig="gridconfig" ref="gridEditRef" />
       <!-- <app-table
         :tableConfig="tableconfig"
@@ -54,6 +56,8 @@ const dialogVisible = ref(true);
 const gridEditRef = ref<AppGridEditMethod | null>(null);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const cDptCde = ref("");
+import zhCn from "element-plus/es/locale/lang/zh-cn";
+const enLocale = zhCn;
 
 const formconfig = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -66,16 +70,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         func: async () => {
           const isValid = await freeEditRef.value?.validate();
           if (!isValid) return false;
-          dzmodal.open(BusinessCvrgTree, {}).then((res) => {
+          dzmodal.open(BusinessCvrgTree, {cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde")}).then((res:any) => {
             if (res.type == "ok") {
-              const selectObj = res.body;
+              const selectObj = res.body?.filter((item:any) => item.parentCode);
               selectObj.forEach((item, index) => {
                 gridEditRef.value?.addRowByData({
                   cProdNo: item.code,
                   cProdNme: item.value,
                   cUndrClsCde: freeEditRef.value?.getValue("cUndrClsCde"),
                   cKindNo: item.parentCode,
-                  // cStatus: "0",
+                  cStatus: "1",
                 });
               });
               console.log("子组件传过来的值", res);

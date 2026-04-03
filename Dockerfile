@@ -1,4 +1,4 @@
-ARG NGINX_NAME=nginx:alpine
+ARG NGINX_NAME=arm64v8/nginx:alpine
 # 使用轻量级的 Nginx 镜像作为基础镜像
 FROM ${NGINX_NAME}
 LABEL authors="duqian"

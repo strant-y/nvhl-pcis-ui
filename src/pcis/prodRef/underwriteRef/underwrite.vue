@@ -196,7 +196,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "临分意见",
-        rows: 3,
+        rows: 1,
         itemWidth: 2,
         hidden: params.pageName === "priceInquiry"
       },
@@ -205,7 +205,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "临分反馈意见",
-        rows: 3,
+        rows: 1,
         itemWidth: 2,
         disabled: true,
         hidden: params.pageName === "priceInquiry"
@@ -215,7 +215,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtinput",
         type: "textarea",
         title: "预约分保意见",
-        rows: 3,
+        rows: 1,
         itemWidth: 2,
         disabled: true,
         hidden: params.pageName === "priceInquiry"

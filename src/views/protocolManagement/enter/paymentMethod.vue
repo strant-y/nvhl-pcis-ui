@@ -145,6 +145,7 @@ const formData = reactive<DictTypeForm>({
     paymentMethod: '',
     cDptCde: "",
     cDptCnm: "",
+    cTeamType: "",
 		dptCde: "",
 		cRenewMrk: "0",
 		cPlyNo: "",
@@ -168,6 +169,7 @@ const getDptCdeList = ()=> {
                 dptCdeList.value = data.map((item) => ({
                     value: item.cDptCde,
                     label: item.cDptCnm,
+										cTeamType: item.cTeamType || '',
                 }));
             }
         }).catch(err => console.error(err));
@@ -187,6 +189,7 @@ const getCDptCdeList = (data: any, data2) => {
             cDptCdeList.value = data.map((item) => ({
                 value: item.cDptCde,
                 label: item.cDptCnm,
+                cTeamType: item.cTeamType || '',
             }));
 
           // 清空已选择的承保机构
@@ -215,6 +218,7 @@ function selectedItem(value) {
     selectTreeItem.value = item;
     formData.cDptCnm = item?.label;
     formData.cDptCde = item?.value;
+    formData.cTeamType = item?.cTeamType || '';
 }
 
 // 绑定方法
@@ -228,6 +232,7 @@ function confirm() {
       const dptCde = formData.dptCde;
       const cDptCde = formData.cDptCde;
 			const cDptCnm = formData.cDptCnm;
+			const cTeamType = formData.cTeamType;
 			// 点击下一步前校验，如果data为true则继续，否则阻断并提示
 			if (formData.cRenewMrk === "1") {
         if(formData.cPlyNo?.length > 19) {
@@ -251,7 +256,7 @@ function confirm() {
 								query: {
 									param: JSON.stringify({
 										...handleArray(AgreementBase),
-										res, dptCde, cDptCde, cDptCnm,
+										res, dptCde, cDptCde, cDptCnm, cTeamType,
 										renewalComponent: renewalComponent.value
 									}),
 									type: 'orig',
@@ -267,7 +272,7 @@ function confirm() {
 			} else {
 				if (param) {
         	closeDialog();
-        	emits("ok", { param,dptCde,cDptCde,cDptCnm });
+        	emits("ok", { param,dptCde,cDptCde,cDptCnm,cTeamType });
       	}
 			}
       

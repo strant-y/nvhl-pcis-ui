@@ -488,6 +488,7 @@ import {POSITE_PAGE_TYPE_APP} from "@/views/pcis/support/composite.types";
 const policyService = new PolicyService();
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 import { saveAs } from "file-saver";
+import { cGrpMrkProd } from '@/views/pcis/my-page/requiredDistMap';
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -578,6 +579,7 @@ const getDptCdeList = ()=> {
                 dptCdeList.value = data.map((item) => ({
                     value: item.cDptCde,
                     label: item.cDptCnm,
+                    cTeamType: item.cTeamType || '',
                 }));
             }
         }).catch(err => console.error(err));
@@ -601,7 +603,11 @@ const getCDptCdeList = (data: any)=> {
             cDptCdeList.value = data.map((item) => ({
                 value: item.cDptCde,
                 label: item.cDptCnm,
-            }));
+								cTeamType: item.cTeamType || '',
+						}));
+						if (formconfig1.value.cRecordType == 9) {
+							selectedItem(formconfig1.value.cDptCde)
+						}
           // 清空已选择的承保机构
           // formconfig1.value.cDptCde = "";
           // formconfig1.value.cDptCnm = "";
@@ -633,6 +639,7 @@ function selectedItem(value: any) {
     selectTreeItem.value = item;
     formconfig1.value.cDptCnm = item?.label;
     formconfig1.value.cDptCde = item?.value;
+    formconfig1.value.cTeamType = item?.cTeamType || '';
 }
 
 // 下一步
@@ -648,18 +655,45 @@ const handleArray = (obj:any)=>{
   }
   return newObj
 }
+
 function next() {
   // console.log(formconfig1.value);
   freeEditRef.value?.validate().then(async (isValid: boolean) => {
     if (!isValid) {
       return false;
-    } else {
+		} else {
+			// 校验团单---自定义录单、新保、团单，并且选择产品不在cGrpMrkProd里面
+			if (formconfig1.value.cRecordType == 10) {
+				if (formconfig1.value.cGrpMrk == '1') {
+					const invalidProducts = formconfig1.value.cProdDtlList.filter(
+						item => !cGrpMrkProd.includes(item.cProdNo)
+					)
+					if (invalidProducts.length > 0) {
+						// 按格式 【编号：名称】 拼接
+						const messages = invalidProducts.map(
+							item => `【${item.cProdNo}：${item.cProdNme}】`
+						)
+						const errorMsg = `所选产品\n${messages.join('、')}不支持团单的类型，请调整后重新选择。`
+						ElMessage.error({
+							message: errorMsg,
+							dangerouslyUseHTMLString: false // 不建议用 HTML，纯文本即可
+						})
+						return
+					}
+				}
+			} else {
+				if (formconfig1.value.cGrpMrk == '1' && (formconfig1.value.cRenewMrk == '0'  || formconfig1.value.cRecordType != 1 ) && !cGrpMrkProd.includes(formconfig1.value.cProdNo)) {
+					ElMessage.error(`当前选择的产品【${formconfig1.value.cProdNo}：${formconfig1.value.cProdNme}】不支持团单功能，请重新选择其他产品。`);
+					return;
+				}
+			}
+			
       if(formconfig1.value.cRecordType === 10) {
         console.log('formconfig1.value', formconfig1.value)
         router.push({
           path: "/pcisapp/posite-page",
           query: {
-            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' } }),
+            param: JSON.stringify({ ...formconfig1.value, ...{ initType: POSITE_PAGE_TYPE_APP, pageType: 'app' }, dptCde: formconfig1.value?.dptCde || userStore.user.companyId }),
           },
         });
         return;
@@ -685,6 +719,9 @@ function next() {
         return
       }
       const data = formconfig1.value;
+      if(!isZGS.value && !data.dptCde) {
+        data.dptCde = userStore.user.companyId
+      }
 			if (formconfig1.value.cRenewMrk == "1") {
 				if(Object.keys(renewalComponent.value).length == 0) {
           ElMessage.error("上年保单号请点击查询！");
@@ -893,6 +930,7 @@ function showModal() {
         formconfig1.value.cTermNo = selectedTerm.data.code;
         formconfig1.value.cTermNme = selectedTerm.data.value;
         formconfig1.value.cProdNo = selectedTerm.parent.data.code;
+        formconfig1.value.cProdNme = selectedTerm.parent.data.value;
         handleQuery();
       }
     });

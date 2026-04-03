@@ -166,6 +166,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "EdrBase.nPrmVar",
         inputtype: "rtinput",
+				type: "number",
         min:-999999999999,
         title: "保费变化",
         disabled:true,
@@ -342,7 +343,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           if(v && tRepStopExtBgnTm && new Date(v).getTime() < new Date(tRepStopExtBgnTm).getTime()) {
             ElMessage.warning("报停止期不能早于报停起期")
             setValue("EdrBase.tRepStopExtEndTm", null)
-          } else if(dayjs(v).isBefore(dayjs(tInsrncBgnTm)) || dayjs(v).isAfter(dayjs(tInsrncEndTm))) {
+          // } else if(dayjs(v).isBefore(dayjs(tInsrncBgnTm)) || dayjs(v).isAfter(dayjs(tInsrncEndTm))) {
             // ElMessage.warning("报停止期应该在保险起止期范围内")
             // setValue("EdrBase.tRepStopExtEndTm", null)
           } else if(v && tRepStopExtBgnTm && lastInsrncEndTm.value) {
@@ -482,7 +483,7 @@ function setFormValue(value: any) {
     "EdrBase.nAmtVar": value["EdrBase.nAmtVar"]?.toLocaleString(),
     "EdrBase.nBefEdrPrm": value["EdrBase.nBefEdrPrm"]?.toLocaleString(),
     "EdrBase.nPrm": value["EdrBase.nPrm"]?.toLocaleString(),
-    "EdrBase.nPrmVar": value["EdrBase.nPrmVar"]?.toLocaleString(),
+    // "EdrBase.nPrmVar": value["EdrBase.nPrmVar"]?.toLocaleString(),
   }
   edrbaseEditRef?.value?.setFormValue(val);
 }
@@ -496,8 +497,8 @@ function setValue(key: string, value: any) {
     key === "EdrBase.nAmt" || 
     key === "EdrBase.nAmtVar" || 
     key === "EdrBase.nBefEdrPrm" || 
-    key === "EdrBase.nPrm" || 
-    key === "EdrBase.nPrmVar"
+    key === "EdrBase.nPrm" 
+    // key === "EdrBase.nPrmVar"
   ) {
     edrbaseEditRef?.value?.setValue(key, value.toLocaleString());
   } else {

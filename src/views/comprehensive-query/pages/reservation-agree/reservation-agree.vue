@@ -70,6 +70,10 @@ const route = useRoute();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const queryLoading = ref(false); // 控制按钮 loading 图标
+// 核保信息
+const UndrOpnList = defineAsyncComponent(
+	() => import("@/views/comprehensive-query/modal/UndrOpnList.vue")
+);
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
@@ -90,7 +94,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       }),
     ],
-    fromSchema: [
+		fromSchema: [
 			{
         prop: "cDptCde",
         inputtype: "rtselect",
@@ -211,14 +215,33 @@ const tableconfig = reactive<AppTableConfig>(
         id: "view",
         link: true,
         tooltip: "查看",
-        type: "danger",
+        type: "primary",
         size: "large",
-        icon: "View",
+				icon: "View",
+				iconSize: "25",
         tableClick: (row) => {
           console.log(row);
           toDtl({ ...row, sence:'policy' }, 'view');
         },
-      }),
+			}),
+			createFreeButtonBase({
+				id: "score",
+				link: true,
+				tooltip: "核保信息",
+				type: "danger",
+				size: "large",
+				icon: "Refresh",
+				iconSize: "25",
+				tableClick: (row) => {
+					dzmodal
+						.open(UndrOpnList, { type: "", CAppNo: row.cEcAgrAppNo })
+						.then((res) => {
+							if (res.type === "ok") {
+								handleQuery(true);
+							}
+						});
+				},
+			}),
 		],
     fromSchema: [
 			{

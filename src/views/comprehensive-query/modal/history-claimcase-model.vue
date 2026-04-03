@@ -281,16 +281,19 @@ const tableconfig = reactive<AppTableConfig>(
       {
         prop: "nPrm",
         inputtype: 'rtinput',
+				type: "number",
         title: "保费",
       },
       {
         prop: "claimAmount",
         inputtype: 'rtinput',
+				type: "number",
         title: "总赔款金额",
       },
       {
         prop: "nPendAmt",
         inputtype: 'rtinput',
+				type: "number",
         title: "总未决金额",
       },
       {
@@ -370,12 +373,14 @@ const tableconfig1 = reactive<AppTableConfig>(
       {
         prop: "nPayAmt",
         inputtype: 'rtinput',
+				type: "number",
         title: "赔款金额(不含费用)",
       },
 
       {
         prop: "nPendAmt",
         inputtype: 'rtinput',
+				type: "number",
         title: "未决金额(不含费用)",
       },
       {
@@ -445,6 +450,7 @@ const tableconfig2 = reactive<AppTableConfig>(
       {
         prop: "nPayAmt",
         inputtype: 'rtinput',
+				type: "number",
         title: "赔案金额",
       },
       {
@@ -465,6 +471,7 @@ const tableconfig2 = reactive<AppTableConfig>(
       {
         prop: "nPendAmt",
         inputtype: 'rtinput',
+				type: "number",
         title: "未决金额(不含费用)",
       },
       {

@@ -698,6 +698,23 @@ const NoAsterisk = (sym) => {
 	};
 }
 
+/**
+ * 农户缴费比例 大于等于2%
+ */
+const farmerPaymentRateRule = () => {
+  return {
+		validator: (rule, value, callback) => {
+      const numValue = Number(value);
+      if (numValue < 0.02) {
+        return callback(new Error('数值必须大于等于 2'));
+      }
+
+      return callback();
+    },
+    trigger: "blur"
+  };
+};
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -781,7 +798,7 @@ const NoAsterisk = (sym) => {
       return isNull()
     }
     if(type == 'valiAddress') {
-      return valiAddress()
+      return valiAddress(param)
     }
     if(type == 'chequeNumberValidation') {
       return chequeNumberValidation()
@@ -803,6 +820,9 @@ const NoAsterisk = (sym) => {
     }
     if(type == 'NoAsterisk') {
       return NoAsterisk(param.sym)
+		}
+		if(type == 'farmerPaymentRateRule') {
+      return farmerPaymentRateRule()
     }
   };
   const validorMap = {

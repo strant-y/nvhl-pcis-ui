@@ -2,7 +2,7 @@
   <template v-if="!showLabel">
     <el-tooltip
         :disabled="!changeContent && (!vInput || vInput === 'undefined' || vInput === '' || vInput === '0' || vInput === 'null' || vInput === 'NaN' || item.type === 'textarea')"
-        placement="top"
+        placement="top" :trigger-keys="[]"
     >
       <template #content>
         <div style="display: flex;align-items: center;font-size: 13px">
@@ -25,7 +25,7 @@
         :placeholder="item.placeholder"
         :size="item.size"
         :type="
-          item.type === 'color' || item.type === 'number' ? 'text' : item.type
+          ( item.type !== 'textarea' && item.type !== 'password') ? 'text' : item.type
         "
         :class="[
             ...customClass,
@@ -40,7 +40,12 @@
         "
         :maxlength="item.maxlength"
         :minlength="item.minlength"
-        :show-word-limit="item.showWordLimit === '1' ? true : false"
+        :show-word-limit="
+          item.showWordLimit ? 
+            typeof item.showWordLimit === 'boolean' ? 
+              item.showWordLimit : 
+              (item.showWordLimit === '1' ||  item.showWordLimit === 1) ? true : false
+            : false "
         :readonly="
           item.type === 'color' || item.type === 'icon'
             ? true
@@ -100,7 +105,8 @@
         v-model="vInput"
         @change="handleChange"
         @input="handleInput"
-        @blur="handleBlur(vInput)"
+        @focus="handleFocus"
+        @blur="handleBlur"
       >
         <template #suffix v-if="item.suffix">
           {{ item.suffix }}
@@ -167,7 +173,11 @@
         <component :is="renderIcon(item.prefixIcon)" />
       </el-icon>
       <span v-if="item.prefix" style="vertical-align: top;">{{ item.prefix }}</span>
-      <el-text class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
+			<!-- 表格中数字也要展示成千分位格式 -->
+			<el-text v-if="item.type == 'number'" class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
+			{{vInput !== 'undefined' && vInput !== 'null' ? formatNumberForTable(vInput) : ''}}
+			</el-text>
+      <el-text v-if="item.type != 'number'" class="mx-1" truncated @click="checkIfTruncated($event, vInput)" @dblclick="item.dblFunc ? item.dblFunc(vInput, row) : ()=>{}">
         {{vInput !== 'undefined' && vInput !== 'null' ? vInput : ''}}
       </el-text>
       <!-- 添加复制图标 -->
@@ -231,6 +241,7 @@ function isReQuired(){
 }
 const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监听事件，同步子组件值的变化给父组件
 const vInput = ref<string | Number | undefined>();
+const originalValue = ref<string | Number | undefined>();
 const customClass = ref<string[]>([]);
 const changeContent = ref<string | undefined>();
 watch([() => props.modelValue], ([newModelValue]) => {
@@ -245,6 +256,9 @@ watch([() => props.modelValue], ([newModelValue]) => {
     n = (newModelValue || newModelValue == 0)? (new Decimal(newModelValue).times(100).toString() + "") : "";
   }else if (props.item.type === "permill") {
     n = newModelValue? (new Decimal(newModelValue).times(1000).toString() + "") : "";
+  }else if (props.item.type === "desensitization") {
+    n = desensitizationStr(newModelValue);
+    originalValue.value = newModelValue;
   }else{
     n = newModelValue;
   }
@@ -304,11 +318,33 @@ onMounted(() => {
     vInput.value = props.modelValue? (new Decimal(props.modelValue).times(100).toString() + "") : "";
   }else if (props.item.type === "permill") {
     vInput.value = props.modelValue? (new Decimal(props.modelValue).times(1000).toString() + "") : "";
+  }else if (props.item.type === "desensitization") {
+    vInput.value = desensitizationStr(props.modelValue);
+    originalValue.value = props.modelValue;
   }else{
     vInput.value = props.modelValue;
   }
-
 });
+
+function desensitizationStr(value) {
+  if (value) {
+    const length = value.length;
+    let r = "";
+    if (value.length <= 3) {
+      // 长度小于等于3，后两位用*代替
+      r = value.slice(0, -2) + "**";
+    } else if (value.length <= 8) {
+      // 长度小于等于8，中间4位用*代替
+      const start = Math.floor((length - 4) / 2);
+      r = value.slice(0, start) + "****" + value.slice(start + 4);
+    } else {
+      // 长度大于8，除了首3位和末3位用*代替
+      r = value.slice(0, 3) + "*".repeat(length - 6) + value.slice(-3);
+    }
+    return r;
+  }
+  return value;
+}
 
 const renderIcon = (iconName: string) => {
   const iconComponent = ElementPlusIconsVue[iconName as IconNames];
@@ -330,6 +366,18 @@ function tooltipIconClick() {
   nextTick(() => {
     handleChange(text);
   })
+}
+
+function isReadonly() {
+  if (
+    props.item.readonly === true ||
+    props.item.readonly === 1 ||
+    props.item.readonly === "1"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // 复制到剪贴板方法
@@ -387,9 +435,22 @@ function fallbackCopyTextToClipboard(text:any) {
   document.body.removeChild(textArea);
 }
 
-function handleBlur(val:any) {
-  if(props.item?.funcBlur) {
-    props.item.funcBlur(val)
+function handleFocus() {
+  if (props.item.type === "desensitization" && !isReadonly()) {
+    // 脱敏模式,选中编辑时,显示明文
+    vInput.value = originalValue.value;
+  }
+}
+function handleBlur() {
+  if (props.item.type === "desensitization"){
+    vInput.value = desensitizationStr(originalValue.value);
+  }
+  if (props.item?.funcBlur) {
+    if (props.item.type === "desensitization"){
+      props.item.funcBlur(originalValue.value);
+    }else{
+      props.item.funcBlur(vInput.value);
+    }
   }
 }
 const handleInputFlag = ref(false);
@@ -397,6 +458,21 @@ function handleInput() {
   if(props.item?.funcBlur) {
     handleInputFlag.value = true;
   }
+}
+
+// 千分位格式化函数（安全处理 null/undefined/非数字）
+function formatNumberForTable (cellValue: any, row: any) {
+	if (cellValue == null || cellValue === '') return '';
+
+	// 尝试转为数字
+	const num = typeof cellValue === 'number' ? cellValue : parseFloat(cellValue);
+	if (isNaN(num)) return String(cellValue); // 非数字原样返回
+
+	// 使用 toLocaleString 格式化（保留原始小数位数）
+	return num.toLocaleString('en-US', {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 20 // 允许任意小数位（或按需限制）
+	});
 }
 defineExpose({
   setCustomClass,

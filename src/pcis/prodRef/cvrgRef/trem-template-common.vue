@@ -13,7 +13,7 @@
                   </a>
 
                   <template v-if="effectiveShowConf.showPlanNo">
-                    <span style="color: var(--el-text-color); margin-right: 3px;">
+                    <span style="color: var(--el-text-color); margin-right: 3px;white-space: nowrap;">
                       {{termdata['Term.cPlanNo']}}方案
                     </span>
                   </template>
@@ -1575,7 +1575,8 @@ const selectRow = (key: any) => {
   }
 };
 
-async function nInsuranceFeeChange(val:any) {
+async function nInsuranceFeeChange(val: any) {
+	opertaor.getFatherPage().setIsEditnPrm(true)
   const plyBase = opertaor.getTableRefByKey("plyBase")?.getFromValue();
   let qryTerminationStatus = false;
   // 投保 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
@@ -1660,7 +1661,7 @@ async function nInsuranceFeeChange(val:any) {
     })
   }
   // 一般批改 条款中的保费手动修改后 承保基本信息中的总保费也需要同步
-  if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType === '1') {
+  if(((pageparam.pageType === "TEMPORARY_DEPOSIT" && pageparam.cTransMrk !=='1') || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType === '1') {
     // TermRisktgt
     const cvrgData = opertaor.getTableRefByKey("cvrg")?.getFromValue();
     let nInsuranceFee:any = 0;

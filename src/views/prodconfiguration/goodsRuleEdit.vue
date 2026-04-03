@@ -5,7 +5,9 @@
     width="80%"
     @update:model-value="handleVisibleUpdate"
   >
-    <app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+		<el-config-provider :locale="enLocale">
+    	<app-free-edit v-model:freeEditConfig="formconfig" ref="freeEditRef" />
+		</el-config-provider>
     <template #footer>
       <span class="dialog-footer">
         <el-button type="primary" @click="handleSave">确定</el-button>
@@ -26,6 +28,8 @@ import { ref, reactive } from "vue";
 import { saveProdRuleInfo, initMultiCodeList } from "@/api/prod"; // api接口 savePrdTermInfo savePrdRuleInfo
 import { useValidator } from "@/typings/useValidator";
 import { useUserStore } from "@/store/modules/user";
+import zhCn from "element-plus/es/locale/lang/zh-cn";
+const enLocale = zhCn;
 const userStore = useUserStore();
 const user = ref(userStore.user);
 const { getRules } = useValidator();
@@ -99,8 +103,10 @@ const formconfig = reactive<AppFreeEditConfig>(
       },
       {
         prop: "cRuleCde",
-        inputtype: "rtinput",
+        inputtype: "rtselect",
         title: "规则名称",
+				clearable: true,
+				typeCode: "RULE_CODE",
       },
       {
         prop: "cRuleValue",
@@ -110,14 +116,21 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "tStaTm",
         inputtype: "rtdatepicker",
-        title: "规则生效起期",
+				title: "规则生效起期",
+				type: "datetime",
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
         rules: [getRules("required", {})],
       },
       {
         prop: "tEndTm",
         inputtype: "rtdatepicker",
-        title: "规则生效止期",
-        rules: [getRules("required", {})],
+				title: "规则生效止期",
+				type: "datetime",
+				defaultTime: new Date(1970, 0, 1, 23, 59, 59),
+        format: "YYYY-MM-DD HH:mm:ss",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+				rules: [getRules("required", {})],
       },
     ],
     fromUi: createFromUiConfig({

@@ -97,18 +97,21 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "nAmt",
-        inputtype: "rtinput",
+				inputtype: "rtinput",
+				type: "number",
         title: "我司保额",
         lengthNum: 4,
       },
       {
         prop: "nPrm",
         inputtype: "rtinput",
+				type: "number",
         title: "我司保费",
       },
       {
         prop: "nRetAmt",
         inputtype: "rtinput",
+				type: "number",
         title: "自留额",
       },
     ],

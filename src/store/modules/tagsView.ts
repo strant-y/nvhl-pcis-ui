@@ -249,7 +249,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
           // when query is different then update
           const newView: TagView = {
             name: route.name as string,
-            title: route.meta.title || "",
+            title: tag.title || route.meta.title || "",
             path: route.path,
             fullPath: route.fullPath,
             affix: route.meta?.affix,
