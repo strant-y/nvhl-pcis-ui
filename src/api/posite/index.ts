@@ -23,11 +23,16 @@ function savePositeInfo(queryParams: any): AxiosPromise<any> {
 function submitCombination(queryParams: any): AxiosPromise<any> {
     return post(`${PageBaseUrl}/submitCombination`, queryParams);
 }
+//意健险方案信息获取
+function getYjxPlanInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/channel/getPlanInfo`, queryParams);
+}
 
 export default {
     queryPositeInfo,
     appCombinationCalc,
     savePositeInfo,
-    submitCombination
+    submitCombination,
+    getYjxPlanInfo
 }
 

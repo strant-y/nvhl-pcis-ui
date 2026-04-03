@@ -21,13 +21,8 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveProdInfo } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-const dzmodal = useDzModal();
-const planInventoryEdit = defineAsyncComponent(
-  () => import("./planInventoryEdit.vue")
-);
 import {
   AppTableConfig,
   AppTableMethod,
@@ -38,12 +33,17 @@ import { ref, reactive, onMounted } from "vue";
 import { qryProdTermList } from "@/api/prod";
 import { inputtype } from "@/utils/utilKey";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
+
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
+const dzmodal = useDzModal();
+const planInventoryEdit = defineAsyncComponent(
+    () => import("./planInventoryEdit.vue")
+);
 const route = useRoute();
 const query = ref(route.query);
 const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
-
 const { getRules } = useValidator();
-
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 

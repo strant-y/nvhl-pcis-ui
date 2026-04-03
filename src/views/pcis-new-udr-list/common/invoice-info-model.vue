@@ -23,13 +23,11 @@ import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {useRoute} from "vue-router";
 
 const route = useRoute();
-const idxParam: IdxParamProps = {
-  opertaorProps: { id: route.name },
-  cdeListViewProps: { id: route.name },
-};
-provide(idxParamKey, idxParam);
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-opertaor.init();
+// const idxParam: IdxParamProps = {
+//   opertaorProps: { id: route.name },
+//   cdeListViewProps: { id: route.name },
+// };
+// provide(idxParamKey, idxParam);
 
 const props = defineProps({
   visible: {
@@ -43,9 +41,12 @@ const props = defineProps({
       return {}
     }
   },
+  opertaor: {
+    type: Object
+  }
 })
 
-
+const opertaor = reactive(props.opertaor ?? {});
 const isVisible = computed(() => props.visible);
 
 let cGrpMrk =opertaor.getDataAll()?.['plyBase']?.['Base.cGrpMrk'];
