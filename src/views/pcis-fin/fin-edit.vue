@@ -319,7 +319,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
 	if (props.type === "update" && props.data) {
-		getPlyPolicyFun(props.data)
+		// getPlyPolicyFun(props.data)
     nextTick(() => {
       freeEditRef.value?.setFormValue(props.data);
 
