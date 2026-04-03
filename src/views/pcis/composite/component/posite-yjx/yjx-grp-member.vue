@@ -506,7 +506,10 @@ function loadData(flag: boolean = true) {
   const plyBase = opertaor.getDataAll()['plyBase'];
   const cCombinationNo = plyBase['Base.cCombinationNo'];
   const cProdNo = plyBase['Base.cProdNo'];
-  let param = Object.assign({
+  if(!cCombinationNo || cCombinationNo === '') {
+    return;
+  }
+  const param = Object.assign({
     cComponentTable: cComponentTableValue,
     cProdNo: cProdNo,
     cAppNo: cCombinationNo,
@@ -576,6 +579,10 @@ function handleQuery(queryParams: any = { pageNum: 1, pageSize: 10 }) {
   const plyBase = opertaor.getDataAll()['plyBase'];
   const cCombinationNo = plyBase['Base.cCombinationNo'];
   const cProdNo = plyBase['Base.cProdNo'];
+  if (cCombinationNo == '' || cCombinationNo == undefined) {
+    ElMessage.warning('请先保存组合单'); // 提示用户保存投保单
+    return;
+  }
   const selData = {
     cAppNo: cCombinationNo,
     cCombinationNo: cCombinationNo,

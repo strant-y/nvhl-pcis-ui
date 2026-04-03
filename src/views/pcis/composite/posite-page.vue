@@ -287,7 +287,7 @@ onBeforeMount(() => {
         cCombinationNo: item.cCombinationNo,
         cKindNo: item.cKindNo,
         cProdNo: item.cProdNo,
-        cGrpMrk: props.param.cGrpMrk,
+        cGrpMrk: item.cGrpMrk,
         nPrm: item.nPrm
       }
     });

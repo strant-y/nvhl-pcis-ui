@@ -941,7 +941,7 @@ function selectProdList() {
           cPlanNo: cPlanNo,
           cPlanNme: planNme,
           cProdNme: prodName,
-          cGrpMrk: formconfig1.value.cGrpMrk,
+          cGrpMrk: kindNo !== '06' ? formconfig1.value.cGrpMrk : '1',
           searchKey: item.searchKey,
           cTermNo: kindNo !== '06' ? item.code : undefined,
         };
