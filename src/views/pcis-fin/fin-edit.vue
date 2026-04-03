@@ -319,7 +319,7 @@ const tableconfig = reactive<AppTableConfig>(
 );
 onMounted(async () => {
 	if (props.type === "update" && props.data) {
-		getPlyPolicyFun(props.data)
+		// getPlyPolicyFun(props.data)
     nextTick(() => {
       freeEditRef.value?.setFormValue(props.data);
 
@@ -480,10 +480,10 @@ function changeBank() {
 
 // 判断当前单能否满足反洗钱条件，不能修改账户人名称
 function getPlyPolicyFun(data) {
-	const param = {
-		scene: "EDR_APP_NEW_SCENE",
-		CPlyNo: data.cPlyNo,
-	};
+  const param = {
+    scene: "EDR_APP_NEW_SCENE",
+    CPlyNo: data.cPlyNo,
+  };
 	getAppPolicy(param).then((res: any) => {
 		console.log("投保单明细", res);
 		if (res["code"] == "200") {
