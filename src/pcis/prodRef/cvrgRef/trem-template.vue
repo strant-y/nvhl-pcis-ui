@@ -1117,7 +1117,11 @@ function setTermConf(d: any,initFlag: boolean){
   const cAddrSeq = termFactormap.value.find(item => item.prop === 'Term.cDistCodeNo');
   if (cAddrSeq) {
       cAddrSeq.loadData = JSON.parse(sessionStorage.getItem("getAddrSeqData"));
-  }
+	}
+	// ---检查初始化数据是否已作废，如果是则禁用费率 ---
+	if (termdata.value['Term.cCancelMrk'] == '1' && pageparam.cRsnCde == '45') {
+		methodMap.disableRateField('Term.nRateVal');
+	}
   methodLink(termFactormap.value);
   riskMethodLink(factormap.value);
   initshowConfig();
@@ -2116,7 +2120,28 @@ const methodMap = {
       }
       riskTableRef.value?.setFormSchema(row._dataId,'TermRisktgt.cTargetClass','loadData',res.data || [])
     });
-  },
+	},
+	/**
+	 * 禁用费率字段
+	 */
+	disableRateField(rateFieldProp) {
+		termFactormap.value?.forEach((item: any) => {
+			if (item.prop === rateFieldProp) {
+				item.readonly = true;
+				item.cPorpRequired = false;
+			}
+		});
+		
+		// 如果是 Grid 表格模式，也需要处理 riskGridConfig
+		if (riskShowTyp.value === 'grid' && riskGridConfig.value?.fromSchema) {
+			riskGridConfig.value.fromSchema?.forEach((item: any) => {
+				if (item.prop === rateFieldProp) {
+					item.readonly = true;
+					item.cPorpRequired = false;
+				}
+			});
+		}
+	}
 };
 
 const checkData = (v :any,item:any) => {
