@@ -128,7 +128,7 @@ onMounted(async () => {
   tableconfig.value.tableBtnType = "btn";
   tableconfig.value.tableBtnWidth = 150;
   tableconfig.value.tableBtnPosition = "right";
-  tableconfig.value.isPage = false;
+  tableconfig.value.isPage = true;
   if (formconfig11.value.editBtns && formconfig11.value.editBtns.length > 0) {
     let btns: any[] = [];
     btns = formconfig11.value.editBtns;
@@ -136,7 +136,7 @@ onMounted(async () => {
       tableconfig.value.tableBtn = btns;
     }
   }
-  tableconfig.value.isPage = false;
+  tableconfig.value.isPage = true;
   // 初始化 cComponentTableValue
   cComponentTableValue = getCComponentTableValue();
   nextTick(()=>{
