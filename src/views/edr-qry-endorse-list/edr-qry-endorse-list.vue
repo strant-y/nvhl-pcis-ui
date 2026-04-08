@@ -364,6 +364,9 @@ const tableconfig = reactive<AppTableConfig>(
 											console.error(err);
 											ElMessage.error('系统异常，请稍后重试');
 										});
+									} else if (row.id[1] === "83" && row.cGrpMrk !== "1") {
+										ElMessage.error('该申请单不是团单，不能选择此批改原因！');
+										return;
 									} else {
 											openEdr(row.cAppNo, row.cPlyNo, row.cProdNo, row.cKindNo, row);
                     }
