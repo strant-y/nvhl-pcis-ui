@@ -213,7 +213,19 @@ const method = {
       }
     }
     // 折人民币协议预收保费
-    setValue('ECargoBase.nRmbReceivedPrm', val * getValue('ECargoBase.nReceivedRate'))
+		setValue('ECargoBase.nRmbReceivedPrm', val * getValue('ECargoBase.nReceivedRate'))
+		// 联共保业务除非共保业务之外，修改预收保费，折人民币我司协议预收保费=预收保费*联供保永安公司的联供保比例
+		const AgreementBase = formPage?.getFormDataById('AgreementBase');
+		const AgreementCi = formPage?.getFormDataById('AgreementCi');
+		const cCiMrk = AgreementBase?.['ECargoBase.cCiMrk'];  // 是否   联共保
+		if (getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01' && !!cCiMrk && cCiMrk != "0") {
+			AgreementCi.forEach(row => {
+				if (row["ECargoCi.cCoinsurerCde"] === "327001") {
+					const share = Number(row["ECargoCi.nCiShare"]) || 0;
+					setValue("ECargoBase.nCiOwnRmbReceivedPrm",share* Number(getValue('ECargoBase.nRmbReceivedPrm') || '0'))
+				}
+			})
+    }
   },
   nWhAmtChange:(val:any)=>{
     if(initFlag.value) return
@@ -344,11 +356,11 @@ const method = {
 	// 折人民币我司协议预收保费
 	nCiOwnRmbReceivedPrmChange: (val: any) => {
 		if (initFlag.value) return
-		const AgreementBase = formPage?.getFormDataById('AgreementBase');
-		const cCiMrk = AgreementBase?.['ECargoBase.cCiMrk'];  // 是否   联共保
-    if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01' && !!cCiMrk && cCiMrk != "0"){
-       setValue('ECargoBase.nRecRemPrm',val - (getValue('ECargoBase.nWhRmbPrm') || 0))
-    }
+		// const AgreementBase = formPage?.getFormDataById('AgreementBase');
+		// const cCiMrk = AgreementBase?.['ECargoBase.cCiMrk'];  // 是否   联共保
+    // if(getValue('ECargoBase.cPayWay') && getValue('ECargoBase.cPayWay') === '01' && !!cCiMrk && cCiMrk != "0"){
+    //    setValue('ECargoBase.nRecRemPrm',val - (getValue('ECargoBase.nWhRmbPrm') || 0))
+    // }
   },
   //折人民币预扣保费
   nWhRmbPrmChange:(val:any)=>{
