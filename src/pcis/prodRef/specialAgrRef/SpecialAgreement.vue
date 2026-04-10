@@ -310,36 +310,49 @@ const refreshData = () => {
   //   return false;
   // }
    const param = opertaor.getParam();
-  const cProdNo =param.cProdNo;
-  const cDptCde =param.cDptCde || '';
-
+  const cProdNo = param.cProdNo;
+  const cProdList = param.cProdList;
+  const cDptCde = param.cDptCde || '';
+  const tAppTm = opertaor.getDataAll().insrnc?.['Base.tAppTm']
+  console.log('refreshData-param', param)
+  const getResult = (result: any[]) => {
+    let len = 0;
+    let sel : any[] = [];
+    defaultData.value.push(...result);
+    const cInstMrk = opertaor.getTableRefByKey('base')?.getValue('Base.cInstMrk');
+    if (parparam.pageType  == "app") {
+      result.forEach((item: any,index:number) => {
+        if(item["cIfMust"] == "1" || (cInstMrk == "0" && item.cSpecialCode == '34201123') || (cInstMrk == "5" && item.cSpecialCode == '34201122')) {
+          item.index = len + 1;
+          sel.push(item);
+          len++;
+        }
+      });
+      originalData.value.push(...deepClone(sel))
+      formData.value.push(...sel)
+    }else{
+      originalData.value.push(...deepClone(result))
+    }
+  }
   // 查询列表数据
-  getpSpecialAgreement({
-    cProdNo: cProdNo,
+  const reqParam: any = {
     cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
-    tAppTm: opertaor.getDataAll().insrnc?.['Base.tAppTm']
-  }).then((res) => {
+    tAppTm: tAppTm
+  }
+  if(cProdList && cProdList.length > 0) { // 组合出单用
+    reqParam.cProdNos = cProdList;
+  } else {
+    reqParam.cProdNo = cProdNo;
+  }
+  originalData.value = []
+  formData.value = []
+  defaultData.value = []
+  console.log('getpSpecialAgreement-reqParam', reqParam)
+  getpSpecialAgreement(reqParam).then((res) => {
     if (res.data?.result) {
-            let len = 0;
-            let sel : any[] = [];
-            defaultData.value = res.data.result;
-            const cInstMrk = opertaor.getTableRefByKey('base')?.getValue('Base.cInstMrk');
-             if (parparam.pageType  == "app") {
-                res.data.result.forEach((item: any,index:number) => {
-                  if(item["cIfMust"] == "1" || (cInstMrk == "0" && item.cSpecialCode == '34201123') || (cInstMrk == "5" && item.cSpecialCode == '34201122')) {
-                      item.index = len + 1;
-                      sel.push(item);
-                      len++;
-                  }
-                });
-                originalData.value =    deepClone(sel)
-                formData.value = sel
-              }else{
-                 originalData.value =    deepClone(res.data.result)
-              }
-            
+      getResult(res.data.result)
     }
   });
 };
@@ -431,11 +444,13 @@ const method = {
   //获取特约按钮
   getSpecialAgree: () => {
     const param = opertaor.getParam();
+    console.log('getSpecialAgree', param)
     dialog.value?.open(
       "prdFixSpec",
       {
           cProdNo: param.cProdNo,
-          cDptCde:param.cDptCde, 
+          cProdList: param.cProdList,
+          cDptCde:param.cDptCde,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
           tAppTm: opertaor.getDataAll().insrnc?.['Base.tAppTm'],
         },

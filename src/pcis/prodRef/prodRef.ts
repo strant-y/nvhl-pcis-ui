@@ -105,6 +105,10 @@ import positeApplicant from "../../views/pcis/composite/component/posite-common/
 import positeInsured from "../../views/pcis/composite/component/posite-common/posite-insured.vue";
 import positePlybase from "../../views/pcis/composite/component/posite-common/posite-plybase.vue";
 import positeCi from "../../views/pcis/composite/component/posite-common/posite-ci.vue";
+import positeInsrnc from "../../views/pcis/composite/component/posite-common/posite-insrnc.vue";
+import positePlan from "../../views/pcis/composite/component/posite-common/posite-plan.vue";
+import customDeductible from "../../views/pcis/composite/component/posite-common-custom/custom-Deductible.vue";
+import customSpecialAgreement from "../../views/pcis/composite/component/posite-common-custom/custom-SpecialAgreement.vue";
 /** **/
 
 /**用于动态组件的映射生成 */
@@ -208,6 +212,10 @@ const componentMap = {
   positeInsured: positeInsured,
   positePlybase: positePlybase,
   positeCi: positeCi,
+  positeInsrnc: positeInsrnc,
+  positePlan: positePlan,
+  customDeductibleDistRef: customDeductible,
+  customSpecialAgreementRef: customSpecialAgreement,
 
   yjxPlanRef: yjxPlanBase,
   yjxGrpMemberRef: yjxGrpMember,

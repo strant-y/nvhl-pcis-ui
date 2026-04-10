@@ -25,6 +25,8 @@ export interface AppGridEditConfig {
   editList?: Array<any>; //指定可编辑列
   showExpand?: boolean; // 是否显示扩展列
   showSelection?: boolean; //是否显示多选列
+  showSummary?: boolean; //是否显示合计行
+  summaryMethod?: () => Array<any>; //
 
   dragFlag?: boolean; // mytable模式下,是否可以拖动
   rowDbClickFun?: (rowData) => void;
@@ -83,6 +85,8 @@ export function createAppGridEditConfig(
     tableBtnType: config.tableBtnType || "btn",
     tableBtnWidth: config.tableBtnWidth || "100",
     showSelection: config.showSelection || false,
+    showSummary: config.showSummary || false,
+    summaryMethod: config.summaryMethod,
     fromUi: createGridFromUiConfig(config.fromUi),
     dragFlag: config.dragFlag || false,
     rowDbClickFun: config.rowDbClickFun || null,

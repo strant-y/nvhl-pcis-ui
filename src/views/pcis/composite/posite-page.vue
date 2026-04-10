@@ -104,6 +104,7 @@ import anchorCollapse from './component/anchor/anchor.vue';
 import type {AnchorItem, GroupForm} from './component';
 import {useDzModal} from "@/common/dzmodel/DzModalService";
 import {
+  CommonComponentMap,
   CompositePageConfigType,
   CompositePageView,
   POSITE_PAGE_TYPE_APP,
@@ -242,9 +243,7 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
     }
 
     anchorConfig.forEach((anchor: AnchorItem) => {
-      // 删除账户信息锚点
-      const acctinfoIdx = anchor.children.findIndex(f => f.tabKey === "acctinfo")
-      acctinfoIdx != -1 && anchor.children.splice(acctinfoIdx, 1);
+
     })
 
     pageConfig.forEach((item: GroupForm) => {
@@ -253,16 +252,14 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
           // 隐藏 申请单号
           comp
               .pageSchema
-              .fromSchema.forEach((ys: any) => {
+              ?.fromSchema
+              ?.forEach((ys: any) => {
             if(ys.prop.includes('cAppNo')) {
               ys.hidden = true;
             }
           })
         })
       }else {
-        // 删除账户信息组件
-        const acctinfoIdx = item.pageInfo.findIndex(f => f.pageKey === "acctinfo")
-        acctinfoIdx != -1 && item.pageInfo.splice(acctinfoIdx, 1);
       }
     })
     console.info('### info anchorConfig', anchorConfig);
@@ -279,8 +276,8 @@ onBeforeMount(() => {
   if(props.param) {
     const initType = props.param.initType;
     const loading = openPageLoading();
-    // 初始化产品信息
-    initProdListData();
+    // 初始化模板信息
+    initTemplateData();
     // 存储路由参数
     pageView.value.setPageParams(props.param);
     // 初始化页面结构
@@ -819,7 +816,7 @@ const submitToUndrFn = async () => {
         },
       }).then(() => {
         console.log('replace props.param', props.param);
-        initProdListData();
+        initTemplateData();
         pageView.value.updatePageParams(props.param, productList.value);
         prodListRef.value?.setDisabledAll();
         pageView.value.setPageDisabledAll();
@@ -901,7 +898,7 @@ const trimPageData = (pageData: any) => {
 }
 
 
-const initProdListData = () => {
+const initTemplateData = () => {
   productList.value = props.param.cProdDtlList.map((item: any) => {
     return {
       cAppNo: item.cAppNo,
@@ -913,6 +910,19 @@ const initProdListData = () => {
       nPrm: item.nPrm
     }
   });
+  pageView.value.discardCompKeys.push(...['acctinfo', 'ci', 'ciMasterAgreement', 'ourCompanyCiShare'])
+  // 初始化公共组件
+  CommonComponentMap.set('applicant', 'positeApplicant');
+  CommonComponentMap.set('insured', 'positeInsured');
+  CommonComponentMap.set('plyBase', 'positePlybase');
+  // CommonComponentMap.set('ci', 'positeCi');
+  if (props.param.cCombinationType === '2') { // 组合方案
+    CommonComponentMap.set("base", 'positeBase');
+    CommonComponentMap.set('insrnc', 'positeInsrnc');
+    CommonComponentMap.set('cvrg', 'positePlan');
+    pageView.value.customCommonCompKeys.push(...["SpecialAgreement", "DeductibleDist"])
+    pageView.value.hiddenCompKeys.push(...["payinfo"])
+  }
 }
 
 const getNewParams = (param: any) => {

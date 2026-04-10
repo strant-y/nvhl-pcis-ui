@@ -24,6 +24,19 @@ const pageView = inject("pageView", ref(new CompositePageView()));
 const formconfig = ref(createAppGridEditConfig({
   title: '产品信息',
   editFlag: true, //是否可以编辑
+  showSummary: true,
+  summaryMethod: () => {
+    let hjPrm = 0;
+    if(gridEditRef.value) {
+      const list = gridEditRef.value.getTableValue();
+      list.forEach((item: any) => {
+        if(item.nPrm) {
+          hjPrm += item.nPrm
+        }
+      })
+    }
+    return ['','','','','','', '合计: ' + hjPrm]
+  },
   titleBtns: [
     createFreeButtonBase({
       id: 'add',

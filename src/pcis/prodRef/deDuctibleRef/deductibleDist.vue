@@ -243,18 +243,24 @@ const tableconfig = reactive<AppTableConfig>(
 
 
 const initOriginalData = ()=> {
+  originalData.value = []
   const param = {
-    cProdNo: route.params.param?.cProdNo,
     pageNum: 1,
     pageSize: 999,
+  }
+  if(route.params.param?.cRecordType === 10) {
+    param.cProdNos = route.params.param?.cProdList;
+  }else {
+    param.cProdNo = route.params.param?.cProdNo;
   }
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
       pageresult.list = [];
       originalData.value = res.data.result.map((item: any) => {
-         return {
+        return {
           cDeductibleClass: item.cDeductibleCode,
           cDeductibleContent: item.cDeductibleContent,
+          cProdNo: route.params.param?.cProdNo, //产品号
           cStatus: item.cStatus, //是否必选
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改
@@ -351,7 +357,7 @@ const mergeArrays = (oldArr, newArr, key, fields)=>{
             return oldItem.cPkId == newItem.cPkId;
           }
 
-          if (oldItem.cRowId != null && oldItem.cRowId !== undefined && oldItem.cRowId !== '' && 
+          if (oldItem.cRowId != null && oldItem.cRowId !== undefined && oldItem.cRowId !== '' &&
               newItem.cRowId != null && newItem.cRowId !== undefined && newItem.cRowId !== '') {
             return oldItem.cRowId == newItem.cRowId;
           }
@@ -390,9 +396,9 @@ const method = {
   },
   //查询免赔
   queryDeductible: () => {
-
     dialog.value?.open('deductibleFix', {
           cProdNo: route.params.param.cProdNo,
+          cProdList: route.params.param.cProdList, // 组合出单用
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
         },
         { 

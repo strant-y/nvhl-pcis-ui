@@ -91,11 +91,17 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
-  const param = {
-    cProdNo: props.data.cProdNo,
+  pageresult.list = [];
+  const param: any = {
     pageNum: 1,
     pageSize: 999,
   }
+  if(props.data.cProdList && props.data.cProdList.length > 0) {
+    param.cProdNos = props.data.cProdList;
+  }else {
+    param.cProdNo = props.data?.cProdNo;
+  }
+  console.log('getPrdDeductible-param', param)
   // 查询列表数据
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
@@ -104,6 +110,7 @@ const refreshData = () => {
         pageresult.list.push({
           cDeductibleClass: item.cDeductibleCode,
           cDeductibleContent: item.cDeductibleContent,
+          cProdNo: props.data.cProdNo, //产品号
           cStatus: item.cStatus, //是否必选
           cIfMust: item.cIfMust, //是否必选
           cIfEdit: item.cIfEdit, //是否可修改

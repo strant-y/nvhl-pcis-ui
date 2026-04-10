@@ -20,13 +20,21 @@ import dayjs from "dayjs";
 import { eventBus } from '@/utils/event-bus'
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useValidator } from "@/typings/useValidator";
+import {
+  baseFormatKeys, CommonGroupId,
+  CompositePageView,
+  CustomStructure, GroupForm, joinFormDataByProdNo,
+  peelFormDataByProdNo
+} from "@/views/pcis/support/composite.types";
+import {ref} from "vue";
 const { getRules } = useValidator();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-
+const pageView = inject("pageView", ref(new CompositePageView()));
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const dialogRef = ref<DialogMethod | null>(null);
 const params = opertaor.getParam();
+const param: any = route.params.param;
 const props = defineProps({
   pageSchema: {
     type: [Object],
@@ -38,13 +46,17 @@ const props = defineProps({
   },
 });
 
+const groupId: any = {value: null} // 当前groupId 不能用ref
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
 const fixSpecData = ref([]); //存储已选择的特别约定数据
+const structure = new CustomStructure()
+// 需要分组的key
 onMounted(async () => {
+  const {pageSchema} = structure.diffGroupBuild(props.pageSchema, param.cProdDtlList, baseFormatKeys)
   const formconfig11 = formInit(
-    JSON.stringify(props.pageSchema),
+    JSON.stringify(pageSchema),
     method,
     exRules
   );
@@ -102,57 +114,56 @@ const nPayNumberFun = ()=>{
     const tabref = opertaor.getTableRefs();
     const baseBefore = tabref["base"].getFromValue();
     const baseData = opertaor.getDataAll()['base']['needCalc'];
-    const payinfoRef =  opertaor.getTableRefByKey("payinfo").getFromValue();
-    console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
-
-    if (!baseData && payinfoRef.length <1) {
-      ElMessage.error("请先进行保费计算!");
-      return false
-    }
-
-    if (Number(getValue("Base.nPayNum"))>12) {
-      ElMessage.warning("拆分最多为12期！");
-      return false
-    }
-    if(getValue("Base.nPayNum")!=''){
-
-      // 多期情况 添加特约信息
-      if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
-
-      const data = opertaor.getDataAll();
-      
-      let nCiShare = Number(getOwnShare()) || 1 ;
-      const totalAmount = Number(data['base']['Base.nPrm']);  
-      const splitCount =Number(data.base?.['Base.nPayNum'])
-   
-      const totalCent = Math.round(totalAmount * 100);
-      const result = ref<number[]>([]);
-      const quotient = Math.floor(totalCent / splitCount) ;
-      const remainder = totalCent % splitCount;
-      result.value = Array(splitCount).fill(quotient);
-      if (remainder > 0) {
-        result.value[splitCount-1] += remainder;
+    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeFirst((operator: any, group: GroupForm) => {
+      const payinfoRef = operator.getTableRefByKey("payinfo").getFromValue();
+      console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
+      if (!baseData && payinfoRef.length <1) {
+        ElMessage.error("请先进行保费计算!");
+        return false
       }
-            result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
-      let val= {}
-      let valArr=[]
-      for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
-        let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
-        let startDate = new Date(BgnTmDate); 
-        let endDate = new Date(BgnTmDate)
-        if (getValue("Base.cInstMrk")=='5') {
-          startDate.setDate(BgnTmDate.getDate() + i * 15); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15); 
-        } else {
-          startDate.setDate(BgnTmDate.getDate() + i * 30); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30); 
-        }
+      if (Number(getValue("Base.nPayNum"))>12) {
+        ElMessage.warning("拆分最多为12期！");
+        return false
+      }
+      if(getValue("Base.nPayNum")!=''){
 
-        let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
-        // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
- 
-        let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
-           val= { "_dataId": "",
+        // 多期情况 添加特约信息
+        if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
+
+        const data = opertaor.getDataAll();
+
+        let nCiShare = Number(getOwnShare()) || 1 ;
+        const totalAmount = Number(data['base']['Base.nPrm']);
+        const splitCount =Number(data.base?.['Base.nPayNum'])
+
+        const totalCent = Math.round(totalAmount * 100);
+        const result = ref<number[]>([]);
+        const quotient = Math.floor(totalCent / splitCount) ;
+        const remainder = totalCent % splitCount;
+        result.value = Array(splitCount).fill(quotient);
+        if (remainder > 0) {
+          result.value[splitCount-1] += remainder;
+        }
+        result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
+        let val= {}
+        let valArr=[]
+        for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
+          let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
+          let startDate = new Date(BgnTmDate);
+          let endDate = new Date(BgnTmDate)
+          if (getValue("Base.cInstMrk")=='5') {
+            startDate.setDate(BgnTmDate.getDate() + i * 15);
+            endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15);
+          } else {
+            startDate.setDate(BgnTmDate.getDate() + i * 30);
+            endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30);
+          }
+
+          let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
+          // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
+
+          let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
+          val= { "_dataId": "",
             "Pay.nTms":i+1 ,
             "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
             "Pay.tPayBgnTm": tInsrncBgnTm,
@@ -165,13 +176,15 @@ const nPayNumberFun = ()=>{
           }
 
           valArr.push(val)
+        }
+
+        console.log('数据',valArr)
+
+        opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
       }
 
-      console.log('数据',valArr)
-   
-      opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
-    }
- } 
+    })
+ }
 
 // 绑定方法
 const method = {
@@ -384,12 +397,32 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
+
+const getGroupKey = (key: string) => {
+  let ikey = key;
+  if(groupId.value && baseFormatKeys.includes(key)) {
+    ikey = `${groupId.value ? groupId.value.replace('group-', '') : ''}:${key}`
+  }
+  return ikey;
+}
+
 function getFromValue() {
-  return baseEditRef?.value?.getFromValue();
+  const fromData = baseEditRef?.value?.getFromValue();
+  return peelFormDataByProdNo(fromData, groupId.value ? groupId.value.replace('group-', '') : '')
 }
 
 function setFormValue(value: any) {
-  baseEditRef?.value?.setFormValue(value);
+  const prodNos = []
+  if(!groupId.value) {
+    prodNos.push(...route.params?.param.cProdList)
+    nextTick(() => {
+      groupId.value = CommonGroupId
+    })
+  }else {
+    prodNos.push(groupId.value ? groupId.value.replace('group-', '') : '')
+  }
+  const res = joinFormDataByProdNo(value, prodNos)
+  baseEditRef?.value?.setFormValue(res);
 }
 
 function validate() {
@@ -397,18 +430,19 @@ function validate() {
 }
 
 function setValue(key: string, value: any) {
-  baseEditRef?.value?.setValue(key, value);
+  baseEditRef?.value?.setValue(getGroupKey(key), value);
 }
 
 function getValue(key: string) {
-  return baseEditRef?.value?.getValue(key);
+  return baseEditRef?.value?.getValue(getGroupKey(key));
 }
 
 //给表单赋值
 function setFormItem(key: any, obj: any) {
+  const ikey = getGroupKey(key)
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
+      if (item.prop === ikey) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {
           for (let key in obj.btnItems) {
@@ -441,6 +475,11 @@ function numMulti(num1, num2) {
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   baseEditRef?.value?.addProvide(key, value);
 }
+const setGroupId = (id: string) => {
+  if(groupId.value) {
+    groupId.value = id
+  }
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -450,7 +489,8 @@ defineExpose({
   getFormconfig,
   nPayNumberFun,
   addProvide,
-  setFormItem
+  setFormItem,
+  setGroupId
 });
 </script>
 

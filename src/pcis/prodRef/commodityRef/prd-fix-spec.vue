@@ -135,36 +135,48 @@ const handleSelectionChange = (selection) => {
   selected.value = selection;
 };
 
+
+// 查询列表数据
 const refreshData = () => {
+  console.log('props.data', props.data)
   const cProdNo = props.data.cProdNo;
   const cDptCde = props.data.cDptCde || '';
-
-  // 查询列表数据
-  getpSpecialAgreement({
-    cProdNo: cProdNo,
+  const cProdList = props.data.cProdList;
+  const tAppTm = props.data.tAppTm;
+  pageresult.list = []
+  const getResult = (result: any[], prodNo: string) => {
+    result.forEach((item, index) => {
+      pageresult.list.push({
+        cSpecialCode: item.cSpecialCode,
+        cSpecialContent: item.cSpecialContent,
+        cSpecialContentEn: item.cSpecialContentEn,
+        cProdNo: prodNo,
+        // cNmeEn: item.cNmeEn,
+        cIfMust: item.cIfMust, //是否必选
+        cIfEdit: item.cIfEdit, //是否可修改
+        cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
+      });
+    });
+  }
+  const reqParam: any = {
     cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
-    tAppTm: props.data.tAppTm
-  }).then((res) => {
+    tAppTm: tAppTm
+  }
+  if(cProdList && cProdList.length > 0) { // 组合出单用
+    reqParam.cProdNos = cProdList;
+  } else {
+    reqParam.cProdNo = cProdNo;
+  }
+  getpSpecialAgreement(reqParam).then((res) => {
     if (res.data?.result) {
-      pageresult.list = [];
-      res.data.result.forEach((item, index) => {
-        pageresult.list.push({
-          cSpecialCode: item.cSpecialCode,
-          cSpecialContent: item.cSpecialContent,
-          cSpecialContentEn: item.cSpecialContentEn,
-          // cNmeEn: item.cNmeEn,
-          cIfMust: item.cIfMust, //是否必选
-          cIfEdit: item.cIfEdit, //是否可修改
-          cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
-        });
-      });
-      nextTick(() => {
-        toggleSpecificRow(); //这里调用是把必选的选中
-        setSelected();
-      });
+      getResult(res.data.result, cProdNo)
     }
+  });
+  nextTick(() => {
+    toggleSpecificRow(); //这里调用是把必选的选中
+    setSelected();
   });
 };
 

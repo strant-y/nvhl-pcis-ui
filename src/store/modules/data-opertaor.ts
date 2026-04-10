@@ -51,9 +51,20 @@ export const dataOpertaor = (props: OpertaorProps) => {
             Object.assign(tableRefs, tablerefs);
         };
         const getTableRefs = () => {
+            // 组合出单场景 组件注入当前groupId
+            if(type === OpertaorPosit) {
+                Object.entries(tableRefs).forEach(([key, value]) => {
+                    if(value && typeof value.setGroupId === 'function') {
+                        value.setGroupId(id)
+                    }
+                })
+            }
             return tableRefs;
         };
         const getTableRefByKey = (key: string) => {
+            if(type === OpertaorPosit && typeof tableRefs[key]?.setGroupId === 'function') {
+                tableRefs[key].setGroupId(id)
+            }
             return tableRefs[key];
         };
         const init = () => {
@@ -86,13 +97,16 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
                         //: 再保时,不再获取这3个组件的数据
                     } else {
+                        if(type === OpertaorPosit && typeof tableRefs[key]?.setGroupId === 'function') {
+                            tableRefs[key].setGroupId(id)
+                        }
                         res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
                     }
                 } catch (error) {
                     // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
-            console.log(`############## ${id} -> getDataAll()`)
+            console.log(`############## ${id} -> getDataAll()`, keys)
             // 组合出单场景
             if(type === OpertaorPosit) {
                 if(allDataFormat && typeof allDataFormat === 'function') {
@@ -336,7 +350,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
 
             Object.keys(res1)?.forEach((k) => {
                 const sc = schema[k];
-                if (sc["fromSchema"] && sc["fromSchema"].length > 0) {
+                if (sc && sc["fromSchema"] && sc["fromSchema"].length > 0) {
                 const fromSchema = sc["fromSchema"];
                 fromSchema.forEach((f) => {
                     if (f.inputtype === "rtinputgroup") {
@@ -390,8 +404,9 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 }
             });
             Object.keys(res1)?.forEach(k => {
+                console.log(k, schema[k])
                 const sc = schema[k];
-                if (sc['fromSchema'] && sc['fromSchema'].length > 0) {
+                if (sc && sc['fromSchema'] && sc['fromSchema'].length > 0) {
                     const fromSchema = sc['fromSchema'];
                     fromSchema.forEach(f => {
                         if (f.inputtype === 'rtinputgroup') {

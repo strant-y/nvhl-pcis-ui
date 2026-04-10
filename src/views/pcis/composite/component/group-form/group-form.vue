@@ -7,6 +7,7 @@
     :id="k.id"
   >
     <component
+      v-show="!pageView.hiddenCompKeys.includes(k.pageKey)"
       :ref="(res: any) => {
         const pageK =
           k.pageKey === 'dist' || k.pageKey === 'distSummary'
