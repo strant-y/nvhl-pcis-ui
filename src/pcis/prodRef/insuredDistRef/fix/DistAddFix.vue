@@ -480,7 +480,7 @@ const InsuredCCertfCls =(val:any) => {
 	}
   setFormItem("InsuredDist.tCertfBgnDate", { rules: null });
   setFormItem("InsuredDist.tCertfEndDate", { rules: null });
-  setFormItem("InsuredDist.tEstablishingDate", { disabled: true, rules: null });
+  setFormItem("InsuredDist.tEstablishingDate", { rules: null });
 	clearValidate('InsuredDist.tEstablishingDate')  // 清除报错信息
   if (val == "111") {
      setFormItem("InsuredDist.cCertfCde", {
@@ -516,8 +516,7 @@ const InsuredCCertfCls =(val:any) => {
 		 });
 		 if (!init.value) {
 				// 为法人  企业成立日期
-				setFormItem("InsuredDist.tEstablishingDate", {
-					disabled: false,
+			 setFormItem("InsuredDist.tEstablishingDate", {
 					rules: [getRules("required", {})],
 				});
 		 }
@@ -829,7 +828,6 @@ const tEstablishingDateChange = (val: any) => {
 				clearValidate('InsuredDist.tEstablishingDate')  // 清除报错信息
 			}
 			setFormItem("InsuredDist.tEstablishingDate", {
-				disabled: !init.value && isSpecialCase ? false : true,
 				rules: isSpecialCase ? requiredRule : []
 			});
 
@@ -993,7 +991,6 @@ const tEstablishingDateChange = (val: any) => {
 				clearValidate('InsuredDist.tEstablishingDate')  // 清除报错信息
 			}
 			setFormItem("InsuredDist.tEstablishingDate", {
-				disabled: true,
 				rules: [],
 			});
 
@@ -1180,7 +1177,6 @@ const cWorkDptChange = (val: any) => {
     });
     // 企业成立日
     setFormItem("InsuredDist.tEstablishingDate", {
-			disabled: !init.value && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
 		if (!init.value && !isSpecialCase) {
