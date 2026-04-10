@@ -561,13 +561,32 @@ const method = {
   //代理业务员
   cBrkSlsCdeChange:()=>{
     const rowData = freeEditRef.value?.getSelectRow();
-    const rowId = rowData?._dataId;
+		const rowId = rowData?._dataId;
+		let AgreementBase = formPage.getFormDataById("AgreementBase");
+		let cslstyp = "";
+    if (AgreementBase['ECargoBase.cChaType'] === "1900201") {
+      // 个人代理时
+      cslstyp = "020003";
+    } else if (
+      AgreementBase['ECargoBase.cChaType'] !== "19001" &&
+      AgreementBase['ECargoBase.cChaType'] !== "1900201"
+    ) {
+      // 非直销且非个人代理
+      cslstyp = "020004";
+    };
     dialogRef.value?.open(
       "eCargociagentWorker",
       {
         type: "show",
         data: {
-          rowData: rowData,
+					rowData: rowData,
+					cBsnsTyp: AgreementBase["ECargoBase.cBsnsTyp"],
+          CChaType: AgreementBase["ECargoBase.cChaType"],
+          cChaSubtype: AgreementBase["ECargoBase.cChaSubtype"],
+          CSlsId: AgreementBase["ECargoBase.CSlsId"], //业务员员工号
+          CBrkrCde: rowData["ECargoCi.cBrkrCde"], //代理(经纪)人
+          CSlsTyp: cslstyp,
+          leading: "CBrkSlsCde",
         },
         method: {
           getSelected: (params) => {
