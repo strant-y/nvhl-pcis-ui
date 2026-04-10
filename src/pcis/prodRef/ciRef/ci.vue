@@ -840,13 +840,32 @@ const method = {
   //代理业务员
   cBrkSlsCdeChange: () => {
     const rowData = freeEditRef.value?.getSelectRow();
-    const rowId = rowData?._dataId;
+		const rowId = rowData?._dataId;
+		let cslstyp = "";
+		let cBsnsTyp = opertaor.getTableRefByKey("plyBase").getValue("Base.cBsnsTyp");
+		let cChaType = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaType");
+		let cChaSubtype = opertaor.getTableRefByKey("plyBase").getValue("Base.cChaSubtype");
+    if (cChaType === "1900201") {
+      // 个人代理时
+      cslstyp = "020003";
+    } else if (
+      cChaType !== "19001" &&
+      cChaType !== "1900201"
+    ) {
+      // 非直销且非个人代理
+      cslstyp = "020004";
+    }
     dialogRef.value?.open(
       "ciagentWorker",
       {
         type: "show",
         data: {
           rowData: rowData,
+          CChaType: cChaType,
+					CChaSubtype: cChaSubtype,
+					CBrkrCde: rowData['Ci.cBrkrCde'],
+          CSlsTyp: cslstyp,
+          leading: "CBrkSlsCde",
         },
         method: {
           getSelected: (params) => {

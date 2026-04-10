@@ -636,12 +636,12 @@ const method = {
           CDptCde: getValue("ECargoBase.cDptCde"),
           cDptCnm: getValue("ECargoBase.cDptCnm"),
           cBsnsTyp: getValue("ECargoBase.cBsnsTyp"),
-          cChaType: getValue("ECargoBase.cChaType"),
+          CChaType: getValue("ECargoBase.cChaType"),
           cChaSubtype: getValue("ECargoBase.cChaSubtype"),
           CSlsId: getValue("ECargoBase.CSlsId"), //业务员员工号
-          CBrkrCde: getValue("ECargoBase.CBrkrCde"), //代理(经纪)人
+          CBrkrCde: getValue("ECargoBase.cBrkrCde"), //代理(经纪)人
           CDptAttr: getValue("ECargoBase.CDptAttr"), //投保单业务归属部门的部门类型(angular上被hidden的,逻辑赋值angular：guide.component.ts【324行】)
-          // CSlsTyp: cslstyp,
+          CSlsTyp: cslstyp,
           leading: "CBrkSlsCde",
         },
         method: {
