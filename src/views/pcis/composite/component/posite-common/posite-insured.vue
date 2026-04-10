@@ -538,7 +538,6 @@ const method = {
 				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 			}
 			setFormItem("Insured.tEstablishingDate", {
-				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -686,7 +685,6 @@ const method = {
 				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 			}
       setFormItem("Insured.tEstablishingDate", {
-				disabled: true,
         rules:[],
       });
 
@@ -1021,7 +1019,7 @@ const method = {
       //     disabled: false,
       // });
     }
-		setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
+		setFormItem("Insured.tEstablishingDate", { rules: null });
 		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
     if (val == "111") {
       // setValue('Insured.cCertfCde','')  //选身份证时清空
@@ -1078,7 +1076,6 @@ const method = {
 
       // 为法人  企业成立日期
       setFormItem("Insured.tEstablishingDate", {
-				disabled: false,
         rules: [getRules("required", {})],
       });
 
@@ -1295,7 +1292,6 @@ const method = {
   });
   // 企业成立日
   setFormItem("Insured.tEstablishingDate", {
-		disabled: !param.initFlag && isSpecialCase ? false : true,
     rules: isSpecialCase ? requiredRule : []
   });
 	if (!param.initFlag && !isSpecialCase) {

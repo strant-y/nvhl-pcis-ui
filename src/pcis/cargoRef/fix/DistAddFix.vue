@@ -584,7 +584,6 @@ const cClntMrkFunc = (val:any) => {
 			clearValidate('ECargoInsuredDist.tEstablishingDate')  // 清除报错信息
 		}
     setFormItem("ECargoInsuredDist.tEstablishingDate", {
-			disabled: !initFlag.value && isSpecialCase && props.data.title !== '详情' ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
 
@@ -749,7 +748,6 @@ const cClntMrkFunc = (val:any) => {
 			clearValidate('ECargoInsuredDist.tEstablishingDate')  // 清除报错信息
 		}
     setFormItem("ECargoInsuredDist.tEstablishingDate", {
-			disabled: true,
       rules: [],
     });
 
@@ -1019,7 +1017,7 @@ const InsuredCCertfCls =(val:any) => {
   });
   setFormItem("ECargoInsuredDist.tCertfBgnDate", { rules: null });
   setFormItem("ECargoInsuredDist.tCertfEndDate", { rules: null });
-  setFormItem("ECargoInsuredDist.tEstablishingDate", { disabled: true, rules: null });
+  setFormItem("ECargoInsuredDist.tEstablishingDate", { rules: null });
 	clearValidate('ECargoInsuredDist.tEstablishingDate')  // 清除报错信息
 
   if (val == "111") {
@@ -1172,7 +1170,6 @@ const cWorkDptChange = (val: any) => {
   });
   // 企业成立日
   setFormItem("ECargoInsuredDist.tEstablishingDate", {
-		disabled: !initFlag.value && isSpecialCase && props.data.title !== '详情' ? false : true,
     rules: isSpecialCase ? requiredRule : []
 	});
 	if (!initFlag.value && !isSpecialCase) {
