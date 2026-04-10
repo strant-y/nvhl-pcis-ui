@@ -1015,17 +1015,19 @@ const method = {
     }
   },
 	industryTypeChange: (val: any) => {
-		// 行业类型为煤矿和非煤矿山时，安全生产许可证号必填
-		if (val == '10' || val == '11') {
-			setFormItem("Tgt.cSafetyProduction", {
-        rules: [getRules("required", {})],
-      });
-		} else {
-			setValue("Tgt.cSafetyProduction", null)
-			clearValidate('Tgt.cSafetyProduction');
-			setFormItem("Tgt.cSafetyProduction", {
-        rules: null,
-      });
+		// 043009产品-行业类型为煤矿和非煤矿山时，安全生产许可证号必填
+		if (params.cProdNo === '043009') {
+			if (val == '10' || val == '11') {
+				setFormItem("Tgt.cSafetyProduction", {
+					rules: [getRules("required", {})],
+				});
+			} else {
+				setValue("Tgt.cSafetyProduction", null)
+				clearValidate('Tgt.cSafetyProduction');
+				setFormItem("Tgt.cSafetyProduction", {
+					rules: null,
+				});
+			}
 		}
     groupCheck();
   },
