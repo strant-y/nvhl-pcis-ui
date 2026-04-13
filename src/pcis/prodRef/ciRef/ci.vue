@@ -1570,7 +1570,70 @@ function setFormValue(value: any) {
         freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cBankAddr", "rules", []);
         freeEditRef.value?.setRowFieldProp(item._dataId, "Ci.cPubPri", "rules", []);
       }
-    })
+		})
+		// 批改联供保信息
+		let cRsnCde = param['cRsnCde'] ? param['cRsnCde'] : param['cEdrRsnBundleCde'];
+		if (!!cRsnCde && cRsnCde == '47') {
+			setTimeout(() => {
+				const cCiMrkFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
+				if(cCiMrkFlag == '0' || cCiMrkFlag == '5'){
+					return
+				}
+				dataList.forEach((item) => {
+					const cChiefMrk = item['Ci.cChiefMrk']; // 主共标志 ('1'=主共, '0'=从共)
+					const cIssueMrk = item['Ci.cIssueMrk']; // 出单标志 ('1'=主共, '0'=从共)
+					const cCoinsurerCde = item['Ci.cCoinsurerCde']; // 共保公司代码
+					const isYongan = (cCoinsurerCde === '327001'); // 判断是否为我方(永安)
+
+					// 定义字段禁用逻辑
+					// 返回 true 表示禁用(只读)，返回 false 表示可编辑
+					const checkDisabled = (field) => {
+						
+						// --- 场景 1: 主共 ---
+						// 规则：只允许修改共保比例 (Ci.nCiShare)
+						if (cChiefMrk == '1' && cCiMrkFlag != '0') {
+							return field !== 'Ci.nCiShare'; // 除了比例，其他都禁用
+						}
+
+						//1外部共保我方主共_主联：他司是从共，可以变更共保公司 、共保比例、出单费比例变更
+						//2外部共保我方从共_主联：永安是从共，可以修改出单费比例
+						//3外部共保我方主共_无联保：他司是从共，可以变更共保公司 、共保比例、出单费比例变更
+						//4外部共保我方从共_无联保：永安是从共，可以修改出单费比例
+						// --- 场景 2: 从共/从联 ---
+						// 规则：永安只改费，非永安全改
+						if (cChiefMrk == '0') {
+							if (isYongan) {
+								// 永安：只允许修改出单费比例 (Ci.nPlyFeeRate)
+								return field !== 'Ci.nPlyFeeRate';
+							} else {
+								// 非永安：允许修改公司、比例、出单费比例
+								const editableList = ['Ci.cCoinsurerCde', 'Ci.nCiShare', 'Ci.nPlyFeeRate'];
+								return !editableList.includes(field);
+							}
+						}
+						// 1外部共保我方主共_主联：我司从联方，可以修改出单费比例
+						// 2外部共保我方从共_主联：我司从联方，可以修改出单费比例
+						return true;
+					};
+
+					// 批量设置字段状态
+					// 这里列出了所有需要控制的字段
+					const fieldsToCheck = [
+						"Ci.cCoinsurerCde", // 共保公司
+						"Ci.nCiShare",      // 共保比例
+						"Ci.nCiAmt",        // 共保保额
+						"Ci.nCiPrm",        // 共保保费
+						"Ci.nPlyFeeRate",   // 出单费比例
+						"Ci.nPlyFee"        // 出单费金额
+					];
+
+					fieldsToCheck.forEach(field => {
+						const isDisabled = checkDisabled(field);
+						freeEditRef.value?.setRowFieldProp(item._dataId, field, "disabled", isDisabled);
+					});
+				});
+			}, 5000)
+		}
   })
 }
 function setValueByRowKey(props: string, rowId: any, value: any) {
