@@ -226,7 +226,7 @@
           </template>
           <template v-if="riskShowTyp === 'grid'">
             <term047005 v-if="pageparam.cProdNo === '049022' " :termCode="modelValue['Term.cClauseCode']" :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate" /> 
-            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate"/>
+            <app-grid-edit v-else :gridEditConfig="riskGridConfig" ref="riskTableRef" @updateDatas="termUpdate" @rowClick="selectRow"/>
           </template>
             <template v-if="riskShowTyp !== 'grid'"> 
               <template v-for="(ginfo, gk) in groupInfo" :key="gk">
