@@ -604,8 +604,8 @@ function sumMoney(flag_to_alert: any,row:any) {
           return false;
         }
       }
-      freeEditRef.value?.setValue("nFeePropSum", my_rate);
-      freeEditRef.value?.setValue("nPrmSum", my_sum);
+      freeEditRef.value?.setValue("nFeePropSum", formartNum(my_rate));
+      freeEditRef.value?.setValue("nPrmSum", formartNum(my_sum));
     }
 }
 
