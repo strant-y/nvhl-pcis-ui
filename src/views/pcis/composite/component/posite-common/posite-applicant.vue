@@ -425,7 +425,7 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         disabled: false,
       });
-      resetFn()
+      // resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];

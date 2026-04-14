@@ -1101,7 +1101,7 @@ const method = {
       setFormItem('Insured.cLongendTyp', {
         disabled: false
       })
-      resetFn()
+      // resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];

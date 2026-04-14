@@ -221,7 +221,7 @@ const method = {
       setFormItem("ECargoApplicant.cCertfCde", {
         disabled: false,
       });
-      resetFn()
+      // resetFn()
     }
     setFormValue(applicantValue);
   },
