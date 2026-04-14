@@ -3350,6 +3350,13 @@ const calcPremium = () => {
     }
     return;
   }
+  const cCardBsnsTyp = res['base']['Base.cCardBsnsTyp']? res['base']['Base.cCardBsnsTyp'] : res['plyBase']['Base.cCardBsnsTyp'];
+  if(cCardBsnsTyp && 'XKCSzx' === cCardBsnsTyp){  //世懋渠道,无需进行保费计算
+    ElMessage.success("保费计算成功!");
+    needCalc.value = false;
+    btn.loading = false;
+    return ;
+  }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
