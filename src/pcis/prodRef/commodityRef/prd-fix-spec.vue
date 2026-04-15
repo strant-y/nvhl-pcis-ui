@@ -36,6 +36,18 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
+				<el-form label-position="top">
+					<el-form-item label="请输入所有特约 (使用 1.,2. 分隔):">
+						<!-- 输入框 -->
+						<el-input
+							v-model="rawInput"
+							type="textarea"
+							:rows="4"
+							placeholder="示例：1.特约条款A2.特约条款B3.特约条款C..."
+							@blur="handleSplit"
+						/>
+					</el-form-item>
+				</el-form>
         <el-table
           ref="multipleTableOtherRef"
           :data="addTableData"
@@ -62,7 +74,7 @@
         </el-table>
         <el-button @click="add" class="addSty" :icon="Plus">新增一行</el-button>
       </el-tab-pane>
-      <div class="languageCheckbox">
+      <div v-if="activeName != 'second'" class="languageCheckbox">
         <el-checkbox-group v-model="checkedLanguage" @change="languageChange">
           <el-checkbox label="中文" value="zh-CN" />
           <el-checkbox label="英文" value="en-US" />
@@ -261,6 +273,33 @@ onMounted(() => {
     }
     refreshData();
 });
+
+// 1. 绑定输入框的内容
+const rawInput = ref('') 
+
+// 2. 处理分割逻辑
+const handleSplit = () => {
+  if (!rawInput.value) {
+    return
+  }
+	// 按照 || 分割、去除首尾空格、过滤空字符串
+	// const arr = rawInput.value.split('||').map(item => item.trim()).filter(item => item !== '') 
+	// 按照 数字加点 分割、去除首尾空格、过滤空字符串
+	const arr = rawInput.value.split(/\d+\.\s*/).map(item => item.trim()).filter(item => item !== '');
+		
+	arr.forEach((item) => {
+		addTableData.push({
+			addIndex: addTableData.length + 1, //序号
+			cSpecialCode: "",
+			cSpecialContent: item,
+			cIfEdit: "1", //是否可修改
+			cIfMust: "2", //是否必选
+			cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+		});
+	})
+
+	rawInput.value = ''
+}
 </script>
 
 <style scoped lang="scss">

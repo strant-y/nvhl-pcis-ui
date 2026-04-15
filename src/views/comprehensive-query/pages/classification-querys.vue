@@ -2697,6 +2697,7 @@ async function exportAE( flag?: boolean, isEs) {
         param.IndexType = 'ply_insured_info';
     }
     formconfig1.endBtns[2].loading = true
+		debugger
     policyService.searchFileDown(param).then((res: any) => {
         formconfig1.endBtns[2].loading = false
         if (res.size <= 0) {

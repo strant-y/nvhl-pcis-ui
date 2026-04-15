@@ -421,7 +421,7 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         disabled: false,
       });
-      resetFn()
+      // resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -1846,6 +1846,7 @@ function getCodeListMap() {
 }
 // 客户重置
 function resetFn() {
+	debugger
   const cAppNo = opertaor.getTableRefByKey('plyBase')?.getFromValue()?.['Base.cAppNo'];
   if(!param.cAppNo || !cAppNo) return;
   const params = {
