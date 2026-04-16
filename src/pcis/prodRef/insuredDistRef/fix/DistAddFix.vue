@@ -880,7 +880,31 @@ const tEstablishingDateChange = (val: any) => {
 			setFormItem("InsuredDist.cWorkDpt", {
 				rules: [getRules("required", {})],
 			});
-    }else{
+			// 注册地址是否同上
+			setFormItem("InsuredDist.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("InsuredDist.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("InsuredDist.cRegisteredcapDre", {
+        hidden: false,
+      });
+		} else {
+			// 注册地址是否同上
+			setFormItem("InsuredDist.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("InsuredDist.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("InsuredDist.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("InsuredDist.tBirthday", {
 				hidden: false,
 			});
@@ -897,7 +921,7 @@ const tEstablishingDateChange = (val: any) => {
 				hidden: false,
 			});
 			setFormItem("InsuredDist.cBusinessScope", {
-				hidden: false,
+				hidden: true,
 			});
 			setFormItem("InsuredDist.cMrgCde", {
 				hidden: false,

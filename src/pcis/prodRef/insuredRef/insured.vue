@@ -755,7 +755,31 @@ const method = {
       // setFormItem("Insured.tOperaterCertfEndTm", {
       //   hidden: true,
       // });
-    } else {
+			// 注册地址是否同上
+			setFormItem("Insured.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Insured.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Insured.cRegisteredcapDre", {
+        hidden: false,
+      });
+		} else {
+			// 注册地址是否同上
+			setFormItem("Insured.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("Insured.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Insured.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("Insured.tBirthday", {
         hidden: false,
       });
@@ -772,7 +796,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Insured.cBusinessScope", {
-        hidden: false,
+        hidden: true,
       });
       setFormItem("Insured.cMrgCde", {
         hidden: false,
