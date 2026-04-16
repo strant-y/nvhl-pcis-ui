@@ -1574,7 +1574,6 @@ const method = {
       "553": "ariCard", // 外国人永久居留身份证
 		};
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    baseRules = [getRules("required", {}), ...baseRules]
 
     setFormItem("Insured.cShareholderCode", {
       rules: baseRules,

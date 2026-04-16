@@ -1035,8 +1035,22 @@ const method = {
           });
       }
       return;
-    }
-    if (val == "1") {// 个人
+		}
+		if (param.cProdNo.slice(0, 2) === "05") {
+			// 大股东证件类型
+			setFormItem("Applicant.cShareholderCategory", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+			// 大股东证件号码
+			setFormItem("Applicant.cShareholderCode", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+			// 大股东名称
+			setFormItem("Applicant.cShareholderName", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+		}
+		if (val == "1") {// 个人
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -1059,7 +1073,7 @@ const method = {
             loadData: res,
           });
         });
-    } else {
+		} else {
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -1494,7 +1508,11 @@ const method = {
       "553": "ariCard", // 外国人永久居留身份证
 		};
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    baseRules = [getRules("required", {}), ...baseRules]
+		if (getValue('Applicant.cShareholderNature') == '0') {
+			baseRules = [getRules("required", {}), ...baseRules]
+		} else {
+			baseRules = [...baseRules]
+		}
 
     setFormItem("Applicant.cShareholderCode", {
       rules: baseRules,
