@@ -194,24 +194,38 @@ function setSelected() {
 }
 
 function delAdd(row: any) {
-  const list = addTableData.value.filter(f => f['cDeductibleClass'] !== row['cDeductibleClass']);
-  const newAddList = list.map((m,idx) => {
-    // const idx = list.length;
-    return {
-      ...m,
-      ...{
-        index: idx+1,
-        // cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx +1,
-      }
+	ElMessageBox.confirm(
+    '确定要删除这条特约吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  });
+	)
+	.then(() => {
+		const list = addTableData.value.filter(f => f['cDeductibleClass'] !== row['cDeductibleClass']);
+		const newAddList = list.map((m,idx) => {
+			// const idx = list.length;
+			return {
+				...m,
+				...{
+					index: idx+1,
+					// cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx +1,
+				}
+			}
+		});
 
-  // if(newAddList){
-      // addTableData.length = 0; // 清空原有内容（保持响应式引用）
-      addTableData.value=newAddList; // 展开新数组，批量添加
-  // }
+		// if(newAddList){
+				// addTableData.length = 0; // 清空原有内容（保持响应式引用）
+				addTableData.value=newAddList; // 展开新数组，批量添加
+		// }
 
-  // addTableData.value = newAddList;
+		// addTableData.value = newAddList;
+	})
+	.catch(() => {
+		// 用户点击取消，不执行操作
+	});
 }
 
 onMounted(() => { 
