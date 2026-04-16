@@ -706,10 +706,6 @@ const method = {
       setFormItem("Applicant.cParticiinsocTyp", {
         rules: [getRules("required", {})],
       });
-      //注册地址
-      // setFormItem("Applicant.cRegisteredcapDre", {
-      //   rules: [getRules("required", {})],
-      // });
 
       // 注册地址
       setFormItem("Applicant.RegisterProp", {
@@ -797,9 +793,32 @@ const method = {
       });
       setFormItem("Applicant.nYearincomeNum", {
         rules: [],
+			});
+			// 注册地址是否同上
+			setFormItem("Applicant.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Applicant.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Applicant.cRegisteredcapDre", {
+        hidden: false,
       });
     } else {
-      
+      // 注册地址是否同上
+			setFormItem("Applicant.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("Applicant.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Applicant.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("Applicant.tBirthday", {
         hidden: false,
       });
@@ -816,7 +835,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Applicant.cBusinessScope", {
-        hidden: false,
+        hidden: true,
         rules: []
       });
       setFormItem("Applicant.cMrgCde", {
@@ -1035,8 +1054,22 @@ const method = {
           });
       }
       return;
-    }
-    if (val == "1") {// 个人
+		}
+		if (param.cProdNo.slice(0, 2) === "05") {
+			// 大股东证件类型
+			setFormItem("Applicant.cShareholderCategory", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+			// 大股东证件号码
+			setFormItem("Applicant.cShareholderCode", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+			// 大股东名称
+			setFormItem("Applicant.cShareholderName", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+		}
+		if (val == "1") {// 个人
       codeListStore
         .queryCodeList({
           codeListName: "NATURAL_CERTIFICATE_CACHE",
@@ -1059,7 +1092,7 @@ const method = {
             loadData: res,
           });
         });
-    } else {
+		} else {
       codeListStore
         .queryCodeList({
           codeListName: "UN_NATURAL_CERTIFICATE_CACHE",
@@ -1494,7 +1527,11 @@ const method = {
       "553": "ariCard", // 外国人永久居留身份证
 		};
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    baseRules = [getRules("required", {}), ...baseRules]
+		if (getValue('Applicant.cShareholderNature') == '0') {
+			baseRules = [getRules("required", {}), ...baseRules]
+		} else {
+			baseRules = [...baseRules]
+		}
 
     setFormItem("Applicant.cShareholderCode", {
       rules: baseRules,
@@ -1846,7 +1883,6 @@ function getCodeListMap() {
 }
 // 客户重置
 function resetFn() {
-	debugger
   const cAppNo = opertaor.getTableRefByKey('plyBase')?.getFromValue()?.['Base.cAppNo'];
   if(!param.cAppNo || !cAppNo) return;
   const params = {

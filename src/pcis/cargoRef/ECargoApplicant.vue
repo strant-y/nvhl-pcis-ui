@@ -516,7 +516,31 @@ const method = {
       setFormItem("ECargoApplicant.nYearincomeNum", {
         rules: [],
       });
+			// 注册地址是否同上
+			setFormItem("ECargoApplicant.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("ECargoApplicant.Address", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("ECargoApplicant.cRegisteredcapDre", {
+        hidden: false,
+      });
     } else {
+      // 注册地址是否同上
+			setFormItem("ECargoApplicant.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("ECargoApplicant.Address", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("ECargoApplicant.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("ECargoApplicant.tBirthday", {
         hidden: false,
       });
@@ -533,7 +557,7 @@ const method = {
         hidden: false,
       });
       setFormItem("ECargoApplicant.cBusinessScope", {
-        hidden: false,
+        hidden: true,
       });
       setFormItem("ECargoApplicant.cMrgCde", {
         hidden: false,

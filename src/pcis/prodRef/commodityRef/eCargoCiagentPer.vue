@@ -416,7 +416,6 @@ function getAgencyBusinessList(param?: any) {
 // }
 
 onMounted(() => {
-  debugger;
   // if (sessionStorage.getItem("toMyPageData")) {
     const data = JSON.parse(sessionStorage.getItem("toMyPageData"));
     //业务来源大类下拉数据

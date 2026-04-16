@@ -247,7 +247,12 @@ onMounted(async () => {
 
   setFormItem("Tgt.cContactNumber", {
     rules: [getRules("phoneNo", {})],
-  });
+	});
+	// 
+	// 043007 危险货物运输许可证号 新车未办理可以录入新车未办理
+  if(params.cProdNo === '043007') {
+		setFormItem("Tgt.cDangerousNo", {iconInfo: '（新车未办理，请在此录入【新车未办理】）' })
+	}
 	setFormItem('Tgt.cCertificateDetailed', { autosize: true })
   selectType()
   // 059902 “借款金额”要素，只有“担保方式”选择“质押贷款”时 才会带出
@@ -1774,10 +1779,13 @@ const method = {
     //   //  网络预约出租汽车运输证
     //   setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("onlineTaxiTransportLicense", {})] })  //证件号
     // }
-    if (val) {
-      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})] })  //证件号
-    }
-
+		if (val == '01') {
+      setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {cCertificateNo: val})],iconInfo:'（新车未办理，请在此录入【新车未办理】）' })  //证件号
+		} else {
+			if (val) {
+				setFormItem("Tgt.cCertificateNo", { rules: [getRules("required", {}), getRules("roadTransportLicense", {})],iconInfo:null })  //证件号
+			}
+		}
   },
   // 证件有效起期
   tStartDateDisable: (date: any) => {

@@ -611,8 +611,39 @@ const method = {
 
       // setFormItem("Insured.tOperaterCertfEndTm", {
       //   hidden: true,
-      // });
-    } else {
+			// });
+			
+      setFormItem("Insured.cBusinessScope", {
+        hidden: true,
+			});
+			// 注册地址是否同上
+			setFormItem("Insured.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Insured.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Insured.cRegisteredcapDre", {
+        hidden: false,
+      });
+		} else {
+			setFormItem("Insured.cBusinessScope", {
+        hidden: true,
+			});
+			// 注册地址是否同上
+			setFormItem("Insured.cIsSame", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Insured.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Insured.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("Insured.tBirthday", {
         rules: [getRules("required", {})],
       });

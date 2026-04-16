@@ -41,6 +41,12 @@ const props = defineProps({
       return {}
     }
   },
+	data: {
+    type: Object,
+    default: () => {
+      return {}
+    }
+  },
   opertaor: {
     type: Object
   }
@@ -61,6 +67,7 @@ const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const dialogVisible = ref(true)
 const policyService = new PolicyService();
+const isHidden = ref(false)
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -73,6 +80,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "保存",
+        hidden: isHidden.value,
         func: async () => {
           saveTaxInfo()
         },
@@ -80,7 +88,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
        createFreeButtonBase({
         type: "primary",
         label: "主共发票信息",
-        hidden: (cCiMrk.value !== '2' && cCiMrk.value !== '4'),
+        hidden: (cCiMrk.value !== '2' && cCiMrk.value !== '4') || isHidden.value,
         func: async () => {
             let customerCode = '9'+ new Date().getTime();
             setValue('CCustomerCode', customerCode);
@@ -94,6 +102,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "同投保人",
+        hidden: isHidden.value,
         disabled: (cGrpMrk == 1),
         func: async () => {
           copyApplicant()
@@ -102,6 +111,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         type: "primary",
         label: "同被保人",
+        hidden: isHidden.value,
         disabled: (cGrpMrk == 1),  //  0 个单  1团单  团单禁用
         func: async () => {
           copyInsured()
@@ -109,6 +119,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
       createFreeButtonBase({
         label: "关闭",
+        hidden: isHidden.value,
         func: () => {
           console.log('cl  guanbi')
           close('close')
@@ -419,11 +430,15 @@ onMounted(() => {
    nextTick(()=>{
     freeEditRef.value?.setValue('CAppNo', CAppNo); 
     freeEditRef.value?.setValue('CGrpMrk', cGrpMrk); 
-    
-       setFormItem('CCustomerType',{disabled:true})
-       setFormItem('CCustomerNm',{disabled:true})
-       setFormItem('CCertfCls',{disabled:true})
-       setFormItem('CCertfCde',{disabled:true})
+		setFormItem('CCustomerType',{disabled:true})
+		setFormItem('CCustomerNm',{disabled:true})
+		setFormItem('CCertfCls',{disabled:true})
+		setFormItem('CCertfCde',{disabled:true})
+		// 所有查看详情页，发票信息弹框只读
+		if (!!props.data?.pageType &&(props.data?.pageType == 'readonly' || props.data?.pageType == 'PLY_UW_PROCESS_SCENE' || props.data?.pageType == 'UW_READ_SCENE')) {
+			isHidden.value = true
+			freeEditRef?.value?.setDisabledAll(true);
+		}
   })
  
 
