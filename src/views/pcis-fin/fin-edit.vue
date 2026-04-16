@@ -102,7 +102,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: 'cAcctNo',
         title: '收款人账号',
         inputtype: "rtinput",
-        rules: [getRules("required", {})],
+        rules: [getRules("required", {}), getRules('bankNum',{})],
       },
       {
         prop: "cBankRelTyp",
