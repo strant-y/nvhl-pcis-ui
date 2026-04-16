@@ -1689,37 +1689,70 @@ function showError(conf: any, value: any) {
   }
   return null;
 }
+// 表单验证方法
 async function validate() {
-  // 进行责任验证
-  let validate = true;
+  let isBasicValid = true;
+
+  // --- 1. 原有的责任列表 (RiskList) 基础验证 ---
   collist.value?.forEach((col: any) => {
     const fact = factormap.value[col["cFactorId"]];
-    const v = riskList.value[col["cRiskNo"]][fact["prop"]];
+    const riskData = riskList.value[col["cRiskNo"]];
+    const v = riskData ? riskData[fact["prop"]] : null;
+
     if (col["cPorpRequired"] === "1") {
       if (v === "" || v === null || v === undefined) {
-        validate = false;
+        isBasicValid = false;
       }
     }
   });
 
-  if (!validate) {
+  if (!isBasicValid) {
     showRequried.value = true;
+    return false;
   } else {
     showRequried.value = false;
   }
-  // 进行条款数据验证
-  const p: Promise<any> = new Promise((resolve) => {
-    templateRef.value.validate((valid: boolean, fields: any) => {
-      if (valid) {
-        resolve(true);
-      } else {
-        resolve(fields);
-      }
-    });
-  });
 
-  const res = await p;
-  return (res === true ? true : false) && validate;
+  // --- 2. 表格组件 (riskTableRef) 的必填验证 ---
+
+  if (riskShowTyp.value === 'grid' && riskTableRef.value) {
+    try {
+      // 调用表格组件的验证方法
+      // 注意：这里假设 AppGridEditMethod 的 validate 方法返回 boolean 或 Promise<boolean>
+      const isGridValid = await riskTableRef.value.validate();
+      
+      if (!isGridValid) {
+        return false; // 表格验证未通过
+      }
+    } catch (error) {
+      console.error('责任表格验证失败', error);
+      return false;
+    }
+  }
+
+  // --- 3. Element Plus 表单验证 (原有的 templateRef 验证) ---
+  try {
+    const isValid = await new Promise<boolean>((resolve) => {
+      if (!templateRef.value?.validate) {
+        resolve(true);
+        return;
+      }
+      templateRef.value.validate((valid: boolean, fields: any) => {
+        if (valid) {
+          resolve(true);
+        } else {
+          console.error('表单验证失败', fields);
+          resolve(false);
+        }
+      });
+    });
+
+    return isValid;
+
+  } catch (error) {
+    console.error('验证过程发生异常', error);
+    return false;
+  }
 }
 function setDisabledAll() {
   if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType && !props.modelValue['Term.cRowId']){
