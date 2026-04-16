@@ -1883,7 +1883,6 @@ function getCodeListMap() {
 }
 // 客户重置
 function resetFn() {
-	debugger
   const cAppNo = opertaor.getTableRefByKey('plyBase')?.getFromValue()?.['Base.cAppNo'];
   if(!param.cAppNo || !cAppNo) return;
   const params = {
