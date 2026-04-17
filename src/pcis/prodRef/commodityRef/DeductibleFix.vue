@@ -20,13 +20,13 @@
       </el-tab-pane>
       <el-tab-pane label="添加其他免赔条件" name="second">
 				<el-form label-position="top">
-					<el-form-item label="请输入所有免赔条件 (使用 1.,2.形式 分隔):">
+					<el-form-item label="示例：1.保险公司服务xxx2.我公司最近季度的综合偿付能力充足率xxxx——(请使用 1.分隔) :">
 						<!-- 输入框 -->
 						<el-input
 							v-model="rawInput"
 							type="textarea"
 							:rows="4"
-							placeholder="示例：1.免赔条件A2.免赔条件B3.免赔条件C..."
+							placeholder="「粘贴识别」或输入文本，智能拆分免赔信息"
 							@blur="handleSplit"
 						/>
 					</el-form-item>
