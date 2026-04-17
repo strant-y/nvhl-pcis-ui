@@ -1,1 +1,0 @@
-import{aY as s,W as e,c as t,e as a,F as n,w as o,bs as r}from"./index.CuKRnkGn.js";const c={style:{padding:"30px"}};const d=s({},[["render",function(s,d){const i=e("router-view"),l=r;return a(),t("div",c,[n(l,{closable:!1,title:"菜单二级",type:"success"},{default:o((()=>[n(i)])),_:1})])}]]);export{d as default};
