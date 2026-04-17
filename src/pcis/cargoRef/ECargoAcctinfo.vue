@@ -65,6 +65,7 @@ onMounted(() => {
 const canOperateForm = () => {
   setFormItem("ECargoAcctinfo.cAcctNo", {
     disabled: false,
+		rules: [getRules('bankNum',{})],
   });
   setFormItem("ECargoAcctinfo.cBankRelTyp", {
     disabled: false,

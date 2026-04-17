@@ -2,7 +2,12 @@
 <template>
   <div>
     <myCard :cardConfig="cardconfig">
-      <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
+      <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" >
+        <template #column-cSpecialContent="{row}">
+          <!-- <div>{{ row.cSpecialContent }}</div> -->
+					<span v-html="highlightText(row)"></span>
+        </template>
+      </rttable>
     </myCard>
     <comDialog ref="dialog"></comDialog>
   </div>
@@ -261,7 +266,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cSpecialContent",
         inputtype: "rtinput",
 				title: "特约内容",
-				align: "left"
+				align: "left",
+        slotName: "cSpecialContent",
       },
     ],
   })
@@ -607,6 +613,57 @@ const deepClone = (obj: any) => {
 function getTableBtn() {
   return tableconfig.tableBtn;
 }
+
+const highlightText = (row: string) => {
+	// 1. 获取原始文本
+  let content = row.cSpecialContent;
+  if (!content) return '';
+
+  // 定义关键词数组
+  let keywords: string[] = [];
+
+  // --- 逻辑分支 A: 优先检查 editList ---
+  if (Array.isArray(row.editList) && row.editList.length > 0) {
+    keywords = row.editList.map(String);
+  } 
+  // --- 逻辑分支 B: 如果没有 editList，检查 nYuliu 系列字段 ---
+  else {
+    // 动态查找所有以 nYuliu 开头的字段
+    const feeKeys = Object.keys(row).filter(key => key.startsWith('nYuliu'));
+    
+    const feeValues = feeKeys
+      .map(key => row[key])
+      .filter(val => val !== null && val !== undefined && val !== '' && val !== 0);
+      
+    keywords = feeValues.map(String);
+  }
+
+  // 如果最终没有提取到任何关键词，直接返回原文本
+  if (keywords.length === 0) return content;
+
+  // --- 执行替换逻辑 (使用你提供的代码结构) ---
+  
+  // 为了防止 "12" 和 "123" 同时存在导致替换冲突，建议先按长度降序排序
+  keywords.sort((a, b) => b.length - a.length);
+
+  // 转义正则特殊字符的辅助函数
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  keywords.forEach((keyword: string) => {
+    if (keyword) {
+      // 关键点：使用 new RegExp 并加上 'g' (全局) 标志
+      // 使用 escapeRegExp 防止数字以外的特殊字符破坏正则
+      const regex = new RegExp(escapeRegExp(keyword), 'g');
+      
+      content = content.replace(regex, `<strong style="color: #F56C6C;">${keyword}</strong>`);
+    }
+  });
+
+  return content;
+}
+
 defineExpose({
   getFormValue,
   setFormValue,

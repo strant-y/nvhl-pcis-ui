@@ -425,7 +425,7 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         disabled: false,
       });
-      resetFn()
+      // resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -806,8 +806,31 @@ const method = {
       setFormItem("Applicant.nYearincomeNum", {
         rules: [],
       });
+			// 注册地址是否同上
+			setFormItem("Applicant.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Applicant.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Applicant.cRegisteredcapDre", {
+        hidden: false,
+      });
     } else {
-
+      // 注册地址是否同上
+			setFormItem("Applicant.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("Applicant.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Applicant.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("Applicant.tBirthday", {
         hidden: false,
       });
@@ -824,7 +847,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Applicant.cBusinessScope", {
-        hidden: false,
+        hidden: true,
         rules: []
       });
       setFormItem("Applicant.cMrgCde", {

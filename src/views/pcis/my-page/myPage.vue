@@ -950,7 +950,7 @@ const setTaxInfo = () => {
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
   if (!!appLicantValue) {
     dzmodal
-      .open(invoiceInfoModel, { type: "Issuer", data: {}, opertaor: opertaor})
+      .open(invoiceInfoModel, { type: "Issuer", data: props.param, opertaor: opertaor})
       .then((res: any) => {
         if (res.type === "ok") {
         }
@@ -2060,6 +2060,14 @@ async function loadAfter() {
           setCusBenefitInfo('view');
         },
       }),
+			createFreeButtonBase({
+				label: "发票信息",
+				type: "primary",
+				buttonColor: bottomBtnColor1,
+				func: () => {
+					setTaxInfo();
+				},
+			}),
 	  )
     //核保处理
     nextTick(() => {
@@ -2127,6 +2135,14 @@ async function loadAfter() {
 						setCusBenefitInfo('view');
 					},
 				}),
+				createFreeButtonBase({
+					label: "发票信息",
+					type: "primary",
+					buttonColor: bottomBtnColor1,
+					func: () => {
+						setTaxInfo();
+					},
+				}),
 			)
 		}
     nextTick(() => {
@@ -2169,6 +2185,14 @@ async function loadAfter() {
 				buttonColor: bottomBtnColor1,
 				func: () => {
 					setCusBenefitInfo('view');
+				},
+			}),
+			createFreeButtonBase({
+				label: "发票信息",
+				type: "primary",
+				buttonColor: bottomBtnColor1,
+				func: () => {
+					setTaxInfo();
 				},
 			}),
 		)

@@ -1749,8 +1749,18 @@ async function getRiskData() {
     pageresult1.list = riskQueryInfo.data.map((item: any, index: number) => ({
       ...item,
       index,
-    }));
-    _dataSet.value = riskQueryInfo.data;
+		}));
+		_dataSet.value = riskQueryInfo.data;
+		// 3. 关键步骤：使用 nextTick 确保 DOM 更新后再操作
+		nextTick(() => {
+			// 判断数据是否为空
+			if (pageresult1.list.length > 0 && tableRef1.value) {
+				// 清除所有选中
+				tableRef1.value.clearSelection();
+				// 设置选中第一行
+				tableRef1.value.toggleRowSelection(pageresult1.list[0], true);
+			}
+  	})
   } else {
     ElMessage.error(riskQueryInfo.message);
   }

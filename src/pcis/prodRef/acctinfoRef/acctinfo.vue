@@ -92,7 +92,8 @@ const loadSelDataCounty = () => {
 const canOperateForm = () => {
   setFormItem("Acctinfo.cAcctNo", {
     disabled: false,
-    // rules: [getRules("required", {})],
+		// rules: [getRules("required", {})],
+		rules: [getRules('bankNum',{})],
   });
   setFormItem("Acctinfo.cBankRelTyp", {
     disabled: false,

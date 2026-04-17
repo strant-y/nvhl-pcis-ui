@@ -637,7 +637,31 @@ const cClntMrkFunc = (val:any) => {
     setFormItem("ECargoInsuredDist.cWorkDpt", {
       rules: [getRules("required", {})],
     });
+		// 注册地址是否同上
+		setFormItem("ECargoInsuredDist.cIsSame", {
+			hidden: false,
+		});
+		// 注册地址
+		setFormItem("ECargoInsuredDist.Address", {
+			hidden: false,
+		});
+		// 注册地址
+		setFormItem("ECargoInsuredDist.cRegisteredcapDre", {
+			hidden: false,
+		});
   } else {
+		// 注册地址是否同上
+		setFormItem("ECargoInsuredDist.cIsSame", {
+			hidden: true,
+		});
+		// 注册地址
+		setFormItem("ECargoInsuredDist.Address", {
+			hidden: true,
+		});
+		// 注册地址
+		setFormItem("ECargoInsuredDist.cRegisteredcapDre", {
+			hidden: true,
+		});
     setFormItem("ECargoInsuredDist.tBirthday", {
       hidden: false,
     });
@@ -654,7 +678,7 @@ const cClntMrkFunc = (val:any) => {
       hidden: false,
     });
     setFormItem("ECargoInsuredDist.cBusinessScope", {
-      hidden: false,
+      hidden: true,
     });
     setFormItem("ECargoInsuredDist.cMrgCde", {
       hidden: false,
