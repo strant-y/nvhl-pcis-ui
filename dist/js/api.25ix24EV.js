@@ -1,1 +1,0 @@
-const e={query:{pcis_query_app:"_index_pcis-query_app",pcis_query_endorse:"_index_qryEndorseList",pcis_query_returnudrlist:"_index_returnUdrList",pcis_query_newudrlist:"_index_newudrlist"}};export{e as A};
