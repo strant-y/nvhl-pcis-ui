@@ -31,6 +31,10 @@ function getYjxPlanInfo(queryParams: any): AxiosPromise<any> {
 function getCombinationPlan(queryParams: any): AxiosPromise<any> {
     return post(`/policy/getCombinationPlan`, queryParams);
 }
+//查询财险方案数据
+function getPlanByCombinationPlanNo(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getPlanByCombinationPlanNo`, queryParams);
+}
 
 export default {
     queryPositeInfo,
@@ -38,6 +42,7 @@ export default {
     savePositeInfo,
     submitCombination,
     getYjxPlanInfo,
-    getCombinationPlan
+    getCombinationPlan,
+    getPlanByCombinationPlanNo
 }
 

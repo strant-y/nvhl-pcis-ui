@@ -98,6 +98,7 @@ const refreshData = () => {
   }
   if(props.data.cProdList && props.data.cProdList.length > 0) {
     param.cProdNos = props.data.cProdList;
+    param.cCombinationPlanNo = props.data.cCombinationPlanNo;
   }else {
     param.cProdNo = props.data?.cProdNo;
   }

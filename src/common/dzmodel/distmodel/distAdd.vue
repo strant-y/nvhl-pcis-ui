@@ -534,31 +534,40 @@ onMounted(async () => {
     }
 		if (item.prop === 'Dist.cPlanNo') {
 			item['func'] =  cPlanNoChange;
-      const termref = opertaor.getTableRefByKey('cvrg');
-      const allPlans = termref.getPlanNo();   // 全部方案
 
-      // 从父页面表格中获取已添加的方案
-      const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
-      const getTableDataAll = await distTableRef?.getTableDataAll();
-      const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row:any) => row['Dist.cPlanNo']) : [];
-      // 去重
-      const uniqueAdded = [...new Set(added)];
-      // let nextIdx = 0;
-      // for (let j = 1; j < allPlans.length + 1; j++) {
-      //   const planNo = 'P' + j;
-      //   // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
-      //   if (!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
-      //     nextIdx = j;   // 已添加的方案跳过
-      //     break;
-      //   }
-      // }
+      if(params.cCombinationPlanNo) {
+        // 组合出单场景
+        item.typeCode = null;
+        item.loadData = opertaor.getTableRefByKey('plan')
+                                ?.getPlanNo(opertaor.getProps().id)
+      } else {
 
-      item.typeCode = null;
-      item.loadData = allPlans;
-      // item.loadData = allPlans.map((p: any, idx: number) => ({
-      //   ...p,
-      //   disabled: idx > nextIdx     // 未开始
-      // }));
+        const termref = opertaor.getTableRefByKey('cvrg');
+        const allPlans = termref.getPlanNo();   // 全部方案
+
+        // 从父页面表格中获取已添加的方案
+        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+        const getTableDataAll = await distTableRef?.getTableDataAll();
+        const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row: any) => row['Dist.cPlanNo']) : [];
+        // 去重
+        const uniqueAdded = [...new Set(added)];
+        // let nextIdx = 0;
+        // for (let j = 1; j < allPlans.length + 1; j++) {
+        //   const planNo = 'P' + j;
+        //   // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+        //   if (!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
+        //     nextIdx = j;   // 已添加的方案跳过
+        //     break;
+        //   }
+        // }
+
+        item.typeCode = null;
+        item.loadData = allPlans;
+        // item.loadData = allPlans.map((p: any, idx: number) => ({
+        //   ...p,
+        //   disabled: idx > nextIdx     // 未开始
+        // }));
+      }
     }
     // 解决特种设备清单信息新增数据后点击编辑或新增，表单中特种设备种类的按钮无法点击
     if((route.params.param.cProdNo == '041014' || route.params.param.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {

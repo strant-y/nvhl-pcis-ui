@@ -55,17 +55,6 @@ import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTgtDetailByDist, getTermDetailByDist } from "@/api/query";
 import Decimal from "decimal.js";
-const { getRules } = useValidator();
-
-
-const route = useRoute();
-const dialog = ref<DialogMethod | null>(null);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-const params = opertaor.getParam();
-const emit = defineEmits(['savePlyInfo']);  
-const btnDisabled = ref(false);
 
 const props = defineProps({
   pageSchema: {
@@ -74,8 +63,26 @@ const props = defineProps({
   },
   compKey: {
     type: String
+  },
+  groupId: {
+    type: String,
+    required: false,
   }
 });
+
+const { getRules } = useValidator();
+const route = useRoute();
+const dialog = ref<DialogMethod | null>(null);
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaorProps = {...idxParam.opertaorProps}
+if(props.groupId) { // 组合方案出单store id特殊处理
+  opertaorProps.id = props.groupId
+}
+const opertaor = dataOpertaor(opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
+const params = opertaor.getParam();
+const emit = defineEmits(['savePlyInfo']);  
+const btnDisabled = ref(false);
 const cardRef = ref<MyCardMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -692,14 +699,15 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
+    console.log('------------------> ', props.groupId, opertaorProps, alldata)
     const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
-      param['cInquiryNo'] = opertaor.getDataAll()?.plyBase["Base.cInquiryNo"]
+      param['cInquiryNo'] = alldata?.plyBase["Base.cInquiryNo"]
     } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
-      param['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"]
+      param['cAppNo'] = alldata?.plyBase["Base.cAppNo"]
     }
 
     let fromSchema = tableconfig.value.fromSchema;
@@ -823,13 +831,11 @@ const method = {
             }
           })
           
-            console.log('pageresult.list',pageresult.list);
           return{
             ... item,
             ... data
           };
         });
-       
         // 040005学生人数（人） 地址清单信息人数 回填
         if( props.compKey === 'AddressDist040005' ){
              if(pageresult.list.length>0){

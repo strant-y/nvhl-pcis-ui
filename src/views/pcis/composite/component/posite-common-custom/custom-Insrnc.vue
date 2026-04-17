@@ -17,14 +17,14 @@ import { transpileModule } from "typescript";
 import { policyRatio } from "@/api/query";
 import { useRoute } from "vue-router";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
-import { getDelayCount, getNewSysDays, checkCdeptByCdptCde, checkCancelM1IsOff, qryTerminationDataList } from "@/api/prod/";
-const route = useRoute();
-const { getRules } = useValidator();
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
+import { getDelayCount, getNewSysDays, checkCdeptByCdptCde, checkCancelM1IsOff, qryTerminationDataList } from "@/api/prod";
+import {buildSignFormDataByProdNo, CustomStructure} from "@/views/pcis/support/composite.types";
+import {descryptParameter} from "@/utils/encipher";
+import {ref} from "vue";
+
 const props = defineProps({
-  pageSchema: {
-    type: [Object],
+  pageSchemaList: {
+    type: [Array],
     required: true,
   },
   compKey: {
@@ -32,13 +32,25 @@ const props = defineProps({
     required: false,
   },
 });
+const route = useRoute();
+const { getRules } = useValidator();
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaor = dataOpertaor(idxParam.opertaorProps);
 const edrbase = ref(null);
 const insrncEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const tInsrncEndTm = ref(null);
+const query = ref(route.query);
+const param = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
+const structure = reactive(new CustomStructure());
+
 onMounted(() => {
+
+  const pageSchema = structure.mergeSchemasSignProdNo(props.pageSchemaList, param.cProdDtlList)
+  console.log('保险期限 insrnc-pageSchema', pageSchema)
+  pageSchema.pageSchema.title = '保险期限'
   const formconfig11 = formInit(
-      JSON.stringify(props.pageSchema),
+      JSON.stringify(pageSchema.pageSchema),
       method,
       exRules
   );
@@ -674,8 +686,9 @@ function getFromValue() {
   return insrncEditRef?.value?.getFromValue();
 }
 
-function setFormValue(value: any) {
-  insrncEditRef?.value?.setFormValue(value);
+function setFormValue(value: any, groupId?: string) {
+  const resultFormData = buildSignFormDataByProdNo(formconfig1.fromSchema, value, groupId)
+  insrncEditRef?.value?.setFormValue(resultFormData);
 }
 
 function validate() {

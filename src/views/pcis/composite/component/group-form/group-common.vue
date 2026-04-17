@@ -22,7 +22,7 @@
           res.addProvide('domId',  k.id);
         }
       }"
-      :is="k.pageType === 'custom' || CommonComponentMap.has(k.pageKey) ? k.pageCode : k.pageKey  + '-ref'"
+      :is="k.pageType === 'custom' || pageView.commonComponentMap.has(k.pageKey) ? k.pageCode : k.pageKey  + '-ref'"
       :pageSchema="k.pageSchema"
       :compKey="k.pageCode"
     />
@@ -49,7 +49,7 @@
 </template>
 <script setup lang="ts">
 
-import {CommonComponentMap, CompositePageView, OpertaorPosit, CommonCustomCompType} from "@/views/pcis/support/composite.types";
+import {CompositePageView, OpertaorPosit, CommonCustomCompType} from "@/views/pcis/support/composite.types";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {dataOpertaor} from "@/store";
 import {ref} from "vue";
@@ -84,6 +84,7 @@ const idxParam: IdxParamProps = {
     id: props.groupId,
     type: OpertaorPosit,
     allDataFormat: pageView.value.allDataFormat,
+    convertGetCommonConfig: pageView.value.convertGetCommonConfig,
   },
   cdeListViewProps: {
     id: props.groupId,

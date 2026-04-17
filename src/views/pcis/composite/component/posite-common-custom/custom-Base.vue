@@ -36,7 +36,7 @@ const dialogRef = ref<DialogMethod | null>(null);
 const params = opertaor.getParam();
 const param: any = route.params.param;
 const props = defineProps({
-  pageSchema: {
+  pageSchemaList: {
     type: [Object],
     required: true,
   },
@@ -46,7 +46,6 @@ const props = defineProps({
   },
 });
 
-const groupId: any = {value: null} // 当前groupId 不能用ref
 const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
@@ -54,7 +53,7 @@ const fixSpecData = ref([]); //存储已选择的特别约定数据
 const structure = new CustomStructure()
 // 需要分组的key
 onMounted(async () => {
-  const {pageSchema} = structure.diffGroupBuild(props.pageSchema, param.cProdDtlList, baseFormatKeys)
+  const {pageSchema} = structure.diffGroupBuild(props.pageSchemaList[0].pageSchema, param.cProdDtlList, baseFormatKeys)
   const formconfig11 = formInit(
     JSON.stringify(pageSchema),
     method,
@@ -68,6 +67,11 @@ onMounted(async () => {
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
   setValue("Base.cCumulativeLimitManual", "0");
+  setFormValue({
+    "Base.nAmtRmbExch": "1.000000",
+    "Base.nPrmRmbExch": "1.000000",
+    "Base.cCumulativeLimitManual": "0"
+  })
   // 隐藏短期费率类型
   setFormItem("Base.cRatioTyp", { 
     hidden: true
@@ -88,6 +92,12 @@ onMounted(async () => {
     setFormItem('Base.cRatioTyp',{hidden:true})
     setFormItem('Base.nRatioCoef',{hidden:true})
   }
+  nextTick(() => {
+    setDisabledAll(true)
+    setFormItem("Base.cFinTyp", {
+      disabled: false
+    });
+  })
 });
 
 
@@ -206,8 +216,7 @@ const method = {
       setFormItem("Base.nPayNum", { disabled: true, });
       setValue('Base.nPayNum',1)
 
- 
-    if (param.initFlag) {
+    if (pageView.value.initFlag) {
       return ;
     }
        nPayNumberFun();
@@ -241,7 +250,8 @@ const method = {
     }
   },
   //总保额币种下拉事件
-  cAmtCurChange(val: any) {
+  cAmtCurChange(val: any, row: any, item: any) {
+    console.log('cAmtCurChange-item', item)
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -249,10 +259,10 @@ const method = {
           codeListParam: { value: val },
         })
         .then((res) => {
-          setValue("Base.nAmtRmbExch", res[0].currency_rate);
+          setValue("Base.nAmtRmbExch", res[0].currency_rate, `group-${item.group}`);
         });
     } else {
-      setValue("Base.nAmtRmbExch", "1.000000");
+      setValue("Base.nAmtRmbExch", "1.000000", `group-${item.group}`);
     }
   },
   //保额汇率标识change事件
@@ -398,28 +408,25 @@ const method = {
 const exRules = {};
 
 
-const getGroupKey = (key: string) => {
+const getGroupKey = (key: string, groupId?: string) => {
   let ikey = key;
-  if(groupId.value && baseFormatKeys.includes(key)) {
-    ikey = `${groupId.value ? groupId.value.replace('group-', '') : ''}:${key}`
+  if(groupId && baseFormatKeys.includes(key)) {
+    ikey = `${groupId ? groupId.replace('group-', '') : ''}:${key}`
   }
   return ikey;
 }
 
-function getFromValue() {
+function getFromValue(groupId: string) {
   const fromData = baseEditRef?.value?.getFromValue();
-  return peelFormDataByProdNo(fromData, groupId.value ? groupId.value.replace('group-', '') : '')
+  return peelFormDataByProdNo(fromData, groupId ? groupId.replace('group-', '') : '')
 }
 
-function setFormValue(value: any) {
+function setFormValue(value: any, groupId?: string) {
   const prodNos = []
-  if(!groupId.value) {
+  if(!groupId || groupId === CommonGroupId) {
     prodNos.push(...route.params?.param.cProdList)
-    nextTick(() => {
-      groupId.value = CommonGroupId
-    })
   }else {
-    prodNos.push(groupId.value ? groupId.value.replace('group-', '') : '')
+    prodNos.push(groupId ? groupId.replace('group-', '') : '')
   }
   const res = joinFormDataByProdNo(value, prodNos)
   baseEditRef?.value?.setFormValue(res);
@@ -429,24 +436,31 @@ function validate() {
   return baseEditRef?.value?.validate();
 }
 
-function setValue(key: string, value: any) {
-  baseEditRef?.value?.setValue(getGroupKey(key), value);
+function setValue(key: string, value: any, groupId?: string) {
+  if(!groupId) {
+    route.params?.param.cProdList.forEach(prodNo => {
+      baseEditRef?.value?.setValue(getGroupKey(key, `group-${prodNo}`), value);
+    })
+  }else {
+    baseEditRef?.value?.setValue(getGroupKey(key, groupId), value);
+  }
 }
 
-function getValue(key: string) {
-  return baseEditRef?.value?.getValue(getGroupKey(key));
+function getValue(key: string, groupId?: string) {
+  return baseEditRef?.value?.getValue(getGroupKey(key, groupId));
 }
 
 //给表单赋值
 function setFormItem(key: any, obj: any) {
-  const ikey = getGroupKey(key)
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === ikey) {
+      const keys = item.prop.split(":")
+      const ikey = keys.length > 1 ? keys[1] : keys[0]
+      if (key === ikey) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
+          for (let k in obj.btnItems) {
+            item.btnItems[k] = obj.btnItems[k];
           }
         }else{
           Object.assign(item, obj);
@@ -472,13 +486,12 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
+function setDisabledAll(isDisabled: boolean = true) {
+  baseEditRef?.value?.setDisabledAll(isDisabled);
+}
+
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   baseEditRef?.value?.addProvide(key, value);
-}
-const setGroupId = (id: string) => {
-  if(groupId.value) {
-    groupId.value = id
-  }
 }
 defineExpose({
   getFromValue,
@@ -490,7 +503,7 @@ defineExpose({
   nPayNumberFun,
   addProvide,
   setFormItem,
-  setGroupId
+  setDisabledAll
 });
 </script>
 

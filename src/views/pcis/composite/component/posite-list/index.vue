@@ -174,7 +174,6 @@ const formconfig = ref(createAppGridEditConfig({
       },
       onInit: (options: any) => {
         const {value, rowData} = options;
-        console.log('### onInit', value, rowData)
         if(rowData['cProdNo']) {
           setProdNme(rowData, value);
         }
@@ -220,7 +219,6 @@ const setProdOptions = async (rowData: any, cKindNo: string) => {
       codeListParam: {"cParCde": cKindNo},
     });
   }
-  console.log('setProdOptions', cKindNo, list)
   gridEditRef.value?.addCodeListMap({
     code: 'cProdNo' + rowData['_dataId'],
     list: list

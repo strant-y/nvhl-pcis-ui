@@ -96,19 +96,23 @@ import TransportinfoRef from "./transportinfoRef/Transportinfo.vue";
 import PlyTermCommonRef from "./cvrgRef/plyTermCommon.vue";
 import insuredDistRef from "./insuredDistRef/insuredDist.vue"; // 被保人清单
 import cFinancingGuarantee from "./commodityRef/cFinancingGuarantee.vue" //融资性保证险弹框组件
-import yjxPlanBase from "@/views/pcis/composite/component/posite-yjx/yjx-plan-base.vue" // 意健险方案数据
-import yjxGrpMember from "@/views/pcis/composite/component/posite-yjx/yjx-grp-member.vue" // 意健险团体成员数据
 
 /** 组合出单公共组件 **/
-import positeBase from "../../views/pcis/composite/component/posite-common/posite-base.vue";
 import positeApplicant from "../../views/pcis/composite/component/posite-common/posite-applicant.vue";
 import positeInsured from "../../views/pcis/composite/component/posite-common/posite-insured.vue";
 import positePlybase from "../../views/pcis/composite/component/posite-common/posite-plybase.vue";
 import positeCi from "../../views/pcis/composite/component/posite-common/posite-ci.vue";
-import positeInsrnc from "../../views/pcis/composite/component/posite-common/posite-insrnc.vue";
-import positePlan from "../../views/pcis/composite/component/posite-common/posite-plan.vue";
+import positeDeductible from "../../views/pcis/composite/component/posite-common/posite-deductible.vue";
+import customInsrnc from "../../views/pcis/composite/component/posite-common-custom/custom-Insrnc.vue";
+import positeCvrg from "../../views/pcis/composite/component/posite-common/posite-cvrg.vue";
+import customBase from "../../views/pcis/composite/component/posite-common-custom/custom-Base.vue";
+import customTgt from "../../views/pcis/composite/component/posite-common-custom/custom-Tgt.vue";
+import customPlan from "../../views/pcis/composite/component/posite-common-custom/custom-Plan.vue";
 import customDeductible from "../../views/pcis/composite/component/posite-common-custom/custom-Deductible.vue";
 import customSpecialAgreement from "../../views/pcis/composite/component/posite-common-custom/custom-SpecialAgreement.vue";
+
+import yjxPlan from "@/views/pcis/composite/component/posite-yjx/yjx-plan-base.vue" // 意健险团体成员数据
+import yjxGrpMember from "@/views/pcis/composite/component/posite-yjx/yjx-grp-member.vue" // 意健险团体成员数据
 /** **/
 
 /**用于动态组件的映射生成 */
@@ -207,17 +211,20 @@ const componentMap = {
   TransportinfoRef:TransportinfoRef,
   cFinancingGuarantee:cFinancingGuarantee,
 
-  positeBase: positeBase,
   positeApplicant: positeApplicant,
   positeInsured: positeInsured,
   positePlybase: positePlybase,
   positeCi: positeCi,
-  positeInsrnc: positeInsrnc,
-  positePlan: positePlan,
+  positeCvrg: positeCvrg,
+  positeDeductible: positeDeductible,
+  customBaseRef: customBase,
+  customInsrncRef: customInsrnc,
+  customTgtRef: customTgt,
+  customPlanRef: customPlan,
   customDeductibleDistRef: customDeductible,
   customSpecialAgreementRef: customSpecialAgreement,
 
-  yjxPlanRef: yjxPlanBase,
+  yjxPlanRef: yjxPlan,
   yjxGrpMemberRef: yjxGrpMember,
 };
 

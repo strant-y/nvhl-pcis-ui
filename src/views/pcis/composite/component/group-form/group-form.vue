@@ -61,6 +61,7 @@ const idxParam: IdxParamProps = {
     id: props.groupId,
     type: OpertaorPosit,
     allDataFormat: pageView.value.allDataFormat,
+    convertGetCommonConfig: pageView.value.convertGetCommonConfig,
   },
   cdeListViewProps: {
     id: props.groupId

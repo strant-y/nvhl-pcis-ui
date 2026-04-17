@@ -142,6 +142,7 @@ const refreshData = () => {
   const cProdNo = props.data.cProdNo;
   const cDptCde = props.data.cDptCde || '';
   const cProdList = props.data.cProdList;
+  const cCombinationPlanNo = props.data.cCombinationPlanNo;
   const tAppTm = props.data.tAppTm;
   pageresult.list = []
   const getResult = (result: any[], prodNo: string) => {
@@ -166,17 +167,19 @@ const refreshData = () => {
   }
   if(cProdList && cProdList.length > 0) { // 组合出单用
     reqParam.cProdNos = cProdList;
+    reqParam.cCombinationPlanNo = cCombinationPlanNo;
   } else {
     reqParam.cProdNo = cProdNo;
   }
   getpSpecialAgreement(reqParam).then((res) => {
     if (res.data?.result) {
       getResult(res.data.result, cProdNo)
+
+      nextTick(() => {
+        toggleSpecificRow(); //这里调用是把必选的选中
+        setSelected();
+      });
     }
-  });
-  nextTick(() => {
-    toggleSpecificRow(); //这里调用是把必选的选中
-    setSelected();
   });
 };
 
@@ -222,25 +225,26 @@ const returnData = () => {
 //     });
 // debugger
 
-const processedNewItems = tempData.map(item2 => {
-  const matchedItem1 = selectedData.find(item1 => {
-    if (item1.cIfEdit !== '1') return false;
-    const [code1, code2] = [item1.cSpecialCode, item2.cSpecialCode];
-    // 非空code优先匹配，否则用addIndex（排除空值匹配）
-    return code1 && code2 && code1 !== '' && code2 !== '' 
-      ? code1 === code2 
-      : item1.addIndex && item2.addIndex && item1.addIndex === item2.addIndex;
+  const processedNewItems = tempData.map(item2 => {
+    const matchedItem1 = selectedData.find(item1 => {
+      if (item1.cIfEdit !== '1') return false;
+      const [code1, code2] = [item1.cSpecialCode, item2.cSpecialCode];
+      // 非空code优先匹配，否则用addIndex（排除空值匹配）
+      return code1 && code2 && code1 !== '' && code2 !== ''
+        ? code1 === code2
+        : item1.addIndex && item2.addIndex && item1.addIndex === item2.addIndex;
+    });
+    return matchedItem1 || item2;
   });
-  return matchedItem1 || item2;
-});
- 
-const oldFenqiItem = selectedData.find(item => item.cSpecialCode === 'fenqi01');
-const result = oldFenqiItem 
-  ? [...processedNewItems, oldFenqiItem]  // 包含fenqi01
-  : processedNewItems;   
+
+  const oldFenqiItem = selectedData.find(item => item.cSpecialCode === 'fenqi01');
+  const result = oldFenqiItem
+    ? [...processedNewItems, oldFenqiItem]  // 包含fenqi01
+    : processedNewItems;
   props.method.getSelected(result);
   close();
 };
+
 const close = () => {
   emits("handleClose");
 };
@@ -261,7 +265,7 @@ function setSelected() {
 
 onMounted(() => {
     let selectedData = props.data.selectedData;
-    const addList = selectedData.filter(item => item.cIfFix==0 in item);
+    const addList = selectedData.filter(item => item.cIfFix == 0 in item);
     if(addList.length >0){
         addList.forEach((item,index) => {
             item.addIndex = index+1;

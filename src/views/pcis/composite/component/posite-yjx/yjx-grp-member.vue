@@ -521,8 +521,8 @@ function loadData(flag: boolean = true) {
       if(res.data.data.length > 0 ){
         setFormValue(res.data.data)
         pageresult.total = res.data.total
-        const tableRefs = opertaor.getTableRefs();
-        tableRefs['yjxPlan'].refushData()
+        // const tableRefs = opertaor.getTableRefs();
+        // tableRefs['plan'].refushData()
       } else {
         pageresult.list = []
         pageresult.total = 0
