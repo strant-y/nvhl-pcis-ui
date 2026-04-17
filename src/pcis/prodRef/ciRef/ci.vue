@@ -554,7 +554,11 @@ const method = {
       // 恢复当前行的联共保保费为原来的值
       freeEditRef?.value?.setValueByRowKey("Ci.nCiPrm", row._dataId, row["Ci.nCiPrm"]);
       return;
-    }
+		}
+		if (row["Ci.cCoinsurerCde"] === "327001") {
+			opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", val);  //我司份额保费
+			opertaor.getTableRefByKey("payinfo")?.nPrmFun()
+		}
   },
   //保单编号change事件
   cPolicyNoChange: (val, row) => {

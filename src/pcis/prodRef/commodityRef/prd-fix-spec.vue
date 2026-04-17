@@ -37,13 +37,13 @@
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
 				<el-form label-position="top">
-					<el-form-item label="请输入所有特约 (使用 1.,2. 分隔):">
+					<el-form-item label="示例：1.保险公司服务xxx2.我公司最近季度的综合偿付能力充足率xxxx——(请使用 1.分隔) :">
 						<!-- 输入框 -->
 						<el-input
 							v-model="rawInput"
 							type="textarea"
 							:rows="4"
-							placeholder="示例：1.特约条款A2.特约条款B3.特约条款C..."
+							placeholder="「粘贴识别」或输入文本，智能拆分特约信息"
 							@blur="handleSplit"
 						/>
 					</el-form-item>

@@ -350,7 +350,8 @@ defineExpose({
   setFormItem,
   // splitnPrm,
   setDisabledAll,
-  addProvide
+	addProvide,
+	nPrmFun
 });
 </script>
 
