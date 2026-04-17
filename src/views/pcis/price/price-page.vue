@@ -1962,10 +1962,7 @@ async function loadAfter() {
         // 用于处理 账户信息
         let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
         if(acctinfoInfo){
-            acctinfoInfo.setDisabledAll(false);  
-            acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-              disabled: true
-            })
+            acctinfoInfo.setDisabledAll(false); 
             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
               disabled: true
             })
