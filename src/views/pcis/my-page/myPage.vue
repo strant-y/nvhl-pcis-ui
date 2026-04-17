@@ -2102,9 +2102,6 @@ async function loadAfter() {
           let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
           if(acctinfoInfo){
             acctinfoInfo.setDisabledAll(false);  
-            acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-              disabled: true
-            })
             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
               disabled: true
             })

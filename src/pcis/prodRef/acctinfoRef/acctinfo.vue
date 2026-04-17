@@ -95,6 +95,10 @@ const canOperateForm = () => {
 		// rules: [getRules("required", {})],
 		rules: [getRules('bankNum',{})],
   });
+  setFormItem("Acctinfo.cAcctNme", {
+    disabled: false,
+    // rules: [getRules("required", {})],
+  });
   setFormItem("Acctinfo.cBankRelTyp", {
     disabled: false,
     // rules: [getRules("required", {})],
