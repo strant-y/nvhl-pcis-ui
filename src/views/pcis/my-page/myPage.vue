@@ -4488,7 +4488,7 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
   const acctinfo = opertaor.getDataAll()["acctinfo"];
   const applicant = opertaor.getDataAll()["applicant"];
 
-  if(acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
+  if(acctinfo['Acctinfo.cAcctNme'] && acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
     edrexpFlag.value = true;
     return true;
   }
