@@ -1019,10 +1019,12 @@ const trimPageData = (allData: any) => {
       const plyBase = prodData['plyBase'][0];
       const idx = productList.value.findIndex(prodInfo => prodInfo.cProdNo === key);
       if(idx != -1) {
-        productList.value[idx]['cAppNo'] = plyBase['Base.cAppNo']
-        productList.value[idx]['cPlyNo'] = plyBase['Base.cPlyNo']
-        productList.value[idx]['cCombinationNo'] = plyBase['Base.cCombinationNo']
-        productList.value[idx]['tUpdTm'] = plyBase['Base.tUpdTm']
+        const rowData = {...productList.value[idx]}
+        rowData['cAppNo'] = plyBase['Base.cAppNo']
+        rowData['cPlyNo'] = plyBase['Base.cPlyNo']
+        rowData['cCombinationNo'] = plyBase['Base.cCombinationNo']
+        rowData['tUpdTm'] = plyBase['Base.tUpdTm']
+        productList.value.splice(idx, 1, rowData)
       }
     }
 
@@ -1081,6 +1083,10 @@ const initTemplateData = () => {
     CommonCustomCompKeyMap.set("Base", {pageKey: "base", Base: 'positeBase'})
     pageView.value.hiddenCompKeys.push(...["payinfo"])
     pageView.value.sortComponentsMap.set('plan', 1)
+
+    if(props.param.cCombinationPlanNo === 'CP_0000') {
+      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
+    }
   }
   pageView.value.sortComponentsMap.set('plyBase', 2)
   pageView.value.sortComponentsMap.set('applicant', 3)
@@ -1095,6 +1101,7 @@ const getReqParams = (t: string = 'save') => {
     if(prodData) {
       if(prodData['base']) {
         prodData['base']['Base.tUpdTm'] = item['tUpdTm']
+        prodData['plyBase']['Base.tUpdTm'] = item['tUpdTm']
       }
     }
   })
@@ -1106,9 +1113,7 @@ const getReqParams = (t: string = 'save') => {
   if(t === 'save' && props.param.cCombinationNo) {
     cList.push(...pageView.value.getAllCopyList())
 
-    if(props.param.cCombinationPlanNo === 'CP_0000') {
-      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
-    }
+    // 要复制的数据
     if (props.param.cCombinationType === '2') {
       cList.push({
         cProdNo: '010002',

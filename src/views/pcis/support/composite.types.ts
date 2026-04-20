@@ -216,6 +216,7 @@ export class CompositePageView {
                 }
                 // 新增或替换组
                 if(this.anchorConfig.length === 0) {
+                    config.anchorConfig.sort((a, b) => a.id.localeCompare(b.id))
                     this.anchorConfig.push(...config.anchorConfig);
                 }else {
                     const oldAnchorIdList = this.anchorConfig.map((anchor: AnchorItem) => anchor.id);
@@ -232,6 +233,7 @@ export class CompositePageView {
                     })
                 }
                 if(this.pageConfig.length === 0) {
+                    config.pageConfig.sort((a, b) => a.params?.cProdNo.localeCompare(b.params?.cProdNo))
                     this.pageConfig.push(...config.pageConfig);
                 }else {
                     const oldGroupIdList = this.pageConfig.map((group: GroupForm) => group.groupId);
@@ -362,7 +364,7 @@ export class CompositePageView {
 
         // 锚点列表
         anchorList.push({
-            id: 'list',
+            id: '0_list',
             title: '产品信息',
             expanded: true,
             children: [{
@@ -893,6 +895,7 @@ export class CustomStructure {
                     resultSchema.cProdNo = '000000'
                 }
                 resultSchemaList.push(resultSchema)
+                resultSchemaList.sort((a, b) => a.cProdNo.localeCompare(b.cProdNo))
             })
             return resultSchemaList;
         }
