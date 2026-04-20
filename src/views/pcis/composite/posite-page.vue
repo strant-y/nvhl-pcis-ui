@@ -1044,10 +1044,10 @@ const trimPageData = (allData: any) => {
     }
   }
   console.log('trimPageData-resultMap', resultMap)
+  console.log('trimPageData-productList.value', productList.value)
   return resultMap
 }
 
-const copyList: any[] = []
 const initTemplateData = () => {
    const list = props.param.cProdDtlList.map((item: any) => {
     if(item.cCombinationNo) {
@@ -1081,28 +1081,6 @@ const initTemplateData = () => {
     CommonCustomCompKeyMap.set("Base", {pageKey: "base", Base: 'positeBase'})
     pageView.value.hiddenCompKeys.push(...["payinfo"])
     pageView.value.sortComponentsMap.set('plan', 1)
-
-    const getAppNo = (cProdNo: string) => {
-      return computed(() => productList.value?.find((p: any) => p.cProdNo === cProdNo)?.cAppNo).value
-    }
-
-    if(props.param.cCombinationPlanNo === 'CP_0000') {
-      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
-      copyList.push({
-        cProdNo: '010002',
-        componentKey: 'PropertyaddressDist010001',
-        componentTable: 'PropertyaddressDist',
-        cAppNo: getAppNo('010002'),
-        copyList: [
-          {
-            cProdNo: '010007',
-            componentKey: 'PropertyaddressDist010006',
-            componentTable: 'PropertyaddressDist',
-            cAppNo: getAppNo('010007'),
-          }
-        ]
-      })
-    }
   }
   pageView.value.sortComponentsMap.set('plyBase', 2)
   pageView.value.sortComponentsMap.set('applicant', 3)
@@ -1121,10 +1099,32 @@ const getReqParams = (t: string = 'save') => {
     }
   })
 
+  const getAppNo = (cProdNo: string) => {
+    return computed(() => productList.value?.find((p: any) => p.cProdNo === cProdNo)?.cAppNo).value
+  }
   const cList: any[] = [];
   if(t === 'save' && props.param.cCombinationNo) {
     cList.push(...pageView.value.getAllCopyList())
-    cList.push(...copyList)
+
+    if(props.param.cCombinationPlanNo === 'CP_0000') {
+      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
+    }
+    if (props.param.cCombinationType === '2') {
+      cList.push({
+        cProdNo: '010002',
+        componentKey: 'PropertyaddressDist010001',
+        componentTable: 'PropertyaddressDist',
+        cAppNo: getAppNo('010002'),
+        copyList: [
+          {
+            cProdNo: '010007',
+            componentKey: 'PropertyaddressDist010006',
+            componentTable: 'PropertyaddressDist',
+            cAppNo: getAppNo('010007'),
+          }
+        ]
+      })
+    }
   }
 
   return {
