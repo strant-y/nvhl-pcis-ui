@@ -818,7 +818,9 @@ function skipPositePage(row: any) {
                 ...m,
                 cKindNo: m.cProdNo.substring(0, 2)
               }
-            })
+            }),
+            cCombinationType: row.cCombinationPlanNo ? '2' : '1',
+            cProdList: res.data.map((m: any) => m.cProdNo)
           })
         },
       });

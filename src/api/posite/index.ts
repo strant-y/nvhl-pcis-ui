@@ -27,12 +27,22 @@ function submitCombination(queryParams: any): AxiosPromise<any> {
 function getYjxPlanInfo(queryParams: any): AxiosPromise<any> {
     return post(`/channel/getPlanInfo`, queryParams);
 }
+//查询组合方案数据
+function getCombinationPlan(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getCombinationPlan`, queryParams);
+}
+//查询财险方案数据
+function getPlanByCombinationPlanNo(queryParams: any): AxiosPromise<any> {
+    return post(`/policy/getPlanByCombinationPlanNo`, queryParams);
+}
 
 export default {
     queryPositeInfo,
     appCombinationCalc,
     savePositeInfo,
     submitCombination,
-    getYjxPlanInfo
+    getYjxPlanInfo,
+    getCombinationPlan,
+    getPlanByCombinationPlanNo
 }
 

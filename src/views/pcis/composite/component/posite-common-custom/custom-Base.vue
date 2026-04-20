@@ -20,15 +20,23 @@ import dayjs from "dayjs";
 import { eventBus } from '@/utils/event-bus'
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { useValidator } from "@/typings/useValidator";
+import {
+  baseFormatKeys, CommonGroupId,
+  CompositePageView,
+  CustomStructure, GroupForm, joinFormDataByProdNo,
+  peelFormDataByProdNo
+} from "@/views/pcis/support/composite.types";
+import {ref} from "vue";
 const { getRules } = useValidator();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-
+const pageView = inject("pageView", ref(new CompositePageView()));
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 const dialogRef = ref<DialogMethod | null>(null);
 const params = opertaor.getParam();
+const param: any = route.params.param;
 const props = defineProps({
-  pageSchema: {
+  pageSchemaList: {
     type: [Object],
     required: true,
   },
@@ -42,9 +50,12 @@ const baseEditRef = ref<AppFreeEditMethod | null>(null);
 const formconfig1 = reactive(createAppFreeEditConfig({}));
 const sessionData = ref();
 const fixSpecData = ref([]); //存储已选择的特别约定数据
+const structure = new CustomStructure()
+// 需要分组的key
 onMounted(async () => {
+  const {pageSchema} = structure.diffGroupBuild(props.pageSchemaList[0].pageSchema, param.cProdDtlList, baseFormatKeys)
   const formconfig11 = formInit(
-    JSON.stringify(props.pageSchema),
+    JSON.stringify(pageSchema),
     method,
     exRules
   );
@@ -56,6 +67,11 @@ onMounted(async () => {
   setValue("Base.nAmtRmbExch", "1.000000");
   setValue("Base.nPrmRmbExch", "1.000000");
   setValue("Base.cCumulativeLimitManual", "0");
+  setFormValue({
+    "Base.nAmtRmbExch": "1.000000",
+    "Base.nPrmRmbExch": "1.000000",
+    "Base.cCumulativeLimitManual": "0"
+  })
   // 隐藏短期费率类型
   setFormItem("Base.cRatioTyp", { 
     hidden: true
@@ -76,6 +92,12 @@ onMounted(async () => {
     setFormItem('Base.cRatioTyp',{hidden:true})
     setFormItem('Base.nRatioCoef',{hidden:true})
   }
+  nextTick(() => {
+    setDisabledAll(true)
+    setFormItem("Base.cFinTyp", {
+      disabled: false
+    });
+  })
 });
 
 
@@ -99,17 +121,19 @@ const getOwnShare =()=>{
 
 // 拆分事件
 const nPayNumberFun = ()=>{
-    const tabref = opertaor.getTableRefs();
-    const baseBefore = tabref["base"].getFromValue();
-    const baseData = opertaor.getDataAll()['base']['needCalc'];
-    const payinfoRef =  opertaor.getTableRefByKey("payinfo").getFromValue();
+  if (param.cCombinationType === '2') {
+    return ;
+  }
+  const tabref = opertaor.getTableRefs();
+  const baseBefore = tabref["base"].getFromValue();
+  const baseData = opertaor.getDataAll()['base']['needCalc'];
+  pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeFirst((operator: any, group: GroupForm) => {
+    const payinfoRef = operator.getTableRefByKey("payinfo").getFromValue();
     console.log('opertaor',baseData,opertaor.getDataAll(),baseBefore)
-
     if (!baseData && payinfoRef.length <1) {
       ElMessage.error("请先进行保费计算!");
       return false
     }
-
     if (Number(getValue("Base.nPayNum"))>12) {
       ElMessage.warning("拆分最多为12期！");
       return false
@@ -120,11 +144,11 @@ const nPayNumberFun = ()=>{
       if(getValue('Base.cInstMrk') =='5')eventBus.emit('add-special');
 
       const data = opertaor.getDataAll();
-      
+
       let nCiShare = Number(getOwnShare()) || 1 ;
-      const totalAmount = Number(data['base']['Base.nPrm']);  
+      const totalAmount = Number(data['base']['Base.nPrm']);
       const splitCount =Number(data.base?.['Base.nPayNum'])
-   
+
       const totalCent = Math.round(totalAmount * 100);
       const result = ref<number[]>([]);
       const quotient = Math.floor(totalCent / splitCount) ;
@@ -133,45 +157,47 @@ const nPayNumberFun = ()=>{
       if (remainder > 0) {
         result.value[splitCount-1] += remainder;
       }
-            result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
+      result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
       let val= {}
       let valArr=[]
       for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
         let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
-        let startDate = new Date(BgnTmDate); 
+        let startDate = new Date(BgnTmDate);
         let endDate = new Date(BgnTmDate)
         if (getValue("Base.cInstMrk")=='5') {
-          startDate.setDate(BgnTmDate.getDate() + i * 15); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15); 
+          startDate.setDate(BgnTmDate.getDate() + i * 15);
+          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15);
         } else {
-          startDate.setDate(BgnTmDate.getDate() + i * 30); 
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30); 
+          startDate.setDate(BgnTmDate.getDate() + i * 30);
+          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30);
         }
 
         let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
         // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
- 
-        let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
-           val= { "_dataId": "",
-            "Pay.nTms":i+1 ,
-            "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
-            "Pay.tPayBgnTm": tInsrncBgnTm,
-            "Pay.tPayEndTm": tPayEndTm,
-            "Pay.nOwnPrm":result.value[i]? parseFloat((result.value[i] * nCiShare ).toFixed(8)):0,   // 我司
-            // "Pay.nOwnPrm": result.value[i] || 0 ,   // 我司
-            "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
-            "Pay.nPayablePrm": result.value[i] || 0, // 应收
-            "Pay.nPrmVar": result.value[i]     // 差额
-          }
 
-          valArr.push(val)
+        let tPayEndTm = dayjs(endDate).add(-1,'second').format("YYYY-MM-DD HH:mm:ss")
+        val= { "_dataId": "",
+          "Pay.nTms":i+1 ,
+          "Pay.cPayorCde": opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppCde"),
+          "Pay.tPayBgnTm": tInsrncBgnTm,
+          "Pay.tPayEndTm": tPayEndTm,
+          "Pay.nOwnPrm":result.value[i]? parseFloat((result.value[i] * nCiShare ).toFixed(8)):0,   // 我司
+          // "Pay.nOwnPrm": result.value[i] || 0 ,   // 我司
+          "Pay.cPayorNme":opertaor.getTableRefs()["applicant"].getValue("Applicant.cAppNme"),
+          "Pay.nPayablePrm": result.value[i] || 0, // 应收
+          "Pay.nPrmVar": result.value[i]     // 差额
+        }
+
+        valArr.push(val)
       }
 
       console.log('数据',valArr)
-   
-      opertaor.getTableRefByKey("payinfo").setFormValue(valArr); 
+
+      opertaor.getTableRefByKey("payinfo").setFormValue(valArr);
     }
- } 
+
+  })
+}
 
 // 绑定方法
 const method = {
@@ -192,12 +218,7 @@ const method = {
     }else if(val=='0'){
       setFormItem("Base.nPayNum", { disabled: true, });
       setValue('Base.nPayNum',1)
-
- 
-    if (param.initFlag) {
-      return ;
-    }
-       nPayNumberFun();
+      nPayNumberFun();
     }
   },
   //争议处理选择事件
@@ -228,7 +249,8 @@ const method = {
     }
   },
   //总保额币种下拉事件
-  cAmtCurChange(val: any) {
+  cAmtCurChange(val: any, row: any, item: any) {
+    console.log('cAmtCurChange-item', item)
     if (val !== "CNY") {
       codeListStore
         .queryCodeList({
@@ -236,10 +258,10 @@ const method = {
           codeListParam: { value: val },
         })
         .then((res) => {
-          setValue("Base.nAmtRmbExch", res[0].currency_rate);
+          setValue("Base.nAmtRmbExch", res[0].currency_rate, `group-${item.group}`);
         });
     } else {
-      setValue("Base.nAmtRmbExch", "1.000000");
+      setValue("Base.nAmtRmbExch", "1.000000", `group-${item.group}`);
     }
   },
   //保额汇率标识change事件
@@ -384,35 +406,60 @@ const method = {
 // 绑定特殊验证器
 const exRules = {};
 
-function getFromValue() {
-  return baseEditRef?.value?.getFromValue();
+
+const getGroupKey = (key: string, groupId?: string) => {
+  let ikey = key;
+  if(groupId && baseFormatKeys.includes(key)) {
+    ikey = `${groupId ? groupId.replace('group-', '') : ''}:${key}`
+  }
+  return ikey;
 }
 
-function setFormValue(value: any) {
-  baseEditRef?.value?.setFormValue(value);
+function getFromValue(groupId: string) {
+  const fromData = baseEditRef?.value?.getFromValue();
+  return peelFormDataByProdNo(fromData, groupId ? groupId.replace('group-', '') : '')
+}
+
+function setFormValue(value: any, groupId?: string) {
+  const prodNos = []
+  if(!groupId || groupId === CommonGroupId) {
+    prodNos.push(...route.params?.param.cProdList)
+  }else {
+    prodNos.push(groupId ? groupId.replace('group-', '') : '')
+  }
+  const res = joinFormDataByProdNo(value, prodNos)
+  baseEditRef?.value?.setFormValue(res);
 }
 
 function validate() {
   return baseEditRef?.value?.validate();
 }
 
-function setValue(key: string, value: any) {
-  baseEditRef?.value?.setValue(key, value);
+function setValue(key: string, value: any, groupId?: string) {
+  if(!groupId) {
+    route.params?.param.cProdList.forEach(prodNo => {
+      baseEditRef?.value?.setValue(getGroupKey(key, `group-${prodNo}`), value);
+    })
+  }else {
+    baseEditRef?.value?.setValue(getGroupKey(key, groupId), value);
+  }
 }
 
-function getValue(key: string) {
-  return baseEditRef?.value?.getValue(key);
+function getValue(key: string, groupId?: string) {
+  return baseEditRef?.value?.getValue(getGroupKey(key, groupId));
 }
 
 //给表单赋值
 function setFormItem(key: any, obj: any) {
   if (obj && Object.keys(obj).length) {
     formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
+      const keys = item.prop.split(":")
+      const ikey = keys.length > 1 ? keys[1] : keys[0]
+      if (key === ikey) {
         //控制尾部按钮的
         if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
+          for (let k in obj.btnItems) {
+            item.btnItems[k] = obj.btnItems[k];
           }
         }else{
           Object.assign(item, obj);
@@ -438,6 +485,10 @@ function numMulti(num1, num2) {
   }
   return Number(num1.toString().replace('.', '')) * Number(num2.toString().replace('.', '')) / Math.pow(10, baseNum);
 }
+function setDisabledAll(isDisabled: boolean = true) {
+  baseEditRef?.value?.setDisabledAll(isDisabled);
+}
+
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   baseEditRef?.value?.addProvide(key, value);
 }
@@ -450,7 +501,8 @@ defineExpose({
   getFormconfig,
   nPayNumberFun,
   addProvide,
-  setFormItem
+  setFormItem,
+  setDisabledAll
 });
 </script>
 

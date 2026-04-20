@@ -27,6 +27,7 @@ import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import {CompositePageView} from "@/views/pcis/support/composite.types";
 
+const groupId = {value: null} // 当前groupId 不能用ref
 const route = useRoute();
 const query = ref(route.query);
 const params = JSON.parse(query.value?.param ? descryptParameter(query.value.param) : "{}");
@@ -145,12 +146,11 @@ onMounted(async () => {
     }
     // 添加处理 Base.cCiMrk 值为 6 时显示"从联单"的逻辑
 
-    // 询价录单 联共保业务暂时固定非共保业务，不允许选择联共保
-    // if(param.pageName === "priceInquiry") {
-    //   setFormItem('Base.cCiMrk',{
-    //     disabled:  true
-    //   })
-    // }
+    // 组合出单，不允许选择联共保
+    setValue('Base.cCiMrk', "0")
+    setFormItem('Base.cCiMrk',{
+      disabled:  true
+    })
   });
 });
 // 添加处理联共保标识显示逻辑的函数
@@ -917,6 +917,9 @@ function getFormconfig() {
 function addProvide<T>(key: InjectionKey<T> | string, value: T)  {
   plyBaseEditRef?.value?.addProvide(key, value);
 }
+const setGroupId = (id: string) => {
+  groupId.value = id
+}
 defineExpose({
   getFromValue,
   setFormValue,
@@ -924,7 +927,8 @@ defineExpose({
   setValue,
   getValue,
   getFormconfig,
-  addProvide
+  addProvide,
+  setGroupId
 });
 </script>
 

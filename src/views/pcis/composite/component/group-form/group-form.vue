@@ -7,6 +7,7 @@
     :id="k.id"
   >
     <component
+      v-show="!pageView.hiddenCompKeys.includes(k.pageKey)"
       :ref="(res: any) => {
         const pageK =
           k.pageKey === 'dist' || k.pageKey === 'distSummary'
@@ -60,6 +61,7 @@ const idxParam: IdxParamProps = {
     id: props.groupId,
     type: OpertaorPosit,
     allDataFormat: pageView.value.allDataFormat,
+    convertGetCommonConfig: pageView.value.convertGetCommonConfig,
   },
   cdeListViewProps: {
     id: props.groupId

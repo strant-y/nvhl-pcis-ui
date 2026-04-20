@@ -104,6 +104,7 @@ import anchorCollapse from './component/anchor/anchor.vue';
 import type {AnchorItem, GroupForm} from './component';
 import {useDzModal} from "@/common/dzmodel/DzModalService";
 import {
+  CommonCustomCompKeyMap, CommonGroupId,
   CompositePageConfigType,
   CompositePageView,
   POSITE_PAGE_TYPE_APP,
@@ -155,6 +156,17 @@ let controlFlag = ""; // 用来处理反洗钱 页面窜窜以及显示
 const commonComp = computed(() => pageView.value.pageConfig[0])
 const formComp = computed(() => pageView.value.pageConfig.filter((item, idx) => idx > 0))
 const anchorConfig = computed(() => pageView.value.anchorConfig)
+
+const getProdInfoList = (idx?: number) => {
+  if(!idx) {
+    return productList.value.map((item: any) => {
+      return {...item}
+    })
+  }else if(idx < productList.value.length){
+    return {...productList.value[idx]}
+  }
+  return undefined
+}
 
 const bthList = ref<FreeButtonBase[]>([
   createFreeButtonBase({
@@ -242,9 +254,7 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
     }
 
     anchorConfig.forEach((anchor: AnchorItem) => {
-      // 删除账户信息锚点
-      const acctinfoIdx = anchor.children.findIndex(f => f.tabKey === "acctinfo")
-      acctinfoIdx != -1 && anchor.children.splice(acctinfoIdx, 1);
+
     })
 
     pageConfig.forEach((item: GroupForm) => {
@@ -253,16 +263,14 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
           // 隐藏 申请单号
           comp
               .pageSchema
-              .fromSchema.forEach((ys: any) => {
+              ?.fromSchema
+              ?.forEach((ys: any) => {
             if(ys.prop.includes('cAppNo')) {
               ys.hidden = true;
             }
           })
         })
       }else {
-        // 删除账户信息组件
-        const acctinfoIdx = item.pageInfo.findIndex(f => f.pageKey === "acctinfo")
-        acctinfoIdx != -1 && item.pageInfo.splice(acctinfoIdx, 1);
       }
     })
     console.info('### info anchorConfig', anchorConfig);
@@ -279,8 +287,8 @@ onBeforeMount(() => {
   if(props.param) {
     const initType = props.param.initType;
     const loading = openPageLoading();
-    // 初始化产品信息
-    initProdListData();
+    // 初始化模板信息
+    initTemplateData();
     // 存储路由参数
     pageView.value.setPageParams(props.param);
     // 初始化页面结构
@@ -308,9 +316,14 @@ onBeforeMount(() => {
             }
             loading.close();
           }).catch((err) => {
+            console.error('queryPositeInfo-err', err)
             ElMessage.error(err);
             loading.close();
           })
+        }
+        // 组合方案出单产品信息不可编辑
+        if(props.param.cCombinationType === '2') {
+          prodListRef.value?.setDisabledAll();
         }
       });
     })
@@ -319,19 +332,20 @@ onBeforeMount(() => {
 
 function appInit() {
   pageView.value.initPageData();
-  inti06PlanData()
+  initPlanData()
   console.log('appInit');
 }
 function saveInit(pageData: any) {
   const data = trimPageData(pageData);
   pageView.value.setPageAllData(data);
-  inti06PlanData(data)
+  initPlanData(data)
   console.log('saveInit', data);
 }
 function readInit(pageData: any) {
   const data = trimPageData(pageData);
-  prodListRef.value?.setDisabledAll();
   pageView.value.setPageAllData(data);
+  initPlanData()
+  prodListRef.value?.setDisabledAll();
   pageView.value.setPageDisabledAll();
   bthList.value.forEach((item: any) => {
     if(item && [
@@ -349,10 +363,52 @@ function readInit(pageData: any) {
 }
 
 /**
- * 意健险方案数据初始化
+ * 方案数据初始化
  */
-const inti06PlanData = (data?: any) => {
-  const prodList06 = productList.value.filter((prod: any) => prod.cKindNo === '06' && prod.cPlanNo)
+const initPlanData = (data?: any) => {
+
+  // 财险数据
+  positeApi.getPlanByCombinationPlanNo({
+    cCombinationPlanNo: props.param.cCombinationPlanNo
+  }).then((res: any) => {
+    if(res.code === 200) {
+      const planList: any[] = res.data
+      const o000000 = pageView.value.getDataOpertaorByProdNo('000000')
+      const tabs = o000000.getTableRefs()
+      tabs['plan']?.setFormValue(planList, 'group-000000')
+      setTimeout(() => {
+        planList.forEach((row: any) => {
+          const o = pageView.value.getDataOpertaorByProdNo(row.cProdNo)
+          if(o) {
+            const base = o.getTableRefs()["base"]
+            if(base) {
+              base.setValue("Base.nPrm", row.nInsuranceFee, `group-${row.cProdNo}`);
+              base.setValue("Base.nRmbPrm", row.nInsuranceFee, `group-${row.cProdNo}`);
+              base.setValue("Base.nAmt", row.nInsuranceAmount, `group-${row.cProdNo}`);
+              base.setValue("Base.nRmbAmt", row.nInsuranceAmount, `group-${row.cProdNo}`);
+              base.setValue("Base.nCumulativeLimitModified", row.nInsuranceAmount, `group-${row.cProdNo}`);
+              base.setValue("Base.nModifiedAccidentLimit", row.nInsuranceAmount, `group-${row.cProdNo}`);
+              base.setValue("Base.nAccidentLimit", row.nInsuranceAmount, `group-${row.cProdNo}`);
+              base.setValue("Base.nPerLimit", row.nInsuranceAmount, `group-${row.cProdNo}`);
+              base.setValue("Base.cAccidentLimitManual", '0', `group-${row.cProdNo}`);
+              base.setValue("Base.cCumulativeLimitManual", '0', `group-${row.cProdNo}`);
+            }
+          }
+
+          productList.value.forEach((prod: any) => {
+            if(prod.cProdNo === row.cProdNo) {
+              prod.nPrm = row.nInsuranceFee
+            }
+          })
+
+        })
+      }, 500)
+
+    }
+  })
+
+  // 意健险数据
+  const prodList06 = getProdInfoList().filter((prod: any) => prod.cKindNo === '06' && prod.cPlanNo)
   console.log('prodList06', prodList06)
   if(data) {
     const dataKeys = Object.keys(data)
@@ -371,9 +427,22 @@ const inti06PlanData = (data?: any) => {
         prodList06.forEach((prod: any) => {
           const opertaor = pageView.value.getDataOpertaorByProdNo(prod.cProdNo)
           if(opertaor) {
-            const yjxPlan = opertaor.getTableRefs()['yjxPlan']
+            const tabs = opertaor.getTableRefs()
+            console.log('tabs', tabs)
+            const yjxPlan = tabs['plan']
             if(yjxPlan) {
-              yjxPlan.setFormValue(planList.filter(p => p['PlanBase.cPlanNo'] === prod.cPlanNo))
+              yjxPlan.setFormValue(planList.filter(p => p['PlanBase.cPlanNo'] === prod.cPlanNo), `group-${prod.cProdNo}`)
+
+              nextTick(() => {
+                const plan06 = yjxPlan.getFromValue(`group-${prod.cProdNo}`)[0]
+                productList.value.forEach((prod: any) => {
+                  if(prod.cProdNo === plan06['PlanBase.cProdNo']) {
+                    prod.nPrm = plan06['PlanBase.nPrm']
+                  }
+                })
+
+              })
+
             }
           }
         })
@@ -427,19 +496,18 @@ const activeChange = (activeItems: AnchorItem[]) => {
 const saveOpt = async (isret: boolean = true) => {
   const btn = getBtn('btn010102')
   btn.loading = true;
-  const allData = pageView.value.getPageAllData();
-  const params = {param: props.param, data: allData, user: userStore.user}
+  const params = getReqParams()
   console.log('saveOpt-params', params);
   const res = await positeApi.savePositeInfo(params)
   console.log('savePositeInfo-res', res);
   if(res.code === 200) {
     if(isret) {
       const pageData = trimPageData({...res.data});
-      const cCombinationNo = productList.value[0]['cCombinationNo']
+      const cCombinationNo = productList.value.find(f => !!f.cCombinationNo)?.cCombinationNo
       const newParams = getNewParams({
         initType: POSITE_PAGE_TYPE_SAVE,
         cCombinationNo: cCombinationNo,
-        cProdDtlList: productList.value,
+        cProdDtlList: getProdInfoList(),
       });
       router.replace({
         path: "/pcisapp/posite-page",
@@ -451,7 +519,7 @@ const saveOpt = async (isret: boolean = true) => {
         // 刷新页面
         pageView.value.setPageAllData(pageData);
         // 刷新页面参数
-        pageView.value.updatePageParams(props.param, productList.value);
+        pageView.value.updatePageParams(props.param, getProdInfoList());
 
         ElMessage.success('保存成功')
 
@@ -465,14 +533,29 @@ const saveOpt = async (isret: boolean = true) => {
 }
 
 const calcPremium = async () => {
-  const allData = pageView.value.getPageAllData();
-  const params = {param: props.param, data: allData, user: userStore.user}
+  const params = getReqParams()
   console.log('calcPremium-params', params);
   // const v = await pageView.value.validateAll()
   // if(!v.validate) {
   //   return;
   // }
+
+  if(props.param.cCombinationType === '2') {
+
+    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeForEach((operator: any, group: GroupForm) => {
+      const allData = operator.getDataAll()
+      console.log('allData', allData)
+      const payInfo = setPayInfo(allData['base'], allData['applicant'], allData['insrnc']);
+      console.log("生成缴费计划内容", group, payInfo);
+      operator.getTableRefs()["payinfo"]?.setFormValue(payInfo);
+    })
+
+    ElMessage.success('总保费：1000元')
+    return
+  }
+
   const loading = openPageLoading('计算中...');
+
   const groupIdList = pageView.value.pageConfig
       .map((group: GroupForm )=> group.groupId)
       .filter(groupId => !groupId.includes('000000') && !groupId.includes('060030'))
@@ -794,70 +877,120 @@ const disposeAfter = (opertaor: any, ops: any, prodNo: string, msg: string) => {
 
 
 const submitToUndrFn = async () => {
-  const allData = pageView.value.getPageAllData();
-  const params = {param: props.param, data: allData, user: userStore.user}
+  const params = getReqParams('submit')
   console.log('submitToUndrFn-params', params);
   const v = await pageView.value.validateAll()
   if(!v.validate) {
     return;
   }
+
+  if(props.param.cCombinationType === '2') {
+    // 组合方案出单添加缴费计划验证
+    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeForEach((operator: any, group: GroupForm) => {
+      const allData = operator.getDataAll()
+      console.log('allData', allData)
+      const payInfo = allData['payinfo'];
+      if (!payInfo || payInfo.length === 0) {
+        ElMessage.warning(`请先进行保费计算`)
+        return;
+      }
+    })
+  }
+
+  // 先保存再提核
   await saveOpt(false)
+
   const loading = openPageLoading('提核中...');
-  positeApi.submitCombination(params).then((res: any) => {
-    console.log('submitCombination-res', res);
-    if(res.code === 200) {
-      // const pageData = trimPageData({...res.data});
-      ElMessage.success(res.msg)
-      const newParams = getNewParams({
-        initType: POSITE_PAGE_TYPE_READ,
-        cProdDtlList: res.data ?? productList.value
-      });
-      router.replace({
-        path: "/pcisapp/posite-page",
-        query: {
-          param: JSON.stringify({...newParams}),
-        },
-      }).then(() => {
-        console.log('replace props.param', props.param);
-        initProdListData();
-        pageView.value.updatePageParams(props.param, productList.value);
-        prodListRef.value?.setDisabledAll();
-        pageView.value.setPageDisabledAll();
-        bthList.value.forEach((item: any) => {
-          if(item && [
-            'btn010101',
-            'btn010102',
-            'btn010103',
-            'btn010104',
-            'btn010105',
-            'btn010106'
-          ].includes(item.id)) {
-            item.disabled = true;
-          }
-        })
-      });
-    }else {
-      ElMessage.error(res.msg)
-    }
-    setTimeout(() => loading.close(), 200)
-  })
+  const btn = getBtn('btn010103')
+  btn.loading = true;
+  const res: any = await positeApi.submitCombination(params);
+  console.log('submitCombination-res', res);
+  if(res.code === 200) {
+    ElMessage.success(res.msg)
+    res.data.data.forEach((d: any) => {
+      const iProd = productList.value.find((prod: any) => prod.cProdNo === d.cProdNo)
+      if(iProd) {
+        iProd.cAppNo = d.cAppNo
+      }
+    })
+    const newParams = getNewParams({
+      initType: POSITE_PAGE_TYPE_READ,
+      cProdDtlList: getProdInfoList()
+    });
+    router.replace({
+      path: "/pcisapp/posite-page",
+      query: {
+        param: JSON.stringify({...newParams}),
+      },
+    }).then(() => {
+      console.log('replace props.param', props.param);
+      initTemplateData();
+      pageView.value.updatePageParams(props.param, getProdInfoList());
+      prodListRef.value?.setDisabledAll();
+      pageView.value.setPageDisabledAll();
+      bthList.value.forEach((item: any) => {
+        if(item && [
+          'btn010101',
+          'btn010102',
+          'btn010103',
+          'btn010104',
+          'btn010105',
+          'btn010106'
+        ].includes(item.id)) {
+          item.disabled = true;
+        }
+      })
+    });
+  }else {
+    ElMessage.error(res.msg)
+  }
+  setTimeout(() => {
+    loading.close()
+    btn.loading = true;
+  }, 300)
 }
 
 
 /**
  * 整理页面数据
- * @param pageData
+ * @param allData
  */
-const trimPageData = (pageData: any) => {
-  if(!pageData) return;
+const trimPageData = (allData: any) => {
+  if(!allData) return;
+  console.log('trimPageData-allData', allData)
+  const pageData = {...allData}
   const resultMap: any = {};
   const dataKeys = Object.keys(pageData);
-  const prodList = productList.value.map((item: any) =>  {return{...item}});
-  let cCombinationNo;
+
+
+  const SpecialAgreementList: any[] = []
+  if(props.param.cCombinationType === '2') {
+    // 特约数据处理
+    dataKeys
+        .filter((key: string) => !['000000'].includes(key))
+        .forEach((key: string) => {
+          const pData = {...pageData[key]};
+          if(pData) {
+            if(pData['SpecialAgreement'] && pData['SpecialAgreement'].length > 0) {
+              pData['SpecialAgreement'].forEach((sa: any) => {
+                if(!SpecialAgreementList.some((s: any) => s['SpecialAgreement.cSpecialCode'] === sa['SpecialAgreement.cSpecialCode'])) {
+                  SpecialAgreementList.push({
+                    ...sa,
+                    'SpecialAgreement.cAppNo': undefined
+                  })
+                }
+              })
+              delete pageData[key]['SpecialAgreement']
+            }
+          }
+        })
+  }
+
   for(const key of dataKeys) {
-    if(!pageData[key]) return;
+    if(!pageData[key]) {
+      continue;
+    }
     const prodData = {...pageData[key]};
-    console.log('trimPageData', key, prodData);
     if(key === '000000') {
       // 删除公共组件中的申请单号
       if(prodData['plyBase']) {
@@ -872,47 +1005,135 @@ const trimPageData = (pageData: any) => {
       if(prodData['insured']) {
         delete prodData['insured']['Insured.cAppNo']
       }
-    }else if(prodData['plyBase']) {
+
+      Object.keys(prodData).forEach((commonKey: string) => {
+        if(!pageView.value.commonComponentMap.has(commonKey)) {
+          delete prodData[commonKey]
+        }
+      })
+    }else if(key.startsWith('06')) {
+      resultMap[key] = prodData;
+      continue;
+    } else if(prodData['plyBase']) {
       // 回填产品组件数据
       const plyBase = prodData['plyBase'][0];
-      cCombinationNo = plyBase['Base.cCombinationNo'];
-      const idx = prodList.findIndex(prodInfo => prodInfo.cProdNo === key);
+      const idx = productList.value.findIndex(prodInfo => prodInfo.cProdNo === key);
       if(idx != -1) {
-        prodList[idx]['cAppNo'] = plyBase['Base.cAppNo']
-        prodList[idx]['cPlyNo'] = plyBase['Base.cPlyNo']
-        prodList[idx]['cCombinationNo'] = cCombinationNo
+        productList.value[idx]['cAppNo'] = plyBase['Base.cAppNo']
+        productList.value[idx]['cPlyNo'] = plyBase['Base.cPlyNo']
+        productList.value[idx]['cCombinationNo'] = plyBase['Base.cCombinationNo']
+        productList.value[idx]['tUpdTm'] = plyBase['Base.tUpdTm']
       }
     }
+
     const opertaor = pageView.value.getDataOpertaorByProdNo(key);
-    resultMap[key] = opertaor.convertData({res: {composition: prodData}})
+    const resProdData = opertaor.convertData({res: {composition: prodData}})
+    if(key === '000000') {
+      resProdData['SpecialAgreement'] = SpecialAgreementList
+    }
+    resultMap[key] = resProdData
   }
   // 意健险产品列表数据回填处理
   const keys06 = dataKeys.filter(key =>  key.startsWith('06'))
-  if(cCombinationNo && keys06) {
+  if(keys06) {
     for(const key of keys06) {
-      const idx = prodList.findIndex(prodInfo => prodInfo.cProdNo === key);
+      const idx = productList.value.findIndex(prodInfo => prodInfo.cProdNo === key);
       if (idx != -1) {
-        prodList[idx]['cCombinationNo'] = cCombinationNo
+        productList.value[idx]['cCombinationNo'] = productList.value.find(f => !!f.cCombinationNo)?.cCombinationNo
       }
     }
   }
-  productList.value = prodList;
+  console.log('trimPageData-resultMap', resultMap)
   return resultMap
 }
 
-
-const initProdListData = () => {
-  productList.value = props.param.cProdDtlList.map((item: any) => {
+const copyList: any[] = []
+const initTemplateData = () => {
+   const list = props.param.cProdDtlList.map((item: any) => {
+    if(item.cCombinationNo) {
+        props.param.cCombinationNo = item.cCombinationNo
+    }
     return {
-      cAppNo: item.cAppNo,
-      cPlyNo: item.cPlyNo,
-      cCombinationNo: item.cCombinationNo,
-      cKindNo: item.cKindNo,
-      cProdNo: item.cProdNo,
-      cGrpMrk: item.cGrpMrk,
-      nPrm: item.nPrm
+        cAppNo: item.cAppNo,
+        cPlyNo: item.cPlyNo,
+        cCombinationNo: item.cCombinationNo,
+        cKindNo: item.cKindNo,
+        cProdNo: item.cProdNo,
+        cGrpMrk: item.cGrpMrk,
+        nPrm: item.nPrm
     }
   });
+  console.log('list', list)
+  productList.value = list.map((item: any) => {
+    return {...item}
+  })
+  console.log('getProdInfoList', getProdInfoList())
+  pageView.value.discardCompKeys.push(...['acctinfo', 'ci', 'ciMasterAgreement', 'ourCompanyCiShare'])
+  // 初始化公共组件
+  pageView.value.commonComponentMap.set('applicant', 'positeApplicant');
+  pageView.value.commonComponentMap.set('insured', 'positeInsured');
+  pageView.value.commonComponentMap.set('plyBase', 'positePlybase');
+  // CommonComponentMap.set('ci', 'positeCi');
+  if (props.param.cCombinationType === '2') { // 组合方案
+    pageView.value.customCommonCompKeys.push(...["base", "Term", "tgt", "insrnc", "SpecialAgreement", "DeductibleDist"])
+    CommonCustomCompKeyMap.set("Term", {pageKey: "plan", cvrg: 'positeCvrg'})
+    CommonCustomCompKeyMap.set("DeductibleDist", {pageKey: "deductibleDist", deductibleDist: 'positeDeductible'})
+    CommonCustomCompKeyMap.set("Base", {pageKey: "base", Base: 'positeBase'})
+    pageView.value.hiddenCompKeys.push(...["payinfo"])
+    pageView.value.sortComponentsMap.set('plan', 1)
+
+    const getAppNo = (cProdNo: string) => {
+      return computed(() => productList.value?.find((p: any) => p.cProdNo === cProdNo)?.cAppNo).value
+    }
+
+    if(props.param.cCombinationPlanNo === 'CP_0000') {
+      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
+      copyList.push({
+        cProdNo: '010002',
+        componentKey: 'PropertyaddressDist010001',
+        componentTable: 'PropertyaddressDist',
+        cAppNo: getAppNo('010002'),
+        copyList: [
+          {
+            cProdNo: '010007',
+            componentKey: 'PropertyaddressDist010006',
+            componentTable: 'PropertyaddressDist',
+            cAppNo: getAppNo('010007'),
+          }
+        ]
+      })
+    }
+  }
+  pageView.value.sortComponentsMap.set('plyBase', 2)
+  pageView.value.sortComponentsMap.set('applicant', 3)
+  pageView.value.sortComponentsMap.set('insured', 4)
+  pageView.value.sortComponentsMap.set('insrnc', 5)
+}
+
+const getReqParams = (t: string = 'save') => {
+  const allData = pageView.value.getPageAllData();
+  productList.value.forEach((item: any) => {
+    const prodData = allData[item.cProdNo]
+    if(prodData) {
+      if(prodData['base']) {
+        prodData['base']['Base.tUpdTm'] = item['tUpdTm']
+      }
+    }
+  })
+
+  const cList: any[] = [];
+  if(t === 'save' && props.param.cCombinationNo) {
+    cList.push(...pageView.value.getAllCopyList())
+    cList.push(...copyList)
+  }
+
+  return {
+    param: getNewParams({
+      copyList: cList
+    }),
+    data: allData,
+    user: userStore.user
+  }
 }
 
 const getNewParams = (param: any) => {
@@ -943,7 +1164,7 @@ const openPageLoading = (text?: string) => {
  * 发票信息
  */
 const setTaxInfo = () => {
-  const prod = productList.value[0]
+  const prod = getProdInfoList(0)
   if (!!prod.cAppNo) {
     dzmodal
         .open(invoiceInfoModel, { type: "Issuer", data: {} , opertaor: pageView.value.getDataOpertaorByProdNo(prod.cProdNo)})
@@ -964,7 +1185,7 @@ const setTaxInfo = () => {
 const setCusBenefitInfo = (val?: any) => {
   const validateIsFxq = () => {
     let res: any;
-    const isFxq = productList.value.filter((item: any) => item.cKindNo !== '06')
+    const isFxq = getProdInfoList().filter((item: any) => item.cKindNo !== '06')
       .some((item: any) => {
         const opertaor = pageView.value.getDataOpertaorByProdNo(item.cProdNo)
         const dataAll = opertaor.getDataAll()
