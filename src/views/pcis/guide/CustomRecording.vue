@@ -92,8 +92,8 @@
 						/>
 					</el-form-item>
 				</div>
+        <h4 style="margin: 0 20px">投保信息</h4>
         <template v-if="formconfig1.cRecordType == 1 || formconfig1.cRecordType == 9">
-          <h4 style="margin: 0 20px">投保信息</h4>
           <el-form-item
             id="cRenewMrk"
 						v-if="formconfig1.cRecordType == '1'"
@@ -264,18 +264,17 @@
 					</el-row>
         </template>
 				<template v-if="formconfig1.cRecordType != 9">
-					<h4 style="margin: 0 20px">选择{{ labelNm }}</h4>
-					<el-form-item
-            id="cGrpMrk"
-						label="团个属性"
-						prop="cGrpMrk"
-						:rules="[getRules('required', {})]"
-					>
-						<el-radio-group v-model="formconfig1.cGrpMrk">
-							<el-radio value="0">个单</el-radio>
-							<el-radio value="1">团单</el-radio>
-						</el-radio-group>
-					</el-form-item>
+          <el-form-item
+              id="cGrpMrk"
+              label="团个属性"
+              prop="cGrpMrk"
+              :rules="[getRules('required', {})]"
+          >
+            <el-radio-group v-model="formconfig1.cGrpMrk">
+              <el-radio value="0">个单</el-radio>
+              <el-radio value="1">团单</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <el-form-item style="margin-left: 170px;" v-if="formconfig1.cRenewMrk == '1'">
             <rt-button
               :item="{
@@ -288,30 +287,8 @@
             />
           </el-form-item>
 				</template>
-        <template v-if="formconfig1.cRecordType == '5'">
-          <rt-button
-            :item="{
-              type: 'primary',
-              label: '模板下载',
-              loading: downloadTemplateLoading,
-              func: () => {
-                downloadTemplate();
-              },
-            }"
-          />
-          <rt-button
-            :item="{
-              type: 'primary',
-              label: '导入方案',
-              loading: importTemplateLoading,
-              func: () => {
-                importTemplate();
-              },
-            }"
-          />
-        </template>
 				<template v-if="formconfig1.cRecordType != 9">
-					<el-tooltip placement="top">
+					<el-tooltip placement="top" v-if="formconfig1.cRecordType != 10">
 						<template #content>
 							可用鼠标左键，按住常用{{ labelNm }}卡片<br />自由拖动常用{{ labelNm }}排序<br />
 						</template>
@@ -319,15 +296,18 @@
 							style="margin: 0 20px; width: 200px"
 							v-if="formconfig1.cRenewMrk !== '1'"
 						>
-							常用{{ labelNm }}
+              常用{{ labelNm}}
 							<el-icon size="20" style="vertical-align: middle; color: red"
 								><InfoFilled
 							/></el-icon>
 						</h4>
 					</el-tooltip>
+          <h4 style="margin: 0 20px; width: 200px" v-else>
+            组合方案
+          </h4>
 					<el-row v-if="formconfig1.cRenewMrk !== '1'">
-            <el-col :span="24" v-if="formconfig1.cRecordType != 10">
-              <div>
+            <el-col :span="24">
+              <div v-if="formconfig1.cRecordType != 10">
                 <VueDraggable
                     class="eachCon"
                     v-model="termList"
@@ -360,8 +340,40 @@
                   </el-card>
                 </VueDraggable>
               </div>
+              <div v-else>
+                <VueDraggable
+                    class="eachCon"
+                    v-model="combinationPlanList"
+                    :animation="150"
+                >
+                  <el-card
+                      v-for="(item, index) in combinationPlanList"
+                      :key="index"
+                      :class="item.checked ? 'checked eachItems' : 'eachItems'"
+                      shadow="hover"
+                      @click="combinationPlanHandleClick(item, index)"
+                  >
+                    <p class="titles">
+                      <el-icon size="20" style="vertical-align: middle"
+                      ><Fold
+                      /></el-icon>
+                      <span :title="item.cCombinationPlanNme" class="">
+												{{ item.cCombinationPlanNme }}
+											</span>
+<!--                      <el-icon-->
+<!--                          :size="25"-->
+<!--                          style="color: rgb(250, 219, 20)"-->
+<!--                          @click.stop="handleStarClick(item)"-->
+<!--                      ><StarFilled-->
+<!--                      /></el-icon>-->
+                    </p>
+                    <p class="txt" v-if="item.cCombinationPlanNo">{{ item.cCombinationPlanNo }} - {{ item.cCombinationPlanNme }}</p>
+                  </el-card>
+                </VueDraggable>
+              </div>
             </el-col>
             <el-col :span="24" v-if="formconfig1.cRecordType === 10">
+              <h4 style="margin: 0 20px">选择{{ labelNm }}</h4>
               <el-form-item
                   :label="`${labelNm}名称`"
                   prop="cProdList"
@@ -386,6 +398,7 @@
                     @click="selectProdList"
                     icon="Search"
                     type="primary"
+                    :disabled="selectProdListBtn"
                 ></el-button>
               </el-form-item>
               <el-form-item>
@@ -401,6 +414,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="24" v-else>
+              <h4 style="margin: 0 20px">选择{{ labelNm }}</h4>
               <el-form-item
                   :label="`${labelNm}名称`"
                   prop="cTermNme"
@@ -428,6 +442,28 @@
                 ></el-button>
               </el-form-item>
               <el-form-item>
+                <template v-if="formconfig1.cRecordType == '5'">
+                  <rt-button
+                      :item="{
+                      type: 'primary',
+                      label: '模板下载',
+                      loading: downloadTemplateLoading,
+                      func: () => {
+                        downloadTemplate();
+                      },
+                    }"
+                          />
+                          <rt-button
+                              :item="{
+                      type: 'primary',
+                      label: '导入方案',
+                      loading: importTemplateLoading,
+                      func: () => {
+                        importTemplate();
+                      },
+                    }"
+                  />
+                </template>
                 <rt-button
                   :item="{
                     type: 'primary',
@@ -489,6 +525,7 @@ const policyService = new PolicyService();
 import { cannotCopy } from '@/utils/cannotCopyPlyNo';
 import { saveAs } from "file-saver";
 import { cGrpMrkProd } from '@/views/pcis/my-page/requiredDistMap';
+import positeApi from "@/api/posite";
 
 const router = useRouter();
 const dialogVisible = ref(true);
@@ -501,6 +538,9 @@ const options = ref<any>([]);
 const prodList = ref<any>([]);
 // 常用条款列表
 const termList = ref<any>([]);
+// 组合方案列表
+const combinationPlanList = ref<any>([]);
+const selectProdListBtn = ref(false)
 // 条款树
 const nodes = ref<Array<any>>([]);
 const defaultProps = {
@@ -619,6 +659,7 @@ const getCDptCdeList = (data: any)=> {
 onMounted(async () => {
   handleQuery();
   loadOptions();
+  loadCombinationPlanList();
   nextTick(() => {
     step.value = "0";
 
@@ -848,6 +889,38 @@ function handleClick(item: any, index: number) {
   formconfig1.value.cProdNo = item.prodNo;
   formconfig1.value.cProdNme = item.prodCnm;
 }
+// 组合方案选中/反选
+function combinationPlanHandleClick(item: any, index: number) {
+  // 每次只能选择一个数据,如果是选中状态,则取消选中
+  if (item.checked) {
+    combinationPlanList.value.map((item: any, index: any) => {
+      if (index != index) {
+        item.checked = false;
+      }
+    });
+  } else {
+    combinationPlanList.value.forEach((item: any, index: any) => (item.checked = false));
+  }
+  item.checked = !item.checked;
+  selectProdListBtn.value = item.checked;
+  if(item.checked) {
+    formconfig1.value.cCombinationPlanNo = item.cCombinationPlanNo // 组合方案号
+    formconfig1.value.cCombinationType = '2' // 组合方案类型
+    formconfig1.value.cProdList = item.list.map((prod: any) => prod.cProdNo);
+    formconfig1.value.cProdDtlList = item.list
+    prodList.value = item.list.map((m: any) => {
+      return {
+        value: m.cProdNo,
+        label: m.cProdNme
+      }
+    })
+  }else {
+    formconfig1.value.cCombinationPlanNo = null;
+    formconfig1.value.cCombinationType = '1' // 自定义组合
+    formconfig1.value.cProdList = []
+    formconfig1.value.cProdDtlList = []
+  }
+}
 //取消常用条款
 function handleStarClick(item: any) {
   console.log("0000000",item);
@@ -1004,6 +1077,10 @@ function handleRecordTypeChange(val:any) {
   } else if (val == "1") {
     loadOptions();
     labelNm.value = "条款";
+    formconfig1.value.cIsPlan = '0';
+  } else if (val == "10") {
+    loadOptions();
+    labelNm.value = "产品";
     formconfig1.value.cIsPlan = '0';
   } else {
     loadOptions(1);
@@ -1384,6 +1461,16 @@ function importTemplate() {
   };
   input.click(); // 触发文件选择对话框
 }
+
+const loadCombinationPlanList = () => {
+  positeApi.getCombinationPlan({}).then((res: any) => {
+    console.log('loadCombinationPlanList', res)
+    if(res.code === 200) {
+      combinationPlanList.value.push(...res.data)
+    }
+  })
+}
+
 </script>
 
 <style scoped>

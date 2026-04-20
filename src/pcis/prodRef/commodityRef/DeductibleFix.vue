@@ -103,11 +103,17 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
-  const param = {
-    cProdNo: props.data.cProdNo,
+  const param: any = {
     pageNum: 1,
     pageSize: 999,
   }
+  if(props.data.cProdList && props.data.cProdList.length > 0) {
+    param.cProdNos = props.data.cProdList;
+    param.cCombinationPlanNo = props.data.cCombinationPlanNo;
+  }else {
+    param.cProdNo = props.data?.cProdNo;
+  }
+  console.log('getPrdDeductible-param', param)
   // 查询列表数据
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {

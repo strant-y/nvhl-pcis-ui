@@ -1,10 +1,9 @@
 <template>
-  <app-grid-edit :gridEditConfig="formconfig1" ref="planEditRef" />
+  <app-grid-edit :gridEditConfig="formconfig1" ref="planEditRef"/>
   <comDialog ref="dialog"></comDialog>
 </template>
 
 <script setup lang="ts">
-import { formInit } from "@/shared/from-init";
 import {
   AppGridEditMethod,
   createAppGridEditConfig,
@@ -14,44 +13,109 @@ import {codeListViewStore, dataOpertaor} from "@/store";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import positeApi from "@/api/posite";
+import {useRoute} from "vue-router";
 import {CompositePageView} from "@/views/pcis/support/composite.types";
+import {creatCardConfig} from "@/shared/mytemplate/card-config";
 
 const props = defineProps({
   pageSchema: {
-    type: [Object],
+    type: Array,
     required: true,
   },
+  compKey: {
+    type: String
+  }
 });
 
+const route = useRoute();
+const param: any = route.params.param;
 const idxParam = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-const pageView = inject("pageView", ref(new CompositePageView()));
 const dialog = ref<DialogMethod | null>(null);
 const planEditRef = ref<AppGridEditMethod | null>(null);
-const formconfig1 = reactive<any>(createAppGridEditConfig({}));
+const pageView = inject("pageView", ref(new CompositePageView()));
+const formconfig1 = reactive<any>(createAppGridEditConfig({
+  editFlag: true, //是否可以编辑
+  titleBtns: [],
+  fromSchema: [
+    {
+      prop: 'cProdNme',
+      inputtype: 'rtinput',
+      title: '产品',
+      disabled: true,
+    },
+    {
+      prop: 'cPlanCn',
+      inputtype: 'rtinput',
+      title: '方案',
+      disabled: true,
+    },
+    {
+      prop: 'cClauseName',
+      inputtype: 'rtinput',
+      title: '条款',
+      disabled: true,
+    },
+    // {
+    //   prop: 'nInsuranceAmount',
+    //   inputtype: 'rtinput',
+    //   title: '累计赔偿限额',
+    //   disabled: true,
+    // },
+    {
+      prop: 'nInsuranceAmount',
+      inputtype: 'rtnumber',
+      title: '保额',
+      disabled: true,
+    },
+    {
+      prop: 'nInsuranceFee',
+      inputtype: 'rtnumber',
+      title: '保费',
+      disabled: true,
+    },
+    {
+      prop: "cGrpMrk",
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
+    {
+      prop: 'cPlanNo',
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
+    {
+      prop: 'cProdNo',
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
+    {
+      prop: 'cClauseNo',
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
+    {
+      prop: 'cPlanNo',
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
+  ]
+}));
 
 onMounted(() => {
-  const tableConfig = props.pageSchema;
-  tableConfig.fromSchema.forEach((item: any) => {
-    if(item.readonly === 1) {
-      item.disabled = true;
-    }
-    if(item.cShowLocation === '2') {
-      item.isShow = false
-    }
-  });
-  const formconfig11 = formInit(
-      JSON.stringify(tableConfig),
-      method,
-      exRules
-  );
 
+  console.log('pageSchema', props.pageSchema)
   formconfig1.stripe = false;
-  formconfig1.spanMethod = spanMethod;
+  // formconfig1.spanMethod = spanMethod;
   formconfig1.currentChange = currentChange;
   formconfig1.showPosition = 'right';
-  Object.assign(formconfig1, formconfig11);
   addProvide(CommonConstants.FORM_DATA_KEY, 'PlanBase.cPkId')
 });
 
@@ -120,16 +184,10 @@ const calculateSpans = (key: string, expandRowKeys: string[]) => {
     list.forEach((item: any, index: number) => {
       if (index === 0) {
         idxArr.push(1)
+      } else if(key === 'cProdNme'){
+        mergedAction(isMerged('PlanBase.cProdNme', item, list[index - 1]), index)
       } else if(key === 'cPlanNme'){
-        mergedAction(isMerged('PlanBase.cPlanNme', item, list[index - 1]), index)
-      } else if(key === 'nAppCopies'){
-        mergedAction(isMerged('PlanBase.nPrm', item, list[index - 1], item['PlanBase.cPlanNme'] === list[index - 1]['PlanBase.cPlanNme']), index)
-      } else if(key === 'nAppPersons'){
-        mergedAction(isMerged('PlanBase.nAmt', item, list[index - 1], item['PlanBase.cPlanNme'] === list[index - 1]['PlanBase.cPlanNme']), index)
-      } else if(key === 'nPrm'){
-        mergedAction(isMerged('PlanBase.nPrm', item, list[index - 1], item['PlanBase.cPlanNme'] === list[index - 1]['PlanBase.cPlanNme']), index)
-      } else if(key === 'nAmt'){
-        mergedAction(isMerged('PlanBase.nAmt', item, list[index - 1], item['PlanBase.cPlanNme'] === list[index - 1]['PlanBase.cPlanNme']), index)
+        mergedAction(isMerged('PlanBase.cPlanNme', item, list[index - 1], item['PlanBase.cProdNme'] === list[index - 1]['PlanBase.cProdNme']), index)
       }
     })
   }
@@ -140,15 +198,9 @@ const spanMethod = (obj: any, expandRowKeys: string[]) => {
   const { row, column, rowIndex, columnIndex } = obj;
   let list;
   if (columnIndex === 1) {
-    list = calculateSpans('cPlanNme', expandRowKeys)
-  } else if (columnIndex === 6) {
-    list = calculateSpans('nAppCopies', expandRowKeys);
-  } else if (columnIndex === 7) {
-    list = calculateSpans('nAppPersons', expandRowKeys);
-  } else if (columnIndex === 10) {
-    list = calculateSpans('nPrm', expandRowKeys);
-  } else if (columnIndex === 11) {
-    list = calculateSpans('nAmt', expandRowKeys);
+    list = calculateSpans('cProdNme', expandRowKeys)
+  } else if (columnIndex === 2) {
+    list = calculateSpans('cPlanNme', expandRowKeys);
   }
   if(list && list.length > 0) {
     const idx = list[rowIndex]
@@ -171,51 +223,15 @@ const currentChange = (currentRow: any, oldCurrentRow: any) => {
 const exRules = {};
 
 
-function calculateData(list: any[]): any[] {
-  let nPrm = 0;
-  let nAmt = 0;
-  let nAppPersons = 5;
-
-  // pageView.value.get
-
-  // const yjxGrpMemberList = opertaor.getTableRefs()['yjxGrpMember'].getFormValue()
-  // if(yjxGrpMemberList) {
-  //   nAppPersons = yjxGrpMemberList.length
-  // }
-  const planList = [...list].map((item: any, index: number) => {
-    const nSumPrm = item['PlanBase.nPerPrm'] * nAppPersons
-    const nSumAmt = item['PlanBase.nPerAmt'] * nAppPersons
-    nPrm += nSumPrm
-    nAmt += nSumAmt
-    return {
-      ...item,
-      ...{
-        'PlanBase.nSumPrm': nSumPrm,
-        'PlanBase.nSumAmt': nSumAmt,
-        'PlanBase.nAppCopies': 1,
-        'PlanBase.nAppPersons': nAppPersons,
-        'PlanBase.nSeqNo': index + 1,
-      }
-    }
-  });
-  planList.forEach((item: any) => {
-    item['PlanBase.nAmt'] = nAmt;
-    item['PlanBase.nPrm'] = nPrm;
-  })
-  return planList
-}
-
 function refushData() {
-  const list = calculateData(getFromValue())
-  planEditRef?.value?.setFormValue(list);
+  planEditRef?.value?.setFormValue(getFromValue());
 }
 
 function getFromValue() {
   return planEditRef?.value?.getFromValue();
 }
 function setFormValue(value: any) {
-  const list = calculateData(value)
-  planEditRef?.value?.setFormValue(list);
+  planEditRef?.value?.setFormValue(value);
 }
 
 function validate() {
@@ -280,4 +296,14 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.rt_group {
+  height: 20px;
+  margin-top: 6px;
+  width: 100%;
+  //margin-bottom: 6px;
+  background: var(--card-group-header-bg-color);
+  /* border: 1px solid #D9D9D9; */
+  padding: 0px 12px;
+}
+</style>
