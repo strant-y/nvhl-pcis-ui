@@ -1309,6 +1309,9 @@ function initMethod(){
   // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
   // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
   if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
+    /* 从共时，安责险产品时，当责任代码为 040196 ：法律费用，041129：医疗救护费用，049003：检验评估费用，049002：抢险救援费用 时，责任总保费不能编辑
+    040002雇主责任险时,041293 误工费用  040046 法律费用 */
+    const readonlyLiabCodes = ['040196','041129','049003','049002','041293','040046'];
     if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
       const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item:any) => item['TermRisktgt.nTotalInsuranceFee'])
       let prop = '';
@@ -1327,17 +1330,30 @@ function initMethod(){
     if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
       for(let i in groupInfo.value) {
         const ginfo = groupInfo.value[i]
-        const riskList = groupconf.value[ginfo.cGroupId].riskList
-        for(let k in riskList) {
-          const riskdata = riskList[k];
+        const riskListConfig = groupconf.value[ginfo.cGroupId].riskList
+        for(let k in riskListConfig) {
+          const riskdata = riskListConfig[k];
           const nItemRateList = Object.keys(riskdata.rowConfig).filter((i:any) => riskdata.rowConfig[i].find((it:any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
           if(riskdata.maxNum > 0 && nItemRateList?.length > 0) {
             for(let n = 1;n <= riskdata.maxNum;n++) {
               riskdata.col?.forEach((colinfo:any) => {
                 const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
                 if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
-                  item.disabled = false;
-                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+
+                  // 获取责任名称
+                  const riskNo = riskdata.rowConfig[colinfo.cColId][n - 1]?.cRiskNo;
+                  const liabCode = riskList.value[riskNo]?.['TermRisktgt.cLiabCode'] || '';
+
+                  // 判断是否需要设置为只读（根据责任代码）
+                  const isReadonly = readonlyLiabCodes.includes(liabCode);
+                  if(isReadonly){
+                    item.disabled = true;
+                    item.readonly = true;
+                    item.funcBlur = null;
+                  }else {
+                    item.disabled = false;
+                    item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                  }
                 }
               })
             }
@@ -1370,7 +1386,69 @@ function initMethod(){
         }
       });
     }
-  } else {
+  } else if(['1','3'].includes(plyBase?.['Base.cCiMrk'])  && pageparam.pageName !== 'priceInquiry') {
+    console.log('主共业务，清空保费并设置为只读');
+
+    if (riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
+      const nTotalInsuranceFee = riskGridConfig.value.fromSchema?.filter((item: any) => item['TermRisktgt.nTotalInsuranceFee'])
+      let prop = '';
+      if (nTotalInsuranceFee && nTotalInsuranceFee.length > 0) {
+        prop = 'TermRisktgt.nTotalInsuranceFee'
+      } else {
+        prop = 'TermRisktgt.nItemFee'
+      }
+      riskGridConfig.value.fromSchema?.forEach((item: any) => {
+        if (item?.prop === prop) {
+          console.log('设置网格模式保费只读, prop=', prop);
+          item.disabled = true;
+          item.readonly = true;
+          item.funcBlur = null;  // 移除失焦事件
+        }
+      })
+    } else if (groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
+      for (let i in groupInfo.value) {
+        const ginfo = groupInfo.value[i]
+        const riskListConfig = groupconf.value[ginfo.cGroupId].riskList
+        for (let k in riskListConfig) {
+          const riskdata = riskListConfig[k];
+          const nItemRateList = Object.keys(riskdata.rowConfig).filter((i: any) => riskdata.rowConfig[i].find((it: any) => it.factorItem?.prop === 'TermRisktgt.nItemRate'));
+          if (riskdata.maxNum > 0 && nItemRateList?.length > 0) {
+            for (let n = 1; n <= riskdata.maxNum; n++) {
+              riskdata.col?.forEach((colinfo: any) => {
+                const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
+                console.log("item=", item);
+                if (item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
+                  console.log('设置责任总保费只读, prop=', item?.prop);
+                  item.disabled = true;
+                  item.readonly = true;
+                  item.funcBlur = null;  // 移除失焦事件
+
+                  // 清空保费值
+                 const riskNo = riskdata.rowConfig[colinfo.cColId][n - 1]?.cRiskNo;
+                   if (riskNo && riskList.value[riskNo]) {
+                    if (riskList.value[riskNo][item.prop] !== undefined && riskList.value[riskNo][item.prop] !== null) {
+                      console.log('清空责任保费值:', riskList.value[riskNo][item.prop], '-> null');
+                      riskList.value[riskNo][item.prop] = null;
+                    }
+                  }
+                }
+              })
+            }
+          } else if (termFactormap && termFactormap.value.length > 0) {
+            termFactormap.value.forEach((item: any) => {
+              if (item.prop === 'Term.nInsuranceFee') {
+                console.log('设置条款保费只读, prop=', item.prop);
+                item.disabled = true;
+                item.readonly = true;
+                item.funcBlur = null;  // 移除失焦事件
+              }
+            });
+          }
+        }
+      }
+    }
+  }
+  else {
     // 根据数据控制开关设置条款中的可编辑项(投保单)
     if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cAppTyp === 'A') {
       qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' }).then((res:any) => {
