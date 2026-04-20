@@ -624,6 +624,7 @@ const method = {
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
           addedPlans: addedPlans.value, // 顺序数组
+          groupId: props.groupId
         },
         {
           isOk: (res: any) => {
@@ -699,7 +700,6 @@ const method = {
   //  042003 根据电梯条数反
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
-    console.log('------------------> ', props.groupId, opertaorProps, alldata)
     const param:any = {};
     if(route.params.param?.pageName === "priceInquiry") {
       param['cInquiryNo'] = alldata?.plyBase["Base.cInquiryNo"]
@@ -722,7 +722,8 @@ const method = {
               tab: formconfig1.value.title,
               compKey: props.compKey,
               codeListMap: distTableRef.value?.getCodeListMap(),
-              addedPlans: addedPlans.value, // 顺序数组
+              addedPlans: addedPlans.value, // 顺序数组,
+              groupId: props.groupId
             },
             {
               isOk: (res: any) => {
@@ -1033,7 +1034,8 @@ const method = {
               tab: formconfig1.value.title,
               compKey: props.compKey,
               codeListMap: distTableRef.value?.getCodeListMap(),
-              addedPlans: addedPlans.value
+              addedPlans: addedPlans.value,
+              groupId: props.groupId
             },
             {
               isOk: (res: any) => {

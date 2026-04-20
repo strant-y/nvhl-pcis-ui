@@ -203,6 +203,12 @@ const formconfig = ref(createAppGridEditConfig({
       disabled: true,
       isShow: false
     },
+    {
+      prop: 'tUpdTm',
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
   ]
 }));
 
