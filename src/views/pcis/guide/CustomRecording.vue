@@ -906,8 +906,10 @@ function combinationPlanHandleClick(item: any, index: number) {
   if(item.checked) {
     formconfig1.value.cCombinationPlanNo = item.cCombinationPlanNo // 组合方案号
     formconfig1.value.cCombinationType = '2' // 组合方案类型
-    formconfig1.value.cProdList = item.list.map((prod: any) => prod.cProdNo);
-    formconfig1.value.cProdDtlList = item.list
+    formconfig1.value.cProdList = item.list
+        .map((prod: any) => prod.cProdNo)
+        .sort((a: string, b: string) => a.localeCompare(b));
+    formconfig1.value.cProdDtlList = item.list.sort((a: any, b: any) => a.cProdNo.localeCompare(b.cProdNo))
     prodList.value = item.list.map((m: any) => {
       return {
         value: m.cProdNo,
@@ -1037,7 +1039,7 @@ function selectProdList() {
       formconfig1.value.cProdList = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
         return datas[3].substring(0, 6)
-      });
+      }).sort((a: string, b: string) => a.localeCompare(b));
       formconfig1.value.cProdDtlList = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
         const cProdNo = datas[3].substring(0, 6);
@@ -1056,7 +1058,7 @@ function selectProdList() {
           searchKey: item.searchKey,
           cTermNo: kindNo !== '06' ? item.code : undefined,
         };
-      });
+      }).sort((a: any, b: any) => a.cProdNo.localeCompare(b.cProdNo));
     }
   });
 }
