@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useProductStore, useTagsViewStore } from "@/store";
 import { eventBus } from "@/utils/event-bus";
-import {OpertaorPosit} from "@/views/pcis/support/composite.types";
+import {CommonCustomCompType, OpertaorPosit} from "@/views/pcis/support/composite.types";
 
 interface OpertaorProps {
     // 唯一键
@@ -10,13 +10,15 @@ interface OpertaorProps {
     type?: string;
     // 格式化页面数据
     allDataFormat?: (id: string, pageData: any) => any
+    // 自定义公共组件场景获取pageInfo
+    convertGetCommonConfig?: (id: string) => any
 }
 
 type StoreCache = Map<string, ReturnType<typeof defineStore>>
 const dataOpertaorMap: StoreCache = new Map();
 
 export const dataOpertaor = (props: OpertaorProps) => {
-    const {id, type, allDataFormat} = props;
+    const {id, type,  allDataFormat, convertGetCommonConfig} = props;
     return storeFactory(id, defineStore(`dataOpertaor-${id}`, () => {
 
         const productStore = useProductStore();
@@ -69,7 +71,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
             param.initFlag = true;
             Object.keys(alldata).forEach((key) => {
                 if (tableRefs[key] && tableRefs[key].setFormValue && Object.keys(alldata[key]).length != 0) {
-                    tableRefs[key].setFormValue(alldata[key]);
+                    tableRefs[key].setFormValue(alldata[key], id);
                 }
             });
             nextTick(() => {
@@ -86,13 +88,13 @@ export const dataOpertaor = (props: OpertaorProps) => {
                     if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
                         //: 再保时,不再获取这3个组件的数据
                     } else {
-                        res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue()));
+                        res[key] = JSON.parse(JSON.stringify(tableRefs[key].getFromValue(id)));
                     }
                 } catch (error) {
                     // console.log('方法不存在或出现错误，跳过执行');
                 }
             });
-            console.log(`############## ${id} -> getDataAll()`)
+            console.log(`############## -> getDataAll() ${id}`)
             // 组合出单场景
             if(type === OpertaorPosit) {
                 if(allDataFormat && typeof allDataFormat === 'function') {
@@ -324,8 +326,19 @@ export const dataOpertaor = (props: OpertaorProps) => {
 
         const mapSetData = (data) => {
             const res1 = {}; //临时存放抽离数据
-            const pageInfo = tableConfig[0]["pageInfo"];
+            const pageInfo = [...tableConfig[0]['pageInfo']];
             const schema = {};
+
+            if(type === OpertaorPosit) {
+                // 组合出单场景 载入自定义公共组件
+                if(convertGetCommonConfig && typeof convertGetCommonConfig === 'function') {
+                    const comps = convertGetCommonConfig(id)
+                    if(comps) {
+                        pageInfo.push(...comps)
+                    }
+                }
+            }
+
             pageInfo.forEach((k) => {
                 const pageKey = k["pageKey"];
                 if (!data[pageKey]) {
@@ -336,7 +349,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
 
             Object.keys(res1)?.forEach((k) => {
                 const sc = schema[k];
-                if (sc["fromSchema"] && sc["fromSchema"].length > 0) {
+                if (sc && sc["fromSchema"] && sc["fromSchema"].length > 0) {
                 const fromSchema = sc["fromSchema"];
                 fromSchema.forEach((f) => {
                     if (f.inputtype === "rtinputgroup") {
@@ -375,14 +388,25 @@ export const dataOpertaor = (props: OpertaorProps) => {
         }
         /**
          * @Title: 转换数据
+         * result 页面数据
          */
-        const convertData = (result) => {
+        const convertData = (result: any) => {
             const res = {};
             const data = result['res']['composition'];
-            const res1 = {};  //临时存放抽离数据
-            const pageInfo = tableConfig[0]['pageInfo'];
-            const schema = {};
-            pageInfo.forEach((k) => {
+            const res1: any = {};  //临时存放抽离数据
+            const pageInfo = [...tableConfig[0]['pageInfo']];
+            const schema: any = {};
+
+            if(type === OpertaorPosit) {
+                // 组合出单场景 载入自定义公共组件
+                if(convertGetCommonConfig && typeof convertGetCommonConfig === 'function') {
+                    const comps = convertGetCommonConfig(id)
+                    if(comps) {
+                        pageInfo.push(...comps)
+                    }
+                }
+            }
+            pageInfo.forEach((k: any) => {
                 const pageKey = k['pageKey'];
                 if (!data[pageKey]) {
                     res1[pageKey] = {};
@@ -391,7 +415,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
             });
             Object.keys(res1)?.forEach(k => {
                 const sc = schema[k];
-                if (sc['fromSchema'] && sc['fromSchema'].length > 0) {
+                if (sc && sc['fromSchema'] && sc['fromSchema'].length > 0) {
                     const fromSchema = sc['fromSchema'];
                     fromSchema.forEach(f => {
                         if (f.inputtype === 'rtinputgroup') {
@@ -460,7 +484,7 @@ export const dataOpertaor = (props: OpertaorProps) => {
                 } else if (!ci && (key === 'ci' || key === 'ciMasterAgreement' || key === 'ourCompanyCiShare')) {
                     return null;
                 } else {
-                    return ref?.validate?.()
+                    return ref?.validate?.(id)
                 }
             });
             let cv = true;

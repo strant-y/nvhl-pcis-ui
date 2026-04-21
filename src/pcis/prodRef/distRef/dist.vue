@@ -44,7 +44,6 @@ import moment from "moment";
 import { formInit } from "@/shared/from-init";
 import { codeListViewStore } from "@/store";
 import { PolicyService } from "@/views/pcis-main/service/my-page/policy.service";
-const policyService = new PolicyService();
 import { CardConfig, creatCardConfig, MyCardMethod } from "@/shared/mytemplate/card-config";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
@@ -55,17 +54,6 @@ import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTgtDetailByDist, getTermDetailByDist } from "@/api/query";
 import Decimal from "decimal.js";
-const { getRules } = useValidator();
-
-
-const route = useRoute();
-const dialog = ref<DialogMethod | null>(null);
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-const params = opertaor.getParam();
-const emit = defineEmits(['savePlyInfo']);  
-const btnDisabled = ref(false);
 
 const props = defineProps({
   pageSchema: {
@@ -74,8 +62,27 @@ const props = defineProps({
   },
   compKey: {
     type: String
+  },
+  groupId: {
+    type: String,
+    required: false,
   }
 });
+
+const policyService = new PolicyService();
+const { getRules } = useValidator();
+const route = useRoute();
+const dialog = ref<DialogMethod | null>(null);
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaorProps = {...idxParam.opertaorProps}
+if(props.groupId) { // 组合方案出单store id特殊处理
+  opertaorProps.id = props.groupId
+}
+const opertaor = dataOpertaor(opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
+const params = opertaor.getParam();
+const emit = defineEmits(['savePlyInfo']);  
+const btnDisabled = ref(false);
 const cardRef = ref<MyCardMethod | null>(null);
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -181,11 +188,11 @@ watch(
       if (newVal) {
         console.log('发生变化了。。。',newVal)
 				// 043003产品的标的信息的“投保车辆总数”需要根据清单的数量自动带出
-        if(route.params.param?.cProdNo === '043003') {
+        if(params?.cProdNo === '043003') {
           opertaor.getTableRefByKey('tgt')?.setValue('Tgt.nInsuredCars', pageresult.list.length)
 				}
 				// 货物信息在满足这些产品时，需要回填到标的信息中
-				if (ProdNo.value.includes(route.params.param.cProdNo)) {
+				if (ProdNo.value.includes(params.cProdNo)) {
 					const param = opertaor.getParam();
 					let app = "";
 					if (opertaor.getDataAll()?.plyBase["Base.cAppNo"]) {
@@ -196,7 +203,7 @@ watch(
 							app = param.cAppNo
 					}
 					let distParam = {};
-					if(route.params.param?.pageName === "priceInquiry") {
+					if(params?.pageName === "priceInquiry") {
 						distParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
 					} else {
 						distParam['cAppNo'] = app;
@@ -228,19 +235,19 @@ watch(
 						}
 					})
 				}
-				if (!isQuery.value && !ProdNo.value.includes(route.params.param.cProdNo)) {
+				if (!isQuery.value && !ProdNo.value.includes(params.cProdNo)) {
 					eventBus.emit('goodsMxChange', newVal);
 				}
 				// 协议
         const prods = ['020001','020002','020003','020004','020005','020006','020007','020009','020011','020013','020015','020016','020017']
-				if (props.pageSchema.title === '货物明细信息' && prods.includes(route.params.param.cProdNo)) {
+				if (props.pageSchema.title === '货物明细信息' && prods.includes(params.cProdNo)) {
 						let tgtRef = opertaor.getTableRefByKey('cvrg');
             if(newVal.length>0){
 							const paramA = {
 								cPkId: newVal.map(item => item['Dist.cPkId'])
 							};
 
-							if(route.params.param?.pageName === "priceInquiry") {
+							if(params?.pageName === "priceInquiry") {
 								paramA['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
 								if(!paramA['cInquiryNo']) return false
 							}else {
@@ -265,21 +272,21 @@ watch(
 				if (isQuery.value) return
 				
         // 02开头的货物明细清单，关联标的信息
-        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && route.params.param?.pageType != "readonly"){
+        if(cComponentTableValue == "CargoDist" && params?.cProdNo.startsWith('02') && opertaor.getTableRefByKey('cvrg')?.getFromValue()?.length > 0 && params?.pageType != "readonly"){
            method.getTgtDetailFn();
           //  emit('savePlyInfo');
           updateCvrgnInsuranceAmount()
         }
         // 010001, 010002, 010003, 010004, 010020产品地址编码根据清单内容下拉框展示
         const targetProducts = ['010001', '010002', '010003', '010004', '010020', '070002'];
-        if(targetProducts.includes(route.params.param?.cProdNo)){
+        if(targetProducts.includes(params?.cProdNo)){
           if(props.compKey?.includes('DeductibleDist')) return;
           const cvrgRef = opertaor.getTableRefs()['cvrg'];
           const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
           await cvrgRef?.getAddrSeqOptions(cComponentTable)
           cvrgRef?.refushCvrgInfo();
         }
-        if(route.params.param?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
+        if(params?.cProdNo === '043009' && props.compKey === 'ProjectDist043009') {
           eventBus.emit('setMap-EmployeeDist043009', {
             code: 'Dist.cEmploymentAddress',
             list: pageresult.list.map((m: any) => {
@@ -303,7 +310,7 @@ onMounted(async () => {
       exRules
   );
   // 如果团个单标识为团单则展示关联被保险人，否则隐藏
-  if(route.params.param?.cGrpMrk !== '1') {
+  if(params?.cGrpMrk !== '1') {
     formconfig11.value.fromSchema = formconfig11.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
   }
   formconfig11.value.fromSchema?.forEach((item:any)=>{
@@ -382,7 +389,6 @@ onMounted(async () => {
   if(hiddenPage.value.indexOf(props.compKey) > -1) {
     cardRef.value.changeMyForm(false);  //初始化隐藏表单
   }
-  console.log(cardconfig.value);
   if(formconfig1.value.distSchema&& formconfig1.value.distSchema.length > 0){
          formconfig1.value.distSchema.forEach((item:any)=>{
             if(item['prop'] === 'cPlateNumber'){
@@ -502,7 +508,7 @@ onMounted(async () => {
   }
  
   distMapCollectCompKey({
-    cProdNo: route.params.param?.cProdNo,
+    cProdNo: params?.cProdNo,
     cComponentKey: props.compKey,
   }).then((res) => {
     collectCompKey.value = res;
@@ -525,8 +531,8 @@ onMounted(async () => {
     eventBus.on(`setMap-${props.compKey}`, addCodeListMap);
   }
   // 解决040002变更清单信息批改单暂存单打开时雇员清单职业类别出现不显示问题(是在获取批改项后职业类别显示内容消失，未找到原因所以只能在setUnDisabledByKeyList执行后调用查询方法让职业类别显示)
-  if(route.params.param?.cProdNo === '040002' && (route.params.param?.pageType === "EDR_APP_NEW_SCENE" ||
-      (route.params.param?.pageType == "TEMPORARY_DEPOSIT" && route.params.param?.cAppTyp == "E"))) {
+  if(params?.cProdNo === '040002' && (params?.pageType === "EDR_APP_NEW_SCENE" ||
+      (params?.pageType == "TEMPORARY_DEPOSIT" && params?.cAppTyp == "E"))) {
     eventBus.on('setUnDisabledDone', (val:any) => {
       if(val) {
 	      handleQuery()
@@ -590,10 +596,10 @@ const method = {
   editmethod: (row: any) => {
     let cappNo = '';
     // 判断有无批改类型参数，有则是批单
-    if(route.params.param?.cEdrType) {
+    if(params?.cEdrType) {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if(route.params.param?.pageName === "priceInquiry") {
+    } else if(params?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -610,13 +616,14 @@ const method = {
           title: "编辑",
           rowData: {
             ...row, 
-            cProdNo: route.params.param?.cProdNo, 
-            cRsnCde: route.params.param?.cRsnCde
+            cProdNo: params?.cProdNo, 
+            cRsnCde: params?.cRsnCde
           },
           tab: formconfig1.value.title,
           compKey: props.compKey,
           codeListMap: distTableRef.value?.getCodeListMap(),
           addedPlans: addedPlans.value, // 顺序数组
+          groupId: props.groupId
         },
         {
           isOk: (res: any) => {
@@ -636,10 +643,10 @@ const method = {
     let cappNo = '';
 
     // 判断有无批改类型参数，有则是批单
-    if (route.params.param?.cEdrType) {
+    if (params?.cEdrType) {
       const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if (route.params.param?.pageName === "priceInquiry") {
+    } else if (params?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -652,7 +659,7 @@ const method = {
       cComponentTable: cComponentTableValue,
       cPkId: [row['Dist.cPkId']],
     }
-    if (route.params.param?.pageName === "priceInquiry") {
+    if (params?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
@@ -670,7 +677,7 @@ const method = {
         }
     ).then(async () => {
       // 02大类和01部分产品删除清单时需要先调用保存在执行删除操作，避免清单更新后刷新条款时丢失未保存的条款数据
-      if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+      if((params?.cProdNo.startsWith('02') || cProdNos.includes(params?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
         const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
         if(!savePlyInfo) return;
       }
@@ -693,13 +700,13 @@ const method = {
   funcdistadd: () => {
     const alldata: any = opertaor.getDataAll();
     const param:any = {};
-    if(route.params.param?.pageName === "priceInquiry") {
-      param['cInquiryNo'] = opertaor.getDataAll()?.plyBase["Base.cInquiryNo"]
-    } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    if(params?.pageName === "priceInquiry") {
+      param['cInquiryNo'] = alldata?.plyBase["Base.cInquiryNo"]
+    } else if (params?.pageType === "EDR_APP_NEW_SCENE") {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       param['cAppNo'] = edrbase["EdrBase.cAppNo"]
     } else {
-      param['cAppNo'] = opertaor.getDataAll()?.plyBase["Base.cAppNo"]
+      param['cAppNo'] = alldata?.plyBase["Base.cAppNo"]
     }
 
     let fromSchema = tableconfig.value.fromSchema;
@@ -714,7 +721,8 @@ const method = {
               tab: formconfig1.value.title,
               compKey: props.compKey,
               codeListMap: distTableRef.value?.getCodeListMap(),
-              addedPlans: addedPlans.value, // 顺序数组
+              addedPlans: addedPlans.value, // 顺序数组,
+              groupId: props.groupId
             },
             {
               isOk: (res: any) => {
@@ -756,13 +764,13 @@ const method = {
     const selData = {
       cAppNo: "",
 			cComponentTable: cComponentTableValue,
-            cClauseCode: route.params.param?.cTermNo, //条款编码  
-            cProdNo: route.params.param?.cProdNo,  //产品号
+            cClauseCode: params?.cTermNo, //条款编码  
+            cProdNo: params?.cProdNo,  //产品号
 			...formconfig1.value,
 			...queryParams
     };
 		selData.dist = JSON.parse(JSON.stringify(s))
-    if(route.params.param?.pageName === "priceInquiry") {
+    if(params?.pageName === "priceInquiry") {
       selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
 			if(!selData['cInquiryNo']){
 				return false
@@ -773,7 +781,7 @@ const method = {
 				return false
 			}
     }
-    if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    if(params?.pageType && params?.pageType === "EDR_APP_NEW_SCENE") {
       selData.voType = "ply"
     }
 		// 级联地址表格显示问题处理
@@ -823,13 +831,11 @@ const method = {
             }
           })
           
-            console.log('pageresult.list',pageresult.list);
           return{
             ... item,
             ... data
           };
         });
-       
         // 040005学生人数（人） 地址清单信息人数 回填
         if( props.compKey === 'AddressDist040005' ){
              if(pageresult.list.length>0){
@@ -942,7 +948,7 @@ const method = {
           idxParam.handleAnchorClick(undefined, `#${props.compKey}`);
         }
 
-        if(cComponentTableValue == "CargoDist" && route.params.param?.cProdNo.startsWith('02') ){
+        if(cComponentTableValue == "CargoDist" && params?.cProdNo.startsWith('02') ){
            method.getTgtDetailFn();
         }
       }
@@ -965,7 +971,7 @@ const method = {
   getTgtDetailFn:() => {
   
         // 询价转投保
-        if(route.params.param?.pageType === "inquiryToApp") {
+        if(params?.pageType === "inquiryToApp") {
            return;
         } 
 
@@ -979,7 +985,7 @@ const method = {
             app = param.cAppNo
         }
         let distParam = {};
-        if(route.params.param?.pageName === "priceInquiry") {
+        if(params?.pageName === "priceInquiry") {
           distParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
         } else {
           distParam['cAppNo'] = app;
@@ -1009,15 +1015,15 @@ const method = {
   },
   carInfoAdd: () => {
     const param = {};
-    if(route.params.param?.pageName === "priceInquiry") {
+    if(params?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-    } else if (route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    } else if (params?.pageType === "EDR_APP_NEW_SCENE") {
       param['cAppNo'] = opertaor.getDataAll().edrBase["Base.cAppNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     checkAppBase(param).then((res) => {
-      if (res.code === 200 || route.params.param?.pageType === "E") {
+      if (res.code === 200 || params?.pageType === "E") {
         dialog.value?.open(
             "distAdd",
             {
@@ -1027,7 +1033,8 @@ const method = {
               tab: formconfig1.value.title,
               compKey: props.compKey,
               codeListMap: distTableRef.value?.getCodeListMap(),
-              addedPlans: addedPlans.value
+              addedPlans: addedPlans.value,
+              groupId: props.groupId
             },
             {
               isOk: (res: any) => {
@@ -1049,10 +1056,10 @@ const method = {
   exportExcel: () => {
     let cappNo = '';
     // 判断有无批改类型参数，有则是批单
-    if(route.params.param?.cEdrType) {
+    if(params?.cEdrType) {
 			const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if(route.params.param?.pageName === "priceInquiry") {
+    } else if(params?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -1072,10 +1079,10 @@ const method = {
       cComponentTable: cComponentTableValue,
     },
 		{ dist: s });
-    if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+    if(params?.pageType && params?.pageType === "EDR_APP_NEW_SCENE") {
       paramitem.voType = "ply"
     }
-    if(route.params.param?.pageName === "priceInquiry") {
+    if(params?.pageName === "priceInquiry") {
       paramitem['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       paramitem['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
@@ -1117,10 +1124,10 @@ const method = {
   importExcel() {
     let cappNo = '';
     // 判断有无批改类型参数，有则是批单
-    if(route.params.param?.cEdrType) {
+    if(params?.cEdrType) {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if(route.params.param?.pageName === "priceInquiry") {
+    } else if(params?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -1146,23 +1153,23 @@ const method = {
           // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
 
           // 构建参数并请求接口
-          const params = {
+          const reqParam: any = {
             ...getFatherPageOldProductResData(),
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
           };
-          if(route.params.param?.pageName === "priceInquiry") {
-            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          if(params?.pageName === "priceInquiry") {
+            reqParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
           } else {
-            params['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+            reqParam['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
           }
           
           // 02大类和01部分产品导入清单时需要先调用保存再执行操作，避免清单更新后刷新条款时丢失未保存的条款数据
-          if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+          if((params?.cProdNo.startsWith('02') || cProdNos.includes(params?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
             const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
             if(!savePlyInfo) return;
           }
-          policyService.importDist(params).then((res) => {
+          policyService.importDist(reqParam).then((res) => {
             if (res.code === 200) {
               titleInfo.value = {
                 successes: res.data.successes,
@@ -1193,10 +1200,10 @@ const method = {
     let cappNo = '';
     if(btnDisabled.value === true) return;
     // 判断有无批改类型参数，有则是批单
-    if(route.params.param?.cEdrType) {
+    if(params?.cEdrType) {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if(route.params.param?.pageName === "priceInquiry") {
+    } else if(params?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -1225,21 +1232,21 @@ const method = {
           // console.log(fileBase, "0000000"); // ✅ 此处可以正常打印 Base64 字符串
 
           // 构建参数并请求接口
-          const params = {
+          const reqParam: any = {
 						...getFatherPageOldProductResData(),
             file: base64String, // ✅ 正确传入
             cComponentTable: cComponentTableValue,
             cAppNo: opertaor.getDataAll().plyBase["Base.cAppNo"],
           };
-          if(route.params.param?.pageName === "priceInquiry") {
-            params['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+          if(params?.pageName === "priceInquiry") {
+            reqParam['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
           }
           // 02大类和01部分产品导入清单时需要先调用保存再执行操作，避免清单更新后刷新条款时丢失未保存的条款数据
-          if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+          if((params?.cProdNo.startsWith('02') || cProdNos.includes(params?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
             const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
             if(!savePlyInfo) return;
           }
-          policyService.importDistIncrement(params).then((res:any) => {
+          policyService.importDistIncrement(reqParam).then((res:any) => {
             btnDisabled.value = false
             if (res.code === 200) {
               titleInfo.value = {
@@ -1282,7 +1289,7 @@ const method = {
         it.rules = item.rules
       }
     })
-    if(route.params.param?.pageName === "priceInquiry") {
+    if(params?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
@@ -1311,7 +1318,7 @@ const method = {
       ...getFatherPageOldProductResData(),
       cComponentTable: cComponentTableValue,
     }
-    if(route.params.param?.pageName === "priceInquiry") {
+    if(params?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
@@ -1353,10 +1360,10 @@ const method = {
   async batchDelete() {
     let cappNo = '';
     // 判断有无批改类型参数，有则是批单
-    if(route.params.param?.cEdrType) {
+    if(params?.cEdrType) {
     	const edrbase = opertaor.getFatherPage().getEdrbaseValue();
       cappNo = edrbase['EdrBase.cAppNo'];
-    } else if(route.params.param?.pageName === "priceInquiry") {
+    } else if(params?.pageName === "priceInquiry") {
       cappNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
     } else {
       cappNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
@@ -1373,13 +1380,13 @@ const method = {
       cComponentTable: cComponentTableValue,
       // cPkId: selectedRows.value.map((row: any) => row['Dist.cPkId']),
     }
-    if (route.params.param?.pageName === "priceInquiry") {
+    if (params?.pageName === "priceInquiry") {
       param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     } else {
       param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
     }
     // 02大类和01部分产品删除清单时需要先调用保存再执行操作，避免清单更新后刷新条款时丢失未保存的条款数据
-    if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
+    if((params?.cProdNo.startsWith('02') || cProdNos.includes(params?.cProdNo)) && !props.compKey?.includes('DeductibleDist')) {
       const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
       if(!savePlyInfo) return;
     }
@@ -1462,7 +1469,7 @@ function handleSelectionChange(selection: any) {
 watch(
   () => pageresult.list,
   async (item) => {
-    if((route.params.param?.cProdNo === '040003' || route.params.param?.cProdNo === '059002') && cardconfig.value.title === "销售区域清单" && item.length > 0) {
+    if((params?.cProdNo === '040003' || params?.cProdNo === '059002') && cardconfig.value.title === "销售区域清单" && item.length > 0) {
       getSummary()
     }
     let totalList = pageresult.list;
@@ -1474,7 +1481,7 @@ watch(
     }
     // 043022 特种设备第三者责任保险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总
     // 041014 特种设备责任险 条款信息中：“投保设备数量”，需要根据<特种设备清单信息>进行汇总 标的信息中：特种设备数量与清单数量一致
-    if(route.params.param?.cProdNo === '043022' || route.params.param?.cProdNo === '041014') {
+    if(params?.cProdNo === '043022' || params?.cProdNo === '041014') {
       const num = totalList.length || 0;
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nDevicesNumber',num);
       const interval = setInterval(() => {
@@ -1501,7 +1508,7 @@ watch(
       }, 500)
     }
     // 047003 非机动车第三者责任保险 标的信息中：“投保总座位数（座）”要素，由清单中“投保座位数”汇总；“投保总车辆数（个）”要素，由清单中总车辆汇总；
-    if(route.params.param?.cProdNo === '047003') {
+    if(params?.cProdNo === '047003') {
       const carNum = totalList.length || 0;
       const seatNum = totalList.map(item => Number(item['Dist.nInsuredSeats']) || 0).reduce((total, value) => total + value, 0)
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nTotalSeats',seatNum)
@@ -1513,7 +1520,7 @@ watch(
     // 043011 户外广告媒体公众责任保险 条款信息中：“关联地址数量”，需要根据<标的地址清单>统计该方案下的地址数量；
     // 041011 食品安全责任险 条款中的关联地址数量根据清单进行汇总
     const nAddressCountProdNoMap = ['049001','043005','043004','043011','041011'];
-    if(nAddressCountProdNoMap.includes(route.params.param?.cProdNo)) {
+    if(nAddressCountProdNoMap.includes(params?.cProdNo)) {
       const interval = setInterval(() => {
         const cvrgData = opertaor.getTableRefs()['cvrg']?.getFromValue();
         if(cvrgData && cvrgData.length > 0) {
@@ -1534,7 +1541,7 @@ watch(
               factorProp: 'Term.nAddressCount',
             },planNoNum[item]);
           })
-          if(route.params.param?.cProdNo === '043005') {
+          if(params?.cProdNo === '043005') {
             const parkingNum:any = {};
             totalList.forEach((i:any) => {
               if(parkingNum[i['Dist.cPlanNo']]) {
@@ -1557,24 +1564,24 @@ watch(
     }
 
     // 041007 条款中的关联被保险人数量由清单中的关联监护人进行汇总;被监护人数量由清单中的被监护人姓名汇总
-    if(route.params.param?.cProdNo === '041007') {
+    if(params?.cProdNo === '041007') {
       const num = totalList.length || 0;
-      if(route.params.param?.cGrpMrk == "1") {
+      if(params?.cGrpMrk == "1") {
         opertaor.getTableRefs()['cvrg']?.setTermData({
-          termNo:route.params.param?.cTermNo,
+          termNo:params?.cTermNo,
           planNo:'P1',
           factorProp: 'Term.nRelatedInsuredCount',
         },num);
       }
       opertaor.getTableRefs()['cvrg']?.setTermData({
-        termNo:route.params.param?.cTermNo,
+        termNo:params?.cTermNo,
         planNo:'P1',
         factorProp: 'Term.nWardTotal',
       },num);
     }
     // 040021 标的信息 预估集装箱吞吐总量 预估散货吞吐总量的值根据清单中的对应字段进行汇总
     // 040021 条款信息中 关联地址数量 合计码头作业吞吐量(箱) 合计码头作业吞吐量(吨) 的值根据清单中的对应字段进行汇总
-    if(route.params.param?.cProdNo === '040021') {
+    if(params?.cProdNo === '040021') {
       const nContainerThroughput = totalList.map(item => Number(item['Dist.nBoxesNumber']) || 0).reduce((total, value) => total + value, 0)
       const nBulkThroughput = totalList.map(item => Number(item['Dist.nGoodsTonnage']) || 0).reduce((total, value) => total + value, 0)
       opertaor.getTableRefs()['tgt']?.setValue('Tgt.nContainerThroughput',nContainerThroughput)
@@ -1597,7 +1604,7 @@ watch(
         Object.keys(cPlanNoObj).forEach((item:any) => {
           Object.keys(cPlanNoObj[item])?.forEach((i:any) => {
             opertaor.getTableRefs()['cvrg']?.setTermData({
-              termNo:route.params.param?.cTermNo,
+              termNo:params?.cTermNo,
               planNo:item,
               factorProp: i,
             },cPlanNoObj[item][i]);
@@ -1611,12 +1618,12 @@ const getSummary = async () => {
   let money = 0;
   let num = 0;
   const param = {};
-  if(route.params.param?.pageName === "priceInquiry") {
+  if(params?.pageName === "priceInquiry") {
     param.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
-  } else if(route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
-    param.cAppNo = route.params.param?.cOrgAppNo;
+  } else if(params?.pageType === "EDR_APP_NEW_SCENE") {
+    param.cAppNo = params?.cOrgAppNo;
   } else {
-    param.cAppNo = route.params.param?.cAppNo || opertaor.getDataAll().plyBase["Base.cAppNo"]
+    param.cAppNo = params?.cAppNo || opertaor.getDataAll().plyBase["Base.cAppNo"]
   }
   await policyService.getEstimatedSalesAndEstimatedSalesQuantity(param).then((res:any) => {
     if(res.code === 200) {
@@ -1633,7 +1640,7 @@ const getSummary = async () => {
 async function refreshCvrg() {
   // 如果是免赔信息则不刷新保障信息
   if(props.compKey?.includes('DeductibleDist')) return;
-  if(route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) {
+  if(params?.cProdNo.startsWith('02') || cProdNos.includes(params?.cProdNo)) {
     const cvrgRef = opertaor.getTableRefs()['cvrg'];
     try {
       const cComponentTable = props.compKey?.split('Dist')?.[0] + 'Dist';
@@ -1718,14 +1725,14 @@ async function getTableDataAll() {
   const selData:any = {
     cAppNo: "",
     cComponentTable: cComponentTableValue,
-    cClauseCode: route.params.param?.cTermNo, //条款编码  
-    cProdNo: route.params.param?.cProdNo,  //产品号
+    cClauseCode: params?.cTermNo, //条款编码  
+    cProdNo: params?.cProdNo,  //产品号
     ...formconfig1.value,
     pageNum: 1,
     pageSize: 99999
   };
   selData.dist = JSON.parse(JSON.stringify(s))
-  if(route.params.param?.pageName === "priceInquiry") {
+  if(params?.pageName === "priceInquiry") {
     selData['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
     if(!selData['cInquiryNo']){
       return []
@@ -1736,7 +1743,7 @@ async function getTableDataAll() {
       return []
     }
   }
-  if(route.params.param?.pageType && route.params.param?.pageType === "EDR_APP_NEW_SCENE") {
+  if(params?.pageType && params?.pageType === "EDR_APP_NEW_SCENE") {
     selData.voType = "ply"
   }
   // 级联地址表格显示问题处理
@@ -1798,7 +1805,7 @@ function getFatherPageOldProductResData() {
   if(opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
     oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
     // 如果团个单标识为团单则展示关联被保险人，否则隐藏
-    if(route.params.param?.cGrpMrk !== '1') {
+    if(params?.cGrpMrk !== '1') {
       oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item:any) => item.prop !== 'Dist.cRelatedInsured')
     }
     // 关联实际用工地址添加下拉选项

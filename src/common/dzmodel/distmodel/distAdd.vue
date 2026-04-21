@@ -19,7 +19,6 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { useRoute } from "vue-router";
-const route = useRoute();
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 import { saveDist } from "@/api/prod";
@@ -34,17 +33,6 @@ import moment from "moment";
 import { deductibleTemple,deductibleKey, fillTemplate } from "@/pcis/prodRef/cvrgRef/titleTemple";
 import { validateIdCard } from "@/typings/method-public";
 import { productListA, productListB, productListC, cIntegrityStatementData, guaranteeTypeMap } from "@/pcis/prodRef/tgtRef/productList";
-const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-const opertaor = dataOpertaor(idxParam.opertaorProps);
-const param = ref({});
-const freeEditRef = ref<AppFreeEditMethod | null>(null);
-const dialog = ref<DialogMethod | null>(null);
-
-const { getRules } = useValidator();
-const tableRef = ref<MyTableMethod | null>(null);
-const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-const params = opertaor.getParam();
-const firstInvoiceCur = ref('');
 
 const props = defineProps({
   data: {
@@ -60,7 +48,19 @@ const props = defineProps({
     default: () => ({}),
   },
 });
-
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const opertaorProps = {...idxParam.opertaorProps}
+if(props.data.groupId) { // 组合方案出单store id特殊处理
+  opertaorProps.id = props.data.groupId
+}
+const opertaor = dataOpertaor(opertaorProps);
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
+const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const dialog = ref<DialogMethod | null>(null);
+const route = useRoute();
+const { getRules } = useValidator();
+const params = opertaor.getParam();
+const firstInvoiceCur = ref('');
 const init = ref(true)
 
 const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.replace(/\d+/g, '') : "");
@@ -147,7 +147,7 @@ const formconfig1 = ref<AppFreeEditConfig>(
 				label: "确定",
 				loading: submitLoding,
         func: async () => {
-            const productNo = route.params?.param?.cProdNo;
+            const productNo = params?.cProdNo;
             const idNumber = getValue('Dist.cIdentificationNumber'); // 证件号码
             const tBirthDate = getValue('Dist.tBirthDate'); // 出生年月（假设字段名，需替换为实际字段）
  
@@ -188,36 +188,36 @@ const formconfig1 = ref<AppFreeEditConfig>(
               }
             }
 
-            console.log('路由data‘',route.params)
+            console.log('opertaor.getParam() -> ', params)
             // return false;
-            const params = Object.assign(
+            const saveParams: any = Object.assign(
               {
-                cProdNo: route.params.param.cProdNo,
+                cProdNo: params.cProdNo,
                 cComponentTable: cComponentTable.value,
                 // cAppNo: appNo.value,
               },
               { dist: s }
             );
-            if(params.dist['Dist.ProjectDesignProp']) {
-              params.dist['Dist.cProjectAddress'] = params.dist['Dist.ProjectDesignProp']
+            if(saveParams.dist['Dist.ProjectDesignProp']) {
+              saveParams.dist['Dist.cProjectAddress'] = saveParams.dist['Dist.ProjectDesignProp']
             }
-            if(route.params.param?.pageName === "priceInquiry") {
-              params.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
-              params.dist['Dist.cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"];
+            if(params?.pageName === "priceInquiry") {
+              saveParams.cInquiryNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
+              saveParams.dist['Dist.cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"];
             } else {
-              params.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
+              saveParams.cAppNo = opertaor.getDataAll().plyBase["Base.cAppNo"];
             }
 
-						if(params.dist['Dist.tSalesTime']) {
-              params.dist['Dist.tSalesTime'] = moment(params.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
-							}
+						if(saveParams.dist['Dist.tSalesTime']) {
+              saveParams.dist['Dist.tSalesTime'] = moment(saveParams.dist['Dist.tSalesTime']).format("YYYY-MM-DD")
+            }
 						// AddressDist040001营业场所地址清单-Dist.cRelatedInsured关联被保险人
-						if (params.dist['Dist.cRelatedInsured']) {
-							params.dist['Dist.cRelatedInsured'] = params.dist['Dist.cRelatedInsured'].toString()
+						if (saveParams.dist['Dist.cRelatedInsured']) {
+              saveParams.dist['Dist.cRelatedInsured'] = saveParams.dist['Dist.cRelatedInsured'].toString()
 							}
 						// PersonnelDist0410071人员清单-Dist.cAssociatedGuardian关联监护人
-						if (params.dist['Dist.cAssociatedGuardian']) {
-							params.dist['Dist.cAssociatedGuardian'] = params.dist['Dist.cAssociatedGuardian'].toString()
+						if (saveParams.dist['Dist.cAssociatedGuardian']) {
+              saveParams.dist['Dist.cAssociatedGuardian'] = saveParams.dist['Dist.cAssociatedGuardian'].toString()
 						}
             // 级联地址表格显示问题处理
             if(Object.keys(mapAddr).includes(props.data.compKey)) {
@@ -226,17 +226,18 @@ const formconfig1 = ref<AppFreeEditConfig>(
               if(keys && keys.length>0) {
                 const inputGroupKey = keys[0];
                 const addrValueKey = addrInput[inputGroupKey];
-                params.dist[addrValueKey] = params.dist[inputGroupKey];
+                saveParams.dist[addrValueKey] = saveParams.dist[inputGroupKey];
               }
             }
             // 02大类和01部分产品保存清单时需要先调用保存再执行保存操作，避免清单更新后刷新条款时丢失未保存的条款数据
             const cProdNos = ['010001','010002','010003','010004','010020'];
-            if((route.params.param?.cProdNo.startsWith('02') || cProdNos.includes(route.params.param?.cProdNo)) && !props.data.compKey?.includes('DeductibleDist')) {
+            if((params?.cProdNo.startsWith('02') || cProdNos.includes(params?.cProdNo)) && !props.data.compKey?.includes('DeductibleDist')) {
               const savePlyInfo = await opertaor.getFatherPage().savePlyInfo();
               if(!savePlyInfo) return;
             }
             formconfig1.value.titleBtns[0].loading = true
-            saveDist(params).then((res:any) => {
+              console.log('saveDist-saveParams', saveParams)
+            saveDist(saveParams).then((res:any) => {
               formconfig1.value.titleBtns[0].loading = false
               if (res.code === 200) {
                 // const cvrgRef = opertaor.getTableRefs()['cvrg'];
@@ -291,7 +292,7 @@ const isObjectValid = (obj: any) => {
 onMounted(async () => {
   dataParams.value = opertaor.getDataAll();
   appNo.value = dataParams.value?.plyBase["Base.cAppNo"];
-  cGrpMrk.value = route.params.param?.cGrpMrk;
+  cGrpMrk.value = params?.cGrpMrk;
   let newSchema = [];
   let cIs= opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']  //  是否记名投保
   for(let i = 0; props.data.fromSchema && i < props.data.fromSchema.length; i++){
@@ -311,12 +312,12 @@ onMounted(async () => {
     }
 
     // 040002 证件号码 必填问题
-    if( route.params.param.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
+    if( params.cProdNo == '040002' && item.prop =='Dist.cIdentificationNumber'){
          item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
 
     // 下面俩产品  出生年月 和 证号2选1   非必填
-    const isCProdNo = ['049020','041007'].includes(route.params.param.cProdNo);
+    const isCProdNo = ['049020','041007'].includes(params.cProdNo);
     if(isCProdNo  && item.prop =='Dist.cIdentificationNumber' ){
           item['rules'] = [];
     }
@@ -358,7 +359,7 @@ onMounted(async () => {
     if(item.prop =='Dist.cIdentificationNumber'){
       item['func'] = (val: string) => {
         // 针对040005产品，自动回填出生年月
-        if(route.params.param.cProdNo === '040005' && val && val.length === 18) {
+        if(params.cProdNo === '040005' && val && val.length === 18) {
           const birthDateFromId = val.substring(6, 14);
           const formattedBirthDate = `${birthDateFromId.substring(0, 4)}-${birthDateFromId.substring(4, 6)}-${birthDateFromId.substring(6, 8)}`;
           setValue('Dist.tBirthDate', formattedBirthDate);
@@ -377,7 +378,7 @@ onMounted(async () => {
 					const sexCode = parseInt(val.substring(16, 17), 10);
 					const sex = sexCode % 2 === 0 ? "2" : "1"; // 1: 男, 2: 女
           const age = calculateAgeFromIdCard(val);
-					if (route.params.param.cProdNo === '040019' || route.params.param.cProdNo === '047002') { 
+					if (params.cProdNo === '040019' || params.cProdNo === '047002') { 
 						setValue("Dist.tBirthday", birthday);
 						setValue("Dist.cGender", sex);
 					}
@@ -387,17 +388,17 @@ onMounted(async () => {
     }
 
      // 针对040005产品 证件号码校验问题
-    if(route.params.param.cProdNo === '040005' &&item.prop =='Dist.cIdentificationNumber'){
+    if(params.cProdNo === '040005' &&item.prop =='Dist.cIdentificationNumber'){
              item['rules'] = [getRules("idCard", {})];
     }
  
     // 040016 身份证必填
-    if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cIdentificationNumber' ){
+    if( params.cProdNo == '040016' && item.prop =='Dist.cIdentificationNumber' ){
         item['rules'] = [{ required: true, message: '该项为必填项', trigger: 'blur' }];
     }
 
         // 042003 证件号码 必填问题  Dist.cIdentificationNumber
-    if( route.params.param.cProdNo == '042003' && item.prop =='Dist.cIdentificationNumber'){
+    if( params.cProdNo == '042003' && item.prop =='Dist.cIdentificationNumber'){
          item['rules'] = [getRules("idCard", {})];
     }
 
@@ -413,14 +414,14 @@ onMounted(async () => {
       item['func'] =  cCertfClsChange;
     }
 		// 040019 保全被申请人信息 身份证
-		if (route.params.param.cProdNo == '040019' && item.prop == 'Dist.cMobile') {
+		if (params.cProdNo == '040019' && item.prop == 'Dist.cMobile') {
       item['rules'] = [getRules("phoneNo", {})];
     }
     if(item.prop == 'Dist.cInvoiceCur' || item.prop == 'Dist.cPrmCur'){
         const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
         const cargoList = distTableRef?.getTableData() || [];
         // 02开头的货物明细清单
-        if(cComponentTable.value == "CargoDist" && route.params.param?.cProdNo.startsWith('02') && cargoList.length > 0 ){
+        if(cComponentTable.value == "CargoDist" && params?.cProdNo.startsWith('02') && cargoList.length > 0 ){
             const firstRow = cargoList[0];
 						if (item.prop == 'Dist.cInvoiceCur') {
 							firstInvoiceCur.value = firstRow['Dist.cInvoiceCur'] || 'CNY';
@@ -487,7 +488,7 @@ onMounted(async () => {
     }
 
 		// 邮编
-		if(route.params.param.cProdNo?.startsWith('01')) {
+		if(params.cProdNo?.startsWith('01')) {
       if(item.prop === 'Dist.cZipCde') {
         item.maxlength = 6
 				item['rules'] = [
@@ -513,7 +514,7 @@ onMounted(async () => {
         })
       }
     }
-    // if( route.params.param.cProdNo == '040016' && item.prop =='Dist.cDetailedAddress' ){
+    // if( params.cProdNo == '040016' && item.prop =='Dist.cDetailedAddress' ){
     //     item.disabled = true;
     // }
     // 实际用工地址清单新增 经营地址/房屋清单 房屋所在地址/营业场所地址清单043013 标的坐落地址
@@ -534,38 +535,47 @@ onMounted(async () => {
     }
 		if (item.prop === 'Dist.cPlanNo') {
 			item['func'] =  cPlanNoChange;
-      const termref = opertaor.getTableRefByKey('cvrg');
-      const allPlans = termref.getPlanNo();   // 全部方案
 
-      // 从父页面表格中获取已添加的方案
-      const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
-      const getTableDataAll = await distTableRef?.getTableDataAll();
-      const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row:any) => row['Dist.cPlanNo']) : [];
-      // 去重
-      const uniqueAdded = [...new Set(added)];
-      // let nextIdx = 0;
-      // for (let j = 1; j < allPlans.length + 1; j++) {
-      //   const planNo = 'P' + j;
-      //   // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
-      //   if (!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
-      //     nextIdx = j;   // 已添加的方案跳过
-      //     break;
-      //   }
-      // }
+      if(params.cCombinationPlanNo) {
+        // 组合出单场景
+        item.typeCode = null;
+        item.loadData = opertaor.getTableRefByKey('plan')
+                                ?.getPlanNo(opertaor.getProps().id)
+      } else {
 
-      item.typeCode = null;
-      item.loadData = allPlans;
-      // item.loadData = allPlans.map((p: any, idx: number) => ({
-      //   ...p,
-      //   disabled: idx > nextIdx     // 未开始
-      // }));
+        const termref = opertaor.getTableRefByKey('cvrg');
+        const allPlans = termref.getPlanNo();   // 全部方案
+
+        // 从父页面表格中获取已添加的方案
+        const distTableRef = opertaor.getTableRefByKey(props.data.compKey);
+        const getTableDataAll = await distTableRef?.getTableDataAll();
+        const added = getTableDataAll?.length > 0 ? getTableDataAll.map((row: any) => row['Dist.cPlanNo']) : [];
+        // 去重
+        const uniqueAdded = [...new Set(added)];
+        // let nextIdx = 0;
+        // for (let j = 1; j < allPlans.length + 1; j++) {
+        //   const planNo = 'P' + j;
+        //   // 如果清单列表中没有某个方案号，则下一个方案号不可选 如：已添加[P1,P2],那么nextIdx = 2，第3个高亮，第4个置灰(3>2)
+        //   if (!uniqueAdded.includes(planNo) || j === uniqueAdded.length) {
+        //     nextIdx = j;   // 已添加的方案跳过
+        //     break;
+        //   }
+        // }
+
+        item.typeCode = null;
+        item.loadData = allPlans;
+        // item.loadData = allPlans.map((p: any, idx: number) => ({
+        //   ...p,
+        //   disabled: idx > nextIdx     // 未开始
+        // }));
+      }
     }
     // 解决特种设备清单信息新增数据后点击编辑或新增，表单中特种设备种类的按钮无法点击
-    if((route.params.param.cProdNo == '041014' || route.params.param.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {
+    if((params.cProdNo == '041014' || params.cProdNo == '043022') && item.prop =='Dist.cEquipmentTypes') {
       item.btnItems.disabled = false;
     }
     // 041007 如果证件号码为空，根据出生年月计算年龄
-    if (item.prop === 'Dist.tBirthDate' && route.params.param.cProdNo == '041007') {
+    if (item.prop === 'Dist.tBirthDate' && params.cProdNo == '041007') {
       item.func = (val:any) => {
         const cIdentificationNumber = getValue('Dist.cIdentificationNumber')
         if(val && !cIdentificationNumber) {
@@ -582,7 +592,7 @@ onMounted(async () => {
       }
     }
     // 房屋建成日期不能大于投保日期
-    if(item.prop === 'Dist.tCompletionDate' && route.params.param.cProdNo == '089005') {
+    if(item.prop === 'Dist.tCompletionDate' && params.cProdNo == '089005') {
       item.disabledDate = (time: Date) => {
         const tAppTm = opertaor.getDataAll().insrnc['Base.tAppTm'];
         return time.getTime() > new Date(tAppTm).getTime();
@@ -595,7 +605,7 @@ onMounted(async () => {
       }
     }
     // 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
-    if(item.prop === 'Dist.cDeductibleClass' && route.params.param.cProdNo == '090001') {
+    if(item.prop === 'Dist.cDeductibleClass' && params.cProdNo == '090001') {
       item.func = (val:any) => {
 				if (!init.value) {
 					setValue('Dist.cItemLiability', null)
@@ -759,7 +769,7 @@ onMounted(async () => {
     }, 100);
   } else {
     // 010006 机动车辆类型默认其他
-    if(route.params?.param?.cProdNo == '010006'){
+    if(params?.cProdNo == '010006'){
       setValue("Dist.cVehicleType", "X")
     }
 	}
@@ -892,7 +902,7 @@ const InsurancecurrencyChange = (val:any)=>{
   console.log('保险金额币种')
   if(!val) {
 		setValue("Dist.nAmtExch", null);
-		if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
 			setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit')))
 		} else {
 			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
@@ -906,7 +916,7 @@ const InsurancecurrencyChange = (val:any)=>{
         .then((res) => {
           console.log("0000000", res);
 					setValue("Dist.nAmtExch", res[0].currency_rate);
-					if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+					if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
 						setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit'))*getValue('Dist.nAmtExch'))
 					} else {
 						setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount'))*getValue('Dist.nAmtExch'))
@@ -914,7 +924,7 @@ const InsurancecurrencyChange = (val:any)=>{
         });
   } else {
 		setValue("Dist.nAmtExch", "1.000000");
-		if (route.params.param.cProdNo == '020019' || route.params.param.cProdNo == '020020' || route.params.param.cProdNo == '020021') {
+		if (params.cProdNo == '020019' || params.cProdNo == '020020' || params.cProdNo == '020021') {
 			setValue('Dist.nRmbLimit',Number(getValue('Dist.nTransportLimit')))
 		} else {
 			setValue('Dist.nRmbLimit',Number(getValue('Dist.nInsuranceAmount')))
@@ -1007,7 +1017,7 @@ const cEquipmentTypesFunc = ()=>{
 }
 // 040019 保全被申请人信息 身份证
 const cCertfClsChange = (val: any) => {
-  const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
+  const productNo = params?.cProdNo; // 产品编号（兼容参数不存在的情况）
 	if (!init.value) {
 		setValue('Dist.cCertfCde', null);
 	}
@@ -1028,7 +1038,7 @@ const cCertfClsChange = (val: any) => {
 // 证件类型change
 const cDocumentTypeChange = (val: any) => {
   const cIs = opertaor.getTableRefs()['tgt']?.getFromValue()['Tgt.cIsinsuranceRegistered']; // 是否记名投保
-  const productNo = route.params?.param?.cProdNo; // 产品编号（兼容参数不存在的情况）
+  const productNo = params?.cProdNo; // 产品编号（兼容参数不存在的情况）
 	if (!init.value) {
 		setValue('Dist.cIdentificationNumber', null);
 		setValue('Dist.cGender', null);
@@ -1459,8 +1469,8 @@ const cRelatedInsuredChange = () => {
 			ElMessage.warning('请选择方案号！');
 			return false
 		}
-    const prop = route.params?.param?.cProdNo === '041007' ? 'Dist.cAssociatedGuardian' : 'Dist.cRelatedInsured';
-    const title = route.params?.param?.cProdNo === '041007' ? '关联监护人' : '关联被保险人';
+    const prop = params?.cProdNo === '041007' ? 'Dist.cAssociatedGuardian' : 'Dist.cRelatedInsured';
+    const title = params?.cProdNo === '041007' ? '关联监护人' : '关联被保险人';
     dialog.value?.open(
       "cRelatedInsuredModal",
       {

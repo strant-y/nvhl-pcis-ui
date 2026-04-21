@@ -7,6 +7,7 @@
     :id="k.id"
   >
     <component
+      v-if="k.pageType !== CommonCustomCompType"
       :ref="(res: any) => {
         const pageK =
           k.pageKey === 'dist' || k.pageKey === 'distSummary'
@@ -21,15 +22,34 @@
           res.addProvide('domId',  k.id);
         }
       }"
-      :is="k.pageType === 'custom' || CommonComponentMap.has(k.pageKey) ? k.pageCode : k.pageKey  + '-ref'"
+      :is="k.pageType === 'custom' || pageView.commonComponentMap.has(k.pageKey) ? k.pageCode : k.pageKey  + '-ref'"
       :pageSchema="k.pageSchema"
       :compKey="k.pageCode"
+    />
+    <component
+        v-else
+        :ref="(res: any) => {
+          opertaor.addTableRef(k.pageCode, res);
+          // 差异化组件关联上公共组件
+          pageView.linkedOperation().executeForEach((operation, group) => {
+            const cProdNos = k.pageSchemaList.map((m: any) => m.cProdNo)
+            if(cProdNos.some((prodNo: string) => `group-${prodNo}` === group.groupId)) {
+              operation.addTableRef(k.pageCode, res)
+            }
+          });
+          if(res && res.addProvide){
+            res.addProvide('domId',  k.id);
+          }
+        }"
+        :is="`custom-${k.pageCode}-ref`"
+        :pageSchemaList="k.pageSchemaList"
+        :compKey="k.pageCode"
     />
   </div>
 </template>
 <script setup lang="ts">
 
-import {CommonComponentMap, CompositePageView, OpertaorPosit} from "@/views/pcis/support/composite.types";
+import {CompositePageView, OpertaorPosit, CommonCustomCompType} from "@/views/pcis/support/composite.types";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {dataOpertaor} from "@/store";
 import {ref} from "vue";
@@ -64,6 +84,7 @@ const idxParam: IdxParamProps = {
     id: props.groupId,
     type: OpertaorPosit,
     allDataFormat: pageView.value.allDataFormat,
+    convertGetCommonConfig: pageView.value.convertGetCommonConfig,
   },
   cdeListViewProps: {
     id: props.groupId,

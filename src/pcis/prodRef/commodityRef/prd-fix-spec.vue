@@ -37,13 +37,13 @@
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
 				<el-form label-position="top">
-					<el-form-item label="请输入所有特约 (使用 1.,2. 分隔):">
+					<el-form-item label="示例：1.保险公司服务xxx2.我公司最近季度的综合偿付能力充足率xxxx——(请使用 1.分隔) :">
 						<!-- 输入框 -->
 						<el-input
 							v-model="rawInput"
 							type="textarea"
 							:rows="4"
-							placeholder="示例：1.特约条款A2.特约条款B3.特约条款C..."
+							placeholder="「粘贴识别」或输入文本，智能拆分特约信息"
 							@blur="handleSplit"
 						/>
 					</el-form-item>
@@ -73,8 +73,8 @@
           </el-table-column>
 					<el-table-column label="操作" width="55">
 						<template #default="scope">
-							<el-button 
-								size="small" link 
+							<el-button
+								size="small" link
 								type="danger"
 								@click="handleDeleteClick(scope.$index, scope.row)"
 							>
@@ -158,31 +158,45 @@ const handleSelectionChange = (selection) => {
   selected.value = selection;
 };
 
+
+// 查询列表数据
 const refreshData = () => {
   const cProdNo = props.data.cProdNo;
   const cDptCde = props.data.cDptCde || '';
-
-  // 查询列表数据
-  getpSpecialAgreement({
-    cProdNo: cProdNo,
+  const cProdList = props.data.cProdList;
+  const cCombinationPlanNo = props.data.cCombinationPlanNo;
+  const tAppTm = props.data.tAppTm;
+  pageresult.list = []
+  const getResult = (result: any[], prodNo: string) => {
+    result.forEach((item, index) => {
+      pageresult.list.push({
+        cSpecialCode: item.cSpecialCode,
+        cSpecialContent: item.cSpecialContent,
+        cSpecialContentEn: item.cSpecialContentEn,
+        cProdNo: prodNo,
+        // cNmeEn: item.cNmeEn,
+        cIfMust: item.cIfMust, //是否必选
+        cIfEdit: item.cIfEdit, //是否可修改
+        cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
+      });
+    });
+  }
+  const reqParam: any = {
     cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
-    tAppTm: props.data.tAppTm
-  }).then((res) => {
+    tAppTm: tAppTm
+  }
+  if(cProdList && cProdList.length > 0) { // 组合出单用
+    reqParam.cProdNos = cProdList;
+    reqParam.cCombinationPlanNo = cCombinationPlanNo;
+  } else {
+    reqParam.cProdNo = cProdNo;
+  }
+  getpSpecialAgreement(reqParam).then((res) => {
     if (res.data?.result) {
-      pageresult.list = [];
-      res.data.result.forEach((item, index) => {
-        pageresult.list.push({
-          cSpecialCode: item.cSpecialCode,
-          cSpecialContent: item.cSpecialContent,
-          cSpecialContentEn: item.cSpecialContentEn,
-          // cNmeEn: item.cNmeEn,
-          cIfMust: item.cIfMust, //是否必选
-          cIfEdit: item.cIfEdit, //是否可修改
-          cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
-        });
-      });
+      getResult(res.data.result, cProdNo)
+
       nextTick(() => {
         toggleSpecificRow(); //这里调用是把必选的选中
         setSelected();
@@ -243,10 +257,10 @@ const returnData = () => {
 	// 1. 准备数据源
   // selectedData: 父组件传来的原始数据（包含旧的、可能被删除的行）
   let selectedData = props.data.selectedData.map((item:any) => ({...item, cLanguageCode: checkedLanguage.value[0]}));
-  
+
   // tempData: 弹窗表格当前选中的数据（左侧表格）
   let tempData = multipleTableRef.value.getSelectionRows().map((item:any) => ({...item, cLanguageCode: checkedLanguage.value[0]}));
-  
+
   // 2. 核心修复：清洗 selectedData
   // 问题根源：selectedData 里包含了 addTableData 的旧数据。
   // 如果用户在 addTableData 删除了行，selectedData 里还有，就会导致“复活”。
@@ -267,13 +281,13 @@ const returnData = () => {
   // 4. 处理分期逻辑 (fenqi01)
   // 先找出分期项
   const fenqiItem = cleanedSelectedData.find(item => item.cSpecialCode === 'fenqi01');
-  
+
   // 如果存在分期项，且 combinedData 里没有（防止重复），则加到最后
   // 注意：这里要检查 combinedData 是否已经有了 fenqi01，避免重复添加
   const hasFenqiInCombined = combinedData.some(item => item.cSpecialCode === 'fenqi01');
-  
-  const result = hasFenqiInCombined 
-    ? combinedData 
+
+  const result = hasFenqiInCombined
+    ? combinedData
     : (fenqiItem ? [...combinedData, fenqiItem] : combinedData);
 
   // 5. 强制重置序号 (关键步骤，防止父组件渲染错乱)
@@ -307,7 +321,7 @@ function setSelected() {
 
 onMounted(() => {
     let selectedData = props.data.selectedData;
-    const addList = selectedData.filter(item => item.cIfFix==0 in item);
+    const addList = selectedData.filter(item => item.cIfFix == 0 in item);
     if(addList.length >0){
         addList.forEach((item,index) => {
             item.addIndex = index+1;
@@ -321,7 +335,7 @@ onMounted(() => {
 });
 
 // 1. 绑定输入框的内容
-const rawInput = ref('') 
+const rawInput = ref('')
 
 // 2. 处理分割逻辑
 const handleSplit = () => {
@@ -329,10 +343,10 @@ const handleSplit = () => {
     return
   }
 	// 按照 || 分割、去除首尾空格、过滤空字符串
-	// const arr = rawInput.value.split('||').map(item => item.trim()).filter(item => item !== '') 
+	// const arr = rawInput.value.split('||').map(item => item.trim()).filter(item => item !== '')
 	// 按照 数字加点 分割、去除首尾空格、过滤空字符串
 	const arr = rawInput.value.split(/\d+\.\s*/).map(item => item.trim()).filter(item => item !== '');
-		
+
 	arr.forEach((item) => {
 		addTableData.push({
 			addIndex: addTableData.length + 1, //序号

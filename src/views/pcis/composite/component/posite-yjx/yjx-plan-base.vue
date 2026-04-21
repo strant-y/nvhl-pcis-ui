@@ -14,6 +14,7 @@ import {codeListViewStore, dataOpertaor} from "@/store";
 import {DialogMethod} from "@/common/dzmodel/ComDialogConf";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {CompositePageView} from "@/views/pcis/support/composite.types";
 
 const props = defineProps({
   pageSchema: {
@@ -25,6 +26,7 @@ const props = defineProps({
 const idxParam = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
+const pageView = inject("pageView", ref(new CompositePageView()));
 const dialog = ref<DialogMethod | null>(null);
 const planEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive<any>(createAppGridEditConfig({}));
@@ -172,11 +174,14 @@ const exRules = {};
 function calculateData(list: any[]): any[] {
   let nPrm = 0;
   let nAmt = 0;
-  let nAppPersons = 0;
-  const yjxGrpMemberList = opertaor.getTableRefs()['yjxGrpMember'].getFormValue()
-  if(yjxGrpMemberList) {
-    nAppPersons = yjxGrpMemberList.length
-  }
+  let nAppPersons = 5;
+
+  // pageView.value.get
+
+  // const yjxGrpMemberList = opertaor.getTableRefs()['yjxGrpMember'].getFormValue()
+  // if(yjxGrpMemberList) {
+  //   nAppPersons = yjxGrpMemberList.length
+  // }
   const planList = [...list].map((item: any, index: number) => {
     const nSumPrm = item['PlanBase.nPerPrm'] * nAppPersons
     const nSumAmt = item['PlanBase.nPerAmt'] * nAppPersons

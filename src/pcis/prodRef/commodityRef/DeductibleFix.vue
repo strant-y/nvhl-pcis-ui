@@ -20,13 +20,13 @@
       </el-tab-pane>
       <el-tab-pane label="添加其他免赔条件" name="second">
 				<el-form label-position="top">
-					<el-form-item label="请输入所有免赔条件 (使用 1.,2.形式 分隔):">
+					<el-form-item label="示例：1.保险公司服务xxx2.我公司最近季度的综合偿付能力充足率xxxx——(请使用 1.分隔) :">
 						<!-- 输入框 -->
 						<el-input
 							v-model="rawInput"
 							type="textarea"
 							:rows="4"
-							placeholder="示例：1.免赔条件A2.免赔条件B3.免赔条件C..."
+							placeholder="「粘贴识别」或输入文本，智能拆分免赔信息"
 							@blur="handleSplit"
 						/>
 					</el-form-item>
@@ -103,11 +103,17 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
-  const param = {
-    cProdNo: props.data.cProdNo,
+  const param: any = {
     pageNum: 1,
     pageSize: 999,
   }
+  if(props.data.cProdList && props.data.cProdList.length > 0) {
+    param.cProdNos = props.data.cProdList;
+    param.cCombinationPlanNo = props.data.cCombinationPlanNo;
+  }else {
+    param.cProdNo = props.data?.cProdNo;
+  }
+  console.log('getPrdDeductible-param', param)
   // 查询列表数据
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {

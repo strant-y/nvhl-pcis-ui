@@ -24,6 +24,19 @@ const pageView = inject("pageView", ref(new CompositePageView()));
 const formconfig = ref(createAppGridEditConfig({
   title: '产品信息',
   editFlag: true, //是否可以编辑
+  showSummary: true,
+  summaryMethod: () => {
+    let hjPrm = 0;
+    if(gridEditRef.value) {
+      const list = gridEditRef.value.getTableValue();
+      list.forEach((item: any) => {
+        if(item.nPrm) {
+          hjPrm += item.nPrm
+        }
+      })
+    }
+    return ['','','','','','', '合计: ' + hjPrm]
+  },
   titleBtns: [
     createFreeButtonBase({
       id: 'add',
@@ -161,7 +174,6 @@ const formconfig = ref(createAppGridEditConfig({
       },
       onInit: (options: any) => {
         const {value, rowData} = options;
-        console.log('### onInit', value, rowData)
         if(rowData['cProdNo']) {
           setProdNme(rowData, value);
         }
@@ -191,6 +203,12 @@ const formconfig = ref(createAppGridEditConfig({
       disabled: true,
       isShow: false
     },
+    {
+      prop: 'tUpdTm',
+      inputtype: 'rtinput',
+      disabled: true,
+      isShow: false
+    },
   ]
 }));
 
@@ -207,7 +225,6 @@ const setProdOptions = async (rowData: any, cKindNo: string) => {
       codeListParam: {"cParCde": cKindNo},
     });
   }
-  console.log('setProdOptions', cKindNo, list)
   gridEditRef.value?.addCodeListMap({
     code: 'cProdNo' + rowData['_dataId'],
     list: list

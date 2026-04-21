@@ -96,7 +96,11 @@ const emits = defineEmits(["update:modelValue", "valueChange"]); // 父组件监
 const vInput = ref<number | string>();
 const customClass = ref<string[]>([]);
 const changeContent = ref<string | undefined>();
-const vInputShow = ()=> {
+
+// --- 新增代码：用于存储上一次有效的时间 ---
+const lastValidTime = ref<string>("");
+
+const vInputShow = () => {
   const value = props.modelValue;
   const format = props.item.valueFormat
     ? props.item.valueFormat
@@ -114,6 +118,12 @@ watch([() => props.modelValue], ([newModelValue]) => {
     vInput.value = newModelValue?.toString();
   } else {
     vInput.value = newModelValue;
+  }
+
+  // --- 新增逻辑：当外部值变化时，更新 lastValidTime ---
+  if (newModelValue) {
+     // 提取时分秒部分，例如 "15:30:00"
+     lastValidTime.value = moment(newModelValue).format("HH:mm:ss");
   }
 });
 function blur(v: any) {
@@ -143,7 +153,37 @@ function blur(v: any) {
     }
   }
 }
+
+// --- 修改 handleChange ---
 function handleChange(val?: string | undefined) {
+  // 如果是日期时间类型，且有时间值，才进行修复
+  if (val && (props.item.type === 'datetime' || props.item.type === 'datetimerange')) {
+    
+    // 1. 获取当前选中的时间部分
+    const currentTime = moment(val).format("HH:mm:ss");
+    
+    // 2. 检查当前时间是否是 00:00:00 (即被重置了)
+    if (currentTime === "00:00:00" && lastValidTime.value) {
+      
+      // 3. 如果当前是 00:00:00，且有历史记录，则拼接回去
+      const datePart = moment(val).format("YYYY-MM-DD");
+      const newValue = `${datePart} ${lastValidTime.value}`;
+      
+      // 4. 更新视图和发射事件
+      vInput.value = newValue;
+      emits("valueChange", newValue);
+      emits("update:modelValue", newValue);
+      
+      // 更新记录，防止下次又变回去
+      lastValidTime.value = lastValidTime.value; 
+      return; // 结束，不走下面的默认逻辑
+    } else if (currentTime !== "00:00:00") {
+      // 如果用户这次选了个新时间（不是0点），更新记录
+      lastValidTime.value = currentTime;
+    }
+  }
+
+  // 默认逻辑
   emits("valueChange", val);
   emits("update:modelValue", val);
   // props.item.func ? props.item.func(val) : null;
