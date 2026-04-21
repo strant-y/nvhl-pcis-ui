@@ -539,8 +539,8 @@ function setFormValue(value: any, groupId: string) {
       return e
     });
     console.log('特约信息-setFormValue', groupId, list)
-    rttableFrom?.value?.setFormValue(list);
-    // formData.value = list;
+    // rttableFrom?.value?.setFormValue(list);
+    formData.value = list;
   }
 }
 
