@@ -703,6 +703,7 @@ function refreshData(flag?: boolean) {
   const param = {
     ...r,
     ...s,
+    isCombination: '1',
   };
   if(param.tAppTm && param.tAppTm[1]) {
     param.tAppTm[1] = dayjs(param.tAppTm[1]).format("YYYY-MM-DD 23:59:59")
