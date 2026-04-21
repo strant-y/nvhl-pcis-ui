@@ -943,7 +943,7 @@ function initMethod(){
 
     /* 从共时，安责险产品时，当责任代码为 040196 ：法律费用，041129：医疗救护费用，049003：检验评估费用，049002：抢险救援费用 时，责任总保费不能编辑
    040002雇主责任险时,041293 误工费用  040046 法律费用 */
-    const readonlyLiabCodes = ['040196','041129','049003','049002','041293','040046'];
+    const readonlyLiabCodes = ['040196','041129','049003','049002','040046','040075'];
     if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
       for(let i in groupInfo.value) {
         const ginfo = groupInfo.value[i]
