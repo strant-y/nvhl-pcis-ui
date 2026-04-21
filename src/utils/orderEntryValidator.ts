@@ -123,7 +123,7 @@ export const checkPayPlanValidity = ({
 
       if (isNaN(payStart.getTime()) || isNaN(payEnd.getTime())) return true;
       if (payStart > payEnd) return true;
-      if (payStart < insStartDate || payEnd > insEndDate) return true;
+      if (payStart > insEndDate || payEnd > insEndDate) return true;
     }
 
     return false;

@@ -679,7 +679,6 @@ const method = {
 				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 			}
       setFormItem("Insured.tEstablishingDate", {
-				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -756,7 +755,31 @@ const method = {
       // setFormItem("Insured.tOperaterCertfEndTm", {
       //   hidden: true,
       // });
-    } else {
+			// 注册地址是否同上
+			setFormItem("Insured.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Insured.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Insured.cRegisteredcapDre", {
+        hidden: false,
+      });
+		} else {
+			// 注册地址是否同上
+			setFormItem("Insured.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("Insured.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Insured.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("Insured.tBirthday", {
         hidden: false,
       });
@@ -773,7 +796,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Insured.cBusinessScope", {
-        hidden: false,
+        hidden: true,
       });
       setFormItem("Insured.cMrgCde", {
         hidden: false,
@@ -1102,7 +1125,7 @@ const method = {
       setFormItem('Insured.cLongendTyp', {
         disabled: false
       })
-      resetFn()
+      // resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -1239,7 +1262,7 @@ const method = {
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
-    // setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
+
 		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -1279,7 +1302,6 @@ const method = {
       });
 			// 为法人  企业成立日期
 			setFormItem("Insured.tEstablishingDate", {
-				disabled: false,
 				rules: [getRules("required", {})],
 			});
 
@@ -1487,7 +1509,6 @@ const method = {
     }
     // 企业成立日
     setFormItem("Insured.tEstablishingDate", {
-			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
 		});
 		if (!param.initFlag && !isSpecialCase) {
@@ -1577,7 +1598,6 @@ const method = {
       "553": "ariCard", // 外国人永久居留身份证
 		};
     baseRules = ruleMap[val] ? [getRules(ruleMap[val], {})] : [];
-    baseRules = [getRules("required", {}), ...baseRules]
 
     setFormItem("Insured.cShareholderCode", {
       rules: baseRules,

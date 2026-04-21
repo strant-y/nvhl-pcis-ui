@@ -818,7 +818,11 @@ function skipPositePage(row: any) {
                 ...m,
                 cKindNo: m.cProdNo.substring(0, 2)
               }
-            })
+            }).sort((a: any, b: any) => a.cProdNo.localeCompare(b.cProdNo)),
+            cCombinationType: row.cCombinationPlanNo ? '2' : '1',
+            cProdList: res.data
+                .map((m: any) => m.cProdNo)
+                .sort((a: string, b: string) => a.localeCompare(b))
           })
         },
       });

@@ -36,6 +36,18 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他特约" name="second">
+				<el-form label-position="top">
+					<el-form-item label="示例：1.保险公司服务xxx2.我公司最近季度的综合偿付能力充足率xxxx——(请使用 1.分隔) :">
+						<!-- 输入框 -->
+						<el-input
+							v-model="rawInput"
+							type="textarea"
+							:rows="4"
+							placeholder="「粘贴识别」或输入文本，智能拆分特约信息"
+							@blur="handleSplit"
+						/>
+					</el-form-item>
+				</el-form>
         <el-table
           ref="multipleTableOtherRef"
           :data="addTableData"
@@ -59,10 +71,21 @@
               <el-input v-model="scope.row['cSpecialContent']" v-else></el-input>
             </template>
           </el-table-column>
+					<el-table-column label="操作" width="55">
+						<template #default="scope">
+							<el-button
+								size="small" link
+								type="danger"
+								@click="handleDeleteClick(scope.$index, scope.row)"
+							>
+							<i-ep-delete />
+							</el-button>
+						</template>
+					</el-table-column>
         </el-table>
         <el-button @click="add" class="addSty" :icon="Plus">新增一行</el-button>
       </el-tab-pane>
-      <div class="languageCheckbox">
+      <div v-if="activeName != 'second'" class="languageCheckbox">
         <el-checkbox-group v-model="checkedLanguage" @change="languageChange">
           <el-checkbox label="中文" value="zh-CN" />
           <el-checkbox label="英文" value="en-US" />
@@ -135,31 +158,45 @@ const handleSelectionChange = (selection) => {
   selected.value = selection;
 };
 
+
+// 查询列表数据
 const refreshData = () => {
   const cProdNo = props.data.cProdNo;
   const cDptCde = props.data.cDptCde || '';
-
-  // 查询列表数据
-  getpSpecialAgreement({
-    cProdNo: cProdNo,
+  const cProdList = props.data.cProdList;
+  const cCombinationPlanNo = props.data.cCombinationPlanNo;
+  const tAppTm = props.data.tAppTm;
+  pageresult.list = []
+  const getResult = (result: any[], prodNo: string) => {
+    result.forEach((item, index) => {
+      pageresult.list.push({
+        cSpecialCode: item.cSpecialCode,
+        cSpecialContent: item.cSpecialContent,
+        cSpecialContentEn: item.cSpecialContentEn,
+        cProdNo: prodNo,
+        // cNmeEn: item.cNmeEn,
+        cIfMust: item.cIfMust, //是否必选
+        cIfEdit: item.cIfEdit, //是否可修改
+        cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
+      });
+    });
+  }
+  const reqParam: any = {
     cDptCde: cDptCde,
     pageNum: 1,
     pageSize: 999,
-    tAppTm: props.data.tAppTm
-  }).then((res) => {
+    tAppTm: tAppTm
+  }
+  if(cProdList && cProdList.length > 0) { // 组合出单用
+    reqParam.cProdNos = cProdList;
+    reqParam.cCombinationPlanNo = cCombinationPlanNo;
+  } else {
+    reqParam.cProdNo = cProdNo;
+  }
+  getpSpecialAgreement(reqParam).then((res) => {
     if (res.data?.result) {
-      pageresult.list = [];
-      res.data.result.forEach((item, index) => {
-        pageresult.list.push({
-          cSpecialCode: item.cSpecialCode,
-          cSpecialContent: item.cSpecialContent,
-          cSpecialContentEn: item.cSpecialContentEn,
-          // cNmeEn: item.cNmeEn,
-          cIfMust: item.cIfMust, //是否必选
-          cIfEdit: item.cIfEdit, //是否可修改
-          cIfFix: "1", //是否固定特约，接口查出来的1，自定义添加的为0
-        });
-      });
+      getResult(res.data.result, cProdNo)
+
       nextTick(() => {
         toggleSpecificRow(); //这里调用是把必选的选中
         setSelected();
@@ -191,41 +228,76 @@ function add() {
   });
 }
 
+// 删除行处理函数
+const handleDeleteClick = (index: number, row: any) => {
+  ElMessageBox.confirm(
+    '确定要删除这条特约吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      // 用户点击确定，执行删除
+      addTableData.splice(index, 1);
+      // 重新计算序号
+      addTableData.forEach((item, i) => {
+        item.addIndex = i + 1;
+      });
+    })
+    .catch(() => {
+      // 用户点击取消，不执行操作
+    });
+};
+
 //点击确定按钮时把选中的数据派发给父组件
 const returnData = () => {
+	// 1. 准备数据源
+  // selectedData: 父组件传来的原始数据（包含旧的、可能被删除的行）
   let selectedData = props.data.selectedData.map((item:any) => ({...item, cLanguageCode: checkedLanguage.value[0]}));
 
+  // tempData: 弹窗表格当前选中的数据（左侧表格）
   let tempData = multipleTableRef.value.getSelectionRows().map((item:any) => ({...item, cLanguageCode: checkedLanguage.value[0]}));
-  if(addTableData) {
-    for (const item of addTableData) {
-      tempData.push(item);
-    }
-  }
 
-//   const processedNewItems = tempData.map(item2 => {
-//       const matchedItem1 = selectedData.find(item1 => 
-//             item1.cIfEdit === '1' && item1.cSpecialCode === item2.cSpecialCode
-//       );
-//       return matchedItem1 ? matchedItem1 : item2;
-//     });
-// debugger
-
-const processedNewItems = tempData.map(item2 => {
-  const matchedItem1 = selectedData.find(item1 => {
-    if (item1.cIfEdit !== '1') return false;
-    const [code1, code2] = [item1.cSpecialCode, item2.cSpecialCode];
-    // 非空code优先匹配，否则用addIndex（排除空值匹配）
-    return code1 && code2 && code1 !== '' && code2 !== '' 
-      ? code1 === code2 
-      : item1.addIndex && item2.addIndex && item1.addIndex === item2.addIndex;
+  // 2. 核心修复：清洗 selectedData
+  // 问题根源：selectedData 里包含了 addTableData 的旧数据。
+  // 如果用户在 addTableData 删除了行，selectedData 里还有，就会导致“复活”。
+  // 我们需要把 selectedData 里属于“自定义添加”（即存在于 addTableData 逻辑中）的数据剔除。
+  // 假设自定义数据的特征是 cSpecialCode 为空 或者 cIfFix === '0' (根据你的业务调整)
+  const cleanedSelectedData = selectedData.filter(item => {
+    // 如果是标准库里的特约（有代码），保留
+    if (item.cSpecialCode && item.cSpecialCode !== '') return true;
+    // 如果是自定义特约（无代码），在 selectedData 中丢弃，因为我们将以 addTableData 为准
+    return false;
   });
-  return matchedItem1 || item2;
-});
- 
-const oldFenqiItem = selectedData.find(item => item.cSpecialCode === 'fenqi01');
-const result = oldFenqiItem 
-  ? [...processedNewItems, oldFenqiItem]  // 包含fenqi01
-  : processedNewItems;   
+
+  // 3. 合并“左侧选中” + “右侧自定义”
+  // 注意：这里直接用 cleanedSelectedData，不要用原始的 selectedData
+  // 这样就不会把 addTableData 里已删除的旧行带进来了
+  const combinedData = [...tempData, ...addTableData];
+
+  // 4. 处理分期逻辑 (fenqi01)
+  // 先找出分期项
+  const fenqiItem = cleanedSelectedData.find(item => item.cSpecialCode === 'fenqi01');
+
+  // 如果存在分期项，且 combinedData 里没有（防止重复），则加到最后
+  // 注意：这里要检查 combinedData 是否已经有了 fenqi01，避免重复添加
+  const hasFenqiInCombined = combinedData.some(item => item.cSpecialCode === 'fenqi01');
+
+  const result = hasFenqiInCombined
+    ? combinedData
+    : (fenqiItem ? [...combinedData, fenqiItem] : combinedData);
+
+  // 5. 强制重置序号 (关键步骤，防止父组件渲染错乱)
+  result.forEach((item, index) => {
+    item.index = index + 1;
+    // 如果父组件依赖 addIndex，也同步更新
+    if (item.addIndex) item.addIndex = index + 1;
+  });
+
+  // 6. 提交数据
   props.method.getSelected(result);
   close();
 };
@@ -249,7 +321,7 @@ function setSelected() {
 
 onMounted(() => {
     let selectedData = props.data.selectedData;
-    const addList = selectedData.filter(item => item.cIfFix==0 in item);
+    const addList = selectedData.filter(item => item.cIfFix == 0 in item);
     if(addList.length >0){
         addList.forEach((item,index) => {
             item.addIndex = index+1;
@@ -261,6 +333,33 @@ onMounted(() => {
     }
     refreshData();
 });
+
+// 1. 绑定输入框的内容
+const rawInput = ref('')
+
+// 2. 处理分割逻辑
+const handleSplit = () => {
+  if (!rawInput.value) {
+    return
+  }
+	// 按照 || 分割、去除首尾空格、过滤空字符串
+	// const arr = rawInput.value.split('||').map(item => item.trim()).filter(item => item !== '')
+	// 按照 数字加点 分割、去除首尾空格、过滤空字符串
+	const arr = rawInput.value.split(/\d+\.\s*/).map(item => item.trim()).filter(item => item !== '');
+
+	arr.forEach((item) => {
+		addTableData.push({
+			addIndex: addTableData.length + 1, //序号
+			cSpecialCode: "",
+			cSpecialContent: item,
+			cIfEdit: "1", //是否可修改
+			cIfMust: "2", //是否必选
+			cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+		});
+	})
+
+	rawInput.value = ''
+}
 </script>
 
 <style scoped lang="scss">

@@ -604,8 +604,8 @@ function sumMoney(flag_to_alert: any,row:any) {
           return false;
         }
       }
-      freeEditRef.value?.setValue("nFeePropSum", my_rate);
-      freeEditRef.value?.setValue("nPrmSum", my_sum);
+      freeEditRef.value?.setValue("nFeePropSum", formartNum(my_rate));
+      freeEditRef.value?.setValue("nPrmSum", formartNum(my_sum));
     }
 }
 
@@ -763,8 +763,13 @@ async function compareAppFee(saveFlag:any) {
 //保存按钮
 async function saveFeeInfo() {
   const items = pageresult.list;
+
+  const formData = freeEditRef.value?.getFromValue();
+  const appFeeInfo = Object.assign({ type: props.type }, formData);
+
   const paramStr = {
-    feeList: items
+    feeList: items,
+    appFeeInfo: appFeeInfo
   };
   if (items.length > 0) {
     let my_node_name = '';

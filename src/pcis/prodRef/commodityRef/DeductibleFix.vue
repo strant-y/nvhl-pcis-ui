@@ -19,6 +19,18 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="添加其他免赔条件" name="second">
+				<el-form label-position="top">
+					<el-form-item label="示例：1.保险公司服务xxx2.我公司最近季度的综合偿付能力充足率xxxx——(请使用 1.分隔) :">
+						<!-- 输入框 -->
+						<el-input
+							v-model="rawInput"
+							type="textarea"
+							:rows="4"
+							placeholder="「粘贴识别」或输入文本，智能拆分免赔信息"
+							@blur="handleSplit"
+						/>
+					</el-form-item>
+				</el-form>
         <el-table ref="multipleTableOtherRef" :data="addTableData" style="width: 100%">
           <el-table-column property="index" label="序号" width="55" />
           <!-- <el-table-column property="cDeductibleClass" label="ID" width="100"/> -->
@@ -91,11 +103,17 @@ const handleSelectionChange = (selection) => {
 };
 
 const refreshData = () => {
-  const param = {
-    cProdNo: props.data.cProdNo,
+  const param: any = {
     pageNum: 1,
     pageSize: 999,
   }
+  if(props.data.cProdList && props.data.cProdList.length > 0) {
+    param.cProdNos = props.data.cProdList;
+    param.cCombinationPlanNo = props.data.cCombinationPlanNo;
+  }else {
+    param.cProdNo = props.data?.cProdNo;
+  }
+  console.log('getPrdDeductible-param', param)
   // 查询列表数据
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
@@ -182,24 +200,38 @@ function setSelected() {
 }
 
 function delAdd(row: any) {
-  const list = addTableData.value.filter(f => f['cDeductibleClass'] !== row['cDeductibleClass']);
-  const newAddList = list.map((m,idx) => {
-    // const idx = list.length;
-    return {
-      ...m,
-      ...{
-        index: idx+1,
-        // cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx +1,
-      }
+	ElMessageBox.confirm(
+    '确定要删除这条特约吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  });
+	)
+	.then(() => {
+		const list = addTableData.value.filter(f => f['cDeductibleClass'] !== row['cDeductibleClass']);
+		const newAddList = list.map((m,idx) => {
+			// const idx = list.length;
+			return {
+				...m,
+				...{
+					index: idx+1,
+					// cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx +1,
+				}
+			}
+		});
 
-  // if(newAddList){
-      // addTableData.length = 0; // 清空原有内容（保持响应式引用）
-      addTableData.value=newAddList; // 展开新数组，批量添加
-  // }
+		// if(newAddList){
+				// addTableData.length = 0; // 清空原有内容（保持响应式引用）
+				addTableData.value=newAddList; // 展开新数组，批量添加
+		// }
 
-  // addTableData.value = newAddList;
+		// addTableData.value = newAddList;
+	})
+	.catch(() => {
+		// 用户点击取消，不执行操作
+	});
 }
 
 onMounted(() => { 
@@ -215,6 +247,38 @@ onMounted(() => {
   
   refreshData();
 });
+
+// 1. 绑定输入框的内容
+const rawInput = ref('') 
+
+// 2. 处理分割逻辑
+const handleSplit = () => {
+  if (!rawInput.value) {
+    return
+  }
+	// 按照 || 分割、去除首尾空格、过滤空字符串
+	// const arr = rawInput.value.split('||').map(item => item.trim()).filter(item => item !== '') 
+	// 按照 数字加点 分割、去除首尾空格、过滤空字符串
+	const arr = rawInput.value.split(/\d+\.\s*/).map(item => item.trim()).filter(item => item !== '');
+
+
+		
+	arr.forEach((item) => {
+		const idx = addTableData.value.length + 1;
+		addTableData.value.push({
+			index: idx, //序号
+			cDeductibleClass: (idx < 10 ? "other_0" : "other_") + idx,
+			cDeductibleContent: item,
+			cStatus: "",
+			cIfEdit: "0", // 是否可修改
+			cIfMust: "9", // 是否必选 9 其他
+			cYuliu1: "",
+			cIfFix: "0", //是否固定特约，查寻特约模板接口查出来的1，自定义添加的为0
+		});
+	})
+
+	rawInput.value = ''
+}
 </script>
 
 <style scoped lang="scss">

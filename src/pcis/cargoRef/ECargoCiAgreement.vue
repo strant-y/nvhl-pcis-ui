@@ -39,7 +39,8 @@ onMounted(() => {
 const method = {
   // func demo
   func1: () => {},
-  cCiAgtNoChange: (val) => {
+	cCiAgtNoChange: (val) => {
+		if(!val) return
     const isPositiveInteger = /^[A-Za-z0-9]+$/.test(val); // 是否为正整数（不含小数点、负号）
     const isValidLength = val.length <= 25;      
     if (!isPositiveInteger || !isValidLength) {

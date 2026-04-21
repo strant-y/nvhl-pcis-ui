@@ -93,7 +93,8 @@
           <el-pagination
             v-model:current-page="queryParams.pageNum"
             v-model:page-size="queryParams.pageSize"
-            layout="total, prev, pager, next, jumper"
+            layout="total, prev, pager, next, jumper, sizes"
+						size="small"
             :total="pageresult.total"
             v-if="tableConfig.isPage && pageresult.total > 0"
             @size-change="pageChange"

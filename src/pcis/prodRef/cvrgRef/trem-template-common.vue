@@ -940,6 +940,10 @@ function initMethod(){
   // 如果联共保业务是从共主联、从共无联保则可以批改条款中的保费
   // 保费变化幅度大于限制区间则需要查询数据接口开关，打开则继续，关闭则提示修改幅度超出限制
   if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {
+
+    /* 从共时，安责险产品时，当责任代码为 040196 ：法律费用，041129：医疗救护费用，049003：检验评估费用，049002：抢险救援费用 时，责任总保费不能编辑
+   040002雇主责任险时,041293 误工费用  040046 法律费用 */
+    const readonlyLiabCodes = ['040196','041129','049003','049002','040046','040075'];
     if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {
       for(let i in groupInfo.value) {
         const ginfo = groupInfo.value[i]
@@ -952,8 +956,17 @@ function initMethod(){
               riskdata.col?.forEach((colinfo:any) => {
                 const item = riskdata.rowConfig[colinfo.cColId][n - 1]?.factorItem
                 if(item?.prop === 'TermRisktgt.nTotalInsuranceFee') {
-                  item.disabled = false;
-                  item.funcBlur = (val:any) => nInsuranceFeeChange(val)
+                  const riskNo = riskdata.rowConfig[colinfo.cColId][n - 1]?.cRiskNo;
+                  // 判断是否需要设置为只读（根据责任代码）
+                  const isReadonly = readonlyLiabCodes.includes(riskNo);
+                  if(isReadonly){
+                    item.disabled = true;
+                    item.readonly = true;
+                    item.funcBlur = null;
+                  }else {
+                    item.disabled = false;
+                    item.funcBlur = (val: any) => nInsuranceFeeChange(val)
+                  }
                 }
               })
             }

@@ -1,6 +1,12 @@
 <template>
   <myCard :cardConfig="cardconfig">
-    <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" />
+    <rttable v-model="formData" :item="tableconfig" ref="rttableFrom" >
+			<!-- 定义插槽 -->
+			<template #column-contentColumn="{ row }">
+				<!-- 使用 v-html 渲染高亮，但数据本身 row.cDeductibleContent 依然是纯文本 -->
+				<span v-html="highlightText(row)"></span>
+			</template>
+		</rttable>
   </myCard>
   <comDialog ref="dialog"></comDialog>
 </template>
@@ -234,7 +240,8 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "cDeductibleContent",
         inputtype: "rtinput",
         title: "免赔内容",
-        align: "left",
+				align: "left",
+				slotName: "contentColumn", // 2. 使用插槽渲染
       },
     ],
   })
@@ -243,16 +250,21 @@ const tableconfig = reactive<AppTableConfig>(
 
 
 const initOriginalData = ()=> {
+  originalData.value = []
   const param = {
-    cProdNo: route.params.param?.cProdNo,
     pageNum: 1,
     pageSize: 999,
+  }
+  if(route.params.param?.cRecordType === 10) {
+    param.cProdNos = route.params.param?.cProdList;
+  }else {
+    param.cProdNo = route.params.param?.cProdNo;
   }
   getPrdDeductible(param).then((res) => {
     if (res.data.result) {
       pageresult.list = [];
       originalData.value = res.data.result.map((item: any) => {
-         return {
+        return {
           cDeductibleClass: item.cDeductibleCode,
           cDeductibleContent: item.cDeductibleContent,
           cStatus: item.cStatus, //是否必选
@@ -351,7 +363,7 @@ const mergeArrays = (oldArr, newArr, key, fields)=>{
             return oldItem.cPkId == newItem.cPkId;
           }
 
-          if (oldItem.cRowId != null && oldItem.cRowId !== undefined && oldItem.cRowId !== '' && 
+          if (oldItem.cRowId != null && oldItem.cRowId !== undefined && oldItem.cRowId !== '' &&
               newItem.cRowId != null && newItem.cRowId !== undefined && newItem.cRowId !== '') {
             return oldItem.cRowId == newItem.cRowId;
           }
@@ -390,9 +402,9 @@ const method = {
   },
   //查询免赔
   queryDeductible: () => {
-
     dialog.value?.open('deductibleFix', {
           cProdNo: route.params.param.cProdNo,
+          cProdList: route.params.param.cProdList, // 组合出单用
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
         },
         { 
@@ -515,6 +527,56 @@ function setUnDisabledByKeyList(key: any) {
       element.hidden = false;
     });
   }
+}
+
+const highlightText = (row: string) => {
+	// 1. 获取原始文本
+  let content = row.cDeductibleContent;
+  if (!content) return '';
+
+  // 定义关键词数组
+  let keywords: string[] = [];
+
+  // --- 逻辑分支 A: 优先检查 editList ---
+  if (Array.isArray(row.editList) && row.editList.length > 0) {
+    keywords = row.editList.map(String);
+  } 
+  // --- 逻辑分支 B: 如果没有 editList，检查 cDeductibleFee 系列字段 ---
+  else {
+    // 动态查找所有以 cDeductibleFee 开头的字段
+    const feeKeys = Object.keys(row).filter(key => key.startsWith('cDeductibleFee'));
+    
+    const feeValues = feeKeys
+      .map(key => row[key])
+      .filter(val => val !== null && val !== undefined && val !== '');
+      
+    keywords = feeValues.map(String);
+  }
+
+  // 如果最终没有提取到任何关键词，直接返回原文本
+  if (keywords.length === 0) return content;
+
+  // --- 执行替换逻辑 (使用你提供的代码结构) ---
+  
+  // 为了防止 "12" 和 "123" 同时存在导致替换冲突，建议先按长度降序排序
+  keywords.sort((a, b) => b.length - a.length);
+
+  // 转义正则特殊字符的辅助函数
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  keywords.forEach((keyword: string) => {
+    if (keyword) {
+      // 关键点：使用 new RegExp 并加上 'g' (全局) 标志
+      // 使用 escapeRegExp 防止数字以外的特殊字符破坏正则
+      const regex = new RegExp(escapeRegExp(keyword), 'g');
+      
+      content = content.replace(regex, `<strong style="color: #F56C6C;">${keyword}</strong>`);
+    }
+  });
+
+  return content;
 }
 
 defineExpose({

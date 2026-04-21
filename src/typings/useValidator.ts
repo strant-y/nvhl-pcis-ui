@@ -510,12 +510,8 @@ const leiCode = () => {
 };
 
 // 道路运输经营许可证校验规则
-const roadTransportLicense = (options = {}) => {
-  const { 
-    message = "请输入有效的证件号",
-    lengthMessage = "证件号长度应为1-100位" // 调整长度提示
-  } = options;
-  
+	const roadTransportLicense = (cCertificateNo) => {
+
   return {
     validator: (rule, value, callback) => {
       if (!value) return callback(); // 空值由required处理
@@ -523,15 +519,17 @@ const roadTransportLicense = (options = {}) => {
       
       // 仅允许字母、数字、汉字（移除了括号和连字符等符号）
       const pattern = /^[a-zA-Z0-9\u4e00-\u9fa5]+$/;
-      
+			if (pattern.test(val) || (val === '新车未上牌' && cCertificateNo == '01')) {
+				callback(); // 校验通过
+			}
       // 基本格式校验
       if (!pattern.test(val)) {
-        return callback(new Error(message + "（仅允许字母、数字、汉字）"));
+        return callback(new Error("请输入有效的证件号（仅允许字母、数字、汉字）"));
       }
       
       // 长度校验（调整为1-100位）
       if (val.length < 1 || val.length > 100) {
-        return callback(new Error(lengthMessage));
+        return callback(new Error('证件号长度应为1-100位'));
       }
       
       callback(); // 校验通过
@@ -799,7 +797,7 @@ const farmerPaymentRateRule = () => {
       return leiCode()
     }
     if(type == 'roadTransportLicense') {
-      return roadTransportLicense()
+      return roadTransportLicense(param.cCertificateNo)
     }
     if(type == 'onlineTaxiLicense') {
       return onlineTaxiLicense()

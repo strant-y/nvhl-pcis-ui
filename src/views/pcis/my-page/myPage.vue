@@ -950,7 +950,7 @@ const setTaxInfo = () => {
   const appLicantValue = tabref["applicant"].getFromValue()["Applicant.cAppNo"]; // 单据编号
   if (!!appLicantValue) {
     dzmodal
-      .open(invoiceInfoModel, { type: "Issuer", data: {}, opertaor: opertaor})
+      .open(invoiceInfoModel, { type: "Issuer", data: props.param, opertaor: opertaor})
       .then((res: any) => {
         if (res.type === "ok") {
         }
@@ -2060,6 +2060,14 @@ async function loadAfter() {
           setCusBenefitInfo('view');
         },
       }),
+			createFreeButtonBase({
+				label: "发票信息",
+				type: "primary",
+				buttonColor: bottomBtnColor1,
+				func: () => {
+					setTaxInfo();
+				},
+			}),
 	  )
     //核保处理
     nextTick(() => {
@@ -2094,9 +2102,6 @@ async function loadAfter() {
           let acctinfoInfo = opertaor.getTableRefByKey('acctinfo')
           if(acctinfoInfo){
             acctinfoInfo.setDisabledAll(false);  
-            acctinfoInfo.setFormItem('Acctinfo.cAcctNme',{
-              disabled: true
-            })
             acctinfoInfo.setFormItem('Acctinfo.cBankCnaps',{
               disabled: true
             })
@@ -2125,6 +2130,14 @@ async function loadAfter() {
 					buttonColor: bottomBtnColor1,
 					func: () => {
 						setCusBenefitInfo('view');
+					},
+				}),
+				createFreeButtonBase({
+					label: "发票信息",
+					type: "primary",
+					buttonColor: bottomBtnColor1,
+					func: () => {
+						setTaxInfo();
 					},
 				}),
 			)
@@ -2169,6 +2182,14 @@ async function loadAfter() {
 				buttonColor: bottomBtnColor1,
 				func: () => {
 					setCusBenefitInfo('view');
+				},
+			}),
+			createFreeButtonBase({
+				label: "发票信息",
+				type: "primary",
+				buttonColor: bottomBtnColor1,
+				func: () => {
+					setTaxInfo();
 				},
 			}),
 		)
@@ -3350,6 +3371,13 @@ const calcPremium = () => {
     }
     return;
   }
+  const cCardBsnsTyp = res['base']['Base.cCardBsnsTyp']? res['base']['Base.cCardBsnsTyp'] : res['plyBase']['Base.cCardBsnsTyp'];
+  if(cCardBsnsTyp && 'XKCSzx' === cCardBsnsTyp){  //世懋渠道,无需进行保费计算
+    ElMessage.success("保费计算成功!");
+    needCalc.value = false;
+    btn.loading = false;
+    return ;
+  }
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
@@ -4457,6 +4485,14 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
 	const nPrmRmbExch = plyBaseData['Base.nPrmRmbExch']; // 总保费汇率
   const nPrmVar = EdrBaseData['EdrBase.nPrmVar']; // 退费金额，退费时为负数
 
+  const acctinfo = opertaor.getDataAll()["acctinfo"];
+  const applicant = opertaor.getDataAll()["applicant"];
+
+  if(acctinfo['Acctinfo.cAcctNme'] && acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
+    edrexpFlag.value = true;
+    return true;
+  }
+
   // 如果不是退费（>=0），不触发
   if (nPrmVar >= 0) {
     return false;
@@ -4470,7 +4506,6 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
 		edrexpFlag.value = true
     return true;
   }
-
   // 美元：退费 >= 1,000
   if (cPrmCur === 'USD' && refundAmount >= 1000) {
 		edrexpFlag.value = true
@@ -4493,83 +4528,31 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
 const edrvalidateNPrmAmlya = (EdrBaseData) => {
 	if (edramlyaFlag(EdrBaseData)) {
 		nextTick(() => {
-			const CPrmCur = opertaor.getDataAll()["base"]['Base.cPrmCur']; // 保费币种
-			let msg = `根据反洗钱相关规定，当前批单保费变化大于等于${CPrmCur === 'USD' ? '1千美元' : '1万'}时：`;
-			let flag = false;
 			let isDis = false;
-			let isMsg = false;
 			if (props.param.pageType === "EDR_APP_NEW_SCENE") {
 				isDis = true
-				isMsg = true
 			} else if ((props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !=='1')) {
 				isDis = true
-				isMsg = false
 			}
-			// ----------投保人------------
-			const edrexptArr = ['EdrBase.cSubtractPrmRsn', 'EdrBase.cNotBackAppRsn', 'EdrBase.cNotBackAppNo'];
-			const edrexpCnmArr = ['退保、减保或者办理保单贷款原因', '未退还至投保人账户的原因', '反洗钱非投保人收款审批单号'];
-			let appMsg = '';
-			const edrexpDataVlue =  edrexp.value?.getFromValue()
-			if(edrbase.value) {
-				const cAppNme = opertaor.getDataAll()["applicant"]['Applicant.cAppNme']; // 投保人名称
-				const cAcctNme = opertaor.getDataAll()["acctinfo"]['Acctinfo.cAcctNme']; // 收款人户名
-				if(cAppNme != cAcctNme){
-					for (const i in edrexptArr) {
-						const objValue = edrexpDataVlue[edrexptArr[i]];
-						if (!objValue) {
-							appMsg += edrexpCnmArr[i] + '、';
-						}
-						if (edrexptArr[i] == 'EdrBase.cNotBackAppNo') {
-							edrexp.value.setFormItem(edrexptArr[i], {
-								rules: [getRules("required", {}),getRules("maxLength", {len:50})],
-								hidden: false,
-								disabled: !isDis
-							});
-						} else {
-							edrexp.value.setFormItem(edrexptArr[i], {
-								rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
-								hidden: false,
-								disabled: !isDis
-							});
-						}
-						flag = true;
-					}
-				} else {
-					const objValue = edrexpDataVlue['EdrBase.cSubtractPrmRsn'];
-					if (!objValue) {
-						appMsg = '退保、减保或者办理保单贷款原因、';
-					}
-					edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-						rules: [getRules("required", {}),getRules("maxLength", {len:2000})],
-						hidden: false,
-						disabled: !isDis
-					});
-					edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-						rules: [getRules("maxLength", {len:2000})],
-						hidden: false,
-						disabled: true
-					});
-					edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-						rules: [getRules("maxLength", {len:50})],
-						hidden: false,
-						disabled: true
-					});
-					edrexp.value.setValue('EdrBase.cNotBackAppRsn', null)
-					edrexp.value.setValue('EdrBase.cNotBackAppNo', null)
-					flag = true;
-				}
-				
-				if (appMsg !== '') {
-					msg += '批改扩展信息中【' + appMsg.substring(0, appMsg.length - 1) + '】不能为空。';
-				}
-			}
-			if (flag && isMsg && appMsg) {
-				ElMessage.error(msg);
-				return false;
-			}
+			edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
+        rules: [getRules("maxLength", {len:2000})],
+        hidden: false,
+        disabled: false
+      });
+      edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
+        rules: [getRules("maxLength", {len:2000})],
+        hidden: false,
+        disabled: false
+      });
+      edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
+        rules: [getRules("maxLength", {len:50})],
+        hidden: false,
+        disabled: false
+      });
 		})
   } else {
     if(edrexp.value) {
+      edrexp.value.setFormValue({});
       edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
         rules: [getRules("maxLength", {len:2000})],
       });

@@ -425,7 +425,7 @@ const method = {
       setFormItem("Applicant.cCertfCde", {
         disabled: false,
       });
-      resetFn()
+      // resetFn()
     }
     resetLogo.value = true;
     tCertfDate.value = [];
@@ -455,7 +455,7 @@ const method = {
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
-    setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
+    setFormItem("Applicant.tEstablishingDate", { rules: null });
     clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -494,7 +494,6 @@ const method = {
 
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
-        disabled: false,
         rules: [getRules("required", {})],
       });
     } else if (val === '07') {
@@ -751,7 +750,6 @@ const method = {
         clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
       }
       setFormItem("Applicant.tEstablishingDate", {
-        disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -808,8 +806,31 @@ const method = {
       setFormItem("Applicant.nYearincomeNum", {
         rules: [],
       });
+			// 注册地址是否同上
+			setFormItem("Applicant.cIsSame", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Applicant.RegisterAddress", {
+        hidden: false,
+			});
+			// 注册地址
+			setFormItem("Applicant.cRegisteredcapDre", {
+        hidden: false,
+      });
     } else {
-
+      // 注册地址是否同上
+			setFormItem("Applicant.cIsSame", {
+        hidden: true,
+      });
+			// 注册地址
+			setFormItem("Applicant.RegisterAddress", {
+        hidden: true,
+			});
+			// 注册地址
+			setFormItem("Applicant.cRegisteredcapDre", {
+        hidden: true,
+      });
       setFormItem("Applicant.tBirthday", {
         hidden: false,
       });
@@ -826,7 +847,7 @@ const method = {
         hidden: false,
       });
       setFormItem("Applicant.cBusinessScope", {
-        hidden: false,
+        hidden: true,
         rules: []
       });
       setFormItem("Applicant.cMrgCde", {
@@ -891,7 +912,6 @@ const method = {
       });
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
-        disabled: true,
         rules: null,
       });
       setFormItem("Applicant.cEnterpriseTel", {
@@ -1404,7 +1424,6 @@ const method = {
     }
     // 企业成立日
     setFormItem("Applicant.tEstablishingDate", {
-      disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
     if (!param.initFlag && !isSpecialCase) {
