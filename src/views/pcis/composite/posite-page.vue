@@ -533,27 +533,38 @@ const saveOpt = async (isret: boolean = true) => {
 }
 
 const calcPremium = async () => {
+
+  // 组合方案出单
+  if(props.param.cCombinationType === '2') {
+    const o060030 = pageView.value.getDataOpertaorByProdNo('060030')
+    const yjxGrpMemberList = o060030.getTableRefs()['yjxGrpMember'].getFormValue()
+    if(yjxGrpMemberList || yjxGrpMemberList.length !== 5) {
+      console.log('yjxGrpMemberList.length', yjxGrpMemberList.length)
+      ElMessage.warning('团意险：团单成员清单必需录入5人')
+      return;
+    }
+    pageView.value.linkedOperation().executeForEach((operator: any, group: GroupForm) => {
+      if(group.groupId !== 'group-060030') {
+        const allData = operator.getDataAll()
+        console.log('allData', allData)
+        const payInfo = setPayInfo(allData['base'], allData['applicant'], allData['insrnc']);
+        console.log("生成缴费计划内容", group, payInfo);
+        operator.getTableRefs()["payinfo"]?.setFormValue(payInfo);
+      }
+    })
+    // 求总保费
+    const sumPrm: number = productList.value.reduce((total, item) => total + item.nPrm, 0);
+    ElMessage.success(`总保费：${sumPrm}元`)
+    return
+  }
+
+  // 自定义组合出单
   const params = getReqParams()
   console.log('calcPremium-params', params);
   // const v = await pageView.value.validateAll()
   // if(!v.validate) {
   //   return;
   // }
-
-  if(props.param.cCombinationType === '2') {
-
-    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeForEach((operator: any, group: GroupForm) => {
-      const allData = operator.getDataAll()
-      console.log('allData', allData)
-      const payInfo = setPayInfo(allData['base'], allData['applicant'], allData['insrnc']);
-      console.log("生成缴费计划内容", group, payInfo);
-      operator.getTableRefs()["payinfo"]?.setFormValue(payInfo);
-    })
-
-    ElMessage.success('总保费：1000元')
-    return
-  }
-
   const loading = openPageLoading('计算中...');
 
   const groupIdList = pageView.value.pageConfig
