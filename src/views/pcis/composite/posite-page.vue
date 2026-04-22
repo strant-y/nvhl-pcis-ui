@@ -541,16 +541,18 @@ const calcPremium = async () => {
   // }
 
   if(props.param.cCombinationType === '2') {
-
-    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeForEach((operator: any, group: GroupForm) => {
-      const allData = operator.getDataAll()
-      console.log('allData', allData)
-      const payInfo = setPayInfo(allData['base'], allData['applicant'], allData['insrnc']);
-      console.log("生成缴费计划内容", group, payInfo);
-      operator.getTableRefs()["payinfo"]?.setFormValue(payInfo);
+    pageView.value.linkedOperation().executeForEach((operator: any, group: GroupForm) => {
+      if(group.groupId !== 'group-060030') {
+        const allData = operator.getDataAll()
+        console.log('allData', allData)
+        const payInfo = setPayInfo(allData['base'], allData['applicant'], allData['insrnc']);
+        console.log("生成缴费计划内容", group, payInfo);
+        operator.getTableRefs()["payinfo"]?.setFormValue(payInfo);
+      }
     })
-
-    ElMessage.success('总保费：1000元')
+    // 求总保费
+    const sumPrm: number = productList.value.reduce((total, item) => total + item.nPrm, 0);
+    ElMessage.success(`总保费：${sumPrm}元`)
     return
   }
 
