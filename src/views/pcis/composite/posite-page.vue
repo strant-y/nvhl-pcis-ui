@@ -533,14 +533,16 @@ const saveOpt = async (isret: boolean = true) => {
 }
 
 const calcPremium = async () => {
-  const params = getReqParams()
-  console.log('calcPremium-params', params);
-  // const v = await pageView.value.validateAll()
-  // if(!v.validate) {
-  //   return;
-  // }
 
+  // 组合方案出单
   if(props.param.cCombinationType === '2') {
+    const o060030 = pageView.value.getDataOpertaorByProdNo('060030')
+    const yjxGrpMemberList = o060030.getTableRefs()['yjxGrpMember'].getFormValue()
+    if(yjxGrpMemberList || yjxGrpMemberList.length !== 5) {
+      console.log('yjxGrpMemberList.length', yjxGrpMemberList.length)
+      ElMessage.warning('团意险：团单成员清单必需录入5人')
+      return;
+    }
     pageView.value.linkedOperation().executeForEach((operator: any, group: GroupForm) => {
       if(group.groupId !== 'group-060030') {
         const allData = operator.getDataAll()
@@ -556,6 +558,13 @@ const calcPremium = async () => {
     return
   }
 
+  // 自定义组合出单
+  const params = getReqParams()
+  console.log('calcPremium-params', params);
+  // const v = await pageView.value.validateAll()
+  // if(!v.validate) {
+  //   return;
+  // }
   const loading = openPageLoading('计算中...');
 
   const groupIdList = pageView.value.pageConfig
