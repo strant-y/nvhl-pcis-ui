@@ -1225,40 +1225,41 @@ function getValue(key: string) {
 // }
 function setFormItem(key: string, obj: Record<string, any>) {
   if (!obj || !formconfig1.fromSchema) return;
+  nextTick().then(() => {
+    formconfig1.fromSchema.forEach((item) => {
+      if (item.prop === key) {
+        // 单独处理 btnItems
+        if (obj.btnItems && item.btnItems) {
+          for (let k in obj.btnItems) {
+            item.btnItems[k] = obj.btnItems[k];
+          }
+        }
 
-  formconfig1.fromSchema.forEach((item) => {
-    if (item.prop === key) {
-      // 单独处理 btnItems
-      if (obj.btnItems && item.btnItems) {
-        for (let k in obj.btnItems) {
-          item.btnItems[k] = obj.btnItems[k];
+        // 清除已有属性再赋值，避免残留
+        const propsToCopy = [
+          "rules",
+          "readonly",
+          "disabled",
+          "hidden",
+          "loadData",
+          "placeholder",
+          "filterable",
+        ];
+        propsToCopy.forEach((prop) => {
+          if (prop in obj) {
+            item[prop] = obj[prop];
+          }
+        });
+
+        // 其他非特定属性通过 assign 补充
+        const extraProps = Object.keys(obj).filter(
+            (k) => !propsToCopy.includes(k) && k !== "btnItems"
+        );
+        if (extraProps.length > 0) {
+          Object.assign(item, ...extraProps.map((k) => ({[k]: obj[k]})));
         }
       }
-
-      // 清除已有属性再赋值，避免残留
-      const propsToCopy = [
-        "rules",
-        "readonly",
-        "disabled",
-        "hidden",
-        "loadData",
-        "placeholder",
-        "filterable",
-      ];
-      propsToCopy.forEach((prop) => {
-        if (prop in obj) {
-          item[prop] = obj[prop];
-        }
-      });
-
-      // 其他非特定属性通过 assign 补充
-      const extraProps = Object.keys(obj).filter(
-        (k) => !propsToCopy.includes(k) && k !== "btnItems"
-      );
-      if (extraProps.length > 0) {
-        Object.assign(item, ...extraProps.map((k) => ({ [k]: obj[k] })));
-      }
-    }
+    });
   });
 }
 
