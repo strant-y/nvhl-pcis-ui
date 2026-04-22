@@ -1646,8 +1646,24 @@ async function getInitParam(codeparam){
 }
 
 function develop(formconfig11: any){
+  // let pages = []
   // for(const page in formconfig11[0].pageInfo){
+  //   if(formconfig11[0].pageInfo[page].pageCode === 'webPlyBaseBasic'){
+  //     console.log(formconfig11[0].pageInfo[page]);
+  //     let p = [];
+  //     for(const r in formconfig11[0].pageInfo[page].pageSchema.fromSchema){
+  //       if(formconfig11[0].pageInfo[page].pageSchema.fromSchema[r].prop !== 'Base.cCiOprRel' 
+  //       ){
+  //         p.push(formconfig11[0].pageInfo[page].pageSchema.fromSchema[r]);
+  //       }else{
+  //         console.log(formconfig11[0].pageInfo[page].pageSchema.fromSchema[r]);
+  //       }
+  //     }
+  //     formconfig11[0].pageInfo[page].pageSchema.fromSchema = p;
+  //     pages.push(formconfig11[0].pageInfo[page]);
+  //   }
   // }
+  // formconfig11[0].pageInfo = pages;
 }
 
 const exlist = ['acctinfo','ci','ourCompanyCiShare'];
@@ -4488,7 +4504,7 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
   const acctinfo = opertaor.getDataAll()["acctinfo"];
   const applicant = opertaor.getDataAll()["applicant"];
 
-  if(acctinfo['Acctinfo.cAcctNme'] && acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
+  if(acctinfo && applicant && acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
     edrexpFlag.value = true;
     return true;
   }
