@@ -63,13 +63,21 @@ onMounted(() => {
 function getPlanNo(groupId: string) {
   const list = getFromValue(groupId)
   console.log('getPlanNo-list', groupId, list)
-  return list
-    ?.map((i: any) => {
-      return {
-        label: i.cPlanNo,
-        value: i.cPlanNo
-      }
-    })
+  // return list
+  //   ?.map((i: any) => {
+  //     return {
+  //       label: i.cPlanNo,
+  //       value: i.cPlanNo
+  //     }
+  //   })
+
+  // 先写死
+  return [
+    {
+          label: 'P1',
+          value: 'P1'
+    }
+  ]
 }
 
 function getFromValue(groupId: string) {
