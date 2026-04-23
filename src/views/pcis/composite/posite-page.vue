@@ -116,7 +116,7 @@ import groupForm from "@/views/pcis/composite/component/group-form/group-form.vu
 import groupCommon from "@/views/pcis/composite/component/group-form/group-common.vue";
 import {createFreeButtonBase, FreeButtonBase} from "@/shared/button-config";
 import positeApi from "@/api/posite";
-import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, useUserStore} from "@/store";
+import {clearCodeListViewByPageKey, clearDataOpertaorByPageKey, useTagsViewStore, useUserStore} from "@/store";
 import { lessThan6Months, toDate } from "@/utils/date";
 import dayjs from "dayjs";
 import moment from "moment";
@@ -137,7 +137,7 @@ const props:any = defineProps({
     type: Object,
   },
 });
-
+const tagsViewStore = useTagsViewStore();
 const userStore = useUserStore();
 const router = useRouter();
 const dzmodal = useDzModal();
@@ -214,7 +214,17 @@ const bthList = ref<FreeButtonBase[]>([
     type: "warning",
     id: "btn010106",
     func: () => {
-      imageMethod.showImage({});
+      const o000000 = pageView.value.getDataOpertaorByProdNo('000000')
+      imageMethod.showPositeImage(getNewParams({
+        plyBase: o000000.getDataAll()['plyBase']
+      }));
+    },
+  }),
+  createFreeButtonBase({
+    label: "返回",
+    func: () => {
+      tagsViewStore.back();
+      // history.back();
     },
   }),
 ]);
@@ -254,7 +264,17 @@ pageView.value.beforeCreation = function(config: CompositePageConfigType) {
     }
 
     anchorConfig.forEach((anchor: AnchorItem) => {
-
+      if(anchor.children && anchor.children.length > 0) {
+        anchor.children.forEach((childrenItem: AnchorItem) => {
+          if (props.param.cCombinationType === '2') { // 组合方案
+            if (childrenItem.tabKey === 'plan') {
+              childrenItem.title = '保障方案'
+            } else if (childrenItem.tabKey === 'deductibleDist') {
+              childrenItem.title = '免赔说明'
+            }
+          }
+        })
+      }
     })
 
     pageConfig.forEach((item: GroupForm) => {
@@ -372,7 +392,8 @@ const initPlanData = (data?: any) => {
     cCombinationPlanNo: props.param.cCombinationPlanNo
   }).then((res: any) => {
     if(res.code === 200) {
-      const planList: any[] = res.data
+      const planList: any[] = res.data ?? []
+      planList.sort((a: any, b: any) => a.cProdNo.localeCompare(b.cProdNo))
       const o000000 = pageView.value.getDataOpertaorByProdNo('000000')
       const tabs = o000000.getTableRefs()
       tabs['plan']?.setFormValue(planList, 'group-000000')
@@ -494,6 +515,20 @@ const activeChange = (activeItems: AnchorItem[]) => {
  * 保存
  */
 const saveOpt = async (isret: boolean = true) => {
+
+  if(props.param.cCombinationType === '2') {
+    // 组合方案出单添加缴费计划验证
+    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeForEach((operator: any, group: GroupForm) => {
+      const allData = operator.getDataAll()
+      console.log('allData', allData)
+      const payInfo = allData['payinfo'];
+      if (!payInfo || payInfo.length === 0) {
+        ElMessage.warning(`请先进行保费计算`)
+        throw new Error('请先进行保费计算')
+      }
+    })
+  }
+
   const btn = getBtn('btn010102')
   btn.loading = true;
   const params = getReqParams()
@@ -536,13 +571,6 @@ const calcPremium = async () => {
 
   // 组合方案出单
   if(props.param.cCombinationType === '2') {
-    const o060030 = pageView.value.getDataOpertaorByProdNo('060030')
-    const yjxGrpMemberList = o060030.getTableRefs()['yjxGrpMember'].getFormValue()
-    if(!yjxGrpMemberList || yjxGrpMemberList.length !== 5) {
-      console.log('yjxGrpMemberList.length', yjxGrpMemberList.length)
-      ElMessage.warning('团意险：团单成员清单必需录入5人')
-      return;
-    }
     pageView.value.linkedOperation().executeForEach((operator: any, group: GroupForm) => {
       if(group.groupId !== 'group-060030') {
         const allData = operator.getDataAll()
@@ -895,21 +923,24 @@ const submitToUndrFn = async () => {
     return;
   }
 
+  // 组合方案出单
   if(props.param.cCombinationType === '2') {
-    // 组合方案出单添加缴费计划验证
-    pageView.value.linkedOperation([CommonGroupId, 'group-060030']).executeForEach((operator: any, group: GroupForm) => {
-      const allData = operator.getDataAll()
-      console.log('allData', allData)
-      const payInfo = allData['payinfo'];
-      if (!payInfo || payInfo.length === 0) {
-        ElMessage.warning(`请先进行保费计算`)
-        return;
-      }
-    })
+    const o060030 = pageView.value.getDataOpertaorByProdNo('060030')
+    const yjxGrpMemberList = o060030.getTableRefs()['yjxGrpMember'].getFormValue()
+    if (!yjxGrpMemberList || yjxGrpMemberList.length !== 5) {
+      console.log('yjxGrpMemberList.length', yjxGrpMemberList.length)
+      ElMessage.warning('团意险：团单成员清单必需录入5人')
+      return;
+    }
   }
 
-  // 先保存再提核
-  await saveOpt(false)
+  try {
+    // 先保存再提核
+    await saveOpt(false)
+  } catch (e) {
+    console.error(e)
+    return;
+  }
 
   const loading = openPageLoading('提核中...');
   const btn = getBtn('btn010103')
@@ -951,14 +982,15 @@ const submitToUndrFn = async () => {
           item.disabled = true;
         }
       })
+    }).finally(() => {
+      loading.close()
+      btn.loading = true;
     });
   }else {
     ElMessage.error(res.msg)
-  }
-  setTimeout(() => {
     loading.close()
     btn.loading = true;
-  }, 300)
+  }
 }
 
 

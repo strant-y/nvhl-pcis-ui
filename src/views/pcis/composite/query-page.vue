@@ -832,6 +832,15 @@ function skipPositePage(row: any) {
     }
   })
 }
+
+onActivated(() => {
+  console.log("keep-alive -> onActivated");
+  // 缓存页面激活 更新查询列表 保存页码不变
+  refreshData(false);
+});
+onDeactivated(() => {
+  console.log("keep-alive -> onDeactivated");
+});
 </script>
 <style lang="scss" scoped>
 .copy-icon {

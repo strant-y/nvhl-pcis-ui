@@ -19,6 +19,7 @@ import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import {ref} from "vue";
 import {useValidator} from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import {calculateAgeFromIdCard, validateAndGetGender} from "@/utils/common";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const props = defineProps({
   data: {
@@ -43,7 +44,7 @@ const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const params = opertaor.getParam();
 const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
-
+const init = ref(true);
 const getCComponentTable = () => {
     return 'InsuredDist';
 };
@@ -114,7 +115,20 @@ onMounted(async  () => {
       }
 		}
 
-		if(params.cEdrType === '1' && (props.data.title == "编辑" || props.data.title == "新增")){
+    if(item.prop === 'GrpMemberYjx.identifyNumber') {
+      item.func = (val:any) => {
+        if(init.value) return;
+        if(val && ['111','553'].includes(getValue('GrpMemberYjx.identifyType'))) {
+          setValue('GrpMemberYjx.age', calculateAgeFromIdCard(val))
+          const birthDateFromId = val.substring(6, 14);
+          const formattedBirthDate = `${birthDateFromId.substring(0, 4)}-${birthDateFromId.substring(4, 6)}-${birthDateFromId.substring(6, 8)}`;
+          setValue('GrpMemberYjx.birthday', formattedBirthDate);
+          setValue('GrpMemberYjx.sex', validateAndGetGender(val));
+        }
+      }
+    }
+
+  if(params.cEdrType === '1' && (props.data.title == "编辑" || props.data.title == "新增")){
       item.disabled = false;
       if(item.inputtype === 'rtinputgroup'){
         item.groupList.forEach(data => {
@@ -141,6 +155,9 @@ onMounted(async  () => {
       setValue("GrpMemberYjx.insuredType", '1');
     }, 150);
   }
+  nextTick(() => {
+    init.value = false;
+  })
 });
 
 

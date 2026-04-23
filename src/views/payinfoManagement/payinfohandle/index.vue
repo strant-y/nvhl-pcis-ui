@@ -363,11 +363,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				param: {'cCde': [ '2', '3', '5',  '99']},
 			},
 			{
-				prop: "CCombinationNo",
-				inputtype: "rtinput",
-				title: "组合产品申请单号"
-			},
-			{
 				prop: "CBillTyp",
 				inputtype: "rtselect",
 				title: "单据类型",

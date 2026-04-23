@@ -1031,7 +1031,11 @@ function refreshData(flag?: boolean) {
   const param = {
     ...r,
     ...s,
+    ...{
+      isCombination: s.baseType === '组合单' ? '1' : null
+    }
   };
+
   if(param.tAppTm && param.tAppTm[1]) {
     param.tAppTm[1] = dayjs(param.tAppTm[1]).format("YYYY-MM-DD 23:59:59")
   }
@@ -1132,7 +1136,7 @@ function setFormItem(key: any, obj: any) {
 function skipPositePage(row: any) {
   policyService.getCombinationProdList({ // 先查询组合产品信息
     cCombinationNo: row.cCombinationNo
-  }).then((res) => {
+  }).then((res: any) => {
     console.log('getCombinationProdList-res', res);
     if(res.code === 200) {
       router.push({
@@ -1140,7 +1144,16 @@ function skipPositePage(row: any) {
         query: {
           param: JSON.stringify({
             ...row,
-            cProdDtlList: res.data
+            cProdDtlList: res.data.map((m: any) => {
+              return {
+                ...m,
+                cKindNo: m.cProdNo.substring(0, 2)
+              }
+            }).sort((a: any, b: any) => a.cProdNo.localeCompare(b.cProdNo)),
+            cCombinationType: row.cCombinationPlanNo ? '2' : '1',
+            cProdList: res.data
+                .map((m: any) => m.cProdNo)
+                .sort((a: string, b: string) => a.localeCompare(b))
           })
         },
       });
