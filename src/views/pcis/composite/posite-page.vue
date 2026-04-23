@@ -683,11 +683,11 @@ const calcBeforeVerify = (opertaor: any) => {
   // 校验标的信息中核定座位总数和投保座位数总数不一致！
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
   if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
-    ElMessage.error("核定座位总数和投保座位数总数不一致！");
-    if (btn && props.param.cRsnCde !== '99') {
-      btn.loading = false;
-    }
-    return;
+    ElMessage.warning("核定座位总数和投保座位数总数不一致！");
+    // if (btn && props.param.cRsnCde !== '99') {
+      // btn.loading = false;
+    // }
+    // return;
   }
 };
 const setPayInfo = (base: any, applicant: any, insrnc: any) => {

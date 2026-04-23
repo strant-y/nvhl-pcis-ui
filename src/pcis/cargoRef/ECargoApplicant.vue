@@ -530,7 +530,10 @@ const method = {
 			setFormItem("ECargoApplicant.cRegisteredcapDre", {
         hidden: false,
       });
-    } else {
+		} else {
+			setFormItem("ECargoApplicant.cTrdCde", {
+				rules: [],
+			});
       // 注册地址是否同上
 			setFormItem("ECargoApplicant.cIsSame", {
         hidden: true,
@@ -804,7 +807,7 @@ const method = {
     } else {
       setFormItem("ECargoApplicant.cOccupCde", { rules: [] });
       setFormItem("ECargoApplicant.cOccupCde", { btnItems: { disabled: true } });
-      setFormItem('ECargoApplicant.cTrdCde',{rules:null})
+      setFormItem('ECargoApplicant.cTrdCde',{ rules:getRules("required", {}) })
       setFormItem("ECargoApplicant.cTrdCde", { btnItems: { disabled: false } });
     }
   },

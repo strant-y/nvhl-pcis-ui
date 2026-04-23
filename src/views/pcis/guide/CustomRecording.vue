@@ -1101,7 +1101,8 @@ function getTplOptions() {
   formconfig1.value.seldef = "";
   formconfig1.value.tpl = null;
   const param = {
-    'PrdProdTemplate.CProdNo': formconfig1.value.cProdNo,
+		'PrdProdTemplate.CProdNo': formconfig1.value.cProdNo,
+		'PrdProdTemplate.cTermNo': formconfig1.value.cTermNo,
     'PrdProdTemplate.CCrtCde': userStore.user.opCde,
     pageNum: 1,
     pageSize: 1000,

@@ -68,19 +68,29 @@ onMounted(async () => {
 
   // 短期费率类型,以下产品只支持按日的短期费率类型
   const disabledProducts = [
-    "040016", "059014", "059015", "070002", "043021",
-    "120008", "059018", "059017", "059016", "043020",
-    "049019", "049020"
+    // "040016", "059014", "059015", "070002", "043021",
+    // "120008", "059018", "059017", "059016", "043020",
+		// "049019", "049020",
+		"019905", "090001", "090002", "090003"
   ];
 
   const isDisabled = disabledProducts.includes(params.cProdNo);
-  // setFormItem("Base.cRatioTyp", { 
-  //   disabled: isDisabled
-  // });
+  setFormItem("Base.cRatioTyp", { 
+    disabled: isDisabled
+  });
   if (params?.cRecordType === 9 || params.cPolicySource == 9) {
     setFormItem('Base.cRatioTyp', { hidden: true })
     setFormItem('Base.nRatioCoef', { hidden: true })
-		opertaor.setDisabledAll(['plyBase','applicant'])
+		opertaor.setDisabledAll(['plyBase', 'applicant'])
+		let plyBase = opertaor.getTableRefByKey('plyBase')
+		if(plyBase){
+			const getFormconfig = plyBase.getFormconfig();
+			getFormconfig.fromSchema?.forEach((item:any) => {
+				if(item.prop == "Base.cNeedfeeFlag"){
+					item.disabled = false;
+				}
+			});
+		}
   }
   // 02的产品，除了020014、020018、020019、020019、020021之外的产品 不需要短期费率系数
   const hidenRatioCoefProdNoMap = ['020014','020018','020019','020019','020021'];
@@ -594,7 +604,12 @@ const method = {
     if(tgt?.['Tgt.cInsuranceMethod'] && ['613002', '613003', '613004'].includes(tgt?.['Tgt.cInsuranceMethod'])) {
       setValue("Base.nRatioCoef", Number(1).toFixed(6));
       return;
-    }
+		}
+		// 这四个产品费率类型只能按日，切费率系数只能是1
+		if (params.cProdNo == '019905' || params.cProdNo == '090001' || params.cProdNo == '090002' || params.cProdNo == '090003') {
+			setValue("Base.nRatioCoef", Number(1).toFixed(6));
+      return;
+		}
     policyRatio(param).then((res: any) => {
       const { code, data, msg } = res;
       if (code === 200) {
