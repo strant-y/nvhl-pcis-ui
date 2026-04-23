@@ -15,6 +15,7 @@ const ViewsCachedKeyMap : any = {
     'PendUdrListQuery': 'PendUdrListQuery',
     'InquiryUdrListQuery': 'InquiryUdrListQuery',
     'orderProcessing': 'orderProcessing',
+    'composite-query-page': 'query-page',
 };
 
 export function getCompName(name: string): string {

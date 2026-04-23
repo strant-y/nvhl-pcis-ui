@@ -136,7 +136,7 @@ const formconfig = ref(createAppGridEditConfig({
     {
       prop: "cProdNo",
       inputtype: "rtselect",
-      title: "产品/方案",
+      title: "产品",
       // typeCode: "PROD_LIST",
       codeParam: {},
       func: async (value: string, rowData: any) => {
@@ -217,7 +217,7 @@ const setProdOptions = async (rowData: any, cKindNo: string) => {
   if(cKindNo === '06') {
     list.push({
       value: '060030',
-      label: '陕西秦科保团体人身意外伤害保险'
+      label: '060030 团体人身意外伤害保险'
     })
   }else {
     list = await codeListStore.queryCodeList({
@@ -237,7 +237,7 @@ const setProdNme = async (rowData: any, cProdNo: string) => {
     if(rowData['cKindNo'] === '06') {
       list.push({
         value: '060030',
-        label: '陕西秦科保团体人身意外伤害保险'
+        label: '060030 团体人身意外伤害保险'
       })
       gridEditRef.value?.setValueByRowKey('cPlanNo', rowData['_dataId'], 'P26000176');
       gridEditRef.value?.setValueByRowKey('cPlanNme', rowData['_dataId'], '陕西秦科保团体人身意外伤害保险');
@@ -268,6 +268,7 @@ onMounted(() => {
 watch(() => props.prodList, (newVal) => {
   if(newVal) {
     gridEditRef.value?.setFormValue([]);
+    newVal.sort((a: any, b: any) => a.cProdNo.localeCompare(b.cProdNo))
     gridEditRef.value?.setFormValue(newVal);
   }
 }, {

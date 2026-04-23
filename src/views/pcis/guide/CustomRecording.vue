@@ -1024,17 +1024,10 @@ function selectProdList() {
       prodList.value = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
         const kindNo = datas[3].substring(0, 2);
-        if(kindNo === '06') {
-          return {
-            value: datas[3].substring(0, 6),
-            label: datas[4].substring(9),
-          };
-        }else {
-          return {
-            value: datas[3].substring(0, 6),
-            label: datas[3].substring(6),
-          };
-        }
+        return {
+          value: datas[3].substring(0, 6),
+          label: datas[3].substring(6),
+        };
       });
       formconfig1.value.cProdList = selectedTerm.map((item: any) => {
         const datas = item.searchKey.split('_');
@@ -1044,6 +1037,7 @@ function selectProdList() {
         const datas = item.searchKey.split('_');
         const cProdNo = datas[3].substring(0, 6);
         const kindNo = datas[3].substring(0, 2);
+
         // 意健险方案数据特殊处理
         const cPlanNo = kindNo === '06' ? item.code : '';
         const prodName = datas[3].substring(6);
