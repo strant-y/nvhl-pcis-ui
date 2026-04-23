@@ -1041,7 +1041,21 @@ const method = {
     }
   },
   //大股东性质change事件
-  funcShareholderNature: (val) => {
+	funcShareholderNature: (val) => {
+		if (param.cProdNo.slice(0, 2) === "05") {
+			// 大股东证件类型
+			setFormItem("Applicant.cShareholderCategory", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+			// 大股东证件号码
+			setFormItem("Applicant.cShareholderCode", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+			// 大股东名称
+			setFormItem("Applicant.cShareholderName", {
+				rules: val === '1' ? [] : [getRules("required", {})],
+			});
+		}
     if (param.initFlag) {
       if(val === "0") {
         codeListStore
@@ -1056,20 +1070,6 @@ const method = {
           });
       }
       return;
-		}
-		if (param.cProdNo.slice(0, 2) === "05") {
-			// 大股东证件类型
-			setFormItem("Applicant.cShareholderCategory", {
-				rules: val === '1' ? [] : [getRules("required", {})],
-			});
-			// 大股东证件号码
-			setFormItem("Applicant.cShareholderCode", {
-				rules: val === '1' ? [] : [getRules("required", {})],
-			});
-			// 大股东名称
-			setFormItem("Applicant.cShareholderName", {
-				rules: val === '1' ? [] : [getRules("required", {})],
-			});
 		}
 		if (val == "1") {// 个人
       codeListStore
