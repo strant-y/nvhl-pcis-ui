@@ -120,7 +120,7 @@ export const getData = (opertaor: any) => {
   if (param.cProdNo === "043009") {
     diy["Tgt.cInsuranceMethod"] = "613001";
   }
-  if (param.cProdNo === "040002") {
+  if (param.cProdNo === "040002" || param.cProdNo === "049035") {
     diy["Tgt.cDeterminingMethod"] = "0"; //赔偿限额确定方式 页面初始化为直接限额制
     diy["Tgt.cRegisteredLogo"] = "0"; //记名投保标志
     diy["Tgt.cIncludeHighrisk"] = "0"; //是否包含高风险

@@ -812,7 +812,7 @@ function getRowConfig(groupId: string, riskNo: string) {
       colconfig["factorItem"] = getProp(item);
       let cf = null;
       // 040002产品特殊处理，判断 cDeterminingMethod ,显示需要的列
-      if (pageparam.cProdNo === "040002") {
+      if (pageparam.cProdNo === "040002" || pageparam.cProdNo === "049035") {
         let deter = null;
         if (tgt) {
           deter = tgt.getValue("Tgt.cDeterminingMethod");
@@ -1599,7 +1599,7 @@ function initMethod(){
 function initTermsData(item: any) {
   if(item.prop === 'Term.cClaimInclude'){ //是否计入累计赔偿限额 默认选择否
     if(termdata.value[item.prop] === null || termdata.value[item.prop] === undefined){
-      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" || pageparam.cProdNo === "040002" ){
+      if(pageparam.cProdNo === "040003" || pageparam.cProdNo === "043002" || pageparam.cProdNo === "040002" || pageparam.cProdNo === "049035" ){
         termdata.value[item.prop] = '1';
       }else{
         termdata.value[item.prop] = '0';
@@ -1749,7 +1749,7 @@ function exChangeFunc() {
     
   }
    // 040002个性化配置
-  if (pageparam.cProdNo === "040002") {
+  if (pageparam.cProdNo === "040002" || pageparam.cProdNo === "049035") {
     if (data["tgt"]["Tgt.cDeterminingMethod"]) {
       if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
         const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");

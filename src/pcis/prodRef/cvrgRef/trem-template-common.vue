@@ -611,7 +611,7 @@ function getRowConfig(groupId: string, riskNo: string) {
       colconfig["factorItem"] = getProp(item);
       let cf = null;
       // 040002产品特殊处理，判断 cDeterminingMethod ,显示需要的列
-      if (pageparam.cProdNo === "040002") {
+      if (pageparam.cProdNo === "040002" || pageparam.cProdNo === "049035") {
         let deter = null;
         if (tgt) {
           deter = tgt.getValue("Tgt.cDeterminingMethod");
@@ -1264,7 +1264,7 @@ function exChangeFunc() {
   }
   let deter = null;
    // 040002个性化配置
-  if (pageparam.cProdNo === "040002") {
+  if (pageparam.cProdNo === "040002" || pageparam.cProdNo === "049035") {
     if(data["tgt"]){
       deter = data["tgt"]["Tgt.cDeterminingMethod"];
       
