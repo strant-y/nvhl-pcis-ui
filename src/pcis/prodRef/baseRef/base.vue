@@ -81,7 +81,16 @@ onMounted(async () => {
   if (params?.cRecordType === 9 || params.cPolicySource == 9) {
     setFormItem('Base.cRatioTyp', { hidden: true })
     setFormItem('Base.nRatioCoef', { hidden: true })
-		opertaor.setDisabledAll(['plyBase','applicant'])
+		opertaor.setDisabledAll(['plyBase', 'applicant'])
+		let plyBase = opertaor.getTableRefByKey('plyBase')
+		if(plyBase){
+			const getFormconfig = plyBase.getFormconfig();
+			getFormconfig.fromSchema?.forEach((item:any) => {
+				if(item.prop == "Base.cNeedfeeFlag"){
+					item.disabled = false;
+				}
+			});
+		}
   }
   // 02的产品，除了020014、020018、020019、020019、020021之外的产品 不需要短期费率系数
   const hidenRatioCoefProdNoMap = ['020014','020018','020019','020019','020021'];

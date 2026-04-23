@@ -1827,7 +1827,7 @@ async function loadAfter() {
 						const getFormconfig = plyBase.getFormconfig();
 						getFormconfig.fromSchema?.forEach((item:any) => {
 							if(item.prop == "Base.cNeedfeeFlag"){
-								item.disabled = true;
+								item.disabled = false;
 							}
 						});
 					}
@@ -1843,7 +1843,16 @@ async function loadAfter() {
 			opertaor.setDataAll(dataInit.value);
 			// 协议录单，基本信息和投保人信息只读
 			if (props.param.cRecordType === 9) {
-				opertaor.setDisabledAll(['plyBase','applicant'])
+				opertaor.setDisabledAll(['plyBase', 'applicant'])
+				let plyBase = opertaor.getTableRefByKey('plyBase')
+				if(plyBase){
+					const getFormconfig = plyBase.getFormconfig();
+					getFormconfig.fromSchema?.forEach((item:any) => {
+						if(item.prop == "Base.cNeedfeeFlag"){
+							item.disabled = false;
+						}
+					});
+				}
 			}
     });
   } else if (props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !='1' && props.param.cAppTyp !== 'E') {
