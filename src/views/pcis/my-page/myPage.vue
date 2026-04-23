@@ -3390,11 +3390,11 @@ const calcPremium = () => {
   // 校验标的信息中核定座位总数和投保座位数总数不一致！
   const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
   if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
-    ElMessage.error("核定座位总数和投保座位数总数不一致！");
-    if (btn && props.param.cRsnCde !== '99') {
-      btn.loading = false;
-    }
-    return;
+    ElMessage.warning("核定座位总数和投保座位数总数不一致！");
+    // if (btn && props.param.cRsnCde !== '99') {
+    //   btn.loading = false;
+    // }
+    // return;
   }
   const cCardBsnsTyp = res['base']['Base.cCardBsnsTyp']? res['base']['Base.cCardBsnsTyp'] : res['plyBase']['Base.cCardBsnsTyp'];
   if(cCardBsnsTyp && 'XKCSzx' === cCardBsnsTyp){  //世懋渠道,无需进行保费计算
@@ -3403,6 +3403,7 @@ const calcPremium = () => {
     btn.loading = false;
     return ;
   }
+	debugger
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
@@ -4103,11 +4104,11 @@ const submitToUndrFn = async () => {
       // 校验标的信息中核定座位总数和投保座位数总数不一致！
       const tgtValue = opertaor.getTableRefByKey("tgt")?.getFromValue() || '';
       if(tgtValue && tgtValue["Tgt.nSeatCapacity"] !== tgtValue["Tgt.nSeatsNumber"]) {
-        ElMessage.error("核定座位总数和投保座位数总数不一致！");
-        if(btn) {
-          btn.loading = false;
-        }
-        return;
+        ElMessage.warning("核定座位总数和投保座位数总数不一致！");
+        // if(btn) {
+        //   btn.loading = false;
+        // }
+        // return;
       }
 
        // 申请核保前判断是否灰黑名单
