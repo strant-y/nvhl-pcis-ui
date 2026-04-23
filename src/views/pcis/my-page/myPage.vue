@@ -3403,6 +3403,7 @@ const calcPremium = () => {
     btn.loading = false;
     return ;
   }
+	debugger
   const appCalcFun = props.param?.pageName === "priceInquiry" ? calculatePremium(res) : appCalc(res);
   appCalcFun.then((res: any) => {
     if(props.param.cRsnCde !== '99'){
