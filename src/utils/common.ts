@@ -101,6 +101,50 @@ export function calculateAgeFromIdCard(idCard: string): number {
 }
 
 /**
+ * 证件号性别提取逻辑
+ */
+export function validateAndGetGender(idNumber: string): string {
+  // 长度检查
+  if (!idNumber || idNumber.trim().length !== 18) {
+    throw new Error('身份证号长度必须为18位')
+  }
+  // 去除首尾空格
+  const cleaned = idNumber.trim();
+  // 正则检查：前17位为数字，最后一位可能是数字或X（18位时）
+  const pattern15 = /^[1-9]\d{13}\d$/;           // 15位全数字
+  const pattern18 = /^[1-9]\d{16}[\dXx]$/;      // 18位，最后可为数字或X/x
+
+  let isValidFormat = false;
+  let genderChar: string;
+
+  if (cleaned.length === 15) {
+    if (pattern15.test(cleaned)) {
+      isValidFormat = true;
+      // 15位身份证：最后一位为性别位
+      genderChar = cleaned.charAt(14);
+    }
+  } else {
+    if (pattern18.test(cleaned)) {
+      isValidFormat = true;
+      // 18位身份证：第17位（倒数第二位）为性别位
+      genderChar = cleaned.charAt(16);
+    }
+  }
+
+  if (!isValidFormat) {
+    return '0';
+  }
+
+  // 性别判断：奇数男，偶数女
+  const genderNum = parseInt(genderChar, 10);
+  if (isNaN(genderNum)) {
+    return '0';
+  }
+
+  return genderNum % 2 === 1 ? '1' : '2';
+}
+
+/**
  * 检测页面是否在滚动
  * @param delay
  */

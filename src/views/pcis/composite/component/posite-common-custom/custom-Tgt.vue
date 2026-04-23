@@ -82,6 +82,7 @@ const structure = reactive(new CustomStructure());
 
 onMounted(async () => {
   const pageSchema = structure.mergeSchemasSignProdNo(props.pageSchemaList, param.cProdDtlList)
+  console.log('标的 pageSchema', pageSchema)
   const formconfig11 = formInit(
       JSON.stringify(pageSchema.pageSchema),
       method,
@@ -98,6 +99,10 @@ onMounted(async () => {
           }
         }
       })
+    }
+    // 营业中断免赔期 输入框类型调整
+    if(formconfig11.fromSchema[i].prop === 'Tgt.cWaitingPeriod') {
+      formconfig11.fromSchema[i].inputtype = 'rtnumber'
     }
   }
   // 建设信息工程累计保额按钮 只在核保页面展示
