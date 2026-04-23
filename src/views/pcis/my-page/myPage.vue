@@ -7661,7 +7661,7 @@ function handleSaveTemplate() {
     }
   }
   dzmodal
-    .open(templateDialog, { type: "", data: {...res, cProdNo: props.param?.cProdNo} })
+    .open(templateDialog, { type: "", data: {...res, cProdNo: props.param?.cProdNo, cTermNo: props.param?.cTermNo} })
     .then((res: any) => {
       if (res.type === "ok") {
       }
