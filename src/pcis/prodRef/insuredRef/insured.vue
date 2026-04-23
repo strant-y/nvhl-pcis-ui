@@ -679,6 +679,7 @@ const method = {
 				clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 			}
       setFormItem("Insured.tEstablishingDate", {
+				disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -1262,7 +1263,7 @@ const method = {
 
     setFormItem("Insured.tCertfBgnDate", { rules: null });
     setFormItem("Insured.tCertfEndDate", { rules: null });
-
+    // setFormItem("Insured.tEstablishingDate", { disabled: true, rules: null });
 		clearValidate('Insured.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -1302,6 +1303,7 @@ const method = {
       });
 			// 为法人  企业成立日期
 			setFormItem("Insured.tEstablishingDate", {
+				disabled: false,
 				rules: [getRules("required", {})],
 			});
 
@@ -1509,6 +1511,7 @@ const method = {
     }
     // 企业成立日
     setFormItem("Insured.tEstablishingDate", {
+			disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
 		});
 		if (!param.initFlag && !isSpecialCase) {

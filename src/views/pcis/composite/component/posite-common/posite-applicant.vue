@@ -455,7 +455,7 @@ const method = {
 
     setFormItem("Applicant.tCertfBgnDate", { rules: null });
     setFormItem("Applicant.tCertfEndDate", { rules: null });
-    setFormItem("Applicant.tEstablishingDate", { rules: null });
+    setFormItem("Applicant.tEstablishingDate", { disabled: true, rules: null });
     clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
 
     if (val == "111") {
@@ -494,6 +494,7 @@ const method = {
 
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
+        disabled: false,
         rules: [getRules("required", {})],
       });
     } else if (val === '07') {
@@ -750,6 +751,7 @@ const method = {
         clearValidate('Applicant.tEstablishingDate')  // 清除报错信息
       }
       setFormItem("Applicant.tEstablishingDate", {
+        disabled: !param.initFlag && isSpecialCase ? false : true,
         rules: isSpecialCase ? requiredRule : []
       });
 
@@ -912,6 +914,7 @@ const method = {
       });
       // 为法人  企业成立日期
       setFormItem("Applicant.tEstablishingDate", {
+        disabled: true,
         rules: null,
       });
       setFormItem("Applicant.cEnterpriseTel", {
@@ -1424,6 +1427,7 @@ const method = {
     }
     // 企业成立日
     setFormItem("Applicant.tEstablishingDate", {
+      disabled: !param.initFlag && isSpecialCase ? false : true,
       rules: isSpecialCase ? requiredRule : []
     });
     if (!param.initFlag && !isSpecialCase) {
