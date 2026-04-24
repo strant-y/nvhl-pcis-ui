@@ -235,7 +235,7 @@ const method = {
       }
     }
     //2 和4 从共主联、从共无联保，条款中的保费可以修改，1和3 主共无联保和主共有联保，条款中的保费不可修改
-    if(['2','4','1','3'].includes(val)) {
+    if(['0','2','4','1','3'].includes(val)) {
       console.log('从共主联、从共无联保，条款中的保费可以修改，主共无联保和主共有联保，条款中的保费不可修改',val)
       opertaor.getTableRefByKey('cvrg')?.showFlush()
     }

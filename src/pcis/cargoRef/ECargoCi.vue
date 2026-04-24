@@ -369,7 +369,8 @@ const method = {
       } else {
         rowItem['ECargoCi.nPlyFeeRate'].disabled = false
       }
-    })
+		})
+		onChiefMrkChange()
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
@@ -407,7 +408,8 @@ const method = {
         freeEditRef?.value?.setValueByRowKey("ECargoCi.cChiefMrk", rowId, "");
         return;
       }
-    }
+		}
+		onChiefMrkChange()
   },
   //联共保比例
   nCiShareChange:(val)=>{
@@ -431,13 +433,15 @@ const method = {
       return;
     }
     const cCiMrk = formPage.getFormDataById("AgreementBase")['ECargoBase.cCiMrk'];
-    updateMasterAgreementValues();
+		updateMasterAgreementValues();
+		onChiefMrkChange()
   },
   //出单费比例
   nPlyFeeRateChange:(val)=>{
     const rowDatas = freeEditRef.value?.getSelectRow();
     const nPlyFee = val * rowDatas["ECargoCi.nCiPrm"]
-    freeEditRef?.value?.setValueByRowKey("ECargoCi.nPlyFee",rowDatas._dataId,nPlyFee.toFixed(2))
+		freeEditRef?.value?.setValueByRowKey("ECargoCi.nPlyFee", rowDatas._dataId, nPlyFee.toFixed(2))
+		onChiefMrkChange()
   },
   //开户行大类改变
   cBankRelTypChange:(val)=>{

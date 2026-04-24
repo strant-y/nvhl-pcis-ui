@@ -361,7 +361,8 @@ const method = {
         }else{
           rowItem['Ci.nPlyFeeRate'].disabled = false
         }
-      })
+			})
+			onChiefMrkChange()
   },
   //主共标志下拉事件
   cChiefMrkChange:(val)=>{
@@ -414,7 +415,8 @@ const method = {
         freeEditRef?.value?.setValueByRowKey('Ci.cChiefMrk',rowId,"")
         return;
       }
-    }
+		}
+		onChiefMrkChange()
     
   },
   //联共保比例
@@ -471,13 +473,13 @@ const method = {
       // }
     }
     updateMasterAgreementValues();
-    // onChiefMrkChange()
     //根据新的联共保保费和出单费比例重新计算出单费用
     const updatedRowData = freeEditRef.value?.getSelectRow();
     const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || 0);
     const nCiPrm = parseFloat(updatedRowData["Ci.nCiPrm"] || 0);
     const nPlyFee = nPlyFeeRate/100 * nCiPrm;
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
+		freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
+    onChiefMrkChange()
   },
   //出单费比例
   nPlyFeeRateChange:(val,row)=>{
@@ -507,7 +509,8 @@ const method = {
     const nCiPrm = parseFloat(row["Ci.nCiPrm"] || 0);
     const nPlyFee = (floatValue / 100) * nCiPrm;
     // 出单费用保留2位小数
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
+		freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
+		onChiefMrkChange()
   },
   //保单编号change事件
   cPolicyNoChange:(val, row)=>{

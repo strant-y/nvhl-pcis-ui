@@ -69,24 +69,6 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11, { preserveExpandedContent: true });
-  //一般批改，部分要素可编辑
-  const cCiMrkValue = opertaor.getTableRefByKey("plyBase").getValue("Base.cCiMrk");
-  setTimeout(() => {
-    valideRequired();
-    // handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
-    if(param.pageType === "inquiryToApp"){
-      const interval = setInterval(() => {
-        const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
-        if(plyBaseData["Base.cCiMrk"]) {
-          clearInterval(interval);
-          // 调用联共保信息初始化方法
-          initCiInfo({
-            cCiMrk: plyBaseData["Base.cCiMrk"]
-          });
-        }
-      }, 500)
-    }
-  }, 3000);
   formconfig1.fromSchema?.forEach((item: any) => {
     if (item.prop === 'Ci.cCoinsurerCde') {
       item.minWidth = 240
@@ -102,7 +84,26 @@ onMounted(async () => {
     if (route.params.param?.cGrpMrk !== '1') {
       oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item: any) => item.prop !== 'Dist.cRelatedInsured')
     }
-  }
+	}
+	nextTick(() => {
+		//一般批改，部分要素可编辑
+		setTimeout(() => {
+			valideRequired();
+			// handleEdrAppNewSceneRules(); // 添加这行来确保规则被应用
+			if(param.pageType === "inquiryToApp"){
+				const interval = setInterval(() => {
+					const plyBaseData = opertaor.getTableRefByKey("plyBase").getFromValue();
+					if(plyBaseData["Base.cCiMrk"]) {
+						clearInterval(interval);
+						// 调用联共保信息初始化方法
+						initCiInfo({
+							cCiMrk: plyBaseData["Base.cCiMrk"]
+						});
+					}
+				}, 500)
+			}
+		}, 5000);
+	})
 });
 
 // 绑定方法
@@ -386,7 +387,8 @@ const method = {
       } else {
         rowItem['Ci.nPlyFeeRate'].disabled = false
       }
-    })
+		})
+		onChiefMrkChange()
   },
   //主共标志下拉事件
   cChiefMrkChange: (val) => {
@@ -439,7 +441,8 @@ const method = {
         freeEditRef?.value?.setValueByRowKey('Ci.cChiefMrk', rowId, "")
         return;
       }
-    }
+		}
+		onChiefMrkChange()
   },
   //联共保比例
   nCiShareChange: (val) => {
@@ -487,7 +490,8 @@ const method = {
     const nPlyFeeRate = parseFloat(updatedRowData["Ci.nPlyFeeRate"] || '0');
     const nCiPrm = parseFloat(updatedRowData["Ci.nCiPrm"] || 0);
     const nPlyFee = nPlyFeeRate * nCiPrm;
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
+		freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", updatedRowData._dataId, nPlyFee.toFixed(2));
+		onChiefMrkChange()
   },
   //出单费比例
   nPlyFeeRateChange: (val, row) => {
@@ -517,7 +521,8 @@ const method = {
     const nCiPrm = parseFloat(row["Ci.nCiPrm"] || 0);
     const nPlyFee = floatValue * nCiPrm;
     // 出单费用保留2位小数
-    freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
+		freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
+		onChiefMrkChange()
   },
   //联共保保费事件
   nCiPrmChange: (val, row) => {
@@ -559,6 +564,7 @@ const method = {
 			opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nCiOwnPrm", val);  //我司份额保费
 			opertaor.getTableRefByKey("payinfo")?.nPrmFun()
 		}
+		onChiefMrkChange()
   },
   //保单编号change事件
   cPolicyNoChange: (val, row) => {

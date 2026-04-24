@@ -393,8 +393,12 @@ onMounted(async () => {
          formconfig1.value.distSchema.forEach((item:any)=>{
             if(item['prop'] === 'cPlateNumber'){
                 item['rules'] = [getRules("vehiclePlate", {})];
+					 	}
+						// 身份证号查询，改文本域，自适应5行高度
+					 	if(item['prop'] === 'cIdentificationNumber'){
+                item['type'] = 'textarea';
+								item['autosize'] = { minRows: 1, maxRows: 5 };
             }
-          
       })
     cardconfig.value.formconfig = createAppFreeEditConfig({
       fromSchema:formconfig1.value.distSchema,
