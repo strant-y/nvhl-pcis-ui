@@ -42,6 +42,8 @@ import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/us
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
 import { CardConfig, creatCardConfig, MyCardMethod } from "@/shared/mytemplate/card-config";
+import {ref} from "vue";
+import {CompositePageView} from "@/views/pcis/support/composite.types";
 const policyService = new PolicyService();
 const addFix = defineAsyncComponent(
     () => import("./fix/addFix.vue")
@@ -60,7 +62,7 @@ const props = defineProps({
 });
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
-
+const pageView = inject("pageView", ref(new CompositePageView()));
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
@@ -171,17 +173,19 @@ function filterFromSchema(obj:any) {
   }
   // 创建新对象的浅拷贝
   const newObj = {...obj};
-  newObj.fromSchema = newObj.fromSchema.map(item => {
-    if (item.prop === 'GrpMemberYjx.cCustRiskRank') {
+  newObj.fromSchema = newObj.fromSchema
+      .filter((fs: any) =>!fs.cShowLocation || fs.cShowLocation === '0')
+      .map((item: any) => {
+    if (item.prop === 'GrpMemberYjx.insuredType') {
       return {
         ...item,
         loadData: [
           {
-            "label": "低风险",
-            "value": "925104"
+            "label": "个人",
+            "value": "1"
           }
         ],
-        disabled:'0'
+        disabled: '1'
       };
     }
     return item;
@@ -337,6 +341,7 @@ const method = {
   },
   //导出
   exportExcel: () => {
+    const loading = pageView.value.pageLoading?.('正在导出')
     const formconfig = filterFromSchema(formconfig1.value)
     let paramitem  = Object.assign(formconfig, {
       cComponentTable:cComponentTableValue,
@@ -361,10 +366,11 @@ const method = {
         responseType: res.headers["content-type"]
       });
       saveAs(blob, fileName);
-    })
+    }).finally(() => loading.close())
   },
   // 模板下载
   downloadTemp: () => {
+    const loading = pageView.value.pageLoading?.('模板下载中')
     const formconfig = filterFromSchema(formconfig1.value)
     const param = {
       ...formconfig,
@@ -372,6 +378,7 @@ const method = {
     const plyBase = opertaor.getDataAll()['plyBase'];
     const cCombinationNo = plyBase['Base.cCombinationNo'];
     const cProdNo = plyBase['Base.cProdNo'];
+    param['cProdNo'] = cProdNo
     param['cAppNo'] = cCombinationNo
     param['cCombinationNo'] = cCombinationNo
     policyService
@@ -389,7 +396,7 @@ const method = {
         })
         .catch(() => {
           ElMessage.error("模板下载失败");
-        });
+        }).finally(() => loading.close());
   },
   // 异常数据下载
   downloadIncrement: () => {
@@ -441,7 +448,7 @@ const method = {
 
           const plyBase = opertaor.getDataAll()['plyBase'];
           const cCombinationNo = plyBase['Base.cCombinationNo'];
-
+          const loading = pageView.value.pageLoading?.('正在导入')
           // 构建参数并请求接口
           const params = {
             ...formconfig,
@@ -461,7 +468,8 @@ const method = {
           }).catch((error) => {
             ElMessage.error("导入出错，请检查文件格式或内容");
             console.error("导入错误：", error);
-          });
+          }).finally(() => loading.close())
+          ;
         };
 
         reader.onerror = (e) => {

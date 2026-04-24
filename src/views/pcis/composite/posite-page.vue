@@ -246,6 +246,10 @@ const getNAmtMap = (prodNo: string) => {
   return nAmtMap[prodNo];
 }
 
+
+pageView.value.pageLoading = function (msg?: string): {close: () => void} {
+  return openPageLoading(msg)
+}
 /**
  * 页面结构数据组装完之后 组件开始加载之前执行
  * @param config

@@ -88,6 +88,8 @@ export class CompositePageView {
     public pageConfig = reactive<GroupForm[]>(new Array<GroupForm>());
     // 页面创建之前调用
     public beforeCreation?: (config: CompositePageConfigType) => Promise<CompositePageConfigType>;
+    // 页面加载
+    public pageLoading?: (msg?: string) => any;
 
     constructor() {
         this.activeAnchorId = reactive({value: ''})
