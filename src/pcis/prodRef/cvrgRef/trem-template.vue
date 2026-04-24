@@ -1060,7 +1060,10 @@ function setTermConf(d: any,initFlag: boolean){
         }
         if(riskfactor.expand){
           riskGridConfig.value.showExpand = true;
-        }
+				}
+				if (isrequired(riskfactor) && riskfactor.prop == 'TermRisktgt.nPropertyNo' && pageparam.cProdNo === '010020') {
+					riskfactor['rules'] = [ getRules("required", {}),getRules("customLengthNumber", {})]
+				}
       })
     }
     if((pageparam.pageType === 'TEMPORARY_DEPOSIT' || pageparam.pageType === 'EDR_APP_NEW_SCENE') && pageparam.cEdrType){ // 批改场景,增加退保标识字段

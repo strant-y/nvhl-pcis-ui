@@ -726,6 +726,15 @@ const farmerPaymentRateRule = () => {
   };
 };
 
+	// 单号校验
+	const customLengthNumber = () => {
+		return {
+			pattern: /^(\d{18}|\d{23})$/,
+			message: "保单号必须是18位或23位数字",
+			trigger: "blur"
+		};
+	};
+
   const getRules = (type: any, param: any) => {
     if (type === "required") {
       return required(param.trigger, param.message);
@@ -837,6 +846,9 @@ const farmerPaymentRateRule = () => {
 		}
 		if(type == 'farmerPaymentRateRule') {
       return farmerPaymentRateRule()
+    }
+		if(type == 'customLengthNumber') {
+      return customLengthNumber()
     }
   };
   const validorMap = {
