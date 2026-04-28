@@ -63,6 +63,9 @@ const params = opertaor.getParam();
 const firstInvoiceCur = ref('');
 const init = ref(true)
 
+const subentryDutyList = ref<any[]>([]);
+const cSuitScopeTypeCode = ref<string>('');
+
 const cComponentTable = computed(() => props.data.compKey ? props.data.compKey.replace(/\d+/g, '') : "");
 
 const mapAddr = {
@@ -622,17 +625,47 @@ onMounted(async () => {
         }
       }
     }
+    if (item.prop === 'Dist.cSuitScope' && item.typeCode) {
+      cSuitScopeTypeCode.value = item.typeCode;
+    }
+    if (cSuitScopeTypeCode.value) {
+      codeListStore
+          .queryCodeList({
+            codeListName: cSuitScopeTypeCode.value,
+            codeListParam: {},
+          })
+          .then((res: any[]) => {
+            subentryDutyList.value = res;
+          });
+    }
     // 免赔率、免赔额输入后自动生成免赔说明
-    if(item.prop === 'Dist.nDductRate' || item.prop === 'Dist.nDductAmt') {
+    if(item.prop === 'Dist.nDductRate' || item.prop === 'Dist.nDductAmt' || item.prop === 'Dist.cSuitScope') {
       item.func = (val:any) => {
         const nDductAmt = getValue("Dist.nDductAmt");
         const nDductRate = getValue("Dist.nDductRate");
+        const cSuitScope = getValue("Dist.cSuitScope"); // 获取多选的责任代码
+
+        console.log(nDductAmt, nDductRate, cSuitScope);
         const k = (nDductAmt !== null && nDductAmt !== undefined ? '1':'0') + '' + (nDductRate !== null && nDductRate !== undefined ? '1':'0') ;
         const strt = deductibleTemple.value[k];
         if(strt){
+
+          let scopeStr = "";
+          if (cSuitScope) {
+            // 统一转为数组处理
+            const scopeCodes = Array.isArray(cSuitScope) ? cSuitScope : cSuitScope.split(',').filter(Boolean);
+            if (subentryDutyList.value.length > 0) {
+              const nameMap = new Map(subentryDutyList.value.map((item: any) => [item.value, item.label]));
+              const names = scopeCodes.map(code => nameMap.get(code) || code);
+              scopeStr = names.join('、');
+            } else {
+              scopeStr = scopeCodes.join('、'); // 如果字典还没加载完，暂时代码拼接
+            }
+          }
           const filledString = fillTemplate(strt, {
             amount: nDductAmt,
             rate: nDductRate,
+            suitScop: scopeStr,
           });
           setValue("Dist.cDductDesc", filledString)
         } else {
@@ -723,7 +756,6 @@ onMounted(async () => {
     newSchema.push(item);
   }
   formconfig1.value.fromSchema = newSchema;
-  
   formconfig1.value.title = props.data.title;
   if (props.data.title == "编辑") {
     setFormItem("Dist.nSeqNo", { disabled: true });

@@ -7,9 +7,9 @@ const prodTemple = ref<{ [key: string] : string }>(
 
 const deductibleTemple = ref<{ [key: string] : string }>(
     {
-        '10':'除另有约定外，本保险合同的每次事故绝对免赔额为人民币{amount}元。',
-        '01':'除另有约定外，本保险合同的每次事故绝对免赔率为损失金额的{rate}%。',
-        '11':'除另有约定外，本保险合同的每次事故绝对免赔额为人民币{amount}元或损失金额的{rate}%，两者以高者为准。'
+        '10':'除另有约定外，本保险合同{suitScop}的每次事故绝对免赔额为人民币{amount}元。',
+        '01':'除另有约定外，本保险合同{suitScop}的每次事故绝对免赔率为损失金额的{rate}%。',
+        '11':'除另有约定外，本保险合同{suitScop}的每次事故绝对免赔额为人民币{amount}元或损失金额的{rate}%，两者以高者为准。',
     }
 );
 
