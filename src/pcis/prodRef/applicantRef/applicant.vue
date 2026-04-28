@@ -189,6 +189,7 @@ onMounted(() => {
           list: res.length > 0 ? res.map((item:any) => ({ label: `${item.value} ${item.label}`, value: item.value })) : [],
         })
       });
+    initData();
   });
 });
 // //给表单下拉项赋值
@@ -1644,6 +1645,12 @@ const method = {
     setValue("Applicant.cRegisterSuffixAddr", '');
   },
 };
+function initData(){
+  const param = opertaor.getParam();
+  if(param.pageType === "app" && !getValue('Applicant.cClntMrk')){
+    setValue("Applicant.cClntMrk", '0');
+  }
+}
 
 function setregistAdd() {
   const ads = applicantEditRef?.value?.getValue("Applicant.ClntAddrProp");
