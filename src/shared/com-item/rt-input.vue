@@ -307,7 +307,7 @@ function handleChange(val?: string | undefined | null) {
   }
   // props.item.func ? props.item.func(val) : null;
   if(handleInputFlag.value === true && props.item?.funcBlur) {
-    props.item.funcBlur(val)
+    props.item.funcBlur(val,'change')
   }
 }
 
@@ -449,7 +449,7 @@ function handleBlur() {
     if (props.item.type === "desensitization"){
       props.item.funcBlur(originalValue.value);
     }else{
-      props.item.funcBlur(vInput.value);
+      props.item.funcBlur(vInput.value,'blur');
     }
   }
 }

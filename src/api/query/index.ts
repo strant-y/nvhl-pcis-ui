@@ -12,6 +12,9 @@ const QUERY = "/query/";
 export function getProdInfoList(queryParams: any): AxiosPromise<any> {
     return post(`${QUERY}getProdInfoList`, queryParams);
 }
+export function getCorporateInfo(queryParams: any): AxiosPromise<any> {
+    return post(`/transfer/getTransferInfo`, queryParams);
+}
   
 /**
  * 查询保单数据
