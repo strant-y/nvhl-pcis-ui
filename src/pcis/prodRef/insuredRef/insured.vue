@@ -36,7 +36,7 @@ import { useValidator } from "@/typings/useValidator";
 import moment from "moment";
 import { codeListViewStore } from "@/store";
 import { useProductStore } from "@/store/modules/prod";
-import { getAddressStr, qryCustomer, reset } from "@/api/query";
+import { getCorporateInfo, getAddressStr, qryCustomer, reset } from "@/api/query";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 import { descryptParameter, encryptParameter } from "@/utils/encipher";
 import { useRouter, useRoute } from 'vue-router';
@@ -44,6 +44,7 @@ import { validateIdCard } from "@/typings/method-public";
 import { calculateAgeFromIdCard } from "@/utils/common";
 import { setCapitalRequiredRule, disablePastDates } from "@/utils/InsuranceCoverageRules";
 import { listChrDepts } from "@/api/dept";
+import { createFreeButtonBase } from "@/shared/button-config";
 const route = useRoute();
 const query = ref(route.query);
 const router = useRouter();
@@ -90,6 +91,11 @@ onMounted(() => {
     exRules,
     getRules
   );
+  formconfig11.fromSchema?.forEach((item: any) => {
+    if (item.prop === "Insured.cCertfCde") {
+      item.funcBlur = certfBlur;
+    }
+  });
   Object.assign(formconfig1, formconfig11);
   nextTick(async () => {
     //是否小微企业，默认非必填、只读
@@ -1246,7 +1252,7 @@ const method = {
     const isInit = param.initFlag; // 是否是初始化状态
       const personFields = ['cNation', 'tBirthday', 'nAge', 'cSex'];
   
-
+    NatureChange();
 
   
     if (!isInit && !isOcrEcho) {
@@ -1355,6 +1361,7 @@ const method = {
   },
   // 证件号码 change
   cCertfCdeChange: (val: any) => {
+    NatureChange();
     const param = opertaor.getParam();
     if (param.initFlag) {
       return;
@@ -1739,6 +1746,79 @@ function getFromValue() {
 
 function setFormValue(value: any) {
   insuredEditRef?.value?.setFormValue(value);
+}
+
+/** 法人,统一社会信用代码,按钮验证,如果是统一社会信用代码,且证件号码属于法人,则显示法人信息获取按钮 */
+function NatureChange(){
+  const datas = insuredEditRef.value?.getFromValue();
+  if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "app")
+  && datas['Insured.cCertfCls'] === '01' 
+  && /^[123456789ANY][0-9A-HJ-NPQRTUWXY]{17}$/.test(datas['Insured.cCertfCde'])){
+    const s = formconfig1.fromSchema?.find((item:any) => item.prop === 'Insured.cCertfCde');
+    formconfig1.fromSchema?.forEach((item:any) => {
+      if(item.prop === 'Insured.cCertfCde'){
+        item.showExBtn=true;
+        item.btnItems = createFreeButtonBase({
+          icon: "Search",
+          type: "primary",
+          func: () => {
+            // 获取法人信息
+            upatetransfer(true);
+          }
+        })
+      }
+    })
+  }else{
+    formconfig1.fromSchema?.forEach((item:any) => {
+      if(item.prop === 'Insured.cCertfCde'){
+        item.showExBtn=false;
+      }
+    })
+  }
+}
+
+const certfBlur = (value: any, typ: string) => { 
+  const datas = insuredEditRef.value?.getFromValue();
+  if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "app")
+  && datas['Insured.cCertfCls'] === '01' 
+  && /^[123456789ANY][0-9A-HJ-NPQRTUWXY]{17}$/.test(datas['Insured.cCertfCde'])){
+    if('blur' === typ){ // 仅失去焦点时,才处罚获取
+      upatetransfer();
+    }
+  }
+};
+
+function upatetransfer(seedFlag: boolean = false){
+  const datas = insuredEditRef.value?.getFromValue();
+  // seedFlag 是否强制平台获取,如果为true,则强制获取
+  let param = {
+    creditCode :datas['Insured.cCertfCde']
+  }
+  getCorporateInfo(param).then((res:any) => {
+    if(res.code === 200) {
+      setData(res.data);
+    }
+  })
+}
+
+function setData(data: any){
+  insuredEditRef?.value?.setValue('Insured.cAppNme' , '临时名称测试');
+  insuredEditRef?.value?.setValue('Insured.tCertfBgnDate' , data['certificateValidFrom']);
+  insuredEditRef?.value?.setValue('Insured.tCertfEndDate' , data['certificateValidTo']);
+  insuredEditRef?.value?.setValue('Insured.cNation' , data['nationality']);
+  insuredEditRef?.value?.setValue('Insured.cClntAddr' , data['residentialAddress']);
+  insuredEditRef?.value?.setValue('Insured.cZipCde' , data['zipCode']);
+  insuredEditRef?.value?.setValue('Insured.cRegisteredcapDre' , data['registeredAddress']);
+  insuredEditRef?.value?.setValue('Insured.cMobile' , data['mobilePhone']);
+  insuredEditRef?.value?.setValue('Insured.cWorkDpt' , data['unitNature']);
+  insuredEditRef?.value?.setValue('Insured.nEntprisPeopTtl' , data['totalEmployees']);
+  insuredEditRef?.value?.setValue('Insured.cIsMicroEntpris' , data['isSmallMicroEnterprise']);
+  insuredEditRef?.value?.setValue('Insured.cParticiinsocTyp' , data['socialSecurityFlag']);
+  insuredEditRef?.value?.setValue('Insured.tEstablishingDate' , data['establishmentDate']);
+  insuredEditRef?.value?.setValue('Insured.cFirmscaleTyp' , data['enterpriseScaleType']);
+  insuredEditRef?.value?.setValue('Insured.nRegisteredCapital' , data['registeredCapital']);
+  insuredEditRef?.value?.setValue('Insured.cLegalRepresentative' , data['legalRepresentative']);
+  insuredEditRef?.value?.setValue('Insured.cEnterpriseTel' , data['fixedPhone']);
 }
 
 function validate() {
