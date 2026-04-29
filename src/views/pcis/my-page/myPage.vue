@@ -8244,17 +8244,35 @@ const shouldCheckYunnanPaymentRules = () => {
       props.param.cDptCde.startsWith('0253');
 };
 /**
- * 09大类提核校验附加条款保证期，保险期限中的保证期起止期必填
+ * 09大类提核校验附加条款保证期，保险期限中的保证期起期必填
  */
 const validateGuaranteeBgnTm = () => {
+  // 获取表格数据
   const cvrgData = opertaor.getTableRefByKey('cvrg')?.getFromValue();
   const insrncData = opertaor.getTableRefByKey('insrnc')?.getFromValue();
-  if(['090001', '090002'].includes(props.param.cProdNo)) {
-    if(insrncData['Base.tGuaranteeEndTm'] && insrncData['Base.tGuaranteeBgnTm'] && !cvrgData.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
-      ElMessage.warning('请录入保证期附加险条款')
-      return true;
-    }
+
+  // 检查产品编号是否在指定范围内
+  if (!['090001', '090002'].includes(props.param.cProdNo)) {
+    return false;
   }
+
+  // 检查数据是否存在
+  if (!cvrgData || !insrncData) {
+    return false;
+  }
+
+  // 检查保证期起日期是否存在
+  const hasGuaranteePeriod =  insrncData['Base.tGuaranteeBgnTm'];
+
+  // 检查是否包含特定的条款编号
+  const hasRequiredTerm = cvrgData.some((item: any) => item['Term.cUniqueTermNo'] === 'P0092500119');
+
+  // 如果有保证期但没有相应条款，则提示用户
+  if (hasGuaranteePeriod && !hasRequiredTerm) {
+    ElMessage.warning('保证期起期已录入，请选择“有限责任保证期条款”！');
+    return true;
+  }
+
   return false;
 }
 // 历史保单
