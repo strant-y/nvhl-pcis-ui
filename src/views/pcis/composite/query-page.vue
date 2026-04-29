@@ -452,7 +452,7 @@ const tableconfig = reactive<AppTableConfig>(
             }
           },
           tableClick: async (row) => {
-            skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_SAVE, pageTye: 'app' }});
+            skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_SAVE, pageType: 'app' }});
           },
         }),
         createFreeButtonBase({
@@ -471,7 +471,7 @@ const tableconfig = reactive<AppTableConfig>(
           },
           tableClick: (row) => {
             if (row) {
-              skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_READ, pageTye: 'app'}});
+              skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_READ, pageType: 'app'}});
             }
           },
         }),

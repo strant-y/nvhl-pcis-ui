@@ -486,8 +486,8 @@ const tableconfig = reactive<AppTableConfig>(
                 }),
               },
             });
-          } else if ((row.cCombinationNo && row.cCombinationNo !== '') || row.baseType === "组合单") {
-              skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_SAVE, pageTye: 'app' }});
+          } else if (row.cAppTyp === 'A' && row.cCombinationNo && row.cCombinationNo !== '') {
+              skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_SAVE, pageType: 'app' }});
           } else {
             const data = row;
             if (row["cEdrRsnBundleCde"]) {
@@ -943,8 +943,8 @@ const pageresult = reactive<Pageresult>({
 
 // 行双击查看详情
 function handleDblClick(row:any) {
-  if(row.cCombinationNo && row.cCombinationNo !== '') {
-    skipPositePage({ ...row, ...{ pageType: POSITE_PAGE_TYPE_READ }});
+  if(row.cAppTyp === 'A' &&  row.cCombinationNo && row.cCombinationNo !== '') {
+    skipPositePage({ ...row, ...{ initType: POSITE_PAGE_TYPE_READ, pageType: 'app'}});
   }else {
     router.push({
       path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
