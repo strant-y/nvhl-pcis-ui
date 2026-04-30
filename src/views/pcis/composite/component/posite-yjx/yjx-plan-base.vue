@@ -186,7 +186,10 @@ function calculateData(list: any[]): any[] {
     const nSumPrm = item['PlanBase.nPerPrm'] * nAppPersons
     const nSumAmt = item['PlanBase.nPerAmt'] * nAppPersons
     nPrm += nSumPrm
-    nAmt += nSumAmt
+    if(item['PlanBase.cCvrgNo'] !== '065404') {
+      // 配合财险调整整单总保额 伤残和身故 只取其中一个保额
+      nAmt += nSumAmt
+    }
     return {
       ...item,
       ...{
