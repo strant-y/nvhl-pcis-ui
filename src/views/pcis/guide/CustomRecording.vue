@@ -1460,7 +1460,9 @@ function importTemplate() {
 }
 
 const loadCombinationPlanList = () => {
-  positeApi.getCombinationPlan({}).then((res: any) => {
+  positeApi.getCombinationPlan({
+    cDptCde: userStore.user.companyId
+  }).then((res: any) => {
     console.log('loadCombinationPlanList', res)
     if(res.code === 200) {
       combinationPlanList.value.push(...res.data)
