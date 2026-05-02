@@ -95,27 +95,27 @@
       </template>
       <!-- 展示成2行，第1行7个字，第2行6个字 + 超出部分用...代替，鼠标放上去可展示全部 -->
       <template #column-cDptCnm="{ row, column, index }">
-        <el-tooltip :content="row.cDptCnm" placement="top">
+        <!-- <el-tooltip :content="row.cDptCnm" placement="top"> -->
           <span v-html="row.cDptCnm || ''" class="twoLine"></span>
-        </el-tooltip>
+        <!-- </el-tooltip> -->
       </template>
       <template #column-cTermNme="{ row, column, index }">
-        <el-tooltip :content="row.cTermNme" placement="top">
+        <!-- <el-tooltip :content="row.cTermNme" placement="top"> -->
           <span v-html="row.cTermNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <!-- </el-tooltip> -->
       </template>
       <template #column-cSecondDptCnm="{ row, column, index }">
         <span v-html="row.cSecondDptCnm ? row.cSecondDptCnm.split('分公司')[0] : ''"></span>
       </template>
       <template #column-cAppNme="{ row, column, index }">
-        <el-tooltip :content="row.cAppNme" placement="top">
+        <!-- <el-tooltip :content="row.cAppNme" placement="top"> -->
           <span v-html="row.cAppNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <!-- </el-tooltip> -->
       </template>
       <template #column-cInsuredNme="{ row, column, index }">
-        <el-tooltip :content="row.cInsuredNme" placement="top">
+        <!-- <el-tooltip :content="row.cInsuredNme" placement="top"> -->
           <span v-html="row.cInsuredNme || ''" class="twoLine"></span>
-        </el-tooltip>
+        <!-- </el-tooltip> -->
       </template>
       <!-- ES查询 查询条件高亮 -->
       <template #column-cClntAddr="{ row }">
@@ -134,9 +134,9 @@
         <span v-html="row.nEdrPrjNo || ''"></span>
       </template>
       <template #column-cProdNmeCn="{ row }">
-        <el-tooltip :content="row.cProdNmeCn" placement="top">
+        <!-- <el-tooltip :content="row.cProdNmeCn" placement="top"> -->
             <span v-html="row.cProdNmeCn || ''" class="twoLine"></span>
-        </el-tooltip>
+        <!-- </el-tooltip> -->
       </template>
       <template #column-nAmt="{ row }">
         <span v-html="formatToThousandsHtml(row.nAmt)"></span>
