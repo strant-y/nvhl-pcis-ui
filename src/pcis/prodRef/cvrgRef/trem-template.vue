@@ -680,7 +680,10 @@ function addriskView(){
           {
             "TermRisktgt.cLiabCode":selectdata
           }
-        );
+				);
+				if (pageparam.cProdNo === "020013") { 
+					terconfig.selectReset();
+				}
       },
     },
     { title: "增加责任", width: 50 }
@@ -2298,8 +2301,9 @@ const isSelected = (key: any) => {
     return key['Term.cClauseCode'] === selectedRow.value.data['Term.cClauseCode'];
   }
 };
-const selectRow = (key: any) => {
+const selectRow = (key: any, index: any) => {
   selectedRow.value.index = props.rowIndex;
+  selectedRow.value.key = index;
   if(typeof key === CommonConstants.TYPE_OF_STRING){
     selectedRow.value.data = riskList.value[key];
   } else {

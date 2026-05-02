@@ -8,6 +8,7 @@ export const terConfig = defineStore(
     const config = reactive<Record<string, any>>({});
     const selectedRow = ref<any>({
         index: undefined,
+				key: undefined,
         data: undefined
     });
 
@@ -23,6 +24,7 @@ export const terConfig = defineStore(
     const selectReset = () => {
       selectedRow.value = {
         index: undefined,
+				key: undefined,
         data: undefined
       };
     };
