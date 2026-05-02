@@ -420,6 +420,7 @@ const method = {
           cProdList: param.cProdList,
           cCombinationPlanNo: param.cCombinationPlanNo,
           cDptCde:param.cDptCde,
+					param,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
           tAppTm: opertaor.getDataAll().insrnc?.['Base.tAppTm'],
         },
