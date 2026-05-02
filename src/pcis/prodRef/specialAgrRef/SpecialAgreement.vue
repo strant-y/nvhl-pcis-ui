@@ -708,7 +708,7 @@ const highlightText = (row: string) => {
       // 使用 escapeRegExp 防止数字以外的特殊字符破坏正则
       const regex = new RegExp(escapeRegExp(keyword), 'g');
       
-      content = content.replace(regex, `<strong style="color: #F56C6C;">${keyword}</strong>`);
+      content = content.replace(regex, `<strong style="color: red;">${keyword}</strong>`);
     }
   });
 
