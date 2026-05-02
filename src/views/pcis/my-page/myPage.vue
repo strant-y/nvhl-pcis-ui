@@ -5069,6 +5069,10 @@ const calcPremiumEdr = async () => {
       let nPrmValue = res.res.composition.plyBase[0]["Base.nPrm"];
       const ops = opertaor.convertData(res);
       console.log("保费计算转换的数据", ops);
+			const nAmtVal = ops["base"]["Base.nAmt"];
+      const nPrmVal = ops["base"]["Base.nPrm"];
+			productStore.setnPrm(nPrmVal);
+      productStore.setnAmt(nAmtVal);
       ElMessage.success(
         res.msg +
           "保费为：" +
