@@ -315,13 +315,21 @@ const method = {
         if(row['Term.cDistPkId']){
             existPkId.push(row['Term.cDistPkId'])
         }
-        if(row.riskList){
-            row.riskList.forEach((item:any)=>{
-                if(item['TermRisktgt.cDistPkId'] && item['TermRisktgt.cLiabCode'] === selectedRow.value?.data?.['TermRisktgt.cLiabCode']){
-                    existPkId.push(item['TermRisktgt.cDistPkId'])
-                }
-            })
-        }
+				if (row.riskList) {
+					if (parparam.cProdNo == '020013') {
+						row.riskList.forEach((item:any)=>{
+							if(item['TermRisktgt.cDistPkId'] && item['TermRisktgt.cPkId'] === selectedRow.value?.data?.['TermRisktgt.cPkId']){
+									existPkId.push(item['TermRisktgt.cDistPkId'])
+							}
+						})
+					} else {
+						row.riskList.forEach((item:any)=>{
+							if(item['TermRisktgt.cDistPkId'] && item['TermRisktgt.cLiabCode'] === selectedRow.value?.data?.['TermRisktgt.cLiabCode']){
+									existPkId.push(item['TermRisktgt.cDistPkId'])
+							}
+						})
+					}
+				}
     })
     const uniqueArr = Array.from(new Set(existPkId));
     console.log(uniqueArr);
@@ -825,7 +833,7 @@ function calcCheck(){
   };
 }
 const setCargoSeq = (value: string, pkId: string, amount: string, nAmtExchs, cPrmCurs, nRmbLimits) => {
-	const { index, data } = selectedRow.value;
+	const { index, data, key } = selectedRow.value;
   if(formData.value['m'] && formData.value['m'].length > 0) {
     if(data && data['Term.cClauseCode']) {
       formData.value['m'][index]['Term.cDistCodeNo'] = value;
@@ -847,18 +855,30 @@ const setCargoSeq = (value: string, pkId: string, amount: string, nAmtExchs, cPr
         }
       });
 		} else {
-			formData.value['m'][0]['riskList'].forEach((item: any) => {
-        if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
-          item['TermRisktgt.cDistCodeNo'] = value;
-          item['TermRisktgt.cDistPkId'] = pkId;
-          item['TermRisktgt.nInsuranceAmount'] = amount;
-					if (allowedList.value.includes(parparam.cProdNo)) {
-						item['TermRisktgt.nOriginalRate'] = nAmtExchs;
-						item['TermRisktgt.cOriginalCurrency'] = cPrmCurs;
-						item['TermRisktgt.nRmbAmount'] = nRmbLimits;
+			if (parparam.cProdNo == '020013') {
+				if (key == undefined) {
+					ElMessage.error("请先选中一条数据!");
+					return
+				}
+				formData.value['m'][index]['riskList'][key]['TermRisktgt.cDistCodeNo'] = value
+				formData.value['m'][index]['riskList'][key]['TermRisktgt.cDistPkId'] = pkId
+				formData.value['m'][index]['riskList'][key]['TermRisktgt.nInsuranceAmount'] = amount;
+				selectedRow.value.data = formData.value['m'][index]['riskList'][key];
+			} else {
+				formData.value['m'][0]['riskList'].forEach((item: any) => {
+					if(item['TermRisktgt.cLiabCode'] === data['TermRisktgt.cLiabCode']) {
+						item['TermRisktgt.cDistCodeNo'] = value;
+						item['TermRisktgt.cDistPkId'] = pkId;
+						item['TermRisktgt.nInsuranceAmount'] = amount;
+						if (allowedList.value.includes(parparam.cProdNo)) {
+							item['TermRisktgt.nOriginalRate'] = nAmtExchs;
+							item['TermRisktgt.cOriginalCurrency'] = cPrmCurs;
+							item['TermRisktgt.nRmbAmount'] = nRmbLimits;
+						}
 					}
-        }
-      });
+				});
+			}
+			
 		}
   }
   emit('savePlyInfo');

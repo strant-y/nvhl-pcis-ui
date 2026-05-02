@@ -514,11 +514,22 @@ function rowClick(row: any, _column: any, _event: Event) {
   //   if (tableDatas.value) {
   //     editIndex.value = row._dataId;
   //   }
-  // }
+	// }
+	let index
+	// 1. 获取触发事件的元素
+  const target = _event?.target as HTMLElement;
+  
+  // 2. 找到最近的 <tr> 标签
+  const tr = target?.closest('tr');
+  
+  // 3. 计算该 <tr> 在表格体中的索引
+  if (tr && tr.parentElement) {
+    index = Array.from(tr.parentElement.children).indexOf(tr);
+  }
   if (tableDatas.value) {
       editIndex.value = row._dataId;
     }
-  emits("rowClick", row);
+  emits("rowClick", row, index);
 }
 
 function rowDblclick(row: any) {

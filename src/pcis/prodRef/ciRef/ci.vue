@@ -1632,7 +1632,7 @@ function setFormValue(value: any) {
 						"Ci.cCoinsurerCde", // 共保公司
 						"Ci.nCiShare",      // 共保比例
 						"Ci.nCiAmt",        // 共保保额
-						"Ci.nCiPrm",        // 共保保费
+						// "Ci.nCiPrm",        // 共保保费
 						"Ci.nPlyFeeRate",   // 出单费比例
 						"Ci.nPlyFee"        // 出单费金额
 					];

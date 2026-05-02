@@ -12,7 +12,9 @@ import {
   createAppGridEditConfig,
 } from "@/shared/app-grid-edit-config";
 import { numAdd } from "@/utils/Math";
-import {idxParamKey, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { idxParamKey, useIdxParam } from "@/views/pcis/support/useIdxParam";
+import { formatDate } from "@/utils/date";
+import dayjs from "dayjs";
 
 const props = defineProps({
   pageSchema: {
@@ -152,14 +154,28 @@ const method = {
       ElMessage.error('“缴费计划”不能超过12期！');
       return false;
     }
-    payinfoEditRef?.value?.addRow();
+		payinfoEditRef?.value?.addRow();
+		let BgnTmDate = new Date(insrncBefore['ECargoBase.tAppTm'])   // 开始时间
+		let startDate = new Date(BgnTmDate);
+		let endDate = new Date(BgnTmDate)
+		if (baseBefore['ECargoBase.cInstMrk'] == '5') {
+			startDate.setDate(BgnTmDate.getDate() + 0 * 15);
+			endDate.setDate(BgnTmDate.getDate() + (0 + 1) * 15);
+		} else {
+			startDate.setDate(BgnTmDate.getDate() + 0 * 30);
+			endDate.setDate(BgnTmDate.getDate() + (0 + 1) * 30);
+		}
+
+		let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
+
+		let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD 23:59:59")
     if (val) {
       let obj = {
         'ECargoPay.nTms': val.length,
         'ECargoPay.cPayorCde': applicantBefore['AgreementApplicant.cAppCde'] || null,
         'ECargoPay.cPayorNme': applicantBefore['AgreementApplicant.cAppNme'] || null,
-        'ECargoPay.tPayBgnTm': insrncBefore['ECargoBase.tInsrncBgnTm'],
-        'ECargoPay.tPayEndTm': insrncBefore['ECargoBase.tInsrncEndTm'],
+        'ECargoPay.tPayBgnTm': tInsrncBgnTm,
+        'ECargoPay.tPayEndTm': tPayEndTm,
         'ECargoPay.nOwnPrm': insrncBefore['ECargoBase.cPayWay'] === '01' ? baseBefore['ECargoBase.nCiOwnRmbReceivedPrm'] || 0 : baseBefore['ECargoBase.nCiOwnRmbPrm'] || 0,
       }
       val[val.length - 1] = { ...val[val.length - 1], ...obj }

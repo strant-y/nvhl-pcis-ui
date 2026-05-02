@@ -680,7 +680,10 @@ function addriskView(){
           {
             "TermRisktgt.cLiabCode":selectdata
           }
-        );
+				);
+				if (pageparam.cProdNo === "020013") { 
+					terconfig.selectReset();
+				}
       },
     },
     { title: "增加责任", width: 50 }
@@ -1005,7 +1008,15 @@ function dataInit(initFlag : boolean = false) {
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
-      if (200 === code) {
+			if (200 === code) {
+				// 永安财险雇主责任保险附加伤残赔偿比例调整保险2026版  这个附加险费率可以是负数
+				if (!!data.data.term['cTermNo'] && data.data.term['cTermNo'] == "0426012128") {
+					data.data.termFactormap.forEach((item) => {
+						if (item.prop == 'Term.nMainRate') {
+							item.min = -99999999999
+						}
+					})
+				}
         terconfig.addConfig(queryKey, JSON.stringify(data.data));
         setTermConf(data.data,initFlag);
       } else {
@@ -2298,8 +2309,9 @@ const isSelected = (key: any) => {
     return key['Term.cClauseCode'] === selectedRow.value.data['Term.cClauseCode'];
   }
 };
-const selectRow = (key: any) => {
+const selectRow = (key: any, index: any) => {
   selectedRow.value.index = props.rowIndex;
+  selectedRow.value.key = index;
   if(typeof key === CommonConstants.TYPE_OF_STRING){
     selectedRow.value.data = riskList.value[key];
   } else {

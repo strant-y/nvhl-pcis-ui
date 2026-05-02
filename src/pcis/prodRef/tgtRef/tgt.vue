@@ -2261,7 +2261,15 @@ const method = {
           setValue("Tgt.cFinancingGuarantee", selectdata.map((item:any) => `${item.value}. ${item.label}`).join('\n'))
         },
       }, { width: 45 });
-  },
+	},
+	// 反担保方式
+	cCounterGuaranteeChange: (val) => {
+		setFormItem('Tgt.cGuarantorName',{rules: val == 'CG06'? [] : [getRules("required", {})]}) // 担保人名称
+		setFormItem('Tgt.cGuaranteeNumber',{rules: val == 'CG06'? [] : [getRules("required", {})]}) // 担保合同编号
+		setFormItem('Tgt.cPledgedProperty',{rules: val == 'CG06'? [] : [getRules("required", {})]}) // 抵质押物
+		setFormItem('Tgt.cPledgeContract',{rules: val == 'CG06'? [] : [getRules("required", {})]}) // 抵质押合同
+		setFormItem('Tgt.nGuaranteeAmount',{rules: val == 'CG06'? [] : [getRules("required", {})]}) // 担保金额
+	}
 };
 
 const subsidyFields = [

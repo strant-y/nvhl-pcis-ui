@@ -7,7 +7,9 @@ import { formInit } from "@/shared/from-init";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
-import {saveAs} from "file-saver";
+import { saveAs } from "file-saver";
+import { formatDate } from "@/utils/date";
+import dayjs from "dayjs";
 
 const route = useRoute();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -176,14 +178,28 @@ const method = {
       ElMessage.error('“缴费计划”不能超过12期！');
       return false;
     }
-    payinfoEditRef?.value?.addRow();
+		payinfoEditRef?.value?.addRow();
+		let BgnTmDate = new Date(insrncBefore['Base.tAppTm'])   // 开始时间
+		let startDate = new Date(BgnTmDate);
+		let endDate = new Date(BgnTmDate)
+		if (baseBefore['Base.cInstMrk'] == '5') {
+			startDate.setDate(BgnTmDate.getDate() + 0 * 15);
+			endDate.setDate(BgnTmDate.getDate() + (0 + 1) * 15);
+		} else {
+			startDate.setDate(BgnTmDate.getDate() + 0 * 30);
+			endDate.setDate(BgnTmDate.getDate() + (0 + 1) * 30);
+		}
+
+		let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
+
+		let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD 23:59:59")
     if (val) {
       let obj = {
         'Pay.nTms': val.length,
         'Pay.cPayorCde': applicantBefore['Applicant.cAppCde'] || null,
         'Pay.cPayorNme': applicantBefore['Applicant.cAppNme'] || null,
-        'Pay.tPayBgnTm': insrncBefore['Base.tInsrncBgnTm'],
-        'Pay.tPayEndTm': insrncBefore['Base.tInsrncEndTm'],
+        'Pay.tPayBgnTm': tInsrncBgnTm,
+        'Pay.tPayEndTm': tPayEndTm,
         'Pay.nOwnPrm': baseBefore['Base.nPrm'],
       }
       val[val.length - 1] = { ...val[val.length - 1], ...obj }

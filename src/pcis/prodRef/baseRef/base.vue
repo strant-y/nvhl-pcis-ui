@@ -245,7 +245,7 @@ const nPayNumberFun = () => {
     let val = {}
     let valArr = []
     for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
-      let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"))   // 开始时间
+      let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tAppTm"))   // 开始时间
       let startDate = new Date(BgnTmDate);
       let endDate = new Date(BgnTmDate)
       if (getValue("Base.cInstMrk") == '5') {
@@ -259,7 +259,11 @@ const nPayNumberFun = () => {
       let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
       // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
 
-      let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD HH:mm:ss")
+			let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD HH:mm:ss")
+			if (i === Number(getValue("Base.nPayNum")) - 1) {
+					// 获取 endDate 的日期部分，拼接固定的时间字符串
+					tPayEndTm = dayjs(endDate).format("YYYY-MM-DD") + " 23:59:59"
+			}
       val = {
         "_dataId": "",
         "Pay.nTms": i + 1,
@@ -445,7 +449,10 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log('付费约定', val)
+		console.log('付费约定', val)
+		if (params?.cRecordType == 9) {
+			eventBus.emit('change-special', val)
+		}
     const param = opertaor.getParam();
     if (param.initFlag) {
       return;

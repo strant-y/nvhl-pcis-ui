@@ -291,15 +291,47 @@ const addData =()=>{
     } 
 }
 
-const changeSpecial =(val:any)=>{
-  const newFormData = formData.value?.filter((item:any) => item.cSpecialCode !== '34201123' && item.cSpecialCode !== '34201122');
-  if(val === '0') {// 一次交清
-    newFormData.push(defaultData.value?.find((item:any) => item.cSpecialCode ==='34201123'))
+const changeSpecial = (val: any) => {
+	const currentList = formData.value || [];
+	let newFormData = []
+	if (param.cRecordType != '9') {
+		newFormData = JSON.parse(JSON.stringify(
+			currentList.filter((item: any) => 
+				item.cSpecialCode != '34201123' && item.cSpecialCode != '34201122'
+			)
+		));
+	} else {
+		if (val === '0') {
+			newFormData = JSON.parse(JSON.stringify(
+				currentList.filter((item: any) => 
+					item.cSpecialCode != '34201122'
+				)
+			));
+		}
+		if (val === '5') {
+			newFormData = JSON.parse(JSON.stringify(
+				currentList.filter((item: any) => 
+					item.cSpecialCode != '34201123'
+				)
+			));
+		}
+	}
+
+  const defaultList = defaultData.value || [];
+  if (val === '0') { // 一次交清
+    const targetItem = defaultList.find((item: any) => item.cSpecialCode == '34201123');
+    if (targetItem) {
+      newFormData.push(JSON.parse(JSON.stringify(targetItem)));
+    }
   }
-  if(val === '5') {// 多次交清
-    newFormData.push(defaultData.value?.find((item:any) => item.cSpecialCode ==='34201122'))
+  if (val === '5') { // 多次交清
+    const targetItem = defaultList.find((item: any) => item.cSpecialCode == '34201122');
+    if (targetItem) {
+      newFormData.push(JSON.parse(JSON.stringify(targetItem)));
+    }
   }
-  setFormValue(newFormData)
+  // 4. 更新表单
+  setFormValue(newFormData);
 }
 
 // 获取默认信息
@@ -436,7 +468,8 @@ const method = {
       "prdFixSpec",
       {
           cProdNo: param.cProdNo,
-          cDptCde:param.cDptCde, 
+					cDptCde: param.cDptCde, 
+					param,
           selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
           tAppTm: opertaor.getDataAll().insrnc?.['Base.tAppTm'],
         },
@@ -676,7 +709,7 @@ const highlightText = (row: string) => {
       // 使用 escapeRegExp 防止数字以外的特殊字符破坏正则
       const regex = new RegExp(escapeRegExp(keyword), 'g');
       
-      content = content.replace(regex, `<strong style="color: #F56C6C;">${keyword}</strong>`);
+      content = content.replace(regex, `<strong style="color: red;">${keyword}</strong>`);
     }
   });
 

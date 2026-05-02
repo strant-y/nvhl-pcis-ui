@@ -144,8 +144,8 @@ watch([() => tableDatas.value],([newFormData])=>{
   deep:true
 })
 
-function handleRowClick(row: any) {
-  emits("rowClick", row);
+function handleRowClick(row: any, index: any) {
+  emits("rowClick", row,index);
 }
 
 function getTableValue() {
