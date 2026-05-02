@@ -1008,7 +1008,15 @@ function dataInit(initFlag : boolean = false) {
   } else {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
-      if (200 === code) {
+			if (200 === code) {
+				// 永安财险雇主责任保险附加伤残赔偿比例调整保险2026版  这个附加险费率可以是负数
+				if (!!data.data.term['cTermNo'] && data.data.term['cTermNo'] == "0426012128") {
+					data.data.termFactormap.forEach((item) => {
+						if (item.prop == 'Term.nMainRate') {
+							item.min = -99999999999
+						}
+					})
+				}
         terconfig.addConfig(queryKey, JSON.stringify(data.data));
         setTermConf(data.data,initFlag);
       } else {
