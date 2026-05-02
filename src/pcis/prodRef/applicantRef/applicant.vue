@@ -564,8 +564,8 @@ const method = {
   //企业成立时间事件改变
   tEstablishingDateChange: (val) => {
     const tableParam = opertaor.getTableRefs();
-    const tAppTm = tableParam["insrnc"].getFromValue()["Base.tAppTm"]  //投保日期
-    const tIssueTm = tableParam["insrnc"].getFromValue()["Base.tIssueTm"]   //签单日期
+    const tAppTm = tableParam["insrnc"]?.getFromValue()["Base.tAppTm"]  //投保日期
+    const tIssueTm = tableParam["insrnc"]?.getFromValue()["Base.tIssueTm"]   //签单日期
     if (val && tAppTm && tIssueTm) {
       const establishingDate = new Date(val).getTime();
       const appTm = new Date(tAppTm).getTime();

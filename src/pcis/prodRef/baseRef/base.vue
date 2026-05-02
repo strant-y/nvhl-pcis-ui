@@ -449,7 +449,10 @@ const method = {
   },
   //付费约定下拉事件
   cInstMrkChange(val: any) {
-    console.log('付费约定', val)
+		console.log('付费约定', val)
+		if (params?.cRecordType == 9) {
+			eventBus.emit('change-special', val)
+		}
     const param = opertaor.getParam();
     if (param.initFlag) {
       return;
