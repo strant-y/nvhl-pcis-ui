@@ -1797,6 +1797,9 @@ function upatetransfer(seedFlag: boolean = false){
   getCorporateInfo(param).then((res:any) => {
     if(res.code === 200) {
       setData(res.data);
+      ElMessage.success('法人获取成功');
+    }else{
+      ElMessage.error('法人获取失败:'+res.msg);
     }
   })
 }

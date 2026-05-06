@@ -1740,7 +1740,7 @@ const certfBlur = (value: any, typ: string) => {
   if((param.pageType === "EDR_APP_NEW_SCENE" || param.pageType === "TEMPORARY_DEPOSIT" || param.pageType === "app")
   && datas['Applicant.cCertfCls'] === '01' 
   && /^[123456789ANY][0-9A-HJ-NPQRTUWXY]{17}$/.test(datas['Applicant.cCertfCde'])){
-    if('blur' === typ){ // 仅失去焦点时,才处罚获取
+    if('blur' === typ){ // 仅失去焦点时,才触发获取
       upatetransfer();
     }
   }
@@ -1755,6 +1755,9 @@ function upatetransfer(seedFlag: boolean = false){
   getCorporateInfo(param).then((res:any) => {
     if(res.code === 200) {
       setData(res.data);
+      ElMessage.success('法人获取成功');
+    }else{
+      ElMessage.error('法人获取失败:'+res.msg);
     }
   })
 }
