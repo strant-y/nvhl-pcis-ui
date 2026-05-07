@@ -208,7 +208,7 @@ const refreshData = () => {
 // 切换指定行的选中状态
 const toggleSpecificRow = () => {
 	let param = props.data.param
-	if (param.cAppNo.length > 18 && (param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cTransMrk !=='1')) && param.cRsnCde == "FZ") {
+	if (!!param.cAppNo && param.cAppNo.length > 18 && (param.pageType === "EDR_APP_NEW_SCENE" || (param.pageType === "TEMPORARY_DEPOSIT" && param.cTransMrk !=='1')) && param.cRsnCde == "FZ") {
 		return false
 	}
   if (multipleTableRef.value) {
