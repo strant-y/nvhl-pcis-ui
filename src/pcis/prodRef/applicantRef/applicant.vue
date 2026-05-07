@@ -1757,13 +1757,13 @@ function upatetransfer(seedFlag: boolean = false){
       setData(res.data);
       ElMessage.success('法人获取成功');
     }else{
-      ElMessage.error('法人获取失败:'+res.msg);
+      ElMessage.error('法人获取失败,可以手动录入.');
     }
   })
 }
 
 function setData(data: any){
-  applicantEditRef?.value?.setValue('Applicant.cAppNme' , '临时名称测试');
+  applicantEditRef?.value?.setValue('Applicant.cAppNme' , data['companyName']?data['companyName']:'临时名称测试');
   applicantEditRef?.value?.setValue('Applicant.tCertfBgnDate' , data['certificateValidFrom']);
   applicantEditRef?.value?.setValue('Applicant.tCertfEndDate' , data['certificateValidTo']);
   applicantEditRef?.value?.setValue('Applicant.cNation' , data['nationality']);
@@ -1772,6 +1772,7 @@ function setData(data: any){
   applicantEditRef?.value?.setValue('Applicant.cRegisteredcapDre' , data['registeredAddress']);
   applicantEditRef?.value?.setValue('Applicant.cMobile' , data['mobilePhone']);
   applicantEditRef?.value?.setValue('Applicant.cWorkDpt' , data['unitNature']);
+  applicantEditRef?.value?.setValue('Applicant.cIsIndvduBiz' , data['selfEmployed']);
   applicantEditRef?.value?.setValue('Applicant.nEntprisPeopTtl' , data['totalEmployees']);
   applicantEditRef?.value?.setValue('Applicant.cIsMicroEntpris' , data['isSmallMicroEnterprise']);
   applicantEditRef?.value?.setValue('Applicant.cParticiinsocTyp' , data['socialSecurityFlag']);
