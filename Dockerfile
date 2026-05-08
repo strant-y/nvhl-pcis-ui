@@ -1,4 +1,4 @@
-ARG NGINX_NAME=arm64v8/nginx:alpine
+ARG NGINX_NAME=swr.cn-east-201.myhuaweicloud.com/yaic-dev/yaic-gg-hce-nginx:hce2.0-nginx1.21.5
 # 使用轻量级的 Nginx 镜像作为基础镜像
 FROM ${NGINX_NAME}
 LABEL authors="duqian"
