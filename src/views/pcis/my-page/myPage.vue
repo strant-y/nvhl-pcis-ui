@@ -1937,39 +1937,13 @@ async function loadAfter() {
 		}
     bthList.value = uwBtn;
     rightBtnList.value = [
-      createFreeButtonBase({
-        label: "费用信息",
+			createFreeButtonBase({
+        label: "反洗钱扩展信息",
         type: "primary",
-        id: "modFee",
-        // svgIcon: "fee1", // 使用本地图标库
-        // iconSize: "22", // 设置图标大小
-        icon: "Money",
+        // buttonColor: bottomBtnColor1,
+      	icon: "Money",
         func: () => {
-          //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
-          const params = {};
-          if(props.param.pageName === "priceInquiry") {
-            params["CInquiryNo"] = props.param.cInquiryNo;
-            params["type"] = "inquiry";
-          } else {
-            params["CAppNo"] = props.param.cAppNo;
-          }
-          checkFeeWindowType(params).then((res: any) => {
-            if (200 !== res["code"]) {
-              ElMessage.error(res["msg"]);
-            } else {
-              if (!!res["data"]) {
-                //typeFlag = res['data'];
-              } else {
-                ElMessage.error(res["msg"]);
-              }
-            }
-          });
-          dzmodal
-            .open(CostInformation, { type: "Issuer", data: {...props.param, nPrm: nPrm.value}, idxParam: idxParam })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
+          setCusBenefitInfo('view');
         },
       }),
       // createFreeButtonBase({
@@ -2013,22 +1987,14 @@ async function loadAfter() {
             });
         },
       }),
-      createFreeButtonBase({
-        label: "核保信息",
-        type: "primary",
-        id: "undrInfo",
-        // svgIcon: "Agree", // 使用本地图标库
-        // iconSize: "25", // 设置图标大小
-        icon: "DocumentChecked",
-        func: () => {
-          dzmodal
-            .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
-            .then((res: any) => {
-              if (res.type === "ok") {
-              }
-            });
-        },
-      }),
+			createFreeButtonBase({
+				label: "发票信息",
+				type: "primary",
+				icon: "DocumentChecked",
+				func: () => {
+					setTaxInfo();
+				},
+			}),
     ]
 		// 核保只有询价单才展示风勘查询按钮
 		if(props.param?.pageName === "priceInquiry") {
@@ -2078,22 +2044,57 @@ async function loadAfter() {
           handleRemoveReceived();
         },
 			}),
-      createFreeButtonBase({
-        label: "反洗钱扩展信息",
+			createFreeButtonBase({
+        label: "费用信息",
         type: "primary",
-        buttonColor: bottomBtnColor1,
+        id: "modFee",
+        // svgIcon: "fee1", // 使用本地图标库
+        // iconSize: "22", // 设置图标大小
+        // icon: "Money",
         func: () => {
-          setCusBenefitInfo('view');
+          //获取费用信息类型接口（缺少渠道，保费，当前表单提交校验待后续补充）
+          const params = {};
+          if(props.param.pageName === "priceInquiry") {
+            params["CInquiryNo"] = props.param.cInquiryNo;
+            params["type"] = "inquiry";
+          } else {
+            params["CAppNo"] = props.param.cAppNo;
+          }
+          checkFeeWindowType(params).then((res: any) => {
+            if (200 !== res["code"]) {
+              ElMessage.error(res["msg"]);
+            } else {
+              if (!!res["data"]) {
+                //typeFlag = res['data'];
+              } else {
+                ElMessage.error(res["msg"]);
+              }
+            }
+          });
+          dzmodal
+            .open(CostInformation, { type: "Issuer", data: {...props.param, nPrm: nPrm.value}, idxParam: idxParam })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
         },
       }),
 			createFreeButtonBase({
-				label: "发票信息",
-				type: "primary",
-				buttonColor: bottomBtnColor1,
-				func: () => {
-					setTaxInfo();
-				},
-			}),
+        label: "核保信息",
+        type: "primary",
+        id: "undrInfo",
+        // svgIcon: "Agree", // 使用本地图标库
+        // iconSize: "25", // 设置图标大小
+        // icon: "DocumentChecked",
+        func: () => {
+          dzmodal
+            .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
 	  )
     //核保处理
     nextTick(() => {

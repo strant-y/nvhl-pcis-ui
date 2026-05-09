@@ -87,10 +87,10 @@ const props = defineProps({
   },
 });
 const tabs = ref([
+	{ name: '表格' },
   { name: '时间轴' },
-  { name: '表格' }
 ])
-const currentTab = ref('时间轴')
+const currentTab = ref('表格')
 
 const pageresult = reactive<Pageresult>({
   result: "",
