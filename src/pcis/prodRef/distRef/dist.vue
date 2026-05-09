@@ -53,6 +53,7 @@ import {eventBus} from "@/utils/event-bus";
 import { useValidator } from "@/typings/useValidator";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import { getTgtDetailByDist, getTermDetailByDist } from "@/api/query";
+import cargoApi from "@/api/cargo";
 import Decimal from "decimal.js";
 
 const props = defineProps({
@@ -1828,12 +1829,30 @@ function getFatherPageOldProductResData() {
     if(cRelatedInsuredflag.value) {
 			oldPageSchema.value.fromSchema.forEach((item: any) => {
         if(item.prop === 'Dist.cRelatedInsured') {
-          const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
-          item.loadData = list.length > 0 ? list.map((i:any) => ({
-            label: i['InsuredDist.cInsuredNme'],
-            value: i['InsuredDist.cPkId']
-            // value: i['InsuredDist.cInsuredCde']
-          })) : []
+          // const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
+          // item.loadData = list.length > 0 ? list.map((i:any) => ({
+          //   label: i['InsuredDist.cInsuredNme'],
+          //   value: i['InsuredDist.cPkId']
+          //   // value: i['InsuredDist.cInsuredCde']
+          // })) : []
+					const r = { pageNum: 1, pageSize: 99999 }
+					let param = Object.assign({
+						cComponentTable:opertaor.getTableRefByKey('insuredDist')?.cComponentTableValue,
+					}, r);
+					if(params?.pageName === "priceInquiry") {
+						param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+					} else {
+						param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+					}
+					cargoApi.selectDistNew(param).then((res: any) => {
+						if(res.code === 200) {
+							item.loadData = res.data.data.length > 0 ? res.data.data.map((i:any) => ({
+								label: i['InsuredDist.cInsuredNme'],
+								value: i['InsuredDist.cPkId']
+								// value: i['InsuredDist.cInsuredCde']
+							})) : []
+						}
+					})
         }
       });
 		}
@@ -1841,12 +1860,30 @@ function getFatherPageOldProductResData() {
     if(cAssociatedGuardianflag.value) {
 			oldPageSchema.value.fromSchema.forEach((item: any) => {
 				if (item.prop === 'Dist.cAssociatedGuardian') {
-          const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
-          item.loadData = list.length > 0 ? list.map((i:any) => ({
-            label: i['InsuredDist.cInsuredNme'],
-            value: i['InsuredDist.cPkId']
-            // value: i['InsuredDist.cInsuredCde']
-          })) : []
+          // const list = opertaor.getTableRefByKey('insuredDist')?.getTableData()
+          // item.loadData = list.length > 0 ? list.map((i:any) => ({
+          //   label: i['InsuredDist.cInsuredNme'],
+          //   value: i['InsuredDist.cPkId']
+          //   // value: i['InsuredDist.cInsuredCde']
+					// })) : []
+					const r = { pageNum: 1, pageSize: 99999 }
+					let param = Object.assign({
+						cComponentTable:opertaor.getTableRefByKey('insuredDist')?.cComponentTableValue,
+					}, r);
+					if(params?.pageName === "priceInquiry") {
+						param['cInquiryNo'] = opertaor.getDataAll().plyBase["Base.cInquiryNo"]
+					} else {
+						param['cAppNo'] = opertaor.getDataAll().plyBase["Base.cAppNo"]
+					}
+					cargoApi.selectDistNew(param).then((res: any) => {
+						if(res.code === 200) {
+							item.loadData = res.data.data.length > 0 ? res.data.data.map((i:any) => ({
+								label: i['InsuredDist.cInsuredNme'],
+								value: i['InsuredDist.cPkId']
+								// value: i['InsuredDist.cInsuredCde']
+							})) : []
+						}
+					})
         }
       });
     }
