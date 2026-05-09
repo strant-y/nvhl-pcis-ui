@@ -485,7 +485,7 @@ onMounted(async () => {
         }
       })
     }
-		// 090001 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
+		// 090001/090002 免赔种类选择后 分项责任根据选中的免赔种类查询下拉选项
 		if (r['prop'] === 'Dist.cItemLiability') {
 			r.multiple = 1
 			r.typeCode = ''
