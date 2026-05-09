@@ -836,7 +836,8 @@ defineExpose({
   setTableData,
   getFormConfig,
   setDisabledAll,
-  getTableDataAll,
+	getTableDataAll,
+	cComponentTableValue,
 });
 </script>
 

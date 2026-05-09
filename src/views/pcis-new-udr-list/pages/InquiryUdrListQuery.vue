@@ -268,6 +268,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtSelectV2",
         title: "机构部门",
         rules: [getRules("required", {})],
+				disabled: true,
         btnWidth: 10,
         // itemWidth: 2,
         showExBtn: true,
