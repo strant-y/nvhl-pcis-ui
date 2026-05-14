@@ -1762,13 +1762,33 @@ function upatetransfer(seedFlag: boolean = false){
   })
 }
 
+let areas = ['cProCode','cCityCode','areaCode'];
+let regareas = ['cRegProCode','cRegCityCode','cRegAreaCode'];
 function setData(data: any){
   applicantEditRef?.value?.setValue('Applicant.cAppNme' , data['companyName']?data['companyName']:'临时名称测试');
   applicantEditRef?.value?.setValue('Applicant.tCertfBgnDate' , data['certificateValidFrom']);
   applicantEditRef?.value?.setValue('Applicant.tCertfEndDate' , data['certificateValidTo']);
   applicantEditRef?.value?.setValue('Applicant.cNation' , data['nationality']);
+  applicantEditRef?.value?.setValue('Applicant.cSuffixAddr' , data['residentialAddress']);
+
+  let area = ['CHN'];
+  for(let i in areas){
+    if(data[areas[i]]) area.push(data[areas[i]]);
+  }
+  if(areas && areas.length > 1){
+    applicantEditRef?.value?.setValue('Applicant.ClntAddrProp' , areas);
+  }
   applicantEditRef?.value?.setValue('Applicant.cClntAddr' , data['residentialAddress']);
   applicantEditRef?.value?.setValue('Applicant.cZipCde' , data['zipCode']);
+  applicantEditRef?.value?.setValue('Applicant.cRegisterSuffixAddr' , data['registeredAddress']);
+
+  let areareg = ['CHN'];
+  for(let i in regareas){
+    if(data[regareas[i]]) areareg.push(data[regareas[i]]);
+  }
+  if(areareg && areareg.length > 1){
+    applicantEditRef?.value?.setValue('Applicant.RegisterProp' , areareg);
+  }
   applicantEditRef?.value?.setValue('Applicant.cRegisteredcapDre' , data['registeredAddress']);
   applicantEditRef?.value?.setValue('Applicant.cMobile' , data['mobilePhone']);
   applicantEditRef?.value?.setValue('Applicant.cWorkDpt' , data['unitNature']);
