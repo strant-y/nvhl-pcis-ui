@@ -4744,6 +4744,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["plyBase"]["Base.cGrpMrk"] = props.param.cGrpMrk;
+  res["insrnc"]['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -4809,6 +4810,7 @@ const savePlyInfo = async () => {
     const applicant = ops["applicant"];
     const insured = ops["insured"];
     const ci = ops["ci"];
+    const insrnc = ops["insrnc"];
     if (base) {
       const baseRef = opertaor.getTableRefByKey("base");
       baseRef.setFormValue(base);
@@ -4824,6 +4826,10 @@ const savePlyInfo = async () => {
     if (insured) {
       const insuredRef = opertaor.getTableRefByKey("insured");
       insuredRef.setFormValue(insured);
+    }
+    if (insrnc) {
+      const insrncRef = opertaor.getTableRefByKey("insrnc");
+      insrncRef.setFormValue(insrnc);
     }
     if (ci && ci.length > 0) {
       const ciRef = opertaor.getTableRefByKey("ci");
