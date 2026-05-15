@@ -1804,13 +1804,34 @@ function upatetransfer(seedFlag: boolean = false){
   })
 }
 
+let areas = ['cProCode','cCityCode','areaCode'];
+let regareas = ['cRegProCode','cRegCityCode','cRegAreaCode'];
+
 function setData(data: any){
   insuredEditRef?.value?.setValue('Insured.cAppNme' , data['companyName']?data['companyName']:'临时名称测试');
   insuredEditRef?.value?.setValue('Insured.tCertfBgnDate' , data['certificateValidFrom']);
   insuredEditRef?.value?.setValue('Insured.tCertfEndDate' , data['certificateValidTo']);
   insuredEditRef?.value?.setValue('Insured.cNation' , data['nationality']);
+  insuredEditRef?.value?.setValue('Insured.cSuffixAddr' , data['residentialAddress']);
+  
+  let area = ['CHN'];
+  for(let i in areas){
+    if(data[areas[i]]) area.push(data[areas[i]]);
+  }
+  if(areas && areas.length > 1){
+    insuredEditRef?.value?.setValue('Insured.ClntAddrAddress' , areas);
+  }
   insuredEditRef?.value?.setValue('Insured.cClntAddr' , data['residentialAddress']);
   insuredEditRef?.value?.setValue('Insured.cZipCde' , data['zipCode']);
+  insuredEditRef?.value?.setValue('Insured.cRegisterSuffixAddr' , data['registeredAddress']);
+  
+  let areareg = ['CHN'];
+  for(let i in regareas){
+    if(data[regareas[i]]) areareg.push(data[regareas[i]]);
+  }
+  if(areareg && areareg.length > 1){
+    insuredEditRef?.value?.setValue('Insured.RegisterProp' , areareg);
+  }
   insuredEditRef?.value?.setValue('Insured.cRegisteredcapDre' , data['registeredAddress']);
   insuredEditRef?.value?.setValue('Insured.cMobile' , data['mobilePhone']);
   insuredEditRef?.value?.setValue('Insured.cWorkDpt' , data['unitNature']);
