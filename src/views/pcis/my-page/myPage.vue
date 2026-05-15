@@ -2169,6 +2169,43 @@ async function loadAfter() {
 				}),
 			)
 		}
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "核保信息",
+        type: "primary",
+        id: "undrInfo",
+        // svgIcon: "Agree", // 使用本地图标库
+        // iconSize: "25", // 设置图标大小
+        // icon: "DocumentChecked",
+        func: () => {
+          dzmodal
+            .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        label: "任务痕迹",
+        type: "primary",
+        id: "taskVestige",
+        // svgIcon: "track", // 使用本地图标库
+        // iconSize: "20", // 设置图标大小
+        // icon: "SetUp",
+        func: () => {
+          dzmodal
+            .open(TaskListVestige, {
+              type: "Issuer",
+              data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
+            })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+    )
     nextTick(() => {
       opertaor.setDisabledAll();
     });
