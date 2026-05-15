@@ -66,7 +66,7 @@ export const getData = (opertaor: any) => {
 
     // 录单日期、签单日期默认值
     dataInit["Base.tOprTm"] = moment(new Date()).format("YYYY-MM-DD");
-    dataInit["Base.tIssueTm"] = moment(new Date()).format("YYYY-MM-DD");
+    dataInit["Base.tIssueTm"] = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     // 是否见费出单 默认值
     dataInit["Base.cNeedfeeFlag"] = "1";
     //是否可疑交易，默认否
