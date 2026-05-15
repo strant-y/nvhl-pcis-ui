@@ -1145,7 +1145,7 @@ const copyPolicyFun = () => {
             }
             // 保单基本信息 录单日期和签单日期默认为当前年月日
             if(ops.plyBase) {
-              ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+              ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
               ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
               ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
               ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
@@ -2169,6 +2169,43 @@ async function loadAfter() {
 				}),
 			)
 		}
+    bthList.value.push(
+      createFreeButtonBase({
+        label: "核保信息",
+        type: "primary",
+        id: "undrInfo",
+        // svgIcon: "Agree", // 使用本地图标库
+        // iconSize: "25", // 设置图标大小
+        // icon: "DocumentChecked",
+        func: () => {
+          dzmodal
+            .open(UndrOpnList, { type: "", CAppNo: props.param?.cAppNo })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+      createFreeButtonBase({
+        label: "任务痕迹",
+        type: "primary",
+        id: "taskVestige",
+        // svgIcon: "track", // 使用本地图标库
+        // iconSize: "20", // 设置图标大小
+        // icon: "SetUp",
+        func: () => {
+          dzmodal
+            .open(TaskListVestige, {
+              type: "Issuer",
+              data: { objId: props.param?.cAppNo, sysType: props.param?.sysType },
+            })
+            .then((res: any) => {
+              if (res.type === "ok") {
+              }
+            });
+        },
+      }),
+    )
     nextTick(() => {
       opertaor.setDisabledAll();
     });
@@ -2340,7 +2377,7 @@ async function loadAfter() {
         }
         // 保单基本信息 录单日期和签单日期默认为当前年月日
         if(ops.plyBase) {
-          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
@@ -2527,7 +2564,7 @@ async function loadAfter() {
         }
         // 保单基本信息 录单日期和签单日期默认为当前年月日
         if(ops.plyBase) {
-          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
@@ -2722,7 +2759,7 @@ async function loadAfter() {
         }
         // 保单基本信息 录单日期和签单日期默认为当前年月日
         if(ops.plyBase) {
-          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
@@ -4707,6 +4744,7 @@ const savePlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   res["plyBase"]["Base.cGrpMrk"] = props.param.cGrpMrk;
+  res["insrnc"]['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
 
   if(props.param?.pageType === "copy" && saveDistBatchFlag.value) {
     const cAppNo = res["plyBase"]["Base.cAppNo"];
@@ -4772,6 +4810,7 @@ const savePlyInfo = async () => {
     const applicant = ops["applicant"];
     const insured = ops["insured"];
     const ci = ops["ci"];
+    const insrnc = ops["insrnc"];
     if (base) {
       const baseRef = opertaor.getTableRefByKey("base");
       baseRef.setFormValue(base);
@@ -4787,6 +4826,10 @@ const savePlyInfo = async () => {
     if (insured) {
       const insuredRef = opertaor.getTableRefByKey("insured");
       insuredRef.setFormValue(insured);
+    }
+    if (insrnc) {
+      const insrncRef = opertaor.getTableRefByKey("insrnc");
+      insrncRef.setFormValue(insrnc);
     }
     if (ci && ci.length > 0) {
       const ciRef = opertaor.getTableRefByKey("ci");

@@ -130,11 +130,13 @@ onMounted(async () => {
   const requiredNo = ['041011','049001']// 必填校验的产品
   if (requiredRulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
-      rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
+      // rules: [getRules("required", { 'trigger': 'blur' }), getRules("vehiclePlate", {})],
+      rules: [getRules("required", { 'trigger': 'blur' })],
     });
   } else if(rulesNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
-      rules: [getRules("vehiclePlate", {})],
+      // rules: [getRules("vehiclePlate", {})],
+      rules: [],
     });
   } else if(requiredNo.includes(params.cProdNo)) {
     setFormItem("Tgt.cLicenseNumber", {
@@ -235,7 +237,8 @@ onMounted(async () => {
 
   // 车牌号校验
   setFormItem("Tgt.cTransportLicenseNumber", {
-    rules: [getRules("vehiclePlate", {})],
+    // rules: [getRules("vehiclePlate", {})],
+    rules: [],
   });
   // 约定保期内服务次数正整数
   setFormItem("Tgt.nAgreeFrequency", {
@@ -834,17 +837,18 @@ const method = {
       clearValidate('Tgt.cTransportTools')
     }
     setFormItem("Tgt.cTransportLicenseNumber", {
-      rules: val === '1' ? [...requiredRule, ...vehiclePlate] : [...vehiclePlate],
+      // rules: val === '1' ? [...requiredRule, ...vehiclePlate] : [...vehiclePlate],
+      rules: val === '1' ? [...requiredRule] : [],
     });
-    setFormItem("Tgt.cTransBrandModel", {
-      rules: val === '1' ? requiredRule : [],
-    });
-    setFormItem("Tgt.cTransportEngineNumber", {
-      rules: val === '1' ? requiredRule : [],
-    });
-    setFormItem("Tgt.cTransportFrameNumber", {
-      rules: val === '1' ? requiredRule : [],
-    });
+    // setFormItem("Tgt.cTransBrandModel", {
+    //   rules: val === '1' ? requiredRule : [],
+    // });
+    // setFormItem("Tgt.cTransportEngineNumber", {
+    //   rules: val === '1' ? requiredRule : [],
+    // });
+    // setFormItem("Tgt.cTransportFrameNumber", {
+    //   rules: val === '1' ? requiredRule : [],
+    // });
 
     setFormItem("Tgt.cTransportTools", {
       disabled: val === '1' ? requiredRule : [],
