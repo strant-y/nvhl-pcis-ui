@@ -8274,7 +8274,7 @@ const validateGuaranteeBgnTm = () => {
 
   // 如果有保证期但没有相应条款，则提示用户
   if (hasGuaranteePeriod && !hasRequiredTerm) {
-    ElMessage.warning('保证期起期已录入，请选择“有限责任保证期条款”！');
+    ElMessage.warning('保证期起期已录入，请选择“保证期条款”！');
     return true;
   }
 
