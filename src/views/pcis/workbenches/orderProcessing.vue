@@ -648,7 +648,8 @@ const tableconfig = reactive<AppTableConfig>(
         tableClick: async (row) => {
           const r = await row;
           if (r) {
-            const data = row;
+            let data = row;
+            data.sysType = !!row["cAppTyp"] && ("A" === row["cAppTyp"] )? "U" : "E" ;
             router.push({
               path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
               query: {
@@ -943,6 +944,7 @@ const pageresult = reactive<Pageresult>({
 
 // 行双击查看详情
 function handleDblClick(row:any) {
+  row.sysType = !!row["cAppTyp"] && ("A" === row["cAppTyp"] )? "U" : "E" ;
   if(row.cAppTyp === 'A' &&  row.cCombinationNo && row.cCombinationNo !== '') {
     skipPositePage({ ...row, ...{ initType: POSITE_PAGE_TYPE_READ, pageType: 'app'}});
   }else {
