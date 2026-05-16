@@ -1862,7 +1862,8 @@ const tableObj = {
                         cUdrNme: stripHtml(r.cUdrNme),
                     };
                     if (cleanRow) {
-                        const data = cleanRow;
+                        let data = cleanRow;
+                        data.sysType = !!cleanRow["cAppTyp"] && ("A" === cleanRow["cAppTyp"] )? "U" : "E" ;
                         router.push({
                             path: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
                             query: {
@@ -2946,7 +2947,8 @@ function handleDelete(row: any) {
 }
 // table表格的双击事件
 const handleRowDoubleClick = (row:any) => {
-    const data = row;
+    let data = row;
+    data.sysType = !!row["cAppTyp"] && ("A" === row["cAppTyp"] )? "U" : "E" ;
     router.push({
         path: !!row["taskTyp"] && ("I" == row["taskTyp"] ) ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
         query: {
