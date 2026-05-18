@@ -645,11 +645,12 @@ onMounted(async () => {
           });
     }
     // 免赔率、免赔额输入后自动生成免赔说明
-    if(item.prop === 'Dist.nDductRate' || item.prop === 'Dist.nDductAmt' || item.prop === 'Dist.cSuitScope') {
+    if(item.prop === 'Dist.nDductRate' || item.prop === 'Dist.nDductAmt' || item.prop === 'Dist.cSuitScope' || item.prop === 'Dist.cItemLiability') {
       item.func = (val:any) => {
         const nDductAmt = getValue("Dist.nDductAmt");
         const nDductRate = getValue("Dist.nDductRate");
         const cSuitScope = getValue("Dist.cSuitScope"); // 获取多选的责任代码
+        const cItemLiability = getValue("Dist.cItemLiability"); // 分项责任
 
         console.log(nDductAmt, nDductRate, cSuitScope);
         const k = (nDductAmt !== null && nDductAmt !== undefined ? '1':'0') + '' + (nDductRate !== null && nDductRate !== undefined ? '1':'0') ;
@@ -668,6 +669,24 @@ onMounted(async () => {
               scopeStr = scopeCodes.join('、'); // 如果字典还没加载完，暂时代码拼接
             }
           }
+
+          // 处理 090001/090002 的 cItemLiability
+          if (cItemLiability && (params.cProdNo === '090001' || params.cProdNo === '090002')) {
+            const liabilityCodes = Array.isArray(cItemLiability) ? cItemLiability : [cItemLiability];
+
+            // 从 formconfig1 中获取 cItemLiability 的 loadData
+            const itemLiabilitySchema = formconfig1.value.fromSchema?.find((schemaItem: any) => schemaItem.prop === 'Dist.cItemLiability');
+            const liabilityData = itemLiabilitySchema?.loadData || [];
+
+            if (liabilityData.length > 0) {
+              const nameMap = new Map(liabilityData.map((item: any) => [item.value, item.label]));
+              const names = liabilityCodes.map(code => nameMap.get(code) || code);
+              scopeStr = names.join('、');
+            } else {
+              scopeStr = liabilityCodes.join('、');
+            }
+          }
+
           const filledString = fillTemplate(strt, {
             amount: nDductAmt,
             rate: nDductRate,
