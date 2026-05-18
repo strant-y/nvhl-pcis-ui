@@ -2214,7 +2214,7 @@ async function loadAfter() {
         }
         // 保单基本信息 录单日期和签单日期默认为当前年月日
         if(ops.plyBase) {
-          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
@@ -2395,7 +2395,7 @@ async function loadAfter() {
         }
         // 保单基本信息 录单日期和签单日期默认为当前年月日
         if(ops.plyBase) {
-          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cBrkrCde'] = null // 代理经纪人
@@ -2561,7 +2561,7 @@ async function loadAfter() {
         }
         // 保单基本信息 录单日期和签单日期默认为当前年月日
         if(ops.plyBase) {
-          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
+          ops.plyBase['Base.tIssueTm'] = dayjs().format("YYYY-MM-DD HH:mm:ss")
           ops.plyBase['Base.tOprTm'] = dayjs().format("YYYY-MM-DD 00:00:00")
           ops.plyBase['Base.cOprCde'] = user.opCde // 录单人为当前用户
           ops.plyBase['Base.cAgriMrk'] = "2"// 涉农标志设置默认值
