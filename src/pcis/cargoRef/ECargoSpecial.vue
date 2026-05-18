@@ -391,7 +391,8 @@ const method = {
       {
         cProdNo: '029900',
         selectedData: formData.value, //需要把自定义的过滤掉，只传过去从模板中选择的
-        cDptCde: agreementBaseRef.getValue('ECargoBase.cDptCde') || ''
+        cDptCde: agreementBaseRef.getValue('ECargoBase.cDptCde') || '',
+				param: params,
       },
       {
         getSelected(selectdata: any) {
