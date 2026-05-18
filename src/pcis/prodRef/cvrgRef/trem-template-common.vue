@@ -1669,6 +1669,7 @@ async function nInsuranceFeeChange(val: any) {
     if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
       opertaor.getTableRefByKey("cvrg")?.updateTitle()
     }
+    opertaor.getTableRefByKey("cvrg")?.setFormValue(cvrgData)
     nextTick(() => {
       opertaor.getFatherPage().afterCalcPremium()
     })
@@ -1749,6 +1750,7 @@ async function nInsuranceFeeChange(val: any) {
     if(opertaor.getTableRefByKey("cvrg")?.updateTitle) {
       opertaor.getTableRefByKey("cvrg")?.updateTitle()
     }
+    opertaor.getTableRefByKey("cvrg")?.setFormValue(cvrgData)
     nextTick(() => {
       opertaor.getFatherPage().afterCalcEdrPremium()
     })
