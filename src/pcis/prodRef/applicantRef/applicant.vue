@@ -1775,8 +1775,8 @@ function setData(data: any){
   for(let i in areas){
     if(data[areas[i]]) area.push(data[areas[i]]);
   }
-  if(areas && areas.length > 1){
-    applicantEditRef?.value?.setValue('Applicant.ClntAddrProp' , areas);
+  if(area && area.length > 1){
+    applicantEditRef?.value?.setValue('Applicant.ClntAddrProp' , area);
   }
   applicantEditRef?.value?.setValue('Applicant.cClntAddr' , data['residentialAddress']);
   applicantEditRef?.value?.setValue('Applicant.cZipCde' , data['zipCode']);
@@ -1801,7 +1801,7 @@ function setData(data: any){
   applicantEditRef?.value?.setValue('Applicant.nRegisteredCapital' , data['registeredCapital']);
   applicantEditRef?.value?.setValue('Applicant.cLegalRepresentative' , data['legalRepresentative']);
   applicantEditRef?.value?.setValue('Applicant.cEnterpriseTel' , data['fixedPhone']);
-
+  applicantEditRef?.value?.setValue('Applicant.cTrdCde' , data['industryNum']);
 }
 
 function validate() {

@@ -1819,7 +1819,7 @@ function setData(data: any){
     if(data[areas[i]]) area.push(data[areas[i]]);
   }
   if(areas && areas.length > 1){
-    insuredEditRef?.value?.setValue('Insured.ClntAddrAddress' , areas);
+    insuredEditRef?.value?.setValue('Insured.ClntAddrAddress' , area);
   }
   insuredEditRef?.value?.setValue('Insured.cClntAddr' , data['residentialAddress']);
   insuredEditRef?.value?.setValue('Insured.cZipCde' , data['zipCode']);
@@ -1844,6 +1844,7 @@ function setData(data: any){
   insuredEditRef?.value?.setValue('Insured.nRegisteredCapital' , data['registeredCapital']);
   insuredEditRef?.value?.setValue('Insured.cLegalRepresentative' , data['legalRepresentative']);
   insuredEditRef?.value?.setValue('Insured.cEnterpriseTel' , data['fixedPhone']);
+  insuredEditRef?.value?.setValue('Insured.cTrdCde' , data['industryNum']);
 }
 
 function validate() {
