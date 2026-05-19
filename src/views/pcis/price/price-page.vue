@@ -4178,7 +4178,7 @@ const getOwnShare =()=>{
   return ownShare;
 }
 
-const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
+const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase, nTms) => {
   console.log('保费---setPay')
   const payListNew = [];
   // const payListNew = [...payList];
@@ -4189,7 +4189,7 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
   if(nCiOwnPrm){
        nCiShare = Number(getOwnShare()) || 1;
   }
-  const pay = {};
+  let pay:any = {};
   if (applicant) {
     pay["Pay.cPayorCde"] = applicant["Applicant.cAppCde"];
     pay["Pay.cPayorNme"] = applicant["Applicant.cAppNme"];
@@ -4198,14 +4198,17 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
     pay["Pay.cPayorNme"] = "";
   }
   pay["Pay.nPayablePrm"] = nPrmVar >0? nPrmVar : 0;
-  pay["Pay.tPayBgnTm"] = plyBase["Base.tEdrAppTm"];
-  pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
 
-
+  let BgnTmDate = new Date(plyBase["Base.tEdrAppTm"]);
+  let endTmDate = new Date(plyBase["Base.tEdrBgnTm"]);
+  // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+  if (endTmDate < BgnTmDate) {
+      endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+  }
+  pay["Pay.tPayBgnTm"] = moment(BgnTmDate).format("YYYY-MM-DD HH:mm:ss");
+  pay["Pay.tPayEndTm"] = moment(endTmDate).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm:ss");
 
   pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * nCiShare).toFixed(8))  : 0;
-
-
 
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = nPrmVar 
