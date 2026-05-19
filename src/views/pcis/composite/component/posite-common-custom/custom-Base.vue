@@ -160,22 +160,34 @@ const nPayNumberFun = ()=>{
       result.value = result.value.map(cent => parseFloat((cent / 100 ).toFixed(8)));
       let val= {}
       let valArr=[]
+      let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tAppTm"));
+      let endTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tInsrncBgnTm"));
+      // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+      if (endTmDate < BgnTmDate) {
+          endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+      }
+
+      let lastEndDate = null; // 专门用来记录上一期的结束时间
       for (let i = 0; i < Number(getValue("Base.nPayNum")); i++) {
-        let BgnTmDate = new Date(opertaor.getTableRefs()["insrnc"].getValue("Base.tAppTm"))   // 开始时间
-        let startDate = new Date(BgnTmDate);
-        let endDate = new Date(BgnTmDate)
-        if (getValue("Base.cInstMrk")=='5') {
-          startDate.setDate(BgnTmDate.getDate() + i * 15);
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 15);
+        let startDate, endDate;
+        if (i === 0) {
+            // 第一期：使用原始的开始时间
+            startDate = new Date(BgnTmDate);
+            // 第一期的结束时间减1秒
+            endDate = new Date(endTmDate.getTime() - 1000);
         } else {
-          startDate.setDate(BgnTmDate.getDate() + i * 30);
-          endDate.setDate(BgnTmDate.getDate() + (i + 1) * 30);
+            // 第二期及以后：开始时间 = 上一期结束时间 + 1秒
+            startDate = new Date((lastEndDate as Date).getTime() + 1000);
+            
+            // 计算本期的结束时间：在上一期结束时间的基础上，增加15天或30天，再减1秒
+            endDate = new Date(lastEndDate as Date);
+            const daysToAdd = getValue("Base.cInstMrk") == '5' ? 15 : 30;
+            endDate.setDate(endDate.getDate() + daysToAdd);
         }
 
         let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
-        // let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
+        let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
 
-				let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD HH:mm:ss")
 				if (i === Number(getValue("Base.nPayNum")) - 1) {
 					// 获取 endDate 的日期部分，拼接固定的时间字符串
 					tPayEndTm = dayjs(endDate).format("YYYY-MM-DD") + " 23:59:59"
@@ -191,8 +203,9 @@ const nPayNumberFun = ()=>{
           "Pay.nPayablePrm": result.value[i] || 0, // 应收
           "Pay.nPrmVar": result.value[i]     // 差额
         }
-
         valArr.push(val)
+        // 【关键】循环结束前，把本期的结束时间存起来，作为下一轮循环的“上一期结束时间”
+        lastEndDate = endDate;
       }
 
       console.log('数据',valArr)

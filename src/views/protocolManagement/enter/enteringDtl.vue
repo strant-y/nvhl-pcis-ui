@@ -1299,13 +1299,14 @@ const setPayInfo = (base: any, applicant: any, insrnc: any, list: any) => {
     }
     pay["ECargoPay.nPrmVar"] = pay["ECargoPay.nPayablePrm"];
   }
-
-  pay["ECargoPay.tPayBgnTm"] = moment(insrnc["ECargoBase.tAppTm"]).format(
-    "YYYY-MM-DD HH:mm:ss"
-  );
-  pay["ECargoPay.tPayEndTm"] = moment(insrnc["ECargoBase.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
-    "YYYY-MM-DD HH:mm:ss"
-  );
+  let BgnTmDate = new Date(base["ECargoBase.tAppTm"]);
+  let endTmDate = new Date(base["ECargoBase.tInsrncBgnTm"]);
+  // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+  if (endTmDate < BgnTmDate) {
+    endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+  }
+  pay["ECargoPay.tPayBgnTm"] = moment(BgnTmDate).format("YYYY-MM-DD HH:mm:ss");
+  pay["ECargoPay.tPayEndTm"] = moment(endTmDate).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm:ss");
   pay["ECargoPay.cProdNo"] = base["ECargoBase.cProdNo"];
   payList.push(pay);
   return payList;

@@ -707,12 +707,14 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
   }
   pay["Pay.nPayablePrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
 
-  pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
-      "YYYY-MM-DD HH:mm:ss"
-  );
-  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
-      "YYYY-MM-DD HH:mm:ss"
-  );
+  let BgnTmDate = new Date(insrnc["Base.tAppTm"]);
+  let endTmDate = new Date(insrnc["Base.tInsrncBgnTm"]);
+  // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+  if (endTmDate < BgnTmDate) {
+    endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+  }
+  pay["Pay.tPayBgnTm"] = moment(BgnTmDate).format("YYYY-MM-DD HH:mm:ss");
+  pay["Pay.tPayEndTm"] = moment(endTmDate).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm:ss");
   pay["Pay.nOwnPrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = !!base["Base.nPrm"] ? base["Base.nPrm"] : 0;

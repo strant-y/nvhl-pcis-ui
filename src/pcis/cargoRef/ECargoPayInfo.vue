@@ -156,15 +156,14 @@ const method = {
     }
 		payinfoEditRef?.value?.addRow();
 		let BgnTmDate = new Date(insrncBefore['ECargoBase.tAppTm'])   // 开始时间
-		let startDate = new Date(BgnTmDate);
-		let endDate = new Date(BgnTmDate)
-		if (baseBefore['ECargoBase.cInstMrk'] == '5') {
-			startDate.setDate(BgnTmDate.getDate() + 0 * 15);
-			endDate.setDate(BgnTmDate.getDate() + (0 + 1) * 15);
-		} else {
-			startDate.setDate(BgnTmDate.getDate() + 0 * 30);
-			endDate.setDate(BgnTmDate.getDate() + (0 + 1) * 30);
-		}
+    let endTmDate = new Date(insrncBefore["ECargoBase.tInsrncBgnTm"]);
+    // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+    if (endTmDate < BgnTmDate) {
+        endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+    }
+
+    let  startDate = new Date(BgnTmDate);
+    let  endDate = new Date(endTmDate.getTime() - 1000);
 
 		let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
 
