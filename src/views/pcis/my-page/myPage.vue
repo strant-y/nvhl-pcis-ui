@@ -3626,13 +3626,14 @@ const setPayInfo = (base: any, applicant: any, insrnc: any) => {
     pay["Pay.cPayorNme"] = "";
   }
   pay["Pay.nPayablePrm"] = base["Base.nPrm"] ? base["Base.nPrm"] : 0;
-
-  pay["Pay.tPayBgnTm"] = moment(insrnc["Base.tAppTm"]).format(
-    "YYYY-MM-DD HH:mm:ss"
-  );
-  pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncBgnTm"]).add(29, 'days').endOf('day').format(
-    "YYYY-MM-DD HH:mm:ss"
-  );
+  let BgnTmDate = new Date(insrnc["Base.tAppTm"]);
+  let endTmDate = new Date(insrnc["Base.tInsrncBgnTm"]);
+  // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+  if (endTmDate < BgnTmDate) {
+    endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+  }
+  pay["Pay.tPayBgnTm"] = moment(BgnTmDate).format("YYYY-MM-DD HH:mm:ss");
+  pay["Pay.tPayEndTm"] = moment(endTmDate).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm:ss");
   // 如果保险期限小于30天，则缴费截止时间为保险期限止期
   if(Number(tmDay.value) < 30) {
     pay["Pay.tPayEndTm"] = moment(insrnc["Base.tInsrncEndTm"]).format(
@@ -5242,8 +5243,14 @@ const setPayInfoEdr = (payList, base, applicant, nPrmVar, plyBase,nTms) => {
     pay["Pay.cPayorNme"] = "";
   }
   pay["Pay.nPayablePrm"] = nPrmVar >0? nPrmVar : 0;
-  pay["Pay.tPayBgnTm"] = plyBase["Base.tEdrAppTm"];
-  pay["Pay.tPayEndTm"] = plyBase["Base.tEdrBgnTm"];
+  let BgnTmDate = new Date(plyBase["Base.tEdrAppTm"]);
+  let endTmDate = new Date(plyBase["Base.tEdrBgnTm"]);
+  // 2. 兜底处理：如果初始结束时间早于开始时间，将其修正为“开始时间 + 3天”
+  if (endTmDate < BgnTmDate) {
+      endTmDate = new Date(BgnTmDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+  }
+  pay["Pay.tPayBgnTm"] = moment(BgnTmDate).format("YYYY-MM-DD HH:mm:ss");
+  pay["Pay.tPayEndTm"] = moment(endTmDate).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm:ss");
   pay["Pay.nOwnPrm"] = nPrmVar >0?  parseFloat((nPrmVar * nCiShare).toFixed(8))  : 0;
   pay["Pay.cProdNo"] = base["Base.cProdNo"];
   pay["Pay.nPrmVar"] = nPrmVar 
