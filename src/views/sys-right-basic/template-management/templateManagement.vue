@@ -143,17 +143,17 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnWidth: 220,
     tableBtnPosition: "right",
     tableBtn: [
-      createFreeButtonBase({
-        id: "score",
-        link: true,
-        tooltip: "编辑",
-        type: "success",
-        size: "large",
-        icon: "Edit",
-        tableClick: (row) => {
-          edit(row)
-        },
-      }),
+      // createFreeButtonBase({
+      //   id: "score",
+      //   link: true,
+      //   tooltip: "编辑",
+      //   type: "success",
+      //   size: "large",
+      //   icon: "Edit",
+      //   tableClick: (row) => {
+      //     edit(row)
+      //   },
+      // }),
       createFreeButtonBase({
         id: "score",
         link: true,
