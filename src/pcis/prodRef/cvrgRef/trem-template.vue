@@ -1764,7 +1764,7 @@ function exChangeFunc() {
   }
    // 040002个性化配置
   if (pageparam.cProdNo === "040002" || pageparam.cProdNo === "049035") {
-    if (data["tgt"]["Tgt.cDeterminingMethod"]) {
+    if (data?.["tgt"]?.["Tgt.cDeterminingMethod"]) {
       if (data["tgt"]["Tgt.cDeterminingMethod"] === "0") {
         const col = colInfo.value.filter((r: any) => r.cColTitle !== "单位");
         colInfo.value = col;
