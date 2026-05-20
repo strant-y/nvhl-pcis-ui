@@ -116,7 +116,15 @@ export const codeListViewStore = (props?: CodeListViewProps) => {
       } else if (!unAuthor) {
         await codelistQuery(param).then((response) => {
           if (response.code === 200) {
-            result.value = response.data;
+            // 做特殊处理--特种设备清单信息-特种设备种类
+            if(param.codeListName == 'Search_Equipment_List'){
+              result.value = response.data.map(item => ({
+                label: item.cnm,
+                value: item.cde
+              }));
+            } else {
+              result.value = response.data;
+            }
           } else {
             ElMessage.error(response.msg);
             reject('queryCodeList() -> codeList查询失败！typeCode: ' + param.codeListName + 'msg: '+response.msg);

@@ -1063,7 +1063,7 @@ const cEquipmentTypesFunc = ()=>{
             setFormItem("Dist.cEquipmentTypes", {
               loadData: [{ label: data.cnm, value: data.cde }],
             });
-            setValue("Dist.cEquipmentTypes", `${data.cde}${data.cnm}`);
+            setValue("Dist.cEquipmentTypes", `${data.cde}`);
             dialog.value?.handleClose();
           },
         },

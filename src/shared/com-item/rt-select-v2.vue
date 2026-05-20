@@ -466,6 +466,10 @@ function getParam() {
     } else if(!Array.isArray(selectedValue.value)) {
       p.value = selectedValue.value;
     }
+    // 做特殊处理--特种设备清单信息-特种设备种类
+    if(props.item.typeCode == 'Search_Equipment_List'){
+      p = { cCde: selectedValue.value };
+    }
   }
   return p;
 }
