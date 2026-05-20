@@ -11,7 +11,7 @@
             </div>
             <div class="sub-header-search-btn">
               <div class="search-btn-item">
-                <rtinput v-model="query.main" :item="{ placeholder: '请输入主条款名称或编码' }" />
+                <el-input v-model="query.main" placeholder='请输入主条款名称或编码' @input="handleSearchInput(query.main, '1')" />
                 <rtButton
                   :item="{
                     icon: 'Search',
@@ -68,7 +68,7 @@
             </div>
             <div class="sub-header-search-btn">
               <div class="search-btn-item">
-                <rtinput v-model="query.sub" :item="{ placeholder: '请输入附加条款名称或编码' }" />
+                <el-input v-model="query.sub" placeholder="请输入附加条款名称或编码" @input="handleSearchInput(query.sub, '2')" />
                 <rtButton
                   :item="{
                     icon: 'Search',
@@ -823,6 +823,14 @@ async function selectOne() {
 
 function fail() {
   emits("handleClose");
+}
+
+function handleSearchInput(data: any, index: any) {
+  if (index == "1") {
+    mainRef.value.filter(data);
+  } else if (index == "2") {
+    additionalRef.value.filter(data);
+  }
 }
 </script>
 
