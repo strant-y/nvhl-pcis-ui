@@ -1933,7 +1933,7 @@ const method = {
               setFormItem("Tgt.cEquipmentCategory", {
                 loadData: [{ label: data.cnm, value: data.cde }],
               });
-              setValue("Tgt.cEquipmentCategory", `${data.cde}${data.cnm}`);
+              setValue("Tgt.cEquipmentCategory", `${data.cde}`);
               dialog.value?.handleClose();
             },
           },
