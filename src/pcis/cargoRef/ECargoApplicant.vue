@@ -1238,11 +1238,11 @@ if (
 							// }
 					// 	}
 					// }
-					Object.keys(result).forEach((key) => { 
-						if(result[key]){
-							setValue(key, result[key]);
-						}
-					});
+					// Object.keys(result).forEach((key) => { 
+					// 	if(result[key]){
+					// 		setValue(key, result[key]);
+					// 	}
+					// });
           
           setValue('ECargoApplicant.cAppCde', data[0]['ECargoApplicant.cCargoAppCde']);
           let userId = getValue('ECargoApplicant.cCertfCde')

@@ -311,7 +311,7 @@ const checkUser = () => {
                   if (data) {
                     if (data && data.length > 0) {
                       Object.keys(data[0]).forEach((key) => {
-                        if (data[0][key]) {
+                        if (data[0][key] && key == 'Applicant.cAppCde') {
                           setValue(key, data[0][key]);
                         }
                       });

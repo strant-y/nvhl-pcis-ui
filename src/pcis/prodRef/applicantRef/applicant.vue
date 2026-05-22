@@ -314,7 +314,8 @@ const checkUser = () => {
                 if (data) {
                   if (data && data.length > 0) {
                     Object.keys(data[0]).forEach((key) => {
-                      if (data[0][key]) {
+                      // 只需要回写客户代码
+                      if (data[0][key] && key == 'Applicant.cAppCde') {
                         setValue(key, data[0][key]);
                       }
                     });

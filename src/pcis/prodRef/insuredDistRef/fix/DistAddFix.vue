@@ -425,12 +425,12 @@ const checkUser = () => {
           const { code, data, msg } = res;
           if (200 === code) {
             if(data){
-              const result:any = {};
-              Object.keys(result).forEach((key) => {
-                if(result[key]){
-                  setValue(key, result[key]);
-                }
-              });
+              // const result:any = {};
+              // Object.keys(result).forEach((key) => {
+              //   if(result[key]){
+              //     setValue(key, result[key]);
+              //   }
+              // });
 
               setValue('InsuredDist.cInsuredCde', data[0]['Applicant.cAppCde']);
               let userId = getValue('InsuredDist.cCertfCde')

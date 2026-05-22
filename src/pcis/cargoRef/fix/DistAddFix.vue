@@ -1413,17 +1413,17 @@ const checkUser = () => {
               // }
               // 	}
               // }
-              Object.keys(result).forEach((key) => {
-                if(result[key]){
-                  setValue(key, result[key]);
-                }
-              });
+              // Object.keys(result).forEach((key) => {
+              //   if(result[key]){
+              //     setValue(key, result[key]);
+              //   }
+              // });
 							if (data[0]['ECargoInsuredDist.cCargoAppCde']) {
 								setValue('ECargoInsuredDist.cInsuredCde', data[0]['ECargoInsuredDist.cCargoAppCde']);
 							}
-              if (data[0]['ECargoInsuredDist.cCargoCertfCde']) {
-								setValue('ECargoInsuredDist.cCertfCde', data[0]['ECargoInsuredDist.cCargoCertfCde']);
-							}
+              // if (data[0]['ECargoInsuredDist.cCargoCertfCde']) {
+							// 	setValue('ECargoInsuredDist.cCertfCde', data[0]['ECargoInsuredDist.cCargoCertfCde']);
+							// }
               let userId = getValue('ECargoInsuredDist.cCertfCde')
               idAnalysis(userId)
             }
