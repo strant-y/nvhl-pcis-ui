@@ -97,7 +97,7 @@ const fromSchema = {
       // inputtype: "rtinput",
       title: "投保人证件类型",
       inputtype: "rtselect",
-      typeCode: "NATURAL_CERTIFICATE_ALL",
+      typeCode: "ACCEPTING_OFFICER",
       disabled: true,
     },
     {
@@ -147,7 +147,7 @@ const fromSchema = {
       // inputtype: "rtinput",
       title: "被保人证件类型",
       inputtype: "rtselect",
-      typeCode: "NATURAL_CERTIFICATE_ALL",
+      typeCode: "ACCEPTING_OFFICER",
       disabled: true,
     },
     {

@@ -72,6 +72,10 @@ const props = defineProps({
   isXY: {
     type: Boolean,
     default: false,
+  },
+  data:{
+    type: Object,
+    default: () => ({}),
   }
 });
 const emits = defineEmits(["ok"]);
@@ -215,7 +219,7 @@ const handleSearch = ()=>{
 }
 
 const initDptTreeList = () => {
-  let root = user.value['companyId'];
+  let root = props.data.cIntroDptcde || user.value['companyId'];
   const params = {
     pId: root,
   };
