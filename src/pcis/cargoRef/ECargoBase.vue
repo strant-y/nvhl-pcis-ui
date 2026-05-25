@@ -144,6 +144,19 @@ const method = {
           setFormItem("ECargoBase.cIntroDptcde", obj);
           setValue("ECargoBase.cIntroDptcde", selectObj.id);
           cIntroDptCnm.value = selectObj.name
+          // 机构部门航保，清除业务员信息和服务机构业务员信息
+          if (!initFlag.value) {
+            const CDptCde = getValue("ECargoBase.cDptCde");
+            setFormItem("ECargoBase.cIntroSalecde", {loadData: []});
+						setValue("ECargoBase.cIntroSalecde", null); // 服务机构业务员
+            if(CDptCde?.substring(0, 4) === "0298"){
+              setValue("ECargoBase.cSlsId", null); // 业务员员工号
+							setValue("ECargoBase.cSlsNme", null); // 业务员名称
+							setValue("ECargoBase.cSlsTel", null); // 业务员电话
+							setValue("ECargoBase.cSlsDptcde", null); // 业务员机构代码
+							setValue("ECargoBase.cSlsCde", null); // 业务员执业证号
+            }
+          }
         }
       }
     });
@@ -187,6 +200,17 @@ const method = {
                           loadData: codeValData,
                         });
                         setValue("ECargoBase.cIntroSalecde", params.CSlsCde);
+                        // 航保服务机构业务员带出业务员
+                        const CDptCde = getValue("ECargoBase.cDptCde");
+                        if(CDptCde?.substring(0, 4) === "0298"){
+                          setFormValue({
+                            "ECargoBase.cSlsId": params.CSlsCde, //业务员员工号
+                            "ECargoBase.cSlsNme": params.CSlsNme, //业务员名称
+                            "ECargoBase.cSlsTel": params.CTel, //业务员电话
+                            "ECargoBase.cSlsDptcde": params.CDptCde, //业务员机构代码
+                            "ECargoBase.cSlsCde": params.CCtfctNo, //业务员执业证号
+                          });
+                        }
                       }
                     }
                   });

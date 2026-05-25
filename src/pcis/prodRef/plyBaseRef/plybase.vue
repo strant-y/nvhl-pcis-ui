@@ -777,7 +777,7 @@ const method = {
   },
   //服务机构ICON事件
   saleDptFunc: () => {
-    dzmodal.open(DepartmentTree, {type: "Issuer", data: {} ,isXY:true}).then((res) => {
+    dzmodal.open(DepartmentTree, {type: "Issuer", data: {cIntroDptcde: "0200000000000"} ,isXY:true}).then((res) => {
       if (res.type === "ok") {
         console.log("选中的回显", res);
         if (res.body) {
@@ -795,6 +795,20 @@ const method = {
           };
           setFormItem("Base.cIntroDptcde", obj);
           setValue("Base.cIntroDptcde", selectObj.id);
+          // 机构部门航保，清除业务员信息和服务机构业务员信息
+          const p = opertaor.getParam();
+          if (!p.initFlag) {
+            const CDptCde = getValue("Base.cDptCde");
+            setFormItem("Base.cIntroSalecde", {loadData: []});
+						setValue("Base.cIntroSalecde", null); // 服务机构业务员
+            if(CDptCde?.substring(0, 4) === "0298"){
+              setValue("Base.cSlsId", null); // 业务员员工号
+							setValue("Base.cSlsNme", null); // 业务员名称
+							setValue("Base.cSlsTel", null); // 业务员电话
+							setValue("Base.cSlsDptcde", null); // 业务员机构代码
+							setValue("Base.cSlsCde", null); // 业务员执业证号
+            }
+          }
         }
       }
     });
@@ -837,6 +851,17 @@ const method = {
                       loadData: codeValData,
                     });
                     setValue("Base.cIntroSalecde", params.CSlsCde);
+                    // 航保服务机构业务员带出业务员
+                    const CDptCde = getValue("Base.cDptCde");
+                    if(CDptCde?.substring(0, 4) === "0298"){
+                      setFormValue({
+                        "Base.cSlsId": params.CSlsCde, //业务员员工号
+                        "Base.cSlsNme": params.CSlsNme, //业务员名称
+                        "Base.cSlsTel": params.CTel, //业务员电话
+                        "Base.cSlsDptcde": params.CDptCde, //业务员机构代码
+                        "Base.cSlsCde": params.CCtfctNo, //业务员执业证号
+                      });
+                    }
                   }
                 }
               });
