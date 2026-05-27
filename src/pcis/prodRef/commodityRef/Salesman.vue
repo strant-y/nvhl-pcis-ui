@@ -141,7 +141,8 @@ const tableconfig = reactive<AppTableConfig>(
       },
       {
         prop: "CSlsTyp",
-        inputtype: "rtinput",
+        inputtype: "rtSelectV2",
+        typeCode: "PERSONNEL_LIST",
         title: "人员分类",
       },
       {
