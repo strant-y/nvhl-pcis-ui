@@ -385,7 +385,7 @@
         <div class="main-header2">
           <div class="tp">
             <span>
-              条款:
+              {{props.param.cPolicySource == "5" || props.param.cRecordType == "5" ? '方案' : '条款'}}:
               <span class="publicStyle">{{props.param.cTermNo }}{{props.param.cTermNme}}</span>
             </span>
             <br/>
@@ -4791,6 +4791,10 @@ const savePlyInfo = async () => {
       }
     })
   }
+  // 方案出单手动赋值方案号
+  if(props.param.cPolicySource == "5" || props.param.cRecordType == "5"){
+    res["plyBase"]["Base.cPlanNo"] = props.param.cTermNo
+  }
   // 判断是否为历史补全保单 (cTransMrk === '1')
   if (props.param.cTransMrk === '1') {
     // 调用批单保存方法
@@ -5643,6 +5647,10 @@ const saveEdrPlyInfo = async () => {
   res["user"] = user;
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
+  // 方案出单手动赋值方案号
+  if(props.param.cPolicySource == "5" || props.param.cRecordType == "5"){
+    res["plyBase"]["Base.cPlanNo"] = props.param.cTermNo
+  }
 
   res["EdrBase"] = edrbase.value?.getFromValue();
   if (
