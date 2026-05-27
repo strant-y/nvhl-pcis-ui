@@ -11,10 +11,7 @@
       <el-col :span="12">
         <div class="search-btn" style="margin: 0px 0 3px 0;">
           <div class="search-btn-item">
-            <rtinput
-                v-model="query.main"
-                :item="{ placeholder: '请输入主条款名称或编码' }"
-            />
+            <el-input v-model="query.main" placeholder='请输入主条款名称或编码' @input="handleSearchInput(query.main)" />
             <rtButton
                 :item="{
                 icon: 'Search',
@@ -408,6 +405,10 @@ async function selectOne() {
 
 function fail() {
   emits("handleClose");
+}
+
+function handleSearchInput(data: any) {
+  mainRef.value?.filter(data);
 }
 </script>
 
