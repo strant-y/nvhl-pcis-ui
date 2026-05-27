@@ -665,6 +665,17 @@ const method = {
   cTmSysCdeChange: (val:any) => {
     opertaor.getFatherPage().setTmDay(val || 0)
   },
+  // 即时生效
+  cImmeffMrkChange:(val:any)=>{
+    const param = opertaor.getParam();
+    const isInit = param.initFlag; // 是否是初始化状态
+    if (isInit) return;
+    if(val == '1'){
+      setValue('Base.tInsrncBgnTm', dayjs().format("YYYY-MM-DD HH:mm:ss"))
+    } else {
+      setValue('Base.tInsrncBgnTm', dayjs().add(1, "day").format("YYYY-MM-DD 00:00:00"))
+    }
+  }
 };
 
 // 绑定特殊验证器
