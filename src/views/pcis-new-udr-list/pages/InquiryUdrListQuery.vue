@@ -159,7 +159,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "重置",
         func: () => {
-          setFormItem("companyId", {
+          setFormItem("cDptCde", {
             loadData: [
               {
                 label: user.value.companyCnm,
@@ -170,7 +170,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           freeEditRef.value?.setFormValue({
             cAppNme: "",
             cInsuredNme: "",
-            companyId: user.value.companyId,
+            cDptCde: user.value.companyId,
             cLoadSub: '0',
             cKindNo: null,
             cProdNo: null,
@@ -264,7 +264,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         ],
       },
       {
-        prop: "companyId",
+        prop: "cDptCde",
         inputtype: "rtSelectV2",
         title: "机构部门",
         rules: [getRules("required", {})],
@@ -913,7 +913,7 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
-  setFormItem("companyId", {
+  setFormItem("cDptCde", {
     loadData: [
       {
         label: user.value.companyCnm,
@@ -922,7 +922,7 @@ onMounted(async () => {
     ],
   });
   const param = {
-    companyId: user.value.companyId,
+    cDptCde: user.value.companyId,
     cLoadSub: '0',
     tm1: [
       moment(new Date(Date.now() - 6 * 1000 * 60 * 60 * 24)).format(
@@ -1117,7 +1117,7 @@ function refreshData(flag?: boolean) {
     ...s,
     tm1: date1,
     tm2: date2,
-    cDptCde: user.value.companyId,
+    // cDptCde: user.value.companyId,
   };
   
   // 提取申请日期的开始时间和结束时间

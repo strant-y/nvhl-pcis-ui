@@ -21,6 +21,24 @@
 				</div>
 			</template>
 		</app-table>
+    <!-- 弹窗组件 -->
+    <el-dialog 
+      v-model="dialogVisible" 
+      title="详细信息" 
+      width="50%" 
+      :append-to-body="true"
+    >
+      <div class="error-list">
+        <div v-for="(item, index) in errorList" :key="index" class="error-item">
+          {{ item }}
+        </div>
+      </div>
+      <!-- <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">关闭</el-button>
+        </span>
+      </template> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -64,6 +82,11 @@ const prodTotalDatas = ref([]); // 所有产品数据
 const cProdData = ref([]); // 选中产品大类的产品
 const isProdList = ["010022", "040002", "043002", "043009", "047002", "047003", "059903", "059905", "059906", "059908", "059914", "080002", "080026", "080027", "120003", "120005", "130001", "130002", "130003"]; // 可以点击模板导入和下载的产品
 const hidden = ref(true);
+const dialogVisible = ref(false)
+const dialogData = ref("")
+const errorList = computed(() => 
+  dialogData.value.split('\n').filter(item => item.trim() !== '')
+)
 const kindData: any = computed(() => {
     return prodTotalDatas.value.map((item: any) => ({
         label: item.code + " " + item.value,
@@ -216,7 +239,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				loadData: kindData,
 				func: (val: string) => {
 					setValue("cProdNo","")
-					setValue("cTermNo","")
+					setValue("cPlanNo","")
           if (val && val.length > 0) {
 							let options: any = [];
 							kindData.value.forEach((item: any) => {
@@ -251,7 +274,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 					} else {
 						hidden.value = true
 					}
-					setValue("cTermNo","")
+					setValue("cPlanNo","")
 					if (val && val.length > 0) {
 						let options: any = [];
 						cProdData.value.forEach((item: any) => {
@@ -264,16 +287,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 										options = options.concat(list);
 								}
 						});
-						setFormItem("cTermNo", { loadData: options });
-						freeEditRef.value?.setValue("cTermNo", null);
+						setFormItem("cPlanNo", { loadData: options });
+						freeEditRef.value?.setValue("cPlanNo", null);
 					} else {
-						setFormItem("cTermNo", { loadData: [] });
-						freeEditRef.value?.setValue("cTermNo", null);
+						setFormItem("cPlanNo", { loadData: [] });
+						freeEditRef.value?.setValue("cPlanNo", null);
 					}
 				},
 			},
       {
-				prop: "cTermNo",
+				prop: "cPlanNo",
 				inputtype: "rtselect",
 				title: "方案名称",
 				itemWidth: 1,
@@ -433,7 +456,11 @@ const pageresult = reactive<Pageresult>({
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: true,
-    isRadio: true,
+    tableBtnType: "btn",
+    tableBtnWidth: 95,
+    tableBtnPosition: "right",
+    tableBtnTitle: "错误信息",
+    fixed: true,
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -443,7 +470,7 @@ const tableconfig = reactive<AppTableConfig>(
 				hidden: hidden,
 				func: function () {
 					let formData = freeEditRef.value?.getFromValue()
-					if(!formData.cProdNo || !formData.cTermNo) {
+					if(!formData.cProdNo || !formData.cPlanNo) {
 						ElMessage.warning("请先选择方案！");
 						return false
 					}
@@ -453,7 +480,7 @@ const tableconfig = reactive<AppTableConfig>(
 					}
 					downloadTemplateLoading.value = true;
 					const param = {
-						cPlanNo: formData.cTermNo,
+						cPlanNo: formData.cPlanNo,
 						CProdNo: formData.cProdNo,
 						CGrpMrk: '0',
 						cDptCde: formData.cDptCde,
@@ -496,7 +523,7 @@ const tableconfig = reactive<AppTableConfig>(
 				hidden: hidden,
 				func: function () {
 					let formData = freeEditRef.value?.getFromValue()
-					if(!formData.cProdNo || !formData.cTermNo) {
+					if(!formData.cProdNo || !formData.cPlanNo) {
 						ElMessage.warning("请先选择方案！");
 						return false
 					}
@@ -517,7 +544,7 @@ const tableconfig = reactive<AppTableConfig>(
 				
 								// 构建参数并请求接口
 								const params = {
-									cPlanNo: formData.cTermNo,
+									cPlanNo: formData.cPlanNo,
 									CProdNo: formData.cProdNo,
 									CGrpMrk: '0',
 									cDptCde: formData.cDptCde,
@@ -561,7 +588,33 @@ const tableconfig = reactive<AppTableConfig>(
         func: function () {},
       }),
 		],
+    tableBtn: [
+      createFreeButtonBase({
+        id: "score",
+        link: true,
+        tooltip: "查看错误原因",
+        type: "success",
+        size: "large",
+        icon: "View",
+        hideBtns: (row: any) => {
+          if (!!row.cImportAppMsg) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          dialogData.value = row.cImportAppMsg;
+          dialogVisible.value = true;
+        },
+      }),
+    ],
     fromSchema: [
+      {
+				prop: "cAppGroup",
+				inputtype: "rtinput",
+				title: "保单序号",
+      },
       {
 				prop: "cAppNo",
 				inputtype: "rtinput",
@@ -624,6 +677,15 @@ const tableconfig = reactive<AppTableConfig>(
         prop: "nPrm",
 				inputtype: "rtinput",
         title: "保险费",
+      },
+      {
+        prop: "cImportType",
+				inputtype: "rtselect",
+				title: "导入类型",
+        loadData :[
+          { label:'普通出单',value: 1 },
+          { label:'方案出单',value: 2 },
+        ]
       },
       {
         prop: "cOprCde_text",
@@ -833,5 +895,21 @@ const copyText = (text: any) => {
 
 :deep(.el-table td.el-table__cell div.cell) {
     white-space: pre-line;
+}
+.error-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+.error-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0; /* 给每一条加个底部分割线 */
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+/* 去掉最后一条的分割线 */
+.error-item:last-child {
+  border-bottom: none;
 }
 </style>
