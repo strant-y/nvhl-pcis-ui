@@ -291,9 +291,9 @@ const method = {
     console.log('是否初始化/回显状态', isInit);
 
 		// 自动填充账户名称为投保人姓名
-		if (!isInit) {
-			setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'] || '');
-		}
+		// if (!isInit) {
+		//	setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']['Applicant.cAppNme'] || '');
+		//}
 
     // 规则：有银行大类值 无值→强制置灰   初始化不做处理  直连银行=1  不必填  非直连=0  必填  
     const setBankCdeStatusByCategory = (isRequired: any, isDisabled = false) => {
