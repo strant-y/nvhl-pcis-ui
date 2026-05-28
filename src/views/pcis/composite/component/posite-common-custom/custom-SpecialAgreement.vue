@@ -438,6 +438,7 @@ const method = {
                 delete item.cAppNo
                 delete item.cPkId
               }
+              if(item.cIfFix === "0") item.cSpecialCode = "";
             })
             console.log('缓存问题',sessionSpecialAgreement )
             console.log('缓存问题2selectdata',selectedData )

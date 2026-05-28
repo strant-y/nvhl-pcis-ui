@@ -301,6 +301,7 @@ const returnData = () => {
     item.index = index + 1;
     // 如果父组件依赖 addIndex，也同步更新
     if (item.addIndex) item.addIndex = index + 1;
+    if(item.cIfFix === "0") item.cSpecialCode = "";
   });
 
   // 6. 提交数据
