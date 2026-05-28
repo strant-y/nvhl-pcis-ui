@@ -398,6 +398,9 @@ const method = {
         getSelected(selectdata: any) {
           let len = formData.value.length;
           let sessionSpecialAgreement = JSON.parse(sessionStorage.getItem('AgreementSpecial')) || [];
+          sessionSpecialAgreement.forEach((item:any) => {
+            if(item.cIfFix === "0") item.cSpecialCode = "";
+          })
           const result = mergeArrays(sessionSpecialAgreement, selectdata, 'cSpecialCode', ['cSpecialContent']);
 
 
