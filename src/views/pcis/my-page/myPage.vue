@@ -4031,11 +4031,9 @@ const submitToUndrFn = async () => {
   }
 
     // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
-  const hasInvalidPlan = checkPayPlanValidity({ opertaor });
-  if(hasInvalidPlan){  // 缴费区间超出保险区间  缴费起期 > 缴费止期
-      //  ElMessage.warning('请注意，缴费计划-缴费区间不能超出保险区间, 并且每期缴费起期 > 缴费止期！缴费期限不能重叠！')
-      ElMessage.warning('缴费计划-存在无效项（格式错误、超出保险区间或期数重叠），请检查！');
-      // opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
+  const errorMsg = checkPayPlanValidity({ opertaor });
+  if (errorMsg) {  
+      ElMessage.warning(errorMsg);
       return false;
   }
   

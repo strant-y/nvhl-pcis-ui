@@ -21,12 +21,13 @@ interface CheckPayPlanParams {
 }
 
 /**
- * 检查缴费计划时间是否超出保险区间
+ * 检查缴费计划时间是否有效
  * @param  opertaor 工具
+ * @returns {string | null} 校验通过返回 null，校验失败返回具体的错误提示文案
  */
 export const checkPayPlanValidity = ({
   opertaor,
-}: CheckPayPlanParams): boolean => {
+}: CheckPayPlanParams): string | null => {
   try {
     const payPlanList = opertaor.getTableRefByKey("payinfo").getFromValue();
     const insuranceStart = opertaor
@@ -66,7 +67,7 @@ export const checkPayPlanValidity = ({
       isNaN(insEndDate.getTime()) ||
       insStartDate > insEndDate
     ) {
-      return true;
+      return "保单的保险起期或止期格式不正确，请检查！";
     }
     
     // 2. 先过滤无效缴费计划（日期格式错误的直接判定无效）
@@ -83,12 +84,12 @@ export const checkPayPlanValidity = ({
       );
     });
 
-    // 3. 校验缴费期数重叠（核心新增逻辑）
+    // 3. 校验缴费期数重叠
     const hasOverlap = (() => {
       // 只有 1 条或 0 条计划，不可能重叠
       if (validPayPlans.length <= 1) return false;
 
-      // 按缴费起期排序（排序后只需对比相邻计划，提升效率）
+      // 按缴费起期排序
       const sortedPlans = [...validPayPlans].sort((a, b) => {
         const startA = toValidDate(a["Pay.tPayBgnTm"]).getTime();
         const startB = toValidDate(b["Pay.tPayBgnTm"]).getTime();
@@ -103,7 +104,7 @@ export const checkPayPlanValidity = ({
         const currentEnd = toValidDate(currentPlan["Pay.tPayEndTm"]).getTime();
         const nextStart = toValidDate(nextPlan["Pay.tPayBgnTm"]).getTime();
 
-        // 重叠判定：当前计划止期 >= 下一个计划起期（包含首尾相接，如需允许相接可改为 currentEnd > nextStart）
+        // 重叠判定
         if (currentEnd >= nextStart) {
           return true;
         }
@@ -113,7 +114,7 @@ export const checkPayPlanValidity = ({
 
     // 4. 若存在重叠，直接判定无效
     if (hasOverlap) {
-      return true;
+      return "缴费计划的缴费期限存在重叠，请检查！";
     }
 
     // 5. 原有单条计划校验（兜底：确保无遗漏的无效计划）
@@ -121,17 +122,57 @@ export const checkPayPlanValidity = ({
       const payStart = toValidDate(plan["Pay.tPayBgnTm"]);
       const payEnd = toValidDate(plan["Pay.tPayEndTm"]);
 
-      if (isNaN(payStart.getTime()) || isNaN(payEnd.getTime())) return true;
-      if (payStart > payEnd) return true;
-      if (payStart > insEndDate || payEnd > insEndDate) return true;
+      if (isNaN(payStart.getTime()) || isNaN(payEnd.getTime())) return "缴费计划时间格式不正确！";
+      if (payStart > payEnd) return "缴费计划的开始时间不能晚于结束时间！";
+      if (payStart > insEndDate || payEnd > insEndDate) return "缴费计划不能超出保单止期！";
     }
 
-    return false;
+    // 6. 校验缴费计划第一期缴费起期缴费止期必须在规则内
+    const appTmVal = opertaor.getTableRefByKey("insrnc").getValue("Base.tAppTm");
+    let bgnTmDate = dayjs(appTmVal);
+    let endTmDate = dayjs(insuranceStart);
+    if (endTmDate.isBefore(bgnTmDate)) {
+      // 默认保险期间为3天
+      endTmDate = bgnTmDate.add(3, 'day');
+    }
+    if (payPlanList.length === 1) {
+      // 直接利用 dayjs 将时间设置为当天的 23:59:59
+      endTmDate = endTmDate.hour(23).minute(59).second(59);
+    } else {
+      // 如果不是单次缴费，减去1秒
+      endTmDate = endTmDate.subtract(1, 'second');
+    }
+    if (payPlanList && payPlanList.length > 0) {
+      const firstPayPlan = payPlanList[0];
+      // 获取第一条数据的开始和结束时间，并转为 dayjs 对象
+      const payStart = dayjs(firstPayPlan['Pay.tPayBgnTm']);
+      const payEnd = dayjs(firstPayPlan['Pay.tPayEndTm']);
+      if (payStart.isAfter(endTmDate)) {
+        return `首期缴费起期不能晚于 ${endTmDate.format('YYYY-MM-DD HH:mm:ss')}！`;
+      }
+      if (payEnd.isAfter(endTmDate)) {
+        return `首期缴费止期不能晚于 ${endTmDate.format('YYYY-MM-DD HH:mm:ss')}！`;
+      }
+      if (payStart.isAfter(payEnd)) {
+        return "首期缴费计划的开始时间不能晚于结束时间！";
+      }
+    }
+    // 7. 校验 多期缴费最后一期缴费止期不能早于保单止期前30天（保留你的原有逻辑）
+    if(payPlanList && payPlanList.length > 1){
+      const lastPlan = payPlanList[payPlanList.length - 1];
+      const lastPayEnd = toValidDate(lastPlan["Pay.tPayEndTm"]); // 最后一期缴费止期
+      // 核心逻辑：最后一期缴费不能晚于保单止期前30天
+      const minLastPayEnd = dayjs(insuranceEnd).subtract(30, 'day');
+      if (dayjs(lastPayEnd).isAfter(minLastPayEnd)) {
+        return `最后一期保费的缴费止期不能晚于保单止期前30天（即不能晚于 ${minLastPayEnd.format('YYYY-MM-DD HH:mm:ss')}）！`;
+      }
+    }
+
+    return null;
   } catch (error) {
-    return true;
+    return "缴费计划校验发生系统异常，请稍后重试！";
   }
 };
-
 
 
 // 校验 040005 产品 清单信息与地址信息 问题
