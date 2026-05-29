@@ -46,7 +46,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cSubtractPrmRsn",
         inputtype: "rtinput",
         title: "退保、减保或者办理保单贷款原因",
-				disabled: true,
 				type: "textarea",
         rows: 2,
       },
@@ -54,7 +53,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cNotBackAppRsn",
         inputtype: "rtinput",
         title: "未退还至投保人账户的原因",
-				disabled: true,
 				type: "textarea",
         rows: 2,
       },
@@ -62,7 +60,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "EdrBase.cNotBackAppNo",
         inputtype: "rtinput",
         title: "反洗钱非投保人收款审批单号",
-        disabled:true
       },
     ],
     fromUi: createFromUiConfig({
