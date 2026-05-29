@@ -3479,7 +3479,7 @@ const calcPremium = () => {
       opertaor.setDataAll(ops);
       isCalcPremium.value = true;
       nPrm.value = ops["base"]["Base.nPrm"] ? ops["base"]["Base.nPrm"] : 0;
-            nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
+      nAmt.value = ops["base"]["Base.nAmt"] ? ops["base"]["Base.nAmt"] : 0;
 
       const nAmtVal = ops["base"]["Base.nAmt"];
       const nPrmVal = ops["base"]["Base.nPrm"];
@@ -4541,7 +4541,7 @@ const validateNPrmAmlya = () => {
   return true;
 }
 
-// 批改保费变化为负数，校验反洗钱
+// 批改保费变化为负数||账户人名与被保人不一致，校验反洗钱
 function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
 	const plyBaseData = opertaor.getDataAll()["base"];
 	const cPrmCur = plyBaseData['Base.cPrmCur']; // 保费币种
@@ -4550,17 +4550,15 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
 
   const acctinfo = opertaor.getDataAll()["acctinfo"];
   const applicant = opertaor.getDataAll()["applicant"];
-
-  if(acctinfo && applicant && acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
-    edrexpFlag.value = true;
-    return true;
-  }
-
   // 如果不是退费（>=0），不触发
   if (nPrmVar >= 0) {
     return false;
   }
-
+  
+  if(acctinfo && applicant && acctinfo['Acctinfo.cAcctNme'] !== applicant['Applicant.cAppNme']){
+    edrexpFlag.value = true;
+    return true;
+  }
   // 取退费的绝对值（正数）
   const refundAmount = Math.abs(nPrmVar);
 
@@ -4590,41 +4588,9 @@ function edramlyaFlag(EdrBaseData: Record<string, any>): boolean {
 }
 const edrvalidateNPrmAmlya = (EdrBaseData) => {
 	if (edramlyaFlag(EdrBaseData)) {
-		nextTick(() => {
-			let isDis = false;
-			if (props.param.pageType === "EDR_APP_NEW_SCENE") {
-				isDis = true
-			} else if ((props.param.pageType === "TEMPORARY_DEPOSIT" && props.param.cTransMrk !=='1')) {
-				isDis = true
-			}
-			edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-        rules: [getRules("maxLength", {len:2000})],
-        hidden: false,
-        disabled: false
-      });
-      edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-        rules: [getRules("maxLength", {len:2000})],
-        hidden: false,
-        disabled: false
-      });
-      edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-        rules: [getRules("maxLength", {len:50})],
-        hidden: false,
-        disabled: false
-      });
-		})
   } else {
     if(edrexp.value) {
       edrexp.value.setFormValue({});
-      edrexp.value.setFormItem('EdrBase.cSubtractPrmRsn', {
-        rules: [getRules("maxLength", {len:2000})],
-      });
-      edrexp.value.setFormItem('EdrBase.cNotBackAppRsn', {
-        rules: [getRules("maxLength", {len:2000})],
-      });
-      edrexp.value.setFormItem('EdrBase.cNotBackAppNo', {
-        rules: [getRules("maxLength", {len:50})],
-      });
     }
   }
   return true;
@@ -5547,11 +5513,12 @@ const submitEdrToUndrSurrender = async () => {
     ElMessage.error("请填写批改信息中的必填项")
     return
   }
-	const edrexpValidate = await edrexp.value?.validate();
-  if(!edrexpValidate && edrexp.value && edrexpFlag) {
-    ElMessage.error("请检查批改扩展信息中的必填项")
-    return
-  }
+  // 反洗钱校验通过后端统一校验,不再前端再做任何提示
+	// const edrexpValidate = await edrexp.value?.validate();
+  // if(!edrexpValidate && edrexp.value && edrexpFlag) {
+  //   ElMessage.error("请检查批改扩展信息中的必填项")
+  //   return
+  // }
 
 
   // 从共主联、从共无联保和数据开关校验
@@ -5629,11 +5596,11 @@ const submitEdrToUndrSurrender = async () => {
  * **/
 const saveEdrState = ref(false);
 const saveEdrPlyInfo = async () => {
-	const edrexpValidate = await edrexp.value?.validate();
-  if(!edrexpValidate && edrexp.value && edrexpFlag) {
-    ElMessage.error("请检查批改扩展信息中的必填项")
-    return
-  }
+	// const edrexpValidate = await edrexp.value?.validate();
+  // if(!edrexpValidate && edrexp.value && edrexpFlag) {
+  //   ElMessage.error("请检查批改扩展信息中的必填项")
+  //   return
+  // }
   let saveEdrFlag = false;
   bthList.value.forEach((item:any) => {
     if(['btnCalEdr','btnCompare','saveEdr','btnSubmitEdr'].includes(item.id)) {
@@ -5975,13 +5942,13 @@ const submitEdrToUndrFun = async () => {
     	return;
   	}
 	}
-	if(props.param.cTransMrk !== "1" && edrexp.value && edrexpFlag){
-    const edrexpValidate = await edrexp.value?.validate();
-     if(!edrexpValidate) {
-      ElMessage.warning("请检查批改扩展信息中的必填项")
-      return
-    }
-  }
+	// if(props.param.cTransMrk !== "1" && edrexp.value && edrexpFlag){
+  //   const edrexpValidate = await edrexp.value?.validate();
+  //    if(!edrexpValidate) {
+  //     ElMessage.warning("请检查批改扩展信息中的必填项")
+  //     return
+  //   }
+  // }
 
   if (validateGuaranteeBgnTm()) {
     return;

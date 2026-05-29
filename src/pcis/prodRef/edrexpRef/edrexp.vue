@@ -49,7 +49,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				disabled: true,
 				type: "textarea",
         rows: 2,
-        rules: [getRules("maxLength", {len:2000})],
       },
       {
         prop: "EdrBase.cNotBackAppRsn",
@@ -58,13 +57,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 				disabled: true,
 				type: "textarea",
         rows: 2,
-        rules: [getRules("maxLength", {len:2000})],
       },
       {
         prop: "EdrBase.cNotBackAppNo",
         inputtype: "rtinput",
         title: "反洗钱非投保人收款审批单号",
-        rules: [getRules("maxLength", {len:50})],
         disabled:true
       },
     ],
