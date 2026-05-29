@@ -1535,7 +1535,7 @@ function initMethod(){
     }
     // 根据数据控制开关设置条款中的可编辑项(批单)
     if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType) {
-      qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
+      qryTerminationDataList({ cPlyNo: pageparam.cPlyNo, cOperType: 'EdrPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
             if(riskShowTyp.value === 'grid' && riskGridConfig.value.fromSchema?.length > 0) {
@@ -2344,6 +2344,7 @@ async function nInsuranceFeeChange(val:any) {
       nInsuranceFee = new Decimal(nInsuranceFee).add(new Decimal(item['Term.nInsuranceFee'] || 0)).toNumber()
     })
     if(['2','4'].includes(plyBase?.['Base.cCiMrk']) && pageparam.pageName !== 'priceInquiry') {// 从共主联、从共无联保
+      console.log('11111111111')
       const qryTerminationData:any = await qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'AppPrm' })
       if(qryTerminationData?.code == 200 && qryTerminationData.data?.length > 0) {
         if(qryTerminationData.data[0]?.cAppTyp === 'on') {
