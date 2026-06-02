@@ -1792,7 +1792,11 @@ function upatetransfer(seedFlag: boolean = false){
   const datas = insuredEditRef.value?.getFromValue();
   // seedFlag 是否强制平台获取,如果为true,则强制获取
   let param = {
-    creditCode :datas['Insured.cCertfCde']
+    creditCode :datas['Applicant.cCertfCde']
+  }
+  // seedFlag 是否强制平台获取,如果为true,则强制获取
+  if(seedFlag){
+    param['cSendFlag'] = '1';
   }
   getCorporateInfo(param).then((res:any) => {
     if(res.code === 200) {
