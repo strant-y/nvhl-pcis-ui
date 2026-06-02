@@ -35,7 +35,7 @@ export const imageMethod = {
       };
       policyService.listEmployeesByRecorder(data).then((res: any) => {
         if(res.code === 200){
-          showImage2(param)
+          showImage2(opertaor,param,params)
         } else {
           policyService
           .imageInfoShow({ ParamNo: ParamNo })
@@ -52,11 +52,11 @@ export const imageMethod = {
         }
       })
     } else {
-      showImage2(param)
+      showImage2(opertaor,param,params)
     }
   },
 
-  showImage2: function (param: any) {
+  showImage2: function (opertaor,param,params) {
     checkAppBase(param).then((res) => {
       if (res.code === 200) {
         const tabref = opertaor.getTableRefs();
