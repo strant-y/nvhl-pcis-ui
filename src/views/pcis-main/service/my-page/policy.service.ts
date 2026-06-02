@@ -1702,4 +1702,9 @@ queryECargoPayString(ops) {
     getCombinationProdList(param: any) {
         return request.post(`/policy/getCombinationProdList`, param);
     }
+
+// 判断当前账号能否上传影像
+listEmployeesByRecorder(ops) {
+	return request.post(`/query/listEmployeesByRecorder`, ops)
+}
 }
