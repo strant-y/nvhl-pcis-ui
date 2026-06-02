@@ -199,6 +199,9 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 cRuleCde: 'RULE_01',
                 cPrd: null,
                 cProdNo: params.cProdNo,
+                cCiMrk: params.cCiMrk,
+                cPlyNo: cPlyNo,
+                cEcAgrNo: params.cEcAgrNo || "",
               }
               const nDpdDays:any = await qryProdRuleList(param);
               if(nDpdDays.code === 200) {

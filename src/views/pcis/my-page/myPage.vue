@@ -7384,6 +7384,9 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
       cRuleCde: 'RULE_01',
       cPrd: null,
       cProdNo: props.param.cProdNo,
+      cCiMrk: props.param.cCiMrk,
+      cPlyNo: cPlyNo,
+      cEcAgrNo: props.param.cEcAgrNo || "",
     }
     const nDpdDays:any = await qryProdRuleList(param);
     if(nDpdDays.code === 200) {
