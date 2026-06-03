@@ -1769,26 +1769,27 @@ function handleFileChange(event: Event) {
               });
               if (cardInfo["BizLicenseCreditCode"])
                 setValue("Applicant.cCertfCde", cardInfo["BizLicenseCreditCode"]); // 证件号码
-              if (cardInfo["BizLicenseCompanyName"]){
-                if (cardInfo["BizLicenseCompanyName"].startsWith('自')) {
-                  setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"].slice(1)); // 客户名称
-                } else {
-                  setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
-                }
-              }
+              if (cardInfo["BizLicenseCompanyName"])
+                setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
               if (cardInfo["BizLicenseOperatingPeriod"]) {
-                tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
+                let data
+                if (cardInfo["BizLicenseOperatingPeriod"].startsWith('自')) {
+                  data = cardInfo["BizLicenseOperatingPeriod"].slice(1);
+                } else {
+                  data = cardInfo["BizLicenseOperatingPeriod"];
+                }
+                tCertfDate.value = data.split("至");
                 setValue(
                     "Applicant.tCertfBgnDate",
-                    cardInfo["BizLicenseOperatingPeriod"].split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效起期
+                    data.split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效起期
                 );
-                if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1].includes("期限") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "年月日") { // 证件有效期长期标识
+                if (data.split("至")[1].includes("长期") || data.split("至")[1].includes("期限") || data.split("至")[1] === "年月日") { // 证件有效期长期标识
                   setValue("Applicant.cLongendTyp", "1");
                 } else {
                   setValue("Applicant.cLongendTyp", "0");
                   setValue(
                       "Applicant.tCertfEndDate",
-                      cardInfo["BizLicenseOperatingPeriod"].split("至")[1]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效止期
+                      data.split("至")[1]?.replace(/[年|月|]/g, '-').replace(/日/g, '') //证件有效止期
                   );
                 }
               }

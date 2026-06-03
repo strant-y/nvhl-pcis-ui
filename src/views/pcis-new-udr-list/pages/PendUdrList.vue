@@ -410,7 +410,7 @@
                         console.log(obj);
                         const res = {};
                         res["user"] = JSON.parse(sessionStorage.getItem("user"));
-                        res["user"]["opRelCde"] = "10030892";
+                        res["user"]["opRelCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
                         res["appNoAndTaskIdMap"] = obj;
                         res["cUndrMrk"] = "BB";
                         res["undrMrk"] = "BB";
@@ -785,7 +785,7 @@
                 res["cUndrMrk"] = "W";
                 res["undrMrk"] = "W";
                 res["user"] = JSON.parse(sessionStorage.getItem("user"));
-                res["user"]["opRelCde"] = "10030892";
+                res["user"]["opRelCde"] = JSON.parse(sessionStorage.getItem("user")).opCde;
                 res["appNo"] = row.objId;
                 res["taskId"] = row.curtTask;
                 res["appTyp"] = row.bsType;

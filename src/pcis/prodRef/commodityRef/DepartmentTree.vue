@@ -11,6 +11,7 @@
       style="width: 500px"
       placeholder="输入机构代码或者机构名称查询"
 			@keyup.enter="handleSearch(true)"
+      @input="handleSearch(true)"
      >
           <template #append>
             <el-button icon="Search" @click="handleSearch(true)" />

@@ -320,13 +320,13 @@ const method = {
         const ciRef = opertaor.getTableRefs()['ci'];
         if (val === "19002" || val === "19003") {
           // 非直销业务：清空业务员
-          if (ciRef) {
-            const ciData = ciRef.getFromValue();
-            ciData.forEach((row: any) => {
-              ciRef.setValueByRowKey("Ci.cSlsId", row._dataId, "");
-              ciRef.setValueByRowKey("Ci.cSlsNme", row._dataId, "");
-            });
-          }
+          // if (ciRef) {
+          //   const ciData = ciRef.getFromValue();
+          //   ciData.forEach((row: any) => {
+          //     ciRef.setValueByRowKey("Ci.cSlsId", row._dataId, "");
+          //     ciRef.setValueByRowKey("Ci.cSlsNme", row._dataId, "");
+          //   });
+          // }
           //代理业务 | 经纪业务
           const obj = {
             rules: [getRules("required", {})],
@@ -336,13 +336,13 @@ const method = {
           };
         } else {
           // 直销业务：清空代理业务员和代理经纪人
-          if (ciRef) {
-            const ciData = ciRef.getFromValue();
-            ciData.forEach((row: any) => {
-              ciRef.setValueByRowKey("Ci.cBrkrCde", row._dataId, "");
-              ciRef.setValueByRowKey("Ci.cBrkSlsCde", row._dataId, "");
-            });
-          }
+          // if (ciRef) {
+          //   const ciData = ciRef.getFromValue();
+          //   ciData.forEach((row: any) => {
+          //     ciRef.setValueByRowKey("Ci.cBrkrCde", row._dataId, "");
+          //     ciRef.setValueByRowKey("Ci.cBrkSlsCde", row._dataId, "");
+          //   });
+          // }
         }
         if (!!ciRef) {
           ciRef.valideRequired();

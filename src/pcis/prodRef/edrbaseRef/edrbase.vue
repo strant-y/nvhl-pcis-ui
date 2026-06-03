@@ -201,7 +201,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 cProdNo: params.cProdNo,
                 cCiMrk: params.cCiMrk,
                 cPlyNo: cPlyNo,
-                cEcAgrNo: params.cEcAgrNo || "",
+                cEcAgrNo: opertaor.getTableRefByKey('plyBase')?.getValue('Base.cEcAgrNo') || "",
               }
               const nDpdDays:any = await qryProdRuleList(param);
               if(nDpdDays.code === 200) {

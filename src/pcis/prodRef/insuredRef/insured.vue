@@ -1984,26 +1984,27 @@ function handleFileChange(event: Event) {
             console.log('营业执照’，', cardInfo)
             if (cardInfo["BizLicenseCreditCode"])
               setValue("Insured.cCertfCde", cardInfo["BizLicenseCreditCode"]); // // 证件号码
-            if (cardInfo["BizLicenseCompanyName"]){
-              if (cardInfo["BizLicenseCompanyName"].startsWith('自')) {
-                setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"].slice(1)); // 客户名称
-              } else {
-                setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
-              }
-            }
+            if (cardInfo["BizLicenseCompanyName"])
+              setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
             if (cardInfo["BizLicenseOperatingPeriod"]) {
-              tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
+              let data
+              if (cardInfo["BizLicenseOperatingPeriod"].startsWith('自')) {
+                data = cardInfo["BizLicenseOperatingPeriod"].slice(1);
+              } else {
+                data = cardInfo["BizLicenseOperatingPeriod"];
+              }
+              tCertfDate.value = data.split("至");
               setValue(
                 "Insured.tCertfBgnDate",
-                cardInfo["BizLicenseOperatingPeriod"].split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '')
+                data.split("至")[0]?.replace(/[年|月|]/g, '-').replace(/日/g, '')
               );
-              if (cardInfo["BizLicenseOperatingPeriod"].split("至")[1]?.includes("长期") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1]?.includes("期限") || cardInfo["BizLicenseOperatingPeriod"].split("至")[1] === "年月日") {
+              if (data.split("至")[1]?.includes("长期") || data.split("至")[1]?.includes("期限") || data.split("至")[1] === "年月日") {
                 setValue("Insured.cLongendTyp", "1");
               } else {
                 setValue("Insured.cLongendTyp", "0");
                 setValue(
                   "Insured.tCertfEndDate",
-                  cardInfo["BizLicenseOperatingPeriod"].split("至")[1]?.replace(/[年|月|]/g, '-').replace(/日/g, '')
+                  data.split("至")[1]?.replace(/[年|月|]/g, '-').replace(/日/g, '')
                 );
               }
             }

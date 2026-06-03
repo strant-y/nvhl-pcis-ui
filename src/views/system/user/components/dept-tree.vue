@@ -15,6 +15,7 @@
       @clear="isQuery = false"
       @keyup.enter="queryDpt"
       @blur="queryDpt"
+      @input="queryDpt"
     />
     <div class="tree" v-loading="loading">
 			<div class="tree-wrapper">
