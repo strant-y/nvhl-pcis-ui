@@ -9,7 +9,7 @@
     <el-input
       v-model="filterText" 
       style="width: 500px"
-      placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
+      placeholder="输入机构代码或者机构名称查询"
 			@keyup.enter="handleSearch(true)"
      >
           <template #append>
@@ -115,9 +115,6 @@ const handleSearch = ()=>{
         _nodes.value = [];
         initDptTreeList();
         return;
-      }else if(filterText.value.trim().length<5){
-            ElMessage.warning('查询条件不得少于五个字符！');
-            return;
       }
       if(props.isXY){
         try {
@@ -145,7 +142,7 @@ const handleSearch = ()=>{
                   leaf: false,
                   children: res.map(item => ({
                     id: item.id,
-                    name: item.name,
+                    name: item.id + '-' +item.name,
                     leaf: !item.hasChildren,
                     children: [],
                     expanded: true, // 确保搜索结果节点展开
@@ -192,7 +189,7 @@ const handleSearch = ()=>{
                   leaf: false,
                   children: res.map(item => ({
                     id: item.id,
-                    name: item.name,
+                    name: item.id + '-' +item.name,
                     leaf: !item.hasChildren,
                     children: [],
                     expanded: true // 确保搜索结果节点展开
@@ -234,7 +231,7 @@ const initDptTreeList = () => {
         if (res["data"]) {
           const rootNode = {
             id: root,
-            name: res["data"]["name"],
+            name: root + '-' +res["data"]["name"],
             leaf: false,
             expanded: true,
             children: [], // 确保有 children 属性用于存放子节点
@@ -313,7 +310,7 @@ const loadNode = (node, resolve) => {
           dto.push({
             cSignDptMrk:item["cSignDptMrk"],
             id: item["id"],
-            name: item["name"],
+            name: item["id"] + '-' +item["name"],
             leaf: !item.hasChildren,
             expanded: true // 关
           });

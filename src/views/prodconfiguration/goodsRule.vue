@@ -3,7 +3,7 @@
     <div class="left-container">
 			<div class="tree-scroll-container">
 				<div class="tree-wrapper">
-					<el-tree
+					<!-- <el-tree
 						:data="treeData"
 						:props="defaultProps"
 						:load="loadNode" 
@@ -13,7 +13,8 @@
 						@node-click="handleNodeClick"
 						ref="treeRef"
 						class="tree-container"
-					/>
+					/> -->
+          <dept-tree v-model="cDptCde" @confirm="handleNodeClick" />
 				</div>
 			</div>
     </div>
@@ -282,6 +283,7 @@ const showRelatedTermsModal = ref(false);
 const showAddTermModal = ref(false);
 
 const treeData = ref<any[]>([]);
+const cDptCde = ref("");
 
 // ref([
 //   // {
@@ -313,7 +315,7 @@ const defaultProps = {
 
 const handleNodeClick = (data: any) => {
   // treeNodeId.value = 123;
-  setValue('cDptCde',data.id)
+  setValue('cDptCde',data.value)
   handleQuery()
   // tableRef.value?.setQuery({
   //   orgCode: data.id,
@@ -535,7 +537,7 @@ defineExpose({
 }
 
 .tree-scroll-container {
-  height: 35rem;
+  height: 100%;
   width: 400px;
   overflow-x: auto; /* 允许横向滚动 */
   overflow-y: auto; /* 纵向也需要滚动 */

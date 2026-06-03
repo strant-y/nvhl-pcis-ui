@@ -98,8 +98,8 @@ const formconfig = reactive<AppFreeEditConfig>(
       {
         prop: "cPlyPrmcalFlg",
         inputtype: "rtselect",
-        title: "投保报废计算规则",
-        rules: [getRules("required", { change: "投保报废计算规则不能为空" })],
+        title: "投保保费计算规则",
+        rules: [getRules("required", { change: "投保保费计算规则不能为空" })],
         loadData: [
           { value: "0", label: "手工录入保费" },
           { value: "1", label: "通用规则计算保费" },

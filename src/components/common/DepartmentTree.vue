@@ -9,7 +9,7 @@
     <el-input
       v-model="filterText"
       style="width: 500px"
-      placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
+      placeholder="输入机构代码或者机构名称查询"
     />
     <el-tree
       ref="treeRef"

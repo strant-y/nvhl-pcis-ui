@@ -108,7 +108,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                   setFormItem("cPertainDptCde", {
                     loadData: [
                       {
-                        label: `${selectObj.id}${selectObj.name}`,
+                        label: selectObj.name,
                         value: selectObj.id,
                       },
                     ],
@@ -235,7 +235,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                     loadData: [
                       {
                         // label: selectObj.name,
-                        label: `${selectObj.id}${selectObj.name}`,
+                        label: selectObj.name,
                         value: selectObj.id,
                       },
                     ],

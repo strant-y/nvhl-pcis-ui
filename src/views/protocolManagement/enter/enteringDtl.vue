@@ -1410,7 +1410,17 @@ function imageManage() {
   if(base?.['ECargoBase.cOprCde'] == user.opCde) {
     imageUploadManage()
   } else {
-    imageView()
+    let data = {
+        COprCde: base?.['ECargoBase.cOprCde'], // 录单员id
+        cOperatorId: user.opCde, // 操作员id
+    };
+    policyService.listEmployeesByRecorder(data).then((res: any) => {
+      if(res.code === 200){
+        imageUploadManage()
+      } else{
+        imageView()
+      }
+    });
   }
 }
 // 影像上传管理

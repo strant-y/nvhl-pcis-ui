@@ -325,7 +325,7 @@ onMounted(async () => {
 
       setValue('cAcctNme',props.data.cCustomerNameCn)
       setValue('cAcctNo',props.data.cCustAccountNo)
-      setValue('cBankRelTyp',props.data.cBankType)
+      // setValue('cBankRelTyp',props.data.cBankType)
       setValue('cBankPro',props.data.cBankProvince)
 
       setValue('cBankArea',props.data.cBankCity)

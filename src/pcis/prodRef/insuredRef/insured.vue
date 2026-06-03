@@ -1984,8 +1984,13 @@ function handleFileChange(event: Event) {
             console.log('营业执照’，', cardInfo)
             if (cardInfo["BizLicenseCreditCode"])
               setValue("Insured.cCertfCde", cardInfo["BizLicenseCreditCode"]); // // 证件号码
-            if (cardInfo["BizLicenseCompanyName"])
-              setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
+            if (cardInfo["BizLicenseCompanyName"]){
+              if (cardInfo["BizLicenseCompanyName"].startsWith('自')) {
+                setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"].slice(1)); // 客户名称
+              } else {
+                setValue("Insured.cInsuredNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
+              }
+            }
             if (cardInfo["BizLicenseOperatingPeriod"]) {
               tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
               setValue(

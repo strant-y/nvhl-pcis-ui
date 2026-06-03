@@ -1935,8 +1935,13 @@ function handleFileChange(event: Event) {
             });
             if (cardInfo["BizLicenseCreditCode"])
               setValue("Applicant.cCertfCde", cardInfo["BizLicenseCreditCode"]); // 证件号码
-            if (cardInfo["BizLicenseCompanyName"])
-              setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
+            if (cardInfo["BizLicenseCompanyName"]){
+              if (cardInfo["BizLicenseCompanyName"].startsWith('自')) {
+                setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"].slice(1)); // 客户名称
+              } else {
+                setValue("Applicant.cAppNme", cardInfo["BizLicenseCompanyName"]); // 客户名称
+              }
+            }
             if (cardInfo["BizLicenseOperatingPeriod"]) {
               tCertfDate.value = cardInfo["BizLicenseOperatingPeriod"].split("至");
               setValue(

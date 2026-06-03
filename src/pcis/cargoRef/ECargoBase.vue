@@ -136,7 +136,7 @@ const method = {
           let obj = {
             loadData: [
               {
-                label: `${selectObj.id}${selectObj.name}`,
+                label: selectObj.name,
                 value: selectObj.id,
               },
             ],
@@ -351,7 +351,7 @@ const method = {
             baseEditRef.value?.addCodeListMap({
               code:"ECargoBase.cIntroDptcde", list:[
                 {
-                  label: `${selectObj.id}${selectObj.name}`,
+                  label: selectObj.name,
                   value: selectObj.id,
                 },
               ],
@@ -360,7 +360,7 @@ const method = {
             baseEditRef.value?.addCodeListMap({
               code:"ECargoBase.cDptCde", list:[
                 {
-                  label: `${selectObj.id}${selectObj.name}`,
+                  label: selectObj.name,
                   value: selectObj.id,
                 },
               ],
