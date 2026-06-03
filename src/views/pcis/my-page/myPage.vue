@@ -7362,7 +7362,7 @@ async function qryTerminationFunc(flag:any) {// flag 0 投保申请核保 1 批�
       cProdNo: props.param.cProdNo,
       cCiMrk: props.param.cCiMrk,
       cPlyNo: cPlyNo,
-      cEcAgrNo: props.param.cEcAgrNo || "",
+      cEcAgrNo: opertaor.getTableRefByKey('plyBase')?.getValue('Base.cEcAgrNo') || "",
     }
     const nDpdDays:any = await qryProdRuleList(param);
     if(nDpdDays.code === 200) {
