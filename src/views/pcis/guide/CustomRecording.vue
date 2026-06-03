@@ -841,6 +841,10 @@ function next() {
 						return false; // 阻断跳转
 					}
 				}
+        if (formconfig1.value.cRecordType == 5) { // 方案出单把方案号和方案名称单独出来
+          data.cPlanNo = data.cTermNo
+          data.cPlanNme = data.cTermNme
+        }
         router.push({
           path: "/pcisapp/myPage",
           query: {

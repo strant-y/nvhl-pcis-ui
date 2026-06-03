@@ -384,10 +384,11 @@
       <div class="right-btns" v-if="pageLoaded">
         <div class="main-header2">
           <div class="tp">
-            <span>
-              {{props.param.cPolicySource == "5" || props.param.cRecordType == "5" ? '方案' : '条款'}}:
-              <span class="publicStyle">{{props.param.cTermNo }}{{props.param.cTermNme}}</span>
+            <span v-if="props.param.cPolicySource == '5' || props.param.cRecordType == '5'">
+              方案:<span class="publicStyle">{{props.param.cPlanNo }}{{props.param.cPlanNme}}</span>
             </span>
+            <br/>
+            <span>条款:<span class="publicStyle">{{props.param.cTermNo }}{{props.param.cTermNme}}</span></span>
             <br/>
             <span>出单方式:</span><span class="publicStyle">{{ getRecordTypeText(props.param.cPolicySource ?? props.param.cRecordType) }}</span>&nbsp;
             <br/>
@@ -3307,6 +3308,10 @@ const loadAppPlyInfo = async (CAppNo) => {
       if (ops["base"]["Base.nAmt"] && ops["base"]["Base.nAmt"] > 0) {
         nAmt.value = ops["base"]["Base.nAmt"];
       } 
+      // 方案出单如果路由里面没有cPlanNo，从详情里面给赋值
+      if((props.param.cPolicySource == "5" || props.param.cRecordType == "5") && !props.param.cPlanNo){
+        props.param.cPlanNo = ops["plyBase"]["Base.cPlanNo"]
+      }
       pageData.value = ops;
       ElMessage.success(res.msg);
       opertaor.setDataAll(ops);
@@ -4790,8 +4795,8 @@ const savePlyInfo = async () => {
     })
   }
   // 方案出单手动赋值方案号
-  if(props.param.cPolicySource == "5" || props.param.cRecordType == "5"){
-    res["plyBase"]["Base.cPlanNo"] = props.param.cTermNo
+  if((props.param.cPolicySource == "5" || props.param.cRecordType == "5") && !!props.param.cPlanNo){
+    res["plyBase"]["Base.cPlanNo"] = props.param.cPlanNo
   }
   // 判断是否为历史补全保单 (cTransMrk === '1')
   if (props.param.cTransMrk === '1') {
@@ -4890,6 +4895,10 @@ const savePlyInfo = async () => {
           if(res.data?.result && res.data?.result.length > 0) {
             sessionStorage.setItem('needCalcValue', JSON.stringify(needCalc.value))
             const data = res.data?.result[0];
+            // if(props.param.cPolicySource == "5" || props.param.cRecordType == "5"){
+            //   data.cPlanNo = props.param.cPlanNo
+            //   data.cPlanNme = props.param.cPlanNme
+            // }
             router.replace({
               path: "/pcisapp/myPage",
               query: {
@@ -5646,8 +5655,8 @@ const saveEdrPlyInfo = async () => {
   res["plyBase"]["Base.cDptCde"] = props.param.cDptCde;
   res["plyBase"]["Base.cProdNo"] = props.param.cProdNo;
   // 方案出单手动赋值方案号
-  if(props.param.cPolicySource == "5" || props.param.cRecordType == "5"){
-    res["plyBase"]["Base.cPlanNo"] = props.param.cTermNo
+  if((props.param.cPolicySource == "5" || props.param.cRecordType == "5") && !!props.param.cPlanNo){
+    res["plyBase"]["Base.cPlanNo"] = props.param.cPlanNo
   }
 
   res["EdrBase"] = edrbase.value?.getFromValue();
