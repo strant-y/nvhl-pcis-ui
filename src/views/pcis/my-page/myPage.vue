@@ -3208,14 +3208,14 @@ const loadAppPlyInfo = async (CAppNo) => {
       }
       // 投保暂存单进来要把代理经纪人、代理合作协议、代理业务员、代理业务执业证号、代理业务员机构代码、业务员员工号、业务员名称、业务员电话、业务员机构代码、业务员执业证号清空
       // 协议小保单除外，因为协议不能编辑如果清空后无法输入
-      if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '投保' && props.param.cPolicySource !== '9' && props.param.cRecordType !== '9') {
-        const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
-        clearList.forEach((item:any) => {
-          if(ops.plyBase?.[item]) {
-            ops.plyBase[item] = null;
-          }
-        })
-      }
+      // if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '投保' && props.param.cPolicySource !== '9' && props.param.cRecordType !== '9') {
+      //   const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
+      //   clearList.forEach((item:any) => {
+      //     if(ops.plyBase?.[item]) {
+      //       ops.plyBase[item] = null;
+      //     }
+      //   })
+      // }
     console.log("转换的数据", ops);
     if(ops["payinfo"] && ops["payinfo"].length > 0){
       ops["payinfo"].forEach((item:any, index:number)=>{

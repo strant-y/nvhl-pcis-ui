@@ -1002,14 +1002,14 @@ function query() {
         dataForm['AgreementBase']['ECargoBase.cEcAgrAppNo'] = ''
       }
       // 协议暂存单进来要把代理经纪人、代理合作协议、代理业务员、代理业务执业证号、代理业务员机构代码、业务员员工号、业务员名称、业务员电话、业务员机构代码、业务员执业证号清空
-      if(props.type === 'edit' && props.param?.cAppTyp === 'A') {
-        const clearList = ['ECargoBase.cBrkrCde','ECargoBase.cAgtAgrNo','ECargoBase.cBrkSlsCde','ECargoBase.cCertfNo','ECargoBase.cBrkrDptcde','ECargoBase.cSlsId','ECargoBase.cSlsNme','ECargoBase.cSlsTel','ECargoBase.cSlsDptcde','ECargoBase.cSlsCde']
-        clearList.forEach((item:any) => {
-          if(dataForm['AgreementBase']?.[item]) {
-            dataForm['AgreementBase'][item] = null;
-          }
-        })
-      }
+      // if(props.type === 'edit' && props.param?.cAppTyp === 'A') {
+      //   const clearList = ['ECargoBase.cBrkrCde','ECargoBase.cAgtAgrNo','ECargoBase.cBrkSlsCde','ECargoBase.cCertfNo','ECargoBase.cBrkrDptcde','ECargoBase.cSlsId','ECargoBase.cSlsNme','ECargoBase.cSlsTel','ECargoBase.cSlsDptcde','ECargoBase.cSlsCde']
+      //   clearList.forEach((item:any) => {
+      //     if(dataForm['AgreementBase']?.[item]) {
+      //       dataForm['AgreementBase'][item] = null;
+      //     }
+      //   })
+      // }
       formPage.value?.setAllFormData( dataForm, {
         success: (pageData: any) => {
           pageInit()

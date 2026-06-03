@@ -2862,14 +2862,14 @@ const loadAppPlyInfo = async (CAppNo) => {
       //   })
       // }
       // 询价暂存单进来要把代理经纪人、代理合作协议、代理业务员、代理业务执业证号、代理业务员机构代码、业务员员工号、业务员名称、业务员电话、业务员机构代码、业务员执业证号清空
-      if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '询价') {
-        const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
-        clearList.forEach((item:any) => {
-          if(ops.plyBase?.[item]) {
-            ops.plyBase[item] = null;
-          }
-        })
-      }
+      // if(props.param?.pageType === "TEMPORARY_DEPOSIT" && props.param?.baseType === '询价') {
+      //   const clearList = ['Base.cBrkrCde','Base.cAgtAgrNo','Base.cBrkSlsCde','Base.cCertfNo','Base.cBrkrDptcde','Base.cSlsId','Base.cSlsNme','Base.cSlsTel','Base.cSlsDptcde','Base.cSlsCde']
+      //   clearList.forEach((item:any) => {
+      //     if(ops.plyBase?.[item]) {
+      //       ops.plyBase[item] = null;
+      //     }
+      //   })
+      // }
       opertaor.setDataAll(ops);
       // 获取原申请单号下的清单列表数据
       const distMap = formconfig1[0].pageInfo.filter((item:any) => {
