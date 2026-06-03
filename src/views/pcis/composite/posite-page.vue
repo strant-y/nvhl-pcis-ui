@@ -1151,6 +1151,9 @@ const getReqParams = (t: string = 'save') => {
       if(prodData['base']) {
         prodData['base']['Base.tUpdTm'] = item['tUpdTm']
         prodData['plyBase']['Base.tUpdTm'] = item['tUpdTm']
+        if(props.param.cCombinationPlanNo) {
+          prodData['plyBase']['Base.cPlanNo'] = props.param.cCombinationPlanNo
+        }
       }
     }
   })
