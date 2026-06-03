@@ -269,7 +269,7 @@ function handleChange(val?: string | undefined | null) {
   let nv = 0;
   if (props.item.type === "number") {
     nv = val ? Number(val.replace(/[^\d.-]/g, '')) : null;
-    let Max = 99999999999;
+    let Max = 999999999999;
     if(props.item.max || props.item.max === 0){
       Max = props.item.max;
     }
