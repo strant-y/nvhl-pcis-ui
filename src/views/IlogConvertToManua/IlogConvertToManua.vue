@@ -149,7 +149,7 @@ const formconfig2 = reactive<AppFreeEditConfig>(
                     loadData: [
                       {
                         value: res.body.id,
-                        label: res.body.id + " " + res.body.name,
+                        label: res.body.name,
                       }
                     ]
                   });

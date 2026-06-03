@@ -4,8 +4,9 @@
       <el-col :span="6">
         <div class="gutter-row">
 					<div class="tree-wrapper">
-          	<el-tree :data="_nodes" :props="defaultProps" :load="loadNode" :show-line="true" :expand-on-click-node="false"
-            lazy accordion @node-click="handleNodeClick"></el-tree>
+          	<!-- <el-tree :data="_nodes" :props="defaultProps" :load="loadNode" :show-line="true" :expand-on-click-node="false"
+            lazy accordion @node-click="handleNodeClick"></el-tree> -->
+            <dept-tree v-model="CDptCde" @confirm="handleNodeClick" />
 					</div>
         </div>
       </el-col>
@@ -99,9 +100,9 @@ const loadNode = (node, resolve) => {
   });
 };
 
-const handleNodeClick = (data) => {
-  CDptCde.value = data.id
-};
+// const handleNodeClick = (data) => {
+//   CDptCde.value = data.id
+// };
 
 const cleanCheck = () => {
   CDptCde.value = ""
@@ -116,7 +117,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .gutter-row {
   background: var(--el-fill-color-blank);
-	height: 35rem;
+	height: 100%;
   width: 100%;
   overflow-x: auto; /* 允许横向滚动 */
   overflow-y: auto; /* 纵向也需要滚动 */

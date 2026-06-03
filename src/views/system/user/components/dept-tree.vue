@@ -35,21 +35,23 @@
   </el-card>
 </template>
 <style lang="scss" scoped>
-.tree{
+.tree {
   height: 500px;
   overflow-y: auto;
   overflow-x: auto;
   width: 100%;
 }
 
-/* 关键：让 tree-wrapper 宽度由内容撑开 */
+/* 让 tree-wrapper 宽度跟随父容器 */
 .tree-wrapper {
-  display: inline-block;
-  min-width: 100%; /* 至少占满容器 */
+  width: 100%;
+  min-width: 0; /* 防止内容撑破容器 */
 }
-:deep(.select-tree){
-  margin-right: 30px;
-  .el-tree-node{
+
+:deep(.select-tree) {
+  width: 100%;
+  min-width: 100%; /* 至少占满容器宽度 */
+  .el-tree-node {
     width: 100%;
   }
 }
@@ -81,9 +83,9 @@ const companyId = useVModel(props, "modelValue", emits);
 
 const deptList = computed(()=> {
   if(!isQuery.value) {
-    return codeListStore.getCacheCodeListByCode('TreeFormDeptType');
+    return formatDataWithIdLabel(codeListStore.getCacheCodeListByCode('TreeFormDeptType'));
   }else{
-    return queryList.value;
+    return formatDataWithIdLabel(queryList.value);
   }
 });
 
@@ -110,7 +112,7 @@ function handleNodeClick(data: { [key: string]: any }) {
   emits('confirm', data)
 }
 
-async function queryDpt(param){
+async function queryDpt(param: any){
   if(!searchParam.value) {
     isQuery.value = false;
     return;
@@ -120,6 +122,50 @@ async function queryDpt(param){
   const response = await getDeptOptions(searchParam.value);
   queryList.value = response.data;
   loading.value = false;
+}
+
+
+/**
+ * 通用数据格式化函数：将数据中的 label 修改为 id_label 格式
+ * 兼容：单层数组结构 和 多层树形结构
+ * @param {Array|Object} data - 原始数据 (可能是数组，也可能是树对象)
+ * @returns {Array|Object} 处理后的数据
+ */
+ function formatDataWithIdLabel(data: any[] | undefined) {
+    // 1. 处理数组情况 (即接口直接返回列表，或递归遍历子节点列表)
+    if (Array.isArray(data)) {
+        return data.map(item => {
+            // 对每一项进行处理
+            const newItem = { ...item };
+            
+            // 核心修改：拼接 label
+            newItem.label = `${newItem.value}_${newItem.label}`;
+            
+            // 关键判断：只有当 children 存在且是数组时才递归
+            // 这样即使 children 是 [] (空数组)，也不会报错，直接跳过
+            if (Array.isArray(newItem.children)) {
+                newItem.children = formatDataWithIdLabel(newItem.children);
+            }
+            
+            return newItem;
+        });
+    } 
+    
+    // 2. 处理单个对象情况 (即树的根节点对象)
+    else if (data && typeof data === 'object') {
+        const node = { ...data };
+        node.label = `${node.value}_${node.label}`;
+        
+        // 同样的逻辑：检查 children 是否为数组
+        if (Array.isArray(node.children)) {
+            node.children = formatDataWithIdLabel(node.children);
+        }
+        
+        return node;
+    }
+    
+    // 3. 其他情况直接返回
+    return data;
 }
 
 </script>

@@ -624,7 +624,7 @@ const method = {
           let obj = {
             loadData: [
               {
-                label:   +selectObj.id + "" +selectObj.name  ,
+                label: selectObj.name  ,
                 value: selectObj.id,
               },
             ],

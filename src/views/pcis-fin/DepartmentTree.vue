@@ -9,7 +9,7 @@
     <el-input
       v-model="filterText" 
       style="width: 500px"
-      placeholder="输入机构代码或者机构名称查询，机构名称查询不得少于5个字符"
+      placeholder="输入机构代码或者机构名称查询"
     />
     <el-tree
       ref="treeRef"
@@ -102,7 +102,7 @@ const initDptTreeList = () => {
         if (res["data"]) {
           _nodes.value.push({
             id: root,
-            name: res["data"]["name"],
+            name: root + '-' + res["data"]["name"],
             leaf: false,
           });
         }
@@ -133,7 +133,7 @@ const loadNode = (node, resolve) => {
         result["data"].forEach((item) => {
           dto.push({
             id: item["id"],
-            name: item["name"],
+            name: item["id"] + '-' + item["name"],
             leaf: !item.hasChildren,
           });
         });

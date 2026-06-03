@@ -125,7 +125,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                             setFormItem("cDptCde", {
                                 loadData: [
                                     {
-                                        label: `${res.body.id}${res.body.name}`,
+                                        label: res.body.name,
                                         value: res.body.id,
                                     },
                                 ],

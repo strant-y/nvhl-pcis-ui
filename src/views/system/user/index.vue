@@ -1,181 +1,181 @@
 <!-- 用户管理 -->
 <template>
   <div class="app-container">
-    <!-- <el-row :gutter="20">
-       部门树 
+    <el-row :gutter="20">
        <el-col :lg="6" :xs="6" class="mb-[12px]">
         <dept-tree v-model="queryParams.companyId" @confirm="dptConfirm"/>
-      </el-col> 
-
-       用户列表 
-      <el-col :lg="18" :xs="18">
-        
       </el-col>
-    </el-row> -->
-
-    <div class="search-container">
-      <el-form ref="queryFormRef" :model="queryParams" :inline="true">
-        <el-form-item prop="companyId" label="归属机构">
-          <dept v-model="queryParams.companyId" />
-        </el-form-item>
-        <el-form-item
-          label="是否包含下级"
-          prop="subordinate"
-          @keyup.enter="handleQuery"
-        >
-          <el-radio-group
-            v-model="queryParams.subordinate"
-            @change="onMenuTypeChange"
-          >
-            <el-radio :value="'1'">是</el-radio>
-            <el-radio :value="'0'">否</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="工号" prop="opCde">
-          <el-input
-            v-model="queryParams.opCde"
-            placeholder="工号"
-            clearable
-            @keyup.enter="handleQuery"
-          />
-        </el-form-item>
-        <el-form-item label="姓名" prop="opCnm">
-          <el-input
-            v-model="queryParams.opCnm"
-            placeholder="姓名"
-            clearable
-            @keyup.enter="handleQuery"
-          />
-        </el-form-item>
-
-        <el-form-item label="状态" prop="cIsValid">
-          <el-select
-            v-model="queryParams.cIsValid"
-            placeholder="全部"
-            clearable
-          >
-            <el-option label="启用" value="1" />
-            <el-option label="禁用" value="0" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div class="search-button">
-        <el-button type="primary" @click="handleQuery"
-          ><i-ep-search />搜索</el-button
-        >
-        <el-button @click="resetQuery"> <i-ep-refresh />重置</el-button>
-      </div>
-    </div>
-
-    <el-card shadow="never" class="table-container">
-      <template #header>
-        <div class="flex justify-between">
-          <div>
-            <el-button
-              v-hasPerm="['sys:user:add']"
-              type="success"
-              @click="openDialog()"
-              ><i-ep-plus />新增</el-button
+      <el-col :lg="18" :xs="18">
+        <div class="search-container">
+          <el-form ref="queryFormRef" :model="queryParams" :inline="true">
+            <el-form-item prop="companyId" label="归属机构">
+              <el-input
+                v-model="queryParams.companyId"
+                placeholder="机构代码"
+                disabled
+              />
+            </el-form-item>
+            <el-form-item
+              label="是否包含下级"
+              prop="subordinate"
+              @keyup.enter="handleQuery"
             >
-            <!-- <el-button
-              v-hasPerm="['sys:user:delete']"
-              type="danger"
-              :disabled="removeIds.length === 0"
-              @click="handleDelete()"
-              ><i-ep-delete />删除</el-button
-            >  -->
+              <el-radio-group
+                v-model="queryParams.subordinate"
+                @change="onMenuTypeChange"
+              >
+                <el-radio :value="'1'">是</el-radio>
+                <el-radio :value="'0'">否</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="工号" prop="opCde">
+              <el-input
+                v-model="queryParams.opCde"
+                placeholder="工号"
+                clearable
+                @keyup.enter="handleQuery"
+              />
+            </el-form-item>
+            <el-form-item label="姓名" prop="opCnm">
+              <el-input
+                v-model="queryParams.opCnm"
+                placeholder="姓名"
+                clearable
+                @keyup.enter="handleQuery"
+              />
+            </el-form-item>
+
+            <el-form-item label="状态" prop="cIsValid">
+              <el-select
+                v-model="queryParams.cIsValid"
+                placeholder="全部"
+                clearable
+              >
+                <el-option label="启用" value="1" />
+                <el-option label="禁用" value="0" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div class="search-button">
+            <el-button type="primary" @click="handleQuery"
+              ><i-ep-search />搜索</el-button
+            >
+            <el-button @click="resetQuery"> <i-ep-refresh />重置</el-button>
           </div>
         </div>
-      </template>
-      <el-table
-        v-loading="loading"
-        :data="pageData"
-        border
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          key="opCde"
-          label="员工工号"
-          align="center"
-          prop="opCde"
-        />
-        <el-table-column
-          key="opCnm"
-          label="员工名称"
-          align="center"
-          prop="opCnm"
-        />
-        <el-table-column
-          label="归属机构"
-          width="200"
-          align="center"
-          prop="cDptCnm"
-        />
-
-        <el-table-column label="状态" align="center" prop="cIsValid">
-          <template #default="scope">
-            <el-tag :type="scope.row.cIsValid == 1 ? 'success' : 'info'">{{
-              scope.row.cIsValid == 1 ? "启用" : "禁用"
-            }}</el-tag>
+        <el-card shadow="never" class="table-container">
+          <template #header>
+            <div class="flex justify-between">
+              <div>
+                <el-button
+                  v-hasPerm="['sys:user:add']"
+                  type="success"
+                  @click="openDialog()"
+                  ><i-ep-plus />新增</el-button
+                >
+                <!-- <el-button
+                  v-hasPerm="['sys:user:delete']"
+                  type="danger"
+                  :disabled="removeIds.length === 0"
+                  @click="handleDelete()"
+                  ><i-ep-delete />删除</el-button
+                >  -->
+              </div>
+            </div>
           </template>
-        </el-table-column>
-        <el-table-column label="操作" width="220" align="center">
-          <template #default="scope">
-            <el-tooltip
-              class="box-item"
-              effect="light"
-              content="重置密码"
-              placement="top-start"
-            >
-              <el-button
-                v-hasPerm="['sys:user:reset_pwd']"
-                type="warning"
-                size="small"
-                link
-                @click="resetPassword(scope.row)"
-                ><i-ep-refresh-left
-              /></el-button>
-            </el-tooltip>
-            <el-tooltip
-              class="box-item"
-              effect="light"
-              content="权限编辑"
-              placement="top-start"
-            >
-              <el-button
-                v-hasPerm="['sys:user:edit']"
-                type="success"
-                link
-                size="small"
-                @click="openDialog(scope.row)"
-                ><i-ep-edit
-              /></el-button>
-            </el-tooltip>
-            <!-- <el-tooltip
-              class="box-item"
-              effect="light"
-              content="删除"
-              placement="top-start">
-              <el-button
-              v-hasPerm="['sys:user:delete']"
-              type="danger"
-              link
-              size="small"
-              @click="handleDelete(scope.row.cPkId)"
-              ><i-ep-delete /></el-button>
-            </el-tooltip> -->
-          </template>
-        </el-table-column>
-      </el-table>
+          <el-table
+            v-loading="loading"
+            :data="pageData"
+            border
+            @selection-change="handleSelectionChange"
+          >
+            <el-table-column
+              key="opCde"
+              label="员工工号"
+              align="center"
+              prop="opCde"
+            />
+            <el-table-column
+              key="opCnm"
+              label="员工名称"
+              align="center"
+              prop="opCnm"
+            />
+            <el-table-column
+              label="归属机构"
+              width="200"
+              align="center"
+              prop="cDptCnm"
+            />
 
-      <pagination
-        v-if="total > 0"
-        v-model:total="total"
-        v-model:page="queryParams.pageNum"
-        v-model:limit="queryParams.pageSize"
-        @pagination="handleQuery"
-      />
-    </el-card>
+            <el-table-column label="状态" align="center" prop="cIsValid">
+              <template #default="scope">
+                <el-tag :type="scope.row.cIsValid == 1 ? 'success' : 'info'">{{
+                  scope.row.cIsValid == 1 ? "启用" : "禁用"
+                }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="220" align="center">
+              <template #default="scope">
+                <el-tooltip
+                  class="box-item"
+                  effect="light"
+                  content="重置密码"
+                  placement="top-start"
+                >
+                  <el-button
+                    v-hasPerm="['sys:user:reset_pwd']"
+                    type="warning"
+                    size="small"
+                    link
+                    @click="resetPassword(scope.row)"
+                    ><i-ep-refresh-left
+                  /></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  class="box-item"
+                  effect="light"
+                  content="权限编辑"
+                  placement="top-start"
+                >
+                  <el-button
+                    v-hasPerm="['sys:user:edit']"
+                    type="success"
+                    link
+                    size="small"
+                    @click="openDialog(scope.row)"
+                    ><i-ep-edit
+                  /></el-button>
+                </el-tooltip>
+                <!-- <el-tooltip
+                  class="box-item"
+                  effect="light"
+                  content="删除"
+                  placement="top-start">
+                  <el-button
+                  v-hasPerm="['sys:user:delete']"
+                  type="danger"
+                  link
+                  size="small"
+                  @click="handleDelete(scope.row.cPkId)"
+                  ><i-ep-delete /></el-button>
+                </el-tooltip> -->
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <pagination
+            v-if="total > 0"
+            v-model:total="total"
+            v-model:page="queryParams.pageNum"
+            v-model:limit="queryParams.pageSize"
+            @pagination="handleQuery"
+          />
+        </el-card>
+      </el-col> 
+    </el-row>
+
+
 
     <!-- 弹窗 -->
     <el-dialog
@@ -660,11 +660,3 @@ function dptConfirm(data) {
   total.value = 0;
 }
 </script>
-
-<style scoped>
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-</style>
