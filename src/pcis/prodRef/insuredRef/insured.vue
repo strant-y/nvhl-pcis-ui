@@ -1812,7 +1812,7 @@ let areas = ['cProCode','cCityCode','areaCode'];
 let regareas = ['cRegProCode','cRegCityCode','cRegAreaCode'];
 
 function setData(data: any){
-  insuredEditRef?.value?.setValue('Insured.cAppNme' , data['companyName']?data['companyName']:'临时名称测试');
+  insuredEditRef?.value?.setValue('Insured.cInsuredNme' , data['companyName']?data['companyName']:'临时名称测试');
   insuredEditRef?.value?.setValue('Insured.tCertfBgnDate' , data['certificateValidFrom']);
   insuredEditRef?.value?.setValue('Insured.tCertfEndDate' , data['certificateValidTo']);
   insuredEditRef?.value?.setValue('Insured.cNation' , data['nationality']);
