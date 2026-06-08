@@ -41,6 +41,7 @@ let dptMinCde = []
 const sysOrgEmpMgrService = new SysOrgEmpMgrService();
 const dzmodal = useDzModal();
 const SysOrgEmpEditComponent = defineAsyncComponent(() => import("../sys-org-emp-edit/sys-org-emp-edit.component.vue"));
+const sysAgreementAssignComponent = defineAsyncComponent(() => import("../sys-org-emp-edit/sys-agreement-assign.component.vue"));
 //const SysOrgIeempWdconfigComponent = defineAsyncComponent(() => import("./sys-org-ieemp-wdconfig.component.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
 const edits = ref<any[]>([]);
@@ -258,6 +259,26 @@ const tableconfig = reactive<AppTableConfig>(
 						type: "update",
 						data: row,
 						title: titlemsg,
+						cEmpCde: row.cEmpCde
+					}).then((res) => {
+						if (res.type === "ok") {
+							handleQuery();
+						}
+					});
+				},
+			}),
+			createFreeButtonBase({
+				id: "score",
+				link: true,
+				tooltip: "分配",
+				type: "success",
+				size: "large",
+				icon: "Position",
+				tableClick: (row) => {
+					dzmodal.open(sysAgreementAssignComponent, {
+						type: "update",
+						data: row,
+						title: '分配',
 						cEmpCde: row.cEmpCde
 					}).then((res) => {
 						if (res.type === "ok") {
