@@ -127,44 +127,49 @@ export const checkPayPlanValidity = ({
       if (payStart > insEndDate || payEnd > insEndDate) return "缴费计划不能超出保单止期！";
     }
 
-    // 6. 校验缴费计划第一期缴费起期缴费止期必须在规则内
-    const appTmVal = opertaor.getTableRefByKey("insrnc").getValue("Base.tAppTm");
-    let bgnTmDate = dayjs(appTmVal);
-    let endTmDate = dayjs(insuranceStart);
-    if (endTmDate.isBefore(bgnTmDate)) {
-      // 默认保险期间为3天
-      endTmDate = bgnTmDate.add(3, 'day');
-    }
-    if (payPlanList.length === 1) {
-      // 直接利用 dayjs 将时间设置为当天的 23:59:59
-      endTmDate = endTmDate.hour(23).minute(59).second(59);
-    } else {
-      // 如果不是单次缴费，减去1秒
-      endTmDate = endTmDate.subtract(1, 'second');
-    }
-    if (payPlanList && payPlanList.length > 0) {
-      const firstPayPlan = payPlanList[0];
-      // 获取第一条数据的开始和结束时间，并转为 dayjs 对象
-      const payStart = dayjs(firstPayPlan['Pay.tPayBgnTm']);
-      const payEnd = dayjs(firstPayPlan['Pay.tPayEndTm']);
-      if (payStart.isAfter(endTmDate)) {
-        return `首期缴费起期不能晚于 ${endTmDate.format('YYYY-MM-DD HH:mm:ss')}！`;
+    // 见费出单才进行下面校验
+    debugger
+    const cNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cNeedfeeFlag");
+    if (cNeedfeeFlag == '1') {
+      // 6. 校验缴费计划第一期缴费起期缴费止期必须在规则内
+      const appTmVal = opertaor.getTableRefByKey("insrnc").getValue("Base.tAppTm");
+      let bgnTmDate = dayjs(appTmVal);
+      let endTmDate = dayjs(insuranceStart);
+      if (endTmDate.isBefore(bgnTmDate)) {
+        // 默认保险期间为3天
+        endTmDate = bgnTmDate.add(3, 'day');
       }
-      if (payEnd.isAfter(endTmDate)) {
-        return `首期缴费止期不能晚于 ${endTmDate.format('YYYY-MM-DD HH:mm:ss')}！`;
+      if (payPlanList.length === 1) {
+        // 直接利用 dayjs 将时间设置为当天的 23:59:59
+        endTmDate = endTmDate.hour(23).minute(59).second(59);
+      } else {
+        // 如果不是单次缴费，减去1秒
+        endTmDate = endTmDate.subtract(1, 'second');
       }
-      if (payStart.isAfter(payEnd)) {
-        return "首期缴费计划的开始时间不能晚于结束时间！";
+      if (payPlanList && payPlanList.length > 0) {
+        const firstPayPlan = payPlanList[0];
+        // 获取第一条数据的开始和结束时间，并转为 dayjs 对象
+        const payStart = dayjs(firstPayPlan['Pay.tPayBgnTm']);
+        const payEnd = dayjs(firstPayPlan['Pay.tPayEndTm']);
+        if (payStart.isAfter(endTmDate)) {
+          return `首期缴费起期不能晚于 ${endTmDate.format('YYYY-MM-DD HH:mm:ss')}！`;
+        }
+        if (payEnd.isAfter(endTmDate)) {
+          return `首期缴费止期不能晚于 ${endTmDate.format('YYYY-MM-DD HH:mm:ss')}！`;
+        }
+        if (payStart.isAfter(payEnd)) {
+          return "首期缴费计划的开始时间不能晚于结束时间！";
+        }
       }
-    }
-    // 7. 校验 多期缴费最后一期缴费止期不能早于保单止期前30天（保留你的原有逻辑）
-    if(payPlanList && payPlanList.length > 1){
-      const lastPlan = payPlanList[payPlanList.length - 1];
-      const lastPayEnd = toValidDate(lastPlan["Pay.tPayEndTm"]); // 最后一期缴费止期
-      // 核心逻辑：最后一期缴费不能晚于保单止期前30天
-      const minLastPayEnd = dayjs(insuranceEnd).subtract(30, 'day');
-      if (dayjs(lastPayEnd).isAfter(minLastPayEnd)) {
-        return `最后一期保费的缴费止期不能晚于保单止期前30天（即不能晚于 ${minLastPayEnd.format('YYYY-MM-DD HH:mm:ss')}）！`;
+      // 7. 校验 多期缴费最后一期缴费止期不能早于保单止期前30天（保留你的原有逻辑）
+      if(payPlanList && payPlanList.length > 1){
+        const lastPlan = payPlanList[payPlanList.length - 1];
+        const lastPayEnd = toValidDate(lastPlan["Pay.tPayEndTm"]); // 最后一期缴费止期
+        // 核心逻辑：最后一期缴费不能晚于保单止期前30天
+        const minLastPayEnd = dayjs(insuranceEnd).subtract(30, 'day');
+        if (dayjs(lastPayEnd).isAfter(minLastPayEnd)) {
+          return `最后一期保费的缴费止期不能晚于保单止期前30天（即不能晚于 ${minLastPayEnd.format('YYYY-MM-DD HH:mm:ss')}）！`;
+        }
       }
     }
 

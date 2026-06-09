@@ -3515,15 +3515,15 @@ const calcPremium = async() => {
   const calccheck = termref.calcCheck();
   if(!calccheck['res']){
     ElMessage.error(calccheck['msg']);
-    if (btn && props.param.cRsnCde !== '99') {
-      btn.loading = false;
-    }
+    // if (btn && props.param.cRsnCde !== '99') {
+    //   btn.loading = false;
+    // }
     return;
   }
   if (!baseValite()) {
-    if (btn && props.param.cRsnCde !== '99') {
-      btn.loading = false;
-    }
+    // if (btn && props.param.cRsnCde !== '99') {
+    //   btn.loading = false;
+    // }
     return;
   }
   // 校验标的信息中核定座位总数和投保座位数总数不一致！
@@ -4139,12 +4139,10 @@ const submitToUndrFn = async () => {
         opertaor.getTableRefByKey("payinfo").setFormValue(setArr); 
     }
 
-      // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
-    const hasInvalidPlan = checkPayPlanValidity({ opertaor });
-    if(hasInvalidPlan){  // 缴费区间超出保险区间  缴费起期 > 缴费止期
-        //  ElMessage.warning('请注意，缴费计划-缴费区间不能超出保险区间, 并且每期缴费起期 > 缴费止期！缴费期限不能重叠！')
-        ElMessage.warning('缴费计划-存在无效项（格式错误、超出保险区间或期数重叠），请检查！');
-        // opertaor.getTableRefByKey("base").setValue('Base.cInstMrk','0')
+    // 校验 缴费计划时间超出保险起止期 时间格式有误等 重置成一条
+    const errorMsg = checkPayPlanValidity({ opertaor });
+    if (errorMsg) {  
+        ElMessage.warning(errorMsg);
         return false;
     }
     
@@ -4756,9 +4754,9 @@ const savePlyInfo = async () => {
 				const BusinessType = await getBusinessType(params)
 				if (BusinessType.code != 200 || BusinessType.data.data < 1) {
 					ElMessage.error('缴费计划“应收保费”不等于“总保费”请确认！')
-          if(btn) {
-            btn.loading = false;
-          }
+          // if(btn) {
+          //   btn.loading = false;
+          // }
        		return false;
 				}
       }
@@ -4771,9 +4769,9 @@ const savePlyInfo = async () => {
 
   if(!res['insrnc']['Base.tInsrncBgnTm'] || !res['insrnc']['Base.tInsrncEndTm']) {
     ElMessage.error('保险起期和保险止期不能为空！');
-    if(btn) {
-      btn.loading = false;
-    }
+    // if(btn) {
+    //   btn.loading = false;
+    // }
     return false;
   }
 
@@ -6022,7 +6020,7 @@ if(props.param.cTransMrk !== "1"){
       // history.back();
       if (result["code"] == "200") {
         ElMessage.success(result.msg);
-        btn.disabled = true;
+        // btn.disabled = true;
         if(result['cDecision'] === '1' || result['cDecision'] === '2'){
           tagsViewStore.delView({"name": "my-page",
             "title": "申请单录入",
@@ -6189,9 +6187,9 @@ if(props.param.cTransMrk !== "1"){
       }
       if (result["code"] == "200") {
         ElMessage.success(result.msg);
-        if(btn) {
-          btn.disabled = true;
-        }
+        // if(btn) {
+        //   btn.disabled = true;
+        // }
         if(result['cDecision'] === '1' || result['cDecision'] === '2'){
           tagsViewStore.delView({"name": "my-page",
             "title": "申请单录入",
@@ -6288,12 +6286,12 @@ const submitUnderwritingFn = async () => {
               nEdrPrjNo: plyBase['Base.nEdrPrjNo']
             }
             const queryFacSts = props.param?.pageName === "priceInquiry" ? await policyService.queryFacStsXJ(param) : await policyService.queryFacSts(param);
-            if(btn) {
-              btn.loading = false;
-            }
-            if(btnun) {
-              btnun.disabled = false;
-            }
+            // if(btn) {
+            //   btn.loading = false;
+            // }
+            // if(btnun) {
+            //   btnun.disabled = false;
+            // }
             if(queryFacSts && queryFacSts.code && (queryFacSts.code === "0" || queryFacSts.code === "1" || queryFacSts.code === "6")) {
               ElMessage.error(queryFacSts.message);
               return
@@ -6320,12 +6318,12 @@ const submitUnderwritingFn = async () => {
             }
             // 调用强制临分
             const queryRiFacMrk = props.param?.pageName === "priceInquiry" ? await policyService.queryRiFacMrkXJ(param) : await policyService.queryRiFacMrk(param);
-            if(btn) {
-              btn.loading = false;
-            }
-            if(btnun) {
-              btnun.disabled = false;
-            }
+            // if(btn) {
+            //   btn.loading = false;
+            // }
+            // if(btnun) {
+            //   btnun.disabled = false;
+            // }
             if(queryRiFacMrk && queryRiFacMrk.code === '0') {
               ElMessage.error(queryRiFacMrk.message);
               underwrite.value?.setRiskunitDisabled()
