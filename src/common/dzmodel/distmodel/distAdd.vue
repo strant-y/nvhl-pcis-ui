@@ -660,7 +660,19 @@ onMounted(async () => {
           let scopeStr = "";
           if (cSuitScope) {
             // 统一转为数组处理
-            const scopeCodes = Array.isArray(cSuitScope) ? cSuitScope : cSuitScope.split(',').filter(Boolean);
+            let scopeCodes = [];
+            if (Array.isArray(cSuitScope)) {
+              scopeCodes = cSuitScope;
+            } else if (typeof cSuitScope === 'string') {
+              // 尝试解析 JSON 字符串
+              try {
+                const parsed = JSON.parse(cSuitScope);
+                scopeCodes = Array.isArray(parsed) ? parsed : [cSuitScope];
+              } catch (e) {
+                // 如果不是 JSON，按逗号分割
+                scopeCodes = cSuitScope.split(',').filter(Boolean).map(s => s.trim());
+              }
+            }
             if (subentryDutyList.value.length > 0) {
               const nameMap = new Map(subentryDutyList.value.map((item: any) => [item.value, item.label]));
               const names = scopeCodes.map(code => nameMap.get(code) || code);
@@ -672,8 +684,19 @@ onMounted(async () => {
 
           // 处理 090001/090002 的 cItemLiability
           if (cItemLiability && (params.cProdNo === '090001' || params.cProdNo === '090002')) {
-            const liabilityCodes = Array.isArray(cItemLiability) ? cItemLiability : [cItemLiability];
-
+            let liabilityCodes = [];
+            if (Array.isArray(cItemLiability)) {
+              liabilityCodes = cItemLiability;
+            } else if (typeof cItemLiability === 'string') {
+              // 尝试解析 JSON 字符串
+              try {
+                const parsed = JSON.parse(cItemLiability);
+                liabilityCodes = Array.isArray(parsed) ? parsed : [cItemLiability];
+              } catch (e) {
+                // 如果不是 JSON，按逗号分割
+                liabilityCodes = cItemLiability.split(',').filter(Boolean).map(s => s.trim());
+              }
+            }
             // 从 formconfig1 中获取 cItemLiability 的 loadData
             const itemLiabilitySchema = formconfig1.value.fromSchema?.find((schemaItem: any) => schemaItem.prop === 'Dist.cItemLiability');
             const liabilityData = itemLiabilitySchema?.loadData || [];
