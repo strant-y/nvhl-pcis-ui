@@ -239,16 +239,18 @@ function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<
 
 
 function setFormItem(key: string, obj: Record<string, any>): void {
-  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
-    return;
-  }
+  nextTick(() => {
+    if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+      return;
+    }
 
-  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
-    return;
-  }
+    if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+      return;
+    }
 
-  // 调用递归方法处理所有项（包括嵌套的groupList）
-  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
+    // 调用递归方法处理所有项（包括嵌套的groupList）
+    recursiveSetFormItem(formconfig1.fromSchema, key, obj);
+  })
 }
 
 // 解析身份证

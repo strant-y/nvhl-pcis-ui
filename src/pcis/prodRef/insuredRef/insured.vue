@@ -224,16 +224,18 @@ function recursiveSetFormItem(items: FormItem[], targetKey: string, obj: Record<
 
 
 function setFormItem(key: string, obj: Record<string, any>): void {
-  if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
-    return;
-  }
+  nextTick(() => { 
+    if (!key || !obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+      return;
+    }
 
-  if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
-    return;
-  }
+    if (!formconfig1.fromSchema || !Array.isArray(formconfig1.fromSchema)) {
+      return;
+    }
 
-  // 调用递归方法处理所有项（包括嵌套的groupList）
-  recursiveSetFormItem(formconfig1.fromSchema, key, obj);
+    // 调用递归方法处理所有项（包括嵌套的groupList）
+    recursiveSetFormItem(formconfig1.fromSchema, key, obj);
+  });
 }
 // 解析身份证
 const idAnalysis = (id: string) => {
@@ -1822,8 +1824,10 @@ function setData(data: any){
   for(let i in areas){
     if(data[areas[i]]) area.push(data[areas[i]]);
   }
+  console.log(area);
+  console.log(formconfig1);
   if(area && area.length > 1){
-    insuredEditRef?.value?.setValue('Insured.ClntAddrAddress' , area);
+    insuredEditRef?.value?.setValue('Insured.ClntAddrProp' , area);
   }
   insuredEditRef?.value?.setValue('Insured.cClntAddr' , data['residentialAddress']);
   insuredEditRef?.value?.setValue('Insured.cZipCde' , data['zipCode']);
