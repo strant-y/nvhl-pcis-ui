@@ -1822,7 +1822,7 @@ function setData(data: any){
   for(let i in areas){
     if(data[areas[i]]) area.push(data[areas[i]]);
   }
-  if(areas && areas.length > 1){
+  if(area && area.length > 1){
     insuredEditRef?.value?.setValue('Insured.ClntAddrAddress' , area);
   }
   insuredEditRef?.value?.setValue('Insured.cClntAddr' , data['residentialAddress']);
