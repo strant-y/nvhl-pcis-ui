@@ -128,7 +128,6 @@ export const checkPayPlanValidity = ({
     }
 
     // 见费出单才进行下面校验
-    debugger
     const cNeedfeeFlag = opertaor.getTableRefByKey("plyBase").getValue("Base.cNeedfeeFlag");
     if (cNeedfeeFlag == '1') {
       // 6. 校验缴费计划第一期缴费起期缴费止期必须在规则内
