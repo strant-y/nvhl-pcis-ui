@@ -7898,8 +7898,8 @@ const queryTermRateLimitFun = async (calcFun: any) => {
         res["EdrBase"] = {...res["EdrBase"],...data}
       }
     }
-    const re = await queryTermRateLimit(res);
-    if(re.code === 200) {
+    const r = await queryTermRateLimit(res);
+    if(r.code === 200) {
         await calcFun();
       } else if(r.msg || r.message) {
         const tableVNode = h(ElTable, {
