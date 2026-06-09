@@ -456,6 +456,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       },
       {
+        prop: "cAppNo",
+        inputtype: "rtinput",
+        title: "申请单号",
+        clearable: true,
+      },
+      {
         prop: "cRemark",
         inputtype: "rtinput",
         type: "textarea",
