@@ -36,9 +36,20 @@ export function fillTemplate(
   template: string,
   params: { [key: string]: any }
 ): string {
-  return template.replace(/{(\w+)}/g, (match, key) => {
-    return params[key] !== undefined ? params[key] : match;
-  });
+    return template.replace(/{(\w+)}/g, (match, key) => {
+        // 如果参数存在且不为空，使用该值
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+            return params[key];
+        }
+
+        // 特殊处理：suitScop 为空时使用默认值
+        if (key === 'suitScop') {
+            return '';
+        }
+
+        // 其他情况保持原样（保留占位符）
+        return match;
+    });
 }
 
 export {
