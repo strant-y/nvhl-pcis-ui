@@ -10,6 +10,8 @@ export const imageMethod = {
     const params = opertaor.getParam();
     const CEdrType = params.cEdrType;
     let ParamNo = null;
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+    
     if (params?.pageName === "priceInquiry") {
       ParamNo = opertaor.getDataAll().plyBase["Base.cInquiryNo"];
       param["cInquiryNo"] = ParamNo;
@@ -57,6 +59,7 @@ export const imageMethod = {
   },
 
   showImage2: function (opertaor,param,params) {
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     checkAppBase(param).then((res) => {
       if (res.code === 200) {
         const tabref = opertaor.getTableRefs();
