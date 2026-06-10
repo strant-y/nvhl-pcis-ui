@@ -208,7 +208,6 @@ const handleTitleBtnClick = async () => {
       const param ={
         cPkIds: multipleSelection.value.map((item: any) => item.cPkId)
       }
-      debugger
       sysOrgEmpMgrService.logicalDeleteOcExtOperRel(param)
       .then((res) => {
         const { code, data, msg } = res;
