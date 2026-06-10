@@ -612,7 +612,7 @@ onMounted(() => {
     
     // 根据数据控制开关设置条款中的可编辑项
     if(params.pageType === 'TEMPORARY_DEPOSIT' && params.cEdrType && params.cRsnCde === 's2') {
-      qryTerminationDataList({ cAppNo: params.cAppNo, cOperType: 'SurPrm' }).then((res:any) => {
+      qryTerminationDataList({ cPlyNo: params.cPlyNo, cOperType: 'SurPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
             setFormItem("EdrBase.nRefundPrm",{ disabled: false })
