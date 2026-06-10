@@ -59,6 +59,7 @@ export const imageMethod = {
   },
 
   showImage2: function (opertaor,param,params) {
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     checkAppBase(param).then((res) => {
       if (res.code === 200) {
         const tabref = opertaor.getTableRefs();
