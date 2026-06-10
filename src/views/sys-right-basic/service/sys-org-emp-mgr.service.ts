@@ -103,4 +103,36 @@ export class SysOrgEmpMgrService {
         return post(`${this.changeOrgEmpStatusUrl}`, ops);
     }
 
+    /**
+     * @Title: 查询协议操作员关系
+     * @Description:
+     * @date 2018/5/16
+     * @author pflir@isoftstone.com
+     * @params:
+     */
+    queryOcExtOperRel(ops: any): AxiosPromise<any> {
+        return post("ecargo/queryOcExtOperRel", ops);
+    }
+
+    /**
+     * @Title: ie员工关联协议单批量保存
+     * @Description:
+     * @date 2018/5/16
+     * @author pflir@isoftstone.com
+     * @params:
+     */
+    batchSaveOcExtOperRel(ops: any): AxiosPromise<any> {
+        return post("ecargo/batchSaveOcExtOperRel", ops);
+    }
+
+     /**
+     * @Title: ie员工关联协议单批量删除
+     * @Description:
+     * @date 2018/5/16
+     * @author pflir@isoftstone.com
+     * @params:
+     */
+     logicalDeleteOcExtOperRel(ops: any): AxiosPromise<any> {
+        return post("ecargo/logicalDeleteOcExtOperRel", ops);
+    }
 }
