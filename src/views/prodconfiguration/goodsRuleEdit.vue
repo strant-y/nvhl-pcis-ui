@@ -107,11 +107,16 @@ const formconfig = reactive<AppFreeEditConfig>(
         title: "规则名称",
 				clearable: true,
 				typeCode: "RULE_CODE",
+        rules: [getRules("required", {})],
       },
       {
         prop: "cRuleValue",
-        inputtype: "rtinput",
+        inputtype: "rtnumber",
         title: "规则值",
+        rules: [getRules("required", {})],
+        step: 1,
+        min: -999999,
+        stepStrictly: true,
       },
       {
         prop: "tStaTm",
