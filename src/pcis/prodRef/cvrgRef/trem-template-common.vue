@@ -1055,7 +1055,7 @@ function initMethod(){
     }
     // 根据数据控制开关设置条款中的可编辑项(批单)
     if(pageparam.pageType === 'TEMPORARY_DEPOSIT' && pageparam.cEdrType) {
-      qryTerminationDataList({ cAppNo: pageparam.cAppNo, cOperType: 'EdrPrm' }).then((res:any) => {
+      qryTerminationDataList({ cPlyNo: pageparam.cPlyNo, cOperType: 'EdrPrm' }).then((res:any) => {
         if(res?.code == 200 && res.data?.length > 0) {
           if(res.data[0]?.cAppTyp === 'on') {
             if(groupInfo.value && Object.keys(groupInfo.value)?.length > 0) {

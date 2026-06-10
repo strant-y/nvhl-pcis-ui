@@ -140,7 +140,7 @@ export const checkPayPlanValidity = ({
       }
       if (payPlanList.length === 1) {
         // 直接利用 dayjs 将时间设置为当天的 23:59:59
-        endTmDate = endTmDate.hour(23).minute(59).second(59);
+        endTmDate = endTmDate.subtract(1, 'day').hour(23).minute(59).second(59);
       } else {
         // 如果不是单次缴费，减去1秒
         endTmDate = endTmDate.subtract(1, 'second');
