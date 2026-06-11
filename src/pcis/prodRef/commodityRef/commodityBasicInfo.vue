@@ -491,6 +491,26 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "yes_no" },
       },
+      {
+        prop: "cPlySendUrl",
+        inputtype: "rtinput",
+        title: "保单发送地址",
+      },
+      {
+        prop: "cEdrSendUrl",
+        inputtype: "rtinput",
+        title: "批单发送地址",
+      },
+      {
+        prop: "cPlatFlag",
+        inputtype: "rtselect",
+        title: "推送标识",
+        loadData: [
+          { value: "00", label: "不推送" },
+          { value: "10", label: "保单推送" },
+          { value: "11", label: "保批单均推送" },
+        ],
+      },
     ],
     fromUi: createFromUiConfig({
       cols: 3,
