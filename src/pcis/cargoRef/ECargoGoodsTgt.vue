@@ -204,7 +204,8 @@ const saveTgt = async (res:any)=>{
     cEcAgrAppNo:agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || ''
   };
   const result =  await cargoApi.saveDistNew(newRow)
-  loadData()
+  eventBus.emit('matterChange', agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || '')
+  loadData();
 }
 async function filterFromSchema(obj:any) {
   // 如果对象不存在或者没有fromSchema属性，直接返回
