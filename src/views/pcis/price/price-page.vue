@@ -808,6 +808,7 @@ const detailcodeList = [
   { id: "25", name: "货物明细表批改" },
   { id: "25", name: "增加保费" },
   { id: "27", name: "变更赔偿限额" },
+  { id: "CE", name: "渠道综合批改" },
 ];
 
 
