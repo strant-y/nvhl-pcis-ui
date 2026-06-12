@@ -815,6 +815,7 @@ const detailcodeList = [
   { id: "27", name: "变更赔偿限额" },
   { id: "80", name: "变更保额" },
   { id: "81", name: "变更险别" },
+  { id: "CE", name: "渠道综合批改" },
 ];
 
 
