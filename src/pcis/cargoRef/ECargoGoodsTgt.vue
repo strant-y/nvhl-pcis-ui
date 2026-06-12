@@ -391,7 +391,11 @@ const method = {
       deleteDist(param).then((res: any) => {
         if (res.code === 200) {
           ElMessage.success("删除成功");
-          loadData()
+          loadData();
+          const cEcAgrAppNo = agreementBaseRef.getValue('ECargoBase.cEcAgrAppNo') || '';
+          if (cEcAgrAppNo) {
+            eventBus.emit('matterChange', cEcAgrAppNo);
+          }
         }
       });
     });
@@ -563,7 +567,12 @@ const method = {
 			deleteDist(param).then((res: any) => {
 				if (res.code === 200) {
 					ElMessage.success("删除成功");
-					loadData()
+					loadData();
+          const agreementBaseRef = formPage?.getComponentRefById('AgreementBase');
+          const cEcAgrAppNo = agreementBaseRef?.getValue('ECargoBase.cEcAgrAppNo') || '';
+          if (cEcAgrAppNo) {
+            eventBus.emit('matterChange', cEcAgrAppNo);
+          }
 				}
 			});
 		}).catch(()=>{})
