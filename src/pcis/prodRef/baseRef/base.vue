@@ -275,7 +275,7 @@ const nPayNumberFun = () => {
       let tPayEndTm = formatDate(endDate, 'yyyy-MM-dd HH:mm:ss');
 
       // 最后一期特殊处理
-      if (i === Number(getValue("Base.nPayNum")) - 1) {
+      if (i === Number(getValue("Base.nPayNum")) - 1 && getValue('Base.cInstMrk') == '5') {
           tPayEndTm = dayjs(endDate).format("YYYY-MM-DD") + " 23:59:59";
       }
       val = {
