@@ -188,7 +188,7 @@ const nPayNumberFun = ()=>{
         let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
         let tPayEndTm = formatDate(endDate,'yyyy-MM-dd HH:mm:ss')
 
-				if (i === Number(getValue("Base.nPayNum")) - 1) {
+				if (i === Number(getValue("Base.nPayNum")) - 1 && getValue("Base.cInstMrk") == '5') {
 					// 获取 endDate 的日期部分，拼接固定的时间字符串
 					tPayEndTm = dayjs(endDate).format("YYYY-MM-DD") + " 23:59:59"
 				}

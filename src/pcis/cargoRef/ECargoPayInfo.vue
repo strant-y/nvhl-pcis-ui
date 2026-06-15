@@ -167,7 +167,7 @@ const method = {
 
 		let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
 
-		let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD 23:59:59")
+		let tPayEndTm = dayjs(endDate).add(-1, 'second')
     if (val) {
       let obj = {
         'ECargoPay.nTms': val.length,

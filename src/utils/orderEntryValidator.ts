@@ -138,13 +138,13 @@ export const checkPayPlanValidity = ({
         // 默认保险期间为3天
         endTmDate = bgnTmDate.add(3, 'day');
       }
-      if (payPlanList.length === 1) {
-        // 直接利用 dayjs 将时间设置为当天的 23:59:59
-        endTmDate = endTmDate.subtract(1, 'day').hour(23).minute(59).second(59);
-      } else {
+      // if (payPlanList.length === 1) {
+      //   // 直接利用 dayjs 将时间设置为当天的 23:59:59
+      //   endTmDate = endTmDate.hour(23).minute(59).second(59);
+      // } else {
         // 如果不是单次缴费，减去1秒
         endTmDate = endTmDate.subtract(1, 'second');
-      }
+      // }
       if (payPlanList && payPlanList.length > 0) {
         const firstPayPlan = payPlanList[0];
         // 获取第一条数据的开始和结束时间，并转为 dayjs 对象

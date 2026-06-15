@@ -190,7 +190,7 @@ const method = {
     let endDate = new Date(endTmDate.getTime() - 1000);
 
 		let tInsrncBgnTm = formatDate(startDate, 'yyyy-MM-dd HH:mm:ss')
-		let tPayEndTm = dayjs(endDate).add(-1, 'second').format("YYYY-MM-DD 23:59:59")
+    let tPayEndTm = dayjs(endDate).add(-1, 'second')
 
     if (val) {
       let obj = {
