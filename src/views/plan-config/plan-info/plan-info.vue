@@ -338,6 +338,31 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { 'cParCde': 'CAccessType' },
       },
       {
+        prop: "cCiMrk",
+        inputtype: "rtselect",
+        title: "联共保业务",
+        clearable: true,
+        defaultValue: '0',
+        loadData: [
+          { value: '0', label: '非共保业务' },
+          { value: '1', label: '外部共保我方主共_主联' },
+          { value: '2', label: '外部共保我方从共_主联' },
+          { value: '3', label: '外部共保我方主共_无联保' },
+          { value: '4', label: '外部共保我方从共_无联保' },
+          { value: '5', label: '司内联保_主联' },
+        ],
+      },
+      {
+        prop: "cIsUseTerm",
+        inputtype: "rtselect",
+        title: "是否使用方案配置条款",
+        clearable: true,
+        loadData: [
+          { value: '1', label: '使用方案配置' },
+          { value: '2', label: '使用外部传输' },
+        ],
+      },
+      {
         prop: "cCriterionTimeUnit",
         inputtype: "rtselect",
         title: "保险期间类型",
