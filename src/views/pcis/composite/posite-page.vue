@@ -995,7 +995,7 @@ const submitToUndrFn = async () => {
   }else {
     ElMessage.error(res.msg)
     loading.close()
-    btn.loading = true;
+    btn.loading = false;
   }
 }
 
