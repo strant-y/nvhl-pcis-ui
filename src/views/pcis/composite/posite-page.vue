@@ -1134,7 +1134,6 @@ const initTemplateData = () => {
     pageView.value.sortComponentsMap.set('plan', 1)
 
     if(props.param.cCombinationPlanNo === 'CP_0000') {
-      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
     }
   }
   pageView.value.sortComponentsMap.set('plyBase', 2)
@@ -1167,20 +1166,6 @@ const getReqParams = (t: string = 'save') => {
 
     // 要复制的数据
     if (props.param.cCombinationType === '2') {
-      cList.push({
-        cProdNo: '010002',
-        componentKey: 'PropertyaddressDist010001',
-        componentTable: 'PropertyaddressDist',
-        cAppNo: getAppNo('010002'),
-        copyList: [
-          {
-            cProdNo: '010007',
-            componentKey: 'PropertyaddressDist010006',
-            componentTable: 'PropertyaddressDist',
-            cAppNo: getAppNo('010007'),
-          }
-        ]
-      })
     }
   }
 
