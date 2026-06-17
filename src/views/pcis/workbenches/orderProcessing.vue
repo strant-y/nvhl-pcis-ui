@@ -486,6 +486,8 @@ const tableconfig = reactive<AppTableConfig>(
                 }),
               },
             });
+          } else if (row.cAppTyp === 'A' && row.cCombinationNo && row.cCombinationNo !== '' && row.taskStatus === '1') {
+              skipPositePage({...row,...{ initType: POSITE_PAGE_TYPE_SAVE, pageType: 'app' }});
           } else {
             const data = row;
             if (row["cEdrRsnBundleCde"]) {
@@ -943,18 +945,22 @@ const pageresult = reactive<Pageresult>({
 // 行双击查看详情
 function handleDblClick(row:any) {
   row.sysType = !!row["cAppTyp"] && ("A" === row["cAppTyp"] )? "U" : "E" ;
-  router.push({
-    path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
-    query: {
-      param:
-          row.baseType === "询价"
-              ? JSON.stringify({
-                ...row,
-                ...{ pageType: "readonly", pageName: "priceInquiry" },
-              })
-              : JSON.stringify({ ...row, ...{ pageType: "readonly" } }),
-    },
-  });
+  if(row.cAppTyp === 'A' &&  row.cCombinationNo && row.cCombinationNo !== '' && row.taskStatus == "1") {
+    skipPositePage({ ...row, ...{ initType: POSITE_PAGE_TYPE_READ, pageType: 'app'}});
+  }else {
+    router.push({
+      path: row.baseType === "询价" ? "/pcisapp/priceView" : "/pcisapp/pcisappView",
+      query: {
+        param:
+            row.baseType === "询价"
+                ? JSON.stringify({
+                  ...row,
+                  ...{ pageType: "readonly", pageName: "priceInquiry" },
+                })
+                : JSON.stringify({ ...row, ...{ pageType: "readonly" } }),
+      },
+    });
+  }
 }
 
 const prodTotalDatas = ref([]);
