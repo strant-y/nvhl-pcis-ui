@@ -990,7 +990,7 @@ const submitToUndrFn = async () => {
       })
     }).finally(() => {
       loading.close()
-      btn.loading = true;
+      btn.loading = false;
     });
   }else {
     ElMessage.error(res.msg)
