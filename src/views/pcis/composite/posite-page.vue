@@ -940,60 +940,63 @@ const submitToUndrFn = async () => {
     }
   }
 
+  const loading = openPageLoading('提核中...');
   try {
     // 先保存再提核
     await saveOpt(false)
   } catch (e) {
+    loading.close()
     console.error(e)
     return;
   }
 
-  const loading = openPageLoading('提核中...');
   const btn = getBtn('btn010103')
-  btn.loading = true;
-  const res: any = await positeApi.submitCombination(params);
-  console.log('submitCombination-res', res);
-  if(res.code === 200) {
-    ElMessage.success(res.msg)
-    res.data.data.forEach((d: any) => {
-      const iProd = productList.value.find((prod: any) => prod.cProdNo === d.cProdNo)
-      if(iProd) {
-        iProd.cAppNo = d.cAppNo
-      }
-    })
-    const newParams = getNewParams({
-      initType: POSITE_PAGE_TYPE_READ,
-      cProdDtlList: getProdInfoList()
-    });
-    router.replace({
-      path: "/pcisapp/posite-page",
-      query: {
-        param: JSON.stringify({...newParams}),
-      },
-    }).then(() => {
-      console.log('replace props.param', props.param);
-      initTemplateData();
-      pageView.value.updatePageParams(props.param, getProdInfoList());
-      prodListRef.value?.setDisabledAll();
-      pageView.value.setPageDisabledAll();
-      bthList.value.forEach((item: any) => {
-        if(item && [
-          'btn010101',
-          'btn010102',
-          'btn010103',
-          'btn010104',
-          'btn010105',
-          'btn010106'
-        ].includes(item.id)) {
-          item.disabled = true;
+  try {
+    btn.loading = true;
+    const res: any = await positeApi.submitCombination(params);
+    console.log('submitCombination-res', res);
+    if (res.code === 200) {
+      ElMessage.success(res.msg)
+      res.data.data.forEach((d: any) => {
+        const iProd = productList.value.find((prod: any) => prod.cProdNo === d.cProdNo)
+        if (iProd) {
+          iProd.cAppNo = d.cAppNo
         }
       })
-    }).finally(() => {
-      loading.close()
-      btn.loading = false;
-    });
-  }else {
-    ElMessage.error(res.msg)
+      const newParams = getNewParams({
+        initType: POSITE_PAGE_TYPE_READ,
+        cProdDtlList: getProdInfoList()
+      });
+      router.replace({
+        path: "/pcisapp/posite-page",
+        query: {
+          param: JSON.stringify({...newParams}),
+        },
+      }).then(() => {
+        console.log('replace props.param', props.param);
+        initTemplateData();
+        pageView.value.updatePageParams(props.param, getProdInfoList());
+        prodListRef.value?.setDisabledAll();
+        pageView.value.setPageDisabledAll();
+        bthList.value.forEach((item: any) => {
+          if (item && [
+            'btn010101',
+            'btn010102',
+            'btn010103',
+            'btn010104',
+            'btn010105',
+            'btn010106'
+          ].includes(item.id)) {
+            item.disabled = true;
+          }
+        })
+      })
+    } else {
+      ElMessage.error(res.msg)
+    }
+  } catch (e) {
+    console.error(e)
+  } finally {
     loading.close()
     btn.loading = false;
   }
