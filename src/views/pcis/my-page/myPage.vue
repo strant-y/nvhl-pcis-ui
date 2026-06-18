@@ -2911,12 +2911,12 @@ async function loadAfter() {
       label: imageStr,
       type: "warning",
       func: () => {
-        const param: any = props.param
-        if(param.cCombinationNo && param.cCombinationNo.trim() !== '') {
-          // 组合出单影像处理
-          const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+        const plyBase = opertaor.getTableRefByKey('plyBase')?.getFromValue();
+        const cCombinationNo = plyBase['Base.cCombinationNo']
+        if(cCombinationNo && cCombinationNo.trim() !== '') { // 组合出单影像处理
           imageMethod.showPositeImage({
-            ...param,
+            ...props.param,
+            cCombinationNo: cCombinationNo,
             plyBase: plyBase
           });
         }else {
