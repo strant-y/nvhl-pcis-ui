@@ -1136,7 +1136,8 @@ const initTemplateData = () => {
     pageView.value.hiddenCompKeys.push(...["payinfo"])
     pageView.value.sortComponentsMap.set('plan', 1)
 
-    if(props.param.cCombinationPlanNo === 'CP_0000') {
+    if(props.param.cCombinationPlanNo === 'CP_0000' && props.param.cVersion === 'V1.0') {
+      pageView.value.discardCompKeys.push('PropertyaddressDist010006')
     }
   }
   pageView.value.sortComponentsMap.set('plyBase', 2)
@@ -1167,9 +1168,28 @@ const getReqParams = (t: string = 'save') => {
   if(t === 'save' && props.param.cCombinationNo) {
     cList.push(...pageView.value.getAllCopyList())
 
-    // 要复制的数据
+     // 要复制的数据
     if (props.param.cCombinationType === '2') {
+
+      if(props.param.cCombinationPlanNo === 'CP_0000' && props.param.cVersion === 'V1.0') {
+        cList.push({
+          cProdNo: '010002',
+          componentKey: 'PropertyaddressDist010001',
+          componentTable: 'PropertyaddressDist',
+          cAppNo: getAppNo('010002'),
+          copyList: [
+            {
+              cProdNo: '010007',
+              componentKey: 'PropertyaddressDist010006',
+              componentTable: 'PropertyaddressDist',
+              cAppNo: getAppNo('010007'),
+            }
+          ]
+        })
+      }
     }
+
+
   }
 
   return {
