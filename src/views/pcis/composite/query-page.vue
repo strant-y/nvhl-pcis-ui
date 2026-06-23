@@ -629,8 +629,15 @@ const pageresult = reactive<Pageresult>({
 });
 
 // 行双击查看详情
-function handleDblClick(row:any) {
-  skipPositePage({ ...row, ...{ pageType: POSITE_PAGE_TYPE_READ }});
+function handleDblClick(row: any) {
+  let initType = POSITE_PAGE_TYPE_READ;
+  if (row.cOprCde == user.opCde && (row.taskStatus == "1" ||
+      row.taskStatus == "3" ||
+      row.taskStatus == "8"
+  )) {
+    initType = POSITE_PAGE_TYPE_SAVE;
+  }
+  skipPositePage({ ...row, ...{ pageType: 'app', initType: initType }});
 }
 
 const prodTotalDatas = ref([]);
