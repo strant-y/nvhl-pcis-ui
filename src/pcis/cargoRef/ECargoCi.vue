@@ -759,7 +759,7 @@ const onChiefMrkChange = () => {
     switch (ciMrkValue) {
       case "2":
       case "4":
-        // cChiefMrkVal = '1'; // 主共方（注释掉的代码表示不需要设置）
+        cChiefMrkVal = '1'; // 主共方（注释掉的代码表示不需要设置）
         break;
       default:
         cChiefMrkVal = '0'; // 从共方
