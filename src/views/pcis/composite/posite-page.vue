@@ -931,12 +931,14 @@ const submitToUndrFn = async () => {
 
   // 组合方案出单
   if(props.param.cCombinationType === '2') {
-    const o060030 = pageView.value.getDataOpertaorByProdNo('060030')
-    const yjxGrpMemberList = o060030.getTableRefs()['yjxGrpMember'].getFormValue()
-    if (!yjxGrpMemberList || yjxGrpMemberList.length !== 5) {
-      console.log('yjxGrpMemberList.length', yjxGrpMemberList.length)
-      ElMessage.warning('团意险：团单成员清单必需录入5人')
-      return;
+    if(props.param.cCombinationPlanNo === 'CP_0000') {
+      const o060030 = pageView.value.getDataOpertaorByProdNo('060030')
+      const yjxGrpMemberList = o060030.getTableRefs()['yjxGrpMember'].getFormValue()
+      if (!yjxGrpMemberList || yjxGrpMemberList.length === 0 || yjxGrpMemberList.length > 5) {
+        console.log('yjxGrpMemberList.length', yjxGrpMemberList.length)
+        ElMessage.warning('团意险：团单成员清单需录入1~5人')
+        return;
+      }
     }
   }
 
