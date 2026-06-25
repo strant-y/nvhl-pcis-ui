@@ -910,6 +910,7 @@ function combinationPlanHandleClick(item: any, index: number) {
   if(item.checked) {
     formconfig1.value.cCombinationPlanNo = item.cCombinationPlanNo // 组合方案号
     formconfig1.value.cCombinationType = '2' // 组合方案类型
+    formconfig1.value.cVersion = item.cVersion // 方案版本号
     formconfig1.value.cProdList = item.list
         .map((prod: any) => prod.cProdNo)
         .sort((a: string, b: string) => a.localeCompare(b));

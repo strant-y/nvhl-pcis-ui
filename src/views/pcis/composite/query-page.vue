@@ -830,7 +830,8 @@ function skipPositePage(row: any) {
             cCombinationType: row.cCombinationPlanNo ? '2' : '1',
             cProdList: res.data
                 .map((m: any) => m.cProdNo)
-                .sort((a: string, b: string) => a.localeCompare(b))
+                .sort((a: string, b: string) => a.localeCompare(b)),
+            cVersion: res.data[0]?.cVersion
           })
         },
       });
