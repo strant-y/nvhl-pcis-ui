@@ -55,7 +55,9 @@ const tableconfig = reactive<AppTableConfig>(
     tableBtnPosition: "right",
     title: "组件绑定关系",
     editFlag: true,
+    fixedHeader: true,
     isPage:false,
+    maxHeight: "400px",
     tableBtn: [
       createFreeButtonBase({
         id: "score",

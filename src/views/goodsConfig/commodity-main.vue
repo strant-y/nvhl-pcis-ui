@@ -24,6 +24,7 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
+import { formatActionTitle } from "@/utils/action-title";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import {
@@ -144,6 +145,7 @@ const tableconfig = reactive<AppTableConfig>(
               param: JSON.stringify({
                 editType: "add",
               }),
+              title: formatActionTitle("add", "商品配置"),
             },
           });
         },
@@ -176,6 +178,7 @@ const tableconfig = reactive<AppTableConfig>(
                 editType: "edit",
                 cCommodityNo: row.cCommodityNo,
               }),
+              title: formatActionTitle("edit", "商品配置"),
             },
           });
         },
@@ -221,6 +224,33 @@ const tableconfig = reactive<AppTableConfig>(
                 editType: "view",
                 cCommodityNo:row.cCommodityNo,
               }),
+              title: formatActionTitle("view", "商品配置"),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "copy",
+        iconColor: "#02D05F",
+        tooltip: "复制",
+        icon: "DocumentCopy",
+        link: true,
+        hideBtns: (row: any) => {
+          if (row.cStatus === "0" || row.cStatus === "3" || row.cStatus === "6") {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        tableClick: (row) => {
+          router.push({
+            path: "/goodsConfig/commodityEdit",
+            query: {
+              param: JSON.stringify({
+                editType: "copy",
+                cCommodityNo: row.cCommodityNo,
+              }),
+              title: formatActionTitle("copy", "商品配置"),
             },
           });
         },

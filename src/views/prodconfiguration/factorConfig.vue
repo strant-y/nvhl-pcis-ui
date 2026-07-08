@@ -134,6 +134,20 @@ const tableconfig = reactive<AppTableConfig>(
         },
       }),
       createFreeButtonBase({
+        id: "copy",
+        iconColor: "#02D05F",
+        tooltip: "复制",
+        icon: "DocumentCopy",
+        link: true,
+        tableClick: (row) => {
+          dzmodal.open(factorEdit, { type: "copy", data: row }).then((res) => {
+            if (res.type === "ok") {
+              handleQuery();
+            }
+          });
+        },
+      }),
+      createFreeButtonBase({
         id: "score",
         type: "danger",
         tooltip: "删除",
@@ -211,8 +225,15 @@ function handleQuery(flag?: boolean) {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        pageresult.list = data;
-        pageresult.total = res.total;
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.result)
+              ? data.result
+              : [];
+        pageresult.list = list;
+        pageresult.total = Number(data?.total ?? res.total ?? list.length ?? 0);
       } else {
         ElMessage.error(msg);
       }

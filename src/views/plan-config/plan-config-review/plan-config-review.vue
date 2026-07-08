@@ -25,6 +25,7 @@ import {
   AppTableMethod,
   createTableEditConfig,
 } from "@/shared/app-table-config";
+import { getActionLabel } from "@/utils/action-title";
 import { useUserStore } from "@/store/modules/user";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
@@ -157,7 +158,7 @@ const tableconfig = reactive<AppTableConfig>(
                 if (result['code'] === 200) {
                     if(result['data']['code']=='1'){
                         row['cGrpMrk']='0'
-                        openEdit('under', row)
+                        openEdit('handle', row)
                     }else{
                         ElMessage.error(result['data']['message']);
                     }
@@ -195,13 +196,7 @@ const tableconfig = reactive<AppTableConfig>(
           size: "large",
           icon: "View",
           hideBtns: (row: any) => {
-              if (
-                  row.cUndrStatus != "1"
-              ) {
-                  return false;
-              } else {
-                  return true;
-              }
+              return false;
           },
           tableClick: (row) => {
               row['cGrpMrk']='0'
@@ -287,9 +282,13 @@ const tableconfig = reactive<AppTableConfig>(
 
 //处理
 const openEdit = (type: string, row) => {
+  const moduleName = type === "handle" || type === "view" ? "方案审核" : "方案配置";
   router.push({
     path: 'plan-info',
-    query: { data: JSON.stringify({ type, rowData: row }) }
+    query: {
+      data: JSON.stringify({ type, rowData: row }),
+      title: `${moduleName} - ${type === "handle" ? "处理" : getActionLabel(type)}`,
+    }
   })
 };
 

@@ -10,6 +10,7 @@
       ref="tableRef"
       :data="tableDatas"
       style="width: 100%"
+      :max-height="item.maxHeight ? item.maxHeight : undefined"
       :default-sort="item.defaultSort"
       :border="item.border || item.border === false ? item.border : true"
       :fit="item.fit ? item.fit : true"
@@ -270,8 +271,18 @@
                         btn.tableClick ? btn.tableClick(scope.row) : () => {}
                       "
                       :item="btn"
-                      :disabled="btn.disabled ? btn.disabled(scope.row) : false"
-                      v-if="!btn.hideBtns?.(scope.row) ?? false"
+                      :disabled="
+                        typeof btn.disabled === 'function'
+                          ? btn.disabled(scope.row)
+                          : btn.disabled === true || btn.disabled === 1 || btn.disabled === '1'
+                      "
+                      v-if="
+                        !(
+                          typeof btn.hideBtns === 'function'
+                            ? btn.hideBtns(scope.row)
+                            : btn.hideBtns === true || btn.hideBtns === 1 || btn.hideBtns === '1'
+                        )
+                      "
                     />
                   </el-tooltip>
                 </template>
@@ -294,7 +305,11 @@
                 <template
                   v-if="
                     index !== item.tableBtn.length - 1 &&
-                    !btn.hideBtns?.(scope.row) &&
+                    !(
+                      typeof btn.hideBtns === 'function'
+                        ? btn.hideBtns(scope.row)
+                        : btn.hideBtns === true || btn.hideBtns === 1 || btn.hideBtns === '1'
+                    ) &&
                     item.tableBtn.length > 1
                   "
                 >
@@ -988,7 +1003,7 @@ function isrequired(i: any) {
 }
 </script>
 <style lang="scss" scoped>
-@import "@/styles/custom-index";
+@use "@/styles/custom-index";
 ::v-deep .el-form-item {
   margin-bottom: 0px !important; /* 使内容显示更近紧促 */
 }

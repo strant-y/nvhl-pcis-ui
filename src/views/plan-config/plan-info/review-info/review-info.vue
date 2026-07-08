@@ -80,12 +80,16 @@ function setValue(key: string, value: any) {
 function getValue(key: string) {
     return freeEditRef?.value?.getValue(key);
 }
+function setDisabledAll(isDisabled: boolean = true) {
+    freeEditRef?.value?.setDisabledAll(isDisabled);
+}
 defineExpose({
     getFromValue,
     setFormValue,
     validate,
     setValue,
     getValue,
+    setDisabledAll,
 });
 </script>
 

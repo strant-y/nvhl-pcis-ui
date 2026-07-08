@@ -581,8 +581,8 @@ async function checkProdGradeChange(isPrompt: boolean): Promise<boolean> {
   };
 
 	try {
-		// 如果不是新增或者编辑的话, 则返回
-		if ('add' !== param.editType && 'edit' !== param.editType) {
+		// copy 沿用新增态校验规则，只在查看/处理等只读场景跳过
+		if ('add' !== param.editType && 'edit' !== param.editType && 'copy' !== param.editType) {
 				return true;
 		}
     // 1. 产品校验
@@ -691,7 +691,7 @@ onMounted(() => {
   }
 
 
-  if (param.editType !== 'add' && param.editType !== 'edit' && param.editType) {
+  if (param.editType !== 'add' && param.editType !== 'edit' && param.editType !== 'copy' && param.editType) {
     // handleQuery();
     // setDisa();
     freeEditRef.value?.setDisabledAll();

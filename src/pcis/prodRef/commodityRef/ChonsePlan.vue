@@ -233,7 +233,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         hideBtns: (row: any) => { 
-          if (param.editType === 'add' ||  param.editType === 'edit'|| !param.editType ) {
+          if (param.editType === 'add' ||  param.editType === 'edit' || param.editType === 'copy' || !param.editType ) {
             return false;
           } else {
             return true;
@@ -262,7 +262,7 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Edit",
           hideBtns: (row: any) => {
             // &&    param.editType !== "edit" 
-          if ( param.editType === 'add' ||  param.editType === 'edit'||  !param.editType) {
+          if ( param.editType === 'add' ||  param.editType === 'edit' || param.editType === 'copy' || !param.editType) {
             return false;
           } else {
             return true;

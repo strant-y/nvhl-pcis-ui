@@ -181,7 +181,7 @@ function handleSearchInput(data: any) {
 </script>
 
 <style lang="scss" scoped>
-@import "src/styles/custom-index";
+@use "src/styles/custom-index" as *;
 
 
 .header-title {
@@ -196,8 +196,8 @@ function handleSearchInput(data: any) {
     height: 32px;
     display: flex;
     align-items: center;
-    @extend .rt-input__btn;
-    @extend .rt-custom-input;
+    @include rt-input__btn;
+    @include rt-custom-input;
   }
 }
 .custom-tree-node {

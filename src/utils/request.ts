@@ -1,7 +1,24 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { useUserStoreHook } from "@/store/modules/user";
 import { reqParamsEncrypt,bodyEncrypt } from "./encipher";
 import {AppBaseApi,LocalBaseApi} from "@/api/config"
+
+const getMessageText = (msg: unknown, fallback = "系统出错") => {
+  if (typeof msg === "string" && msg.trim()) {
+    return msg;
+  }
+  if (msg instanceof Error && msg.message) {
+    return msg.message;
+  }
+  if (msg && typeof msg === "object") {
+    try {
+      return JSON.stringify(msg);
+    } catch (e) {
+      return fallback;
+    }
+  }
+  return fallback;
+}
 
 
 
@@ -46,7 +63,7 @@ service.interceptors.request.use(
       // console.log('请求参数',param);
       config.data = reqParamsEncrypt(param)
     }catch (e){
-      ElMessage.error(e);
+      ElMessage.error(getMessageText(e, "加密参数发生异常"));
       throw '加密参数发生异常：' + e;
     }
     return config;
@@ -99,7 +116,7 @@ service.interceptors.response.use( (response: AxiosResponse) => {
         });
       } else {
         // sessionStorage.setItem("token", "");
-        ElMessage.error(msg || "系统出错");
+        ElMessage.error(getMessageText(msg));
       }
     }else {
 			const isCanceled = error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED';
@@ -107,15 +124,21 @@ service.interceptors.response.use( (response: AxiosResponse) => {
 				// 请求被取消（超时）
 				ElMessage.warning('请求超时，请稍后重试');
 			} else {
-				ElMessage.error(error)
+				ElMessage.error(getMessageText(error))
 			}
     }
     return Promise.reject(error.message);
   }
 );
 
-export function download(url,params,filename) {
-  const data = service.post( url, params, {responseType:'blob'});
+export function download(
+  url: string,
+  params: Record<string, unknown> | unknown,
+  filename: string
+) {
+  const data = service.post<Blob, AxiosResponse<Blob>>(url, params, {
+    responseType: "blob",
+  });
   
   data.then((res) => {
     const blob = new Blob([res.data]);

@@ -1,15 +1,14 @@
 import request from "@/utils/request";
-import { AxiosPromise } from "axios";
+import type { AxiosResponse } from "axios";
 import { UserForm, UserInfo, UserPageVO, UserQuery } from "./types";
-import {post,get} from "@/utils/http";
-import { LocalBaseApi } from "../config";
+import { post } from "@/utils/http";
+import type { ApiResult } from "@/types/api";
 
 
-/**
- * 登录成功后获取用户信息（昵称、头像、权限集合和角色集合）
- */
-export function getUserInfoApi(params): AxiosPromise<UserInfo> {
-  return post('/userInfo',params);
+export function getUserInfoApi(
+  params: Record<string, unknown>
+): Promise<ApiResult<UserInfo>> {
+  return post("/userInfo", params);
 }
 
 
@@ -20,8 +19,8 @@ export function getUserInfoApi(params): AxiosPromise<UserInfo> {
  */
 export function getUserPage(
   queryParams: UserQuery
-): AxiosPromise<PageResult<UserPageVO[]>> {
-  return post('/getUserList',queryParams);
+): Promise<ApiResult<PageResult<UserPageVO[]>>> {
+  return post("/getUserList", queryParams);
 }
 
 /**
@@ -29,8 +28,8 @@ export function getUserPage(
  *
  * @param userId
  */
-export function getUserForm(userId: number): AxiosPromise<UserForm> {
-  return request({
+export function getUserForm(userId: number): Promise<ApiResult<UserForm>> {
+  return request<any, ApiResult<UserForm>>({
     url: "/api/v1/users/" + userId + "/form",
     method: "get",
   });
@@ -42,7 +41,7 @@ export function getUserForm(userId: number): AxiosPromise<UserForm> {
  * @param data
  */
 export function addUser(data: any) {
-  return post('/saveUser',data);
+  return post("/saveUser", data);
 
 }
 
@@ -52,7 +51,7 @@ export function addUser(data: any) {
  * @param data
  */
 export function updateUser(data: UserForm) {
-  return post('/saveUser',data);
+  return post("/saveUser", data);
 
 }
 
@@ -62,16 +61,16 @@ export function updateUser(data: UserForm) {
  * @param id
  * @param password
  */
-export function resetUserPassword(id: number, password: string) {
-  return post('/resetPassword',{id:id,password:password});
+export function resetUserPassword(id: string | number, password: string) {
+  return post("/resetPassword", { id: id, password: password });
 }
 
 export function updateUserPassword(formData: any) {
-  return post('/modifyPassword',formData);
+  return post("/modifyPassword", formData);
 }
 
 export function changeDptToken(formData: any) {
-  return post('/changeDptToken',formData);
+  return post("/changeDptToken", formData);
 }
 /**
  * 删除用户
@@ -79,7 +78,7 @@ export function changeDptToken(formData: any) {
  * @param ids
  */
 export function deleteUsers(ids: string) {
-  return post( '/delUser',{ids:ids});
+  return post("/delUser", { ids: ids });
 
 }
 
@@ -87,7 +86,7 @@ export function deleteUsers(ids: string) {
  * 获取个人绑定数据
  */
 export function getOtherList(formData: any) {
-  return post( '/getOtherList',formData);
+  return post("/getOtherList", formData);
 
 }
 
@@ -95,7 +94,7 @@ export function getOtherList(formData: any) {
  * 获取个人绑定数据
  */
 export function updateOtherUser(formData: any) {
-  return post( '/updateOtherUser',formData);
+  return post("/updateOtherUser", formData);
 
 }
 
@@ -105,7 +104,7 @@ export function updateOtherUser(formData: any) {
  * @returns
  */
 export function downloadTemplateApi() {
-  return request({
+  return request<ArrayBuffer, AxiosResponse<ArrayBuffer>>({
     url: "/api/v1/users/template",
     method: "get",
     responseType: "arraybuffer",
@@ -119,7 +118,7 @@ export function downloadTemplateApi() {
  * @returns
  */
 export function exportUser(queryParams: UserQuery) {
-  return request({
+  return request<ArrayBuffer, AxiosResponse<ArrayBuffer>>({
     url: "/api/v1/users/_export",
     method: "get",
     params: queryParams,
@@ -135,7 +134,7 @@ export function exportUser(queryParams: UserQuery) {
 export function importUser(deptId: number, file: File) {
   const formData = new FormData();
   formData.append("file", file);
-  return request({
+  return request<any, ApiResult<unknown>>({
     url: "/api/v1/users/_import",
     method: "post",
     params: { deptId: deptId },

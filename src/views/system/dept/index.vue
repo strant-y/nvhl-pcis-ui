@@ -47,11 +47,11 @@
           <el-table v-loading="loading" :data="deptList" border>
             <el-table-column prop="cDptCde" label="机构代码" align="center" />
             <el-table-column prop="cDptCnm" label="机构名称" align="center" />
-            <el-table-column prop="cDptCls" label="机构类型" align="center">
+            <!-- <el-table-column prop="cDptCls" label="机构类型" align="center">
               <template #default="scope">
-                {{ deptClsMap[scope.row.cDptCls] }}
+                {{ deptClsMap[String(scope.row.cDptCls ?? "")] || "-" }}
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="成立时间" align="center">
               <template #default="{ row }">
                 <div>{{ formatDate(row.tFndTm, "yyyy-MM-dd") }}</div>
@@ -59,7 +59,7 @@
             </el-table-column>
             <el-table-column prop="cIsValid" label="状态" align="center">
               <template #default="scope">
-                <el-tag v-if="scope.row.cIsValid == 1" type="success"
+                <el-tag v-if="String(scope.row.cIsValid) === '1'" type="success"
                   >正常</el-tag
                 >
                 <el-tag v-else type="info">禁用</el-tag>
@@ -101,6 +101,7 @@
       v-model="dialog.visible"
       :title="dialog.title"
       width="1000px"
+      class="system-dialog-scroll"
       @closed="closeDialog"
     >
       <el-form
@@ -121,7 +122,7 @@
               <el-input v-model="formData.cDptCnm" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <!-- <el-col :span="8">
             <el-form-item label="机构类别" prop="cDptCls" class="!w-[300px]">
               <el-select v-model="formData.cDptCls">
                 <el-option label="机构" value="1" />
@@ -129,7 +130,7 @@
                 <el-option label="室" value="3" />
               </el-select>
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-row justify="space-between">
           <el-col :span="8">
@@ -183,6 +184,13 @@
   </div>
 </template>
 
+<style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+</style>
+
 <script setup lang="ts">
 import {
   getDeptForm,
@@ -218,13 +226,13 @@ const queryParams = reactive<DeptQuery>({
   pageSize: 10,
   subordinate: true,
 });
-const deptList = ref<DeptVO[]>();
+const deptList = ref<DeptVO[]>([]);
 
 const deptOptions = ref<OptionType[]>();
 
 const formData = reactive<DeptForm>({});
 
-const deptClsMap = {
+const deptClsMap: Record<string, string> = {
   "1": "机构",
   "2": "部门",
   "3": "室",
@@ -234,7 +242,7 @@ const rules = reactive({
   cSnrDpt: [{ required: true, message: "上级机构不能为空", trigger: "change" }],
   cDptCde: [{ required: true, message: "机构代码不能为空", trigger: "change" }],
   cDptCnm: [{ required: true, message: "机构名称不能为空", trigger: "change" }],
-  cDptType: [
+  cDptCls: [
     { required: true, message: "机构类别不能为空", trigger: "change" },
   ],
   tFndTm: [{ required: true, message: "成立时间不能为空", trigger: "change" }],
@@ -243,7 +251,7 @@ const rules = reactive({
 /**
  * 选中机构时触发 回填机构名
  * */
-function dptConfirm(data) {
+function dptConfirm(data: { label: string }) {
   queryParams.cDptCnm = data.label;
 }
 

@@ -23,8 +23,8 @@ const queryParams = reactive({
   cProdNo: '',
 });
 const templateList = ref<DictTypePageVO[]>();
-const cKindNoList = ref([]);
-const cProdNoList = ref([]);
+const cKindNoList = ref<OptionType[]>([]);
+const cProdNoList = ref<OptionType[]>([]);
 const formData = reactive<DictTypeForm>({});
 
 onMounted(() => {
@@ -97,6 +97,8 @@ function resetQuery() {
   queryParams.pageNo = 1;
   handleQuery();
 }
+
+function handleSelectionChange(_: any) {}
 
 // 编辑
 function jumpPage(row: any) {

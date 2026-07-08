@@ -94,6 +94,18 @@ const pageresult = reactive<Pageresult>({
   list: [],
   total: 0,
 });
+
+function getClauseConfBasicInfoRef() {
+  return opertaor.getTableRefByKey("clauseConfBasicInfo");
+}
+
+function getCurrentTermNo() {
+  if (param.type === "edit") {
+    return param.row.cTermNo;
+  }
+  return getClauseConfBasicInfoRef()?.getFromValue?.().cTermNo;
+}
+
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     titleBtns: [
@@ -182,9 +194,8 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         tableClick: (row) => {
-          // const param = Object.assign(cvrgNo: tabref.getFromValue().cCvrgNo, row)
           const params = Object.assign(row, {
-            cTermNo: tabref.getFromValue().cTermNo,
+            cTermNo: getCurrentTermNo(),
           });
           deleteTermRiskRel(params)
             .then((res) => {
@@ -258,13 +269,7 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  let term = '';
-  console.log(param);
-  if(param.type === "edit"){
-    term = param.row.cTermNo;
-  }else{
-    term = tabref.getFromValue().cTermNo
-  }
+  const term = getCurrentTermNo();
   if (!term || term === '') {
     ElMessage.error("请完善基本信息后在操作!");
     return;

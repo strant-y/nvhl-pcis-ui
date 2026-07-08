@@ -410,7 +410,7 @@ const method = {
     }
     // 我方主共或从共的情况
     if (cCiMrk["Base.cCiMrk"] === '2' || cCiMrk["Base.cCiMrk"] === '4') {
-      // 情况1：如果选中的是“是”且是永安保险(327001)
+      // 情况1：如果选中的是“是”且是诚泰保险(327001)
       if (val === "1" && cCoinsurerCde === "327001") {
         ElMessage.error("我方从共时主共保方不能是我司！");
         freeEditRef?.value?.setValueByRowKey("Ci.cChiefMrk", rowId, "");
@@ -1033,7 +1033,7 @@ const updateMasterAgreementValues = () => {
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntAmt", totalAmt.toFixed(2));  //联保总保额
       opertaor.getTableRefByKey("ciMasterAgreement").setValue("Base.nJiJntPrm", totalPrm.toFixed(2)); //联保总保费
     } else {
-      // 非永安保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
+      // 非诚泰保险公司：仅更新该行的 Ci.nCiAmt 和 Ci.nCiPrm，不参与总和计算
       const share = Number(row["Ci.nCiShare"]) || 0;
       const nAmt = res["base"]["Base.nAmt"] ? Number(res["base"]["Base.nAmt"]) : 0;
       const nPrm = res["base"]["Base.nPrm"] ? Number(res["base"]["Base.nPrm"]) : 0;
@@ -1053,7 +1053,7 @@ const updateMasterAgreementValues = () => {
     freeEditRef?.value?.setValueByRowKey("Ci.nPlyFee", row._dataId, nPlyFee.toFixed(2));
   });
   updateCiPrmEditable();
-  // 设置到对应组件字段（仅使用永安保险的总和）
+  // 设置到对应组件字段（仅使用诚泰保险的总和）
   allRows.forEach((row) => {
     if (row['Ci.cCoinsurerCde']) {
       console.log(totalAmt, "totalAmt")
@@ -1502,14 +1502,14 @@ const ciJiDptOptionsQuery = async (val: string, row: any) => {
   const rowId = row._dataId;
   valideRequired()
   if (val === "327001") {
-    // 如果选择的是永安保险，加载对应的分公司列表
+    // 如果选择的是诚泰保险，加载对应的分公司列表
     const list = await codeListStore.queryCodeList({
       codeListName: "Comm_Code_LIST",
       codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
     });
     freeEditRef.value?.addCodeListMap({ code: "dptCascader" + rowId, list: list });
   } else {
-    // 非永安保险，设置默认值和其他数据
+    // 非诚泰保险，设置默认值和其他数据
     const list = await codeListStore.queryCodeList({
       codeListName: "66",
       codeListParam: {},

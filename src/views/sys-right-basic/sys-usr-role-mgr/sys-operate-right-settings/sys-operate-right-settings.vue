@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <el-dialog v-model="dialogVisible" width="90%" class="system-dialog-scroll">
     <div style="margin-top: 1rem; margin-bottom: 1rem" align="left" v-if="propData">
       操作员: <b>{{ propData.cOperCnm }}[{{ propData.cOperId }}]</b> 操作机构：<b>{{ propData.cDptCnm }}[{{
         propData.cDptDispCde }}]</b>
@@ -95,4 +95,8 @@ const refreshData = (reset = false) => {
 
 <style scoped lang="scss">
 /* Add your styles here */
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
 </style>

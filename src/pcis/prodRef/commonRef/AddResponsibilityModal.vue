@@ -19,7 +19,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { ref, reactive, defineEmits } from "vue";
 import { ElMessage } from "element-plus";
-import { saveRiskInfo, saveCvrgRiskRel } from "@/api/prod";
+import { saveRiskInfo, saveTermRiskRel } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
@@ -89,16 +89,27 @@ const handleSave = async () => {
   formData.cCrtCde = opCde;
   formData.cUpdCde = opCde;
   const objStr = [formData];
-  const params = { rel: objStr, isAdd: props.type, cTermNo: cTermNo };
+  const params = { rel: objStr, cTermNo: cTermNo };
   if (formData) {
     try {
-      saveRiskInfo(param).then((res) => {
-        ElMessage.success(res.msg);
-      });
-      saveCvrgRiskRel(params);
+      const riskRes = await saveRiskInfo(param);
+      if (riskRes.code !== 200) {
+        ElMessage.error(riskRes.msg || "责任保存失败");
+        return;
+      }
+
+      const relRes = await saveTermRiskRel(params);
+      if (relRes.code !== 200) {
+        ElMessage.error(relRes.msg || "关联责任保存失败");
+        return;
+      }
+
+      ElMessage.success(relRes.msg || riskRes.msg || "保存成功");
       emits("ok", {});
       dialogVisible.value = false;
-    } catch (error) {}
+    } catch (error) {
+      ElMessage.error("保存失败");
+    }
   }
 };
 

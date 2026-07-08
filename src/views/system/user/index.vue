@@ -182,6 +182,7 @@
       v-model="dialog.visible"
       :title="dialog.title"
       :width="dialog.width"
+      class="system-dialog-scroll"
       append-to-body
       @close="closeDialog"
     >
@@ -278,9 +279,9 @@
                   <el-select v-model="formData.roleIds" style="width:91.5%" multiple placeholder="请选择">
                     <el-option
                       v-for="item in roleList"
-                      :key="item.value"
+                      :key="String(item.value ?? item.label ?? '')"
                       :label="item.label"
-                      :value="item.value"
+                      :value="item.value ?? ''"
                     />
                   </el-select>
                 </el-form-item>
@@ -356,9 +357,9 @@
                     >
                       <el-option
                         v-for="item in roleList"
-                        :key="item.value"
+                        :key="String(item.value ?? item.label ?? '')"
                         :label="item.label"
-                        :value="item.value"
+                        :value="item.value ?? ''"
                       />
                     </el-select>
                   </template>
@@ -406,11 +407,13 @@ import { getDeptOptions } from "@/api/dept";
 import { getRoleOptions } from "@/api/role";
 import { v4 as uuidv4 } from "uuid";
 
-import { UserForm, UserQuery, UserPageVO } from "@/api/user/types";
+import { UserForm, UserQuery, UserPageVO, UserRoleBindVO } from "@/api/user/types";
 import type { UploadInstance } from "element-plus";
+import type { FormRules } from "element-plus";
 import { genFileId } from "element-plus";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
 import moment from "moment";
+import type { ComponentOptions } from "vue";
 
 const queryFormRef = ref(ElForm); // 查询表单
 const userFormRef = ref(ElForm); // 用户表单
@@ -420,21 +423,24 @@ const editRow = ref(0);
 const dzmodal = useDzModal();
 const selectEmp = defineAsyncComponent(
   () => import("./components/selec-emp.vue")
-);
+) as unknown as ComponentOptions;
 
 const loading = ref(false); //  加载状态
-const removeIds = ref([]); // 删除用户ID集合 用于批量删除
-const user = JSON.parse(sessionStorage.getItem("user"));
+const removeIds = ref<string[]>([]); // 删除用户ID集合 用于批量删除
+const user = JSON.parse(sessionStorage.getItem("user") || "{}") as Record<
+  string,
+  any
+>;
 const queryParams = reactive<UserQuery>({
   pageNum: 1,
   pageSize: 10,
   subordinate: "1",
-  companyId: user.companyId,
+  companyId: user.companyId || "",
 });
 const dateTimeRange = ref("");
 const total = ref(0); // 数据总数
-const pageData = ref<UserPageVO[]>(); // 用户分页数据
-const roleList = ref<OptionType[]>(); // 角色下拉数据源
+const pageData = ref<UserPageVO[]>([]); // 用户分页数据
+const roleList = ref<OptionType[]>([]); // 角色下拉数据源
 const isAdd = ref(false); //弹出窗口是否为新增人员
 
 // 弹窗对象
@@ -445,9 +451,9 @@ const dialog = reactive({
 });
 
 // 用户表单数据
-const formData = reactive<UserForm>({});
+const formData = reactive<UserForm>({ roles: [] });
 
-const rules = reactive({
+const rules = reactive<FormRules>({
   opCde: [{ required: true, message: "请输入员工工号", trigger: "change" }],
   opCnm: [{ required: true, message: "请输入员工姓名", trigger: "change" }],
   tPwdStrtTm: [
@@ -471,6 +477,10 @@ function handleQuery() {
     .finally(() => {
       loading.value = false;
     });
+}
+
+function onMenuTypeChange() {
+  handleQuery();
 }
 
 /** 重置查询 */
@@ -532,7 +542,7 @@ async function loadRoleOptions() {
  *
  * @param type 弹窗类型  用户表单：user-form | 用户导入：user-import
  */
-async function openDialog(row: UserPageVO) {
+async function openDialog(row?: UserPageVO) {
   dialog.visible = true;
   // 用户表单弹窗
   await loadRoleOptions();
@@ -590,7 +600,7 @@ function addItem() {
   editRow.value = formData.roles.length;
 }
 
-function deleteItem(row) {
+function deleteItem(row: UserRoleBindVO) {
   formData.roles = formData.roles.filter((item) => item.cPkId !== row.cPkId);
 }
 
@@ -660,3 +670,10 @@ function dptConfirm(data) {
   total.value = 0;
 }
 </script>
+
+<style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+</style>

@@ -7,8 +7,15 @@
       <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     </el-card>
     <el-card style="margin-top: 20px;">
-      <template v-for="(pageConfig, v) in formconfig2" :key="v">
-        <div class="card_" v-for="(k, i) in pageConfig?.pageInfo" :key="i"
+      <template #header>
+        <span class="module-title">特约信息</span>
+      </template>
+      <plan-special-agreement-list ref="specialEditRef" />
+    </el-card>
+    <el-card style="margin-top: 20px;">
+    
+      <template v-for="(pageConfig, v) in formconfig2" :key="formconfig2RenderKey + '-' + v">
+        <div class="card_" v-for="(k, i) in pageConfig?.pageInfo" :key="formconfig2RenderKey + '-' + i"
           :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey">
           <component v-if="currentIndex >= i" :ref="(res) => {
             const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey
@@ -21,32 +28,39 @@
     </el-card>
 
     <div v-if="!props.goodsType">
-    <el-card style="margin-top: 20px;" v-if="isAdd ">
-      <review-info ref="reviewInfoRef"></review-info>
-    </el-card>
-    <div style="text-align: right;margin-top: 20px;" v-if="!isAdd ">
-      <div style="text-align: right;margin-top: 20px;" v-if="routeQryParams?.type !== 'view'">
-        <el-button type="primary" @click="save">保存</el-button>
-        <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
-        <el-button @click="goBack">返回</el-button>
+      <el-card style="margin-top: 20px;" v-if="isReviewPage">
+        <review-info ref="reviewInfoRef"></review-info>
+      </el-card>
+      <div style="text-align: right;margin-top: 20px;" v-if="!isReviewPage">
+        <div style="text-align: right;margin-top: 20px;" v-if="pageMode !== 'view'">
+          <el-button type="primary" @click="save">保存</el-button>
+          <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
+          <el-button @click="goBack">返回</el-button>
+        </div>
+        <div style="text-align: right;margin-top: 20px;" v-else>
+          <el-button @click="goBack">返回</el-button>
+        </div>
       </div>
       <div style="text-align: right;margin-top: 20px;" v-else>
-        <el-button @click="goBack">返回</el-button>
+        <template v-if="pageMode === 'handle'">
+          <el-button type="primary" @click="submit">提交</el-button>
+          <el-button @click="goBack">返回</el-button>
+        </template>
+        <template v-else>
+          <el-button @click="goBack">返回</el-button>
+        </template>
       </div>
+      <el-card style="margin-top: 20px;" v-if="payinfo">
+        <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" />
+      </el-card>
     </div>
-    <div style="text-align: right;margin-top: 20px;" v-else>
-      <el-button type="primary" @click="submit">提交</el-button>
-      <el-button @click="goBack">返回</el-button>
-    </div>
-    <el-card style="margin-top: 20px;" v-if="payinfo">
-      <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" /> 
-    </el-card>
+   
   </div>
-  </div>
+ 
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted,watch } from 'vue';
+import { ref, reactive, onMounted, watch, nextTick, onBeforeMount, computed, onBeforeUnmount, onActivated, onDeactivated } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getListByCode } from '@/api/code-list-service';
 import { Search } from '@element-plus/icons-vue'
@@ -69,7 +83,7 @@ import RiskInfo from './risk-info/risk-info.vue'
 //审核详情得状态等
 import ReviewInfo from './review-info/review-info.vue';
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import PrdFixSpec from '../com/prd-fix-spec.vue'
+import PlanSpecialAgreementList from "../com/plan-special-agreement-list.vue";
 import DepartmentTree from "@/pcis/prodRef/commodityRef/DepartmentTree.vue";
 import {
   AppGridEditMethod,
@@ -80,6 +94,15 @@ import {dataParam} from "@/store/modules/dataParam";
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+type SpecialEditMethod = {
+  getFromValue?: () => Record<string, any>;
+  getValue?: (key: string) => any;
+  setValue?: (key: string, value: any) => void;
+  setFormValue?: (value: any) => void;
+  setDisabledAll?: (disabled?: boolean) => void;
+  validate?: () => Promise<boolean> | boolean;
+};
+const specialEditRef = ref<SpecialEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const userStore = useUserStore();
 const router = useRouter()
@@ -91,8 +114,43 @@ const props = defineProps({
   goodsType: String,
 });
 
-const routeQryParams: any = props.data;
-const isAdd = ref((routeQryParams?.type !== 'planConfigAdd' && routeQryParams?.type !== 'planConfigupdate' && routeQryParams?.type !== 'planConfigview'))
+type PageMode = "view" | "handle" | "add" | "edit" | "copy";
+
+const routeQryParams = ref<any>(props.data);
+const rawPageType = ref<any>(routeQryParams.value?.type);
+const pageMode = ref<PageMode>("edit");
+const isReviewPage = computed(() => ["handle", "under", "view"].includes(rawPageType.value));
+
+function initPageMode() {
+  rawPageType.value = routeQryParams.value?.type;
+  pageMode.value =
+    rawPageType.value === "handle" || rawPageType.value === "under"
+      ? "handle"
+      : rawPageType.value === "view" || rawPageType.value === "planConfigview"
+        ? "view"
+        : rawPageType.value === "planConfigAdd"
+          ? "add"
+          : rawPageType.value === "planConfigupdate"
+            ? "edit"
+            : rawPageType.value === "planConfigCopy"
+              ? "copy"
+              : "edit";
+}
+
+initPageMode();
+
+watch(
+  () => props.data,
+  (val) => {
+    routeQryParams.value = val;
+    initPageMode();
+    nextTick(() => {
+      syncRouteTitle();
+      applyPageReadonlyState();
+    });
+  },
+  { deep: true, immediate: true }
+);
 const user = ref(userStore.user);
 const reviewInfoRef = ref(null);
 const policyService = new PolicyService();
@@ -110,6 +168,84 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig2 = opertaor.getTableConfig();
 const payinfoEditRef = ref<AppGridEditMethod | null>(null);
 
+const formconfig2RenderKey = ref(0);
+let renderInterval: any = null;
+
+if (formconfig2.length === 0) {
+  formconfig2.push({ pageInfo: [] });
+}
+
+
+const getPageRowData = () =>
+  props.goodsType === "goods" ? props.goodsData : routeQryParams.value?.rowData;
+
+const getPlanFormValue = () =>
+  Object.assign(
+    {},
+    freeEditRef.value?.getFromValue?.() || {},
+    specialEditRef.value?.getFromValue?.() || {}
+  );
+
+const getPageConfigParam = (data?) => {
+  const pageRowData = data || {};
+  const sourceRowData = getPageRowData() || {};
+  const formValue = getPlanFormValue();
+
+  return {
+    CProdNo:
+      pageRowData.cProdNo ||
+      pageRowData.CProdNo ||
+      formValue.cProdNo ||
+      formValue.CProdNo ||
+      sourceRowData.cProdNo ||
+      sourceRowData.CProdNo,
+    CGrpMrk:
+      pageRowData.cGrpMrk ||
+      pageRowData.CGrpMrk ||
+      formValue.cGrpMrk ||
+      formValue.CGrpMrk ||
+      sourceRowData.cGrpMrk ||
+      sourceRowData.CGrpMrk,
+  };
+};
+
+const getPlanBaseDetail = (result: any) => {
+  const payload = result?.data?.data;
+  if (Array.isArray(payload)) {
+    return payload[0] || {};
+  }
+  return payload && typeof payload === "object" ? payload : {};
+};
+
+const waitForTableRefReady = async (key: string, retries = 20, delay = 50) => {
+  for (let index = 0; index < retries; index++) {
+    await nextTick();
+    const tableRef = opertaor.getTableRefByKey(key);
+    if (tableRef?.setFormValue) {
+      return tableRef;
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, delay));
+  }
+  return null;
+};
+
+const applyCvrgData = async (cvrgData: any) => {
+  if (!Array.isArray(cvrgData) || cvrgData.length === 0) {
+    return;
+  }
+  const cvrgRef = await waitForTableRefReady("cvrg");
+  if (!cvrgRef) {
+    console.warn("cvrg ref is not ready, skip initial data apply");
+    return;
+  }
+  opertaor.setDataAll({ cvrg: cvrgData });
+};
+
+const setPlanFormValue = (value: any) => {
+  freeEditRef.value?.setFormValue(value);
+  specialEditRef.value?.setFormValue(value);
+};
+
 
  
 let payinfo = ref(false)
@@ -120,8 +256,9 @@ watch(
   () => props.goodsData,
   (newVal,oldVal) => {
     if (props.goodsType == 'goods') {
-      // initPage();
-      // againActiveTop(newVal as string);
+      if (newVal) {
+        initPage(newVal);
+      }
     }
   },
   {
@@ -130,46 +267,69 @@ watch(
   }
 );
 
-opertaor.setParam(routeQryParams?.rowData);
+opertaor.setParam(getPageRowData());
 onBeforeMount(async() => {
 });
 /**
  * 数据初始化
  * @param data
  */
-const initPage = async () => {
-  let param = {}
-  if(props.type == 'goods'){
-    param = {
-      CProdNo: props.goodsData.cProdNo,
-      CGrpMrk:props.goodsData.cGrpMrk,
-    }
-  }else{
-    param = {
-      CProdNo: routeQryParams?.rowData.cProdNo,
-      CGrpMrk: routeQryParams?.rowData.cGrpMrk,
-    }
+const initPage = async (data?) => {
+  const param = getPageConfigParam(data);
+  if (!param.CProdNo || !param.CGrpMrk) {
+    return;
   }
 
-  const getProductRes = await getProductPage(param);
-  // 页面初始化
-  const formconfig21 = JSON.parse(getProductRes.data);
-  formconfig21[0].pageInfo = formconfig21[0].pageInfo.filter(item => item.pageKey == 'cvrg');
-  opertaor.setTableConfig(formconfig21);
-  renderComponents();
+  try {
+    const getProductRes = await getProductPage(param);
+    const rawPageConfig = getProductRes?.data;
+    const formconfig21 =
+      typeof rawPageConfig === "string" ? JSON.parse(rawPageConfig) : rawPageConfig;
+
+    if (!Array.isArray(formconfig21) || formconfig21.length === 0) {
+      ElMessage.error("页面配置信息为空，请检查产品页面配置");
+      formconfig2.splice(0, formconfig2.length, { pageInfo: [] });
+      formconfig2RenderKey.value++;
+      currentIndex.value = 0;
+      return;
+    }
+
+    const firstPageInfo = Array.isArray(formconfig21[0]?.pageInfo)
+      ? formconfig21[0].pageInfo.filter((item) => item.pageKey == "cvrg")
+      : [];
+    formconfig21[0].pageInfo = firstPageInfo;
+    formconfig2.splice(0, formconfig2.length, ...formconfig21);
+    formconfig2RenderKey.value++;
+    await nextTick();
+    renderComponents();
+  } catch (error) {
+    console.error("initPage getProductPage error:", error, param);
+    ElMessage.error("页面配置信息加载失败");
+    formconfig2.splice(0, formconfig2.length, { pageInfo: [] });
+    formconfig2RenderKey.value++;
+    currentIndex.value = 0;
+  }
 };
 /**
  * 逐个渲染组件
  */
 function renderComponents() {
-  const interval = setInterval(() => {
-    if (currentIndex.value < formconfig1[0]?.pageInfo.length - 1) {
+  if (renderInterval) {
+    clearInterval(renderInterval);
+    renderInterval = null;
+  }
+  currentIndex.value = 0;
+  renderInterval = setInterval(() => {
+    const pageLength = formconfig2[0]?.pageInfo?.length ?? 0;
+    if (currentIndex.value < pageLength - 1) {
       currentIndex.value++;
     } else {
       // loadAfter(); //页面加载完成之后,再加载后续所需的事件
-      clearInterval(interval);
+      clearInterval(renderInterval);
+      renderInterval = null;
     }
   }, 100); // 延迟组件渲染,增加页面响应效率
+  console.log(formconfig2)
 }
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -435,52 +595,6 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         params: {},
       },
       {
-        prop: "cSpecMrk",
-        inputtype: "rtselect",
-        title: "是否有特约",
-        clearable: true,
-        // typeCode: "WEB_SYS_STA_DICT", //暂时无接口
-        // params: {'cParCde': 'yes_no'},
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
-      },
-      {
-        prop: "cSpecContent",
-        inputtype: "rtinput",
-        type: "textarea",
-        title: "特别约定",
-        rows: 4,
-        itemWidth: 2,
-        clearable: true,
-        showExBtn: true,
-        btnWidth: 5,
-        btnItems: {
-          icon: "Search",
-          type: "primary",
-          func: () => {
-            dzmodal.open(PrdFixSpec, {
-              data: {
-                cProdNo: freeEditRef.value?.getValue('cProdNo'),
-                fixSpecData: freeEditRef.value?.getValue('CSpecNo') //之前选中的数据数组
-              }
-            }).then((res) => {
-              if (res.type === "ok") {
-                let i = 1;
-                let cSpecNo = '';
-                let cUnfixSpc = '';
-                res.body.forEach(value => {
-                  cSpecNo = '' === cSpecNo ? value['PrdFixSpec.CSpecNo'] : cSpecNo + '$$' + value['PrdFixSpec.CSpecNo'];
-                  cUnfixSpc = '' === cUnfixSpc ? i + '.' + value['PrdFixSpec.CNmeCn'] : cUnfixSpc + '\n' + i + '.' + value['PrdFixSpec.CNmeCn'];
-                  freeEditRef.value?.setValue('cSpecContent', cUnfixSpc)
-                  freeEditRef.value?.setValue('CSpecNo', cSpecNo)
-                  i++;
-                });
-              }
-            });
-          }
-        },
-      },
-      {
         prop: "cAppNo",
         inputtype: "rtinput",
         title: "申请单号",
@@ -496,17 +610,10 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         itemWidth: 2,
         clearable: true,
       },
-      {
-        prop: "CSpecNo",
-        inputtype: "rtinput",
-        title: "",
-        type: 'hidden'
-      },
 
     ],
   })
 );
-
 
 const formconfig3 = reactive<AppFreeEditConfig>(
   createAppGridEditConfig({
@@ -805,49 +912,57 @@ const saveProdDataFun = async () => {
 
 
 //form表单部分保存
-const saveData = (call?) => {
-  freeEditRef.value?.validate().then((isValid) => {
-    if (isValid) {
-      const s = freeEditRef.value?.getFromValue(); //获取表单数据
-      const param = Object.assign(s);
-      if (!!call) {
-        param['cUndrStatus'] = '1';
-      }
-      save()
-      //调用接口
-      policyService.saveOrUpdatePlan(param).then(result => {
-        if (result['code'] === 200) {
-          freeEditRef.value?.setFormValue(result.data.data)
-          if (!!call) {
-            call();
-          } else {
-            ElMessage.success(result['data']['message']);
-          }
-        } else {
-          ElMessage.error(result['msg']);
-        }
-      });
-    } else {
-      ElMessage.error("请填写必填项");
-    }
-  })
-}
+const saveData = async (call?) => {
+  const [isBasicValid, isSpecialValid] = await Promise.all([
+    freeEditRef.value?.validate?.() ?? Promise.resolve(true),
+    specialEditRef.value?.validate?.() ?? Promise.resolve(true),
+  ]);
+  if (!isBasicValid || !isSpecialValid) {
+    ElMessage.error("请填写必填项");
+    return;
+  }
+
+  const param = Object.assign(getPlanFormValue());
+  if (!!call) {
+    param["cUndrStatus"] = "1";
+  }
+
+  const result = await policyService.saveOrUpdatePlan(param);
+  if (result["code"] !== 200) {
+    ElMessage.error(result["msg"]);
+    return;
+  }
+
+  setPlanFormValue(result.data.data);
+
+  const saveCvrgOk = await save();
+  if (!saveCvrgOk) {
+    return;
+  }
+
+  if (!!call) {
+    call();
+  } else {
+    ElMessage.success(result["data"]["message"]);
+  }
+};
 
 //总的保存
-const save = () => {
+const save = async () => {
   //调用保存接口
   const res = opertaor.getDataAll();
   res['cPlanNo'] = freeEditRef.value?.getValue("cPlanNo");
-  policyService.savePlanCvrg(res).then(result => {
-    if (result['code'] === 200) {
-      const ops = { cvrg: result.data.cvrg }
-      opertaor.setDataAll(ops);
-      ElMessage.success(result['msg']);
-    } else {
-      ElMessage.error(result['msg']);
-    }
-  });
-}
+  console.log(res, 455454)
+  const result = await policyService.savePlanCvrg(res);
+  if (result["code"] === 200) {
+    const ops = { cvrg: result.data.cvrg };
+    opertaor.setDataAll(ops);
+    ElMessage.success(result["msg"]);
+    return true;
+  }
+  ElMessage.error(result["msg"]);
+  return false;
+};
 const saveAndSubmit = () => {
   //调用保存并提交接口
   const call = () => {
@@ -881,7 +996,7 @@ const submit = () => {
   const s = reviewInfoRef.value.getFromValue(); //获取表单数据
   const res = Object.assign(s);
   res['cRelNo'] = freeEditRef.value?.getValue("cPlanNo");
-  res['id'] = routeQryParams?.rowData.cPkId;
+  res['id'] = routeQryParams.value?.rowData?.cPkId;
   res['cType'] = 'PLAN';
   policyService.processApprove(res).then(result => {
     if (result['code'] === 200) {
@@ -896,40 +1011,142 @@ const submit = () => {
   });
 }
 
-onMounted(async() => {
-  if(routeQryParams?.rowData){
-    await initPage();
+const isPlanConfigPage = computed(() =>
+  ["planConfigAdd", "planConfigupdate", "planConfigview", "planConfigCopy"].includes(rawPageType.value)
+);
+
+const getRouteTitle = () => {
+  const paramsTitle = Array.isArray(route.params?.title) ? route.params.title[0] : route.params?.title;
+  const queryTitle = Array.isArray(route.query?.title) ? route.query.title[0] : route.query?.title;
+  return (paramsTitle as string) || (queryTitle as string) || "";
+};
+
+const breadcrumbTitle = computed(() => {
+  const routeTitle = getRouteTitle();
+  if (routeTitle) {
+    return routeTitle;
   }
+  if (isReviewPage.value) {
+    return pageMode.value === "handle" ? "方案审核 - 处理" : "方案审核 - 查看";
+  }
+  if (isPlanConfigPage.value) {
+    return pageMode.value === "add"
+      ? "方案配置 - 新增"
+      : pageMode.value === "edit"
+        ? "方案配置 - 修改"
+        : pageMode.value === "copy"
+          ? "方案配置 - 复制"
+          : pageMode.value === "view"
+            ? "方案配置 - 查看"
+            : "";
+  }
+  return "";
+});
+
+const titleRouteRecord = ref<any>(null);
+const originalRouteTitle = ref<any>(undefined);
+function restoreRouteTitle() {
+  const record = titleRouteRecord.value;
+  if (record?.meta && originalRouteTitle.value !== undefined) {
+    record.meta.title = originalRouteTitle.value;
+  }
+}
+function syncRouteTitle() {
+  const lastRouteRecord = route.matched?.[route.matched.length - 1];
+  if (lastRouteRecord?.meta) {
+    titleRouteRecord.value = lastRouteRecord;
+    if (originalRouteTitle.value === undefined) {
+      originalRouteTitle.value = lastRouteRecord.meta.title;
+    }
+  }
+
+  const title = breadcrumbTitle.value;
+
+  if (titleRouteRecord.value?.meta) {
+    titleRouteRecord.value.meta.title = title || originalRouteTitle.value;
+  }
+}
+
+function applyPageReadonlyState() {
+  const disablePlan = pageMode.value === "view" || isReviewPage.value || props.goodsType === "goods";
+  if (disablePlan) {
+    freeEditRef.value?.setDisabledAll();
+    specialEditRef.value?.setDisabledAll();
+    opertaor.setDisabledAll();
+  }
+
+  if (pageMode.value === "view" || pageMode.value === "handle") {
+    payinfoEditRef.value?.setDisabledAll(true);
+  }
+
+  if (pageMode.value === "view") {
+    reviewInfoRef.value?.setDisabledAll?.(true);
+  }
+}
+
+onBeforeUnmount(() => {
+  restoreRouteTitle();
+});
+
+onActivated(() => {
+  initPageMode();
+  syncRouteTitle();
   nextTick(() => {
-    if (routeQryParams?.type == 'planConfigAdd') {
+    applyPageReadonlyState();
+  });
+});
+
+onDeactivated(() => {
+  restoreRouteTitle();
+});
+
+onMounted(async() => {
+  nextTick(() => {
+    syncRouteTitle();
+    if (rawPageType.value == 'planConfigAdd') {
+      if(getPageRowData()){
+        initPage(getPageRowData());
+      }
       nextTick(() => {
-        freeEditRef.value?.setValue("cKindNo", routeQryParams?.rowData.cKindNo);
-        freeEditRef.value?.setValue("cProdNo", routeQryParams?.rowData.cProdNo);
+        freeEditRef.value?.setValue("cKindNo", routeQryParams.value?.rowData?.cKindNo);
+        freeEditRef.value?.setValue("cProdNo", routeQryParams.value?.rowData?.cProdNo);
+        specialEditRef.value?.setValue?.("cProdNo", routeQryParams.value?.rowData?.cProdNo);
       });
     } else {
       let param = {
-        cPlanNo: props.goodsType=='goods'? props.goodsData.cPlanNo:  routeQryParams.rowData.cPlanNo
+        cPlanNo: getPageRowData()?.cPlanNo
       };
 
-      policyService.getPlanBase(param).then(result => {
-        if (result['code'] === 200) {
-          freeEditRef.value?.setFormValue(result.data.data)
+      policyService.getPlanBase(param).then(async result => {
+        if (result['code'] === 200 && result?.data?.code === "1") {
+          const detailData = getPlanBaseDetail(result);
+          setPlanFormValue(detailData)
+          await initPage({
+            ...(getPageRowData() || {}),
+            ...detailData,
+          });
+          if (rawPageType.value === 'planConfigCopy') {
+            nextTick(() => {
+              freeEditRef.value?.setValue("cPkId", null);
+              freeEditRef.value?.setValue("cPlanNo", "");
+              freeEditRef.value?.setValue("cUndrStatus", "0");
+            });
+          }
 
           // 根据公式计算弹框
-          payinfo.value = result.data.data.cCalcFormula == 3 ? true : false;
+          payinfo.value = detailData.cCalcFormula == 3 ? true : false;
           // payinfo.value = true
           if (payinfo.value) {
             initData();
           }
 
         } else {
-          ElMessage.error(result['msg']);
+          ElMessage.error(result?.data?.message || result['msg']);
         }
       });
-      policyService.getPlanCvrg(param).then(result => {
+      policyService.getPlanCvrg(param).then(async result => {
         if (result['code'] === 200) {
-          const ops = { cvrg: result.data.cvrg }
-          opertaor.setDataAll(ops);
+          await applyCvrgData(result.data.cvrg);
         } else {
           ElMessage.error(result['msg']);
         }
@@ -937,13 +1154,28 @@ onMounted(async() => {
     }
     // || props.type == 'goods'
     nextTick(() => {
-      if (routeQryParams?.type == 'planConfigview' || routeQryParams?.type == 'under' ||props.goodsType=='goods' ) {
-        freeEditRef.value.setDisabledAll();
-        opertaor.setDisabledAll();
-      }
+      applyPageReadonlyState();
     });
   });
 });
+
+watch(
+  () => payinfo.value,
+  () => {
+    nextTick(() => {
+      applyPageReadonlyState();
+    });
+  }
+);
+
+watch(
+  () => [route.params?.title, route.query?.title],
+  () => {
+    nextTick(() => {
+      syncRouteTitle();
+    });
+  }
+);
 //给表单下拉项赋值
 function setFormItem(prop: string, config: any) {
   formconfig1.fromSchema?.forEach((item) => {
@@ -980,4 +1212,8 @@ defineExpose({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.module-title {
+  font-weight: 600;
+}
+</style>

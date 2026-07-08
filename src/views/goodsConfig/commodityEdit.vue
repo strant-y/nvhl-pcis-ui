@@ -49,7 +49,7 @@
     </div> -->
 
       <div class="footer"
-        v-if="queryParam.editType === 'add' || queryParam.editType === 'edit' || queryParam.editType === 'upload'">
+        v-if="queryParam.editType === 'add' || queryParam.editType === 'edit' || queryParam.editType === 'copy' || queryParam.editType === 'upload'">
         <el-button type="primary" @click="scrollToTop">一键回到顶部</el-button>
         <el-button type="primary" @click="saveAll(false)">保存</el-button>
         <el-button type="primary" @click="saveAllSubmit">保存并提交审核</el-button>
@@ -338,13 +338,17 @@ function handleQuery() {
 
         //  测试报告说明
         tabref6.setValue('cTestReport', dataS.cTestReport)
-        if (queryParam.editType === "edit") {
+        if (queryParam.editType === "edit" || queryParam.editType === "copy") {
           isShowTest.value = cStatus == '3' || cStatus == '6' || cStatus == '2' ? true : false;
         } else if (queryParam.editType === "upload") {
           isShowTest.value = true
         } else {
           isShowTest.value = cStatus == '2' || cStatus == '3' || cStatus == '4' || cStatus == '5' || cStatus == '6' ? true : false;
           tabref6.setDisabledAll()
+        }
+        if (queryParam.editType === "copy") {
+          tabref.setValue("cCommodityNo", "");
+          tabref.setValue("cStatus", "0");
         }
       } else {
         ElMessage.error(msg);
@@ -470,7 +474,7 @@ const saveAllSubmit = async () => {
   if (!isValid) {
     return;
   } else {
-		if ('add' === queryParam.editType || 'edit' === queryParam.editType) {
+		if ('add' === queryParam.editType || 'edit' === queryParam.editType || 'copy' === queryParam.editType) {
 			// 校验销售资质
 			const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
 			const saleQualifyCheckResult = await tabref3?.checkProdGradeChange(true);

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <el-dialog v-model="dialogVisible" :title="dialogTitle" width="90%">
     <div>
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
@@ -23,9 +23,10 @@
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
+import { formatActionTitle } from "@/utils/action-title";
 import { yesOrNo, size, inputtype, typeMap, dateType } from "@/utils/utilKey";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { ref, defineProps } from "vue";
+import { computed, ref, defineProps } from "vue";
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
   getButtonByFacKey,
@@ -56,6 +57,7 @@ const showBtnConfig = ref(false);
 const dialogVisible = ref(true);
 const showView = ref(false);
 const dzmodal = useDzModal();
+const dialogTitle = computed(() => formatActionTitle(props.type, "特约配置"));
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const freeLookRef = ref<AppFreeEditMethod | null>(null);
@@ -141,10 +143,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   })
 );
 onMounted(async () => {
-  if (props.type === "edit") {
+  if (props.type === "edit" || props.type === "copy") {
     const dataObj = props.data;
     setTimeout(() => {
       freeEditRef.value?.setFormValue(dataObj);
+      if (props.type === "copy") {
+        freeEditRef.value?.setValue("cSpecNo", "");
+      }
     }, 50);
   }
 });
@@ -185,7 +190,7 @@ function save() {
   freeEditRef.value?.validate().then((isValid) => {
     if (isValid) {
       const formParam = getFrom();
-      const param = Object.assign({ type: props.type }, formParam);
+      const param = Object.assign({ type: props.type === "copy" ? "add" : props.type }, formParam);
       savePrdFixSpecInfo(param)
         .then((res) => {
           const { code, data, msg } = res;

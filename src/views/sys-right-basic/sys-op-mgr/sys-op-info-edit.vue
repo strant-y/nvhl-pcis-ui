@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="props.type == 'add' ? '新增权限菜单信息' : '修改权限菜单信息'" v-model="dialogVisible" width="90%">
+  <el-dialog :title="props.type == 'add' ? '新增权限菜单信息' : '修改权限菜单信息'" v-model="dialogVisible" width="90%" class="system-dialog-scroll">
     <div>
       <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
       <div style="margin-top: 20px" :style="{ textAlign: 'right' }">
@@ -211,4 +211,9 @@ function save() {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+</style>

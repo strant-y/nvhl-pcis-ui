@@ -591,7 +591,7 @@ onMounted(() => {
   })
 
   const user = JSON.parse(sessionStorage.getItem("user")).opCde;
-  if (param.editType !== 'add' && param.editType !== 'edit' && param.editType) {
+  if (param.editType !== 'add' && param.editType !== 'edit' && param.editType !== 'copy' && param.editType) {
     // handleQuery();
     // setDisa();
     freeEditRef.value?.setDisabledAll();

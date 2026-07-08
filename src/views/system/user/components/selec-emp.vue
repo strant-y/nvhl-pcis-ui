@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, defineProps } from 'vue'
 import { getEmpList } from "@/api/dict/index";
-import { UserQuery } from '@/api/user/types';
+import { UserQuery, UserPageVO } from '@/api/user/types';
 import { codeListViewStore } from '@/store';
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 
@@ -16,13 +16,16 @@ const props = defineProps({
 });
 const dialogVisible = ref(true)
 const isUpper = ref(false)
-const datas = ref([])
+const datas = ref<Record<string, any>[]>([])
 const loading = ref(false); //  加载状态
-const pageData = ref<any[]>(); // 用户分页数据
-const user = JSON.parse(sessionStorage.getItem("user"));
+const pageData = ref<UserPageVO[]>([]); // 用户分页数据
+const user = JSON.parse(sessionStorage.getItem("user") || "{}") as Record<
+  string,
+  any
+>;
 const total = ref(0); // 数据总数
-const cCtfctTyp =ref([]);
-const sex =ref([]);
+const cCtfctTyp = ref<OptionType[]>([]);
+const sex = ref<OptionType[]>([]);
 
 function getValue(type:any,code: any ) {
     if(type === 'ctfc'){
@@ -42,7 +45,7 @@ const queryParams = reactive<UserQuery>({
   pageNum: 1,
   pageSize: 5,
   subordinate: '1',
-  companyId : user.companyId
+  companyId : user.companyId || ""
 });
 
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -50,12 +53,12 @@ const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 onMounted(()=>{
     codeListStore.queryCodeListByCode('allCertificateType',false,true)
-      .then(res => cCtfctTyp.value = res).catch(err => {
+      .then((res: OptionType[]) => cCtfctTyp.value = res).catch((err: unknown) => {
         console.error(err);
         cCtfctTyp.value = [];
     });
     codeListStore.queryCodeListByCode('SexType',false,true)
-      .then(res => sex.value = res).catch(err => {
+      .then((res: OptionType[]) => sex.value = res).catch((err: unknown) => {
         console.error(err);
         sex.value = [];
     });
@@ -72,7 +75,7 @@ function handleQuery(){
     loading.value = false;
   });
 }
-function handleSelectionChange(i){
+function handleSelectionChange(i: UserPageVO){
     emits('ok',{res:i});
     dialogVisible.value = false;
 }
@@ -90,6 +93,7 @@ function closeDialog(){
       v-model="dialogVisible"
       :title="dialog.title"
       style="width: 1000px;"
+      class="system-dialog-scroll"
       append-to-body
       @close="closeDialog"
     >
@@ -194,6 +198,11 @@ function closeDialog(){
 </template>
 
 <style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+
 .search-container {
     padding: 25px 20px 15px 10px;
     background-color: var(--el-bg-color-overlay);

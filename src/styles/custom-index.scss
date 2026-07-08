@@ -1,3 +1,110 @@
+@mixin rt-custom-input {
+  .el-input__wrapper{
+    min-height: var(--rt-form-content-height);
+    border-radius: var(--rt-form-item-radius);
+  }
+  .el-input__inner {
+    font-size: var(--rt-form-content-font-size);
+    color: var(--el-text-color);
+    line-height: 100%;
+    height: 100%;
+  }
+  .el-input__placeholder {
+    font-size: var(--rt-form-content-font-size);
+  }
+  .el-input__prefix {
+    .el-input__prefix-inner {
+      height: calc(var(--rt-form-content-height) - 3px);
+      font-size: var(--rt-form-content-font-size);
+    }
+  }
+  .el-input__suffix {
+    .el-input__suffix-inner {
+      height: calc(var(--rt-form-content-height) - 3px);
+      font-size: var(--rt-form-content-font-size);
+    }
+  }
+}
+
+@mixin rt-custom-textarea {
+  border-radius: var(--rt-form-item-radius);
+  .el-textarea__wrapper {
+    border-radius: var(--rt-form-item-radius);
+  }
+  .el-textarea__inner {
+    font-size: var(--rt-form-content-font-size);
+    color: var(--el-text-color);
+  }
+  .el-textarea__placeholder {
+    font-size: var(--rt-form-content-font-size);
+  }
+}
+
+@mixin rt-custom-select {
+  .el-select__wrapper {
+    min-height: var(--rt-form-content-height);
+    border-radius: var(--rt-form-item-radius);
+  }
+  .el-select__input {
+    font-size: var(--rt-form-content-font-size);
+    color: var(--el-text-color);
+    line-height: 100%;
+    height: 100%;
+  }
+  .el-select__placeholder {
+    font-size: var(--rt-form-content-font-size);
+  }
+  .el-select__selection.is-near {
+    margin-left: 0px;
+  }
+  .el-select__selection .el-tag {
+    height: 100%;
+  }
+}
+
+@mixin rt-custom-picker {
+  .el-input__wrapper {
+    height: var(--rt-form-content-height);
+    min-height: var(--rt-form-content-height);
+    border-radius: var(--rt-form-item-radius);
+  }
+  .el-date-picker__input {
+    height: var(--rt-form-content-height) !important;
+  }
+  .el-input__inner {
+    font-size: var(--rt-form-content-font-size);
+    color: var(--el-text-color);
+  }
+  .el-input__placeholder {
+    font-size: var(--rt-form-content-font-size);
+  }
+}
+
+@mixin rt-input__btn {
+  .el-input,
+  .el-input-number,
+  .el-textarea,
+  .el-select,
+  .el-date-picker {
+    .el-select__wrapper {
+      border-radius: var(--rt-form-item-radius) 0 0 var(--rt-form-item-radius);
+    }
+    .el-input__wrapper {
+      border-radius: var(--rt-form-item-radius) 0 0 var(--rt-form-item-radius);
+    }
+  }
+  .el-button {
+    border-radius: 0 var(--rt-form-item-radius) var(--rt-form-item-radius) 0;
+    height: calc(var(--rt-form-content-height) + 0.01px) !important;
+    background-color: var(--el-color-primary);
+    .el-icon {
+      &:hover{
+        color: var(--menu-hover);
+      }
+    }
+  }
+}
+
 // 左侧锚点样式
 :deep(.custom-anchor-bg) {
   background-color: var(--menu-background);
@@ -100,10 +207,10 @@
   margin-bottom: 0 !important;
   .el-form-item__content {
     .el-input {
-      @extend .rt-custom-input;
+      @include rt-custom-input;
     }
     .el-select {
-      @extend .rt-custom-select;
+     @include rt-custom-select;
     }
     @extend .rt-custom-item__error;
   }
@@ -154,14 +261,14 @@
     // 表单项内容区域（与label对应）
     .el-form-item__content {
       .el-input {
-        @extend .rt-custom-input;
+        @include rt-custom-input;
       }
       .el-textarea {
-        @extend .rt-custom-textarea;
+        @include rt-custom-textarea;
       }
       // 下拉选择器样式
       .el-select {
-        @extend .rt-custom-select;
+        @include rt-custom-select;
       }
 
       // 日期选择器输入框样式
@@ -173,7 +280,7 @@
         }
       }
       .el-date-picker {
-        @extend .rt-custom-picker;
+        @include rt-custom-picker;
       }
       // 校验提示信息样式
       @extend .rt-custom-item__error;
@@ -185,7 +292,7 @@
 
       // input + btn 样式
       .show-right-btn {
-        @extend .rt-input__btn;
+        @include rt-input__btn;
       }
 
       // inputgroup 样式
@@ -267,19 +374,19 @@
     .el-form-item__content {
       // 所有输入控件继承字体样式
       .el-input {
-        @extend .rt-custom-input;
+        @include rt-custom-input;
       }
       .el-textarea {
-        @extend .rt-custom-textarea;
+        @include rt-custom-textarea;
       }
       // 下拉选择器样式
       .el-select {
-        @extend .rt-custom-select;
+         @include rt-custom-select;
       }
 
       // 日期选择器输入框样式
       .el-date-picker {
-        @extend .rt-custom-picker;
+        @include rt-custom-picker;
       }
 
       .el-text, span {
@@ -295,7 +402,7 @@
 
       // input + btn 样式
       .show-right-btn {
-        @extend .rt-input__btn;
+        @include rt-input__btn;
       }
 
       @extend .rt-custom-item__error;
@@ -327,7 +434,7 @@
       font-size: var(--rt-form-content-font-size);
     }
     .el-input {
-      @extend .rt-custom-input;
+      @include rt-custom-input;
     }
   }
 }
@@ -338,94 +445,8 @@
     height: 32px;
     display: flex;
     align-items: center;
-    @extend .rt-input__btn;
-    @extend .rt-custom-input;
-  }
-}
-
-// 输入框块样式
-.rt-custom-input {
-  .el-input__wrapper{
-    min-height: var(--rt-form-content-height);
-    border-radius: var(--rt-form-item-radius);
-  }
-  .el-input__inner {
-    font-size: var(--rt-form-content-font-size);
-    color: var(--el-text-color);
-    line-height: 100%;
-    height: 100%;
-  }
-  .el-input__placeholder {
-    font-size: var(--rt-form-content-font-size);
-  }
-  .el-input__prefix {
-    .el-input__prefix-inner {
-      height: calc(var(--rt-form-content-height) - 3px);
-      font-size: var(--rt-form-content-font-size);
-    }
-  }
-  .el-input__suffix {
-    .el-input__suffix-inner {
-      height: calc(var(--rt-form-content-height) - 3px);
-      font-size: var(--rt-form-content-font-size);
-    }
-  }
-}
-
-// 文本块样式
-.rt-custom-textarea {
-  border-radius: var(--rt-form-item-radius);
-  .el-textarea__wrapper {
-    border-radius: var(--rt-form-item-radius);
-  }
-  .el-textarea__inner {
-    font-size: var(--rt-form-content-font-size);
-    color: var(--el-text-color);
-  }
-  .el-textarea__placeholder {
-    font-size: var(--rt-form-content-font-size);
-  }
-}
-
-// reselect 样式
-.rt-custom-select {
-  .el-select__wrapper {
-    min-height: var(--rt-form-content-height);
-    border-radius: var(--rt-form-item-radius);
-  }
-  .el-select__input {
-    font-size: var(--rt-form-content-font-size);
-    color: var(--el-text-color);
-    line-height: 100%;
-    height: 100%;
-  }
-  .el-select__placeholder {
-    font-size: var(--rt-form-content-font-size);
-  }
-  .el-select__selection.is-near {
-    margin-left: 0px;
-  }
-  .el-select__selection .el-tag {
-    height: 100%;
-  }
-}
-
-// 日期选择框样式
-.rt-custom-picker {
-  .el-input__wrapper {
-    height: var(--rt-form-content-height);
-    min-height: var(--rt-form-content-height);
-    border-radius: var(--rt-form-item-radius);
-  }
-  .el-date-picker__input {
-    height: var(--rt-form-content-height) !important;
-  }
-  .el-input__inner {
-    font-size: var(--rt-form-content-font-size);
-    color: var(--el-text-color);
-  }
-  .el-input__placeholder {
-    font-size: var(--rt-form-content-font-size);
+    @include rt-input__btn;
+    @include rt-custom-input;
   }
 }
 
@@ -434,31 +455,5 @@
   .el-form-item__error, .el-form-item__error--inline {
     font-size: calc(var(--rt-form-content-font-size) - 1.5px);
     margin-left: 2px;
-  }
-}
-
-// 输入框 + btn 样式
-.rt-input__btn {
-  .el-input,
-  .el-input-number,
-  .el-textarea,
-  .el-select,
-  .el-date-picker {
-    .el-select__wrapper {
-      border-radius: var(--rt-form-item-radius) 0 0 var(--rt-form-item-radius);
-    }
-    .el-input__wrapper {
-      border-radius: var(--rt-form-item-radius) 0 0 var(--rt-form-item-radius);
-    }
-  }
-  .el-button {
-    border-radius: 0 var(--rt-form-item-radius) var(--rt-form-item-radius) 0;
-    height: calc(var(--rt-form-content-height) + 0.01px) !important;
-    background-color: var(--el-color-primary);
-    .el-icon {
-      &:hover{
-        color: var(--menu-hover);
-      }
-    }
   }
 }

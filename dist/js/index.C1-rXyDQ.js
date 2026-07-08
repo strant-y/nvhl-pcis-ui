@@ -1,0 +1,1 @@
+import{d as a,av as e,aw as r,c as s,e as t,aT as i}from"./index.ClVsHzfm.js";const c=i(a({__name:"index",setup(a){const i=e(),c=r(),{params:p,query:d}=i,{path:n}=p;return c.replace({path:"/"+n,query:d}),(a,e)=>(s(),t("div"))}}),[["__file","D:/work/productFactory/nvhl-pcis-ui/src/views/redirect/index.vue"]]);export{c as default};

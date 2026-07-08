@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
-    <div class="app-container">
+  <el-dialog v-model="dialogVisible" width="90%" class="prd-fix-spec-dialog">
+    <div class="app-container prd-fix-spec-container">
       <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
         @selection-change="handleSelectionChange" />
     </div>
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, inject } from 'vue';
 import { ElMessage } from 'element-plus';
 
 import { createFreeButtonBase } from "@/shared/button-config";
@@ -26,7 +26,10 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { codeListViewStore } from "@/store";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
 
+const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
+const codeListStore = codeListViewStore(idxParam.cdeListViewProps);
 
 const props = defineProps({
   data: {
@@ -77,6 +80,10 @@ const handleSelectionChange = (selection) => {
 }
 
 const refreshData = () => {
+  if (!props.data?.cProdNo) {
+    ElMessage.error("产品号为空，无法查询特约列表");
+    return;
+  }
   // 查询列表数据
   codeListStore.queryCodeList({
     codeListName: 'FIX_SPEC_LIST',
@@ -108,4 +115,9 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.prd-fix-spec-container {
+  max-height: 400px;
+  overflow: auto;
+}
+</style>

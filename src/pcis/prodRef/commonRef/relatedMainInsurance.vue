@@ -112,6 +112,10 @@ const tableconfig = reactive<AppTableConfig>(
         label: "关联主条款",
         type: "success",
         func: function () {
+
+          if (!assertCopyTargetReady()) {
+            return;
+          }
           if (tabref.getFromValue().cProdNo == null) {
             ElMessage.error("产品编码为空,请保存后操作!");
             return;
@@ -138,6 +142,9 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "Delete",
         link: true,
         tableClick: (row) => {
+          if (!assertCopyTargetReady()) {
+            return;
+          }
           const userId = sessionStorage.getItem("user").opCde;
           const delParam = { ...row, cCrtCde: userId, cUpdCde: userId };
           unAssociationTerm(delParam)
@@ -225,14 +232,38 @@ function setDisa() {
     e.disabled = true;
   });
 }
+function getSourceProdNo() {
+  return param?.prodNo || param?.prod?.cProdNo || "";
+}
+function getTargetProdNo() {
+  return tabref?.getFromValue?.()?.cProdNo || "";
+}
+function getActiveProdNo() {
+  const sourceProdNo = getSourceProdNo();
+  const targetProdNo = getTargetProdNo();
+  if (param.editType === "edit") {
+    return sourceProdNo;
+  }
+  if (param.editType === "copy") {
+    return targetProdNo && targetProdNo !== sourceProdNo ? targetProdNo : sourceProdNo;
+  }
+  return targetProdNo;
+}
+function assertCopyTargetReady() {
+  if (param.editType !== "copy") {
+    return true;
+  }
+  const sourceProdNo = getSourceProdNo();
+  const targetProdNo = getTargetProdNo();
+  if (!targetProdNo || targetProdNo === sourceProdNo) {
+    ElMessage.error("复制模式请先录入并保存新的产品编码后操作!");
+    return false;
+  }
+  return true;
+}
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  let prod = '';
-  if(param.editType === "edit"){
-    prod = param.prodNo;
-  }else{
-    prod = tabref.getFromValue().cProdNo;
-  }
+  const prod = getActiveProdNo();
   if (!prod || prod === '') {
     ElMessage.error("产品编码为空,请保存后操作!");
     return;
@@ -255,7 +286,7 @@ function handleQuery(flag?: boolean) {
   }
 }
 onMounted(() => {
-  if (param.editType == "edit") {
+  if (param.editType == "edit" || param.editType == "copy") {
     handleQuery();
   } else if (param.editType == "view") {
     setDisa();

@@ -141,8 +141,9 @@
       </div>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item @click="openShortcutEdit"> <el-icon><Menu /></el-icon>
-            <span style="font-size: var(--menu-text-size);">快捷菜单</span></el-dropdown-item>
+          <!-- 临时禁用快捷菜单功能，避免依赖dashboard -->
+          <!-- <el-dropdown-item @click="openShortcutEdit"> <el-icon><Menu /></el-icon>
+            <span style="font-size: var(--menu-text-size);">快捷菜单</span></el-dropdown-item> -->
           <el-dropdown-item @click="openDialog" v-if="userStore.user.src == null"> <el-icon><Lock /></el-icon>
             <span style="font-size: var(--menu-text-size);">修改密码</span></el-dropdown-item>
           <el-dropdown-item @click="clearRedisCache" v-if="showRedisCache">清除redis缓存</el-dropdown-item>
@@ -212,8 +213,7 @@ import defaultSettings from "@/settings";
 import { updateUserPassword, changeDptToken } from "@/api/user";
 import { download } from "@/utils/request";
 import { LocalBaseApi } from "@/api/config";
-import { PcisQueryService } from '@/views/dashboard/service/v1.service';
-// import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
+import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 
 import { useRouter, useRoute } from "vue-router";
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -222,10 +222,11 @@ import { Notification } from '@element-plus/icons-vue'
 import { viewManual } from "@/api/prod";
 import ViewPdf from "@/views/apdfmodo/viewPdf.vue";
 const dzmodal = useDzModal();
-const shortMenuDialog = defineAsyncComponent(
-  () => import("@/views/dashboard/components/shortMenuDialog.vue")
-);
-import { getShortcutDataList, updateShortRoute } from "@/api/menu";
+// 临时禁用快捷菜单功能，避免依赖dashboard
+// const shortMenuDialog = defineAsyncComponent(
+//   () => import("@/views/dashboard/components/shortMenuDialog.vue")
+// );
+// import { getShortcutDataList, updateShortRoute } from "@/api/menu"; // 临时禁用快捷菜单功能
 
 
 
@@ -281,7 +282,7 @@ onMounted(() => {
     showChangeDpt.value = false;
   }
   loadData()
-	getShortMenuList()
+	// getShortMenuList() // 临时禁用快捷菜单功能
 	// nextTick(() => {
   //   if (pdfDialogRef.value) {
   //     // 调用 preload：静默执行，成功则存缓存，失败也不报错
@@ -572,26 +573,26 @@ const switchTab = (tab) => {
 	}
 };
 
-const shortcutDataList = ref([])
-function getShortMenuList() {
-  getShortcutDataList().then((res: any) => {
-    if (res.code == 200) {
-      shortcutDataList.value = res.data.filter((item:any) => item.cOpAct !== "Layout");
-    }
-  });
-}
-const emits = defineEmits(["shortMenu"])
+// const shortcutDataList = ref([])
+// function getShortMenuList() {
+//   getShortcutDataList().then((res: any) => {
+//     if (res.code == 200) {
+//       shortcutDataList.value = res.data.filter((item:any) => item.cOpAct !== "Layout");
+//     }
+//   });
+// }
+// const emits = defineEmits(["shortMenu"])
 
-// 编辑快捷菜单
-function openShortcutEdit() {
-  dzmodal
-    .open(shortMenuDialog, { type: "", data: shortcutDataList.value })
-    .then((res: any) => {
-      if (res.type === "ok") {
-        emits("shortMenu")
-      }
-    });
-}
+// // 编辑快捷菜单
+// function openShortcutEdit() {
+//   dzmodal
+//     .open(shortMenuDialog, { type: "", data: shortcutDataList.value })
+//     .then((res: any) => {
+//       if (res.type === "ok") {
+//         emits("shortMenu")
+//       }
+//     });
+// }
 
 
 // 存储每条的轨道容器

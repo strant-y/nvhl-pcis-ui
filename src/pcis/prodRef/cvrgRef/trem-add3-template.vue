@@ -110,7 +110,12 @@ onMounted(() => {
     riskList: queryList,
   };
   getTRFactorJson(params).then((res: any) => {
-    term.value = res.data?.data?.term
+    const factorData = res.data?.data;
+    if (!factorData?.term) {
+      ElMessage.error(res.msg || "条款配置加载失败");
+      return;
+    }
+    term.value = factorData.term
   })
 });
 
@@ -195,7 +200,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index";
+@use "src/styles/custom-index" as *;
 table {
   border-collapse: collapse; /* 合并边框 */
   width: 100%;

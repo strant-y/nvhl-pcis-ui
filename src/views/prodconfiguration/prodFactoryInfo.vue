@@ -1,35 +1,45 @@
 <!-- 用户管理 -->
 <template>
-  <div>
+  <div :class="{ 'dialog-mode': param?.inDialog }">
     <el-container>
       <el-main>
-        <el-container>
-          <el-aside>
+    <el-container>
+          <el-aside :class="{ collapsed: asideCollapsed }">
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
               <el-affix :offset="0">
+                
                 <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
                   <el-anchor-link
                     v-for="(k, i) in pageConfig?.pageInfo"
                     :key="i"
                     :href="`#${k.pageKey}`"
                   >
-                    <i :class="['icon','iconfont',iconMap[k.pageKey]]"></i>
-                    <div class="icon-title">
-                      <template v-if="k.pageTtile && k.pageTtile.length > 6">
-                        <el-tooltip
-                          effect="dark"
-                          :content="k.pageTtile"
-                          placement="top-start"
-                        >
-                          {{ k.pageTtile.substring(0, 6) + "..." }}
-                        </el-tooltip>
-                      </template>
-                      <template v-else>
-                        {{ k.pageTtile }}
-                      </template>
-                    </div>
+                    <el-tooltip
+                      effect="dark"
+                      :content="k.pageTtile || ''"
+                      placement="top-start"
+                      :disabled="!(asideCollapsed || (k.pageTtile && k.pageTtile.length > 6))"
+                    >
+                      <div class="anchor-item">
+                        <i :class="['icon', 'iconfont', iconMap[k.pageKey]]"></i>
+                        <div v-if="!asideCollapsed" class="icon-title">
+                          <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                            {{ k.pageTtile.substring(0, 6) + "..." }}
+                          </template>
+                          <template v-else>
+                            {{ k.pageTtile }}
+                          </template>
+                        </div>
+                      </div>
+                    </el-tooltip>
                   </el-anchor-link>
                 </el-anchor>
+                <div class="aside-toggle" @click="toggleAside">
+                  <el-icon>
+                    <Fold v-if="!asideCollapsed" />
+                    <Expand v-else />
+                  </el-icon>
+                </div>
               </el-affix>
             </template>
           </el-aside>
@@ -57,16 +67,23 @@
         </el-container>
       </el-main>
     </el-container>
-    <el-backtop :right="100" :bottom="100" style="background-color: #dcf9fd" />
+    <el-backtop
+      v-if="!param?.inDialog"
+      :right="100"
+      :bottom="100"
+      style="background-color: #dcf9fd"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { getProdInfos, getInquiryPage } from "@/api/prod";
+import { getProdInfos } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
-import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { createCopyData } from "@/utils/copy";
+import { idxParamKey, IdxParamProps } from "@/views/pcis/support/useIdxParam";
 import { useRoute } from "vue-router";
+import { Expand, Fold } from "@element-plus/icons-vue";
 
 const route = useRoute();
 const dataparam = dataParam();
@@ -91,6 +108,7 @@ dataparam.setParam(param);
 const formconfig1 = opertaor.getTableConfig();
 // 当前加载的组件索引
 const currentIndex = ref(0);
+const asideCollapsed = ref(false);
 const prodauditConfig = {
   pageKey: "prodaudit",
   pageTtile: "产品审核",
@@ -127,66 +145,15 @@ opertaor.setTableConfig([
         pageTtile: "关联特别约定",
         pageRef: "specialAgreement",
       },
-      // healthNotice: {
-      //   pageKey: "healthNotice",
-      //   pageTtile: "关联健康告知",
-      //   pageRef: "healthNotice",
-      // },
-      // relatedInsuranceLiability: {
-      //   pageKey: "relatedInsuranceLiability",
-      //   pageTtile: "关联条款责任",
-      //   pageRef: "relatedInsuranceLiability",
-      // },
-      relatedBusinessRules: {
-        pageKey: "relatedBusinessRules",
-        pageTtile: "关联业务规则",
-        pageRef: "relatedBusinessRules",
-      },
-      relatedPremCalcuRules: {
-        pageKey: "relatedPremCalcuRules",
-        pageTtile: "关联保费计算规则",
-        pageRef: "relatedPremCalcuRules",
-      },
-      relatedPayOrderConf: {
-        pageKey: "relatedPayOrderConf",
-        pageTtile: "关联见费出单配置",
-        pageRef: "relatedPayOrderConf",
-      },
-      planConfigration: {
-        pageKey: "planConfigration",
-        pageTtile: "计划配置",
-        pageRef: "planConfigration",
-      },
-      rateConfiguration: {
-        pageKey: "rateConfiguration",
-        pageTtile: "费率配置",
-        pageRef: "rateConfiguration",
-      },
-      InstituTaxRateAllocat: {
-        pageKey: "InstituTaxRateAllocat",
-        pageTtile: "机构税率配置",
-        pageRef: "InstituTaxRateAllocat",
-      },
-      assoCorrPreCalculFormula: {
-        pageKey: "assoCorrPreCalculFormula",
-        pageTtile: "关联批改保费计算公式",
-        pageRef: "assoCorrPreCalculFormula",
-      },
       prodComponent: {
         pageKey: "prodComponent",
         pageTtile: "页面组件绑定",
         pageRef: "prodComponent",
       },
-      // priceComponent: {
-      //   pageKey: "priceComponent",
-      //   pageTtile: "询价页面配置",
-      //   pageRef: "priceComponent",
-      // },
     },
   },
 ]);
 
-const btns = {};
 const anchorRef = ref(null);
 onMounted(() => {
   formconfig1.forEach((ele) => {
@@ -205,8 +172,11 @@ onMounted(() => {
 });
 
 function renderComponents() {
+  const total = formconfig1.reduce((sum, ele) => {
+    return sum + Object.keys(ele.pageInfo || {}).length;
+  }, 0);
   const interval = setInterval(() => {
-    if (currentIndex.value < 15) {
+    if (currentIndex.value < total - 1) {
       currentIndex.value++;
     } else {
       loadAfter(); //页面加载完成之后,再加载后续所需的事件
@@ -215,7 +185,7 @@ function renderComponents() {
   }, 100); // 延迟组件渲染,增加页面响应效率
 }
 function loadAfter() {
-  if (param.editType === "edit") {
+  if (param.editType === "edit" || param.editType === "copy") {
     nextTick(() => {
       getProdInfos(param)
         .then((res) => {
@@ -229,49 +199,29 @@ function loadAfter() {
           }
         })
         .finally(() => {});
-      getInquiryPage(param)
-        .then((res) => {
-          const { code, data, msg } = res;
-          if (200 === code) {
-            setTimeout(() => {
-              setData({ priceComponent: data});
-            }, 100);
-          } else {
-            ElMessage.error(msg);
-          }
-        })
-        .finally(() => {});
     });
   }
 }
-// function fileterAside(val: string) {
-//   pageconfig.forEach((element) => {
-//     if (element.pageKey === "prodaudit") {
-//     }
-//   });
-// }
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
     const ref = opertaor.getTableRefByKey(k);
     if(ref?.setFormValue) {
-      ref.setFormValue(datas[k]);
+      const currentData =
+        param.editType === "copy" ? createCopyData(datas[k], ["cProdNo"]) : datas[k];
+      ref.setFormValue(currentData);
     }
   });
+}
+
+function toggleAside() {
+  asideCollapsed.value = !asideCollapsed.value;
 }
 
 const iconMap = {
   'prodInfo': 'icon-wenjianban1',
   'relatedMainInsurance': 'icon-zaibaoxinxi',
   'specialAgreement': 'icon-anjiantiaocha',
-  'relatedBusinessRules': 'icon-lishiyijian',
-  'relatedPremCalcuRules': 'icon-qitafeiyong',
-  'relatedPayOrderConf': 'icon-yufuxinxi',
-  'planConfigration': 'icon-xianbiexinxi',
-  'rateConfiguration': 'icon-jiaonafeiyong',
-  'InstituTaxRateAllocat': 'icon-jinetiaozheng',
-  'assoCorrPreCalculFormula': 'icon-yishoubaodan',
   'prodComponent': 'icon-tiaoduxinxi',
-  'priceComponent': 'icon-tiaodumingxi',
 }
 </script>
 
@@ -282,17 +232,28 @@ const iconMap = {
   overflow: hidden;
   overflow-y: auto;
   .el-aside {
-    width: auto;
+    width: 180px;
+    transition: width 0.2s ease;
     .el-affix {
       height: 100%;
       background: var(--el-color-primary);
+      position: relative;
     }
+    &.collapsed {
+      width: 64px;
+    }
+  }
+}
+
+.dialog-mode {
+  .el-main {
+    height: calc(78vh - 34px);
   }
 }
 :deep(.el-anchor) {
   background: transparent;
   .el-anchor__list {
-    padding: 20px 10px;
+    padding: 20px 10px 64px;
     .el-anchor__item {
       margin-bottom: 20px;
       .el-anchor__link {
@@ -302,6 +263,7 @@ const iconMap = {
         padding: 0;
         opacity: 0.6;
         display: flex;
+        align-items: center;
         &.isActive{
           background: var(--el-color-primary);
           :deep(a) {
@@ -327,6 +289,30 @@ const iconMap = {
         }
       }
     }
+  }
+}
+
+.aside-toggle {
+  height: 34px;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.anchor-item {
+  display: flex;
+  align-items: center;
+}
+
+.el-aside.collapsed {
+  :deep(.iconfont) {
+    margin-right: 0;
   }
 }
 </style>

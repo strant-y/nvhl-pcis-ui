@@ -4,6 +4,7 @@ import ComDialog from "./ComDialog.vue";
 import componentView from "./prodconfig/componentView.vue";
 import componentCompare from "./prodconfig/componentCompare.vue";
 import prodCopy from "./prodconfig/prodCopy.vue";
+import prodFactoryEditor from "./prodconfig/prodFactoryEditor.vue";
 import componentPageView from "./prodconfig/componentPageView.vue";
 import DistFactorMap from "./prodconfig/DistFactorMap.vue";
 import addtremView from "./prodconfig/addtremView.vue";
@@ -39,6 +40,7 @@ const componentMap = {
     chooseProdDialog:chooseProdDialog,
 
     prodCopy:prodCopy,
+    prodFactoryEditor:prodFactoryEditor,
     componentPageView:componentPageView,
     distFactorMap:DistFactorMap,
 

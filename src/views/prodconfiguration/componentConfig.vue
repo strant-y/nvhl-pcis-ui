@@ -65,6 +65,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 
 import { ref } from "vue";
+import { formatActionTitle } from "@/utils/action-title";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -193,7 +194,7 @@ const tableconfig = reactive<AppTableConfig>(
                 }
               },
             },
-            { title: "新增组件",draggable :false }
+            { title: formatActionTitle("add", "组件设计"),draggable :false }
           );
         },
       }),
@@ -225,7 +226,7 @@ const tableconfig = reactive<AppTableConfig>(
                 }
               },
             },
-            { title: "编辑组件",draggable :false }
+            { title: formatActionTitle("edit", "组件设计"),draggable :false }
           );
         },
       }),
@@ -254,7 +255,21 @@ const tableconfig = reactive<AppTableConfig>(
         icon: "DocumentCopy",
         link: true,
         tableClick: function (row) {
-          showView("copy", row.cComponentKey);
+          dialog.value?.open(
+            "componentEdit",
+            {
+              type: "copy",
+              data: { componentKey: row.cComponentKey },
+            },
+            {
+              isOk: (res: any) => {
+                if (res.type === "ok") {
+                  handleQuery();
+                }
+              },
+            },
+            { title: formatActionTitle("copy", "组件设计"), draggable: false }
+          );
         },
       }),
       createFreeButtonBase({

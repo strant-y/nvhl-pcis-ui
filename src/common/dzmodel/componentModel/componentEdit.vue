@@ -146,6 +146,7 @@ const jsonArrayEdit = defineAsyncComponent(
   () => import("@/common/dzmodel/jsonArrayEdit.vue")
 );
 const showLocationList = ref<any[]>(showLocation);
+const copyFromComponentKey = ref<string | null>(null);
 const props = defineProps({
   data: {
     type: Object,
@@ -503,12 +504,13 @@ const tableconfig = reactive<AppTableConfig>(
 );
 
 onMounted(async () => {
-  if (props.data.type === "edit") {
+  if (props.data.type === "edit" || props.data.type === "copy") {
     getComponentByKey({
       componentKey: props.data.data?.componentKey,
     }).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
+        copyFromComponentKey.value = data.cComponentKey;
         const param = {
           componentKey: data.cComponentKey,
           componentName: data.cComponentName,
@@ -576,6 +578,11 @@ onMounted(async () => {
           showFactorList.value = true;
           nextTick(() => {
             pageQuerySelect(true);
+          });
+        }
+        if (props.data.type === "copy") {
+          nextTick(() => {
+            freeEditRef.value?.setValue("componentKey", "");
           });
         }
       }
@@ -665,7 +672,8 @@ function pageQuerySelect(isPage: boolean = true) {
   const paraParam = tableRef.value?.getPartnerPage(isPage);
 
   const fromp = tableRef.value?.getFormData();
-  const ck = freeEditRef.value?.getValue("componentKey");
+  const currentKey = freeEditRef.value?.getValue("componentKey");
+  const ck = currentKey || copyFromComponentKey.value;
   const tb = freeEditRef.value?.getValue("componentTab");
   showFactorList.value = true;
   const param = {

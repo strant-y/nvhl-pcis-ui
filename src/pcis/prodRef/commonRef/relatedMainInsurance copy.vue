@@ -47,6 +47,14 @@ const { getRules } = useValidator();
 const tableRef = ref<AppTableMethod | null>(null);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tabref = opertaor.getTableRefByKey("prodInfo");
+function getCProdNo() {
+  const cProdNo = tabref?.getFromValue?.()?.cProdNo;
+  if (!cProdNo) {
+    ElMessage.error("产品编码为空,请保存后操作!");
+    return "";
+  }
+  return cProdNo;
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "关联主险",
@@ -108,12 +116,11 @@ const tableconfig = reactive<AppTableConfig>(
         label: "关联险别",
         type: "success",
         func: function () {
-          if (tabref.getFromValue().cProdNo == null) {
-            ElMessage.error("产品编码为空,请保存后操作!");
+          if (!getCProdNo()) {
             return;
           } else {
             dzmodal
-              .open(MaininsuranceModal, { type: "add", data: {} })
+              .open(MaininsuranceModal, { type: "add", data: {}, idxParam: idxParam })
               .then((res) => {
                 if (res.type === "ok") {
                   handleQuery();

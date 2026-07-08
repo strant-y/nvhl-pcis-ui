@@ -17,6 +17,7 @@ import {
   createFromUiConfig,
 } from "@/shared/app-free-edit-config";
 import { createFreeButtonBase } from "@/shared/button-config";
+import { formatActionTitle } from "@/utils/action-title";
 import { useValidator } from "@/typings/useValidator";
 import {
   saveInruanceTypeBasicInfo,
@@ -38,7 +39,7 @@ const freeEditRef = ref<AppFreeEditMethod | null>(null);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
-    title: "条款基本信息",
+    title: formatActionTitle(param?.type, "条款基本信息"),
     endBtnsPosition: "right",
     endBtns: [
       createFreeButtonBase({
@@ -96,7 +97,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           const isValid = await freeEditRef.value?.validate();
           if (isValid) {
             const s = freeEditRef.value?.getFromValue(); //获取表单数据
-            const datas = Object.assign(s, { type: param.type });
+            const datas = Object.assign(s, { type: param.type === "copy" ? "add" : param.type });
             // const paramData = datas.map((item: any) => {
             //   if (item.cRdrTyp == "1") {
             //   }
@@ -224,6 +225,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         rules: [getRules("required", { change: true })],
         //主条款是0附加条款是1
         func: (val: any) => {
+          emit("clause-type-change", val);
           setFormItem("additionalInsuranceType", {
             hidden: val === "1" ? 0 : 1,
           });
@@ -249,18 +251,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         prop: "tFilingTm",
         inputtype: "rtdatepicker",
         title: "备案日期",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD HH:mm:ss",
         rules: [getRules("required", { change: true })],
       },
       {
         prop: "tFeedbackTm",
         inputtype: "rtdatepicker",
         title: "反馈日期",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD HH:mm:ss",
         rules: [getRules("required", { change: true })],
       },
       {
         prop: "cRegisterDate",
         inputtype: "rtdatepicker",
         title: "注册日期",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD HH:mm:ss",
       },
       {
         prop: "cAreaRange",
@@ -447,6 +455,10 @@ function handleQuery() {
       if (200 === code) {
         setTimeout(() => {
           freeEditRef?.value?.setFormValue(data);
+          emit("clause-type-change", data?.cRdrTyp);
+          if (param.type === "copy") {
+            freeEditRef?.value?.setValue("cTermNo", null);
+          }
         }, 1000);
       } else {
         ElMessage.error(msg);
@@ -489,7 +501,7 @@ watch(
 
 onMounted(() => {
   
-  if (param.type === "edit") {
+  if (param.type === "edit" || param.type === "copy") {
     handleQuery();
   } else {
     // 如果不是编辑模式，确保默认值生效

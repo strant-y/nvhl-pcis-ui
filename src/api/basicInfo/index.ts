@@ -1,12 +1,11 @@
-import {AxiosPromise} from "axios";
 import {post} from "@/utils/http";
-import {del} from "@/utils/http";
+import type { ApiResult } from "@/types/api";
 /**
  * 获取角色信息列表
  *
  * @param queryParams
  */
-export function getSysRoleList(queryParams: any): AxiosPromise<any> {
+export function getSysRoleList(queryParams: any): Promise<ApiResult<any>> {
     return post(`/role/getSysRoleList`, queryParams);
 }
 
@@ -15,7 +14,7 @@ export function getSysRoleList(queryParams: any): AxiosPromise<any> {
  *
  * @param queryParams
  */
-export function getTemplateList(queryParams: any): AxiosPromise<any> {
+export function getTemplateList(queryParams: any): Promise<ApiResult<any>> {
     return post(`/template/list`, queryParams);
 }
 
@@ -24,8 +23,6 @@ export function getTemplateList(queryParams: any): AxiosPromise<any> {
  *
  * @param queryParams
  */
-export function deleteTemplate(queryParams: any): AxiosPromise<any> {
+export function deleteTemplate(queryParams: any): Promise<ApiResult<any>> {
     return post(`/template/delete`, queryParams);
 }
-
-

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%">
+  <el-dialog v-model="dialogVisible" width="90%" class="system-dialog-scroll">
     <app-table
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
@@ -171,4 +171,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 /* Add your styles here */
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
 </style>

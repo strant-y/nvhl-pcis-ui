@@ -1,7 +1,6 @@
-import { AxiosPromise } from "axios";
 import { post } from "@/utils/http";
-import { LocalBaseApi } from "../config";
 import request from "@/utils/request";
+import type { ApiResult } from "@/types/api";
 
 const QUERY = "/query/";
 
@@ -64,7 +63,7 @@ export function getAppPolicyList(queryParams: any): AxiosPromise<any> {
  * 平台日志列表查询
  * @param queryParams
  */
-export function getPlatformList(queryParams: any): AxiosPromise<any> {
+export function getPlatformList(queryParams: any): Promise<ApiResult<any>> {
     return post(`/policy/getPlatformList`, queryParams);
 }
 
@@ -418,4 +417,3 @@ export function enquiryToAppEndorseChange(queryParams: any): AxiosPromise<any> {
 export function getBusinessType(queryParams: any): AxiosPromise<any> {
 	return post(`/policy/getBusinessType`, queryParams);
 }
-

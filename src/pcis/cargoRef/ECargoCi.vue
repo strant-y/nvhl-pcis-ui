@@ -382,7 +382,7 @@ const method = {
     const cCoinsurerCde = rowData["ECargoCi.cCoinsurerCde"];
     // 我方主共或从共的情况
     if (cCiMrk === '1' || cCiMrk === '3') {
-      // 情况1：如果选中的是“是”且是永安保险(327001)
+      // 情况1：如果选中的是“是”且是诚泰保险(327001)
       if (rowData && val === "0" && cCoinsurerCde === "327001") {
         // ElMessage.error("我方从共时主共保方不能是我司！");
         ElMessage.error("我方主共时主共保方必须是我司！");
@@ -646,7 +646,7 @@ const updateMasterAgreementValues = () => {
       // ECargoBase.nWhRmbPrm //折人民币预扣保费
       // ECargoBase.nRecRemPrm  //协议剩余预收保费（人民币）
     }else{
-      // 非永安保险公司：仅更新该行的 ECargoCi.nCiAmt 和 ECargoCi.nCiPrm，不参与总和计算
+      // 非诚泰保险公司：仅更新该行的 ECargoCi.nCiAmt 和 ECargoCi.nCiPrm，不参与总和计算
       const share = Number(row["ECargoCi.nCiShare"]) || 0;
       const nAmt = res["ECargoBase.nAmt"] ? Number(res["ECargoBase.nAmt"]) : 0;
       const nPrm = res["ECargoBase.nPrm"] ? Number(res["ECargoBase.nPrm"]) : 0;
@@ -703,7 +703,7 @@ const updateMasterAgreementValues = () => {
       // formPage.getComponentRefById("AgreementFeeWarn").setValue("ECargoBase.nRecRemEstAmt",nRecRemEstAmts)
     }
   })
-  // 设置到对应组件字段（仅使用永安保险的总和）
+  // 设置到对应组件字段（仅使用诚泰保险的总和）
   allRows.forEach((row) => {
     if(row['ECargoCi.cCoinsurerCde']){
       console.log(totalAmt,"totalAmt")
@@ -897,14 +897,14 @@ const ciJiDptOptionsQuery = async (val: string, row: any) => {
   const rowId = row._dataId;
   valideRequired()
   if (val === "327001") {
-    // 如果选择的是永安保险，加载对应的分公司列表
+    // 如果选择的是诚泰保险，加载对应的分公司列表
     const list = await codeListStore.queryCodeList({
       codeListName: "Comm_Code_LIST",
       codeListParam: { "CParCde": "subdpt", cParCde: "327001" },
     });
     freeEditRef.value?.addCodeListMap({code: "dptCascader"+rowId, list: list});
   } else {
-    // 非永安保险，设置默认值和其他数据
+    // 非诚泰保险，设置默认值和其他数据
     const list = await codeListStore.queryCodeList({
       // codeListName: "CDptJointCde_List",
       codeListName: "66",

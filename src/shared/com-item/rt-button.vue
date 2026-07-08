@@ -13,6 +13,7 @@
               :size="item.size"
               :placeholder="item.placeholder"
               :loading="item.loading"
+              :disabled="computedDisabled"
               :link="
             item.link
               ? typeof item.link === 'boolean'
@@ -37,7 +38,7 @@
             ...style,
             ...item.btnStyle,
           }"
-              @click="visible = !visible"
+              @click="computedDisabled ? null : (visible = !visible)"
           >
             <!-- 将isBtn透传,防止出现icon方法重复执行  -->
             <rt-icon v-if="item.icon" :item="{ ...item, isBtn: true }" />
@@ -64,10 +65,7 @@
             :type="item.type"
             :size="item.size"
             :loading="item.loading"
-            :disabled="
-          item.disabled ||
-          (typeof item.disabled === 'function' ? item.disabled(row) : false)
-        "
+            :disabled="computedDisabled"
             :placeholder="item.placeholder"
             :link="
           item.link
@@ -111,10 +109,7 @@
           ref="buttonRef"
           :type="item.type"
           :size="item.size"
-          :disabled="
-        item.disabled ||
-        (typeof item.disabled === 'function' ? item.disabled(row) : false)
-      "
+          :disabled="computedDisabled"
           :placeholder="item.placeholder"
           :link="
         item.link
@@ -156,8 +151,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount } from "vue";
+import { computed, ref, onBeforeMount } from "vue";
 import request from "@/utils/request";
+import { dataParam } from "@/store/modules/dataParam";
+import { useRoute } from "vue-router";
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -186,8 +183,23 @@ const props = defineProps({
   }
 });
 // console.log(props.row, "props.row");
-const disabled = ref(false);
 const visible = ref(false);
+const route = useRoute();
+const dataparam = dataParam();
+
+const computedDisabled = computed(() => {
+  const itemDisabled =
+    typeof props.item?.disabled === "function"
+      ? props.item.disabled(props.row)
+      : props.item?.disabled;
+
+  const isProdFactoryInfoViewMode =
+    route.path === "/prodconfiguration/prodFactoryInfo" && dataparam.getParam()?.editType === "view";
+  const label = String(props.item?.label || "");
+  const viewModeDisabled = isProdFactoryInfoViewMode && !["查询", "预览"].includes(label);
+
+  return Boolean(itemDisabled) || viewModeDisabled;
+});
 function closepopover(value: any) {
   visible.value = false;
   if (value.type === "select") {

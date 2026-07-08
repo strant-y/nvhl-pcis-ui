@@ -1,10 +1,10 @@
 /**
  * 部门查询参数
  */
-export interface DeptQuery {
+export interface DeptQuery extends PageQuery {
   cDptCde?: string;
   cDptCnm?: string;
-  subordinate?: string;
+  subordinate?: boolean;
 }
 
 /**
@@ -19,6 +19,7 @@ export interface DeptVO {
    * 部门ID
    */
   cDptCde?: string;
+  id?: number;
   /**
    * 部门名称
    */
@@ -57,6 +58,7 @@ export interface DeptForm {
    * 部门ID
    */
   cDptCde?: string;
+  id?: number;
   /**
    * 部门名称
    */

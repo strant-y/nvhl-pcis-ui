@@ -339,6 +339,23 @@ const dtofirstCharUpper = (map: any, key?: any) => {
   return data;
 }
 
+const getSafeMessage = (msg: unknown, fallback = "系统出错") => {
+  if (typeof msg === "string" && msg.trim()) {
+    return msg;
+  }
+  if (msg instanceof Error && msg.message) {
+    return msg.message;
+  }
+  if (msg && typeof msg === "object") {
+    try {
+      return JSON.stringify(msg);
+    } catch (error) {
+      return fallback;
+    }
+  }
+  return fallback;
+}
+
 const handleQuery = (flag) => {
   refreshData(flag)
 }
@@ -351,19 +368,27 @@ const refreshData = (reset = false) => {
     if (result['code'] === 200) {
       ElMessage.success('查询成功');
       const pageData = result['data'];
-      if (pageData) {
-        pageresult.total = pageData.total;
-        pageresult.list = [];
-        pageresult.list= pageData.result
-        // pageData.result.forEach(value => {
-          // const data = dtofirstCharUpper(value, 'PrdProdPlan');
-          // console.log(data)
-        //   pageresult.list.push(value);
-        // });
-      }
+      const resultList = Array.isArray(pageData?.data)
+        ? pageData.data
+        : Array.isArray(pageData?.result)
+          ? pageData.result
+          : [];
+      pageresult.total = Number(pageData?.total) || resultList.length || 0;
+      pageresult.list = resultList;
+      // resultList.forEach(value => {
+      //   const data = dtofirstCharUpper(value, 'PrdProdPlan');
+      //   console.log(data)
+      //   pageresult.list.push(value);
+      // });
     } else {
-      ElMessage.error(result['msg']);
+      pageresult.total = 0;
+      pageresult.list = [];
+      ElMessage.error(getSafeMessage(result['msg']));
     }
+  }).catch((error) => {
+    pageresult.total = 0;
+    pageresult.list = [];
+    console.error("searchPlan error:", error);
   });
 };
 function setFormItem(prop: string, config: any) {

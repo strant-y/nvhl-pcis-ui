@@ -1,6 +1,6 @@
 <!-- 配置 -->
 <template>
-  <el-dialog v-model="dialogVisible" width="80%" title="机构列表">
+  <el-dialog v-model="dialogVisible" width="80%" title="机构列表" class="system-dialog-scroll">
     <div>
       <el-row :gutter="20">
         <el-col :span="24" class="col-md-6">
@@ -375,6 +375,11 @@ function handleDeleteAll() {
 </script>
 
 <style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+
 .table-container {
   display: flex;
   flex-wrap: wrap;

@@ -50,6 +50,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 const { code, data, msg } = res;
                 if (200 === code) {
                   ElMessage.success("保存成功");
+                  param?.onSaved?.(s);
                 } else {
                   ElMessage.error(msg);
                 }
@@ -61,9 +62,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         },
       }),
       createFreeButtonBase({
-        label: "返回",
+        label: param?.inDialog ? "关闭" : "返回",
         func: () => {
-          router.push("/prodconfiguration/prodFactory");
+          if (param?.inDialog) {
+            param?.onClose?.();
+          } else {
+            router.push("/prodconfiguration/prodFactory");
+          }
         },
       }),
     ],
@@ -317,8 +322,12 @@ function setDisa() {
   });
 }
 /** 查询详情 */
-function handleQuery() {
-  const newparam = { cProdNo: param.prod.cProdNo };
+function handleQuery(prodNo?: string) {
+  const cProdNo = prodNo || param?.prodNo || param?.prod?.cProdNo;
+  if (!cProdNo) {
+    return;
+  }
+  const newparam = { cProdNo };
   getProducts(newparam)
     .then((res) => {
       const { code, data, msg } = res;

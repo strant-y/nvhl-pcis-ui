@@ -28,7 +28,7 @@
               >
                 <component
                   v-if="
-                    k.pageKey !== 'relatedAdditionalIns' || isAdditionalClause
+                    k.pageKey !== 'relatedAdditionalIns' || showRelatedAdditionalIns
                   "
                   :ref="
                     (res) => {
@@ -106,18 +106,10 @@ opertaor.setTableConfig([
     },
   },
 ]);
-const isAdditionalClause = ref(false);
+const showRelatedAdditionalIns = ref(false);
 
 const handleClauseTypeChange = (val: string) => {
-  isAdditionalClause.value = val === "0"; // 0 表示主条款
-};
-const filteredPageInfo = (pageInfo: any) => {
-  if (isAdditionalClause.value) {
-    return Object.values(pageInfo).filter(
-      (item: any) => item.pageKey !== "relatedAdditionalIns"
-    );
-  }
-  return Object.values(pageInfo);
+  showRelatedAdditionalIns.value = val === "0"; // 0 表示主条款，主条款时显示关联附加条款
 };
 const btns = {};
 onMounted(async () => {

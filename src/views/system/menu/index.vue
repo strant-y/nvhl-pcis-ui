@@ -178,6 +178,7 @@
       v-model="dialog.visible"
       :title="dialog.title"
       destroy-on-close
+      class="system-dialog-scroll"
       append-to-body
       width="1000px"
       @close="closeDialog"
@@ -358,6 +359,13 @@
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+</style>
 
 <script setup lang="ts">
 defineOptions({

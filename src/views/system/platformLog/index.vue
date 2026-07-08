@@ -99,6 +99,17 @@ const formatcSucMrk = (status: number | string) => {
   return statusMap[String(status)] || '-';
 };
 
+type TagType = "success" | "warning" | "info" | "primary" | "danger";
+
+const formatcSucMrkType = (status: number | string): TagType => {
+  const typeMap: Record<string, TagType> = {
+    "1": "success",
+    "0": "info",
+    "9": "danger",
+  };
+  return typeMap[String(status)] || "info";
+};
+
 const formatDocType = (type: string) => {
   const typeMap: Record<string, string> = {
     'A': '保单',
@@ -318,7 +329,11 @@ const copyText = (text: any) => {
         </el-table-column>
         <el-table-column label="是否成功" align="center" width="100">
           <template #default="scope">
-            <el-tag :type="formatcSucMrk(scope.row)">
+            <el-tag
+              :type="
+                formatcSucMrkType(scope.row.cSucMrk || scope.row.CSucMrk)
+              "
+            >
               {{ formatcSucMrk(scope.row.cSucMrk || scope.row.CSucMrk) }}
             </el-tag>
           </template>
@@ -386,4 +401,3 @@ const copyText = (text: any) => {
   margin-left: 5px;
 }
 </style>
-

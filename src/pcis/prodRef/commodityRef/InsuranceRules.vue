@@ -167,7 +167,7 @@ onMounted(() => {
 
     handleQuery();
 
-    if (param.editType !== "edit") {
+    if (param.editType !== "edit" && param.editType !== "copy") {
       freeEditRef.value?.setDisabledAll();
     }
 

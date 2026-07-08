@@ -1,8 +1,11 @@
-import request from "@/utils/request";
-import { AxiosPromise } from "axios";
 import { RoleQuery, RolePageResult, RoleForm } from "./types";
-import {post,get} from "@/utils/http";
-import {LocalBaseApi} from "@/api/config";
+import { post, get } from "@/utils/http";
+import type { ApiResult } from "@/types/api";
+
+interface LegacyMsgResult {
+  code: string;
+  message: string;
+}
 
 /**
  * 获取角色分页数据
@@ -11,33 +14,26 @@ import {LocalBaseApi} from "@/api/config";
  */
 export function getRolePage(
   queryParams?: RoleQuery
-): AxiosPromise<RolePageResult> {
-  return post(`/role/getSysRoleList`,queryParams)
+): Promise<ApiResult<RolePageResult>> {
+  return post(`/role/getSysRoleList`, queryParams);
 }
 
-/**
- * 分配菜单权限给角色
- * @param queryParams
- */
-export function updateRoleMenus(roleId: string,opCdeList: string[]): AxiosPromise<any> {
-  return post('/role/roleMenusAllot',{roleCde: roleId,opCdeList: opCdeList});
+export function updateRoleMenus(
+  roleId: string,
+  opCdeList: string[]
+): Promise<ApiResult<unknown>> {
+  return post("/role/roleMenusAllot", { roleCde: roleId, opCdeList: opCdeList });
 }
 
-/**
- * 获取角色的菜单ID集合
- * @param queryParams
- */
-export function getRoleMenuIds(roleCde: string): AxiosPromise<string[]> {
-  return post('/role/roleMenuIds', {roleCde: roleCde});
+export function getRoleMenuIds(
+  roleCde: string
+): Promise<ApiResult<Record<string, string[]>>> {
+  return post("/role/roleMenuIds", { roleCde: roleCde });
 }
 
 
-/**
- * 获取角色下拉数据
- * @param queryParams
- */
-export function getRoleOptions(): AxiosPromise<OptionType[]> {
-  return get('/role/roleOptionsList');
+export function getRoleOptions(): Promise<ApiResult<{ data: OptionType[] }>> {
+  return get("/role/roleOptionsList");
 
 }
 
@@ -48,7 +44,7 @@ export function getRoleOptions(): AxiosPromise<OptionType[]> {
  * @param data
  */
 export function addRole(data: RoleForm) {
-  return post(`/role/saveRoleInfo`,data)
+  return post<LegacyMsgResult>(`/role/saveRoleInfo`, data);
 }
 
 /**
@@ -58,7 +54,7 @@ export function addRole(data: RoleForm) {
  * @param data
  */
 export function updateRole(data: RoleForm) {
-  return post(`/role/saveRoleInfo`,data)
+  return post<LegacyMsgResult>(`/role/saveRoleInfo`, data);
 }
 
 /**
@@ -67,6 +63,6 @@ export function updateRole(data: RoleForm) {
  * @param ids
  */
 export function deleteRoles(ids: string) {
-  return post(`/role/delRoleInfo`,{roleIds : ids})
+  return post<LegacyMsgResult>(`/role/delRoleInfo`, { roleIds: ids });
 
 }

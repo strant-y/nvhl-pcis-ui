@@ -40,6 +40,7 @@ export interface LoginUserInfo extends UserInfo{
  */
 export interface UserQuery extends PageQuery {
   companyId?: string;
+  cDptCnm?: string;
   cIsValid?: string;
   opCde?: string;
   opCnm?: string;
@@ -80,6 +81,18 @@ export interface UserPageVO {
    */
   cIsValid?: string;
 
+  tPwdStrtTm?: string;
+
+  tPwdEndTm?: string;
+
+  cPkId?: string;
+
+}
+
+export interface UserRoleBindVO {
+  cDptCde: string;
+  cRoleCde: string[];
+  cPkId: string;
 }
 
 /**
@@ -114,7 +127,7 @@ export interface UserForm {
    * 角色ID集合
    */
   roleIds?: string[];
-  roles?:string[];
+  roles?: UserRoleBindVO[];
   /**
    * 用户状态(1:正常;0:禁用)
    */

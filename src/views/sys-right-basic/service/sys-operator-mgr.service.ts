@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import type { ApiResult } from '@/types/api';
 
 /*
  * 操作员管理服务
@@ -303,7 +304,7 @@ export class SysOperatorMgrService {
      * @returns {Observable<any>}
      */
     getOrgDptTreeNodeById(ops) {
-        return request.post(`role/getOrgDptTreeNodeById`, ops);
+        return request.post<any, ApiResult<any>>(`role/getOrgDptTreeNodeById`, ops);
     }
     /**
      *  根据机构id获取下级机构列表
@@ -311,7 +312,7 @@ export class SysOperatorMgrService {
      * @returns {Observable<any>}
      */
     getOrgDptTreeListByPid(ops) {
-        return request.post(`role/getOrgDptTreeListByPid`, ops);
+        return request.post<any, ApiResult<any>>(`role/getOrgDptTreeListByPid`, ops);
     }
     /**
      * @Title: 数据同步

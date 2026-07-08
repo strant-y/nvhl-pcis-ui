@@ -67,42 +67,42 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       }),
     ],
     fromSchema: [
-      {
-        prop: "cFeeFlag",
-        inputtype: "rtcheckbox",
-        title: " 费用配置已完成",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
-      {
-        prop: "cFeedBackFlag",
-        inputtype: "rtcheckbox",
-        title: " 测试反馈报告已完成",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
-      {
-        prop: "cNetProdFlag",
-        inputtype: "rtcheckbox",
-        title: " 互联网产品线上披露已完成",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
-      {
-        prop: "cEpolicyFlag",
-        inputtype: "rtcheckbox",
-        title: " 电子保单配置完成",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
+      // {
+      //   prop: "cFeeFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 费用配置已完成",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
+      // {
+      //   prop: "cFeedBackFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 测试反馈报告已完成",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
+      // {
+      //   prop: "cNetProdFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 互联网产品线上披露已完成",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
+      // {
+      //   prop: "cEpolicyFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 电子保单配置完成",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
 
       {
         prop: "cAuditType",

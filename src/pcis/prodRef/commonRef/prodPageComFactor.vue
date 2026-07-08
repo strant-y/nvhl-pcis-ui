@@ -166,7 +166,9 @@ const tableRef = ref<MyTableMethod | null>(null);
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     title: "配置明细",
+    fixedHeader: true,
     isPage: false,
+    maxHeight: "400px",
     fromSchema: [
       {
         prop: "icon",

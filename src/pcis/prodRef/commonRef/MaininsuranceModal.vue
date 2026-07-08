@@ -59,8 +59,17 @@ const opertaor = dataOpertaor(props.idxParam?.opertaorProps);
 const selectedRows = ref<any[]>([]);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("prodInfo");
 const { getRules } = useValidator();
+
+function getCProdNo() {
+  const prodInfoRef = opertaor?.getTableRefByKey?.("prodInfo");
+  const cProdNo = prodInfoRef?.getFromValue?.()?.cProdNo;
+  if (!cProdNo) {
+    ElMessage.error("产品编码为空,请保存后操作!");
+    return "";
+  }
+  return cProdNo;
+}
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -116,6 +125,7 @@ const pageresult = reactive<Pageresult>({
 const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: true,
+    maxHeight: "300",
     fromSchema: [
       {
         prop: "cKindNme",
@@ -139,12 +149,15 @@ const tableConfig = reactive<AppTableConfig>(
  * 分页查询
  */
 function handleQuery(flag?: boolean) {
-  const tabref = opertaor.getTableRefByKey("prodInfo");
+  const cProdNo = getCProdNo();
+  if (!cProdNo) {
+    return;
+  }
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r, {
     cRdrTyp: "0",
-    cProdNo: tabref.getFromValue().cProdNo,
+    cProdNo,
   });
   getUnbindTermRefProd(param)
     .then((res) => {
@@ -172,6 +185,10 @@ const handleConfirm = () => {
     ElMessage.warning("请选择至少一项");
     return;
   }
+  const cProdNo = getCProdNo();
+  if (!cProdNo) {
+    return;
+  }
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const param = selectedRows.value.map((item) => item.cTermNo).join(",");
   const newParam = {
@@ -179,7 +196,7 @@ const handleConfirm = () => {
     cCrtCde: user.opCde,
     cUpdCde: user.opCde,
     cTermNo: param,
-    cProdNo: tabref.getFromValue().cProdNo,
+    cProdNo,
     cTyp: "0",
   };
   associationTerm(newParam)

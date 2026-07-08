@@ -140,6 +140,20 @@ const tableconfig = reactive<AppTableConfig>(
           });
         },
       }),
+      createFreeButtonBase({
+        id: "copy",
+        iconColor: "#02D05F",
+        tooltip: "复制",
+        icon: "DocumentCopy",
+        link: true,
+        tableClick: (row) => {
+          dzmodal.open(riskEdit, { type: "copy", data: row }).then((res) => {
+            if (res.type === "ok") {
+              handleQuery();
+            }
+          });
+        },
+      }),
     ],
     fromSchema: [
       {

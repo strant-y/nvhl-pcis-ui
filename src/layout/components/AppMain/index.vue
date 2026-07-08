@@ -33,7 +33,7 @@ const {
 }
 
 .hasTagsView .app-main {
-  min-height: calc(100vh - $navbar-height - $tags-view-height);
+  min-height: calc(100vh - $navbar-height - $tags-view-height - 3px);
 }
 
 .fixed-header + .app-main {

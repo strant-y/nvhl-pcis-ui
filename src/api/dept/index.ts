@@ -1,8 +1,12 @@
 import request from "@/utils/request";
-import { AxiosPromise } from "axios";
 import { DeptForm, DeptQuery, DeptVO } from "./types";
-import {post,get} from "@/utils/http";
-import { LocalBaseApi } from "../config";
+import { post } from "@/utils/http";
+import type { ApiResult } from "@/types/api";
+
+interface DeptListData {
+  list: DeptVO[];
+  total: number;
+}
 
 
 /**
@@ -10,8 +14,8 @@ import { LocalBaseApi } from "../config";
  *
  * @param queryParams
  */
-export function listDepts(queryParams?: DeptQuery): AxiosPromise<DeptVO[]> {
-  return post(`/dpt/dptList`,queryParams)
+export function listDepts(queryParams?: DeptQuery): Promise<ApiResult<DeptListData>> {
+  return post(`/dpt/dptList`, queryParams);
 
 }
 
@@ -24,8 +28,8 @@ export function listDepts(queryParams?: DeptQuery): AxiosPromise<DeptVO[]> {
  * cSignDptMrk
  * }
  */
-export function listChrDepts(param?: any): AxiosPromise<DeptVO[]> {
-  return post(`/dpt/dptChrList`, param)
+export function listChrDepts(param?: any): Promise<ApiResult<DeptVO[]>> {
+  return post(`/dpt/dptChrList`, param);
 }
 
 /**
@@ -33,16 +37,20 @@ export function listChrDepts(param?: any): AxiosPromise<DeptVO[]> {
  *
  * @param queryParams
  */
-export function deptLists(cDptCde?: string): AxiosPromise<DeptVO[]> {
-  return post(`/dpt/deptLists`,{cDptCde:cDptCde})
+export function deptLists(
+  cDptCde?: string
+): Promise<ApiResult<{ cDptRelCde: string }>> {
+  return post(`/dpt/deptLists`, { cDptCde: cDptCde });
 }
 
 
 /**
  * 部门下拉列表
  */
-export function getDeptOptions(queryParam: string): AxiosPromise<OptionType[]> {
-  return post(`/dpt/dptOptionsList`,{queryParam: queryParam})
+export function getDeptOptions(
+  queryParam: string
+): Promise<ApiResult<OptionType[]>> {
+  return post(`/dpt/dptOptionsList`, { queryParam: queryParam });
 }
 
 
@@ -52,8 +60,8 @@ export function getDeptOptions(queryParam: string): AxiosPromise<OptionType[]> {
  *
  * @param id
  */
-export function getDeptForm(id: number): AxiosPromise<DeptForm> {
-  return request({
+export function getDeptForm(id: number): Promise<ApiResult<DeptForm>> {
+  return request<any, ApiResult<DeptForm>>({
     url: "/api/v1/dept/" + id + "/form",
     method: "get",
   });
@@ -65,7 +73,7 @@ export function getDeptForm(id: number): AxiosPromise<DeptForm> {
  * @param data
  */
 export function addDept(data: DeptForm) {
-  return request({
+  return request<any, ApiResult<unknown>>({
     url: "/api/v1/dept",
     method: "post",
     data: data,
@@ -79,7 +87,7 @@ export function addDept(data: DeptForm) {
  * @param data
  */
 export function updateDept(id: number, data: DeptForm) {
-  return request({
+  return request<any, ApiResult<unknown>>({
     url: "/api/v1/dept/" + id,
     method: "put",
     data: data,
@@ -92,7 +100,7 @@ export function updateDept(id: number, data: DeptForm) {
  * @param ids
  */
 export function deleteDept(ids: string) {
-  return request({
+  return request<any, ApiResult<unknown>>({
     url: "/api/v1/dept/" + ids,
     method: "delete",
   });

@@ -59,7 +59,6 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { getBasicKindList } from "@/api/prod";
-import { useDzModal } from "@/common/dzmodel/DzModalService";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { PcisEdrQueryService } from '@/views/edr-qry-endorse-list/service/pcis-edr-query-service';
 import { getAppPolicyList } from "@/api/query";
@@ -67,15 +66,11 @@ import {encryptRouterParam} from "@/router";
 import { saveAs } from 'file-saver';
 const policyService = new PolicyService();
 const pcisEdrQueryService = new PcisEdrQueryService();
-const dzmodal = useDzModal();
 const tableRef = ref<AppTableMethod | null>(null);
 const removeIds = ref([]); // 删除用户ID集合 用于批量删除
 const dialogVisible = ref(true);
 const userStore = useUserStore();
 const user = ref(userStore.user) || ref({ companyId: '',opCde: '' });
-const myPageDialog = defineAsyncComponent(
-  () => import("@/views/pcis/my-page/myPageDialog.vue")
-);
 
 const props = defineProps({
   objId: {// 申请单号
@@ -249,33 +244,6 @@ function handleExport() {
   });
 }
 
-// 查看
-function showDetails(cAppNo, cPlyNo, cProdNo, cKindNo, data) {
-  const param = {
-    // scene: SCENE_PLY_APP_READ,
-    cAppNo: cAppNo,
-    cOrgAppNo: cAppNo,
-    cCiMrk: data["cCiMrk"],
-    cProdNo: cProdNo,
-    cAppTyp: data["cAppTyp"],
-    cGrpMrk: data["cGrpMrk"],
-    cDptCde: data["cDptCde"],
-    cDptCnm: data["cDptCnm"],
-    cPolicySource: data["cPolicySource"],
-    cTermNo: data["cTermNo"],
-    cTermNme: data["cTermNme"],
-    pageType: "readonly",
-  };
-  dzmodal
-    .open(myPageDialog, {
-      type: "Issuer",
-      param: param,
-    })
-    .then((res: any) => {
-      if (res.type === "ok") {
-      }
-    });
-};
 function turnToDetail(cAppNo:any) {
   if(cAppNo) {
     getAppPolicyList({

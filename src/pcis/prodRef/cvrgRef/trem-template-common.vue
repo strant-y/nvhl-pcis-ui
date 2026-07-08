@@ -843,13 +843,18 @@ function dataInit() {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        terconfig.addConfig(queryKey, JSON.stringify(data.data));
-        collist.value = getUseData(data.data.collist);
-        factormap.value = data.data.factormap;
-        colInfo.value = data.data.colInfo;
-        groupInfo.value = data.data.groupInfo;
-        term.value = data.data.term;
-        termFactormap.value = getUseData(data.data.termFactormap);
+        const factorData = data?.data;
+        if (!factorData?.term) {
+          ElMessage.error(msg || "条款配置加载失败");
+          return;
+        }
+        terconfig.addConfig(queryKey, JSON.stringify(factorData));
+        collist.value = getUseData(factorData.collist);
+        factormap.value = factorData.factormap;
+        colInfo.value = factorData.colInfo;
+        groupInfo.value = factorData.groupInfo;
+        term.value = factorData.term;
+        termFactormap.value = getUseData(factorData.termFactormap);
         methodLink(termFactormap.value);
         riskMethodLink(factormap.value);
         initshowConfig();
@@ -857,8 +862,8 @@ function dataInit() {
           (v: any) => v.cPorpShowtitle !== "1"
         );
         formconfig1.fromSchema = fromc;
-        if (data.data.termTitleConf?.CCnm) {
-          termTitleConf.value = JSON.parse(data.data.termTitleConf.CCnm);
+        if (factorData.termTitleConf?.CCnm) {
+          termTitleConf.value = JSON.parse(factorData.termTitleConf.CCnm);
         }
       } else {
         ElMessage.error(msg);
@@ -1766,7 +1771,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index";
+@use "src/styles/custom-index" as *;
 
 .cvrg-info {
   box-shadow: none;

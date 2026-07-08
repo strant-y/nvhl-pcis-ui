@@ -1,5 +1,5 @@
 const defaultSettings: AppSettings = {
-  title: "财产险承保系统",
+  title: "产品引擎系统 ",
   version: "v1.0.1",
   showSettings: true,
   tagsView: true,

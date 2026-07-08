@@ -9,10 +9,10 @@
       <!-- 系统名称 -->
       <div class="system-name">
         <div class="name-cn">
-          <span class="text-class">永安财产保险承保系统</span>
+          <span class="text-class">诚泰产品引擎系统</span>
         </div>
         <div class="name-en">
-          <span class="text-en">Yong'an Property Insurance Underwriting System</span>
+          <span class="text-en">Chengtai Product Engine System</span>
         </div>
       </div>
     </div>

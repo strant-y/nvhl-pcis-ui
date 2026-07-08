@@ -67,6 +67,7 @@ const gridconfig = reactive<AppGridEditConfig>(
               const { code, data, msg } = res;
               if (200 === code) {
                 ElMessage.success("保存成功");
+                dataparam.getParam()?.onSaved?.(params);
               } else {
                 ElMessage.error(msg);
               }

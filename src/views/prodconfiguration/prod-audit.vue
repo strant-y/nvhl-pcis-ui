@@ -139,6 +139,8 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         size: "large",
         icon: "Edit",
+        hideBtns: (row) =>
+          row.cAuditStatus === "audit",
         tableClick: (row) => {
           router.push({
             path: "/prodconfiguration/prodFactoryInfo",

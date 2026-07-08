@@ -1009,16 +1009,21 @@ function dataInit(initFlag : boolean = false) {
     getTRFactorJson(param).then((res: any) => {
       const { code, data, msg } = res;
 			if (200 === code) {
+        const factorData = data?.data;
+        if (!factorData?.term) {
+          ElMessage.error(msg || "条款配置加载失败");
+          return;
+        }
 				// 永安财险雇主责任保险附加伤残赔偿比例调整保险2026版  这个附加险费率可以是负数
-				if (!!data.data.term['cTermNo'] && (data.data.term['cTermNo'] == "0426012128" || data.data.term['cTermNo'] == "0426040901")) {
-					data.data.termFactormap.forEach((item) => {
+				if (!!factorData.term['cTermNo'] && (factorData.term['cTermNo'] == "0426012128" || factorData.term['cTermNo'] == "0426040901")) {
+					factorData.termFactormap.forEach((item) => {
 						if (item.prop == 'Term.nMainRate') {
 							item.min = -99999999999
 						}
 					})
 				}
-        terconfig.addConfig(queryKey, JSON.stringify(data.data));
-        setTermConf(data.data,initFlag);
+        terconfig.addConfig(queryKey, JSON.stringify(factorData));
+        setTermConf(factorData,initFlag);
       } else {
         ElMessage.error(msg);
       }
@@ -2495,7 +2500,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-@import "src/styles/custom-index";
+@use "src/styles/custom-index" as *;
 .cvrg-info {
   //background: #FAFAFA;
   box-shadow: none;
@@ -2525,7 +2530,7 @@ defineExpose({
         color: var(--el-text-color);
       }
       .el-form-item__content {
-        @extend .rt-custom-select;
+        @include rt-custom-select;
       }
     }
   }

@@ -8,7 +8,6 @@
       ref="tableRef"
       @page-change="handleQuery(false)"
     />
-    <comDialog ref="dialog"></comDialog>
     
     <!-- 全产品组件更新弹窗 -->
     <el-dialog
@@ -36,7 +35,7 @@ import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const router = useRouter();
 
-import { ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 import {
   AppFreeEditConfig,
   createAppFreeEditConfig,
@@ -46,9 +45,10 @@ import {
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
 import { createFreeButtonBase } from "@/shared/button-config";
-const dialog = ref<DialogMethod | null>(null);
+import { formatActionTitle } from "@/utils/action-title";
 const releaseDialogVisible = ref(false);
 const cGrpMrk = ref("9"); // 默认选择"全部"
+const statusDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 import {
   AppTableConfig,
   AppTableMethod,
@@ -56,7 +56,6 @@ import {
 } from "@/shared/app-table-config";
 import { getProFactoryList, changeStatus, auditSubmit, releaseAllPage } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
-import { DialogMethod } from "../../common/dzmodel/ComDialogConf";
 
 const pageresult = reactive<Pageresult>({
   result: "",
@@ -161,6 +160,7 @@ const tableconfig = reactive<AppTableConfig>(
               param: JSON.stringify({
                 editType: "add",
               }),
+              title: formatActionTitle("add", "产品配置"),
             },
           });
         },
@@ -177,6 +177,8 @@ const tableconfig = reactive<AppTableConfig>(
         link: true,
         type: "success",
         icon: "Edit",
+        hideBtns: (row) =>
+          row.cAuditStatus === "audit",
         tableClick: (row) => {
           router.push({
             path: "/prodconfiguration/prodFactoryInfo",
@@ -186,6 +188,29 @@ const tableconfig = reactive<AppTableConfig>(
                 prod: row,
                 prodNo: row.cProdNo,
               }),
+              title: formatActionTitle("edit", "产品配置"),
+            },
+          });
+        },
+      }),
+      createFreeButtonBase({
+        id: "view",
+        link: true,
+        tooltip: "查看",
+        type: "primary",
+        size: "large",
+        icon: "View",
+        tableClick: (row) => {
+          router.push({
+            path: "/prodconfiguration/prodFactoryInfo",
+            query: {
+              param: JSON.stringify({
+                type: "approve",
+                editType: "view",
+                prod: row,
+                prodNo: row.cProdNo,
+              }),
+              title: formatActionTitle("view", "产品配置"),
             },
           });
         },
@@ -197,7 +222,10 @@ const tableconfig = reactive<AppTableConfig>(
         type: "primary",
         icon: "Check",
         hideBtns: (row) =>
-          row.cAuditStatus == "audit" || row.cAuditStatus == "submit",
+          row.cAuditStatus == "audit" ||
+          row.cAuditStatus == "submit" ||
+          row.cStatus == "0" ||
+          row.cStatus == 0,
         tableClick: async (row) => {
           await auditSubmit({
             cProdNo: row.cProdNo,
@@ -217,8 +245,19 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "复制",
         icon: "DocumentCopy",
         link: true,
+       
         tableClick: function (row) {
-          copy(row.cProdNo);
+          router.push({
+            path: "/prodconfiguration/prodFactoryInfo",
+            query: {
+              param: JSON.stringify({
+                editType: "copy",
+                prod: row,
+                prodNo: row.cProdNo,
+              }),
+              title: formatActionTitle("copy", "产品配置"),
+            },
+          });
         },
       }),
     ],
@@ -262,15 +301,8 @@ const tableconfig = reactive<AppTableConfig>(
         activeText: "启用",
         inactiveText: "禁用",
         inlinePrompt: true,
-        func: async (val, row) => {
-          await changeStatus({
-            cProdNo: row.cProdNo,
-            cStatus: val,
-          }).then((res) => {
-            if (res.code === 200) {
-              handleQuery();
-            }
-          });
+        func: (val, row) => {
+          debounceChangeStatus(row, val);
         },
       },
       {
@@ -305,7 +337,7 @@ const method = {
     console.log(getRules);
   },
 };
-// 绑定特殊验证器
+// 缁戝畾鐗规畩楠岃瘉鍣?
 const exRules = {
   byrtInput: (rule: any, value: any, callback: any) => {
     const r = freeEditRef.value.getFromData();
@@ -316,18 +348,32 @@ const exRules = {
     }
   },
 };
-function copy(cProdNo: string) {
-  dialog.value?.open(
-    "prodCopy",
-    { prodNo: cProdNo },
-    {
-      isOk: () => {
-        // handleQuery();
-      },
-    },
-    { title: "产品复制确认" }
-  );
+function debounceChangeStatus(row: any, val: string) {
+  const key = row?.cProdNo;
+  if (!key) {
+    return;
+  }
+  const timer = statusDebounceTimers.get(key);
+  if (timer) {
+    clearTimeout(timer);
+  }
+  const nextTimer = setTimeout(async () => {
+    statusDebounceTimers.delete(key);
+    const res = await changeStatus({
+      cProdNo: row.cProdNo,
+      cStatus: val,
+    });
+    if (res.code === 200) {
+      handleQuery();
+    }
+  }, 300);
+  statusDebounceTimers.set(key, nextTimer);
 }
+
+onBeforeUnmount(() => {
+  statusDebounceTimers.forEach((timer) => clearTimeout(timer));
+  statusDebounceTimers.clear();
+});
 /** 查询 */
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据

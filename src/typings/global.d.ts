@@ -100,5 +100,24 @@ declare global {
     /** 子列表  */
     children?: OptionType[];
   }
+
+  interface MyTableMethod {
+    getPartnerPage?: (flag?: boolean) => PageQuery & Record<string, any>;
+    setPartnerPage?: (params: PageQuery) => void;
+    getFromValue?: () => any;
+    setFormSchema?: (rowId: string, props: any, schama: any, value: any) => any;
+    setValueByRowKey?: (props: string, rowId: any, value: any) => any;
+    getselectionData?: () => any;
+    getRowAllItemRefById?: (id: string) => any;
+    clearSelection?: () => void;
+    toggleRowSelection?: (row: any, selected: boolean) => void;
+    getFormBtn?: () => any;
+    getTableBtn?: () => any;
+    getCodeListMap?: () => any;
+    addCodeListMap?: (data: any) => void;
+    setCodeListMap?: (map: any) => void;
+    setRowFieldProp?: (rowId: string, field: string, prop: string, value: any) => any;
+    getTableValues?: () => any;
+  }
 }
 export {};

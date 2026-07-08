@@ -46,7 +46,7 @@ const rules = reactive({
   cRoleLevl: [{ required: true, message: "请输入角色级别", trigger: "change" }],
 });
 
-const roleMap = {
+const roleMap: Record<string, string> = {
   "0": "总公司",
   "1": "分公司",
 };
@@ -66,7 +66,10 @@ interface CheckedRole {
    */
   cOpgrpCnm: string;
 }
-let checkedRole: { cOpgrpCde: string; cOpgrpCnm: string } = reactive({});
+const checkedRole = reactive<CheckedRole>({
+  cOpgrpCde: "",
+  cOpgrpCnm: "",
+});
 
 /** 查询 */
 function handleQuery() {
@@ -93,7 +96,7 @@ function handleSelectionChange(selection: any) {
 }
 
 /** 打开角色表单弹窗 */
-function openDialog(row: RolePageVO) {
+function openDialog(row?: RolePageVO) {
   dialog.visible = true;
   if (!!row) {
     dialog.title = "修改角色";
@@ -185,10 +188,8 @@ function handleDelete(roleId?: string) {
 function openMenuDialog(row: RolePageVO) {
   const roleId = row.cOpgrpCde;
   if (roleId) {
-    checkedRole = {
-      cOpgrpCde: roleId,
-      cOpgrpCnm: row.cOpgrpCnm,
-    };
+    checkedRole.cOpgrpCde = roleId;
+    checkedRole.cOpgrpCnm = row.cOpgrpCnm;
     menuDialogVisible.value = true;
     loading.value = true;
 
@@ -200,8 +201,8 @@ function openMenuDialog(row: RolePageVO) {
         getRoleMenuIds(roleId)
           .then((res) => {
             const { msg, data, code } = res;
-            const checkedMenuIds = data["data"];
-            checkedMenuIds.forEach((menuId) =>
+            const checkedMenuIds = data["data"] ?? [];
+            checkedMenuIds.forEach((menuId: string) =>
               menuRef.value.setChecked(menuId, true, false)
             );
           })
@@ -374,6 +375,7 @@ function handleRoleMenuSubmit() {
       v-model="dialog.visible"
       :title="dialog.title"
       width="500px"
+      class="system-dialog-scroll"
       @close="closeDialog"
     >
       <el-form
@@ -413,6 +415,7 @@ function handleRoleMenuSubmit() {
       v-model="menuDialogVisible"
       :title="'【' + checkedRole.cOpgrpCnm + '】权限分配'"
       width="800px"
+      class="system-dialog-scroll"
     >
       <el-scrollbar v-loading="loading" max-height="600px">
         <el-tree
@@ -440,6 +443,11 @@ function handleRoleMenuSubmit() {
   </div>
 </template>
 <style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
 }

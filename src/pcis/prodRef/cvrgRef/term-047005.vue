@@ -274,7 +274,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-@import "@/styles/custom-index";
+@use "@/styles/custom-index";
 .table_overflow_x {
   width: 100%;
   overflow-x: auto;

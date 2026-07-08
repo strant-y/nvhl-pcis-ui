@@ -67,7 +67,7 @@ const initDptTreeList = () => {
   });
 };
 
-const loadNode = (node, resolve) => {
+const loadNode = (node: any, resolve: (data: any[]) => void) => {
   console.log(233,node.data.id)
   if (node.level === 0) {
     return resolve([]);
@@ -78,14 +78,14 @@ const loadNode = (node, resolve) => {
 
 
   sysOperatorMgrService.getOrgDptTreeListByPid(params).then((result) => {
-    const dto = [];
+    const dto: any[] = [];
     if (200 !== result['code']) {
       ElMessage.error(result['msg']);
     } else {
       ElMessage.success(result['msg']);
     }
     if (result['data'] && result['data'].length > 0) {
-      result['data'].forEach(item => {
+      result['data'].forEach((item: any) => {
         dto.push({
           id: item['id'],
           name: item['id'] + '-' + item['name'],

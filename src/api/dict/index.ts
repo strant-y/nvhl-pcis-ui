@@ -1,5 +1,4 @@
 import request from "@/utils/request";
-import { AxiosPromise } from "axios";
 import {
   DictTypeQuery,
   DictTypePageResult,
@@ -8,8 +7,8 @@ import {
   DictForm,
   DictPageResult,
 } from "./types";
-import {post,get} from "@/utils/http";
-import { LocalBaseApi } from "../config";
+import { post, get } from "@/utils/http";
+import type { ApiResult } from "@/types/api";
 
 /**
  * 字典类型分页列表
@@ -18,12 +17,12 @@ import { LocalBaseApi } from "../config";
  */
 export function getDictTypePage(
   queryParams: DictTypeQuery
-): AxiosPromise<DictTypePageResult> {
-  return post(`/dict/getSysDictList`,queryParams)
+): Promise<ApiResult<DictTypePageResult>> {
+  return post(`/dict/getSysDictList`, queryParams);
 }
 
-export function redisCache(): AxiosPromise {
-  return post(`/dict/redisCache`,{})
+export function redisCache(): Promise<ApiResult<unknown>> {
+  return post(`/dict/redisCache`, {});
 }
 
 
@@ -32,7 +31,7 @@ export function redisCache(): AxiosPromise {
  * @param params
  */
 export function addDictType(params: DictTypeForm) {
-  return post(`/dict/addDictType`, params)
+  return post(`/dict/addDictType`, params);
 }
 
 
@@ -42,15 +41,17 @@ export function addDictType(params: DictTypeForm) {
  * @param data
  */
 export function updateDictType(data: DictTypeForm) {
-  return post(`/dict/updateDictType`, data)
+  return post(`/dict/updateDictType`, data);
 }
 
 
 /**
  * 删除字典类型
  */
-export function deleteDictTypes(params) {
-  return post(`/dict/deleteDictTypes`, params)
+export function deleteDictTypes(
+  params: Record<string, unknown>
+): Promise<ApiResult<unknown>> {
+  return post(`/dict/deleteDictTypes`, params);
 }
 
 /**
@@ -67,8 +68,10 @@ export function findDropDownBoxList(queryCodeList: any) {
  *
  * @param typeCode 字典类型编码
  */
-export function getDictOptions(typeCode: string): AxiosPromise<OptionType[]> {
-  return post( `/dict/dictOptions`, {dictType: typeCode});
+export function getDictOptions(
+  typeCode: string
+): Promise<ApiResult<OptionType[]>> {
+  return post(`/dict/dictOptions`, { dictType: typeCode });
 }
 
 /**
@@ -76,8 +79,8 @@ export function getDictOptions(typeCode: string): AxiosPromise<OptionType[]> {
  *
  * @param param 字典参数 包含codeListName codelist参数以及codeListParam参数
  */
-export function codelistQuery(param: any): AxiosPromise<OptionType[]> {
-  return post( `/codelist/query`, param);
+export function codelistQuery(param: any): Promise<ApiResult<OptionType[]>> {
+  return post(`/codelist/query`, param);
 }
 
 /**
@@ -85,8 +88,10 @@ export function codelistQuery(param: any): AxiosPromise<OptionType[]> {
  *
  * @param typeCode 字典类型编码
  */
-export function getDictOptionsUnAuthor(typeCode: string): AxiosPromise<OptionType[]> {
-  return post( `dict/dictOptionsUnAuthor`, {dictType: typeCode});
+export function getDictOptionsUnAuthor(
+  typeCode: string
+): Promise<ApiResult<OptionType[]>> {
+  return post(`dict/dictOptionsUnAuthor`, { dictType: typeCode });
 }
 
 /**
@@ -94,8 +99,8 @@ export function getDictOptionsUnAuthor(typeCode: string): AxiosPromise<OptionTyp
  *
  * @param id
  */
-export function getDictTypeForm(id: number): AxiosPromise<DictTypeForm> {
-  return request({
+export function getDictTypeForm(id: number): Promise<ApiResult<DictTypeForm>> {
+  return request<any, ApiResult<DictTypeForm>>({
     url: "/api/v1/dict/types/" + id + "/form",
     method: "get",
   });
@@ -108,8 +113,8 @@ export function getDictTypeForm(id: number): AxiosPromise<DictTypeForm> {
  */
 export function getDictPage(
   queryParams: DictQuery
-): AxiosPromise<DictPageResult> {
-  return post(`/dict/getDictDelList`,queryParams)
+): Promise<ApiResult<DictPageResult>> {
+  return post(`/dict/getDictDelList`, queryParams);
 }
 
 /**
@@ -117,8 +122,8 @@ export function getDictPage(
  *
  * @param id
  */
-export function getDictFormData(id: number): AxiosPromise<DictForm> {
-  return request({
+export function getDictFormData(id: number): Promise<ApiResult<DictForm>> {
+  return request<any, ApiResult<DictForm>>({
     url: "/api/v1/dict/" + id + "/form",
     method: "get",
   });
@@ -130,7 +135,7 @@ export function getDictFormData(id: number): AxiosPromise<DictForm> {
  * @param data
  */
 export function addDict(data: DictForm) {
-  return post(`/dict/saveOptions`,data)
+  return post(`/dict/saveOptions`, data);
 }
 
 /**
@@ -140,7 +145,7 @@ export function addDict(data: DictForm) {
  * @param data
  */
 export function updateDict( data: DictForm) {
-  return post(`/dict/saveOptions`,data)
+  return post(`/dict/saveOptions`, data);
 
 }
 
@@ -150,42 +155,42 @@ export function updateDict( data: DictForm) {
  * @param ids 字典项ID，多个以英文逗号(,)分割
  */
 export function deleteDict(ids: string) {
-  return post(`/dict/delOptions`,{ids:ids})
+  return post(`/dict/delOptions`, { ids: ids });
 
 }
 
 /**
  * 风险项字典查询
  */
-export function getRiskDownList(param: any): AxiosPromise  {
-  return post(`/query/getRiskDownList`,param);
+export function getRiskDownList(param: any): Promise<ApiResult<unknown>> {
+  return post(`/query/getRiskDownList`, param);
 
 }
 
 /**
  * 获取风险明细模版
  */
-export function getRiskMapList(param: any): AxiosPromise  {
-  return post(`/query/getRiskMapList`,param);
+export function getRiskMapList(param: any): Promise<ApiResult<unknown>> {
+  return post(`/query/getRiskMapList`, param);
 }
 
 /**
  * 获取用户信息功能
  */
-export function getEmpList(param: any): AxiosPromise  {
-  return post(`/getEmpList`,param);
+export function getEmpList(param: any): Promise<ApiResult<unknown>> {
+  return post(`/getEmpList`, param);
 }
 /**
  * 获取制裁国家名单
  *
  */
-export function sanctionCountry(param: any): AxiosPromise<OptionType[]> {
-  return post( `/cargoInsurance/sanctionCountry`, param);
+export function sanctionCountry(param: any): Promise<ApiResult<OptionType[]>> {
+  return post(`/cargoInsurance/sanctionCountry`, param);
 }
 /**
  * 获取水险再保提示
  *
  */
-export function insurancePolicies(): AxiosPromise<OptionType[]> {
-  return get( `/cargoInsurance/insurancePolicies`);
+export function insurancePolicies(): Promise<ApiResult<OptionType[]>> {
+  return get(`/cargoInsurance/insurancePolicies`);
 }

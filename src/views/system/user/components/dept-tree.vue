@@ -132,7 +132,9 @@ async function queryDpt(param: any){
  * @param {Array|Object} data - 原始数据 (可能是数组，也可能是树对象)
  * @returns {Array|Object} 处理后的数据
  */
- function formatDataWithIdLabel(data: any[] | undefined) {
+ function formatDataWithIdLabel(
+    data: any[] | Record<string, any> | undefined
+ ) {
     // 1. 处理数组情况 (即接口直接返回列表，或递归遍历子节点列表)
     if (Array.isArray(data)) {
         return data.map(item => {

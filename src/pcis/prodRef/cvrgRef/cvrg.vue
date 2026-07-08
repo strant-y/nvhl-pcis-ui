@@ -22,6 +22,7 @@ const props = defineProps({
 
 const cvrgEditRef = ref<AppGridEditMethod | null>(null);
 const formconfig1 = reactive(createAppGridEditConfig({}));
+const pendingFormValue = ref<any>(null);
 
 onMounted(async () => {
   const formconfig11 = formInit(
@@ -30,6 +31,11 @@ onMounted(async () => {
     exRules
   );
   Object.assign(formconfig1, formconfig11);
+  await nextTick();
+  if (pendingFormValue.value && cvrgEditRef.value?.setFormValue) {
+    cvrgEditRef.value.setFormValue(pendingFormValue.value);
+    pendingFormValue.value = null;
+  }
 });
 
 // 绑定方法
@@ -49,7 +55,12 @@ function getFromValue() {
 }
 
 function setFormValue(value: any) {
-  cvrgEditRef?.value?.setFormValue(value);
+  if (cvrgEditRef.value?.setFormValue) {
+    cvrgEditRef.value.setFormValue(value);
+    pendingFormValue.value = null;
+    return;
+  }
+  pendingFormValue.value = value;
 }
 
 function validate() {

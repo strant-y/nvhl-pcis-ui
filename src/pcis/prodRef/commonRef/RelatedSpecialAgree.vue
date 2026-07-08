@@ -114,6 +114,7 @@ const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
     // showSelection: true,
     // isPage: true,
+    maxHeight: "280",
     fromSchema: [
       {
         prop: "checked",

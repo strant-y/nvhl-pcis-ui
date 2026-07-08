@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
+import { formatActionTitle } from "@/utils/action-title";
 const { getRules } = useValidator();
 const router = useRouter();
 
@@ -158,6 +159,7 @@ const tableconfig = reactive<AppTableConfig>(
               param: JSON.stringify({
                 type: "add",
               }),
+              title: formatActionTitle("add", "条款基本信息"),
             },
           });
         },
@@ -200,18 +202,30 @@ const tableconfig = reactive<AppTableConfig>(
                 type: "edit",
                 row: row,
               }),
+              title: formatActionTitle("edit", "条款基本信息"),
             },
           });
         },
       }),
-      // createFreeButtonBase({
-      //   id: "score",
-      //   iconColor: "#02D05F",
-      //   tooltip: "复制",
-      //   icon: "DocumentCopy",
-      //   link: true,
-      //   func: function () {},
-      // }),
+      createFreeButtonBase({
+        id: "copy",
+        iconColor: "#02D05F",
+        tooltip: "复制",
+        icon: "DocumentCopy",
+        link: true,
+        tableClick: (row) => {
+          router.push({
+            path: "/prodconfiguration/insuranceConInfo",
+            query: {
+              param: JSON.stringify({
+                type: "copy",
+                row: row,
+              }),
+              title: formatActionTitle("copy", "条款基本信息"),
+            },
+          });
+        },
+      }),
     ],
     fromSchema: [
       {

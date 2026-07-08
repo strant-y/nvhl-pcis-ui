@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" :title="props.title">
+  <el-dialog v-model="dialogVisible" width="90%" :title="props.title" class="system-dialog-scroll">
     <div>
       <app-free-edit
         v-model:freeEditConfig="formconfig1"
@@ -369,4 +369,9 @@ function getFrom() {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.system-dialog-scroll :deep(.el-dialog__body) {
+  max-height: 400px;
+  overflow: auto;
+}
+</style>
