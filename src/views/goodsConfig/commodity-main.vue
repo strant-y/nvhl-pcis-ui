@@ -235,13 +235,7 @@ const tableconfig = reactive<AppTableConfig>(
         tooltip: "复制",
         icon: "DocumentCopy",
         link: true,
-        hideBtns: (row: any) => {
-          if (row.cStatus === "0" || row.cStatus === "3" || row.cStatus === "6") {
-            return false;
-          } else {
-            return true;
-          }
-        },
+      
         tableClick: (row) => {
           router.push({
             path: "/goodsConfig/commodityEdit",

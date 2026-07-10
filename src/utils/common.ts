@@ -2,6 +2,8 @@ import Clipboard from "clipboard";
 import { descryptParameter, encryptParameter, descryptParameterRouter } from "@/utils/encipher";
 import {CommonConstants} from "@/constants/CommonConstants";
 import {Tooltip} from "@/common/dztooltip/tooltipOptions";
+import { useTagsViewStore } from "@/store";
+import router from "@/router";
 
 /**
  * 复制功能
@@ -295,4 +297,44 @@ export function updateLabelWidth(): string {
     maxLabelWidth = px + 240 + 'px';
   }
   return maxLabelWidth;
+}
+
+/**
+ * 关闭当前标签页（面包屑）并返回上一页
+ * 不依赖 selectedView 和浏览器 history，刷新或侧边导航后也能正常工作
+ * @param path 可选，指定跳转路径；不传则自动跳转到上一个标签页
+ */
+export function closeCurrentTagAndBack(path?: string) {
+  const tagsViewStore = useTagsViewStore();
+  const currentRoute = router.currentRoute.value;
+  // 从 visitedViews 中按 path 匹配当前页对应的标签
+  const currentView = tagsViewStore.visitedViews.find(
+    (v: TagView) => v.path === currentRoute.path
+  );
+  if (currentView) {
+    tagsViewStore.delView(currentView).then((res: any) => {
+      if (path) {
+        router.push(path);
+      } else {
+        // 跳转到剩余标签中的最后一个
+        const latestView = res.visitedViews.slice(-1)[0];
+        if (latestView && latestView.path) {
+          if (latestView.keepAlive) {
+            router.replace({ path: latestView.path, query: latestView.query });
+          } else {
+            router.push({ path: latestView.path, query: latestView.query });
+          }
+        } else {
+          router.push("/");
+        }
+      }
+    });
+  } else {
+    // 兜底：未找到当前标签，直接跳转
+    if (path) {
+      router.push(path);
+    } else {
+      router.go(-1);
+    }
+  }
 }

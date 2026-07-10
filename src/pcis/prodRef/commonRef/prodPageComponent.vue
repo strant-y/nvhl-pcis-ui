@@ -173,9 +173,11 @@ const saveBtn = createFreeButtonBase({
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
+            emits("ok", {});
             ElMessage.success("保存成功");
+            dialogVisible.value = false;
           } else {
-            ElMessage.error(msg);
+            ElMessage.error({ message: msg, duration: 1000 });
           }
         })
         .finally(() => {});
@@ -184,9 +186,11 @@ const saveBtn = createFreeButtonBase({
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
+            emits("ok", {});
             ElMessage.success("保存成功");
+            dialogVisible.value = false;
           } else {
-            ElMessage.error(msg);
+            ElMessage.error({ message: msg, duration: 1000 });
           }
         })
         .finally(() => {});
@@ -211,7 +215,7 @@ function updateOption(params: any, dataId: string, props: string) {
           tableRef.value?.updateOption(dataId, props, newOption);
         }
       } else {
-        ElMessage.error(msg);
+        ElMessage.error({ message: msg, duration: 1000 });
       }
     })
     .finally(() => {});
@@ -235,7 +239,7 @@ onMounted(() => {
             });
           }, 100);
         } else {
-          ElMessage.error(msg);
+          ElMessage.error({ message: msg, duration: 1000 });
         }
       })
       .finally(() => {});
@@ -256,7 +260,7 @@ onMounted(() => {
             });
           }, 100);
         } else {
-          ElMessage.error(msg);
+          ElMessage.error({ message: msg, duration: 1000 });
         }
       })
       .finally(() => {});

@@ -69,7 +69,7 @@ const gridconfig = reactive<AppGridEditConfig>(
                 ElMessage.success("保存成功");
                 dataparam.getParam()?.onSaved?.(params);
               } else {
-                ElMessage.error(msg);
+                ElMessage.error({ message: msg, duration: 1000 });
               }
             })
             .finally(() => {});
@@ -83,7 +83,7 @@ const gridconfig = reactive<AppGridEditConfig>(
           const prodInfoData = prodInfo?.getFromValue();
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
-            ElMessage.error("请选择一行数据");
+            ElMessage.error({ message: "请选择一行数据", duration: 1000 });
             return;
           }
           dzmodal
@@ -105,7 +105,7 @@ const gridconfig = reactive<AppGridEditConfig>(
           const prodInfoData = prodInfo?.getFromValue();
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
-            ElMessage.error("请选择一行数据");
+            ElMessage.error({ message: "请选择一行数据", duration: 1000 });
             return;
           }
           dzmodal
@@ -125,7 +125,7 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: () => {
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
-            ElMessage.error("请选择一行数据");
+            ElMessage.error({ message: "请选择一行数据", duration: 1000 });
             return;
           }
           dialog.value?.open(

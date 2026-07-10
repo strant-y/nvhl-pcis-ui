@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "css-styling-expert": {
+      "source": "cin12211/orca-q",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/css-expert/SKILL.md",
+      "computedHash": "28ff7750cba870d447e3a99d1b7e4cd653f2d57448fa69c40eab628cbfebd3e7"
+    },
+    "frontend-expert": {
+      "source": "oimiragieo/agent-studio",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/frontend-expert/SKILL.md",
+      "computedHash": "5e9ef3ee22639c6d327a90f9c912170b28f51ae565421cfeeef6c76c6f3b6bc0"
+    }
+  }
+}

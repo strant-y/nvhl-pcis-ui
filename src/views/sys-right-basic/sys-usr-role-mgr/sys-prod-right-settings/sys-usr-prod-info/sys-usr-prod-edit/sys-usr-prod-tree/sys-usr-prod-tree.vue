@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="90%" class="system-dialog-scroll">
-    <el-tree v-if="nodes && nodes.length" ref="treeRef" :data="nodes" show-checkbox node-key="id" :props="defaultProps"
+  <el-dialog v-model="dialogVisible" width="80%" class="system-dialog-scroll">
+    <el-tree class="menu-tree" v-if="nodes && nodes.length" ref="treeRef" :data="nodes" show-checkbox node-key="id" :props="defaultProps"
       :default-expanded-keys="expandedKeys" :default-checked-keys="checkedKeys" :check-strictly="false"></el-tree>
     <template #footer>
       <div class="dialog-footer">
@@ -165,7 +165,7 @@ const initExpandedKeys = ()=> {
 
 <style scoped lang="scss">
 /* Add your styles here */
-.system-dialog-scroll :deep(.el-dialog__body) {
+.menu-tree {
   max-height: 400px;
   overflow: auto;
 }

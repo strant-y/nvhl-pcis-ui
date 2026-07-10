@@ -31,6 +31,7 @@ const router = useRouter();
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
 import { clear } from "console";
 import { dataParam } from "@/store/modules/dataParam";
+import { closeCurrentTagAndBack } from "@/utils/common";
 const paramparam = dataParam();
 const dialog = ref<DialogMethod | null>(null);
 const param = paramparam.getParam();
@@ -121,7 +122,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "返回",
         func: () => {
-          router.push("/prodconfiguration/InsuranceConfiguration");
+          closeCurrentTagAndBack("/prodconfiguration/InsuranceConfiguration");
         },
       }),
     ],

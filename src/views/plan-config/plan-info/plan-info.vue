@@ -1,60 +1,105 @@
 <template>
-  <div class="app-container">
-    <!--<el-card>-->
-    <!--<underwriteRef ref="underwrite"></underwriteRef>-->
-    <!--</el-card>-->
-    <el-card>
-      <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
-    </el-card>
-    <el-card style="margin-top: 20px;">
-      <template #header>
-        <span class="module-title">特约信息</span>
-      </template>
-      <plan-special-agreement-list ref="specialEditRef" />
-    </el-card>
-    <el-card style="margin-top: 20px;">
-    
-      <template v-for="(pageConfig, v) in formconfig2" :key="formconfig2RenderKey + '-' + v">
-        <div class="card_" v-for="(k, i) in pageConfig?.pageInfo" :key="formconfig2RenderKey + '-' + i"
-          :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey">
-          <component v-if="currentIndex >= i" :ref="(res) => {
-            const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey
-            opertaor.addTableRef(pageK, res);
-          }
-            " :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
-              " :pageSchema="k.pageSchema" />
-        </div>
-      </template>
-    </el-card>
+  <div >
+    <el-container>
+      <el-main>
+        <el-container>
+          <el-aside :class="{ collapsed: asideCollapsed }">
+            <el-affix :offset="0">
+              <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
+                <el-anchor-link
+                  v-for="page in sidebarPages"
+                  :key="page.pageKey"
+                  v-show="page.pageKey === 'reviewInfo' ? isReviewPage : page.pageKey === 'payInfo' ? payinfo : true"
+                  :href="`#${page.pageKey}`"
+                >
+                  <el-tooltip
+                    effect="dark"
+                    :content="page.pageTtile || ''"
+                    placement="top-start"
+                    :disabled="!(asideCollapsed || (page.pageTtile && page.pageTtile.length > 6))"
+                  >
+                    <div class="anchor-item">
+                      <i :class="['icon', 'iconfont', iconMap[page.pageKey] || 'icon-wenjianban1']"></i>
+                      <div v-if="!asideCollapsed" class="icon-title">
+                        <template v-if="page.pageTtile && page.pageTtile.length > 6">
+                          {{ page.pageTtile.substring(0, 6) + "..." }}
+                        </template>
+                        <template v-else>
+                          {{ page.pageTtile }}
+                        </template>
+                      </div>
+                    </div>
+                  </el-tooltip>
+                </el-anchor-link>
+              </el-anchor>
+              <div class="aside-toggle" @click="toggleAside">
+                <el-icon>
+                  <Fold v-if="!asideCollapsed" />
+                  <Expand v-else />
+                </el-icon>
+              </div>
+            </el-affix>
+          </el-aside>
+          <el-container>
+            <el-main id="main-container" style="padding: 10px;">
+              <div id="planBasicInfo">
+                <el-card>
+                  <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+                </el-card>
+              </div>
+              <div id="specialAgreement" style="margin-top: 20px;">
+                <el-card>
+                  <template #header>
+                    <span class="module-title">特约信息</span>
+                  </template>
+                  <plan-special-agreement-list ref="specialEditRef" />
+                </el-card>
+              </div>
+              <el-card style="margin-top: 20px;">
+                <template v-for="(pageConfig, v) in formconfig2" :key="formconfig2RenderKey + '-' + v">
+                  <div class="card_" v-for="(k, i) in pageConfig?.pageInfo" :key="formconfig2RenderKey + '-' + i"
+                    :id="(k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey">
+                    <component v-if="currentIndex >= i" :ref="(res) => {
+                      const pageK = (k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey
+                      opertaor.addTableRef(pageK, res);
+                    }
+                      " :is="k.pageType === 'custom' ? k.pageCode : k.pageKey + '-ref'
+                        " :pageSchema="k.pageSchema" />
+                  </div>
+                </template>
+              </el-card>
+              <div v-if="!props.goodsType">
+                <div id="reviewInfo" v-if="isReviewPage" style="margin-top: 20px;">
+                  <el-card>
+                    <review-info ref="reviewInfoRef"></review-info>
+                  </el-card>
+                </div>
+                <div id="payInfo" v-if="payinfo" style="margin-top: 20px;">
+                  <el-card>
+                    <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" />
+                  </el-card>
+                </div>
+              </div>
 
-    <div v-if="!props.goodsType">
-      <el-card style="margin-top: 20px;" v-if="isReviewPage">
-        <review-info ref="reviewInfoRef"></review-info>
-      </el-card>
-      <div style="text-align: right;margin-top: 20px;" v-if="!isReviewPage">
-        <div style="text-align: right;margin-top: 20px;" v-if="pageMode !== 'view'">
+      <el-footer v-if="!props.goodsType">
+        <div class="footer" v-if="!isReviewPage && pageMode !== 'view'">
           <el-button type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="saveAndSubmit">保存并提交审核</el-button>
           <el-button @click="goBack">返回</el-button>
         </div>
-        <div style="text-align: right;margin-top: 20px;" v-else>
-          <el-button @click="goBack">返回</el-button>
-        </div>
-      </div>
-      <div style="text-align: right;margin-top: 20px;" v-else>
-        <template v-if="pageMode === 'handle'">
+        <div class="footer" v-else-if="isReviewPage && pageMode === 'handle'">
           <el-button type="primary" @click="submit">提交</el-button>
           <el-button @click="goBack">返回</el-button>
-        </template>
-        <template v-else>
+        </div>
+        <div class="footer" v-else>
           <el-button @click="goBack">返回</el-button>
-        </template>
-      </div>
-      <el-card style="margin-top: 20px;" v-if="payinfo">
-        <app-grid-edit :gridEditConfig="formconfig3" ref="payinfoEditRef" />
-      </el-card>
-    </div>
-   
+        </div>
+      </el-footer>
+            </el-main>
+          </el-container>
+        </el-container>
+      </el-main>
+    </el-container>
   </div>
  
 </template>
@@ -63,7 +108,7 @@
 import { ref, reactive, onMounted, watch, nextTick, onBeforeMount, computed, onBeforeUnmount, onActivated, onDeactivated } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getListByCode } from '@/api/code-list-service';
-import { Search } from '@element-plus/icons-vue'
+import { Search, Expand, Fold } from '@element-plus/icons-vue'
 import { AppKey } from '@/constants/api';
 import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from "@/store/modules/user";
@@ -91,6 +136,7 @@ import {
 } from "@/shared/app-grid-edit-config";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
 import {dataParam} from "@/store/modules/dataParam";
+import { closeCurrentTagAndBack } from "@/utils/common";
 const { getRules } = useValidator();
 const dzmodal = useDzModal();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
@@ -250,6 +296,48 @@ const setPlanFormValue = (value: any) => {
  
 let payinfo = ref(false)
 // const formconfig3 = reactive(createAppGridEditConfig({}));
+
+const asideCollapsed = ref(false);
+const anchorRef = ref(null);
+function toggleAside() {
+  asideCollapsed.value = !asideCollapsed.value;
+}
+const pageTitleMap: Record<string, string> = {
+  cvrg: '责任险别',
+  dist: '配送信息',
+  distSummary: '配送汇总',
+};
+const iconMap: Record<string, string> = {
+  planBasicInfo: 'icon-wenjianban1',
+  specialAgreement: 'icon-anjiantiaocha',
+  cvrg: 'icon-zaibaoxinxi',
+  reviewInfo: 'icon-yijian',
+  payInfo: 'icon-tiaoduxinxi',
+};
+const sidebarPages = computed(() => {
+  const pages: { pageKey: string; pageTtile: string }[] = [
+    { pageKey: 'planBasicInfo', pageTtile: '方案基本信息' },
+    { pageKey: 'specialAgreement', pageTtile: '特约信息' },
+  ];
+  formconfig2.forEach((pageConfig: any) => {
+    if (Array.isArray(pageConfig?.pageInfo)) {
+      pageConfig.pageInfo.forEach((k: any) => {
+        const key = (k.pageKey === 'dist' || k.pageKey === 'distSummary') ? k.pageCode : k.pageKey;
+        pages.push({
+          pageKey: key,
+          pageTtile: k.pageTitle || pageTitleMap[k.pageKey] || k.pageKey,
+        });
+      });
+    }
+  });
+  if (!props.goodsType && isReviewPage.value) {
+    pages.push({ pageKey: 'reviewInfo', pageTtile: '审核信息' });
+  }
+  if (!props.goodsType && payinfo.value) {
+    pages.push({ pageKey: 'payInfo', pageTtile: '计算公式' });
+  }
+  return pages;
+});
 
 
 watch(
@@ -975,6 +1063,7 @@ const saveAndSubmit = () => {
       if (result['code'] === 200) {
         if (result['data']['code'] == '1') {
           ElMessage.success(result['data']['message']);
+          closeCurrentTagAndBack();
         } else {
           ElMessage.error(result['data']['message']);
         }
@@ -987,7 +1076,7 @@ const saveAndSubmit = () => {
 }
 const goBack = () => {
   //返回上个页面
-  router.go(-1)
+  closeCurrentTagAndBack();
 }
 
 //审核的提交
@@ -1002,6 +1091,7 @@ const submit = () => {
     if (result['code'] === 200) {
       if (result['data']['code'] == '1') {
         ElMessage.success(result['data']['message']);
+        closeCurrentTagAndBack();
       } else {
         ElMessage.error(result['data']['message']);
       }
@@ -1215,5 +1305,113 @@ defineExpose({
 <style scoped lang="scss">
 .module-title {
   font-weight: 600;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.el-main {
+  padding: 0;
+  height: calc(100vh - 45px - 34px);
+  overflow: hidden;
+  overflow-y: auto;
+  .el-aside {
+    width: 180px;
+    transition: width 0.2s ease;
+    .el-affix {
+      height: 100%;
+      background: var(--el-color-primary);
+      position: relative;
+    }
+    &.collapsed {
+      width: 64px;
+    }
+  }
+}
+
+.el-footer {
+  margin-top: 20px;
+  background-color: #f5f7fa;
+  padding: 10px;
+  text-align: right;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.footer .el-button {
+  margin-left: 10px;
+}
+
+:deep(.el-anchor) {
+  background: transparent;
+  .el-anchor__list {
+    padding: 20px 10px 64px;
+    .el-anchor__item {
+      margin-bottom: 20px;
+      .el-anchor__link {
+        font-size: 14px;
+        color: #FFF;
+        text-align: center;
+        padding: 0;
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        &.isActive{
+          background: var(--el-color-primary);
+          :deep(a) {
+            color: var(--menu-active-text);
+            .iconfont {
+              color: var(--menu-active-text);
+            }
+          }
+        }
+        &:hover {
+          background: var(--menu-hover);
+          :deep(a) {
+            color: var(--el-color-primary);
+            .iconfont {
+              color: var(--el-color-primary);
+            }
+          }
+        }
+        .iconfont {
+          font-size: 1.2rem;
+          color: #FFF;
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
+
+.aside-toggle {
+  height: 34px;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.anchor-item {
+  display: flex;
+  align-items: center;
+}
+
+.el-aside.collapsed {
+  :deep(.iconfont) {
+    margin-right: 0;
+  }
 }
 </style>

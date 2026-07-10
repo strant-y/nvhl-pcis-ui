@@ -2,8 +2,8 @@
   <el-dialog
     v-model="dialogVisible"
     title="机构部门"
-    custom-class="custom-dialog"
-    width="85%"
+    class="custom-dialog"
+    width="60%"
   >
     <el-divider></el-divider>
     <el-input
@@ -19,7 +19,7 @@
     </el-input>
     <el-tree
       ref="treeRef"
-      style="max-width: 500px"
+      style="max-width: 600px"
       class="filter-tree"
 			node-key="id"
       :data="_nodes"
@@ -330,11 +330,14 @@ onMounted(() => {
 });
 </script>
 <style scoped>
-filter-tree {
+.filter-tree {
   padding: 10px;
-  border-right: 1px solid #ccc;
+   max-height: 400px;
+   overflow: auto;
 }
 :deep(.el-tree-node__expand-icon) {
   font-size: 18px;
 }
+
 </style>
+

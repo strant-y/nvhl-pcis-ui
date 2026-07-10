@@ -97,11 +97,11 @@ const clickBtn = ref<Array<FreeButtonBase>>([
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
-            // emits("ok", {});
-            selectComponent(selectConItem.value);
+            emits("ok", {});
             ElMessage.success("保存成功");
+            dialogVisible.value = false;
           } else {
-            ElMessage.error(msg);
+            ElMessage.error({ message: msg, duration: 1000 });
           }
         })
         .finally(() => {});
@@ -137,10 +137,11 @@ const clickBtn = ref<Array<FreeButtonBase>>([
           .then((res) => {
             const { code, data, msg } = res;
             if (200 === code) {
-              // emits("ok", {});
+              emits("ok", {});
               ElMessage.success("保存成功");
+              dialogVisible.value = false;
             } else {
-              ElMessage.error(msg);
+              ElMessage.error({ message: msg, duration: 1000 });
             }
           })
           .finally(() => {});
@@ -149,10 +150,11 @@ const clickBtn = ref<Array<FreeButtonBase>>([
           .then((res) => {
             const { code, data, msg } = res;
             if (200 === code) {
-              // emits("ok", {});
+              emits("ok", {});
               ElMessage.success("保存成功");
+              dialogVisible.value = false;
             } else {
-              ElMessage.error(msg);
+              ElMessage.error({ message: msg, duration: 1000 });
             }
           })
           .finally(() => {});
@@ -235,7 +237,7 @@ function selectComponent(item: any) {
         console.log(data);
         tableRef.value?.setFormValue(data);
       } else {
-        ElMessage.error(msg);
+        ElMessage.error({ message: msg, duration: 1000 });
       }
     })
     .finally(() => {});
@@ -248,7 +250,7 @@ onMounted(() => {
         if (200 === code) {
           componentList.value = data;
         } else {
-          ElMessage.error(msg);
+          ElMessage.error({ message: msg, duration: 1000 });
         }
       })
       .finally(() => {});
@@ -259,7 +261,7 @@ onMounted(() => {
         if (200 === code) {
           componentList.value = data;
         } else {
-          ElMessage.error(msg);
+          ElMessage.error({ message: msg, duration: 1000 });
         }
       })
       .finally(() => {});

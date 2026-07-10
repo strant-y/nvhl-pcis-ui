@@ -1,24 +1,5 @@
 <template>
   <div class="special-agreement-panel">
-    <el-form :model="formModel" label-width="100px" class="special-filter-form">
-      <el-row :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="是否有特约">
-            <el-select
-              v-model="formModel.cSpecMrk"
-              placeholder="请选择"
-              clearable
-              :disabled="disabledAll"
-              @change="handleSpecMarkChange"
-            >
-              <el-option label="是" value="1" />
-              <el-option label="否" value="0" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </el-form>
-
     <div class="toolbar" v-if="!disabledAll">
       <el-button type="primary" @click="handleAddTemplate">模板特约</el-button>
       <el-button type="success" @click="openEditDialog('custom')">自定义特约</el-button>
@@ -399,30 +380,6 @@ function moveItem(index: number, offset: -1 | 1) {
   updateFieldsFromList();
 }
 
-function handleSpecMarkChange(value: string) {
-  if (value === "1") {
-    return;
-  }
-  if (specialList.value.length === 0) {
-    formModel.cSpecMrk = "0";
-    formModel.CSpecNo = "";
-    formModel.cSpecContent = "";
-    return;
-  }
-  ElMessageBox.confirm("切换为“否”后将清空现有特约信息，是否继续？", "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  })
-    .then(() => {
-      specialList.value = [];
-      updateFieldsFromList();
-    })
-    .catch(() => {
-      formModel.cSpecMrk = "1";
-    });
-}
-
 defineExpose({
   getFromValue,
   getValue,
@@ -435,10 +392,6 @@ defineExpose({
 
 <style scoped lang="scss">
 .special-agreement-panel {
-  .special-filter-form {
-    margin-bottom: 8px;
-  }
-
   .toolbar {
     display: flex;
     justify-content: flex-end;

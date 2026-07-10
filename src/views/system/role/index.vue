@@ -421,6 +421,7 @@ function handleRoleMenuSubmit() {
         <el-tree
           ref="menuRef"
           node-key="value"
+          class="menu-tree"
           show-checkbox
           :data="menuList"
           :default-expand-all="true"
@@ -445,6 +446,10 @@ function handleRoleMenuSubmit() {
 <style scoped>
 .system-dialog-scroll :deep(.el-dialog__body) {
   max-height: 400px;
+  overflow: auto;
+}
+.menu-tree{
+   max-height: 400px;
   overflow: auto;
 }
 

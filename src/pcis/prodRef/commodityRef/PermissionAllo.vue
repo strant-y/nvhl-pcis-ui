@@ -23,7 +23,6 @@ import {
   // getPageList,
 } from "@/api/code-list-service";
 import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
-import { checkProdGrade } from "@/api/prod/index";
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useDzModal } from "@/common/dzmodel/DzModalService";
@@ -157,7 +156,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 };
 
                 setFormItem("cBrkrCde", { ...obj, disabled: 0 }); //代理(经纪)人
-                setFormItem("cBrkSlsCde", obj); //代理业务员
+                setFormItem("cBrkSlsCde", { ...obj, rules: [] }); //代理业务员
 
 
               } else {
@@ -626,12 +625,9 @@ async function checkProdGradeChange(isPrompt: boolean): Promise<boolean> {
     }
 
     // 6. 获取其他字段
-    const brkrCde = getValue('cBrkrCde'); // 代理人/经纪人
-    const brkSlsCde = getValue('cBrkSlsCde'); // 代理业务员
-    const agtAgrNo = getValue('cAgtAgrNo'); // 代理协议号
     const slsId = getValue('cSlsId'); // 业务员
 
-    // 6. 分场景校验
+    // 7. 分场景校验
     if (bsnsTyp === '19001') {
       // 直销业务
       if (!slsId) {
@@ -640,44 +636,16 @@ async function checkProdGradeChange(isPrompt: boolean): Promise<boolean> {
       }
     } else if (bsnsTyp === '19002') {
       // 代理业务
-      if (chaType === '1900201') {
-        // 个人代理
-        if (!brkSlsCde || !agtAgrNo) {
-          showError('代理业务员和代理协议号不能为空！');
-          return false;
-        }
-      } else {
+      if (chaType !== '1900201') {
         // 兼业/专业代理
-        if (!slsId || !agtAgrNo) {
-          showError('业务员/产险专员和代理协议号不能为空！');
+        if (!slsId) {
+          showError('请选择业务员/产险专员！');
           return false;
         }
       }
     }
 
-    // 7. 构造请求数据
-    const data = {
-      cProdNo: prodNo, // 产品
-      cDptCde: dptNo, // 机构部门
-      cBsnsTyp: bsnsTyp, // 业务来源 (19001: 直销业务, 19002:代理业务, 19003: 经纪业务)
-      cChaType: chaType, // 渠道中级分类 (1900201: 个人代理, 1900202: 兼业代理, 1900203: 专业代理)
-      cChaSubtype: cChaSubtype, // 渠道子类
-      cSlsId: slsId, // 业务员员工号
-      cBrkrCde: brkrCde, // 代理(经纪)人
-      cBrkSlsCde: brkSlsCde, // 代理业务员
-      cAgtAgrNo: agtAgrNo, // 代理(合作)协议
-    };
-
-    // 8. 调用后端校验接口
-    const res = await checkProdGrade(data);
-
-    if (res?.code === 200) {
-      return true;
-    } else {
-      const msg = res?.msg || '产品等级校验失败';
-      ElMessage.error(msg);
-      return false;
-    }
+    return true;
   } catch (error) {
     ElMessage.error('系统异常，请联系管理员');
     return false;

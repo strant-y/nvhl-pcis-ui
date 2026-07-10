@@ -4,21 +4,47 @@
     <el-container>
       <el-main>
         <el-container>
-          <el-aside width="150px">
+          <el-aside :class="{ collapsed: asideCollapsed }">
             <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <el-affix :offset="150">
-                <el-anchor :bound="120" :offset="80">
-                  <!-- k.pageKey == 'relatedancillaryInfo' ? iscAffiliatedMrk : true -->
-                  <el-anchor-link v-for="(k, i) in pageConfig?.pageInfo" :key="i"
-                    v-show="k.pageKey === 'ReviewComments' ? isShowReview : k.pageKey === 'TestReport' ? isShowTest : true" :href="`#${k.pageKey}`">
-                    {{ k.pageTtile }}
+              <el-affix :offset="0">
+                <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
+                  <el-anchor-link
+                    v-for="(k, i) in pageConfig?.pageInfo"
+                    :key="i"
+                    v-show="k.pageKey === 'ReviewComments' ? isShowReview : k.pageKey === 'TestReport' ? isShowTest : true"
+                    :href="`#${k.pageKey}`"
+                  >
+                    <el-tooltip
+                      effect="dark"
+                      :content="k.pageTtile || ''"
+                      placement="top-start"
+                      :disabled="!(asideCollapsed || (k.pageTtile && k.pageTtile.length > 6))"
+                    >
+                      <div class="anchor-item">
+                        <i :class="['icon', 'iconfont', iconMap[k.pageKey]]"></i>
+                        <div v-if="!asideCollapsed" class="icon-title">
+                          <template v-if="k.pageTtile && k.pageTtile.length > 6">
+                            {{ k.pageTtile.substring(0, 6) + "..." }}
+                          </template>
+                          <template v-else>
+                            {{ k.pageTtile }}
+                          </template>
+                        </div>
+                      </div>
+                    </el-tooltip>
                   </el-anchor-link>
                 </el-anchor>
+                <div class="aside-toggle" @click="toggleAside">
+                  <el-icon>
+                    <Fold v-if="!asideCollapsed" />
+                    <Expand v-else />
+                  </el-icon>
+                </div>
               </el-affix>
             </template>
           </el-aside>
           <el-container>
-            <el-main>
+            <el-main id="main-container" style="padding: 10px;">
               <!-- v-show="k.pageKey == 'relatedancillaryinfo' ?iscAffiliatedMrk : true" -->
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
                 <div v-for="(k, i) in pageConfig?.pageInfo" :key="i" :id="k.pageKey"
@@ -30,24 +56,8 @@
                     " :is="k.pageRef + '-ref'" />
                 </div>
               </template>
-            </el-main>
-          </el-container>
-        </el-container>
-      </el-main>
-    </el-container>
-    <el-footer>
-      <!-- <div class="footer" v-if="queryParam.editType === 'edit' || queryParam.editType === 'add'">
-       <el-button type="primary" @click="scrollToTop">一键回到顶部</el-button>
-      <el-button type="primary" @click="saveAll">保存</el-button>
-      <el-button type="primary" @click="saveAllSubmit">保存并提交审核</el-button>
-      <el-button type="primary" @click="backClick">返回 </el-button>
-    </div>
 
-    <div class="footer" v-else >
-      <el-button type="primary" @click="scrollToTop">一键回到顶部</el-button>
-      <el-button type="primary" @click="backClick">返回 </el-button>
-    </div> -->
-
+      <el-footer>
       <div class="footer"
         v-if="queryParam.editType === 'add' || queryParam.editType === 'edit' || queryParam.editType === 'copy' || queryParam.editType === 'upload'">
         <el-button type="primary" @click="scrollToTop">一键回到顶部</el-button>
@@ -64,10 +74,12 @@
         <el-button type="primary" @click="scrollToTop">一键回到顶部</el-button>
         <el-button type="primary" @click="backClick">返回 </el-button>
       </div>
-
-
-
     </el-footer>
+            </el-main>
+          </el-container>
+        </el-container>
+      </el-main>
+    </el-container>
   </div>
 </template>
 
@@ -77,7 +89,9 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 
 import { useProductStore } from "@/store";
+import { closeCurrentTagAndBack } from "@/utils/common";
 import { descryptParameter } from "@/utils/encipher";
+import { Expand, Fold } from "@element-plus/icons-vue";
 const productStore = useProductStore();
 const { iscAffiliatedMrk } = storeToRefs(productStore);
 import { useRouter, useRoute } from 'vue-router';
@@ -87,7 +101,20 @@ const router = useRouter();
 let isShowTest = ref(false)  // 用来控制显示审核信息模块
 let TestData = ref({});  // 审核状态 返回数据 
 let isShowReview = ref(false)  // 用来控制显示审核信息模块
-let ProcessData = ref({});  // 审核状态 返回数据 
+let ProcessData = ref({});  // 审核状态 返回数据
+const asideCollapsed = ref(false);
+const anchorRef = ref(null);
+function toggleAside() {
+  asideCollapsed.value = !asideCollapsed.value;
+}
+const iconMap = {
+  'commodityBasicInfo': 'icon-wenjianban1',
+  'choosePlan': 'icon-tiaoduxinxi',
+  'permissionAllo': 'icon-renyuanfenpei',
+  'InsuranceRules': 'icon-anjiantiaocha',
+  'TestReport': 'icon-shenhexinxi',
+  'ReviewComments': 'icon-yijian',
+} 
 console.log(1,query.value?.param)
 console.log(2,descryptParameter(query.value?.param))
 
@@ -187,7 +214,7 @@ const reViewClick = async () => {
     let { code, msg, data } = res;
     if (code === 200) {
       ElMessage.success('审核成功');
-      router.go(-1)
+      closeCurrentTagAndBack();
     }
 
   })
@@ -407,7 +434,7 @@ const save = (call, param: any) => {
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
   if (!!call) {
     // return false;
-    if ('0' === param['cStatus']) {
+    if (!param['cStatus'] || '0' === param['cStatus']) {
       param['cStatus'] = '1'; // 一级审核
     } else {
       param['cStatus'] = '4'; // 二级审核
@@ -437,7 +464,7 @@ const save = (call, param: any) => {
       // 保存并提交
       if (!!data['data'] && !!data['data']['cCommodityNo']) {
         if (!!call) {
-          call(data['data']['cCommodityNo'], data['data']['cStatus']);
+          call(data['data']['cCommodityNo'], param['cStatus']);
         }
       }
     }
@@ -499,7 +526,7 @@ const saveAllSubmit = async () => {
 
           // 跳转
           //返回上个页面
-          router.go(-1)
+          closeCurrentTagAndBack();
 
         } else {
         }
@@ -589,7 +616,7 @@ const initInfo = () => {
 
 const backClick = () => {
   //返回上个页面
-  router.go(-1)
+  closeCurrentTagAndBack();
 }
 
 onMounted(async () => {
@@ -637,7 +664,7 @@ function scrollToTop() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .app-container {
   display: flex;
   flex-direction: column;
@@ -646,10 +673,26 @@ function scrollToTop() {
 
 .el-main {
   flex: 1;
+  padding: 0;
+  height: calc(100vh - 45px - 34px);
+  overflow: hidden;
+  overflow-y: auto;
+  .el-aside {
+    width: 180px;
+    transition: width 0.2s ease;
+    .el-affix {
+      height: 100%;
+      background: var(--el-color-primary);
+      position: relative;
+    }
+    &.collapsed {
+      width: 64px;
+    }
+  }
 }
 
 .el-footer {
-  margin-top: auto;
+  margin-top: 20px;
   background-color: #f5f7fa;
   padding: 10px;
   text-align: right;
@@ -663,5 +706,71 @@ function scrollToTop() {
 
 .footer .el-button {
   margin-left: 10px;
+}
+
+:deep(.el-anchor) {
+  background: transparent;
+  .el-anchor__list {
+    padding: 20px 10px 64px;
+    .el-anchor__item {
+      margin-bottom: 20px;
+      .el-anchor__link {
+        font-size: 14px;
+        color: #FFF;
+        text-align: center;
+        padding: 0;
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        &.isActive{
+          background: var(--el-color-primary);
+          :deep(a) {
+            color: var(--menu-active-text);
+            .iconfont {
+              color: var(--menu-active-text);
+            }
+          }
+        }
+        &:hover {
+          background: var(--menu-hover);
+          :deep(a) {
+            color: var(--el-color-primary);
+            .iconfont {
+              color: var(--el-color-primary);
+            }
+          }
+        }
+        .iconfont {
+          font-size: 1.2rem;
+          color: #FFF;
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
+
+.aside-toggle {
+  height: 34px;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.anchor-item {
+  display: flex;
+  align-items: center;
+}
+
+.el-aside.collapsed {
+  :deep(.iconfont) {
+    margin-right: 0;
+  }
 }
 </style>
