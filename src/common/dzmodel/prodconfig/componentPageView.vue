@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
-import { dataOpertaor } from "@/store/modules/data-opertaor";
+import { dataParam } from "@/store/modules/dataParam";
 
 const currentIndex = ref(0);
 const formconfig1 = ref({});
@@ -42,6 +42,8 @@ const props = defineProps({
 import { formInit } from "@/shared/from-init";
 import { getPageViewByPage } from "@/api/prod";
 
+const dataparam = dataParam();
+
 // 绑定方法
 const method = {};
 
@@ -49,6 +51,10 @@ const method = {};
 const exRules = {};
 
 onMounted(async () => {
+  // 将预览参数中的 cProdNo 写入全局 dataParam store，供子组件读取
+  if (props.data?.param?.cProdNo) {
+    dataparam.setParam({ cProdNo: props.data.param.cProdNo });
+  }
   const res = await getPageViewByPage(props.data.param);
   if (200 === res.code) {
     formconfig1.value = res.data;

@@ -308,9 +308,20 @@ export function closeCurrentTagAndBack(path?: string) {
   const tagsViewStore = useTagsViewStore();
   const currentRoute = router.currentRoute.value;
   // 从 visitedViews 中按 path 匹配当前页对应的标签
-  const currentView = tagsViewStore.visitedViews.find(
+  let currentView = tagsViewStore.visitedViews.find(
     (v: TagView) => v.path === currentRoute.path
   );
+  // 如果按 path 没找到，尝试用 fullPath 匹配
+  if (!currentView) {
+    currentView = tagsViewStore.visitedViews.find(
+      (v: TagView) => v.fullPath === currentRoute.fullPath
+    );
+  }
+  // 如果仍然没找到，尝试用 selectedView
+  if (!currentView && tagsViewStore.selectedView) {
+    currentView = tagsViewStore.selectedView;
+  }
+
   if (currentView) {
     tagsViewStore.delView(currentView).then((res: any) => {
       if (path) {
@@ -330,8 +341,10 @@ export function closeCurrentTagAndBack(path?: string) {
       }
     });
   } else {
-    // 兜底：未找到当前标签，直接跳转
-    if (path) {
+    // 兜底：未找到当前标签，尝试用 selectedView 通过 eventBus 关闭
+    if (tagsViewStore.selectedView) {
+      tagsViewStore.back();
+    } else if (path) {
       router.push(path);
     } else {
       router.go(-1);

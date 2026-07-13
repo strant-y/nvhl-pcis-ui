@@ -167,7 +167,7 @@ onMounted(async () => {
       }
     });
   }
-  if (!parparam.cProdNo.startsWith("02") && deleteId > 0) {
+  if (!parparam.cProdNo?.startsWith("02") && deleteId > 0) {
     // 只有货运险,需要选择获取按钮
     formconfig11.titleBtns?.splice(deleteId, 1);
   }

@@ -448,6 +448,8 @@ defineExpose({
   validate,
   setValue,
   getValue,
-  getTableValue
+  getTableValue,
+  /** 暴露查询方法，供父组件在复制保存后刷新方案列表 */
+  handleQuery,
 });
 </script>

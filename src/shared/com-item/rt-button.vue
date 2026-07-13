@@ -196,7 +196,7 @@ const computedDisabled = computed(() => {
   const isProdFactoryInfoViewMode =
     route.path === "/prodconfiguration/prodFactoryInfo" && dataparam.getParam()?.editType === "view";
   const label = String(props.item?.label || "");
-  const viewModeDisabled = isProdFactoryInfoViewMode && !["查询", "预览"].includes(label);
+  const viewModeDisabled = isProdFactoryInfoViewMode && !["查询", "预览", "返回", "关闭"].includes(label);
 
   return Boolean(itemDisabled) || viewModeDisabled;
 });

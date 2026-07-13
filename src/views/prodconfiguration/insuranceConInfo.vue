@@ -37,6 +37,8 @@
                   "
                   :is="k.pageRef + '-ref'"
                   @clause-type-change="handleClauseTypeChange"
+                  @term-data-loaded="handleTermDataLoaded"
+                  @term-saved="handleTermSaved"
                 />
               </div>
             </template>
@@ -53,6 +55,7 @@ import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { ref, onMounted } from "vue";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 import {useRoute} from "vue-router";
+import { saveTermRiskRel, saveTermRel } from "@/api/prod";
 
 const props = defineProps({
   param: {
@@ -111,6 +114,78 @@ const showRelatedAdditionalIns = ref(false);
 const handleClauseTypeChange = (val: string) => {
   showRelatedAdditionalIns.value = val === "0"; // 0 表示主条款，主条款时显示关联附加条款
 };
+
+/**
+ * 复制模式下，条款基本信息数据加载完成后触发
+ * 先用原始 cTermNo 查询关联责任和关联附加条款，实现数据回显
+ * 查询完成后再清空 cTermNo
+ */
+function handleTermDataLoaded() {
+  // 查询关联责任
+  const relatedResponsRef = opertaor.getTableRefByKey("relatedRespons");
+  if (relatedResponsRef && typeof relatedResponsRef.handleQuery === 'function') {
+    relatedResponsRef.handleQuery();
+  }
+  // 查询关联附加条款
+  const relatedAdditionalInsRef = opertaor.getTableRefByKey("relatedAdditionalIns");
+  if (relatedAdditionalInsRef && typeof relatedAdditionalInsRef.handleQuery === 'function') {
+    relatedAdditionalInsRef.handleQuery();
+  }
+  // 关联查询发起后，清空条款代码
+  const clauseConfBasicInfoRef = opertaor.getTableRefByKey("clauseConfBasicInfo");
+  if (clauseConfBasicInfoRef && typeof clauseConfBasicInfoRef.clearCopyTermNo === 'function') {
+    clauseConfBasicInfoRef.clearCopyTermNo();
+  }
+}
+/**
+ * 复制模式下，条款基本信息保存成功后触发
+ * 用新 cTermNo 将关联责任和关联附加条款数据重新保存绑定
+ * @param newTermNo 保存后返回的新条款代码
+ */
+function handleTermSaved(newTermNo: string) {
+  const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
+
+  // 保存关联责任数据
+  const relatedResponsRef = opertaor.getTableRefByKey("relatedRespons");
+  if (relatedResponsRef && typeof relatedResponsRef.getTableData === 'function') {
+    const riskList = relatedResponsRef.getTableData();
+    if (riskList && riskList.length > 0) {
+      const rel = riskList.map((item: any) => {
+        item.cCrtCde = opCde;
+        item.cUpdCde = opCde;
+        item.cTermNo = newTermNo;
+        return item;
+      });
+      saveTermRiskRel({ cTermNo: newTermNo, rel }).then((res: any) => {
+        if (res.code !== 200) {
+          ElMessage.error(res.msg || "关联责任保存失败");
+        }
+      });
+    }
+  }
+
+  // 保存关联附加条款数据
+  const relatedAdditionalInsRef = opertaor.getTableRefByKey("relatedAdditionalIns");
+  if (relatedAdditionalInsRef && typeof relatedAdditionalInsRef.getTableData === 'function') {
+    const termRelList = relatedAdditionalInsRef.getTableData();
+    if (termRelList && termRelList.length > 0) {
+      const rel = termRelList.map((item: any) => {
+        item.cCrtCde = opCde;
+        item.cUpdCde = opCde;
+        item.cTermRdrCde = item.cTermNo;
+        item.cTermNo = newTermNo;
+        item.cRdrTyp = "1";
+        return item;
+      });
+      saveTermRel({ cTermNo: newTermNo, rel }).then((res: any) => {
+        if (res.code !== 200) {
+          ElMessage.error(res.msg || "关联附加条款保存失败");
+        }
+      });
+    }
+  }
+}
+
 const btns = {};
 onMounted(async () => {
   // getProdInfos(param)

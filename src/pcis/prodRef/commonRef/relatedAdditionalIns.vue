@@ -297,12 +297,24 @@ onMounted(() => {
   }
 });
 
+/**
+ * 获取当前表格中的关联附加条款数据
+ * 复制模式保存时，由父组件调用获取数据并重新绑定到新条款代码
+ */
+function getTableData() {
+  return pageresult.list;
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  /** 暴露查询方法，供父组件在复制模式下调用 */
+  handleQuery,
+  /** 暴露获取表格数据方法，供父组件在复制保存时调用 */
+  getTableData,
 });
 </script>
 

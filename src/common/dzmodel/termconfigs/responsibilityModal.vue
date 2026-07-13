@@ -49,7 +49,8 @@ const props = defineProps({
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("clauseConfBasicInfo");
+/** 动态获取条款基本信息组件引用，避免 setup 阶段 ref 未注册 */
+const getTabref = () => opertaor.getTableRefByKey("clauseConfBasicInfo");
 const { getRules } = useValidator();
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -105,6 +106,7 @@ const pageresult = reactive<Pageresult>({
 const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: true,
+    maxHeight: "260px",
     editList:['cIsCommon'],
     fromSchema: [
       {
@@ -163,7 +165,7 @@ const selectedRows = ref<any[]>([]);
 function handleQuery(flag?: boolean) {
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r, { cTermNo: tabref.getFromValue().cTermNo });
+  const param = Object.assign(s, r, { cTermNo: getTabref()?.getFromValue()?.cTermNo });
   getRiskList(param)
     .then((res) => {
       const { code, data, msg } = res;
@@ -184,7 +186,7 @@ function handleSelectionChange(rows: any[]) {
 
 const handleConfirm = () => {
   const opCde = JSON.parse(sessionStorage.getItem("user")).opCde;
-  const cTermNo = tabref.getFromValue().cTermNo;
+  const cTermNo = getTabref()?.getFromValue()?.cTermNo;
   const newArr = selectedRows.value.map((item) => {
     item.cCrtCde = opCde;
     item.cUpdCde = opCde;
@@ -196,8 +198,10 @@ const handleConfirm = () => {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        emits("ok", {});
         ElMessage.success("保存成功");
+        if (props.method && typeof props.method.isOk === 'function') {
+          props.method.isOk();
+        }
         emits("handleClose");
       } else {
         ElMessage.error(msg);

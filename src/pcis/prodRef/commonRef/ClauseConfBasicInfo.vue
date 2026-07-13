@@ -109,6 +109,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 if (200 === code) {
                   freeEditRef?.value?.setFormValue({ cTermNo: data });
                   ElMessage.success("保存成功");
+                  // 复制模式下，保存成功后通知父组件，用新 cTermNo 保存关联数据
+                  if (param.type === "copy") {
+                    nextTick(() => {
+                      emit("term-saved", data);
+                    });
+                  }
                 } else {
                   ElMessage.error(msg);
                 }
@@ -122,7 +128,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       createFreeButtonBase({
         label: "返回",
         func: () => {
-          closeCurrentTagAndBack("/prodconfiguration/InsuranceConfiguration");
+          closeCurrentTagAndBack();
         },
       }),
     ],
@@ -457,8 +463,12 @@ function handleQuery() {
         setTimeout(() => {
           freeEditRef?.value?.setFormValue(data);
           emit("clause-type-change", data?.cRdrTyp);
+          // 复制模式下，保留原始 cTermNo 先不清空，通知父组件触发关联查询
+          // 关联查询完成后再由父组件调用 clearCopyTermNo() 清空
           if (param.type === "copy") {
-            freeEditRef?.value?.setValue("cTermNo", null);
+            nextTick(() => {
+              emit("term-data-loaded");
+            });
           }
         }, 1000);
       } else {
@@ -468,7 +478,17 @@ function handleQuery() {
     .finally(() => {});
 }
 
-const emit = defineEmits(["clause-type-change"]);
+/**
+ * 复制模式下，清空条款代码
+ * 在关联责任和关联附加条款查询完成后，由父组件调用此方法
+ */
+function clearCopyTermNo() {
+  if (param.type === "copy") {
+    freeEditRef?.value?.setValue("cTermNo", null);
+  }
+}
+
+const emit = defineEmits(["clause-type-change", "term-data-loaded", "term-saved"]);
 
 // 监听主条款/附加条款字段的变化
 watch(
@@ -490,6 +510,8 @@ defineExpose({
   validate,
   setValue,
   getValue,
+  /** 暴露清空复制条款代码方法，供父组件在关联查询后调用 */
+  clearCopyTermNo,
 });
 
 watch(

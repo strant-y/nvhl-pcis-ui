@@ -59,6 +59,8 @@
                       }
                     "
                     :is="k.pageRef + '-ref'"
+                    @prod-data-loaded="handleProdDataLoaded"
+                    @prod-saved="handleProdSaved"
                   />
                 </div>
               </template>
@@ -77,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { getProdInfos } from "@/api/prod";
+import { getProdInfos, associationTerm, associationSpec, saveProdPages } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
 import { createCopyData } from "@/utils/copy";
@@ -185,7 +187,7 @@ function renderComponents() {
   }, 100); // 延迟组件渲染,增加页面响应效率
 }
 function loadAfter() {
-  if (param.editType === "edit" || param.editType === "copy") {
+  if (param.editType === "edit" || param.editType === "copy" || param.editType === "view") {
     nextTick(() => {
       getProdInfos(param)
         .then((res) => {
@@ -204,6 +206,10 @@ function loadAfter() {
 }
 function setData(datas: any) {
   Object.keys(datas).forEach((k) => {
+    // 复制模式下，prodInfo 由组件自行查询并处理 cProdNo 清空逻辑，跳过父级赋值
+    if (param.editType === "copy" && k === "prodInfo") {
+      return;
+    }
     const ref = opertaor.getTableRefByKey(k);
     if(ref?.setFormValue) {
       const currentData =
@@ -211,6 +217,99 @@ function setData(datas: any) {
       ref.setFormValue(currentData);
     }
   });
+}
+
+/**
+ * 复制模式下，产品基本信息数据加载完成后触发
+ * 在此时清空产品编码，确保数据已回显
+ */
+function handleProdDataLoaded() {
+  const prodInfoRef = opertaor.getTableRefByKey("prodInfo");
+  if (prodInfoRef && typeof prodInfoRef.clearCopyProdNo === 'function') {
+    prodInfoRef.clearCopyProdNo();
+  }
+}
+
+/**
+ * 复制模式下，产品基本信息保存成功后触发
+ * 用新 cProdNo 将关联主条款、关联特别约定、页面组件绑定数据重新保存绑定
+ * @param newProdNo 保存后返回的新产品编码
+ */
+function handleProdSaved(newProdNo: string) {
+  const opCde = JSON.parse(sessionStorage.getItem("user") || "{}").opCde;
+
+  // 保存关联主条款数据
+  const relatedMainInsuranceRef = opertaor.getTableRefByKey("relatedMainInsurance");
+  if (relatedMainInsuranceRef && typeof relatedMainInsuranceRef.getTableData === 'function') {
+    const termList = relatedMainInsuranceRef.getTableData();
+    if (termList && termList.length > 0) {
+      // 提取条款编码，逗号拼接，与原始 associationTerm 调用方式一致
+      const cTermNo = termList.map((item: any) => item.cTermNo).filter(Boolean).join(",");
+      if (cTermNo) {
+        const newParam = {
+          userId: opCde,
+          cCrtCde: opCde,
+          cUpdCde: opCde,
+          cTermNo,
+          cProdNo: newProdNo,
+          cTyp: "0",
+        };
+        associationTerm(newParam).then((res: any) => {
+          if (res.code !== 200) {
+            ElMessage.error(res.msg || "关联主条款保存失败");
+          }
+        });
+      }
+    }
+  }
+
+  // 保存关联特别约定数据
+  const specialAgreementRef = opertaor.getTableRefByKey("specialAgreement");
+  if (specialAgreementRef && typeof specialAgreementRef.getTableData === 'function') {
+    const specList = specialAgreementRef.getTableData();
+    if (specList && specList.length > 0) {
+      // 清理旧关联字段，只保留创建新关联所需的字段
+      const webPrdProdSpecRelDTOList = specList.map((item: any) => ({
+        cSpecNo: item.cSpecNo,
+        cNmeCn: item.cNmeCn,
+        cIfEdit: item.cIfEdit === true || item.cIfEdit === "1" ? "1" : "0",
+        cIfMust: item.cIfMust === true || item.cIfMust === "1" ? "1" : "0",
+      }));
+      const cSpecNo = specList.map((item: any) => item.cSpecNo).filter(Boolean).join(",");
+      if (cSpecNo) {
+        const newParam = {
+          userId: opCde,
+          cCrtCde: opCde,
+          cUpdCde: opCde,
+          webPrdProdSpecRelDTOList,
+          cSpecNo,
+          cProdNo: newProdNo,
+        };
+        associationSpec(newParam).then((res: any) => {
+          if (res.code !== 200) {
+            ElMessage.error(res.msg || "关联特别约定保存失败");
+          }
+        });
+      }
+    }
+  }
+
+  // 保存页面组件绑定数据
+  const prodComponentRef = opertaor.getTableRefByKey("prodComponent");
+  if (prodComponentRef && typeof prodComponentRef.getTableData === 'function') {
+    const pages = prodComponentRef.getTableData();
+    if (pages && pages.length > 0) {
+      const prodInfoRef = opertaor.getTableRefByKey("prodInfo");
+      const prodInfoData = prodInfoRef?.getFromValue() || {};
+      prodInfoData.cProdNo = newProdNo;
+      const params = Object.assign(prodInfoData, { pages });
+      saveProdPages(params).then((res: any) => {
+        if (res.code !== 200) {
+          ElMessage.error(res.msg || "页面组件绑定保存失败");
+        }
+      });
+    }
+  }
 }
 
 function toggleAside() {

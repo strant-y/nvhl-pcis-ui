@@ -22,6 +22,9 @@ const opertaor = dataOpertaor(idxParam.opertaorProps);
 import { useRoute } from "vue-router";
 import { cp } from "fs";
 import { eventBus } from '@/utils/event-bus'
+
+// 复制模式下，保存成功后通知父组件，用新 cCommodityNo 保存关联方案数据
+const emit = defineEmits(["commodity-saved"]);
 import { useUserStore, useProductStore } from "@/store";
 import moment from "moment";
 // import { useProductStore } from "@/store";
@@ -66,9 +69,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 .then((res) => {
                   const { code, data, msg } = res;
                   if (200 === code) {
+                    let newCommodityNo = null;
                     if (data['data']) {
                       // setFormItem('cCommodityNo',data["data"]['cCommodityNo'])
-                      setValue('cCommodityNo', data["data"]['cCommodityNo'])
+                      newCommodityNo = data["data"]['cCommodityNo'];
+                      setValue('cCommodityNo', newCommodityNo)
                     }
 
                     setFormItem('cKindNo', {
@@ -78,6 +83,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                       disabled: true,
                     })
                     ElMessage.success("保存成功");
+                    // 复制模式下，保存成功后通知父组件，用新 cCommodityNo 保存关联方案数据
+                    if (param.editType === 'copy' && newCommodityNo) {
+                      nextTick(() => {
+                        emit("commodity-saved", newCommodityNo);
+                      });
+                    }
                   } else {
                     ElMessage.error(msg);
                   }

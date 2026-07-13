@@ -216,7 +216,7 @@ onMounted(async () => {
       }
     });
   }
-  if(!parparam.cProdNo.startsWith("02") && deleteId > 0){ // 只有货运险,需要选择获取按钮
+  if(!parparam.cProdNo?.startsWith("02") && deleteId > 0){ // 只有货运险,需要选择获取按钮
     formconfig11.titleBtns?.splice(deleteId,1);
   }
   formconfig11.titleClass = 'card-title-style';
@@ -554,7 +554,7 @@ function deleteTermByNo(t: any) {
 }
 
 function refushCvrgInfo() {
-  if(!(parparam.cProdNo.startsWith("02") || exli.value.filter(item => item === parparam.cProdNo).length > 0 )) {
+  if(!(parparam.cProdNo?.startsWith("02") || exli.value.filter(item => item === parparam.cProdNo).length > 0 )) {
     return;
   }
   const selData: any = {
@@ -670,7 +670,7 @@ function setFormValue(value: any) {
     terms.push(newItem['Term.cClauseCode']);
     delete newItem['Term.riskList'];
 
-    if(newItem['Term.cDistCodeNo'] && parparam.cProdNo.startsWith("01")) {// Term.cDistCodeNo 01产品是下拉多选 02 是输入框选择货物后带出
+    if(newItem['Term.cDistCodeNo'] && parparam.cProdNo?.startsWith("01")) {// Term.cDistCodeNo 01产品是下拉多选 02 是输入框选择货物后带出
       newItem['Term.cDistCodeNo'] = newItem['Term.cDistCodeNo'].split(',');
     }
 
@@ -896,7 +896,7 @@ function getPlanNo() {
 }
 
 function updateInsrnc() {
-  if(parparam.cProdNo.startsWith("09")) {
+  if(parparam.cProdNo?.startsWith("09")) {
     if(formData.value['a1']?.find((i:any) => i['Term.cUniqueTermNo'] === 'P0092500119')) {
       opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeBgnTm',{ rules: [getRules("required", {})] })
       opertaor.getTableRefByKey('insrnc')?.setFormItem('Base.tGuaranteeEndTm',{ rules: [getRules("required", {})] })

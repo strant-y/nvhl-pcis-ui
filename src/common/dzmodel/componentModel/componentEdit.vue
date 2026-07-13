@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="component-edit-root">
     <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <el-row :gutter="20" style="margin-bottom: 10px">
       <el-col :span="2">
@@ -106,7 +106,7 @@ import { componentType, position, showLocation } from "@/utils/utilKey";
 const { getRules } = useValidator();
 const dialog = ref<DialogMethod | null>(null);
 import { ref, defineProps } from "vue";
-const emits = defineEmits(["ok", "cancel"]);
+const emits = defineEmits(["ok", "cancel", "handleClose"]);
 
 const dialogVisible = ref(true);
 
@@ -609,46 +609,44 @@ const exRules = {
   },
 };
 
-/** 查询 */
+/** 保存 */
 function save() {
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  let selectList = Array<any>();
-  if (tableRef.value && s.componentType !== "custom") {
-    const all = tableRef.value?.getFromValue();
-    all.forEach((item: any) => {
-      if (item.isChecked === "1") {
-        selectList.push(item);
-      }
+  freeEditRef.value?.validate().then((isValid) => {
+    if (!isValid) {
+      ElMessage.error({ message: "请填写必填项", duration: 1000 });
+      return;
+    }
+    const s = freeEditRef.value?.getFromValue(); //获取表单数据
+    let selectList = Array<any>();
+    if (tableRef.value && s.componentType !== "custom") {
+      const all = tableRef.value?.getFromValue();
+      all.forEach((item: any) => {
+        if (item.isChecked === "1") {
+          selectList.push(item);
+        }
+      });
+    }
+    const param = Object.assign(s, {
+      selectFactor: selectList,
+      titleBtns: titleBtns.value,
+      endBtns: endBtns.value,
+      editBtns: editBtns.value,
     });
-  }
-  const param = Object.assign(s, {
-    selectFactor: selectList,
-    titleBtns: titleBtns.value,
-    endBtns: endBtns.value,
-    editBtns: editBtns.value,
-  });
-  saveComponent(param)
+    saveComponent(param)
     .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        // emits("ok", {});
         ElMessage.success("保存成功");
-        formconfig1.fromSchema?.forEach((e) => {
-          if (e.prop === "componentKey") {
-            e.disabled = true;
-          }
-        });
-
-        const ct = freeEditRef.value?.getValue("componentType");
-        if (ct !== "custom") {
-          showFactorList.value = true;
-          pageQuerySelect(true);
+        if (props.method && typeof props.method.isOk === 'function') {
+          props.method.isOk({ type: "ok" });
         }
+        emits("handleClose");
       } else {
         ElMessage.error(msg);
       }
     })
     .finally(() => {});
+  });
 }
 
 function showView(cComponentKey: any) {
@@ -701,6 +699,13 @@ function querySelector(param: any) {
   });
 }
 </script>
+
+<style lang="scss">
+.el-dialog:has(.component-edit-root) .el-dialog__body {
+  max-height: 530px;
+  overflow-y: auto;
+}
+</style>
 
 <style scoped>
 .container {

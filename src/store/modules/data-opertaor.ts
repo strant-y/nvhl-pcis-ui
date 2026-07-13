@@ -631,7 +631,32 @@ function storeFactory(
     const pageKey = storeId;
     const storeRef = ref();
     if(!pageKey) {
-        storeRef.value = {};
+        // 当 pageKey 为空时（如弹窗预览场景），返回带基础方法的默认 store，避免子组件调用 getParam/setParam 报错
+        storeRef.value = {
+            getParam: () => ({}),
+            setParam: () => {},
+            getTableConfig: () => [],
+            setTableConfig: () => {},
+            getTableRefByKey: () => null,
+            addTableRef: () => {},
+            getTableRefs: () => ({}),
+            setTableRefs: () => {},
+            init: () => {},
+            setDataAll: () => {},
+            getDataAll: () => ({}),
+            convertData: () => ({}),
+            setFatherPage: () => {},
+            getFatherPage: () => ({}),
+            setDisabledAll: () => {},
+            setAddData: () => {},
+            setUnDisabledByKeyList: () => {},
+            validateAll: () => true,
+            setReadOnly: () => {},
+            mapSetData: () => {},
+            isEditScene: () => false,
+            isReadOnlyScene: () => false,
+            getProps: () => ({}),
+        };
     }else if (dataOpertaorMap.has(pageKey)) {
         storeRef.value = dataOpertaorMap.get(pageKey)
     }else if (newStore) {

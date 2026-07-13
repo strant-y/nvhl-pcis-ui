@@ -31,7 +31,7 @@ onMounted(() => {
 <style scoped lang="scss">
 /* 添加样式 */
 .system-dialog-scroll :deep(.el-dialog__body) {
-  max-height: 400px;
+  max-height: 600px;
   overflow: auto;
 }
 </style>

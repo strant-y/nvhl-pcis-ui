@@ -74,6 +74,7 @@ const tableconfig = reactive<AppTableConfig>(
     title: "操作权限-本次新增角色",
     isPage: false,
     showSelection: true,
+    maxHeight: "380px",
     fromSchema: [
       {
         prop: "cOpgrpCde",
@@ -169,10 +170,9 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
-/* Add your styles here */
-.system-dialog-scroll :deep(.el-dialog__body) {
-  max-height: 400px;
+<style lang="scss">
+.system-dialog-scroll .el-dialog__body {
+  max-height: 550px;
   overflow: auto;
 }
 </style>

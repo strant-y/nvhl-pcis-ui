@@ -241,7 +241,7 @@ function getTargetProdNo() {
 function getActiveProdNo() {
   const sourceProdNo = getSourceProdNo();
   const targetProdNo = getTargetProdNo();
-  if (param.editType === "edit") {
+  if (param.editType === "edit" || param.editType === "view") {
     return sourceProdNo;
   }
   if (param.editType === "copy") {
@@ -286,9 +286,10 @@ function handleQuery(flag?: boolean) {
   }
 }
 onMounted(() => {
-  if (param.editType == "edit" || param.editType == "copy") {
+  if (param.editType == "edit" || param.editType == "copy" || param.editType == "view") {
     handleQuery();
-  } else if (param.editType == "view") {
+  }
+  if (param.editType == "view") {
     setDisa();
     tableconfig.titleBtns.forEach((btn) => {
       btn.disabled = true;
@@ -299,11 +300,21 @@ onMounted(() => {
   }
 });
 
+/**
+ * 获取当前表格中的关联主条款数据
+ * 复制模式保存时，由父组件调用获取数据并重新绑定到新产品编码
+ */
+function getTableData() {
+  return pageresult.list;
+}
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
+  /** 暴露获取表格数据方法，供父组件在复制保存时调用 */
+  getTableData,
 });
 </script>

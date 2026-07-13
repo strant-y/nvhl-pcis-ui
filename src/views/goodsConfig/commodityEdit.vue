@@ -53,7 +53,7 @@
                   <component :ref="(res) => {
                     opertaor.addTableRef(k.pageKey, res);
                   }
-                    " :is="k.pageRef + '-ref'" />
+                    " :is="k.pageRef + '-ref'" @commodity-saved="handleCommoditySaved" />
                 </div>
               </template>
 
@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import {  saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, getEdrNmeByCde } from "@/api/prod";
+import {  saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, getEdrNmeByCde, saveCommodityPlan } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 
@@ -365,8 +365,11 @@ function handleQuery() {
 
         //  测试报告说明
         tabref6.setValue('cTestReport', dataS.cTestReport)
-        if (queryParam.editType === "edit" || queryParam.editType === "copy") {
+        if (queryParam.editType === "edit") {
           isShowTest.value = cStatus == '3' || cStatus == '6' || cStatus == '2' ? true : false;
+        } else if (queryParam.editType === "copy") {
+          // 复制模式下不显示测试报告模块
+          isShowTest.value = false;
         } else if (queryParam.editType === "upload") {
           isShowTest.value = true
         } else {
@@ -611,6 +614,42 @@ const validateForm = async () => {
 }
 const initInfo = () => {
 
+}
+
+/**
+ * 复制模式下，商品基本信息保存成功后触发
+ * 用新 cCommodityNo 将选择方案 table 中的数据重新保存绑定
+ * @param newCommodityNo 保存后返回的新商品编码
+ */
+function handleCommoditySaved(newCommodityNo: string) {
+  const choosePlanRef = opertaor.getTableRefByKey("choosePlan");
+  if (choosePlanRef && typeof choosePlanRef.getTableValue === 'function') {
+    const planList = choosePlanRef.getTableValue();
+    if (planList && planList.length > 0) {
+      // 构造保存参数，与新方案关联时需清理旧关联字段
+      const items = planList.map((item: any) => ({
+        CPlanNo: item.cPlanNo,
+        CPlanCn: item.cPlanCn,
+        CNmeCn: item.cNmeCn || item.CNmeCn,
+        CTyp: item.cIsMainProdPlan || item.CTyp,
+        cDispNme: item.cDispNme,
+        cSaleName: item.cSaleName,
+      }));
+      const param = {
+        CCommodityNo: newCommodityNo,
+        items: items,
+      };
+      saveCommodityPlan(param).then((res: any) => {
+        if (res.code === 200) {
+          ElMessage.success("方案数据已绑定到新商品编码");
+          // 刷新选择方案列表，用新商品编码查询
+          choosePlanRef.handleQuery?.();
+        } else {
+          ElMessage.error(res.msg || "方案数据保存失败");
+        }
+      });
+    }
+  }
 }
 
 

@@ -16,6 +16,7 @@ import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 import { saveProInfo, getProducts } from "@/api/prod";
+const emit = defineEmits(["prod-data-loaded", "prod-saved"]);
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { useRoute } from "vue-router";
 import { dataParam } from "@/store/modules/dataParam";
@@ -51,6 +52,13 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 if (200 === code) {
                   ElMessage.success("保存成功");
                   param?.onSaved?.(s);
+                  // 复制模式下，保存成功后通知父组件，用新 cProdNo 保存关联数据
+                  // cProdNo 由用户手动输入，从表单数据中获取，而非接口返回值
+                  if (param.editType === "copy") {
+                    nextTick(() => {
+                      emit("prod-saved", s.cProdNo);
+                    });
+                  }
                 } else {
                   ElMessage.error(msg);
                 }
@@ -332,19 +340,42 @@ function handleQuery(prodNo?: string) {
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
-        if (pageType.value === "copy") {
+        // 复制模式下，先保留原始 cProdNo 回显数据，通知父组件后再清空
+        if (param.editType === "copy") {
+          freeEditRef?.value?.setFormValue(data);
+          nextTick(() => {
+            emit("prod-data-loaded");
+          });
+        } else if (pageType.value === "copy") {
           data.cProdNo = null;
+          freeEditRef?.value?.setFormValue(data);
+        } else {
+          freeEditRef?.value?.setFormValue(data);
         }
-        freeEditRef?.value?.setFormValue(data);
       } else {
         ElMessage.error(msg);
       }
     })
     .finally(() => {});
 }
+
+/**
+ * 复制模式下，清空产品编码
+ * 在数据回显完成后，由父组件调用此方法
+ */
+function clearCopyProdNo() {
+  if (param.editType === "copy") {
+    freeEditRef?.value?.setValue("cProdNo", null);
+  }
+}
 onMounted(() => {
   if (param.editType === "edit") {
     setDisa();
+    setTimeout(() => {
+      handleQuery(param.prodNo);
+    }, 100);
+  } else if (param.editType === "copy") {
+    // 复制模式：使用原始产品编码查询数据，回显后再清空产品编码
     setTimeout(() => {
       handleQuery(param.prodNo);
     }, 100);
@@ -355,6 +386,10 @@ onMounted(() => {
     formconfig1.fromSchema?.forEach((e) => {
       e.disabled = true;
     });
+    // view 模式下禁用保存按钮，但保留返回按钮可用
+    if (formconfig1.endBtns && formconfig1.endBtns.length > 0) {
+      formconfig1.endBtns[0].disabled = true;
+    }
   } else {
     setTimeout(() => {
       freeEditRef.value?.setFormValue({
@@ -382,5 +417,7 @@ defineExpose({
   setValue,
   getValue,
   copyInitProdNo,
+  /** 暴露清空复制产品编码方法，供父组件在数据回显后调用 */
+  clearCopyProdNo,
 });
 </script>

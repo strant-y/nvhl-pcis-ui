@@ -37,6 +37,7 @@ const jsonArrayEdit = defineAsyncComponent(
 );
 const dialog = ref<DialogMethod | null>(null);
 const { getRules } = useValidator();
+const param = dataparam.getParam();
 
 const gridEditRef = ref<AppGridEditMethod | null>(null);
 
@@ -132,8 +133,8 @@ const gridconfig = reactive<AppGridEditConfig>(
             "componentPageView",
             {
               param: {
-                CprodNo: r.cProdNo,
-                CPageCde: r.cPkId,
+                cProdNo: r.cProdNo,
+                cPageCde: r.cPkId,
               },
             },
             {},
@@ -222,9 +223,37 @@ function setFormValue(value: any) {
 function getFromValue() {
   return gridEditRef?.value?.getFromValue();
 }
+
+/**
+ * 获取当前表格中的页面组件绑定数据
+ * 复制模式保存时，由父组件调用获取数据并重新绑定到新产品编码
+ */
+function getTableData() {
+  return gridEditRef.value?.getTableValue();
+}
+
+onMounted(() => {
+  // view 模式下禁用操作按钮（预览除外）和表格编辑
+  if (param?.editType === "view") {
+    gridconfig.endBtns.forEach((btn) => {
+      // 预览按钮在查看模式下保持可用
+      if (btn.label !== "预览") {
+        btn.disabled = true;
+      }
+    });
+    gridconfig.editFlag = false;
+    // 禁用表格内字段编辑
+    gridconfig.fromSchema?.forEach((e) => {
+      e.disabled = true;
+    });
+  }
+});
+
 defineExpose({
   setFormValue,
   getFromValue,
   copyInitProdNo,
+  /** 暴露获取表格数据方法，供父组件在复制保存时调用 */
+  getTableData,
 });
 </script>

@@ -101,6 +101,7 @@ const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
     showSelection: true,
     editFlag: true,
+    maxHeight: "280px",
     editList: ["cStatus"],
     titleBtns: [
       createFreeButtonBase({
