@@ -1,6 +1,8 @@
 <!-- 商品配置-》测试报告 -->
 <template>
+  <div class="componenFrom">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
+    </div>
   </template>
   
   <script setup lang="ts">

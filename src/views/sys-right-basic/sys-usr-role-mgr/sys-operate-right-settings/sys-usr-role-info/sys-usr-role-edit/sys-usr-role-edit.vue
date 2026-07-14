@@ -173,6 +173,7 @@ onMounted(() => {
 <style lang="scss">
 .system-dialog-scroll .el-dialog__body {
   max-height: 550px;
-  overflow: auto;
+   overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>

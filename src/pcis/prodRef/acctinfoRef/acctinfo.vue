@@ -69,7 +69,9 @@ onMounted(() => {
   })
 
 
+	let acctInfoRetry = 0;
 	let timer = setInterval(() => {
+		acctInfoRetry++;
 		if (!getValue('Acctinfo.cAcctNme')) {
 			setValue('Acctinfo.cAcctNme', opertaor.getDataAll()['applicant']?.['Applicant.cAppNme'])
 			let cAcctNme = getValue('Acctinfo.cAcctNme')
@@ -79,7 +81,11 @@ onMounted(() => {
 		} else {
 			clearInterval(timer); //清除定时器
 		}
-  }, 1000)
+		if (acctInfoRetry > 30) {
+			// 超过30秒仍未获取到数据（如预览模式），清除定时器避免无限循环
+			clearInterval(timer);
+		}
+	}, 1000)
 });
 
 // 获取开户行省

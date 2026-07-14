@@ -1,6 +1,8 @@
-<template>
+<template >
+  <div class="componenFrom">
   <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
   <comDialog ref="dialog"></comDialog>
+  </div>
 </template>
 
 <script setup lang="ts">

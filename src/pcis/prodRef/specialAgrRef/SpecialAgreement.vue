@@ -389,12 +389,17 @@ onMounted(async () => {
   formData.value.forEach((item, index) => {
     item.index = index + 1;
   });
+  let gettAppTmRetry = 0;
   const gettAppTm = setInterval(() => {
+    gettAppTmRetry++;
     const cInstMrk = opertaor.getTableRefByKey('base')?.getValue('Base.cInstMrk');
 		if (opertaor.getDataAll().insrnc?.['Base.tAppTm'] && cInstMrk) {
 			if (param.cRecordType != '9') {
 				refreshData();
 			}
+      clearInterval(gettAppTm);
+    } else if (gettAppTmRetry > 60) {
+      // 超过30秒仍未获取到数据（如预览模式），清除定时器避免无限循环
       clearInterval(gettAppTm);
     }
   }, 500)

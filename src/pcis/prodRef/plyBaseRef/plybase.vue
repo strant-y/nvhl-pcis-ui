@@ -115,9 +115,9 @@ onMounted(async () => {
     getCheckCdeptByCdptCde();
 		//回显机构部门数据
 		let label = param.cDptCnm
-		 if (!param.cDptCnm) {
+		if (!param.cDptCnm) {
 			const response = await getDeptOptions(param.cDptCde);
-			if (response.data.length>0) {
+			if (response.data && response.data.length>0) {
 				label = response.data[0]["label"]
 			}
 		}

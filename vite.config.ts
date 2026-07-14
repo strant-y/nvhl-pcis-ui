@@ -23,9 +23,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     case 'development':
       return 'http://10.12.18.165:9080/' // DEV环境
     case 'uat':
-      return 'http://10.12.18.114:9080/' // UAT环境
+      // return 'http://10.12.18.114:9080/' // UAT环境
       //  return 'http://192.168.1.124:9080/'
-        // return 'http://127.0.0.1:9080/'
+        return 'http://127.0.0.1:9080/'
     case 'verification':
       return 'http://10.4.18.99:9082/' // verification发布
     case 'pre':

@@ -120,9 +120,9 @@ onMounted(async () => {
 		// 协议出单-收费方式、付费约定、缴费期数设置不可编辑
 		//回显出单机构
 		let label = params.cDptCnm
-		 if (!params.cDptCnm) {
+		if (!params.cDptCnm) {
 			const response = await getDeptOptions(params.cDptCde);
-			if (response.data.length>0) {
+			if (response.data && response.data.length>0) {
 				label = response.data[0]["label"]
 			}
 		}

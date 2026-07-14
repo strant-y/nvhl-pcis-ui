@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="componenFrom">
     <app-grid-edit v-model:gridEditConfig="gridconfig" ref="gridEditRef" />
     <comDialog ref="dialog"></comDialog>
   </div>

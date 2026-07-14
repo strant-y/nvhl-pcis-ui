@@ -22,6 +22,15 @@
 <script setup lang="ts">
 import { useValidator } from "@/typings/useValidator";
 import { dataParam } from "@/store/modules/dataParam";
+import { idxParamKey, IdxParamProps, useIdxParam } from "@/views/pcis/support/useIdxParam";
+
+// 提供独立的 idxParam，隔离预览组件的 dataOpertaor store，
+// 避免与父页面共享 store 导致 getDataAll() 被循环调用
+const previewIdxParam: IdxParamProps = useIdxParam({
+  opertaorProps: { id: 'componentPageView-preview' },
+  cdeListViewProps: { id: 'componentPageView-preview' },
+});
+provide(idxParamKey, previewIdxParam);
 
 const currentIndex = ref(0);
 const formconfig1 = ref({});

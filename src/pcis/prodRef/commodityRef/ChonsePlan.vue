@@ -1,8 +1,8 @@
 <!--商品配置-选择方案列表-->
 <template>
-  <div>
-    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
-    <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
+  <div class="callComponentCalls">
+    <app-free-edit custom-class="componentCalls" v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+    <app-table custom-class="tableComponentCalls" :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
       @page-change="handleQuery(false)" />
   </div>
 

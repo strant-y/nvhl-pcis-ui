@@ -1,5 +1,5 @@
 <template>
-  <div class="searchbar">
+  <div class="searchbar" :class="customClass">
     <el-card
         shadow="hover"
         :class="['card_container', 'table-container',tableConfig.titleBtns.length > 0 ? 'table_header_has-title-btns' : 'table_header']"
@@ -155,6 +155,11 @@ const props = defineProps({
   pageresult: {
     type: Object as () => Pageresult,
     required: true,
+  },
+
+  customClass: {
+    type: String,
+    default: "",
   },
 });
 

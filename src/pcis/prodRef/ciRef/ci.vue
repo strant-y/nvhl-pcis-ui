@@ -78,8 +78,9 @@ onMounted(async () => {
     }
   })
   // 获取页面初始化的时候获取的组件配置信息
-  if (opertaor.getFatherPage() && opertaor.getFatherPage().getOldProductResData() && opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo) {
-    oldPageSchema.value = opertaor.getFatherPage().getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
+  const fatherPage = opertaor.getFatherPage();
+  if (fatherPage && typeof fatherPage.getOldProductResData === 'function' && fatherPage.getOldProductResData() && fatherPage.getOldProductResData()[0]?.pageInfo) {
+    oldPageSchema.value = fatherPage.getOldProductResData()[0]?.pageInfo.find((item: any) => item.pageCode === props.compKey).pageSchema || {};
     // 如果团个单标识为团单则展示关联被保险人，否则隐藏
     if (route.params.param?.cGrpMrk !== '1') {
       oldPageSchema.value.fromSchema = oldPageSchema.value.fromSchema.filter((item: any) => item.prop !== 'Dist.cRelatedInsured')

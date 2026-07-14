@@ -1,7 +1,8 @@
 <template>
-  <div class="" style="padding-top: 6px">
-    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <div class="callComponentCalls" >
+    <app-free-edit custom-class="componentCalls" v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
+    custom-class="tableComponentCalls"
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"

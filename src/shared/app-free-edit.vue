@@ -1,5 +1,5 @@
 <template>
-  <div v-if="freeEditConfig" class="freeedit free_container">
+  <div v-if="freeEditConfig" class="freeedit free_container" :class="customClass">
     <div class="searchbar">
       <el-row :gutter="16">
         <el-col :md="24">
@@ -130,6 +130,10 @@ const props = defineProps({
   freeEditConfig: {
     type: Object as () => AppFreeEditConfig,
     required: true,
+  },
+  customClass: {
+    type: String,
+    default: "",
   },
 });
 const codeListMap = ref<any>({});

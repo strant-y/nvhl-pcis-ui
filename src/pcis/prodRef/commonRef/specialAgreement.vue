@@ -1,13 +1,15 @@
 <!--特别约定-->
 <template>
-  <div class="">
-    <app-free-edit v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
+  <div class="callComponentCalls" >
+    <app-free-edit custom-class="componentCalls" v-model:freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table
+    custom-class="tableComponentCalls"
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
       @page-change="handleQuery(false)"
       @refreshParent="handleQuery(false)"
+      
     />
   </div>
 </template>

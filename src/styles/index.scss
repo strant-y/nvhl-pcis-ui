@@ -158,5 +158,21 @@
 
 }
 
+// 组件调用容器公共样式（关联主条款、关联特别约定、关联责任等）
+.callComponentCalls {
+  background-color: #fff;
+  margin-top: 20px;
+}
+
+.componentCalls .card_container {
+  border: 0px;
+}
+
+.tableComponentCalls .card_container {
+  border: 0px;
+}
+.componenFrom{
+   margin-top: 20px;
+}
 
 
