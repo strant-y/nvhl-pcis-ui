@@ -6,6 +6,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
+      :loading="loading"
       @page-change="handleQuery(false)"
     />
     <comDialog ref="dialog"></comDialog>
@@ -18,7 +19,7 @@ import { formatActionTitle } from "@/utils/action-title";
 const { getRules } = useValidator();
 const router = useRouter();
 
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import {
   AppFreeEditConfig,
   createAppFreeEditConfig,
@@ -27,6 +28,7 @@ import {
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
+const loading = ref(false);
 import { createFreeButtonBase } from "@/shared/button-config";
 import {
   AppTableConfig,
@@ -318,7 +320,11 @@ function setDisa() {
     }
   });
 }
-onMounted(() => {});
+onMounted(() => {
+  nextTick(() => {
+    handleQuery();
+  });
+});
 
 // 绑定方法
 const method = {
@@ -341,10 +347,11 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  qryProdTermList(param)
+  loading.value = true;
+const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+const s = freeEditRef.value?.getFromValue(); //获取表单数据
+const param = Object.assign(s, r);
+qryProdTermList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -354,7 +361,9 @@ function handleQuery(flag?: boolean) {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .finally(() => {
+    loading.value = false;
+  });
 }
 </script>
 

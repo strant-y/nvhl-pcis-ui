@@ -2,12 +2,12 @@
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-      @page-change="handleQuery(false)" />
+      :loading="loading" @page-change="handleQuery(false)" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, nextTick } from 'vue';
 import {  ElMessage } from 'element-plus';
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
 import { useRouter } from 'vue-router';
@@ -29,6 +29,7 @@ import { getActionLabel } from "@/utils/action-title";
 import { useUserStore } from "@/store/modules/user";
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
+const loading = ref(false);
 const { getRules } = useValidator();
 
 const router = useRouter()
@@ -132,6 +133,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "400px",
     tableBtnType: "btn",
     tableBtnWidth: 220,
     tableBtnPosition: "right",
@@ -344,6 +346,7 @@ const handleQuery = (flag = true) => {
 }
 
 const refreshData = (reset = true) => {
+  loading.value = true;
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
@@ -355,18 +358,20 @@ const refreshData = (reset = true) => {
         pageresult.total = pageData.total;
         pageresult.list = [];
         pageresult.list= pageData.result
-        // pageData.result.forEach(value => {
-        //   const data: any = dtofirstCharUpper(value, 'PrdProdPlan');
-        //   pageresult.list.push(data);
-        // });
       }
     } else {
       ElMessage.error(result['msg']);
     }
+  }).finally(() => {
+    loading.value = false;
   });
 };
 
 onMounted(() => {
+  nextTick(() => {
+    freeEditRef.value?.setValue("cUndrStatus", "1");
+    handleQuery();
+  });
 });
 
 function setFormItem(prop: string, config: any) {

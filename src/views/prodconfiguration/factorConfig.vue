@@ -1,4 +1,4 @@
-<!-- 用户管理 -->
+
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -99,6 +99,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "400px",
     titleBtns: [
       createFreeButtonBase({
         id: "score",

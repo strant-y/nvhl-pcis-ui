@@ -2,12 +2,12 @@
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
     <app-table :tableConfig="tableconfig" v-model:pageresult="pageresult" ref="tableRef"
-      @page-change="handleQuery(false)" />
+      :loading="loading" @page-change="handleQuery(false)" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { defineComponent, ref, reactive, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
@@ -29,6 +29,7 @@ const userStore = useUserStore();
 const user = ref(userStore.user);
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
+const loading = ref(false);
 const router = useRouter()
 const policyService = new PolicyService();
 const { getRules } = useValidator();
@@ -130,6 +131,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "420px",
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -361,6 +363,7 @@ const handleQuery = (flag) => {
 }
 
 const refreshData = (reset = false) => {
+  loading.value = true;
   const r = tableRef.value?.getPartnerPage(reset); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
@@ -375,11 +378,6 @@ const refreshData = (reset = false) => {
           : [];
       pageresult.total = Number(pageData?.total) || resultList.length || 0;
       pageresult.list = resultList;
-      // resultList.forEach(value => {
-      //   const data = dtofirstCharUpper(value, 'PrdProdPlan');
-      //   console.log(data)
-      //   pageresult.list.push(value);
-      // });
     } else {
       pageresult.total = 0;
       pageresult.list = [];
@@ -389,6 +387,8 @@ const refreshData = (reset = false) => {
     pageresult.total = 0;
     pageresult.list = [];
     console.error("searchPlan error:", error);
+  }).finally(() => {
+    loading.value = false;
   });
 };
 function setFormItem(prop: string, config: any) {
@@ -399,6 +399,9 @@ function setFormItem(prop: string, config: any) {
     });
 }
 onMounted(() => {
+  nextTick(() => {
+    handleQuery();
+  });
 });
 </script>
 

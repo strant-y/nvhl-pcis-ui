@@ -5,6 +5,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
+      :loading="loading"
       @page-change="handleQuery(false)"
     />
   </div>
@@ -24,7 +25,7 @@ import {
   createTableEditConfig,
 } from "@/shared/app-table-config";
 import { useRoute } from "vue-router";
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, nextTick } from "vue";
 import { getProFactoryList, changeStatus } from "@/api/prod";
 import { descryptParameter } from "@/utils/encipher";
 const route = useRoute();
@@ -34,6 +35,7 @@ const param = JSON.parse(query.value?.param ? descryptParameter(query.value.para
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
 const tableRef = ref<AppTableMethod | null>(null);
+const loading = ref(false);
 
 
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -113,6 +115,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "400px",
     // titleBtns: [
     //   createFreeButtonBase({
     //     id: "add-edrRsn",
@@ -312,10 +315,11 @@ function setDisa() {
 }
 /** 查询 */
 function handleQuery() {
-  const r = tableRef.value?.getPartnerPage(); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getProFactoryList(param)
+  loading.value = true;
+const r = tableRef.value?.getPartnerPage(); //获取分页数据
+const s = freeEditRef.value?.getFromValue(); //获取表单数据
+const param = Object.assign(s, r);
+getProFactoryList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -325,12 +329,17 @@ function handleQuery() {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .finally(() => {
+    loading.value = false;
+  });
 }
 onMounted(() => {
   if (param.editType === "edit") {
     setDisa();
   }
+  nextTick(() => {
+    handleQuery();
+  });
 });
 
 defineExpose({

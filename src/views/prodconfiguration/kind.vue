@@ -6,6 +6,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
+      :loading="loading"
       @page-change="handleQuery(false)"
     />
   </div>
@@ -15,7 +16,7 @@
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -40,6 +41,7 @@ import { useDzModal } from "@/common/dzmodel/DzModalService";
 const dzmodal = useDzModal();
 const kindEdit = defineAsyncComponent(() => import("./kindEdit.vue"));
 const tableRef = ref<AppTableMethod | null>(null);
+const loading = ref(false);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -177,7 +179,11 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {});
+onMounted(() => {
+  nextTick(() => {
+    handleQuery();
+  });
+});
 
 // 绑定方法
 const method = {
@@ -200,10 +206,11 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
-  const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getBasicKindList(param)
+  loading.value = true;
+const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
+const s = freeEditRef.value?.getFromValue(); //获取表单数据
+const param = Object.assign(s, r);
+getBasicKindList(param)
     .then((res) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -214,7 +221,9 @@ function handleQuery(flag?: boolean) {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .finally(() => {
+    loading.value = false;
+  });
 }
 </script>
 

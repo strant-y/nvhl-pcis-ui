@@ -116,6 +116,11 @@ const prodauditConfig = {
   pageTtile: "产品审核",
   pageRef: "prodaudit",
 };
+const approvalFlowConfig = {
+  pageKey: "approvalFlow",
+  pageTtile: "审批流程",
+  pageRef: "approvalFlow",
+};
 
 opertaor.setTableConfig([
   {
@@ -126,6 +131,11 @@ opertaor.setTableConfig([
         pageKey: "prodaudit",
         pageTtile: "产品审核",
         pageRef: "prodaudit",
+      },
+      approvalFlow: {
+        pageKey: "approvalFlow",
+        pageTtile: "审批流程",
+        pageRef: "approvalFlow",
       },
       prodInfo: {
         pageKey: "prodInfo",
@@ -159,10 +169,17 @@ opertaor.setTableConfig([
 const anchorRef = ref(null);
 onMounted(() => {
   formconfig1.forEach((ele) => {
+    // 产品审核：仅在 approve + 非查看 模式下显示
     if (param.type !== "approve" || param.editType === "view") {
       delete ele.pageInfo.prodaudit;
     } else if (!ele.pageInfo.prodaudit) {
       ele.pageInfo.prodaudit = { ...prodauditConfig };
+    }
+    // 审批流程：仅在 approve 模式下显示（含查看）
+    if (param.type !== "approve") {
+      delete ele.pageInfo.approvalFlow;
+    } else if (!ele.pageInfo.approvalFlow) {
+      ele.pageInfo.approvalFlow = { ...approvalFlowConfig };
     }
   });
   renderComponents();
@@ -317,6 +334,8 @@ function toggleAside() {
 }
 
 const iconMap = {
+  'prodaudit': 'icon-shenhe',
+  'approvalFlow': 'icon-shenhelishi',
   'prodInfo': 'icon-wenjianban1',
   'relatedMainInsurance': 'icon-zaibaoxinxi',
   'specialAgreement': 'icon-anjiantiaocha',

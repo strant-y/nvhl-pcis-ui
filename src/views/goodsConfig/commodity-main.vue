@@ -6,6 +6,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
+      :loading="loading"
       @page-change="handleQuery(false)"
     />
   </div>
@@ -15,7 +16,7 @@
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 const router = useRouter();
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import {
   AppFreeEditConfig,
   AppFreeEditMethod,
@@ -36,6 +37,7 @@ import { delUndrClsById, qryCommodityBasePage } from "@/api/prod";
 const dzmodal = useDzModal();
 
 const tableRef = ref<AppTableMethod | null>(null);
+const loading = ref(false);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -132,6 +134,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "370px",
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -354,7 +357,11 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {});
+onMounted(() => {
+  nextTick(() => {
+    handleQuery();
+  });
+});
 
 // 绑定方法
 const method = {
@@ -377,6 +384,7 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(flag?: boolean) {
+  loading.value = true;
   const r = tableRef.value?.getPartnerPage(flag); //获取分页数据
   const s = freeEditRef.value?.getFromValue(); //获取表单数据
   const param = Object.assign(s, r);
@@ -390,7 +398,9 @@ function handleQuery(flag?: boolean) {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .finally(() => {
+      loading.value = false;
+    });
 }
 </script>
 

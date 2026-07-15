@@ -1,4 +1,4 @@
-<!-- 用户管理 -->
+
 <template>
   <div class="app-container">
     <app-free-edit :freeEditConfig="formconfig1" ref="freeEditRef" />
@@ -53,6 +53,7 @@
       :tableConfig="tableconfig"
       v-model:pageresult="pageresult"
       ref="tableRef"
+      :loading="loading"
       @page-change="handleQuery(false)"
     />
 
@@ -64,7 +65,7 @@
 import { useValidator } from "@/typings/useValidator";
 const { getRules } = useValidator();
 
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { formatActionTitle } from "@/utils/action-title";
 import {
   AppFreeEditConfig,
@@ -89,6 +90,7 @@ import {
 } from "@/api/prod";
 
 const tableRef = ref<AppTableMethod | null>(null);
+const loading = ref(false);
 const dialog = ref<DialogMethod | null>(null);
 const compareList = ref<any>([]);
 const formconfig1 = reactive<AppFreeEditConfig>(
@@ -176,6 +178,7 @@ const pageresult = reactive<Pageresult>({
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "435px",
     titleBtns: [
       createFreeButtonBase({
         id: "score",
@@ -346,7 +349,11 @@ const tableconfig = reactive<AppTableConfig>(
   })
 );
 
-onMounted(async () => {});
+onMounted(() => {
+  nextTick(() => {
+    handleQuery();
+  });
+});
 function showView(type: string, cComponentKey: any) {
   getComponentViewByKey({
     componentKey: cComponentKey,
@@ -418,10 +425,11 @@ const exRules = {
 
 /** 查询 */
 function handleQuery(type?: boolean) {
-  const r = tableRef.value?.getPartnerPage(type); //获取分页数据
-  const s = freeEditRef.value?.getFromValue(); //获取表单数据
-  const param = Object.assign(s, r);
-  getComponentList(param)
+  loading.value = true;
+const r = tableRef.value?.getPartnerPage(type); //获取分页数据
+const s = freeEditRef.value?.getFromValue(); //获取表单数据
+const param = Object.assign(s, r);
+getComponentList(param)
     .then((res: any) => {
       const { code, data, msg } = res;
       if (200 === code) {
@@ -431,7 +439,9 @@ function handleQuery(type?: boolean) {
         ElMessage.error(msg);
       }
     })
-    .finally(() => {});
+    .finally(() => {
+    loading.value = false;
+  });
 }
 </script>
 

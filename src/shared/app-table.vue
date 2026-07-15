@@ -1,5 +1,5 @@
 <template>
-  <div class="searchbar" :class="customClass">
+  <div class="searchbar" :class="customClass" v-loading="loading">
     <el-card
         shadow="hover"
         :class="['card_container', 'table-container',tableConfig.titleBtns.length > 0 ? 'table_header_has-title-btns' : 'table_header']"
@@ -160,6 +160,10 @@ const props = defineProps({
   customClass: {
     type: String,
     default: "",
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 });
 

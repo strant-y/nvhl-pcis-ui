@@ -2,6 +2,7 @@ import Vue from "vue";
 
 // 产品配置使用的组件
 import prodaudit from "./commonRef/prodaudit.vue";
+import approvalFlow from "./commonRef/approvalFlow.vue";
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
 import prodComponent from "./commonRef/prodComponent.vue";
@@ -126,6 +127,7 @@ import cFinancingGuarantee from "./commodityRef/cFinancingGuarantee.vue" //融�
 const componentMap = {
   // 产品配置使用的组件
   prodauditRef: prodaudit,
+  approvalFlowRef: approvalFlow,
   prodInfoRef: prodInfo,
   relatedMainInsuranceRef: relatedMainInsurance,
   prodComponentRef: prodComponent,
