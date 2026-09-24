@@ -1,8 +1,141 @@
 @use "./reset";
 
+// ============================================================
+// Design Token 运行时输出
+// 由 vite additionalData 全局注入的 design-token.scss 提供 mixin
+// 输出 --dt-* 项目自有 token 与 --el-* Element Plus 桥接映射
+// ============================================================
+@include design-token-root;
+
+// 页面内容容器：灰底之上的白色卡片（Ant Design Pro 式），全站页面自动生效
 .app-container {
-  padding: 6px;
-  // margin-bottom: 80px
+  margin: 16px;
+  padding: 24px;
+  background-color: var(--el-bg-color);
+  border-radius: $radius-large;
+  box-shadow: $shadow-card;
+  min-height: calc(100vh - #{$navbar-height} - #{$tags-view-height} - #{$page-header-height} - 35px);
+}
+
+// ============================================================
+// 表单控件统一样式（飞书表单风格）
+// 圆角 6px + Focus 蓝色强调；错误态 Focus 保持红色
+// html 前缀保证特异性 (0,x,1) 稳定胜过 Element Plus 默认样式，
+// 且低于业务侧 input-group 拼接圆角规则，不影响组合控件
+// ============================================================
+html .el-input__wrapper,
+html .el-textarea__inner,
+html .el-select__wrapper {
+  border-radius: $form-control-radius;
+}
+
+// Focus 蓝色强调：内 1px 主色描边 + 外 3px 浅色光环
+html .el-input__wrapper:focus-within,
+html .el-textarea__inner:focus,
+html .el-select__wrapper.is-focused {
+  box-shadow:
+    0 0 0 1px var(--el-color-primary) inset,
+    0 0 0 3px var(--el-color-primary-light-8);
+}
+
+// 错误态 Focus：红色描边 + 红色光环（校验提示不受影响）
+html .el-form-item.is-error .el-input__wrapper:focus-within,
+html .el-form-item.is-error .el-textarea__inner:focus,
+html .el-form-item.is-error .el-select__wrapper.is-focused {
+  box-shadow:
+    0 0 0 1px var(--el-color-danger) inset,
+    0 0 0 3px var(--el-color-danger-light-8);
+}
+
+// Label 统一：字号 13px + 次要灰（消费运行时变量，
+// 与 custom-form 及像素比缩放机制同源；覆盖 custom-form 之外的原生表单）
+html .el-form-item__label {
+  font-size: var(--rt-form-label-font-size);
+  color: var(--rt-form-label-font-color);
+}
+
+// ============================================================
+// 按钮统一样式（飞书风格）
+// Primary / Secondary / Danger 统一：高度 32px、圆角 6px、间距 12px
+// ============================================================
+html .el-button {
+  border-radius: $button-radius;
+}
+
+// 默认尺寸按钮统一高度（排除 link 按钮，避免表格操作列行高被撑大；
+// small/large 尺寸不受影响）
+html .el-button--default:not(.is-link) {
+  height: $button-height;
+}
+
+// 相邻按钮统一间距
+html .el-button + .el-button {
+  margin-left: $button-gap;
+}
+
+// 按钮组外侧圆角跟随统一圆角（组内直角规则特异性更高，不受影响）
+html .el-button-group .el-button:first-child {
+  border-top-left-radius: $button-radius;
+  border-bottom-left-radius: $button-radius;
+}
+html .el-button-group .el-button:last-child {
+  border-top-right-radius: $button-radius;
+  border-bottom-right-radius: $button-radius;
+}
+
+// ============================================================
+// 弹窗统一样式（飞书风格）
+// 圆角 8px；标题 16px 半粗；标题/内容/footer 统一 24px 内边距
+// ============================================================
+html .el-dialog {
+  padding: 0;
+  border-radius: $radius-large;
+}
+
+html .el-dialog__header {
+  padding: 24px 24px 0;
+}
+
+// 带关闭按钮时预留足够空间，避免长标题与关闭按钮重叠
+html .el-dialog__header.show-close {
+  padding-right: 48px;
+}
+
+html .el-dialog__title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+// 内容区域 padding 24px
+html .el-dialog__body {
+  padding: $dialog-body-padding;
+}
+
+// footer 右对齐按钮（EP 默认 text-align: right 保留），间距与内容区对齐
+html .el-dialog__footer {
+  padding: 0 24px 24px;
+}
+
+// 弹窗内表格 400px 上限 + 内部滚动（el-table 根节点 max-height 与
+// 官方 prop 实现等价；已通过 tableConfig.maxHeight 配置的表格
+// 走内联样式，优先级更高，不受此规则影响）
+html .el-dialog__body .el-table {
+  max-height: $dialog-table-max-height;
+}
+
+// ============================================================
+// 表格变量元素级覆盖
+// EP 将 --el-table-* 定义在 .el-table 元素自身（如
+// --el-table-header-text-color: var(--el-text-color-secondary)），
+// 元素级声明会遮蔽 :root 桥接，故必须在元素级重新声明 token。
+// html:not(.dark) 限定仅亮色模式生效；暗黑模式继续走
+// EP 变量链的自适应默认值
+// ============================================================
+html:not(.dark) .el-table {
+  --el-table-header-bg-color: #{$table-header-background};
+  --el-table-header-text-color: #{$table-header-text-color};
+  --el-table-row-hover-bg-color: #{$table-row-hover-background};
+  --el-table-border-color: #{$table-border-color};
 }
 
 .app-button-margin5 {

@@ -58,7 +58,10 @@ const param = dataparam.getParam();
 const { getRules } = useValidator();
 
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
-const tabref = opertaor.getTableRefByKey("prodInfo");
+/** 动态获取 prodInfo 组件引用，避免 setup 阶段 prodInfo 尚未注册导致 tabref 为 undefined */
+function getProdInfoRef() {
+  return opertaor.getTableRefByKey("prodInfo");
+}
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     title: "关联特别约定",
@@ -125,7 +128,7 @@ const tableconfig = reactive<AppTableConfig>(
           if (!assertCopyTargetReady()) {
             return;
           }
-          if (tabref.getFromValue().cProdNo == null) {
+          if (!getProdInfoRef() || getProdInfoRef().getFromValue()?.cProdNo == null) {
             ElMessage.error("产品编码为空,请保存后操作!");
             return;
           } else {
@@ -311,7 +314,7 @@ function getSourceProdNo() {
   return param?.prodNo || param?.prod?.cProdNo || "";
 }
 function getTargetProdNo() {
-  return tabref?.getFromValue?.()?.cProdNo || "";
+  return getProdInfoRef()?.getFromValue?.()?.cProdNo || "";
 }
 function getActiveProdNo() {
   const sourceProdNo = getSourceProdNo();

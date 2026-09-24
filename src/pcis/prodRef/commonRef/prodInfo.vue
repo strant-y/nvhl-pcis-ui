@@ -125,24 +125,24 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         title: "中文简称",
         clearable: true,
       },
-      {
-        prop: "cPlynoFlag",
-        inputtype: "rtcheckbox",
-        title: "手工录入保单号",
-        clearable: true,
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-        func: (val) => {
-          console.log(val);
-        },
-      },
-      {
-        prop: "cDispOrd",
-        inputtype: "rtinput",
-        title: "显示顺序",
-      },
+      // {
+      //   prop: "cPlynoFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: "手工录入保单号",
+      //   clearable: true,
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      //   func: (val) => {
+      //     console.log(val);
+      //   },
+      // },
+      // {
+      //   prop: "cDispOrd",
+      //   inputtype: "rtinput",
+      //   title: "显示顺序",
+      // },
       {
         prop: "nCriterionTime",
         inputtype: "rtnumber",
@@ -159,16 +159,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         codeParam: { cParCde: "CriterionUnit" },
         clearable: true,
       },
-      {
-        prop: "cFincvrgFlag",
-        inputtype: "rtcheckbox",
-        title: "按险别核算标志",
-        clearable: true,
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
+      // {
+      //   prop: "cFincvrgFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: "按险别核算标志",
+      //   clearable: true,
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
       {
         prop: "cInsrncLong",
         inputtype: "rtselect",
@@ -176,16 +176,16 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         typeCode: "WEB_SYS_STA_DICT",
         codeParam: { cParCde: "longshortIns" },
       },
-      {
-        prop: "cClmedrFlag",
-        inputtype: "rtcheckbox",
-        title: " 赔款后生成减保额批单",
-        clearable: true,
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
+      // {
+      //   prop: "cClmedrFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 赔款后生成减保额批单",
+      //   clearable: true,
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
       {
         prop: "cPerFlag",
         inputtype: "rtcheckbox",
@@ -204,12 +204,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           n: "0",
         },
       },
-      {
-        prop: "cIsSelect",
-        inputtype: "rtselect",
-        title: " 是否展示所有条款",
-        loadData: yesOrNo,
-      },
+      // {
+      //   prop: "cIsSelect",
+      //   inputtype: "rtselect",
+      //   title: " 是否展示所有条款",
+      //   loadData: yesOrNo,
+      // },
       {
         prop: "tBgnTm",
         inputtype: "rtdatepicker",
@@ -233,48 +233,48 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           valueFormat: "YYYY-MM-DD HH:mm:ss",
           format: "YYYY-MM-DD HH:mm:ss",
       },
-      {
-        prop: "cSepaCvrgFlag",
-        inputtype: "rtcheckbox",
-        title: " 主条款和附加条款是否分开",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
-      {
-        prop: "cPkgFlag",
-        inputtype: "rtcheckbox",
-        title: " 是否组合产品",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
-      {
-        prop: "cAddType",
-        inputtype: "rtselect",
-        title: " 利率类型",
-        typeCode: "RECEIVE_BANK_CATEGORY",
-        clearable: true,
-        codeParam: { cParCde: "addtype" },
-      },
-      {
-        prop: "descri",
-        inputtype: "rtinput",
-        type: "textarea",
-        title: " 利率描述",
-        itemWidth: 2,
-      },
-      {
-        prop: "cFamilyFlag",
-        inputtype: "rtcheckbox",
-        title: " 是否家庭单",
-        keymap: {
-          y: "1",
-          n: "0",
-        },
-      },
+      // {
+      //   prop: "cSepaCvrgFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 主条款和附加条款是否分开",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
+      // {
+      //   prop: "cPkgFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 是否组合产品",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
+      // {
+      //   prop: "cAddType",
+      //   inputtype: "rtselect",
+      //   title: " 利率类型",
+      //   typeCode: "RECEIVE_BANK_CATEGORY",
+      //   clearable: true,
+      //   codeParam: { cParCde: "addtype" },
+      // },
+      // {
+      //   prop: "descri",
+      //   inputtype: "rtinput",
+      //   type: "textarea",
+      //   title: " 利率描述",
+      //   itemWidth: 2,
+      // },
+      // {
+      //   prop: "cFamilyFlag",
+      //   inputtype: "rtcheckbox",
+      //   title: " 是否家庭单",
+      //   keymap: {
+      //     y: "1",
+      //     n: "0",
+      //   },
+      // },
       // {
       //   prop: "cCvrgTypFlag",
       //   inputtype: "rtselect",

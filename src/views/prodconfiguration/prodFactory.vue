@@ -181,7 +181,7 @@ const tableconfig = reactive<AppTableConfig>(
         type: "success",
         icon: "Edit",
         hideBtns: (row) =>
-          row.cAuditStatus === "audit",
+          row.cAuditStatus === "audit" || row.cAuditStatus === "submit",
         tableClick: (row) => {
           router.push({
             path: "/prodconfiguration/prodFactoryInfo",
@@ -308,28 +308,28 @@ const tableconfig = reactive<AppTableConfig>(
           debounceChangeStatus(row, val);
         },
       },
-      {
-        prop: "cAuditStatus",
-        inputtype: "rttag",
-        title: "审核状态",
-        loadData: [
-          {
-            label: "已提交",
-            value: "submit",
-            color: "#67C23A",
-          },
-          {
-            label: "未提交",
-            value: "unsubmit",
-            color: "#14CCCC",
-          },
-          {
-            label: "已审核",
-            value: "audit",
-            color: "##409EFF",
-          },
-        ],
-      },
+      // {
+      //   prop: "cAuditStatus",
+      //   inputtype: "rttag",
+      //   title: "审核状态",
+      //   loadData: [
+      //     {
+      //       label: "已提交",
+      //       value: "submit",
+      //       color: "#67C23A",
+      //     },
+      //     {
+      //       label: "未提交",
+      //       value: "unsubmit",
+      //       color: "#14CCCC",
+      //     },
+      //     {
+      //       label: "已审核",
+      //       value: "audit",
+      //       color: "##409EFF",
+      //     },
+      //   ],
+      // },
     ],
   })
 );

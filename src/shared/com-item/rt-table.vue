@@ -31,7 +31,7 @@
       :span-method="objectSpanMethod"
       @current-change="currentChange"
       :cell-style="getCellStyle"
-      :header-cell-style="{color: '#000', fontWeight: 450, padding: '2px 2px'}"
+      :header-cell-style="{ fontWeight: 500 }"
       class="custom-table"
       :preserve-expanded-content="item.preserveExpandedContent ? item.preserveExpandedContent : false"
     >
@@ -320,6 +320,10 @@
               </div>
         </template>
       </el-table-column>
+      <!-- 空状态：居中插图 + 提示文字（飞书式） -->
+      <template #empty>
+        <el-empty :image-size="72" description="暂无数据" />
+      </template>
     </el-table>
     <el-button
         v-if="props.item.bottomBtn && !props.item.bottomBtn.hidden"
@@ -391,11 +395,11 @@ const calculatedLabelWidth = () => {
 const getCellStyle = (row: Record<string, any>) => {
   if(!props.item.editFlag) {
     return {
-      padding: '1px 1px'
+      padding: '14px 8px'
     }
   }else {
     return {
-      padding: '2px'
+      padding: '8px 8px'
     }
   }
 };
@@ -1011,7 +1015,12 @@ function isrequired(i: any) {
 :deep(.el-table .cell) {
   /* white-space: nowrap; */
   line-height: 16px;
-  padding: 0 2px;
+  padding: 0 6px;
+}
+
+// 表头单元格内边距（飞书式：表头行高约 40px，颜色由 --el-table-header-* token 控制）
+:deep(.el-table th.el-table__cell) {
+  padding: 12px 8px;
 }
 
 :deep(.el-table td.el-table__cell div.cell) {
@@ -1022,27 +1031,37 @@ function isrequired(i: any) {
   justify-content: center;
   align-items: center;
 }
-:deep(.el-table__empty-block){
-  min-height: 30px !important;
+// 空状态：为插图式空状态留出呼吸空间（替代原先 30px 压缩文本）
+:deep(.el-table__empty-block) {
+  min-height: 160px;
 }
-:deep(.el-table__empty-text){
-  line-height: 30px !important;
+:deep(.el-table__empty-block .el-empty) {
+  padding: 24px 0;
+}
+:deep(.el-table__empty-block .el-empty__description p) {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
 }
 /* 表头居中对齐 */
 :deep(.el-table th.is-left div.cell) {
   text-align: center;
 }
+// 操作列：轻量网格布局，按钮居中并保留间距
 .methodColumn {
   display: grid;
-  grid-template-columns: 1ft;
+  grid-template-columns: 1fr;
+  gap: 4px 12px;
+  align-items: center;
+  justify-items: center;
 }
-.methodColumn.multiple-items {  // 如果只有一列,居中显示
+.methodColumn.multiple-items {  // 多按钮时两列排布
   grid-template-columns: repeat(2, 1fr);
 }
 :deep(.methodColumn .el-button+.el-button) {
   margin-left: 0;
 }
+// 行悬停整行高亮：统一走 design token（#f5f6f7），条纹行保持一致
 :deep(.el-table__body tr.hover-row>td.el-table__cell),:deep(.el-table__body tr.el-table__row--striped.hover-row>td.el-table__cell) {
-  background-color: #e1e8f2;
+  background-color: var(--el-table-row-hover-bg-color);
 }
 </style>

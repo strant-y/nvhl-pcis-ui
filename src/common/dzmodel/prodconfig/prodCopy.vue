@@ -64,7 +64,7 @@ const exRules = {};
 onMounted(async () => {
   nextTick(() => {
     prodInfoRef.value.copyInitProdNo(props.data.prodNo);
-    getProdInfos({ prodNo: props.data.prodNo })
+    getProdInfos({ cProdNo: props.data.prodNo })
       .then((res) => {
         const { code, data, msg } = res;
         if (200 === code) {

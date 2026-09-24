@@ -18,6 +18,7 @@ import {
 } from "@/shared/app-free-edit-config";
 import { useValidator } from "@/typings/useValidator";
 import { createFreeButtonBase } from "@/shared/button-config";
+import { formatActionTitle } from "@/utils/action-title";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import {
   AppTableConfig,
@@ -37,7 +38,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
     endBtnsPosition: "right",
     fromUi: {
-      cols: 2
+      cols: 3
     },
     endBtns: [
       createFreeButtonBase({
@@ -218,6 +219,18 @@ const tableconfig = reactive<AppTableConfig>(
               openEdit('planConfigview', row)
           },
       }),
+      createFreeButtonBase({
+          id: "copy",
+          link: true,
+          tooltip: "复制",
+          type: "success",
+          size: "large",
+          icon: "DocumentCopy",
+          tableClick: (row) => {
+              row['cGrpMrk']='0'
+              openEdit('planConfigCopy', row)
+          },
+      }),
     ],
     fromSchema: [
       {
@@ -245,13 +258,6 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: 'rtselect',
         title: "审核状态",
         loadData:[{value:'0',label:'暂存'},{value:'1',label:'待审核'},{value:'2',label:'已审核'}]
-      },
-      {
-        prop: "cAccessType",
-        inputtype: 'rtselect',
-        title: "访问类型",
-        typeCode: "BAS_COMM_CODE_OUT_CDE",
-        codeParam: {'cParCde': 'CAccessType'},
       },
         {
             prop: "cEnableStatus",
@@ -297,7 +303,10 @@ const openEdit = (type: string, row) => {
   router.push({
     // path: '/plan-config/plan-info',
     path:'plan-info',
-    query: { data: JSON.stringify({ type, rowData: row }) }
+    query: {
+      data: JSON.stringify({ type, rowData: row }),
+      title: formatActionTitle(type, "方案配置"),
+    }
   })
 
       // router.push({

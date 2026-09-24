@@ -19,6 +19,8 @@ export const codeListViewStore = (props?: CodeListViewProps) => {
     const userStore = useUserStore();
     // codeList 集合
     const codeListMap = ref({});
+    // 在途请求登记表: 相同 key 的并发请求共享同一个 Promise, 避免重复请求(in-flight 去重)
+    const pendingMap: Record<string, Promise<OptionType[]>> = {};
     // 需要初始化codeType列表
     const codeTypeList = ref<string[]>([
       'CProdMap',
@@ -100,20 +102,24 @@ export const codeListViewStore = (props?: CodeListViewProps) => {
    * @param cache 是否缓存 默认false
    */
   function queryCodeList(param: any, unAuthor: boolean = false, cache: boolean = false): Promise<OptionType[]>{
-    return new Promise<OptionType[]> (async (resolve, reject) => {
+    const k = param.codeListName + ((param.codeListParam && Object.keys(param.codeListParam).length > 0) ? JSON.stringify(param.codeListParam):'');
+    // 1. 缓存命中(精确 key)
+    if(codeListMap.value[k]){
+      return Promise.resolve(codeListMap.value[k]);
+    }
+    // 2. 缓存命中(仅 codeListName)
+    const cacheData = codeListMap.value[param.codeListName];
+    if (!!cacheData) {
+      return Promise.resolve(cacheData);
+    }
+    // 3. 在途请求合并: 已有相同 key 的请求在进行中, 直接复用同一个 Promise, 避免并发重复请求
+    if (pendingMap[k]) {
+      return pendingMap[k];
+    }
+    // 4. 发起新请求并登记到在途表
+    const request = new Promise<OptionType[]> (async (resolve, reject) => {
       const result = ref<OptionType[]>([]);
-      const k = param.codeListName + ((param.codeListParam && Object.keys(param.codeListParam).length > 0) ? JSON.stringify(param.codeListParam):'');
-      const v = codeListMap.value[k];
-      if(codeListMap.value[k]){
-        resolve(codeListMap.value[k]);
-        return ;
-      }
-      const cacheData = codeListMap.value[param.codeListName];
-      if (!!cacheData) {
-        // 缓存有数据就返回
-        resolve(cacheData);
-        return;
-      } else if (!unAuthor) {
+      if (!unAuthor) {
         await codelistQuery(param).then((response) => {
           if (response.code === 200) {
             // 做特殊处理--特种设备清单信息-特种设备种类
@@ -140,13 +146,15 @@ export const codeListViewStore = (props?: CodeListViewProps) => {
           }
         });
       }
-      // 插入缓存
-      if (!!result.value && cache) {
-        // setOptionsToCacheMap(param.codeListName, result.value);
-      }
       codeListMap.value[k] = result.value;  // 将数据加入缓存,方便下次直接缓存获取不需要再数据库交互
       resolve(result.value);
     });
+    pendingMap[k] = request;
+    // 请求结束(无论成功或失败)后移除在途登记, 后续请求可重新发起或命中缓存
+    request.finally(() => {
+      delete pendingMap[k];
+    });
+    return request;
   }
 
     /**

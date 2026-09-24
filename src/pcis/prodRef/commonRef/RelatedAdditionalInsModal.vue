@@ -116,6 +116,7 @@ const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
     defaultSelectedRows: [] as string[],
     showSelection: true,
+    maxHeight: "300px",
     fromSchema: [
       {
         prop: "cKindNo",

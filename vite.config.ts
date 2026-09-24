@@ -21,11 +21,11 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const getProxyTarget = () => {
   switch (mode) {
     case 'development':
-      return 'http://10.12.18.165:9080/' // DEV环境
+      return 'http://169.254.105.77:9080/' // DEV环境
     case 'uat':
-      // return 'http://10.12.18.114:9080/' // UAT环境
-      //  return 'http://192.168.1.124:9080/'
-        return 'http://127.0.0.1:9080/'
+      return 'http://10.12.18.114:9080/' // UAT环境
+      //  return 'http://169.254.105.77:9080/'
+        // return 'http://127.0.0.1:9080/'
     case 'verification':
       return 'http://10.4.18.99:9082/' // verification发布
     case 'pre':
@@ -33,7 +33,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     case 'prod':
       return 'http://10.4.18.95:9080/' // prod发布
     default:
-      return 'http://10.12.18.165:9080/' // 默认DEV
+      return 'http://169.254.105.77:9080/' // 默认DEV
   }
 }
 
@@ -51,6 +51,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           javascriptEnabled: true,
           additionalData: `
             @use "@/styles/variables.scss" as *;
+            @use "@/styles/design-token.scss" as *;
           `,
         },
       },

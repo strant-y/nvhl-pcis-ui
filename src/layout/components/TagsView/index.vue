@@ -371,23 +371,28 @@ onMounted(() => {
 <style lang="scss" scoped>
 .tags-container {
   width: 100%;
-  background-color: var(--el-bg-color);
-  border: 1px solid var(--el-border-color-light);
-  box-shadow: 0 1px 1px var(--el-box-shadow-light);
+  background-color: var(--layout-header-bg);
   display: flex;
   flex-direction: column;
+  border-bottom:1px solid #e5e6eb;
 
   .tags-item {
     display: inline-block;
-    padding: 3px 8px;
-    margin: 4px 0 0 5px;
+    padding: 0 12px;
+    margin: 6px 0 6px 0;
     font-size: 13px;
     cursor: pointer;
-    border: 1px solid var(--el-border-color-light);
-    height: 32px;
-    line-height: 26px;
+    border: none;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--el-text-color-regular);
+    transition: background-color 0.2s ease, color 0.2s ease;
+
     &:hover {
-      color: var(--el-color-primary);
+      color: var(--el-text-color-primary);
+      background-color: var(--el-fill-color-light);
     }
 
     &:first-of-type {
@@ -408,8 +413,9 @@ onMounted(() => {
     }
 
     &.active {
-      color: #fff;
-      background-color: var(--el-color-primary);
+      color: var(--el-color-primary);
+      font-weight: 600;
+      background-color: var(--el-color-primary-light-9);
 
       &::before {
         display: inline-block;
@@ -417,13 +423,17 @@ onMounted(() => {
         height: 8px;
         margin-right: 5px;
         content: "";
-        background: #fff;
+        background: var(--el-color-primary);
         border-radius: 50%;
       }
 
+      &:hover {
+        background-color: var(--el-color-primary-light-8);
+      }
+
       .close-icon:hover {
-        color: var(--el-color-primary);
-        background-color: var(--el-fill-color-light);
+        color: #fff;
+        background-color: var(--el-color-primary);
       }
     }
   }
@@ -458,31 +468,7 @@ onMounted(() => {
   }
 
   .el-scrollbar__wrap {
-    height: 49px;
+    height: 40px;
   }
-}
-
-.current-title {
-  width: 100px;
-  height: 28px;
-  font-family: PingFangSC, PingFang SC;
-  font-weight: 500;
-  font-size: 20px;
-  color: rgba(0,0,0,0.85);
-  line-height: 28px;
-  text-align: left;
-  font-style: normal;
-  margin: 16px 20px;
-}
-// 面包屑
-.el-breadcrumb {
-  margin: 16px 0 0 20px;
-}
-:deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
-  color: rgba(0,0,0,0.85);
-}
-:deep(.el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner) {
-  color: rgba(0,0,0,0.45);
-  font-weight: 400;
 }
 </style>

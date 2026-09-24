@@ -28,7 +28,8 @@
               >
                 <component
                   v-if="
-                    k.pageKey !== 'relatedAdditionalIns' || showRelatedAdditionalIns
+                    k.pageKey !== 'relatedAdditionalIns' ||
+                    showRelatedAdditionalIns
                   "
                   :ref="
                     (res) => {
@@ -53,8 +54,8 @@
 import { dataParam } from "@/store/modules/dataParam";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { ref, onMounted } from "vue";
-import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
-import {useRoute} from "vue-router";
+import { idxParamKey, IdxParamProps } from "@/views/pcis/support/useIdxParam";
+import { useRoute } from "vue-router";
 import { saveTermRiskRel, saveTermRel } from "@/api/prod";
 
 const props = defineProps({
@@ -74,7 +75,6 @@ const idxParam: IdxParamProps = {
 provide(idxParamKey, idxParam);
 const opertaor = dataOpertaor(idxParam.opertaorProps);
 const formconfig1 = opertaor.getTableConfig();
-
 
 opertaor.setTableConfig([
   {
@@ -112,7 +112,7 @@ opertaor.setTableConfig([
 const showRelatedAdditionalIns = ref(false);
 
 const handleClauseTypeChange = (val: string) => {
-  showRelatedAdditionalIns.value = val === "0"; // 0 表示主条款，主条款时显示关联附加条款
+  showRelatedAdditionalIns.value = val === "1"; // 1 表示主条款，主条款时显示关联附加条款
 };
 
 /**
@@ -123,17 +123,30 @@ const handleClauseTypeChange = (val: string) => {
 function handleTermDataLoaded() {
   // 查询关联责任
   const relatedResponsRef = opertaor.getTableRefByKey("relatedRespons");
-  if (relatedResponsRef && typeof relatedResponsRef.handleQuery === 'function') {
+  if (
+    relatedResponsRef &&
+    typeof relatedResponsRef.handleQuery === "function"
+  ) {
     relatedResponsRef.handleQuery();
   }
   // 查询关联附加条款
-  const relatedAdditionalInsRef = opertaor.getTableRefByKey("relatedAdditionalIns");
-  if (relatedAdditionalInsRef && typeof relatedAdditionalInsRef.handleQuery === 'function') {
+  const relatedAdditionalInsRef = opertaor.getTableRefByKey(
+    "relatedAdditionalIns",
+  );
+  if (
+    relatedAdditionalInsRef &&
+    typeof relatedAdditionalInsRef.handleQuery === "function"
+  ) {
     relatedAdditionalInsRef.handleQuery();
   }
   // 关联查询发起后，清空条款代码
-  const clauseConfBasicInfoRef = opertaor.getTableRefByKey("clauseConfBasicInfo");
-  if (clauseConfBasicInfoRef && typeof clauseConfBasicInfoRef.clearCopyTermNo === 'function') {
+  const clauseConfBasicInfoRef = opertaor.getTableRefByKey(
+    "clauseConfBasicInfo",
+  );
+  if (
+    clauseConfBasicInfoRef &&
+    typeof clauseConfBasicInfoRef.clearCopyTermNo === "function"
+  ) {
     clauseConfBasicInfoRef.clearCopyTermNo();
   }
 }
@@ -147,7 +160,10 @@ function handleTermSaved(newTermNo: string) {
 
   // 保存关联责任数据
   const relatedResponsRef = opertaor.getTableRefByKey("relatedRespons");
-  if (relatedResponsRef && typeof relatedResponsRef.getTableData === 'function') {
+  if (
+    relatedResponsRef &&
+    typeof relatedResponsRef.getTableData === "function"
+  ) {
     const riskList = relatedResponsRef.getTableData();
     if (riskList && riskList.length > 0) {
       const rel = riskList.map((item: any) => {
@@ -165,8 +181,13 @@ function handleTermSaved(newTermNo: string) {
   }
 
   // 保存关联附加条款数据
-  const relatedAdditionalInsRef = opertaor.getTableRefByKey("relatedAdditionalIns");
-  if (relatedAdditionalInsRef && typeof relatedAdditionalInsRef.getTableData === 'function') {
+  const relatedAdditionalInsRef = opertaor.getTableRefByKey(
+    "relatedAdditionalIns",
+  );
+  if (
+    relatedAdditionalInsRef &&
+    typeof relatedAdditionalInsRef.getTableData === "function"
+  ) {
     const termRelList = relatedAdditionalInsRef.getTableData();
     if (termRelList && termRelList.length > 0) {
       const rel = termRelList.map((item: any) => {

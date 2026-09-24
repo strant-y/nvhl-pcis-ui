@@ -133,9 +133,9 @@ const baseStyles = {
   cardGroupHeaderTitleSize: 14,
   contentFontSize: 12,
   contentFontWeight: 450,
-  contentHeight: 24,
-  contentLineHeight: 24,
-  labelFontSize: 12,
+  contentHeight: 28,
+  contentLineHeight: 28,
+  labelFontSize: 13,
   labelFontWeight: 400
 };
 
@@ -207,6 +207,7 @@ onUnmounted(() => {
   z-index: 9;
   width: calc(100% - $sidebar-width);
   transition: width 0.28s;
+  background: transparent;
 }
 
 .sidebar-container {
@@ -235,6 +236,7 @@ onUnmounted(() => {
   height: 100%;
   flex-direction: column;
   overflow: hidden;
+  background: var(--el-bg-color-page);
 }
 
 .layout-top {
@@ -248,18 +250,29 @@ onUnmounted(() => {
     display: flex;
     width: 100% !important;
     height: $navbar-height;
+    background: var(--layout-header-bg);
+    border-bottom: 1px solid var(--layout-border-color);
+    box-shadow: var(--layout-header-shadow);
+    backdrop-filter: blur(12px);
 
     :deep(.el-scrollbar) {
       flex: 1;
       height: $navbar-height;
     }
 
-    :deep(.el-menu-item),
-    :deep(.el-sub-menu__title),
     :deep(.el-menu--horizontal) {
       height: $navbar-height;
-      line-height: $navbar-height;
+      align-items: center;
       font-size: $menu-text-size;
+    }
+
+    :deep(.el-menu-item),
+    :deep(.el-sub-menu__title) {
+      height: 36px;
+      margin: 0 4px;
+      line-height: 36px;
+      font-size: $menu-text-size;
+      border-radius: var(--layout-menu-radius);
     }
 
     :deep(.el-menu--collapse) {
@@ -278,17 +291,26 @@ onUnmounted(() => {
   .sidebar-container {
     width: 100% !important;
     height: $navbar-height;
+    background: var(--layout-header-bg);
+    border-bottom: 1px solid var(--layout-border-color);
+    box-shadow: var(--layout-header-shadow);
+    backdrop-filter: blur(12px);
 
     :deep(.el-scrollbar) {
       flex: 1;
       height: $navbar-height;
     }
 
-    :deep(.el-menu-item),
-    :deep(.el-sub-menu__title),
     :deep(.el-menu--horizontal) {
       height: $navbar-height;
-      line-height: $navbar-height;
+      align-items: center;
+    }
+
+    :deep(.el-menu-item),
+    :deep(.el-sub-menu__title) {
+      height: 36px;
+      margin: 0 4px;
+      line-height: 36px;
 
       span {
         font-size: 10px !important;
@@ -309,7 +331,7 @@ onUnmounted(() => {
       // z-index: 150;
       position: relative;
       width: $sidebar-width;
-      // height: 100%;
+      background: var(--layout-surface-bg);
 
       :deep(.el-menu) {
         height: 100%;
@@ -325,10 +347,12 @@ onUnmounted(() => {
         width: 99%;
         height: 45px;
         line-height: 45px;
-        box-shadow: 0 0 6px -2px var(--el-color-primary);
+        border-top: 1px solid var(--layout-border-color);
+        background: var(--layout-header-bg);
+        box-shadow: 0 -1px 3px rgba(15, 23, 42, 0.04);
 
         div:hover {
-          background-color: var(--menu-background);
+          background-color: var(--layout-hover-bg);
         }
 
         :deep(svg) {

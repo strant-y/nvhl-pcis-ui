@@ -50,6 +50,8 @@ import {
   SaveComponentFactors,
   releaseInquiryPage,
   queryInquiryPageComponentList,
+  savePageFactorConfig,
+  queryPageFactorConfig,
 } from "@/api/prod";
 import {
   AppTableConfig,
@@ -97,6 +99,23 @@ const clickBtn = ref<Array<FreeButtonBase>>([
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
+            // 保存页面要素配置（默认值+JSON+正则）
+            const factorConfigParam = {
+              cProdNo: props.data?.pageSelect?.cProdNo || "",
+              cPageCode: props.data?.pageSelect?.cPkId || "",
+              cComponentCode: (selectConItem.value as any).cComponentKey || "",
+              factorConfigs: checkList.map((row: any) => ({
+                cFactorKey: row.c_pk_id || "",
+                cFactorDefault: row.c_factor_default || "",
+                cFactorJson: row.c_factor_json || "",
+                cFactorRegex: row.c_factor_regex || "",
+              })),
+            };
+            savePageFactorConfig(factorConfigParam).then((cfgRes) => {
+              if (cfgRes.code !== 200 && cfgRes.code !== "0") {
+                ElMessage.error({ message: cfgRes.msg || cfgRes.message, duration: 1000 });
+              }
+            });
             emits("ok", {});
             ElMessage.success("保存成功");
             dialogVisible.value = false;
@@ -171,6 +190,9 @@ const tableconfig = reactive<AppTableConfig>(
     fixedHeader: true,
     isPage: false,
     maxHeight: "400px",
+    // 点击行进入编辑态, 仅默认值/json/正则三列可输入
+    editFlag: true,
+    editList: ["c_factor_default", "c_factor_json", "c_factor_regex"],
     fromSchema: [
       {
         prop: "icon",
@@ -213,6 +235,58 @@ const tableconfig = reactive<AppTableConfig>(
         inputtype: "rtinput",
         title: "要素名称",
       },
+      {
+        prop: "c_factor_default",
+        inputtype: "rtinput",
+        title: "默认值",
+        placeholder: "可输入",
+      },
+      {
+        prop: "c_factor_json",
+        inputtype: "rtinput",
+        title: "json",
+        placeholder: "可输入",
+        rules: [
+          {
+            validator: (rule: any, value: any, callback: any) => {
+              if (value === null || value === undefined || String(value).trim() === "") {
+                callback();
+                return;
+              }
+              try {
+                JSON.parse(String(value));
+                callback();
+              } catch (e) {
+                callback(new Error("请输入正确的JSON格式"));
+              }
+            },
+            trigger: "blur",
+          },
+        ],
+      },
+      {
+        prop: "c_factor_regex",
+        inputtype: "rtinput",
+        title: "正则",
+        placeholder: "可输入",
+        rules: [
+          {
+            validator: (rule: any, value: any, callback: any) => {
+              if (value === null || value === undefined || String(value).trim() === "") {
+                callback();
+                return;
+              }
+              try {
+                new RegExp(String(value));
+                callback();
+              } catch (e) {
+                callback(new Error("请输入正确的正则表达式"));
+              }
+            },
+            trigger: "blur",
+          },
+        ],
+      },
     ],
   })
 );
@@ -234,8 +308,32 @@ function selectComponent(item: any) {
             }
           });
         }
-        console.log(data);
-        tableRef.value?.setFormValue(data);
+        // 查询页面要素配置，回显默认值、JSON和正则
+        const cfgParam = {
+          cProdNo: props.data?.pageSelect?.cProdNo || "",
+          cPageCode: props.data?.pageSelect?.cPkId || "",
+          cComponentCode: item.cComponentKey || "",
+        };
+        queryPageFactorConfig(cfgParam)
+          .then((cfgRes) => {
+            const cfgCode = cfgRes.code;
+            if ((cfgCode === 200 || cfgCode === "0") && cfgRes.data && data) {
+              const configMap = new Map(
+                (cfgRes.data as any[]).map((c: any) => [c.cFactorKey, c])
+              );
+              data.forEach((row: any) => {
+                const cfg = configMap.get(row.c_pk_id);
+                if (cfg) {
+                  row.c_factor_default = cfg.cFactorDefault || "";
+                  row.c_factor_json = cfg.cFactorJson || "";
+                  row.c_factor_regex = cfg.cFactorRegex || "";
+                }
+              });
+            }
+          })
+          .finally(() => {
+            tableRef.value?.setFormValue(data);
+          });
       } else {
         ElMessage.error({ message: msg, duration: 1000 });
       }

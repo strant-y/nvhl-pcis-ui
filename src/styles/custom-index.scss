@@ -349,11 +349,11 @@
   font-size: var(--rt-form-content-font-size);
   line-height: var(--rt-form-content-line-height);
 
-  // 表头字体颜色
+  // 表头字体颜色（跟随表格 design token，默认 #646A73）
   .el-table__header {
     .el-table__cell {
       .cell {
-        color: var(--rt-form-label-font-color) !important;
+        color: var(--el-table-header-text-color) !important;
       }
     }
   }

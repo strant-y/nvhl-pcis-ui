@@ -120,13 +120,13 @@
 
     <div v-if="!readonly" class="footer">
 
-      <el-button @click="emit('transfer')">
+      <el-button @click="emit('transfer', opinion)">
 
         转办
 
       </el-button>
 
-      <el-button @click="emit('return')">
+      <el-button @click="emit('return', opinion)">
 
         退回
 
@@ -134,14 +134,14 @@
 
       <el-button
         type="danger"
-        @click="emit('reject')"
+        @click="emit('reject', opinion)"
       >
         驳回
       </el-button>
 
       <el-button
         type="primary"
-        @click="emit('approve')"
+        @click="emit('approve', opinion)"
       >
         同意
       </el-button>
@@ -180,10 +180,15 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'approve'): void
-  (e: 'reject'): void
-  (e: 'return'): void
-  (e: 'transfer'): void
+
+  (e: 'approve', opinion: string): void
+
+  (e: 'reject', opinion: string): void
+
+  (e: 'return', opinion: string): void
+
+  (e: 'transfer', opinion: string): void
+
 }>()
 
 const opinion = ref("")

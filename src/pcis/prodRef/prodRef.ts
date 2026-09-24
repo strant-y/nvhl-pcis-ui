@@ -2,7 +2,8 @@ import Vue from "vue";
 
 // 产品配置使用的组件
 import prodaudit from "./commonRef/prodaudit.vue";
-import approvalFlow from "./commonRef/approvalFlow.vue";
+import approvalProgress from "./commonRef/approvalProgress.vue";
+import currentApprovalFlow from "./commonRef/currentApprovalFlow.vue";
 import prodInfo from "./commonRef/prodInfo.vue";
 import relatedMainInsurance from "./commonRef/relatedMainInsurance.vue";
 import prodComponent from "./commonRef/prodComponent.vue";
@@ -20,6 +21,11 @@ import commodityBasicInfo from "./commodityRef/commodityBasicInfo.vue";
 import choosePlan from "./commodityRef/ChonsePlan.vue";
 import permissionAllo from "./commodityRef/PermissionAllo.vue";
 import InsuranceRules from "./commodityRef/InsuranceRules.vue";
+import InsuranceRuleSelectModal from "./commodityRef/InsuranceRuleSelectModal.vue";
+import InsuranceRuleConfigModal from "./commodityRef/InsuranceRuleConfigModal.vue";
+import HealthDeclaration from "./commodityRef/HealthDeclaration.vue";
+import InsuranceNotice from "./commodityRef/InsuranceNotice.vue";
+import DisclaimerInfo from "./commodityRef/DisclaimerInfo.vue";
 import ReviewComments from "./commodityRef/ReviewComments.vue";
 import TestReport from "./commodityRef/TestReport.vue";
 
@@ -127,7 +133,8 @@ import cFinancingGuarantee from "./commodityRef/cFinancingGuarantee.vue" //融�
 const componentMap = {
   // 产品配置使用的组件
   prodauditRef: prodaudit,
-  approvalFlowRef: approvalFlow,
+  approvalProgressRef: approvalProgress,
+  currentApprovalFlowRef: currentApprovalFlow,
   prodInfoRef: prodInfo,
   relatedMainInsuranceRef: relatedMainInsurance,
   prodComponentRef: prodComponent,
@@ -145,6 +152,11 @@ const componentMap = {
   choosePlanRef: choosePlan,
   permissionAlloRef: permissionAllo,
   InsuranceRulesRef: InsuranceRules,
+  InsuranceRuleSelectModalRef: InsuranceRuleSelectModal,
+  InsuranceRuleConfigModalRef: InsuranceRuleConfigModal,
+  HealthDeclarationRef: HealthDeclaration,
+  InsuranceNoticeRef: InsuranceNotice,
+  DisclaimerInfoRef: DisclaimerInfo,
   ReviewCommentsRef: ReviewComments,
   TestReportRef: TestReport,
 

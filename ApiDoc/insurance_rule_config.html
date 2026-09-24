@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投保规则配置系统</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- SortableJS 用于拖拽排序 -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        .sortable-ghost { opacity: 0.4; background-color: #e0f2fe; border: 2px dashed #0284c7; }
+        .sortable-chosen { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800" x-data="app()">
+
+    <div class="max-w-7xl mx-auto p-8">
+        
+        <!-- ==================================== -->
+        <!-- 配置完成的表单展示区 -->
+        <!-- ==================================== -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            
+            <!-- 表单头部 -->
+            <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 to-white">
+                <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    投保规则表单
+                </h2>
+                <button @click="openMainModal()" 
+                        class="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1.5 transition px-3 py-1.5 rounded-lg hover:bg-indigo-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    编辑配置
+                </button>
+            </div>
+            
+            <!-- 空状态 -->
+            <template x-if="finalSelection.length === 0">
+                <div class="text-center py-20 px-8">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    </div>
+                    <p class="text-slate-500 font-medium">暂无配置内容</p>
+                    <p class="text-slate-400 text-sm mt-1">点击右上角"编辑配置"按钮添加要素</p>
+                </div>
+            </template>
+
+            <!-- 表单内容 -->
+            <template x-if="finalSelection.length > 0">
+                <div class="p-8">
+                    <!-- 按分类分组展示 -->
+                    <div class="space-y-6">
+                        <template x-for="group in groupedFinalSelection()" :key="group.category">
+                            <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                <!-- 分组标题栏 -->
+                                <div class="px-5 py-3 flex items-center justify-between border-b border-slate-100 bg-slate-50/80">
+                                    <span class="text-sm font-semibold text-slate-600" x-text="group.categoryName"></span>
+                                    <span class="text-xs text-slate-400" x-text="group.items.length + ' 项'"></span>
+                                </div>
+                                
+                                <!-- 字段网格 -->
+                                <div class="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 bg-white">
+                                    <template x-for="item in group.items" :key="item.id">
+                                        <div>
+                                            <!-- 字段标签 -->
+                                            <div class="mb-2">
+                                                <label class="block text-sm font-medium text-slate-700">
+                                                    <span x-text="item.name"></span>
+                                                    <span x-show="item.config.required" class="text-red-500 ml-0.5">*</span>
+                                                </label>
+                                            </div>
+                                            
+                                            <!-- String 类型输入框 -->
+                                            <template x-if="item.type === 'string'">
+                                                <input type="text" 
+                                                       :value="item.config.defaultValue" 
+                                                       :placeholder="item.config.defaultValue ? '默认: ' + item.config.defaultValue : '请输入' + item.name"
+                                                       :required="item.config.required"
+                                                       :maxlength="item.config.maxLength || undefined"
+                                                       :minlength="item.config.minLength || undefined"
+                                                       :pattern="item.config.regex || undefined"
+                                                       class="w-full border-slate-300 rounded-lg border px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                            </template>
+                                            
+                                            <!-- Number 类型输入框 -->
+                                            <template x-if="item.type === 'number'">
+                                                <input type="number" 
+                                                       :value="item.config.defaultValue"
+                                                       :placeholder="item.config.defaultValue ? '默认: ' + item.config.defaultValue : '请输入' + item.name"
+                                                       :required="item.config.required"
+                                                       :min="item.config.min !== null && item.config.min !== undefined ? item.config.min : undefined"
+                                                       :max="item.config.max !== null && item.config.max !== undefined ? item.config.max : undefined"
+                                                       :step="item.config.integerOnly ? 1 : undefined"
+                                                       class="w-full border-slate-300 rounded-lg border px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                            </template>
+                                            
+                                            <!-- Date 类型输入框 -->
+                                            <template x-if="item.type === 'date'">
+                                                <input type="date" 
+                                                       :value="item.config.defaultValue"
+                                                       :required="item.config.required"
+                                                       class="w-full border-slate-300 rounded-lg border px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white">
+                                            </template>
+                                            
+                                            <!-- 规则提示标签 -->
+                                            <div class="mt-1.5 flex flex-wrap gap-1">
+                                                <span x-show="item.config.required" class="inline-flex items-center text-[10px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded font-medium border border-red-100">必填</span>
+                                                <span x-show="item.config.regex" class="inline-flex items-center text-[10px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-mono border border-purple-100" x-text="item.config.regex ? (item.config.regex.length > 18 ? item.config.regex.substring(0, 18) + '...' : item.config.regex) : ''"></span>
+                                                <span x-show="item.config.minLength" class="inline-flex items-center text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100" x-text="'≥' + item.config.minLength + '字符'"></span>
+                                                <span x-show="item.config.maxLength" class="inline-flex items-center text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100" x-text="'≤' + item.config.maxLength + '字符'"></span>
+                                                <span x-show="item.config.min !== null && item.config.min !== undefined" class="inline-flex items-center text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100" x-text="'最小值: ' + item.config.min"></span>
+                                                <span x-show="item.config.max !== null && item.config.max !== undefined" class="inline-flex items-center text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100" x-text="'最大值: ' + item.config.max"></span>
+                                                <span x-show="item.config.integerOnly" class="inline-flex items-center text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">仅整数</span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- 表单底部操作 -->
+                    <div class="flex justify-end gap-3 pt-6 mt-8 border-t border-slate-100">
+                        <button class="px-6 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">重置</button>
+                        <button class="px-6 py-2.5 bg-indigo-600 text-white border border-transparent rounded-lg text-sm font-semibold hover:bg-indigo-700 shadow-md transition">提交表单</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- ========================================= -->
+    <!-- 模态框 1: 关联投保规则 (选择框 + 搜索 + 拖拽) -->
+    <!-- ========================================= -->
+    <div x-show="showMainModal" x-cloak x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+        
+        <div @click.away="showMainModal = false" 
+             class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl mx-auto overflow-hidden flex flex-col" style="height: 85vh;">
+            
+            <!-- Modal Header -->
+            <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">关联投保规则配置</h3>
+                    <p class="text-sm text-slate-500 mt-1">选择要素并配置其校验逻辑</p>
+                </div>
+                <button @click="showMainModal = false" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="flex-1 flex overflow-hidden bg-slate-50">
+                
+                <!-- 左侧: 元素库 -->
+                <div class="w-3/5 flex flex-col border-r border-slate-200 bg-white">
+                    <!-- 信息分类选择 & 搜索 -->
+                    <div class="border-b border-slate-200 p-4 bg-white space-y-3">
+                        <!-- 信息分类选择框 -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">信息分类</label>
+                            <div class="relative">
+                                <select x-model="activeTab" 
+                                        class="w-full appearance-none border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 cursor-pointer transition pr-10">
+                                    <template x-for="tab in tabs" :key="tab.id">
+                                        <option :value="tab.id" x-text="tab.name"></option>
+                                    </template>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 模糊搜索 -->
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" x-model="searchQuery" 
+                                   class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-4 py-2.5 sm:text-sm bg-slate-100 border-transparent rounded-xl transition" 
+                                   placeholder="输入要素Key或名称进行搜索...">
+                        </div>
+                    </div>
+
+                    <!-- 元素列表 -->
+                    <div class="flex-1 overflow-y-auto p-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <template x-for="item in filteredElements()" :key="item.id">
+                                <div @click="toggleElementSelection(item)" 
+                                     :class="{'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200': isElementSelected(item.id), 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm': !isElementSelected(item.id)}"
+                                     class="p-4 border rounded-xl cursor-pointer transition-all flex flex-col justify-between h-24 relative">
+                                    
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <div class="font-semibold text-slate-800" x-text="item.name"></div>
+                                            <div class="text-xs text-slate-400 font-mono mt-1" x-text="item.key"></div>
+                                        </div>
+                                        <!-- 类型角标 -->
+                                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-slate-100 text-slate-500" x-text="item.type"></span>
+                                    </div>
+                                    
+                                    <!-- 选中状态图标 -->
+                                    <div x-show="isElementSelected(item.id)" class="absolute top-3 right-3 text-indigo-600">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </div>
+                            </template>
+                            <template x-if="filteredElements().length === 0">
+                                <div class="col-span-2 py-10 text-center text-slate-400">
+                                    未找到匹配的要素
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧: 已选要素 (支持拖拽) -->
+                <div class="w-2/5 bg-white flex flex-col">
+                    <div class="px-6 py-4 border-b border-slate-100 bg-white flex justify-between items-center">
+                        <h4 class="font-semibold text-slate-800">已选要素 <span class="text-slate-400 font-normal text-sm" x-text="'(' + tempSelected.length + ')'"></span></h4>
+                        <button @click="tempSelected = []" class="text-xs font-medium text-red-500 hover:text-red-700 px-3 py-1 bg-red-50 rounded-lg transition">清空</button>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
+                        <div id="selected-list" class="space-y-3 min-h-[200px] pb-20">
+                            <template x-if="tempSelected.length === 0">
+                                <div class="text-center py-12">
+                                    <div class="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                    </div>
+                                    <p class="text-sm font-medium text-slate-500">拖拽或点击添加要素</p>
+                                    <p class="text-xs text-slate-400 mt-1">支持拖拽排序</p>
+                                </div>
+                            </template>
+                            
+                            <!-- 注意: 此处渲染用于拖拽的列表 -->
+                            <!-- Alpine x-for 不能直接用于可重排序列表的DOM更新，通常配合 SortableJS 的事件回调更新数组 -->
+                            <!-- 这里为了简化原型，我们依然用 x-for 渲染，但通过 id 让 SortableJS 绑定 -->
+                            <template x-for="(sel, index) in tempSelected" :key="sel.id">
+                                <div :id="'item-'+sel.id" class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm flex items-center justify-between group hover:border-indigo-300 transition-colors cursor-move">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 shrink-0" x-text="index + 1"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-medium text-sm text-slate-800 truncate" x-text="sel.name"></span>
+                                                <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 bg-slate-100 rounded shrink-0">
+                                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                                                    <span x-text="sel.categoryName"></span>
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-slate-400 font-mono truncate" x-text="sel.key"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button @click="openConfig(sel)" class="p-2 hover:bg-indigo-50 text-indigo-500 rounded-lg transition" title="规则配置">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                        </button>
+                                        <button @click="removeElement(sel.id)" class="p-2 hover:bg-red-50 text-red-500 rounded-lg transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                    <!-- 配置完成标记 -->
+                                    <div x-show="hasConfig(sel)" class="w-2 h-2 rounded-full bg-green-500 ml-2"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-8 py-4 border-t border-slate-100 bg-white flex justify-end gap-3">
+                <button @click="showMainModal = false" class="px-6 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">取消</button>
+                <button @click="confirmSelection()" class="px-6 py-2.5 bg-indigo-600 text-white border border-transparent rounded-lg text-sm font-semibold hover:bg-indigo-700 shadow-md transition">确认配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================= -->
+    <!-- 模态框 2: 规则配置 (智能识别类型) -->
+    <!-- ========================================= -->
+    <div x-show="showConfigModal" x-cloak x-transition class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm" @keydown.escape.window="showConfigModal = false">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden flex flex-col" @click.away="showConfigModal = false" style="max-height: 80vh;">
+            
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">规则配置</h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-indigo-600 font-medium" x-text="currentConfigItem?.name"></span>
+                        <span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-mono" x-text="currentConfigItem?.type"></span>
+                    </div>
+                </div>
+                <button @click="showConfigModal = false" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-200 transition">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <!-- Body (Scrollable) -->
+            <div class="p-6 space-y-6 overflow-y-auto bg-white">
+                
+                <!-- 默认值 -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">默认值 (Default Value)</label>
+                    <input type="text" x-model="currentConfigItem.config.defaultValue" 
+                           class="w-full border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-3 transition">
+                </div>
+
+                <div class="h-px bg-slate-100 w-full my-2"></div>
+
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">校验规则</h4>
+
+                <!-- 必填 -->
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-slate-800">必填项 (Required)</div>
+                            <div class="text-xs text-slate-500">不允许为空</div>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" x-model="currentConfigItem.config.required" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+
+                <!-- 动态规则: String 类型 -->
+                <template x-if="currentConfigItem?.type === 'string'">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">最小长度 (Min Length)</label>
+                                <input type="number" x-model.number="currentConfigItem.config.minLength" min="0" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">最大长度 (Max Length)</label>
+                                <input type="number" x-model.number="currentConfigItem.config.maxLength" min="0" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">正则表达式 (Regex)</label>
+                            <input type="text" x-model="currentConfigItem.config.regex" placeholder="如: ^[A-Za-z]+$" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm font-mono focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                             <label class="block text-xs font-bold text-slate-600 mb-1">格式预设</label>
+                             <select x-model="currentConfigItem.config.formatPreset" @change="applyPreset(currentConfigItem)" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                 <option value="">无</option>
+                                 <option value="email">邮箱 (Email)</option>
+                                 <option value="phone">手机号 (Mobile)</option>
+                                 <option value="idcard">身份证 (ID Card)</option>
+                                 <option value="url">网址 (URL)</option>
+                             </select>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 动态规则: Number 类型 -->
+                <template x-if="currentConfigItem?.type === 'number'">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">最小值 (Min)</label>
+                                <input type="number" x-model.number="currentConfigItem.config.min" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">最大值 (Max)</label>
+                                <input type="number" x-model.number="currentConfigItem.config.max" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                            <div class="text-sm font-medium text-slate-700">仅允许整数</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" x-model="currentConfigItem.config.integerOnly" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="h-px bg-slate-100 w-full my-2"></div>
+
+                <!-- 扩展 JSON -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">高级扩展配置 (JSON)</label>
+                    <textarea x-model="currentConfigItem.config.extJson" rows="3" placeholder='{"key": "value"}' class="w-full border-slate-300 rounded-lg border p-3 text-xs font-mono focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50"></textarea>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 rounded-b-2xl flex justify-end gap-3">
+                <button @click="showConfigModal = false" class="px-5 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-white transition">取消</button>
+                <button @click="saveConfig()" class="px-5 py-2.5 bg-indigo-600 text-white border border-transparent rounded-lg text-sm font-semibold hover:bg-indigo-700 shadow-md transition">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function app() {
+            return {
+                showMainModal: false,
+                showConfigModal: false,
+                activeTab: 'applicant',
+                searchQuery: '',
+                currentConfigItem: null,
+                sortableInstance: null,
+                
+                tabs: [
+                    { id: 'applicant', name: '投保人信息' },
+                    { id: 'insured', name: '被保人信息' },
+                    { id: 'product', name: '产品信息' }
+                ],
+                
+                // 模拟数据库：增加 type 字段
+                elementsDB: {
+                    applicant: [
+                        { id: 'a1', name: '投保人姓名', key: 'app_name', type: 'string' },
+                        { id: 'a2', name: '证件类型', key: 'id_type', type: 'string' },
+                        { id: 'a3', name: '证件号码', key: 'id_no', type: 'string' },
+                        { id: 'a4', name: '手机号码', key: 'mobile', type: 'string' },
+                        { id: 'a5', name: '邮箱', key: 'email', type: 'string' }
+                    ],
+                    insured: [
+                        { id: 'i1', name: '被保人姓名', key: 'ins_name', type: 'string' },
+                        { id: 'i2', name: '与投保人关系', key: 'relation', type: 'string' },
+                        { id: 'i3', name: '出生日期', key: 'birthday', type: 'date' },
+                        { id: 'i4', name: '性别', key: 'gender', type: 'string' }
+                    ],
+                    product: [
+                        { id: 'p1', name: '保险金额', key: 'amount', type: 'number' },
+                        { id: 'p2', name: '缴费期间', key: 'pay_period', type: 'number' },
+                        { id: 'p3', name: '保险期间', key: 'ins_period', type: 'number' }
+                    ]
+                },
+                
+                tempSelected: [],
+                finalSelection: [],
+
+                init() {
+                    // 监听 DOM 更新后初始化 Sortable
+                    this.$watch('showMainModal', value => {
+                        if (value) {
+                            this.$nextTick(() => this.initSortable());
+                        }
+                    });
+                },
+
+                initSortable() {
+                    const el = document.getElementById('selected-list');
+                    if (el && !this.sortableInstance) {
+                        this.sortableInstance = Sortable.create(el, {
+                            animation: 150,
+                            ghostClass: 'sortable-ghost',
+                            chosenClass: 'sortable-chosen',
+                            handle: '.cursor-move', // 拖拽手柄
+                            onEnd: (evt) => {
+                                // 处理排序结果
+                                const item = this.tempSelected.splice(evt.oldIndex, 1)[0];
+                                this.tempSelected.splice(evt.newIndex, 0, item);
+                            }
+                        });
+                    }
+                },
+
+                filteredElements() {
+                    const query = this.searchQuery.toLowerCase();
+                    const list = this.elementsDB[this.activeTab] || [];
+                    if (!query) return list;
+                    return list.filter(item => 
+                        item.name.toLowerCase().includes(query) || 
+                        item.key.toLowerCase().includes(query)
+                    );
+                },
+
+                groupedFinalSelection() {
+                    const groups = {};
+                    const order = this.tabs.map(t => t.id);
+                    this.finalSelection.forEach(item => {
+                        const cat = item.category || 'other';
+                        if (!groups[cat]) {
+                            const tab = this.tabs.find(t => t.id === cat);
+                            groups[cat] = {
+                                category: cat,
+                                categoryName: tab ? tab.name : '其他',
+                                items: []
+                            };
+                        }
+                        groups[cat].items.push(item);
+                    });
+                    // 按 tabs 定义的顺序返回分组
+                    return order.filter(id => groups[id]).map(id => groups[id]);
+                },
+
+                openMainModal() {
+                    // 深拷贝数据进入临时编辑状态
+                    this.tempSelected = JSON.parse(JSON.stringify(this.finalSelection));
+                    this.showMainModal = true;
+                    this.searchQuery = '';
+                },
+
+                toggleElementSelection(item) {
+                    const index = this.tempSelected.findIndex(i => i.id === item.id);
+                    if (index > -1) {
+                        this.removeElement(item.id);
+                    } else {
+                        // 默认配置初始化，附带分类信息
+                        const tab = this.tabs.find(t => t.id === this.activeTab);
+                        this.tempSelected.push({
+                            ...item, 
+                            category: this.activeTab,
+                            categoryName: tab ? tab.name : '',
+                            config: { 
+                                defaultValue: '', 
+                                required: false, 
+                                regex: '', 
+                                minLength: null, 
+                                maxLength: null, 
+                                min: null, 
+                                max: null, 
+                                integerOnly: false,
+                                formatPreset: '',
+                                extJson: '' 
+                            }
+                        });
+                    }
+                },
+
+                isElementSelected(id) {
+                    return this.tempSelected.some(i => i.id === id);
+                },
+
+                removeElement(id) {
+                    this.tempSelected = this.tempSelected.filter(i => i.id !== id);
+                },
+
+                openConfig(item) {
+                    // 引用直接绑定，修改 tempSelected 的内容会同步更新列表
+                    this.currentConfigItem = item;
+                    this.showConfigModal = true;
+                },
+
+                applyPreset(item) {
+                    if(item.config.formatPreset === 'email') item.config.regex = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
+                    if(item.config.formatPreset === 'phone') item.config.regex = "^1[3-9]\\d{9}$";
+                    if(item.config.formatPreset === 'idcard') item.config.regex = "^[1-9]\\d{5}(18|19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]$";
+                    if(item.config.formatPreset === 'url') item.config.regex = "^https?://.*$";
+                },
+
+                saveConfig() {
+                    // 在我们的实现中，由于是对象引用，配置已经自动保存在 tempSelected 中了
+                    // 只需要关闭弹窗即可
+                    this.showConfigModal = false;
+                },
+
+                hasConfig(item) {
+                    if (!item || !item.config) return false;
+                    return item.config.required || 
+                           item.config.regex || 
+                           item.config.defaultValue ||
+                           item.config.min !== null || 
+                           item.config.max !== null;
+                },
+
+                confirmSelection() {
+                    this.finalSelection = [...this.tempSelected];
+                    this.showMainModal = false;
+                },
+                
+                editFinalItem(item) {
+                    // 允许在主页面直接编辑已确认的项
+                    this.currentConfigItem = item;
+                    this.showConfigModal = true;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

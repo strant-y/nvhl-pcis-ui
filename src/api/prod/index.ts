@@ -99,6 +99,38 @@ export function queryFactorListByComCode(queryParams: any): AxiosPromise<any> {
 }
 
 /**
+ * 保存页面要素配置（默认值+JSON）
+ * POST /prod/savePageFactorConfig
+ */
+export function savePageFactorConfig(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/savePageFactorConfig`, queryParams);
+}
+
+/**
+ * 查询页面要素配置（默认值+JSON回显）
+ * POST /prod/queryPageFactorConfig
+ */
+export function queryPageFactorConfig(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/queryPageFactorConfig`, queryParams);
+}
+
+/**
+ * 保存规则要素配置（按规则编码先删后插全量替换）
+ * POST /prod/saveRuleFactorConfig
+ */
+export function saveRuleFactorConfig(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/saveRuleFactorConfig`, queryParams);
+}
+
+/**
+ * 查询规则要素配置（投保规则展示回显）
+ * POST /prod/queryRuleFactorConfig
+ */
+export function queryRuleFactorConfig(queryParams: any): AxiosPromise<any> {
+  return post(`/prod/queryRuleFactorConfig`, queryParams);
+}
+
+/**
  * 获取组件信息列表
  *
  * @param queryParams
@@ -728,6 +760,69 @@ export function associationSpec(queryParams: any): AxiosPromise<any> {
  */
 export function saveAssociationSpec(queryParams: any): AxiosPromise<any> {
   return post(`/proddef/saveAssociationSpec`, queryParams);
+}
+
+/**
+ * 方案配置-已关联方案特约列表查询
+ *
+ * @param queryParams
+ */
+export function qryRefPlanAndSpecList(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/qryRefPlanAndSpecList`, queryParams);
+}
+
+/**
+ * 方案配置-待关联方案特约列表查询
+ *
+ * @param queryParams
+ */
+export function getUnbindSpecRefPlan(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/getUnbindSpecRefPlan`, queryParams);
+}
+
+/**
+ * 方案配置-关联方案特约保存
+ *
+ * @param queryParams
+ */
+export function associationPlanSpec(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/associationPlanSpec`, queryParams);
+}
+
+/**
+ * 方案配置-取关方案特约
+ *
+ * @param queryParams 主键ID列表（数组）
+ */
+export function unAssociationPlanSpec(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/unAssociationPlanSpec`, queryParams);
+}
+
+/**
+ * 方案配置-修改方案特约状态
+ *
+ * @param queryParams
+ */
+export function editPlanSpecStatus(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/editPlanSpecStatus`, queryParams);
+}
+
+/**
+ * 方案配置-新增并绑定方案特约
+ *
+ * @param queryParams
+ */
+export function saveAssociationPlanSpec(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/saveAssociationPlanSpec`, queryParams);
+}
+
+/**
+ * 方案配置-自定义方案特约保存
+ *
+ * @param queryParams
+ */
+export function saveCustomPlanSpec(queryParams: any): AxiosPromise<any> {
+  return post(`/proddef/saveCustomPlanSpec`, queryParams);
 }
 
 /**

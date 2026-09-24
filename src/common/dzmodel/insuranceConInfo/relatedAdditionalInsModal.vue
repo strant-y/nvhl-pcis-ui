@@ -102,6 +102,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
 
 const tableConfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight:"260px",
     fromSchema: [
       {
         prop: "isChecked",

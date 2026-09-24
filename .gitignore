@@ -1,6 +1,8 @@
 
 node_modules/
 node_modules.7z
+dist/
 src/views/pcis/prodRef/clauseConfRef/ClauseConfAdd copy.vue
 src/views/insure/CustomRecording copy 2.vue
 *.mjs
+.workbuddy/

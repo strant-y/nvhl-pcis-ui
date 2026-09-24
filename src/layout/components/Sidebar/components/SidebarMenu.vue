@@ -68,17 +68,6 @@ const props = defineProps({
     required: true,
   },
 });
-const dropdownContentWidth = computed(() => {
-  return window.innerWidth - 10 + 'px';
-});
-const dropdowmList = computed(() => {
-  const list = props.menuList.filter((item:any) => {
-    return item.path !== "/login" && item.path !== "/" && item.path !== "/redirect"
-  })
-  return list;
-});
-
-console.log(props.menuList);
 
 /**
  * 解析路径
@@ -100,9 +89,37 @@ function resolvePath(routePath: string) {
 </script>
 <style lang="scss" scoped>
 :deep(.el-sub-menu.is-active .el-sub-menu__title) {
-  color: #FFFFFF!important;
-  background: var(--el-color-primary);
+  color: var(--el-color-primary) !important;
+  font-weight: 600;
 }
+
+:deep(.el-menu) {
+  border-right: none;
+}
+
+:deep(.el-menu--vertical) {
+  padding: 12px 10px 52px;
+}
+
+:deep(.el-menu--vertical .el-menu-item),
+:deep(.el-menu--vertical .el-sub-menu__title) {
+  height: 36px;
+  margin-bottom: 6px;
+  line-height: 36px;
+  border-radius: var(--layout-menu-radius);
+}
+
+:deep(.el-menu--horizontal) {
+  padding: 0 8px;
+  border-bottom: none;
+}
+
+:deep(.el-menu--horizontal > .el-menu-item),
+:deep(.el-menu--horizontal > .el-sub-menu .el-sub-menu__title) {
+  margin: 0 4px;
+  border-radius: var(--layout-menu-radius);
+}
+
 .el-dropdown-link {
   padding: 0 20px;
   display: flex;

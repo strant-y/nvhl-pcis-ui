@@ -19,24 +19,67 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { formatActionTitle } from "@/utils/action-title";
 import { useValidator } from "@/typings/useValidator";
-import {
-  saveInruanceTypeBasicInfo,
-  getCvrgList,
-  savePrdTermInfo,
-  getPrdTermInfo,
-} from "@/api/prod";
-import { ref, reactive, onMounted } from "vue";
-import { useRoute } from "vue-router";
-const router = useRouter();
+import { getPrdTermInfo, qryProdTermList, savePrdTermInfo } from "@/api/prod";
+import { nextTick, onMounted, reactive, ref, watch } from "vue";
 import { DialogMethod } from "@/common/dzmodel/ComDialogConf";
-import { clear } from "console";
 import { dataParam } from "@/store/modules/dataParam";
 import { closeCurrentTagAndBack } from "@/utils/common";
+
+const UI_MAIN_CLAUSE = "1";
+const UI_ADDITIONAL_CLAUSE = "2";
+const LEGACY_MAIN_CLAUSE = "0";
+const LEGACY_ADDITIONAL_CLAUSE = "1";
+
+const yesNoOptions = [
+  { label: "是", value: "1" },
+  { label: "否", value: "0" },
+];
+const zeroOneOptions = [
+  { label: "0-否", value: "0" },
+  { label: "1-是", value: "1" },
+];
+const clauseTypeOptions = [
+  { label: "1-主险", value: UI_MAIN_CLAUSE },
+  { label: "2-附加险", value: UI_ADDITIONAL_CLAUSE },
+];
+const productFlagOptions = [
+  { label: "1-新增", value: "1" },
+  { label: "U1-修订-报送", value: "U1" },
+  { label: "U2-修订-新增", value: "U2" },
+];
+const platformOptions = [
+  { label: "1-自主注册平台", value: "1" },
+  { label: "2-电子化报备", value: "2" },
+  { label: "3-其他", value: "3" },
+];
+const reportTypeOptions = [
+  { label: "2-备案制", value: "2" },
+  { label: "3-注册制", value: "3" },
+];
+const eastOptions = [
+  { label: "1-是", value: "1" },
+  { label: "0-否", value: "0" },
+];
+const saleStatusOptions = [
+  { label: "1-在售", value: "1" },
+  { label: "2-停售", value: "2" },
+];
+const propertyTypeOptions = [{ label: "1-普通型", value: "1" }];
+const agricultureOptions = [
+  { label: "1-是", value: "1" },
+  { label: "2-否", value: "2" },
+];
+
 const paramparam = dataParam();
-const dialog = ref<DialogMethod | null>(null);
 const param = paramparam.getParam();
+const dialog = ref<DialogMethod | null>(null);
 const { getRules } = useValidator();
 const freeEditRef = ref<AppFreeEditMethod | null>(null);
+const emit = defineEmits([
+  "clause-type-change",
+  "term-data-loaded",
+  "term-saved",
+]);
 
 const formconfig1 = reactive<AppFreeEditConfig>(
   createAppFreeEditConfig({
@@ -48,19 +91,11 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         label: "条款要素绑定",
         func: async () => {
           const cTermNo = freeEditRef.value?.getValue("cTermNo");
-
           dialog.value?.open(
             "termFactorConfig",
-            {
-              type: "show",
-              data: {
-                cTermNo: cTermNo,
-              },
-            },
-            {
-              isOk: (selectdata: any) => {},
-            },
-            { title: "条款要素绑定", width: 75 }
+            { type: "show", data: { cTermNo } },
+            { isOk: () => {} },
+            { title: "条款要素绑定", width: 75 },
           );
         },
       }),
@@ -71,65 +106,44 @@ const formconfig1 = reactive<AppFreeEditConfig>(
           const cTermNo = freeEditRef.value?.getValue("cTermNo");
           dialog.value?.open(
             "termRiskGroupConfig",
-            {
-              type: "show",
-              data: {
-                cTermNo: cTermNo,
-              },
-            },
-            {
-              isOk: (selectdata: any) => {},
-            },
-            { title: "条款责任分组关联", width: 75 }
+            { type: "show", data: { cTermNo } },
+            { isOk: () => {} },
+            { title: "条款责任分组关联", width: 75 },
           );
         },
       }),
-      // createFreeButtonBase({
-      //   label: "上传条款文件",
-      //   type: "primary",
-      //   func: async () => {
-      //     handleUpload();
-      //   },
-      // }),
       createFreeButtonBase({
         type: "primary",
         label: "保存",
         func: async () => {
           const isValid = await freeEditRef.value?.validate();
-          if (isValid) {
-            const s = freeEditRef.value?.getFromValue(); //获取表单数据
-            const datas = Object.assign(s, { type: param.type === "copy" ? "add" : param.type });
-            // const paramData = datas.map((item: any) => {
-            //   if (item.cRdrTyp == "1") {
-            //   }
-            // });
-            savePrdTermInfo(datas)
-              .then((res) => {
-                const { code, data, msg } = res;
-                if (200 === code) {
-                  freeEditRef?.value?.setFormValue({ cTermNo: data });
-                  ElMessage.success("保存成功");
-                  // 复制模式下，保存成功后通知父组件，用新 cTermNo 保存关联数据
-                  if (param.type === "copy") {
-                    nextTick(() => {
-                      emit("term-saved", data);
-                    });
-                  }
-                } else {
-                  ElMessage.error(msg);
-                }
-              })
-              .finally(() => {});
-          } else {
+          if (!isValid) {
             ElMessage.error("请填写必填项");
+            return;
           }
+
+          const formData = freeEditRef.value?.getFromValue();
+          const datas = buildSaveData(formData || {});
+          datas.type = param?.type === "copy" ? "add" : param?.type;
+          savePrdTermInfo(datas)
+            .then((res) => {
+              const { code, data, msg } = res;
+              if (code === 200) {
+                freeEditRef.value?.setFormValue({ cTermNo: data });
+                ElMessage.success("保存成功");
+                if (param?.type === "copy") {
+                  nextTick(() => emit("term-saved", data));
+                }
+              } else {
+                ElMessage.error(msg);
+              }
+            })
+            .finally(() => {});
         },
       }),
       createFreeButtonBase({
         label: "返回",
-        func: () => {
-          closeCurrentTagAndBack();
-        },
+        func: () => closeCurrentTagAndBack(),
       }),
     ],
     fromSchema: [
@@ -138,398 +152,566 @@ const formconfig1 = reactive<AppFreeEditConfig>(
         inputtype: "rtselect",
         title: "险类代码",
         typeCode: "KIND_LIST_GRT",
-        codeParam: { codeListParam: "" },
+        codeParam: { cStatus: "1" },
+        rules: [getRules("required", { change: true })],
+        func: () => updateConditionalVisibility(),
+      },
+      {
+        prop: "cEastClassCode",
+        inputtype: "rtselect",
+        title: "EAST险类",
+        typeCode: "WEB_BAS_CODELIST",
+        codeParam: { cParCde: "EastClass" },
+        filterable: true,
         rules: [getRules("required", { change: true })],
       },
       {
         prop: "cTermNo",
         inputtype: "rtinput",
         title: "条款代码",
-        disabled: true,
+        maxlength: 50,
+        disabled: param?.type === "edit",
+        rules: [getRules("required", { change: true })],
       },
       {
         prop: "cNmeCn",
         inputtype: "rtinput",
         title: "条款名称",
+        maxlength: 150,
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cNmeEn",
-        inputtype: "rtinput",
-        title: "英文名称",
-      },
-      {
-        prop: "cFilingNo",
-        inputtype: "rtinput",
-        title: "备案号",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "cRegisteredNo",
-        inputtype: "rtinput",
-        title: "注册号",
-        rules: [getRules("required", { blur: true })],
+        prop: "cRdrTyp",
+        inputtype: "rtselect",
+        title: "条款类型",
+        loadData: clauseTypeOptions,
+        rules: [getRules("required", { change: true })],
+        func: (value: any) => {
+          emit("clause-type-change", toUiClauseType(value));
+        },
       },
       {
         prop: "cEnableFlag",
         inputtype: "rtselect",
         title: "启用标志",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "use_mrk" },
+        loadData: [
+          { label: "启用", value: "1" },
+          { label: "停用", value: "0" },
+        ],
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "cIsInternet",
+        prop: "cProdFlag",
         inputtype: "rtselect",
-        title: "是否互联网",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
+        title: "产品标识",
+        loadData: productFlagOptions,
+        rules: [getRules("required", { change: true })],
+        func: () => updateConditionalVisibility(),
+      },
+      {
+        prop: "cOriginalProdNo",
+        inputtype: "rtautocomplete",
+        title: "修订的原产品关联号",
+        maxlength: 50,
+        triggerOnFocus: false,
+        fetchSuggestions: fetchOriginalProductSuggestions,
+        hidden: true,
+        rules: [getRules("required", { blur: true })],
+      },
+      {
+        prop: "cVersionNo",
+        inputtype: "rtinput",
+        title: "当前版本号",
+        maxlength: 3,
+        readonly: true,
+        placeholder: "000",
+      },
+      {
+        prop: "cClauseRegistPlatform",
+        inputtype: "rtselect",
+        title: "条款备案平台",
+        loadData: platformOptions,
         rules: [getRules("required", { change: true })],
       },
       {
-        prop: "termRateUpper",
-        inputtype: "rtnumber",
-        title: "费率上限",
-        precision: 8,
-        placeholder: "1.00000000",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "termRateLower",
-        inputtype: "rtnumber",
-        title: "费率下限",
-        precision: 8,
-        placeholder: "1.00000000",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "averageCostRate",
-        inputtype: "rtnumber",
-        title: "平均费用率",
-        precision: 8,
-        placeholder: "1.00000000",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "costRateUpper",
-        inputtype: "rtnumber",
-        precision: 8,
-        placeholder: "1.00000000",
-        step: 0.01,
-        max: 999999,
-        stepStrictly: true,
-        min: 0,
-        title: "费用率上限",
-        rules: [getRules("required", { blur: true })],
-      },
-      {
-        prop: "cRdrTyp",
+        prop: "cClauseReportType",
         inputtype: "rtselect",
-        title: "主条款/附加条款",
-        typeCode: "WEB_SYS_RdrTyp",
-        codeParam: { cParCde: "RdrTyp" },
+        title: "条款报送类型",
+        loadData: reportTypeOptions,
+        rules: [getRules("required", { change: true })],
+      },
+      {
+        prop: "cRegisteredNo",
+        inputtype: "rtinput",
+        title: "注册号",
+        maxlength: 50,
+      },
+      {
+        prop: "cFilingNo",
+        inputtype: "rtinput",
+        title: "备案号",
+        maxlength: 50,
+      },
+      {
+        prop: "cIsEast",
+        inputtype: "rtselect",
+        title: "是否EAST产品上报",
+        loadData: eastOptions,
         clearable: true,
-        rules: [getRules("required", { change: true })],
-        //主条款是0附加条款是1
-        func: (val: any) => {
-          emit("clause-type-change", val);
-          setFormItem("additionalInsuranceType", {
-            hidden: val === "1" ? 0 : 1,
-          });
-          // 当选择附加条款时，隐藏费率相关字段
-          const rateFields = ["termRateUpper", "termRateLower", "averageCostRate", "costRateUpper"];
-          rateFields.forEach(field => {
-            setFormItem(field, {
-              hidden: val === "1"
-            });
-          });
-        },
+        func: () => updateConditionalVisibility(),
       },
       {
-        prop: "additionalInsuranceType",
-        inputtype: "rtselect",
-        title: "附加条款类型",
-        typeCode: "additional_insurance",
-        codeParam: { cParCde: "add_type" },
+        prop: "cRegisterDate",
+        inputtype: "rtdatepicker",
+        title: "注册日期",
+        type: "date",
+        valueFormat: "YYYY-MM-DD",
+        format: "YYYY-MM-DD",
+        hidden: true,
         rules: [getRules("required", { change: true })],
-        hidden: false, // 初始状态为显示
       },
       {
         prop: "tFilingTm",
         inputtype: "rtdatepicker",
         title: "备案日期",
-        valueFormat: "YYYY-MM-DD HH:mm:ss",
-        format: "YYYY-MM-DD HH:mm:ss",
+        type: "date",
+        valueFormat: "YYYY-MM-DD",
+        format: "YYYY-MM-DD",
+        hidden: true,
         rules: [getRules("required", { change: true })],
       },
       {
         prop: "tFeedbackTm",
         inputtype: "rtdatepicker",
         title: "反馈日期",
-        valueFormat: "YYYY-MM-DD HH:mm:ss",
-        format: "YYYY-MM-DD HH:mm:ss",
-        rules: [getRules("required", { change: true })],
+        type: "date",
+        valueFormat: "YYYY-MM-DD",
+        format: "YYYY-MM-DD",
       },
       {
-        prop: "cRegisterDate",
-        inputtype: "rtdatepicker",
-        title: "注册日期",
-        valueFormat: "YYYY-MM-DD HH:mm:ss",
-        format: "YYYY-MM-DD HH:mm:ss",
-      },
-      {
-        prop: "cAreaRange",
+        prop: "cReportFileNo",
         inputtype: "rtinput",
-        title: "经营区域",
-        rules: [getRules("required", { blur: true })],
+        title: "报送文件编号",
       },
       {
-        prop: "cIsGreenProduct",
-        inputtype: "rtselect",
-        title: "是否绿色产品",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "cBasicRate",
+        prop: "termRateUpper",
         inputtype: "rtnumber",
-        title: "基础费率",
+        title: "备案费率上限",
         precision: 8,
-        placeholder: "1.00000000",
       },
       {
-        prop: "cRateFloatCoefFloor",
+        prop: "termRateLower",
         inputtype: "rtnumber",
-        title: "费率浮动系数上限",
+        title: "备案费率下限",
         precision: 8,
-        placeholder: "1.00000000",
       },
       {
-        prop: "cRateFloatCoefCeil",
+        prop: "costRateUpper",
         inputtype: "rtnumber",
-        title: "费率浮动系数下限",
+        title: "保司费率上限",
         precision: 8,
-        placeholder: "1.00000000",
       },
       {
-        prop: "cIsGroup",
-        inputtype: "rtselect",
-        title: "是否团单",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "isDutyfree",
-        inputtype: "rtselect",
-        title: "是否免税",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
-        rules: [getRules("required", { change: true })],
-      },
-      {
-        prop: "cInsurancePeriod",
-        inputtype: "rtinput",
-        title: "保险期间",
-      },
-      {
-        prop: "cClauseFilename",
-        inputtype: "rtinput",
-        title: "条款附件名称",
-        rules: [getRules("required", { blur: true })],
+        prop: "costRateLower",
+        inputtype: "rtnumber",
+        title: "保司费率下限",
+        precision: 8,
       },
       {
         prop: "cRateFilepath",
         inputtype: "rtinput",
         title: "费率附件下载路径",
-        btnWidth: 20,
-        itemWidth: 3,
-        disabled: true,
       },
       {
-        prop: "cIsExist",
-        inputtype: "rtselect",
-        title: "电子保单是否存在",
-        typeCode: "WEB_SYS_STA_DICT",
-        codeParam: { cParCde: "yes_no" },
+        prop: "tSaleStartTm",
+        inputtype: "rtdatepicker",
+        title: "备案起售日期",
+        type: "date",
+        valueFormat: "YYYY-MM-DD",
+        format: "YYYY-MM-DD",
+        hidden: true,
         rules: [getRules("required", { change: true })],
       },
-      // {
-      //   prop: "cClassOfClause",
-      //   inputtype: "rtselect",
-      //   title: "条款类别",
-      //   typeCode: "ClassOfClause",
-      //   codeParam: { cParCde: "" },
-      // },
       {
-        prop: "cWebsite",
+        prop: "tSaleEndTm",
+        inputtype: "rtdatepicker",
+        title: "备案停售日期",
+        type: "date",
+        valueFormat: "YYYY-MM-DD",
+        format: "YYYY-MM-DD",
+        placeholder: "支持 9999-12-31",
+        hidden: true,
+        rules: [getRules("required", { change: true })],
+      },
+      {
+        prop: "cSaleStatus",
+        inputtype: "rtselect",
+        title: "产品销售状态",
+        loadData: saleStatusOptions,
+        readonly: true,
+      },
+      {
+        prop: "tStopUseTm",
+        inputtype: "rtdatepicker",
+        title: "条款停止使用时间",
+        type: "datetime",
+        valueFormat: "YYYY-MM-DD HH:mm:ss",
+        format: "YYYY-MM-DD HH:mm:ss",
+        hidden: true,
+        rules: [getRules("required", { change: true })],
+      },
+      {
+        prop: "cAreaRange",
+        inputtype: "rtselect",
+        title: "经营区域",
+        typeCode: "WEB_BAS_AREA",
+        codeParam: { cType: "3" },
+        multiple: true,
+        filterable: true,
+        clearable: true,
+      },
+      {
+        prop: "cIsInternet",
+        inputtype: "rtselect",
+        title: "是否互联网",
+        loadData: yesNoOptions,
+      },
+      {
+        prop: "cIsGroup",
+        inputtype: "rtselect",
+        title: "是否团单",
+        loadData: yesNoOptions,
+      },
+      {
+        prop: "isDutyfree",
+        inputtype: "rtselect",
+        title: "是否免税",
+        loadData: zeroOneOptions,
+      },
+      {
+        prop: "cIsFromCommon",
+        inputtype: "rtselect",
+        title: "是否从共条款",
+        loadData: yesNoOptions,
+      },
+      {
+        prop: "cAgriculturalType",
+        inputtype: "rtselect",
+        title: "农险产品类型",
+        typeCode: "WEB_BAS_CODELIST",
+        codeParam: { cParCde: "AgriculturalType" },
+        filterable: true,
+        hidden: true,
+        rules: [getRules("required", { change: true })],
+      },
+      {
+        prop: "cPropertyType",
+        inputtype: "rtselect",
+        title: "财产险产品类型",
+        loadData: propertyTypeOptions,
+      },
+      {
+        prop: "cPolicyFlag",
+        inputtype: "rtselect",
+        title: "政策性保险标志",
+        loadData: zeroOneOptions,
+        func: () => updateConditionalVisibility(),
+      },
+      {
+        prop: "cSubsidyRate",
         inputtype: "rtinput",
-        title: "官网链接",
-        btnWidth: 20,
-        itemWidth: 3,
-        disabled: true,
+        title: "政府保费补贴比例",
+        type: "number",
+        maxlength: 8,
+        hidden: true,
+        rules: [getRules("required", { blur: true })],
+      },
+      {
+        prop: "cAgricultureFlag",
+        inputtype: "rtselect",
+        title: "涉农标志",
+        loadData: agricultureOptions,
+      },
+      {
+        prop: "cVirtualFlag",
+        inputtype: "rtselect",
+        title: "产品虚标标志",
+        loadData: zeroOneOptions,
+        readonly: true,
+      },
+      {
+        prop: "cApprovalNo",
+        inputtype: "rtinput",
+        title: "关联审批申请单号",
+        maxlength: 50,
+        rules: [getRules("required", { blur: true })],
+      },
+      {
+        prop: "cClauseUrl",
+        inputtype: "rtinput",
+        title: "条款附件链接",
+        maxlength: 1000,
       },
       {
         prop: "cDesc",
         inputtype: "rtinput",
         type: "textarea",
-        btnWidth: 20,
-        itemWidth: 3,
-        rows: 4,
         title: "条款描述",
+        rows: 4,
+        itemWidth: 3,
       },
     ],
-    fromUi: createFromUiConfig({
-      cols: 3,
-    }),
-  })
+    fromUi: createFromUiConfig({ cols: 3 }),
+  }),
 );
-// 上传文件处理函数
-const handleUpload = async () => {
-  try {
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = ".pdf,.docx";
-    fileInput.onchange = async (event: any) => {
-      const file = event.target.files[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const response = await uploadFile(formData);
-        if (response.code === 200) {
-          ElMessage.success("文件上传成功");
-        } else {
-          ElMessage.error(response.msg || "文件上传失败");
-        }
-      }
-    };
-    fileInput.click();
-  } catch (error) {
-    ElMessage.error("文件上传失败");
+
+function updateConditionalVisibility() {
+  const productFlag = String(getValue("cProdFlag") || "");
+  const eastFlag = String(getValue("cIsEast") || "");
+  const productKind = String(getValue("cKindNo") || "").padStart(2, "0");
+  const policyFlag = String(getValue("cPolicyFlag") || "");
+  const saleStatus = String(getValue("cSaleStatus") || "");
+
+  setFormItem("cOriginalProdNo", {
+    hidden: !["U1", "U2"].includes(productFlag),
+  });
+  const eastRequired = eastFlag === "1";
+  ["cRegisterDate", "tFilingTm", "tSaleStartTm", "tSaleEndTm"].forEach(
+    (field) => {
+      setFormItem(field, { hidden: !eastRequired });
+    },
+  );
+  setFormItem("cAgriculturalType", {
+    hidden: !["20", "21", "22"].includes(productKind),
+  });
+  setFormItem("cSubsidyRate", { hidden: policyFlag !== "1" });
+  setFormItem("tStopUseTm", { hidden: saleStatus !== "2" });
+}
+
+function setFormItem(key: string, value: Record<string, any>) {
+  const item = formconfig1.fromSchema?.find((schema) => schema.prop === key);
+  if (item) {
+    Object.assign(item, value);
   }
-};
-
-//上传文件的 API
-const uploadFile = (formData: FormData) => {
-  // 调用后端 API 进行文件上传
-  // return axios.post('/api/upload', formData, {
-  //   headers: {
-  //     'Content-Type': 'multipart/form-data',
-  //   },
-  // });
-};
-function setFormItem(key: any, obj: any) {
-  if (obj && Object.keys(obj).length) {
-    formconfig1.fromSchema?.forEach((item) => {
-      if (item.prop === key) {
-        //控制尾部按钮的
-        if (item.btnItems && obj.btnItems) {
-          for (let key in obj.btnItems) {
-            item.btnItems[key] = obj.btnItems[key];
-          }
-        }else{
-          Object.assign(item, obj);
-        }
-      }
-    });
-  }
-}
-function getFromValue() {
-  return freeEditRef?.value?.getFromValue();
-}
-
-function setFormValue(value: any) {
-  freeEditRef?.value?.setFormValue(value);
-}
-
-function validate() {
-  return freeEditRef?.value?.validate();
-}
-
-function setValue(key: string, value: any) {
-  freeEditRef?.value?.setValue(key, value);
 }
 
 function getValue(key: string) {
-  return freeEditRef?.value?.getValue(key);
+  return freeEditRef.value?.getValue(key);
 }
+
+function setValue(key: string, value: any, noupdate = false) {
+  freeEditRef.value?.setValue(key, value, noupdate);
+}
+
+function getFromValue() {
+  return freeEditRef.value?.getFromValue();
+}
+
+function setFormValue(value: any) {
+  freeEditRef.value?.setFormValue(value);
+}
+
+function validate() {
+  return freeEditRef.value?.validate();
+}
+
+function toUiClauseType(value: any) {
+  const clauseType = value == null ? value : String(value);
+  if (clauseType === LEGACY_MAIN_CLAUSE) return UI_MAIN_CLAUSE;
+  return clauseType;
+}
+
+function normalizeLoadedClauseType(value: any) {
+  const clauseType = value == null ? value : String(value);
+  if (clauseType === LEGACY_MAIN_CLAUSE) return UI_MAIN_CLAUSE;
+  if (clauseType === LEGACY_ADDITIONAL_CLAUSE) return UI_ADDITIONAL_CLAUSE;
+  return clauseType;
+}
+
+function toApiClauseType(value: any) {
+  const clauseType = value == null ? value : String(value);
+  if (clauseType === UI_MAIN_CLAUSE) return LEGACY_MAIN_CLAUSE;
+  if (clauseType === UI_ADDITIONAL_CLAUSE) return LEGACY_ADDITIONAL_CLAUSE;
+  return clauseType;
+}
+
+function normalizeAreaValue(value: any) {
+  if (Array.isArray(value)) return value;
+  if (value == null || value === "") return [];
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        // 按普通分隔字符串继续处理
+      }
+    }
+    return trimmed
+      .split(/[,，]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [value];
+}
+
+function normalizeLoadedData(data: any) {
+  const normalized = { ...(data || {}) };
+  const aliases: Record<string, string[]> = {
+    cEastClassCode: ["classCode"],
+    cVersionNo: ["versionNo"],
+    cOriginalProdNo: ["originalProductNo"],
+    cClauseRegistPlatform: ["clauseRegistPlatform"],
+    cClauseReportType: ["clauseReportType"],
+    cIsEast: ["validIndEast"],
+    cRegisterDate: ["registDate"],
+    tFilingTm: ["recordDate"],
+    tSaleStartTm: ["saleStartDate"],
+    tSaleEndTm: ["saleEndDate"],
+    tStopUseTm: ["ProposeSaleStopDate", "proposeSaleStopDate"],
+    cAreaRange: ["saleDistrict"],
+    cAgriculturalType: ["agriculturalType"],
+    cPropertyType: ["propertyType"],
+    isDutyfree: ["taxFlag"],
+    cPolicyFlag: ["policyFlag"],
+    cAgricultureFlag: ["isAgriculture"],
+    cVirtualFlag: ["virtualInd"],
+    cClauseUrl: ["clauseUrl"],
+    cRegisteredNo: ["registNo"],
+    cFilingNo: ["recordNumber"],
+    cRdrTyp: ["kindInd"],
+  };
+
+  Object.entries(aliases).forEach(([target, sources]) => {
+    if (normalized[target] == null) {
+      const source = sources.find((key) => normalized[key] != null);
+      if (source) normalized[target] = normalized[source];
+    }
+  });
+  normalized.cRdrTyp = normalizeLoadedClauseType(normalized.cRdrTyp);
+  normalized.cAreaRange = normalizeAreaValue(normalized.cAreaRange);
+  return normalized;
+}
+
+function buildSaveData(formData: any) {
+  const data = { ...(formData || {}) };
+  data.cRdrTyp = toApiClauseType(data.cRdrTyp);
+  if (Array.isArray(data.cAreaRange)) {
+    data.cAreaRange = data.cAreaRange.join(",");
+  }
+  return data;
+}
+
+function fetchOriginalProductSuggestions(
+  query: string,
+  callback: (suggestions: any[]) => void,
+) {
+  const keyword = query?.trim();
+  if (!keyword) {
+    callback([]);
+    return;
+  }
+  qryProdTermList({
+    cTermNo: keyword,
+    cEnableFlag: "1",
+    pageNum: 1,
+    pageSize: 20,
+  })
+    .then((res: any) => {
+      const list = res?.data?.result || res?.data?.list || [];
+      callback(
+        list.map((item: any) => ({
+          value: item.cTermNo,
+          label: `${item.cTermNo || ""}${item.cNmeCn ? ` ${item.cNmeCn}` : ""}`,
+        })),
+      );
+    })
+    .catch(() => callback([]));
+}
+
 function handleQuery() {
-  const newparam = { cPkId: param.row.cPkId, pageNum: 1, pageSize: 10 };
-  getPrdTermInfo(newparam)
+  const cPkId = param?.row?.cPkId;
+  if (!cPkId) return;
+  getPrdTermInfo({ cPkId, pageNum: 1, pageSize: 10 })
     .then((res) => {
       const { code, data, msg } = res;
-      if (200 === code) {
-        setTimeout(() => {
-          freeEditRef?.value?.setFormValue(data);
-          emit("clause-type-change", data?.cRdrTyp);
-          // 复制模式下，保留原始 cTermNo 先不清空，通知父组件触发关联查询
-          // 关联查询完成后再由父组件调用 clearCopyTermNo() 清空
-          if (param.type === "copy") {
-            nextTick(() => {
-              emit("term-data-loaded");
-            });
-          }
-        }, 1000);
-      } else {
+      if (code !== 200) {
         ElMessage.error(msg);
+        return;
       }
+      setTimeout(() => {
+        const normalized = normalizeLoadedData(data);
+        setFormValue(normalized);
+        updateConditionalVisibility();
+        emit("clause-type-change", normalized.cRdrTyp);
+        if (param?.type === "copy") {
+          nextTick(() => emit("term-data-loaded"));
+        }
+      }, 100);
     })
     .finally(() => {});
 }
 
-/**
- * 复制模式下，清空条款代码
- * 在关联责任和关联附加条款查询完成后，由父组件调用此方法
- */
 function clearCopyTermNo() {
-  if (param.type === "copy") {
-    freeEditRef?.value?.setValue("cTermNo", null);
+  if (param?.type === "copy") {
+    setValue("cTermNo", null);
   }
 }
 
-const emit = defineEmits(["clause-type-change", "term-data-loaded", "term-saved"]);
-
-// 监听主条款/附加条款字段的变化
-watch(
-  () => freeEditRef.value?.getValue("cRdrTyp"),
-  (newValue) => {
-    emit("clause-type-change", newValue);
-  }
-);
 function setDisa() {
-  formconfig1.fromSchema?.forEach((e) => {
-    if (e.prop === "cTermNo" || e.prop === "cWebsite") {
-      e.disabled = true;
-    }
-  });
+  if (param?.type === "edit") {
+    setFormItem("cTermNo", { disabled: true });
+  }
 }
+
+watch(
+  () => [
+    getValue("cRdrTyp"),
+    getValue("cProdFlag"),
+    getValue("cIsEast"),
+    getValue("cKindNo"),
+    getValue("cPolicyFlag"),
+    getValue("cSaleStatus"),
+  ],
+  () => {
+    updateConditionalVisibility();
+    const clauseType = getValue("cRdrTyp");
+    if (clauseType != null) {
+      emit("clause-type-change", toUiClauseType(clauseType));
+    }
+  },
+  { immediate: true },
+);
+
 defineExpose({
   getFromValue,
   setFormValue,
   validate,
   setValue,
   getValue,
-  /** 暴露清空复制条款代码方法，供父组件在关联查询后调用 */
   clearCopyTermNo,
 });
 
-watch(
-  () => formconfig1.fromSchema,
-  (newVal) => {},
-  {
-    deep: true,
-  }
-);
-
 onMounted(() => {
-  
-  if (param.type === "edit" || param.type === "copy") {
+  if (param?.type === "edit" || param?.type === "copy") {
+    setDisa();
     handleQuery();
   } else {
-    // 如果不是编辑模式，确保默认值生效
-    freeEditRef.value?.setFormValue({ cSourceTyp: "9" });
-    freeEditRef?.value?.setFormValue({cIsExist:'0'})
+    setFormValue({
+      cEnableFlag: "1",
+      cProdFlag: "1",
+      cIsEast: "0",
+      cPropertyType: "1",
+      cVirtualFlag: "0",
+      cIsInternet: "0",
+      cIsGroup: "0",
+      isDutyfree: "0",
+      cIsFromCommon: "0",
+      cPolicyFlag: "0",
+      cAgricultureFlag: "2",
+    });
+    updateConditionalVisibility();
   }
 });
 </script>

@@ -21,21 +21,64 @@
   --rt-border: rgb(100 100 100 / 20%) 1px solid !important;
   --rt-overlay-color: rgb(20 20 20 / 10%) !important;
 
-  --rt-form-item-radius: 2px;
+  --rt-form-item-radius: 6px;
   --rt-form-content-font-size: 12px; // 表单content字体大小
   --rt-form-content-font-weight: 450;
-  --rt-form-content-height: 24px; // 表单content高
-  --rt-form-content-line-height: 24px;
-  --rt-form-label-font-size: 12px; // 表单label字体大小
+  --rt-form-content-height: 28px; // 表单content高
+  
+  --rt-form-label-font-size: 13px; // 表单label字体大小
   --rt-form-label-font-weight: 400;
-  --rt-form-label-font-color: #000000;
-  --rt-form-label-padding: 0 3px 0 0, // 标签内边距
+  --rt-form-label-font-color: #646a73;
+  --rt-form-label-padding: 0 8px 0 0; // 标签内边距
+
+  // Layout / Navigation
+  --layout-header-bg: rgba(255, 255, 255, 0.92);
+  --layout-surface-bg: rgba(255, 255, 255, 0.86);
+  --layout-border-color: rgba(15, 23, 42, 0.08);
+  --layout-header-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --layout-hover-bg: rgba(64, 158, 255, 0.1);
+  --layout-hover-text: var(--el-color-primary);
+  --layout-menu-radius: 8px;
+  // has-logo 区域 el-menu 背景色（浅色模式纯白，暗黑模式跟随导航栏）
+  --menu-bg-has-logo: #fff;
+  --layout-dropdown-bg: rgba(15, 23, 42, 0.9);
+  --layout-dropdown-border: rgba(255, 255, 255, 0.12);
+  --layout-dropdown-text: rgba(255, 255, 255, 0.86);
+  --layout-dropdown-muted: rgba(255, 255, 255, 0.65);
+
+  // Dashboard 专用变量
+  --dash-bg: #f0f2f5;
+  --dash-card-bg: #fff;
+  --dash-card-border: #e8e8e8;
+  --dash-text-primary: #1a1a1a;
+  --dash-text-secondary: #333;
+  --dash-text-muted: #999;
+  --dash-table-header-bg: #fafafa;
+  --dash-table-border: #f0f0f0;
+  --dash-table-row-border: #f5f5f5;
+  --dash-hover-bg: #f9fbff;
+  --dash-hover-shadow: rgba(0, 0, 0, 0.08);
+  --dash-quick-link-bg: #f8fafc;
+  --dash-quick-link-hover-bg: #e8f0fe;
+  --dash-quick-link-hover-border: #3a76c5;
+  --dash-progress-bg: #f0f0f0;
+  // Accent 色系（Badge / 图标背景）
+  --dash-accent-blue-bg: #e8f0fe;
+  --dash-accent-blue-color: #3a76c5;
+  --dash-accent-green-bg: #e6f7e6;
+  --dash-accent-green-color: #52c41a;
+  --dash-accent-orange-bg: #fff7e6;
+  --dash-accent-orange-color: #fa8c16;
+  --dash-accent-purple-bg: #f3e8ff;
+  --dash-accent-purple-color: #722ed1;
+  --dash-accent-red-bg: #fff1f0;
+  --dash-accent-red-color: #ff4d4f;
 }
 
 
 
 html.default {
-  --menu-background: #f0f5f9;;
+  --menu-background: #f7f8fa;;
   --menu-active-text: #FFFFFF;
   --menu-hover: rgba(171, 212, 253, 0.4);
   --menu-text: #000000;
@@ -46,7 +89,7 @@ html.default {
   --rt-select-row-bg-color: rgba(165, 204, 255, 0.15);
 }
 html.orange {
-  --menu-background: #f0f5f9;;
+  --menu-background: #f7f8fa;;
   --menu-active-text: #FFFFFF;
   --menu-hover: rgba(236, 177, 148, 0.4);
   --menu-text: #000000;
@@ -57,7 +100,7 @@ html.orange {
   --rt-select-row-bg-color: rgba(255, 211, 169, 0.15);
 }
 html.green {
-  --menu-background: #f0f5f9;
+  --menu-background: #f7f8fa;
   --menu-active-text: #FFFFFF;
   --menu-hover: rgba(184, 248, 218, 0.4);
   --menu-text: #000;
@@ -74,6 +117,9 @@ html.dark {
   --menu-background: rgb(0 0 0 / 80%);
   --menu-text: #fff !important;
   --menu-hover: rgb(220 220 220 / 30%);
+  --menu-active-text: #fff;
+  // has-logo 区域 el-menu 背景色跟随暗黑导航栏
+  --menu-bg-has-logo: var(--layout-header-bg);
 
   --sidebar-logo-background: rgba(255, 255, 255, 0.6);
   --el-text-color: #b9b9b9 !important;
@@ -99,6 +145,44 @@ html.dark {
   --dashboard-bg: rgb(0 0 0 / 85%) !important;
   --el-text-color-regular: #bababa;
   --rt-form-label-font-color: rgba(220, 220, 220, 0.5);
+  --layout-header-bg: rgba(17, 24, 39, 0.92);
+  --layout-surface-bg: rgba(17, 24, 39, 0.86);
+  --layout-border-color: rgba(148, 163, 184, 0.16);
+  --layout-header-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  --layout-hover-bg: rgba(255, 255, 255, 0.1);
+  --layout-hover-text: #ffffff;
+  --layout-dropdown-bg: rgba(2, 6, 23, 0.94);
+  --layout-dropdown-border: rgba(148, 163, 184, 0.2);
+  --layout-dropdown-text: rgba(255, 255, 255, 0.9);
+  --layout-dropdown-muted: rgba(255, 255, 255, 0.72);
+
+  // Dashboard 专用变量 - 暗色
+  --dash-bg: #141414;
+  --dash-card-bg: #1f1f1f;
+  --dash-card-border: #303030;
+  --dash-text-primary: #e0e0e0;
+  --dash-text-secondary: #c0c0c0;
+  --dash-text-muted: #888;
+  --dash-table-header-bg: #262626;
+  --dash-table-border: #303030;
+  --dash-table-row-border: #2a2a2a;
+  --dash-hover-bg: #262626;
+  --dash-hover-shadow: rgba(0, 0, 0, 0.3);
+  --dash-quick-link-bg: #1a1a2e;
+  --dash-quick-link-hover-bg: rgba(58, 118, 197, 0.15);
+  --dash-quick-link-hover-border: #5ba0e6;
+  --dash-progress-bg: #2a2a2a;
+  // Accent 色系 - 暗色（半透明背景 + 更亮的文字色）
+  --dash-accent-blue-bg: rgba(58, 118, 197, 0.15);
+  --dash-accent-blue-color: #5ba0e6;
+  --dash-accent-green-bg: rgba(82, 196, 26, 0.15);
+  --dash-accent-green-color: #73d13d;
+  --dash-accent-orange-bg: rgba(250, 140, 22, 0.15);
+  --dash-accent-orange-color: #ffa940;
+  --dash-accent-purple-bg: rgba(114, 46, 209, 0.15);
+  --dash-accent-purple-color: #9254de;
+  --dash-accent-red-bg: rgba(255, 77, 79, 0.15);
+  --dash-accent-red-color: #ff7875;
 }
 
 $menu-background: var(--menu-background); // 菜单背景色
@@ -107,17 +191,33 @@ $menu-active-text: var(--menu-active-text); // 菜单激活文字颜色
 $menu-hover: var(--el-color-primary); // 菜单悬停背景色
 $sidebar-logo-background: var(--sidebar-logo-background); // 侧边栏 Logo 背景色
 
-.el-menu-item:hover,.el-menu-item.is-active {
-  background-color: var(--el-color-primary) !important;
-  color: #FFFFFF!important;
+// 菜单 hover / active 统一规范（飞书式软着色，替代厚重蓝底白字）
+.el-menu-item:hover {
+  background-color: var(--layout-hover-bg) !important;
+  color: var(--layout-hover-text) !important;
+}
+.el-menu-item.is-active {
+  background-color: var(--el-color-primary-light-9) !important;
+  color: var(--el-color-primary) !important;
+  font-weight: 600;
 }
 .el-sub-menu__title:hover {
-  background-color: var(--el-color-primary);
-  color: #FFFFFF;
+  background-color: var(--layout-hover-bg);
+  color: var(--layout-hover-text);
+}
+.el-sub-menu.is-active > .el-sub-menu__title {
+  color: var(--el-color-primary);
+  font-weight: 600;
+}
+// 水平菜单激活态不显示下边框，统一为圆角高亮块
+.el-menu--horizontal .el-menu-item.is-active,
+.el-menu--horizontal .el-sub-menu.is-active .el-sub-menu__title {
+  border-bottom-color: transparent;
 }
 
 $sidebar-width: 210px; // 侧边栏宽度
 $sidebar-width-collapsed: 54px; // 侧边栏收缩宽度
-$navbar-height: 38px; // 导航栏高度
-$tags-view-height: 35px; // TagsView 高度
+$navbar-height: 48px; // 导航栏高度
+$tags-view-height: 40px; // TagsView 高度
+$page-header-height: 42px; // 页面标题区高度
 $menu-text-size: var(--menu-text-size);

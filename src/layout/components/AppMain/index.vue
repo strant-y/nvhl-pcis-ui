@@ -1,5 +1,6 @@
 <template>
   <section class="app-main">
+    
     <router-view>
       <template #default="{ Component, route }">
         <transition

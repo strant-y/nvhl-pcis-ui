@@ -1,24 +1,15 @@
 <template>
-  <div class="flex">
+  <div class="navbar-right">
     <template v-if="device !== 'mobile'">
-      <!-- 操作手册 -->
-      <!-- <div class="setting-word" @click="downWord"> -->
-			<div class="setting-word" @click="view">
-        <el-icon>
-          <Memo />
-        </el-icon>
-      </div>
-
       <!--全屏 -->
       <div class="setting-item" @click="toggle">
         <svg-icon :icon-class="isFullscreen ? 'fullscreen-exit' : 'fullscreen'" />
       </div>
 
       <!-- 消息 -->
-      <div ref="buttonRef" class="setting-word"  
-        style="position: relative;display: inline-block;">
+      <div ref="buttonRef" class="setting-word notify-trigger">
 				<el-badge :value="total" :max="99" class="item" :offset="[0, 10]">
-					<el-icon style="font-size: 20px; ">
+					<el-icon class="notify-icon">
 						<bell />
 					</el-icon>
 				</el-badge>
@@ -28,33 +19,31 @@
 
       <el-popover ref="popoverRef" :virtual-ref="buttonRef" trigger="click" virtual-triggering :width="350">
 				<!-- 外层容器：启用 flex 纵向布局 -->
-				<div style="display: flex; flex-direction: column; height: 100%; max-height: 500px;">
+				<div class="message-popover">
 					<div class="tab-box">
 						<div v-for="(tab, index) in tabs" :key="index" class="tab-btn" :class="{ active: currentTab === tab }"
 							@click="switchTab(tab)">
 							{{ tab }}
 						</div>
 					</div>
-					<div style="border-bottom: 1px solid #cccccc;"></div>
+					<div class="popover-divider"></div>
 
 					<!-- 中间：可滚动内容区 -->
-					<div style="flex: 1; overflow-y: auto;">
+					<div class="popover-body">
 						<div v-if="currentTab == '消息'" class="mes-box">
 							<ul v-if="mesList.length > 0">
 								<li v-for="item in mesList" :key="item">
-									<div style="  padding: 0 5px;">
-										<img src="@/assets/icons/letter.svg" width="30px" alt="My Icon"
-											style="padding: 5px; border-radius: 50%; background: #f8fdb4; display: flex; align-items: center; justify-content: center;" />
+									<div class="message-icon-wrap">
+										<img src="@/assets/icons/letter.svg" width="30px" alt="My Icon" class="message-avatar" />
 									</div>
-									<div>
-										<div style="font-weight: 600; cursor: pointer;" @click="JumpClick(item)">【{{ item.title }}】</div>
-										<div style="font-size: 12px; padding-top: 5px;">{{ item.description }}
+									<div class="message-content">
+										<div class="message-title" @click="JumpClick(item)">【{{ item.title }}】</div>
+										<div class="message-desc">{{ item.description }}
 											<span v-if="item.dataId">【申请单号：{{ item.dataId }}】</span>
 											<span v-if="item.cEdrNo">【批单号：{{ item.cEdrNo }}】</span>
 											<span v-if="item.cplyNo">【保单号：{{ item.cplyNo }}】</span>
 										</div>
-										<div
-											style="font-size: 12px; display: flex; align-items: center; justify-content: space-between; padding-top: 5px;">
+										<div class="message-meta">
 											<span v-if="item.operId">提交人：{{ item.operId }}</span>
 											<span>{{ item.datetime }}</span>
 										</div>
@@ -91,12 +80,12 @@
 					</div>
 					<!-- 统一底部按钮：始终显示在 popover 底部 -->
 					<div
-						v-if="currentTab === '消息' && mesList.length > 0" style="padding-top: 10px; border-top: 1px solid #eee; text-align: center;"
+						v-if="currentTab === '消息' && mesList.length > 0" class="popover-footer"
 					>
 						<el-button
 							type="text"
 							size="small"
-							style="color: #f56c6c; font-size: 13px;"
+							class="clear-button"
 							@click="clear"
 						>
 							清空通知
@@ -131,13 +120,13 @@
 
     <!-- 用户头像 -->
     <el-dropdown class="setting-item" trigger="click">
-      <div class="flex-center h100% p10px">
+      <div class="flex-center h100% p10px user-trigger">
         <img v-if="userStore.user.cCssStyle === '0'" class="rounded-full mr-10px w24px w24px"
           src="/src/assets/images/0_.png" />
         <img v-else-if="userStore.user.cCssStyle === '1'" class="rounded-full mr-10px w24px w24px"
           src="/src/assets/images/1_.png" />
         <el-icon v-else><User /></el-icon>
-        <span style="margin-left: 0.3rem;">{{ userStore.user.opCnm }}</span>
+        <span class="user-name">{{ userStore.user.opCnm }}</span>
       </div>
       <template #dropdown>
         <el-dropdown-menu>
@@ -145,11 +134,11 @@
           <!-- <el-dropdown-item @click="openShortcutEdit"> <el-icon><Menu /></el-icon>
             <span style="font-size: var(--menu-text-size);">快捷菜单</span></el-dropdown-item> -->
           <el-dropdown-item @click="openDialog" v-if="userStore.user.src == null"> <el-icon><Lock /></el-icon>
-            <span style="font-size: var(--menu-text-size);">修改密码</span></el-dropdown-item>
+            <span class="dropdown-label">修改密码</span></el-dropdown-item>
           <el-dropdown-item @click="clearRedisCache" v-if="showRedisCache">清除redis缓存</el-dropdown-item>
           <el-dropdown-item @click="logout">
             <el-icon><SwitchButton /></el-icon>
-            <span style="font-size: var(--menu-text-size);">退出登录</span></el-dropdown-item>
+            <span class="dropdown-label">退出登录</span></el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -198,10 +187,9 @@
       </div>
     </template>
   </el-dialog>
-  <ViewPdf ref="pdfDialogRef"></ViewPdf>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, nextTick, unref } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import {
   useAppStore,
   useTagsViewStore,
@@ -211,17 +199,10 @@ import {
 import { redisCache } from "@/api/dict";
 import defaultSettings from "@/settings";
 import { updateUserPassword, changeDptToken } from "@/api/user";
-import { download } from "@/utils/request";
-import { LocalBaseApi } from "@/api/config";
 import { PcisQueryService } from "@/views/payinfoManagement/service/pcis-query-service";
 
 import { useRouter, useRoute } from "vue-router";
-import { useDzModal } from "@/common/dzmodel/DzModalService";
-import { ElIcon } from 'element-plus'
 import { Notification } from '@element-plus/icons-vue'
-import { viewManual } from "@/api/prod";
-import ViewPdf from "@/views/apdfmodo/viewPdf.vue";
-const dzmodal = useDzModal();
 // 临时禁用快捷菜单功能，避免依赖dashboard
 // const shortMenuDialog = defineAsyncComponent(
 //   () => import("@/views/dashboard/components/shortMenuDialog.vue")
@@ -259,18 +240,7 @@ const bulList = ref([])
 const currentIndex = ref(30); // 当前索引，用于加载更多
 let total = ref(0);  // 总条数
 // ref(allItems.value.slice(0, 3));
-const hasMoreItems = computed(() => total.value > mesList.value.length);
 
-const loadMore = () => {
-  // const nextItems = arr.value.slice(currentIndex.value, currentIndex.value + 999); // 每次加载10条数据
-  // mesList.value.push(...nextItems);
-  currentIndex.value = total.value;
-
-
-  loadData()
-};
-
-const pdfDialogRef = ref(null);
 onMounted(() => {
   selectDpt.value = user.companyId;
   dptList.value = user.opOrgs;
@@ -283,12 +253,6 @@ onMounted(() => {
   }
   loadData()
 	// getShortMenuList() // 临时禁用快捷菜单功能
-	// nextTick(() => {
-  //   if (pdfDialogRef.value) {
-  //     // 调用 preload：静默执行，成功则存缓存，失败也不报错
-  //     pdfDialogRef.value.preload(() => viewManual());
-  //   }
-  // });
 });
 
 
@@ -312,11 +276,6 @@ const loadData = () => {
   })
 
 }
-
-const showPopover = () => {
-  unref(popoverRef).popperRef?.delayHide?.()
-  // visible2.value = !visible2.value; // 切换弹出框显示
-};
 
 // 点击跳转查询
 const JumpClick = (row: any) => {
@@ -455,20 +414,6 @@ const changeDpt = () => {
     });
   })
 }
-
-// const downWord = () => {
-//   let url = `/down/handBook`;
-//   download(url, {}, '安责险事故预防平台操作手册.docx');
-// }
-// 操作手册
-const view = async () => {
-  if (pdfDialogRef.value) {
-    // 调用 open 方法
-    // 如果预加载成功，这里会瞬间打开并显示 PDF
-    // 如果预加载失败或没做，这里会打开 Dialog 并显示 Loading 然后请求
-    await pdfDialogRef.value.open(() => viewManual());
-  }
-};
 
 const formData = reactive({
   userId: userStore.user.opCde,
@@ -665,38 +610,69 @@ const initBulletinScroll = () => {
 }
 </script>
 <style lang="scss" scoped>
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
 .setting-item {
-  display: inline-block;
-  min-width: 40px;
-  height: $navbar-height;
-  line-height: $navbar-height;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 6px;
   color: var(--el-text-color);
   text-align: center;
   cursor: pointer;
   font-size: var(--menu-text-size);
+  border-radius: var(--layout-menu-radius);
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  svg {
+    font-size: 16px;
+  }
+
   &:hover {
-    background: rgb(0 0 0 / 10%);
+    background: var(--layout-hover-bg);
+    color: var(--layout-hover-text);
   }
 }
 
 .setting-word {
-  display: inline-block;
-  min-width: 40px;
-  height: $navbar-height;
-  line-height: $navbar-height;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 6px;
   color: var(--el-text-color);
   text-align: center;
   cursor: pointer;
   font-size: 14px;
+  border-radius: var(--layout-menu-radius);
+  transition: background-color 0.2s ease, color 0.2s ease;
 
   :deep(.el-icon) {
-    font-size: 14px;
+    font-size: 16px;
     display: inline-block !important;
   }
 
   &:hover {
-    background: rgb(0 0 0 / 10%);
+    background: var(--layout-hover-bg);
+    color: var(--layout-hover-text);
   }
+}
+
+.notify-trigger {
+  position: relative;
+  display: inline-block;
+}
+
+.notify-icon {
+  font-size: 16px !important;
 }
 
 .layout-top,
@@ -710,6 +686,10 @@ const initBulletinScroll = () => {
 }
 
 .dark .setting-item:hover {
+  background: rgb(255 255 255 / 20%);
+}
+
+.dark .setting-word:hover {
   background: rgb(255 255 255 / 20%);
 }
 
@@ -729,6 +709,85 @@ const initBulletinScroll = () => {
   }
 }
 
+.user-trigger {
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.user-name {
+  margin-left: 0.3rem;
+  max-width: 120px;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-label {
+  margin-left: 0.3rem;
+  font-size: var(--menu-text-size);
+}
+
+.message-popover {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+}
+
+.popover-divider {
+  border-bottom: 1px solid var(--el-border-color);
+}
+
+.popover-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.popover-footer {
+  padding-top: 10px;
+  text-align: center;
+  border-top: 1px solid var(--el-border-color);
+}
+
+.clear-button {
+  font-size: 13px;
+  color: var(--el-color-danger);
+}
+
+.message-icon-wrap {
+  padding: 0 5px;
+}
+
+.message-avatar {
+  display: flex;
+  padding: 5px;
+  background: #f8fdb4;
+  border-radius: 50%;
+}
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-title {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.message-desc,
+.message-meta {
+  padding-top: 5px;
+  font-size: 12px;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--el-text-color-secondary);
+}
 
 .badge {
   position: absolute;
@@ -750,6 +809,7 @@ const initBulletinScroll = () => {
   display: flex;
   justify-content: center;
   font-size: 12px;
+  padding-bottom: 4px;
 
   .tab-btn {
     margin: 0 10px;
@@ -760,8 +820,8 @@ const initBulletinScroll = () => {
   }
 
   .active {
-    border-bottom: 2px solid red;
-    color: chocolate;
+    border-bottom: 2px solid var(--el-color-primary);
+    color: var(--el-color-primary);
   }
 }
 
@@ -772,8 +832,8 @@ const initBulletinScroll = () => {
 
   li {
     display: flex;
-    border-bottom: solid 1px #ccc;
     padding: 10px 3px;
+    border-bottom: 1px solid var(--el-border-color-lighter);
 
   }
 
@@ -812,7 +872,7 @@ const initBulletinScroll = () => {
   align-items: flex-start;
   padding: 10px 12px;
   gap: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .bulletin-item-wrapper:last-child {
@@ -844,7 +904,7 @@ const initBulletinScroll = () => {
 
 .bulletin-text {
 	font-size: 13px;
-  color: #555;
+  color: var(--el-text-color-regular);
   letter-spacing: 0.5px;
   white-space: nowrap;
 }

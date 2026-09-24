@@ -1,0 +1,194 @@
+// ============================================================
+// Design Token — 全局设计变量（Foundation Layer）
+// ------------------------------------------------------------
+// 职责：统一定义颜色、间距、圆角、阴影等基础设计变量
+// 规则：
+//   1. 本文件仅包含 SCSS 变量与 mixin，不直接产生 CSS 输出
+//   2. 通过 vite.config.ts additionalData 全局注入，
+//      所有 <style lang="scss"> 可直接使用 $primary-color 等变量
+//   3. 运行时变量通过 @include design-token-root 在 index.scss
+//      中统一输出为 CSS Custom Properties（--dt-* 与 --el-* 映射）
+//   4. 取值与当前 Element Plus 默认值保持一致，本阶段不改变视觉
+// ============================================================
+
+// ------------------------------------------------------------
+// 颜色 Color
+// ------------------------------------------------------------
+$primary-color: #409eff; // 品牌主色（Element Plus 默认主色）
+$success-color: #67c23a; // 成功色
+$warning-color: #e6a23c; // 警告色
+$error-color: #f56c6c; // 错误/危险色
+$info-color: #909399; // 信息色
+
+// ------------------------------------------------------------
+// 文本 Text
+// ------------------------------------------------------------
+$text-primary: #303133; // 主要文本
+$text-secondary: #909399; // 次要文本
+$text-regular: #606266; // 常规文本（Element Plus regular 默认值）
+$text-placeholder: #a8abb2; // 占位文本
+
+// ------------------------------------------------------------
+// 边框 Border
+// ------------------------------------------------------------
+$border-color: #dcdfe6; // 基础边框
+$border-color-light: #e4e7ed; // 浅色边框
+$border-color-lighter: #ebeef5; // 更浅边框（表格分隔线）
+
+// ------------------------------------------------------------
+// 背景 Background
+// ------------------------------------------------------------
+$page-background: #f2f3f5; // 页面背景
+$surface-background: #ffffff; // 卡片/面板等承载面背景
+$overlay-background: #ffffff; // 浮层背景（下拉、弹窗）
+
+// ------------------------------------------------------------
+// 表格 Table（飞书多维表格风格）
+// ------------------------------------------------------------
+$table-header-background: #fafafa; // 表头背景
+$table-header-text-color: #000000; // 表头文字
+$table-row-hover-background: #f5f6f7; // 行悬停高亮
+$table-border-color: #f0f1f2; // 表格边框（弱化网格感）
+
+// ------------------------------------------------------------
+// 表单 Form（飞书表单风格）
+// ------------------------------------------------------------
+$form-control-height: 28px; // 控件统一高度
+$form-control-radius: 6px; // 控件统一圆角
+$form-label-font-size: 13px; // Label 字号
+$form-label-color: #646a73; // Label 颜色（次要文本灰）
+
+// ------------------------------------------------------------
+// 按钮 Button（飞书风格）
+// ------------------------------------------------------------
+$button-height: 32px; // 默认尺寸按钮统一高度
+$button-radius: 6px; // 按钮统一圆角（与表单控件一致）
+$button-gap: 12px; // 相邻按钮统一间距
+
+// ------------------------------------------------------------
+// 弹窗 Dialog（飞书风格，圆角复用 $radius-large = 8px）
+// ------------------------------------------------------------
+$dialog-body-padding: 24px; // 弹窗内容区内边距
+$dialog-table-max-height: 400px; // 弹窗内表格高度上限
+
+// ------------------------------------------------------------
+// 间距 Spacing
+// ------------------------------------------------------------
+$space-xs: 4px; // 紧凑间距
+$space-sm: 8px; // 小间距
+$space-md: 12px; // 标准间距
+$space-lg: 16px; // 大间距
+$space-xl: 24px; // 超大间距（区块之间）
+
+// ------------------------------------------------------------
+// 圆角 Radius
+// ------------------------------------------------------------
+$radius-small: 2px; // 小型控件（输入框、标签）
+$radius-normal: 4px; // 常规控件（按钮、卡片）
+$radius-large: 8px; // 大型容器（弹窗、大卡片）
+
+// ------------------------------------------------------------
+// 阴影 Shadow
+// ------------------------------------------------------------
+$shadow-light: 0 0 12px rgba(0, 0, 0, 0.12); // 轻阴影（下拉浮层）
+$shadow-card: 0 1px 4px rgba(0, 0, 0, 0.08); // 卡片阴影
+
+// ============================================================
+// 运行时输出 mixin
+// ------------------------------------------------------------
+// 在 index.scss 中调用一次：@include design-token-root;
+// 输出内容：
+//   1. --dt-* 命名空间：项目自有 token，供业务样式直接消费
+//   2. --el-* 映射：将 token 桥接到 Element Plus CSS 变量，
+//      使 Element Plus 组件自动跟随 token 变化
+// 注意：
+//   - 所有映射值与 Element Plus 默认值一致，不产生视觉变化
+//   - :root 特异性 (0,1,0) 低于 html.dark (0,1,1)，
+//     暗黑模式仍由 Element Plus dark css-vars 与 variables.scss 控制
+//   - variables.scss 中已覆盖的变量（如 --el-text-color-regular）
+//     不在此处重复映射，避免覆盖项目既有定制
+// ============================================================
+@mixin design-token-root {
+  :root {
+    // ---- 项目自有 Token（--dt-*） ----
+    // 颜色
+    --dt-color-primary: #{$primary-color};
+    --dt-color-success: #{$success-color};
+    --dt-color-warning: #{$warning-color};
+    --dt-color-error: #{$error-color};
+    --dt-color-info: #{$info-color};
+    // 文本
+    --dt-text-primary: #{$text-primary};
+    --dt-text-secondary: #{$text-secondary};
+    --dt-text-regular: #{$text-regular};
+    --dt-text-placeholder: #{$text-placeholder};
+    // 边框
+    --dt-border-color: #{$border-color};
+    --dt-border-color-light: #{$border-color-light};
+    --dt-border-color-lighter: #{$border-color-lighter};
+    // 背景
+    --dt-bg-page: #{$page-background};
+    --dt-bg-surface: #{$surface-background};
+    --dt-bg-overlay: #{$overlay-background};
+    // 间距
+    --dt-space-xs: #{$space-xs};
+    --dt-space-sm: #{$space-sm};
+    --dt-space-md: #{$space-md};
+    --dt-space-lg: #{$space-lg};
+    --dt-space-xl: #{$space-xl};
+    // 圆角
+    --dt-radius-small: #{$radius-small};
+    --dt-radius-normal: #{$radius-normal};
+    --dt-radius-large: #{$radius-large};
+    // 阴影
+    --dt-shadow-light: #{$shadow-light};
+    --dt-shadow-card: #{$shadow-card};
+
+    // ---- Element Plus 桥接映射 ----
+    // 颜色
+    --el-color-primary: #{$primary-color};
+    --el-color-success: #{$success-color};
+    --el-color-warning: #{$warning-color};
+    --el-color-danger: #{$error-color};
+    --el-color-info: #{$info-color};
+    // 文本
+    --el-text-color-primary: #{$text-primary};
+    --el-text-color-secondary: #{$text-secondary};
+    --el-text-color-placeholder: #{$text-placeholder};
+    // 边框
+    --el-border-color: #{$border-color};
+    --el-border-color-light: #{$border-color-light};
+    --el-border-color-lighter: #{$border-color-lighter};
+    // 背景
+    --el-bg-color: #{$surface-background};
+    --el-bg-color-page: #{$page-background};
+    --el-bg-color-overlay: #{$overlay-background};
+    // 圆角
+    --el-border-radius-base: #{$radius-normal};
+    --el-border-radius-small: #{$radius-small};
+    // 阴影
+    --el-box-shadow-light: #{$shadow-light};
+    // 表格（桥接 Element Plus table CSS 变量，暗黑模式由 html.dark 覆盖）
+    --dt-table-header-bg: #{$table-header-background};
+    --dt-table-header-text: #{$table-header-text-color};
+    --dt-table-row-hover-bg: #{$table-row-hover-background};
+    --dt-table-border-color: #{$table-border-color};
+    --el-table-header-bg-color: #{$table-header-background};
+    --el-table-header-text-color: #{$table-header-text-color};
+    --el-table-row-hover-bg-color: #{$table-row-hover-background};
+    --el-table-border-color: #{$table-border-color};
+    // 表单（仅输出 --dt-*，不桥接 --el-*，避免影响按钮等非表单组件）
+    --dt-form-control-height: #{$form-control-height};
+    --dt-form-control-radius: #{$form-control-radius};
+    --dt-form-label-font-size: #{$form-label-font-size};
+    --dt-form-label-color: #{$form-label-color};
+    // 按钮（EP 按钮变量定义在 .el-button 元素自身，:root 桥接无效，
+    // 实际统一规则见 index.scss 全局选择器）
+    --dt-button-height: #{$button-height};
+    --dt-button-radius: #{$button-radius};
+    --dt-button-gap: #{$button-gap};
+    // 弹窗（同上，实际规则见 index.scss）
+    --dt-dialog-body-padding: #{$dialog-body-padding};
+    --dt-dialog-table-max-height: #{$dialog-table-max-height};
+  }
+}

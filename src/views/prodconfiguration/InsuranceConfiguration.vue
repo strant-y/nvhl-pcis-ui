@@ -249,10 +249,16 @@ const tableconfig = reactive<AppTableConfig>(
         align: "left",
 
       },
-      {
+      
+       {
         prop: "cRegisteredNo",
         inputtype: "rtinput",
-        title: "注册号",
+        title: "条款注册号",
+      },
+      {
+        prop: "cFilingNo",
+        inputtype: "rtinput",
+        title: "条款备案号",
       },
       {
         prop: "cIsInternet",

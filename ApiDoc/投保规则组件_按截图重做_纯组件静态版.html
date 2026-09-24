@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资料配置组件 - 静态版</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff;
+    font-family:"Microsoft YaHei","PingFang SC","Helvetica Neue",Arial,sans-serif;
+    color:#303133;
+    font-size:14px;
+  }
+
+  /* 纯组件：不包含顶部导航、左侧菜单 */
+  .material-config{
+    width:100%;
+    min-width:920px;
+    background:#fff;
+  }
+
+  /* 与截图一致的返回/标题区域 */
+  .component-toolbar{
+    height:42px;
+    display:flex;
+    align-items:center;
+    padding:0 10px;
+    background:#f5f7fa;
+    border-bottom:1px solid #ebeef5;
+    color:#303133;
+  }
+  .back{
+    color:#303133;
+    line-height:1;
+  }
+  .divider{
+    width:1px;
+    height:18px;
+    margin:0 12px;
+    background:#dcdfe6;
+  }
+  .page-title{
+    color:#356ff2;
+  }
+
+  .content{
+    padding:0 10px 0 10px;
+  }
+
+  /* 保存按钮单独占一行，位置和截图接近 */
+  .save-row{
+    height:36px;
+    display:flex;
+    align-items:center;
+  }
+  .save-btn{
+    width:45px;
+    height:27px;
+    border:1px solid #dcdfe6;
+    border-radius:3px;
+    background:#fff;
+    color:#606266;
+    font-size:13px;
+    cursor:default;
+  }
+
+  .form{
+    width:100%;
+  }
+
+  .form-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap:24px;
+    min-height:56px;
+  }
+
+  .field{
+    display:flex;
+    align-items:center;
+    min-width:0;
+  }
+  .label{
+    width:98px;
+    flex:0 0 98px;
+    padding-right:10px;
+    text-align:right;
+    color:#606266;
+    white-space:nowrap;
+  }
+  .required:before{
+    content:"*";
+    color:#f56c6c;
+    margin-right:4px;
+  }
+
+  .input{
+    flex:1;
+    height:36px;
+    display:flex;
+    align-items:center;
+    border:1px solid #dcdfe6;
+    border-radius:4px;
+    background:#fff;
+    padding:0 12px;
+    color:#606266;
+    overflow:hidden;
+  }
+
+  .select-arrow{
+    margin-left:auto;
+    width:0;
+    height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:5px solid #c0c4cc;
+  }
+
+  .file-line{
+    display:flex;
+    align-items:center;
+    min-width:0;
+  }
+  .file-name{
+    color:#303133;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .clear{
+    margin-left:auto;
+    width:16px;
+    height:16px;
+    border:1px solid #c0c4cc;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#a8abb2;
+    font-size:11px;
+    line-height:1;
+  }
+
+  .preview-title{
+    height:31px;
+    display:flex;
+    align-items:flex-end;
+    padding-bottom:5px;
+    color:#303133;
+    font-size:15px;
+  }
+
+  .preview-wrap{
+    position:relative;
+    height:490px;
+    border:1px solid #ebeef5;
+    background:#fff;
+    overflow:auto;
+  }
+
+  /* 右上删除图标 */
+  .delete-icon{
+    position:absolute;
+    top:-22px;
+    right:0;
+    width:16px;
+    height:16px;
+    color:#606266;
+    font-size:17px;
+    line-height:16px;
+  }
+  .delete-icon:before{
+    content:"";
+    position:absolute;
+    top:2px;
+    left:3px;
+    width:9px;
+    height:11px;
+    border:1.5px solid #606266;
+    border-top:none;
+    border-radius:0 0 1px 1px;
+  }
+  .delete-icon:after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:2px;
+    width:11px;
+    height:2px;
+    border-top:1.5px solid #606266;
+    border-bottom:1.5px solid #606266;
+  }
+
+  @media(max-width:1000px){
+    .form-row{column-gap:16px}
+    .label{width:88px;flex-basis:88px}
+  }
+</style>
+</head>
+<body>
+  <div class="material-config">
+    <div class="component-toolbar">
+      <span class="back">‹ 返回</span>
+      <span class="divider"></span>
+      <span class="page-title">资料配置</span>
+    </div>
+
+    <div class="content">
+      <div class="save-row">
+        <button class="save-btn">保存</button>
+      </div>
+
+      <div class="form">
+        <div class="form-row">
+          <div class="field">
+            <div class="label required">资料类型</div>
+            <div class="input">
+              <span>投保须知</span>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label required">资料名称</div>
+            <div class="input">投保须知</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <div class="label required">资料格式</div>
+            <div class="input">
+              <span>pdf文件</span>
+              <span class="clear">×</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label required">资料</div>
+            <div class="file-line">
+              <span class="file-name">河南微货车投保须知.pdf</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-title">文件预览</div>
+
+      <div class="preview-wrap">
+        <span class="delete-icon" aria-label="删除"></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

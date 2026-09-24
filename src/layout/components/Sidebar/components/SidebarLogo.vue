@@ -35,14 +35,16 @@ const isRole173 = user.roles?.length > 0 && user.roles.find((item:any) => item.c
 .logo-container {
   // width: 100%;
   height: $navbar-height;
-  background-color: $sidebar-logo-background;
-  padding: 0 20px;
+  // 透明底：继承导航栏/侧边栏背景，避免顶部布局下出现透明度不一致的色块
+  background-color: transparent;
+  padding: 0 16px;
 
   .logo-image {
     // margin-bottom: 5px;
     // width: 35px;
     // height: 32px;
     height: 24px;
+    object-fit: contain;
   }
 
   .logo-title {
@@ -82,5 +84,6 @@ const isRole173 = user.roles?.length > 0 && user.roles.find((item:any) => item.c
 .logo-title-box {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 </style>

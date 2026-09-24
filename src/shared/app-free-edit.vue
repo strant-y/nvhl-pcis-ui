@@ -386,7 +386,7 @@ defineExpose({
 :deep(.el-select__wrapper) {
   /* height: 28px; */
   min-height: 28px;
-  line-height: 28px;
+ 
   padding: 4px 6px;
 }
 :deep(.el-select__input) {

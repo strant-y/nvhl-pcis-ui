@@ -118,6 +118,16 @@
                       :parentFromUi="formUi"
                       @update-method="formsDataUpdate"
                   />
+                  <div v-if="item.ruleTags && item.ruleTags.length" class="rt-rule-tags">
+                    <el-tag
+                        v-for="(tag, ti) in item.ruleTags"
+                        :key="ti"
+                        :type="tag.type || 'info'"
+                        size="small"
+                        effect="light"
+                        class="rt-rule-tag"
+                    >{{ tag.label }}</el-tag>
+                  </div>
                 </el-form-item>
               </template>
             </el-col>
@@ -247,6 +257,16 @@
                           :parentFromUi="formUi"
                           @update-method="formsDataUpdate"
                       />
+                      <div v-if="item.ruleTags && item.ruleTags.length" class="rt-rule-tags">
+                        <el-tag
+                            v-for="(tag, ti) in item.ruleTags"
+                            :key="ti"
+                            :type="tag.type || 'info'"
+                            size="small"
+                            effect="light"
+                            class="rt-rule-tag"
+                        >{{ tag.label }}</el-tag>
+                      </div>
                     </el-form-item>
                   </template>
                 </el-col>
@@ -856,5 +876,19 @@ defineExpose({
 }
 :deep(.group-input__items .el-form-item__content) {
   line-height: normal;
+}
+/* 规则提示标签: 显示在表单控件下方 */
+.rt-rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  margin-top: 2px;
+  line-height: normal;
+}
+.rt-rule-tags .rt-rule-tag {
+  height: 18px;
+  font-size: 10px;
+  padding: 0 5px;
 }
 </style>

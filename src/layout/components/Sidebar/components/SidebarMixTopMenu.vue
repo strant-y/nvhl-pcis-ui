@@ -4,7 +4,6 @@
     <el-menu
       mode="horizontal"
       :default-active="activePath"
-      :background-color="variables['menu-background']"
       :text-color="variables['menu-text']"
       :active-text-color="variables['menu-active-text']"
       @select="handleMenuSelect"
@@ -81,3 +80,29 @@ onMounted(() => {
   );
 });
 </script>
+
+<style lang="scss" scoped>
+:deep(.el-scrollbar) {
+  height: 100%;
+}
+
+:deep(.el-menu) {
+  height: 100%;
+  padding: 0 8px;
+  border-bottom: none;
+  background: transparent;
+}
+
+:deep(.el-menu--horizontal > .el-menu-item) {
+  height: calc($navbar-height - 8px);
+  margin: 4px 4px 0;
+  line-height: calc($navbar-height - 8px);
+  border-radius: var(--layout-menu-radius) var(--layout-menu-radius) 0 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+:deep(.el-menu--horizontal > .el-menu-item:hover) {
+  background: var(--layout-hover-bg);
+  color: var(--layout-hover-text);
+}
+</style>

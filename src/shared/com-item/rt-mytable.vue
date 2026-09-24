@@ -210,11 +210,15 @@
                       </template>
                       <template v-else>
                         <td
-                          :class="
+                          :class="[
                             !appgrideditConfig.dragFlag && t.dragFlag
                               ? 'handle cursor-move'
-                              : null
-                          "
+                              : null,
+                            appgrideditConfig.editList &&
+                            appgrideditConfig.editList.includes(t.prop)
+                              ? 'editable-cell'
+                              : null,
+                          ]"
                           :style="{
                             textAlign: 'center',
                           }"
@@ -612,6 +616,10 @@ defineExpose({
 /* 高亮选中行的样式 */
 .highlight {
   background-color: #dcf9fd; /* 高亮背景颜色 */
+}
+/* 可编辑列单元格底色, 提示该列可输入 */
+.table-container table td.editable-cell {
+  background-color: #f0f9ff;
 }
 .el-table tr:hover {
   background-color: #ecfcf3; /* 修改为你想要的颜色 */

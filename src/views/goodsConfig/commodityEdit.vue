@@ -4,45 +4,14 @@
     <el-container>
       <el-main>
         <el-container>
-          <el-aside :class="{ collapsed: asideCollapsed }">
-            <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <el-affix :offset="0">
-                <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
-                  <el-anchor-link
-                    v-for="(k, i) in pageConfig?.pageInfo"
-                    :key="i"
-                    v-show="k.pageKey === 'ReviewComments' ? isShowReview : k.pageKey === 'TestReport' ? isShowTest : true"
-                    :href="`#${k.pageKey}`"
-                  >
-                    <el-tooltip
-                      effect="dark"
-                      :content="k.pageTtile || ''"
-                      placement="top-start"
-                      :disabled="!(asideCollapsed || (k.pageTtile && k.pageTtile.length > 6))"
-                    >
-                      <div class="anchor-item">
-                        <i :class="['icon', 'iconfont', iconMap[k.pageKey]]"></i>
-                        <div v-if="!asideCollapsed" class="icon-title">
-                          <template v-if="k.pageTtile && k.pageTtile.length > 6">
-                            {{ k.pageTtile.substring(0, 6) + "..." }}
-                          </template>
-                          <template v-else>
-                            {{ k.pageTtile }}
-                          </template>
-                        </div>
-                      </div>
-                    </el-tooltip>
-                  </el-anchor-link>
-                </el-anchor>
-                <div class="aside-toggle" @click="toggleAside">
-                  <el-icon>
-                    <Fold v-if="!asideCollapsed" />
-                    <Expand v-else />
-                  </el-icon>
-                </div>
-              </el-affix>
-            </template>
-          </el-aside>
+          <ProdSidebar
+            :page-configs="formconfig1"
+            :collapsed="asideCollapsed"
+            :icon-map="iconMap"
+            :visible-fn="sidebarVisible"
+            container="#main-container"
+            @toggle="toggleAside"
+          />
           <el-container>
             <el-main id="main-container" style="padding: 10px;">
               <!-- v-show="k.pageKey == 'relatedancillaryinfo' ?iscAffiliatedMrk : true" -->
@@ -84,14 +53,14 @@
 </template>
 
 <script setup lang="ts">
-import {  saveCommodityBase, commodityBaseOperatorCheck, saveRule, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, getEdrNmeByCde, saveCommodityPlan } from "@/api/prod";
+import {  saveCommodityBase, commodityBaseOperatorCheck, addProcessUndr, getCommodityBase, processApprove, getProcessInfo, saveCommodityPlan, getOrgDptTreeNodeById } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import {idxParamKey, IdxParamProps} from "@/views/pcis/support/useIdxParam";
 
 import { useProductStore } from "@/store";
 import { closeCurrentTagAndBack } from "@/utils/common";
 import { descryptParameter } from "@/utils/encipher";
-import { Expand, Fold } from "@element-plus/icons-vue";
+import ProdSidebar from "../prodconfiguration/components/ProdSidebar.vue";
 const productStore = useProductStore();
 const { iscAffiliatedMrk } = storeToRefs(productStore);
 import { useRouter, useRoute } from 'vue-router';
@@ -103,15 +72,22 @@ let TestData = ref({});  // 审核状态 返回数据
 let isShowReview = ref(false)  // 用来控制显示审核信息模块
 let ProcessData = ref({});  // 审核状态 返回数据
 const asideCollapsed = ref(false);
-const anchorRef = ref(null);
 function toggleAside() {
   asideCollapsed.value = !asideCollapsed.value;
+}
+// 侧边栏菜单项条件显隐：审核意见/测试报告按状态控制，其余常显
+function sidebarVisible(page: any) {
+  if (page.pageKey === "ReviewComments") return isShowReview.value;
+  if (page.pageKey === "TestReport") return isShowTest.value;
+  return true;
 }
 const iconMap = {
   'commodityBasicInfo': 'icon-wenjianban1',
   'choosePlan': 'icon-tiaoduxinxi',
   'permissionAllo': 'icon-renyuanfenpei',
-  'InsuranceRules': 'icon-anjiantiaocha',
+  'healthDeclaration': 'icon-anjiantiaocha',
+  'insuranceNotice': 'icon-anjiantiaocha',
+  'disclaimerInfo': 'icon-anjiantiaocha',
   'TestReport': 'icon-shenhexinxi',
   'ReviewComments': 'icon-yijian',
 } 
@@ -165,10 +141,20 @@ opertaor.setTableConfig([
         pageTtile: "出单权限分配",
         pageRef: "permissionAllo",
       },
-      InsuranceRules: {
-        pageKey: "InsuranceRules",
-        pageTtile: "投保规则",
-        pageRef: "InsuranceRules",
+      healthDeclaration: {
+        pageKey: "healthDeclaration",
+        pageTtile: "健康告知",
+        pageRef: "HealthDeclaration",
+      },
+      insuranceNotice: {
+        pageKey: "insuranceNotice",
+        pageTtile: "投保须知",
+        pageRef: "InsuranceNotice",
+      },
+      disclaimerInfo: {
+        pageKey: "disclaimerInfo",
+        pageTtile: "免责信息",
+        pageRef: "DisclaimerInfo",
       },
       TestReport: {
         pageKey: "TestReport",
@@ -285,11 +271,13 @@ function handleQuery() {
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
   const tabref2 = opertaor.getTableRefByKey("choosePlan");  // 选择方案
   const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
-  const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
+  const tabrefHealth = opertaor.getTableRefByKey("healthDeclaration");  // 健康告知
+  const tabrefNotice = opertaor.getTableRefByKey("insuranceNotice");  // 投保须知
+  const tabrefDisclaimer = opertaor.getTableRefByKey("disclaimerInfo");  // 免责信息
   const tabref6 = opertaor.getTableRefByKey("TestReport");  // 测试规则
   const newparam = { cCommodityNo: queryParam.cCommodityNo };
   getCommodityBase(newparam)
-    .then((res) => {
+    .then(async (res) => {
       const { code, data, msg } = res;
       if (200 === code) {
         let dataS = data['result'][0];
@@ -297,12 +285,12 @@ function handleQuery() {
         tabref.setFormValue(data['result'][0])
 
         //  出单权限分配 数据回显
-        getNmeByCde(dataS.cPertainDptCde, "cPertainDptCde", "permissionAllo")
+        await getNmeByCde(dataS.cPertainDptCde, "cPertainDptCde", "permissionAllo")
         tabref3.setValue('cPertainDptCde', dataS.cPertainDptCde);
         tabref3.setValue('cBsnsTyp', dataS.cBsnsTyp);
         tabref3.setValue('cChaType', dataS.cChaType);
         tabref3.setValue('cChaSubType', dataS.cChaSubType);
-        getNmeByCde(dataS.cDptCde, "cDptCde", "permissionAllo")
+        await getNmeByCde(dataS.cDptCde, "cDptCde", "permissionAllo")
         tabref3.setValue('cDptCde', dataS.cDptCde);
 
         // 出单员
@@ -393,7 +381,9 @@ const saveAll = async (call) => {
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
   const tabref2 = opertaor.getTableRefByKey("choosePlan");  // 选择方案
   const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
-  const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
+  const tabrefHealth = opertaor.getTableRefByKey("healthDeclaration");  // 健康告知
+  const tabrefNotice = opertaor.getTableRefByKey("insuranceNotice");  // 投保须知
+  const tabrefDisclaimer = opertaor.getTableRefByKey("disclaimerInfo");  // 免责信息
   const tabref6 = opertaor.getTableRefByKey("TestReport");  // 测试规则
   let isValid = await validateForm();
   // 方案基本信息检查
@@ -460,40 +450,58 @@ const save = (call, param: any) => {
         disabled: true,
       })
 
-      // "产品承保限制" 选 "是" 才保存投保规则
-      if (tabref.getFromValue()['cPolicyLimit']) {
-        InsuranceSaveData();
-      }
-      // 保存并提交
-      if (!!data['data'] && !!data['data']['cCommodityNo']) {
-        if (!!call) {
-          call(data['data']['cCommodityNo'], param['cStatus']);
-        }
+      // 保存健康告知
+      HealthSaveData();
+      // 保存投保须知
+      NoticeSaveData();
+      // 保存免责信息
+      DisclaimerSaveData();
+      // 保存并提交：优先用后端返回值，fallback 到表单中用户输入的 cCommodityNo
+      if (!!call) {
+        const commodityNo = (data['data'] && data['data']['cCommodityNo']) || param['cCommodityNo'];
+        call(commodityNo, param['cStatus']);
       }
     }
   })
 }
 
-// 投保规则 保存
-const InsuranceSaveData = () => {
-  const user = JSON.parse(sessionStorage.getItem("user"));
+// 健康告知 保存(规则要素配置接口 /saveRuleFactorConfig)
+const HealthSaveData = () => {
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
-  const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
+  const tabrefHealth = opertaor.getTableRefByKey("healthDeclaration");  // 健康告知
 
-  const param = Object.assign({
-    cCrtCde: user.opCde,
-    cUpdCde: user.opCde,
-    cCommodityNo: tabref.getFromValue().cCommodityNo,
-  }, tabref4.getFromValue());
-  saveRule(param).then((res) => {
-    let { code, data, msg } = res;
-    if (code === 200) {
-      ElMessage.success(msg);
-    } else {
-      ElMessage.error(msg);
+  const cCommodityNo = tabref.getFromValue().cCommodityNo;
+  tabrefHealth?.saveRuleConfig(cCommodityNo)?.then((ok: boolean) => {
+    if (ok) {
+      ElMessage.success("健康告知保存成功");
     }
+  });
+}
 
-  })
+// 投保须知 保存(延用关联特约接口)
+const NoticeSaveData = () => {
+  const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
+  const tabrefNotice = opertaor.getTableRefByKey("insuranceNotice");  // 投保须知
+
+  const cCommodityNo = tabref.getFromValue().cCommodityNo;
+  tabrefNotice?.saveRuleConfig?.(cCommodityNo)?.then((ok: boolean) => {
+    if (ok) {
+      ElMessage.success("投保须知保存成功");
+    }
+  });
+}
+
+// 免责信息 保存(延用关联特约接口)
+const DisclaimerSaveData = () => {
+  const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
+  const tabrefDisclaimer = opertaor.getTableRefByKey("disclaimerInfo");  // 免责信息
+
+  const cCommodityNo = tabref.getFromValue().cCommodityNo;
+  tabrefDisclaimer?.saveRuleConfig?.(cCommodityNo)?.then((ok: boolean) => {
+    if (ok) {
+      ElMessage.success("免责信息保存成功");
+    }
+  });
 }
 
 // 保存并提交按钮
@@ -525,13 +533,13 @@ const saveAllSubmit = async () => {
       addProcessUndr(param).then((res) => {
         let { code, data, msg } = res;
         if (code === 200) {
-          ElMessage.success(msg); // 保存成功
-
-          // 跳转
-          //返回上个页面
-          closeCurrentTagAndBack();
-
+         
+            ElMessage.success(data.message || '提交成功');
+            //返回上个页面
+            closeCurrentTagAndBack();
+         
         } else {
+          ElMessage.error(msg || '提交失败');
         }
       })
     }
@@ -556,14 +564,16 @@ const validateForm = async () => {
   const tabref = opertaor.getTableRefByKey("commodityBasicInfo");  // 基本信息
   const tabref2 = opertaor.getTableRefByKey("choosePlan");  // 选择方案
   const tabref3 = opertaor.getTableRefByKey("permissionAllo");  // 出单权限分配
-  const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
+  const tabrefHealth = opertaor.getTableRefByKey("healthDeclaration");  // 健康告知
+  const tabrefNotice = opertaor.getTableRefByKey("insuranceNotice");  // 投保须知
+  const tabrefDisclaimer = opertaor.getTableRefByKey("disclaimerInfo");  // 免责信息
   let choosePlanList = tabref2.getTableValue()
   // const tabref4 = opertaor.getTableRefByKey("InsuranceRules");  // 投保规则
   // const tabref5= opertaor.getTableRefByKey("commonProblem");  // 常见问题配置
 
 
   let v = false; // 没有错误  
-  const formRefs = [tabref, tabref2, tabref3, tabref4]
+  const formRefs = [tabref, tabref2, tabref3, tabrefHealth, tabrefNotice, tabrefDisclaimer]
 
   for (let i = 0; i < formRefs.length; i++) {
     const formRef = formRefs[i]
@@ -677,14 +687,11 @@ onMounted(async () => {
 const getNmeByCde = async(val:any, key: string, pageKey: string) => {
   if(val) {
     const tabref = opertaor.getTableRefByKey(pageKey);
-    await getEdrNmeByCde({
-      code: "orgDpt",
-      val: val
-    }).then((res:any) => {
-      if (res.code === 200 && res.data && res.data.data) {
+    await getOrgDptTreeNodeById({ pId: val }).then((res:any) => {
+      if (res?.data?.name) {
         tabref.setFormItem(key, {
           loadData: [
-            { value: val, label: val+res.data.data }
+            { value: val, label: val + "-" + res.data.name }
           ],
         });
       }
@@ -713,21 +720,9 @@ function scrollToTop() {
 .el-main {
   flex: 1;
   padding: 0;
-  height: calc(100vh - 45px - 34px);
+  height: calc(100vh - 45px - 44px);
   overflow: hidden;
   overflow-y: auto;
-  .el-aside {
-    width: 180px;
-    transition: width 0.2s ease;
-    .el-affix {
-      height: 100%;
-      background: var(--el-color-primary);
-      position: relative;
-    }
-    &.collapsed {
-      width: 64px;
-    }
-  }
 }
 
 .el-footer {
@@ -745,71 +740,5 @@ function scrollToTop() {
 
 .footer .el-button {
   margin-left: 10px;
-}
-
-:deep(.el-anchor) {
-  background: transparent;
-  .el-anchor__list {
-    padding: 20px 10px 64px;
-    .el-anchor__item {
-      margin-bottom: 20px;
-      .el-anchor__link {
-        font-size: 14px;
-        color: #FFF;
-        text-align: center;
-        padding: 0;
-        opacity: 0.6;
-        display: flex;
-        align-items: center;
-        &.isActive{
-          background: var(--el-color-primary);
-          :deep(a) {
-            color: var(--menu-active-text);
-            .iconfont {
-              color: var(--menu-active-text);
-            }
-          }
-        }
-        &:hover {
-          background: var(--menu-hover);
-          :deep(a) {
-            color: var(--el-color-primary);
-            .iconfont {
-              color: var(--el-color-primary);
-            }
-          }
-        }
-        .iconfont {
-          font-size: 1.2rem;
-          color: #FFF;
-          margin-right: 5px;
-        }
-      }
-    }
-  }
-}
-
-.aside-toggle {
-  height: 34px;
-  width: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #fff;
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-}
-
-.anchor-item {
-  display: flex;
-  align-items: center;
-}
-
-.el-aside.collapsed {
-  :deep(.iconfont) {
-    margin-right: 0;
-  }
 }
 </style>

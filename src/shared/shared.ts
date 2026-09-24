@@ -8,6 +8,7 @@ import FromItem from "./com-item/from-item.vue"; // 表单明细组件
 import RtButton from "./com-item/rt-button.vue";
 import RtIcon from "./com-item/rt-icon.vue";
 import RtInput from "./com-item/rt-input.vue";
+import RtAutoComplete from "./com-item/rt-auto-complete.vue";
 import RtSelect from "./com-item/rt-select.vue";
 import RtCascader from "./com-item/rt-cascader.vue";
 import RtCascaderArea from "./com-item/rt-cascader-area.vue";
@@ -38,6 +39,7 @@ const componentMap = {
   rtButton: RtButton,
   rtIcon: RtIcon,
   rtinput: RtInput,
+  rtautocomplete: RtAutoComplete,
   rtselect: RtSelect,
   rtSelectV2: RtSelectV2,
   rtcascader: RtCascader,
@@ -51,13 +53,13 @@ const componentMap = {
   rtcheckboxgroup: RtCheckboxGroup,
   rttable: RtlTable,
   rtMytable: RtMytable,
-  rtUpload:rtUpload,
-  
-  myCard:MyCard
+  rtUpload: rtUpload,
+
+  myCard: MyCard,
 };
 
 const install = (Vue) => {
-  Object.keys(componentMap).forEach((k,v) => {
+  Object.keys(componentMap).forEach((k, v) => {
     Vue.component(k, componentMap[k]);
   });
 };

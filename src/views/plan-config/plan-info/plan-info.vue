@@ -3,43 +3,15 @@
     <el-container>
       <el-main>
         <el-container>
-          <el-aside :class="{ collapsed: asideCollapsed }">
-            <el-affix :offset="0">
-              <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
-                <el-anchor-link
-                  v-for="page in sidebarPages"
-                  :key="page.pageKey"
-                  v-show="page.pageKey === 'reviewInfo' ? isReviewPage : page.pageKey === 'payInfo' ? payinfo : true"
-                  :href="`#${page.pageKey}`"
-                >
-                  <el-tooltip
-                    effect="dark"
-                    :content="page.pageTtile || ''"
-                    placement="top-start"
-                    :disabled="!(asideCollapsed || (page.pageTtile && page.pageTtile.length > 6))"
-                  >
-                    <div class="anchor-item">
-                      <i :class="['icon', 'iconfont', iconMap[page.pageKey] || 'icon-wenjianban1']"></i>
-                      <div v-if="!asideCollapsed" class="icon-title">
-                        <template v-if="page.pageTtile && page.pageTtile.length > 6">
-                          {{ page.pageTtile.substring(0, 6) + "..." }}
-                        </template>
-                        <template v-else>
-                          {{ page.pageTtile }}
-                        </template>
-                      </div>
-                    </div>
-                  </el-tooltip>
-                </el-anchor-link>
-              </el-anchor>
-              <div class="aside-toggle" @click="toggleAside">
-                <el-icon>
-                  <Fold v-if="!asideCollapsed" />
-                  <Expand v-else />
-                </el-icon>
-              </div>
-            </el-affix>
-          </el-aside>
+          <ProdSidebar
+            :page-configs="sidebarPageConfigs"
+            :collapsed="asideCollapsed"
+            :icon-map="iconMap"
+            icon-fallback="icon-wenjianban1"
+            :visible-fn="sidebarVisible"
+            container="#main-container"
+            @toggle="toggleAside"
+          />
           <el-container>
             <el-main id="main-container" style="padding: 10px;">
               <div id="planBasicInfo">
@@ -68,6 +40,13 @@
                   </div>
                 </template>
               </el-card>
+              <div id="insuranceRules" style="margin-top: 20px;">
+                <InsuranceRules
+                  ref="insuranceRulesRef"
+                  :biz-no="planNoForRules"
+                  :mode="pageMode"
+                />
+              </div>
               <div v-if="!props.goodsType">
                 <div id="reviewInfo" v-if="isReviewPage" style="margin-top: 20px;">
                   <el-card>
@@ -108,7 +87,9 @@
 import { ref, reactive, onMounted, watch, nextTick, onBeforeMount, computed, onBeforeUnmount, onActivated, onDeactivated } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getListByCode } from '@/api/code-list-service';
-import { Search, Expand, Fold } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
+import ProdSidebar from "../../prodconfiguration/components/ProdSidebar.vue";
+import InsuranceRules from "@/pcis/prodRef/commodityRef/InsuranceRules.vue";
 import { AppKey } from '@/constants/api';
 import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from "@/store/modules/user";
@@ -122,7 +103,7 @@ import {
 import { createFreeButtonBase } from "@/shared/button-config";
 import { yesOrNo, size, inputtype } from "@/utils/utilKey";
 import { PolicyService } from '@/views/pcis-main/service/my-page/policy.service';
-import { getProductPage, getRenewalAppPolicy } from "../../../api/prod/index";
+import { getProductPage, getRenewalAppPolicy, getOrgDptTreeNodeById } from "../../../api/prod/index";
 import OrgDptModel from '@/components/common/DepartmentTree.vue';
 import RiskInfo from './risk-info/risk-info.vue'
 //审核详情得状态等
@@ -147,8 +128,17 @@ type SpecialEditMethod = {
   setFormValue?: (value: any) => void;
   setDisabledAll?: (disabled?: boolean) => void;
   validate?: () => Promise<boolean> | boolean;
+  refreshSpecialList?: () => Promise<void>;
+  bindSpecialToPlan?: (newCPlanNo: string, newCPlanCn: string) => Promise<void>;
 };
 const specialEditRef = ref<SpecialEditMethod | null>(null);
+type InsuranceRulesMethod = {
+  getFromValue?: () => { ruleElements: any[] };
+  getValue?: (key: string) => any;
+  setDisabledAll?: () => void;
+  saveRuleConfig?: (ruleCode?: string) => Promise<boolean>;
+};
+const insuranceRulesRef = ref<InsuranceRulesMethod | null>(null);
 const tableRef = ref<MyTableMethod | null>(null);
 const userStore = useUserStore();
 const router = useRouter()
@@ -225,6 +215,9 @@ if (formconfig2.length === 0) {
 const getPageRowData = () =>
   props.goodsType === "goods" ? props.goodsData : routeQryParams.value?.rowData;
 
+/** 投保规则组件加载数据所用的方案号(来自当前行数据) */
+const planNoForRules = computed(() => getPageRowData()?.cPlanNo || "");
+
 const getPlanFormValue = () =>
   Object.assign(
     {},
@@ -298,12 +291,11 @@ let payinfo = ref(false)
 // const formconfig3 = reactive(createAppGridEditConfig({}));
 
 const asideCollapsed = ref(false);
-const anchorRef = ref(null);
 function toggleAside() {
   asideCollapsed.value = !asideCollapsed.value;
 }
 const pageTitleMap: Record<string, string> = {
-  cvrg: '责任险别',
+  cvrg: '条款信息',
   dist: '配送信息',
   distSummary: '配送汇总',
 };
@@ -311,6 +303,7 @@ const iconMap: Record<string, string> = {
   planBasicInfo: 'icon-wenjianban1',
   specialAgreement: 'icon-anjiantiaocha',
   cvrg: 'icon-zaibaoxinxi',
+  insuranceRules: 'icon-anjiantiaocha',
   reviewInfo: 'icon-yijian',
   payInfo: 'icon-tiaoduxinxi',
 };
@@ -330,6 +323,7 @@ const sidebarPages = computed(() => {
       });
     }
   });
+  pages.push({ pageKey: 'insuranceRules', pageTtile: '投保规则' });
   if (!props.goodsType && isReviewPage.value) {
     pages.push({ pageKey: 'reviewInfo', pageTtile: '审核信息' });
   }
@@ -338,6 +332,16 @@ const sidebarPages = computed(() => {
   }
   return pages;
 });
+
+// 将扁平的 sidebarPages 包装为 ProdSidebar 所需的 pageConfigs 结构
+const sidebarPageConfigs = computed(() => [{ pageInfo: sidebarPages.value }]);
+
+// 侧边栏菜单项条件显隐：审核信息/计算公式按状态控制，其余常显
+function sidebarVisible(page: any) {
+  if (page.pageKey === 'reviewInfo') return isReviewPage.value;
+  if (page.pageKey === 'payInfo') return payinfo.value;
+  return true;
+}
 
 
 watch(
@@ -551,20 +555,12 @@ const formconfig1 = reactive<AppFreeEditConfig>(
       {
         prop: "cCalcFormula",
         inputtype: "rtselect",
-        title: "计算保费公式",
+        title: "保费计算方式",
         clearable: true,
         rules: [getRules("required", {})],
         loadData: [
           { value: '1', label: '固定保额保费' },
-          // { value: '2', label: '根据费率表计算' },
           { value: '3', label: '根据公式计算' },
-          // {value: '1', label: '定险别/保额保费不校验'},
-          // {value: '2', label: '非定费非定保险期间(不校验)'},
-          // {value: '3', label: '非定额非定费率计算公式'},
-          // {value: '4', label: '定额计算公式'},
-          // {value: '5', label: '非定险别/保额保费不校验'},
-          // {value: '6', label: '保额保费不校验'},
-          // {value: '7', label: '非定额非定保费(不校验)'},
         ],
         func: (v: any) => {
           if (v == 3) {
@@ -573,121 +569,129 @@ const formconfig1 = reactive<AppFreeEditConfig>(
             payinfo.value = false;
           }
         },
-        // typeCode: "", //暂时无接口
-        // params: {},
       },
       {
-        prop: "cAccessType",
+        prop: "cFollowCar",
         inputtype: "rtselect",
-        title: "是否保密",
-        clearable: true,
-        rules: [getRules("required", {})],
-        typeCode: "BAS_COMM_CODE_OUT_CDE",
-        codeParam: { 'cParCde': 'CAccessType' },
-      },
-      {
-        prop: "cCiMrk",
-        inputtype: "rtselect",
-        title: "联共保业务",
-        clearable: true,
-        defaultValue: '0',
-        loadData: [
-          { value: '0', label: '非共保业务' },
-          { value: '1', label: '外部共保我方主共_主联' },
-          { value: '2', label: '外部共保我方从共_主联' },
-          { value: '3', label: '外部共保我方主共_无联保' },
-          { value: '4', label: '外部共保我方从共_无联保' },
-          { value: '5', label: '司内联保_主联' },
-        ],
-      },
-      {
-        prop: "cIsUseTerm",
-        inputtype: "rtselect",
-        title: "是否使用方案配置条款",
+        title: "是否随车",
         clearable: true,
         loadData: [
-          { value: '1', label: '使用方案配置' },
-          { value: '2', label: '使用外部传输' },
+          { value: '1', label: '是' },
+          { value: '0', label: '否' },
         ],
       },
-      {
-        prop: "cCriterionTimeUnit",
-        inputtype: "rtselect",
-        title: "保险期间类型",
-        clearable: true,
-        typeCode: "RECEIVE_BANK_CATEGORY",
-        codeParam: { 'cParCde': 'CriterionUnit' },
-      },
-      {
-        prop: "nCriterionTime",
-        inputtype: "rtinput",
-        title: "标准承保期限",
-        type: "number",
-        clearable: true,
-      },
-      {
-        prop: "nLowInsureDays",
-        inputtype: "rtinput",
-        title: "保险期限浮动区间起",
-        clearable: true,
-      },
-      {
-        prop: "nTopInsureDays",
-        inputtype: "rtinput",
-        title: "保险期限浮动区间止",
-        clearable: true,
-      },
-      {
-        prop: "CAppNme",
-        inputtype: "rtselect",
-        title: "是否绿色产业客户",
-        clearable: true,
-        typeCode: "", //暂时无接口
-        params: {},
-        func: (val) => {
-          //获取 绿色产业细分列表 配置项
-          const item = freeEditRef.value?.getFromSchemaItem('greenDetailList')
-          if (val === '1') { //当选择是的时候绿色产业细分列表必输
-            item['disabled'] = false
-            item['rules'] = [getRules("required", {})]
-          } else {
-            item['disabled'] = true
-            item['rules'] = []
-          }
-        }
-      },
-      {
-        prop: "greenDetailList",
-        inputtype: "rtselect",
-        title: "绿色产业细分列表",
-        clearable: true,
-        rules: [],
-        typeCode: "", //暂时无接口
-        params: {},
-      },
-      {
-        prop: "CAppNme",
-        inputtype: "rtselect",
-        title: "是否调用智能风控",
-        clearable: true,
-        typeCode: "", //暂时无接口
-        params: {},
-      },
-      {
-        prop: "cShowDpt",
-        inputtype: "rtselect",
-        title: "分公司出单配置",
-        itemWidth: 2,
-        clearable: true,
-        typeCode: "BRANCH_ID_LIST", //暂时无接口
-        params: {},
-      },
-      {
-        prop: "cAppNo",
-        inputtype: "rtinput",
-        title: "申请单号",
-        clearable: true,
-      },
+      // {
+      //   prop: "cAccessType",
+      //   inputtype: "rtselect",
+      //   title: "是否保密",
+      //   clearable: true,
+      //   rules: [getRules("required", {})],
+      //   typeCode: "BAS_COMM_CODE_OUT_CDE",
+      //   codeParam: { 'cParCde': 'CAccessType' },
+      // },
+      // {
+      //   prop: "cCiMrk",
+      //   inputtype: "rtselect",
+      //   title: "联共保业务",
+      //   clearable: true,
+      //   defaultValue: '0',
+      //   loadData: [
+      //     { value: '0', label: '非共保业务' },
+      //     { value: '1', label: '外部共保我方主共_主联' },
+      //     { value: '2', label: '外部共保我方从共_主联' },
+      //     { value: '3', label: '外部共保我方主共_无联保' },
+      //     { value: '4', label: '外部共保我方从共_无联保' },
+      //     { value: '5', label: '司内联保_主联' },
+      //   ],
+      // },
+      // {
+      //   prop: "cIsUseTerm",
+      //   inputtype: "rtselect",
+      //   title: "是否使用方案配置条款",
+      //   clearable: true,
+      //   loadData: [
+      //     { value: '1', label: '使用方案配置' },
+      //     { value: '2', label: '使用外部传输' },
+      //   ],
+      // },
+      // {
+      //   prop: "cCriterionTimeUnit",
+      //   inputtype: "rtselect",
+      //   title: "保险期间类型",
+      //   clearable: true,
+      //   typeCode: "RECEIVE_BANK_CATEGORY",
+      //   codeParam: { 'cParCde': 'CriterionUnit' },
+      // },
+      // {
+      //   prop: "nCriterionTime",
+      //   inputtype: "rtinput",
+      //   title: "标准承保期限",
+      //   type: "number",
+      //   clearable: true,
+      // },
+      // {
+      //   prop: "nLowInsureDays",
+      //   inputtype: "rtinput",
+      //   title: "保险期限浮动区间起",
+      //   clearable: true,
+      // },
+      // {
+      //   prop: "nTopInsureDays",
+      //   inputtype: "rtinput",
+      //   title: "保险期限浮动区间止",
+      //   clearable: true,
+      // },
+      // {
+      //   prop: "CAppNme",
+      //   inputtype: "rtselect",
+      //   title: "是否绿色产业客户",
+      //   clearable: true,
+      //   typeCode: "", //暂时无接口
+      //   params: {},
+      //   func: (val) => {
+      //     //获取 绿色产业细分列表 配置项
+      //     const item = freeEditRef.value?.getFromSchemaItem('greenDetailList')
+      //     if (val === '1') { //当选择是的时候绿色产业细分列表必输
+      //       item['disabled'] = false
+      //       item['rules'] = [getRules("required", {})]
+      //     } else {
+      //       item['disabled'] = true
+      //       item['rules'] = []
+      //     }
+      //   }
+      // },
+      // {
+      //   prop: "greenDetailList",
+      //   inputtype: "rtselect",
+      //   title: "绿色产业细分列表",
+      //   clearable: true,
+      //   rules: [],
+      //   typeCode: "", //暂时无接口
+      //   params: {},
+      // },
+      // {
+      //   prop: "CAppNme",
+      //   inputtype: "rtselect",
+      //   title: "是否调用智能风控",
+      //   clearable: true,
+      //   typeCode: "", //暂时无接口
+      //   params: {},
+      // },
+      // {
+      //   prop: "cShowDpt",
+      //   inputtype: "rtselect",
+      //   title: "分公司出单配置",
+      //   itemWidth: 2,
+      //   clearable: true,
+      //   typeCode: "BRANCH_ID_LIST", //暂时无接口
+      //   params: {},
+      // },
+      // {
+      //   prop: "cAppNo",
+      //   inputtype: "rtinput",
+      //   title: "申请单号",
+      //   clearable: true,
+      // },
       {
         prop: "cRemark",
         inputtype: "rtinput",
@@ -997,7 +1001,14 @@ const saveProdDataFun = async () => {
   })
 }
 
-
+// 投保规则保存(规则要素配置接口 /saveRuleFactorConfig, 以 cPlanNo 为规则编码)
+const saveInsuranceRules = () => {
+  const ruleRef = insuranceRulesRef.value;
+  if (!ruleRef?.saveRuleConfig) return;
+  const cPlanNo = freeEditRef.value?.getValue("cPlanNo");
+  if (!cPlanNo) return;
+  ruleRef.saveRuleConfig(cPlanNo);
+};
 
 //form表单部分保存
 const saveData = async (call?) => {
@@ -1021,12 +1032,25 @@ const saveData = async (call?) => {
     return;
   }
 
-  setPlanFormValue(result.data.data);
+  // 复制模式下，保存方案成功后，将特约信息绑定到新方案
+  if (pageMode.value === "copy") {
+    const newCPlanNo = result?.data?.data?.cPlanNo || "";
+    const newCPlanCn = result?.data?.data?.cPlanCn || "";
+    // 先绑定特约到新方案（此时 specialList 中还有源方案的特约数据）
+    await specialEditRef.value?.bindSpecialToPlan?.(newCPlanNo, newCPlanCn);
+    // 只回填基本信息表单，特约信息已通过 bindSpecialToPlan 处理
+    freeEditRef.value?.setFormValue(result.data.data);
+  } else {
+    setPlanFormValue(result.data.data);
+  }
 
   const saveCvrgOk = await save();
   if (!saveCvrgOk) {
     return;
   }
+
+  // 保存投保规则
+  saveInsuranceRules();
 
   if (!!call) {
     call();
@@ -1163,6 +1187,7 @@ function applyPageReadonlyState() {
     freeEditRef.value?.setDisabledAll();
     specialEditRef.value?.setDisabledAll();
     opertaor.setDisabledAll();
+    insuranceRulesRef.value?.setDisabledAll?.();
   }
 
   if (pageMode.value === "view" || pageMode.value === "handle") {
@@ -1211,6 +1236,22 @@ onMounted(async() => {
         if (result['code'] === 200 && result?.data?.code === "1") {
           const detailData = getPlanBaseDetail(result);
           setPlanFormValue(detailData)
+          // 机构名称回显：根据 cDptCde 查询机构节点，填充下拉选项
+          if (detailData.cDptCde) {
+            getOrgDptTreeNodeById({ pId: detailData.cDptCde })
+              .then((dptRes: any) => {
+                if (dptRes?.data?.name) {
+                  setFormItem("cDptCde", {
+                    loadData: [
+                      {
+                        label: detailData.cDptCde + "-" + dptRes.data.name,
+                        value: detailData.cDptCde,
+                      },
+                    ],
+                  });
+                }
+              });
+          }
           await initPage({
             ...(getPageRowData() || {}),
             ...detailData,
@@ -1222,6 +1263,9 @@ onMounted(async() => {
               freeEditRef.value?.setValue("cUndrStatus", "0");
             });
           }
+
+          // 查看、编辑、复制模式下，获取方案编号后调用 refreshSpecialList 从后端获取完整的已关联特约数据
+          specialEditRef.value?.refreshSpecialList?.();
 
           // 根据公式计算弹框
           payinfo.value = detailData.cCalcFormula == 3 ? true : false;
@@ -1315,21 +1359,9 @@ defineExpose({
 
 .el-main {
   padding: 0;
-  height: calc(100vh - 45px - 34px);
+  height: calc(100vh - 45px - 44px);
   overflow: hidden;
   overflow-y: auto;
-  .el-aside {
-    width: 180px;
-    transition: width 0.2s ease;
-    .el-affix {
-      height: 100%;
-      background: var(--el-color-primary);
-      position: relative;
-    }
-    &.collapsed {
-      width: 64px;
-    }
-  }
 }
 
 .el-footer {
@@ -1347,71 +1379,5 @@ defineExpose({
 
 .footer .el-button {
   margin-left: 10px;
-}
-
-:deep(.el-anchor) {
-  background: transparent;
-  .el-anchor__list {
-    padding: 20px 10px 64px;
-    .el-anchor__item {
-      margin-bottom: 20px;
-      .el-anchor__link {
-        font-size: 14px;
-        color: #FFF;
-        text-align: center;
-        padding: 0;
-        opacity: 0.6;
-        display: flex;
-        align-items: center;
-        &.isActive{
-          background: var(--el-color-primary);
-          :deep(a) {
-            color: var(--menu-active-text);
-            .iconfont {
-              color: var(--menu-active-text);
-            }
-          }
-        }
-        &:hover {
-          background: var(--menu-hover);
-          :deep(a) {
-            color: var(--el-color-primary);
-            .iconfont {
-              color: var(--el-color-primary);
-            }
-          }
-        }
-        .iconfont {
-          font-size: 1.2rem;
-          color: #FFF;
-          margin-right: 5px;
-        }
-      }
-    }
-  }
-}
-
-.aside-toggle {
-  height: 34px;
-  width: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #fff;
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-}
-
-.anchor-item {
-  display: flex;
-  align-items: center;
-}
-
-.el-aside.collapsed {
-  :deep(.iconfont) {
-    margin-right: 0;
-  }
 }
 </style>

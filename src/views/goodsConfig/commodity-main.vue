@@ -308,20 +308,6 @@ const tableconfig = reactive<AppTableConfig>(
         title: "商品名称",
       },
       {
-        prop: "cPlatformCn",
-        inputtype: "rtinput",
-        title: "平台名称",
-      },
-      {
-        prop: "cIsOpenCommodity",
-        inputtype: "rtselect",
-        title: "是否全国性商品",
-           loadData:[
-          {value: '0',label:'否'},
-          { value: "1",  label: "是" },
-        ]
-      },
-      {
         prop: "cStatus",
         inputtype: "rtselect",
         title: "状态",

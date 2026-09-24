@@ -1446,6 +1446,7 @@ function getFrom() {
 
 const tableconfig = reactive<AppTableConfig>(
   createTableEditConfig({
+    maxHeight: "300px",
     editFlag: true,
     editList: ["cFactorPersent"],
     fromSchema: [

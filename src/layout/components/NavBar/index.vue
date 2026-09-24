@@ -13,10 +13,13 @@
   @apply flex-x-between;
 
   height: $navbar-height;
-  background: var(--el-bg-color);
+  padding: 0 16px 0 8px;
+  background: var(--layout-header-bg);
+  border-bottom: 1px solid var(--layout-border-color);
+  backdrop-filter: blur(12px);
 }
-.navbar-border{
-  background-color: var(--el-bg-color);
-  box-shadow: var(--el-box-shadow-light); /*边框阴影*/
+
+.navbar-border {
+  box-shadow: var(--layout-header-shadow);
 }
 </style>

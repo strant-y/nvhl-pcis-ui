@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { createFreeButtonBase } from "@/shared/button-config";
 import { useValidator } from "@/typings/useValidator";
-import { getPageViewByPage, getProdList, saveProdPages } from "@/api/prod";
+import { getPageViewByPage, getProdInfos, getProdList, saveProdPages } from "@/api/prod";
 import {
   AppGridEditConfig,
   AppGridEditMethod,
@@ -61,6 +61,10 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
           const prodInfoData = prodInfo?.getFromValue();
+          if (!prodInfoData?.cProdNo) {
+            ElMessage.error("产品编码为空,请先保存产品基本信息后操作!");
+            return;
+          }
           const pages = gridEditRef.value?.getTableValue();
           const params = Object.assign(prodInfoData, { pages: pages });
           saveProdPages(params)
@@ -69,6 +73,17 @@ const gridconfig = reactive<AppGridEditConfig>(
               if (200 === code) {
                 ElMessage.success("保存成功");
                 dataparam.getParam()?.onSaved?.(params);
+                // 保存成功后调用 getProdInfos 回显，获取后端生成的 cPkId 等字段
+                getProdInfos({ cProdNo: prodInfoData.cProdNo })
+                  .then((res: any) => {
+                    const { code, data, msg } = res;
+                    if (200 === code) {
+                      gridEditRef.value?.setFormValue(data?.prodComponent);
+                    } else {
+                      ElMessage.error({ message: msg, duration: 1000 });
+                    }
+                  })
+                  .finally(() => {});
               } else {
                 ElMessage.error({ message: msg, duration: 1000 });
               }
@@ -82,9 +97,17 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
           const prodInfoData = prodInfo?.getFromValue();
+          if (!prodInfoData?.cProdNo) {
+            ElMessage.error("产品编码为空,请先保存产品基本信息后操作!");
+            return;
+          }
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
             ElMessage.error({ message: "请选择一行数据", duration: 1000 });
+            return;
+          }
+          if (!r.cPkId) {
+            ElMessage.error({ message: "该页面尚未保存，请先保存后操作", duration: 1000 });
             return;
           }
           dzmodal
@@ -104,9 +127,17 @@ const gridconfig = reactive<AppGridEditConfig>(
         func: function () {
           const prodInfo = opertaor?.getTableRefByKey("prodInfo");
           const prodInfoData = prodInfo?.getFromValue();
+          if (!prodInfoData?.cProdNo) {
+            ElMessage.error("产品编码为空,请先保存产品基本信息后操作!");
+            return;
+          }
           const r = gridEditRef.value?.getSelectRow();
           if (!r) {
             ElMessage.error({ message: "请选择一行数据", duration: 1000 });
+            return;
+          }
+          if (!r.cPkId) {
+            ElMessage.error({ message: "该页面尚未保存，请先保存后操作", duration: 1000 });
             return;
           }
           dzmodal

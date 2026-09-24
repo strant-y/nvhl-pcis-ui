@@ -16,6 +16,7 @@ import { saveProdAudit, getProducts } from "@/api/prod";
 import { dataOpertaor } from "@/store/modules/data-opertaor";
 import { dataParam } from "@/store/modules/dataParam";
 import {idxParamKey, IdxParamProps, useIdxParam} from "@/views/pcis/support/useIdxParam";
+import { closeCurrentTagAndBack } from "@/utils/common";
 
 const dataparam = dataParam();
 const idxParam: IdxParamProps = inject(idxParamKey, useIdxParam());
@@ -48,7 +49,7 @@ const formconfig1 = reactive<AppFreeEditConfig>(
                 const { code, data, msg } = res;
                 if (200 === code) {
                   ElMessage.success("保存成功");
-                  router.push("/prodconfiguration/prod-audit");
+                  closeCurrentTagAndBack("/prodconfiguration/prod-audit");
                 } else {
                   ElMessage.error(msg);
                 }

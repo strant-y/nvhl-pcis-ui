@@ -95,7 +95,7 @@ export function createTableEditConfig(
     showSelection: config.showSelection || false,
     showEdit: config.showEdit || false,
     formconfig: config.formconfig || null,
-    maxHeight: config.maxHeight || '435px',
+    maxHeight: config.maxHeight || '400px',
     rowDbClickFun: config.rowDbClickFun || null,
     stripe: config.stripe,
     border: config.border,

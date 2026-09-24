@@ -29,8 +29,21 @@ export const constantRoutes: RouteRecordRaw[] = [
     path: "/",
     name: "/",
     component: Layout,
-    redirect: "/prodconfiguration/prodFactory",
+    redirect: "/dashboard",
     children: [
+      {
+        path: "dashboard",
+        component: () => import("@/views/dashboard/index.vue"),
+        name: "Dashboard", // 用于 keep-alive, 必须与SFC自动推导或者显示声明的组件name一致
+        // https://cn.vuejs.org/guide/built-ins/keep-alive.html#include-exclude
+        meta: {
+          title: "首页",
+          icon: "homepage",
+          affix: true,
+          keepAlive: false,
+          alwaysShow: false,
+        },
+      },
       {
         path: "prodconfiguration/prodFactory",
         component: () => import("@/views/prodconfiguration/prodFactory.vue"),
@@ -39,7 +52,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: {
           title: "产品管理",
           icon: "homepage",
-          affix: true,
+          affix: false,
           keepAlive: false,
           alwaysShow: false,
         },

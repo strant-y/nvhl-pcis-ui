@@ -4,45 +4,14 @@
     <el-container>
       <el-main>
     <el-container>
-          <el-aside :class="{ collapsed: asideCollapsed }">
-            <template v-for="(pageConfig, v) in formconfig1" :key="v">
-              <el-affix :offset="0">
-                
-                <el-anchor :bound="120" :offset="10" container="#main-container" ref="anchorRef">
-                  <el-anchor-link
-                    v-for="(k, i) in pageConfig?.pageInfo"
-                    :key="i"
-                    :href="`#${k.pageKey}`"
-                  >
-                    <el-tooltip
-                      effect="dark"
-                      :content="k.pageTtile || ''"
-                      placement="top-start"
-                      :disabled="!(asideCollapsed || (k.pageTtile && k.pageTtile.length > 6))"
-                    >
-                      <div class="anchor-item">
-                        <i :class="['icon', 'iconfont', iconMap[k.pageKey]]"></i>
-                        <div v-if="!asideCollapsed" class="icon-title">
-                          <template v-if="k.pageTtile && k.pageTtile.length > 6">
-                            {{ k.pageTtile.substring(0, 6) + "..." }}
-                          </template>
-                          <template v-else>
-                            {{ k.pageTtile }}
-                          </template>
-                        </div>
-                      </div>
-                    </el-tooltip>
-                  </el-anchor-link>
-                </el-anchor>
-                <div class="aside-toggle" @click="toggleAside">
-                  <el-icon>
-                    <Fold v-if="!asideCollapsed" />
-                    <Expand v-else />
-                  </el-icon>
-                </div>
-              </el-affix>
-            </template>
-          </el-aside>
+          <ProdSidebar
+            ref="sidebarRef"
+            :page-configs="formconfig1"
+            :collapsed="asideCollapsed"
+            :icon-map="iconMap"
+            container="#main-container"
+            @toggle="toggleAside"
+          />
           <el-container>
             <el-main id="main-container" style="padding: 10px;">
               <template v-for="(pageConfig, v) in formconfig1" :key="v">
@@ -85,7 +54,7 @@ import { dataParam } from "@/store/modules/dataParam";
 import { createCopyData } from "@/utils/copy";
 import { idxParamKey, IdxParamProps } from "@/views/pcis/support/useIdxParam";
 import { useRoute } from "vue-router";
-import { Expand, Fold } from "@element-plus/icons-vue";
+import ProdSidebar from "./components/ProdSidebar.vue";
 
 const route = useRoute();
 const dataparam = dataParam();
@@ -111,15 +80,15 @@ const formconfig1 = opertaor.getTableConfig();
 // 当前加载的组件索引
 const currentIndex = ref(0);
 const asideCollapsed = ref(false);
-const prodauditConfig = {
-  pageKey: "prodaudit",
-  pageTtile: "产品审核",
-  pageRef: "prodaudit",
+const approvalProgressConfig = {
+  pageKey: "approvalProgress",
+  pageTtile: "审批进度",
+  pageRef: "approvalProgress",
 };
-const approvalFlowConfig = {
-  pageKey: "approvalFlow",
-  pageTtile: "审批流程",
-  pageRef: "approvalFlow",
+const currentApprovalConfig = {
+  pageKey: "currentApproval",
+  pageTtile: "当前审批",
+  pageRef: "currentApprovalFlow",
 };
 
 opertaor.setTableConfig([
@@ -127,15 +96,10 @@ opertaor.setTableConfig([
     groupId: "",
     showGroupId: false,
     pageInfo: {
-      prodaudit: {
-        pageKey: "prodaudit",
-        pageTtile: "产品审核",
-        pageRef: "prodaudit",
-      },
-      approvalFlow: {
-        pageKey: "approvalFlow",
-        pageTtile: "审批流程",
-        pageRef: "approvalFlow",
+      approvalProgress: {
+        pageKey: "approvalProgress",
+        pageTtile: "审批进度",
+        pageRef: "approvalProgress",
       },
       prodInfo: {
         pageKey: "prodInfo",
@@ -162,31 +126,36 @@ opertaor.setTableConfig([
         pageTtile: "页面组件绑定",
         pageRef: "prodComponent",
       },
+      currentApproval: {
+        pageKey: "currentApproval",
+        pageTtile: "当前审批",
+        pageRef: "currentApprovalFlow",
+      },
     },
   },
 ]);
 
-const anchorRef = ref(null);
+const sidebarRef = ref(null);
 onMounted(() => {
   formconfig1.forEach((ele) => {
-    // 产品审核：仅在 approve + 非查看 模式下显示
-    if (param.type !== "approve" || param.editType === "view") {
-      delete ele.pageInfo.prodaudit;
-    } else if (!ele.pageInfo.prodaudit) {
-      ele.pageInfo.prodaudit = { ...prodauditConfig };
-    }
-    // 审批流程：仅在 approve 模式下显示（含查看）
+    // 审批进度：仅在 approve 模式下显示（含查看），置于顶部
     if (param.type !== "approve") {
-      delete ele.pageInfo.approvalFlow;
-    } else if (!ele.pageInfo.approvalFlow) {
-      ele.pageInfo.approvalFlow = { ...approvalFlowConfig };
+      delete ele.pageInfo.approvalProgress;
+    } else if (!ele.pageInfo.approvalProgress) {
+      ele.pageInfo.approvalProgress = { ...approvalProgressConfig };
+    }
+    // 当前审批：仅在 approve 模式下显示（含查看），置于底部
+    if (param.type !== "approve") {
+      delete ele.pageInfo.currentApproval;
+    } else if (!ele.pageInfo.currentApproval) {
+      ele.pageInfo.currentApproval = { ...currentApprovalConfig };
     }
   });
   renderComponents();
   nextTick(() => {
     const keys = Object.keys(formconfig1[0].pageInfo)
     const href = '#' + formconfig1[0].pageInfo[keys[0]]?.pageKey
-    anchorRef.value[0]?.scrollTo(href);
+    sidebarRef.value?.scrollTo(href);
   })
 });
 
@@ -206,7 +175,7 @@ function renderComponents() {
 function loadAfter() {
   if (param.editType === "edit" || param.editType === "copy" || param.editType === "view") {
     nextTick(() => {
-      getProdInfos(param)
+      getProdInfos({...param, cProdNo: param.prodNo})
         .then((res) => {
           const { code, data, msg } = res;
           if (200 === code) {
@@ -334,8 +303,8 @@ function toggleAside() {
 }
 
 const iconMap = {
-  'prodaudit': 'icon-shenhe',
-  'approvalFlow': 'icon-shenhelishi',
+  'approvalProgress': 'icon-shenhelishi',
+  'currentApproval': 'icon-shenhexinxi',
   'prodInfo': 'icon-wenjianban1',
   'relatedMainInsurance': 'icon-zaibaoxinxi',
   'specialAgreement': 'icon-anjiantiaocha',
@@ -346,91 +315,14 @@ const iconMap = {
 <style lang="scss" scoped>
 .el-main {
   padding: 0;
-  height: calc(100vh - 45px - 34px);
+  height: calc(100vh - 45px - 44px);
   overflow: hidden;
   overflow-y: auto;
-  .el-aside {
-    width: 180px;
-    transition: width 0.2s ease;
-    .el-affix {
-      height: 100%;
-      background: var(--el-color-primary);
-      position: relative;
-    }
-    &.collapsed {
-      width: 64px;
-    }
-  }
 }
 
 .dialog-mode {
   .el-main {
     height: calc(78vh - 34px);
-  }
-}
-:deep(.el-anchor) {
-  background: transparent;
-  .el-anchor__list {
-    padding: 20px 10px 64px;
-    .el-anchor__item {
-      margin-bottom: 20px;
-      .el-anchor__link {
-        font-size: 14px;
-        color: #FFF;
-        text-align: center;
-        padding: 0;
-        opacity: 0.6;
-        display: flex;
-        align-items: center;
-        &.isActive{
-          background: var(--el-color-primary);
-          :deep(a) {
-            color: var(--menu-active-text);
-            .iconfont {
-              color: var(--menu-active-text);
-            }
-          }
-        }
-        &:hover {
-          background: var(--menu-hover);
-          :deep(a) {
-            color: var(--el-color-primary);
-            .iconfont {
-              color: var(--el-color-primary);
-            }
-          }
-        }
-        .iconfont {
-          font-size: 1.2rem;
-          color: #FFF;
-          margin-right: 5px;
-        }
-      }
-    }
-  }
-}
-
-.aside-toggle {
-  height: 34px;
-  width: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #fff;
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-}
-
-.anchor-item {
-  display: flex;
-  align-items: center;
-}
-
-.el-aside.collapsed {
-  :deep(.iconfont) {
-    margin-right: 0;
   }
 }
 </style>
